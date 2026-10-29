@@ -1,0 +1,189 @@
+# Sync with your own storage
+
+lines syncs through storage you already have. There's no lines server and no account.
+
+## Cloud drive (desktop apps)
+
+In the Mac (and Windows/Linux) app, Settings → Sync → Cloud drive lists the drives on your computer: iCloud Drive, Google Drive, Proton Drive, Dropbox, OneDrive and Box. Pick one, or any folder. lines keeps your notes in a `lines` folder there, one Markdown file per note (`lines/notes/<note-id>.md`, the same format as a bucket), and the drive's own app carries them to your other computers. Connect lines on each of them to the same drive.
+
+- lines only ever touches its own files in that one folder: `.md` notes and their attachments (or, with end-to-end encryption, `.enc` files and `encryption.json`).
+- macOS asks once for permission to use the drive's folder.
+- If iCloud hasn't downloaded a note to this Mac yet, lines asks it to and picks the note up on the next pass.
+- The drive's app does the uploading, so lines doesn't need to be online, and conflicts are handled just like with a bucket.
+
+On the web and on phones, use a bucket for now; signing in to iCloud, Google Drive and Proton Drive there is on the roadmap.
+
+## S3-compatible bucket
+
+lines can also sync through any S3-compatible object storage you control.
+
+Tested API surface: `ListObjectsV2`, `GetObject`, `PutObject`, `DeleteObject`. Any provider that implements these with AWS Signature V4 should work:
+
+- Cloudflare R2
+- Backblaze B2
+- Amazon S3
+- MinIO, Wasabi, Tigris, DigitalOcean Spaces, Hetzner Object Storage, Garage, …
+
+## How it works
+
+Your notes are always stored on the device first. lines stays instant and works offline, and syncs in the background: about 2 seconds after you stop typing, every minute, when the app regains focus, and when you come back online.
+
+Each note is a Markdown file in the bucket:
+
+```
+<bucket>/<folder>/notes/<note-id>.md
+```
+
+```markdown
+---
+id: 6f1c2a9e-…
+created: 2026-10-28T14:43:00.000Z
+updated: 2026-10-28T15:02:11.000Z
+pinned: false
+trashed: false
+---
+# My note
+
+Plain Markdown, readable by any editor.
+```
+
+On each sync, lines compares every note with what it last exchanged with the bucket (the object's ETag and a hash of its content):
+
+| Situation | What happens |
+| --- | --- |
+| Changed on this device | Uploaded |
+| Changed on another device | Downloaded, including into an open editor |
+| Changed on both | The newer edit wins, and the other is saved as a separate note titled “… (conflicted copy)”. Nothing is lost. |
+| Deleted on one device | Deleted on the others, unless another device edited it in the meantime, in which case the edit wins |
+
+Images and files in notes sit next to them, named after their content and keeping their extension:
+
+```
+<bucket>/<folder>/attachments/<hash>.png
+<bucket>/<folder>/attachments/<hash>.pdf
+```
+
+A note shows an image as `![](../attachments/<hash>.png)` and links a file as `[Report.pdf](../attachments/<hash>.pdf)`, so the folder reads correctly in other Markdown apps too. Since a name always means the same bytes, there's nothing to merge: each sync uploads the attachments your notes use that the bucket lacks, and downloads the ones this device lacks. Every device keeps a copy of every attachment, so large files take room everywhere. One no note uses any more is removed from the device at the next launch, but stays in the bucket for now.
+
+Several devices can share one bucket and folder. To keep separate libraries in one bucket, use different folders.
+
+## End-to-end encryption
+
+Settings → Sync & Data → **Set up encryption…** encrypts notes and attachments on the device before they're uploaded, so the bucket or drive (and whoever runs it) only ever holds files it can't read:
+
+```
+<bucket>/<folder>/encryption.json             the library key, locked with your passphrase
+<bucket>/<folder>/notes/<note-id>.enc         a note, encrypted
+<bucket>/<folder>/attachments/<name>.enc      an attachment, encrypted, under a keyed hash of its name
+```
+
+- Notes and attachments are encrypted with AES-256-GCM under a random library key. Your passphrase only locks that key (PBKDF2-SHA-256, 600,000 iterations), so changing the passphrase doesn't re-upload anything, and devices that already have the key keep syncing.
+- Each file is bound to its name, so one note can't be swapped for another.
+- Attachment names are hidden too: a content hash would show whether a known file is in your library.
+- Still visible: how many notes and attachments there are, their sizes, when they change, and note ids (random).
+
+Turning it on syncs once, uploads everything again encrypted, and removes the plain copies. Every other device stops syncing until you enter the passphrase there (Settings → Sync & Data). Turning it off does the reverse; other devices stop until it's turned off there too. lines never goes back to plain files on its own, since anyone who can change the bucket could make that happen.
+
+If you forget the passphrase, any device that still syncs can set a new one (Change passphrase…), since it already has the key. With no such device left, the encrypted notes can't be recovered; the copies on each device are unaffected.
+
+With encryption on, the bucket no longer holds Markdown other apps can open; Settings → Export still makes a .zip of plain Markdown files.
+
+## Locked notes
+
+A locked note (Lock Note, in its toolbar or menu) is encrypted on its own, whether end-to-end encryption is on or not. Its file keeps the usual front matter, plus a `locked` line, and its Markdown is encrypted:
+
+```markdown
+---
+id: 6f1c2a9e-…
+created: 2026-10-28T14:43:00.000Z
+updated: 2026-10-28T15:02:11.000Z
+pinned: false
+trashed: false
+locked: {"title":"Bank","files":[],"key":{"id":"…","changed":…,"kdf":"PBKDF2-SHA256","iterations":600000,"salt":"…","key":"…"}}
+---
+AWeRtq…
+```
+
+- The Markdown is encrypted with AES-256-GCM under a random key that notes locked with the same password share. Each note carries that key, locked with the password (PBKDF2-SHA-256, 600,000 iterations), so it opens on any device where you type the password. A device that has no password of its own yet takes this one once it's typed.
+- Changing the password locks the same key again, in every note that has it; they sync, and the new password opens them everywhere. "Forgot password" sets a new one for notes you lock from then on; notes already locked still need the old one.
+- Readable: the title, dates, pin and icon, and the names of the images and files it shows. Those images and files themselves aren't encrypted by the lock (end-to-end encryption does encrypt them).
+
+## Setting up a bucket
+
+1. Create a bucket (private, no public access needed).
+2. Create an access key that can only read and write that bucket.
+3. In lines, open the sync button at the bottom of the sidebar, choose your provider, and enter the endpoint, bucket and keys.
+4. **Only for the web app:** add a CORS rule (below). The desktop and mobile apps send requests from native code and don't need CORS.
+
+### Cloudflare R2
+
+- **Endpoint:** `https://<account-id>.r2.cloudflarestorage.com` (shown in the bucket's settings)
+- **Keys:** R2 → *Manage API tokens* → *Create API token* → *Object Read & Write*, scoped to your bucket
+- **Region:** `auto` (filled in for you)
+
+### Backblaze B2
+
+- **Endpoint:** shown on the bucket page, e.g. `https://s3.us-west-004.backblazeb2.com`
+- **Keys:** *Application Keys* → *Add a New Application Key* with *Read and Write* access to your bucket
+- **Region:** taken from the endpoint automatically
+
+### Amazon S3
+
+- **Endpoint:** `https://s3.<region>.amazonaws.com`
+- **Keys:** an IAM user with a policy like:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    { "Effect": "Allow", "Action": "s3:ListBucket", "Resource": "arn:aws:s3:::my-notes" },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::my-notes/*"
+    }
+  ]
+}
+```
+
+## CORS (web app only)
+
+Browsers only let a web page call your bucket if the bucket allows the page's origin. Replace the origin with wherever you host lines, e.g. `https://notes.example.com`.
+
+**Amazon S3, Cloudflare R2, MinIO, and most others** (bucket → CORS settings):
+
+```json
+[
+  {
+    "AllowedOrigins": ["https://notes.example.com"],
+    "AllowedMethods": ["GET", "PUT", "DELETE", "HEAD"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+**Backblaze B2** uses its own rule format. Its web UI only offers download-only rules, so set the rule with the [B2 CLI](https://www.backblaze.com/docs/cloud-storage-command-line-tools):
+
+```json
+[
+  {
+    "corsRuleName": "lines",
+    "allowedOrigins": ["https://notes.example.com"],
+    "allowedOperations": ["s3_get", "s3_head", "s3_put", "s3_delete"],
+    "allowedHeaders": ["*"],
+    "exposeHeaders": ["ETag"],
+    "maxAgeSeconds": 3600
+  }
+]
+```
+
+`ExposeHeaders: ETag` is recommended. Without it sync still works, but it downloads a little more than necessary.
+
+## Security notes
+
+- Credentials are stored on the device: in the browser's local storage for the web app, and in the app's data folder for native apps. Use a key limited to a single bucket, and revoke it if a device is lost.
+- Without end-to-end encryption (above), notes are stored in your bucket unencrypted, protected by your provider's access controls.
+- The app lock (Settings → Privacy) encrypts what's on the device too: notes, attachments, and these credentials.
+- Locking a note replaces its plain copy in the bucket with the encrypted one. A bucket that keeps old versions (S3 versioning, a drive's file history) may still hold the plain one from before.

@@ -1,0 +1,359 @@
+@import "./themes.css";
+
+:root {
+  --font-system: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-serif: ui-serif, "New York", "Iowan Old Style", Charter, "Bitstream Charter", Georgia, Cambria, serif;
+  --font-rounded: ui-rounded, "SF Pro Rounded", Nunito, "Varela Round", var(--font-system);
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --font-ui: var(--font-system);
+  --font-text: var(--font-system);
+
+  /* Defaults; prefs.svelte.ts overrides these with the user's own choices. */
+  --editor-size: 17px;
+  --editor-line-height: 1.65;
+  --paragraph-gap: 1;
+  --heading-space: 1;
+  --title-gap: 4px;
+  --editor-width: 720px;
+  --editor-margin: 40px;
+  --editor-pad-x: var(--editor-margin);
+  --editor-pad-top: 24px;
+  --titlebar-pad-top: 0px;
+  --titlebar-h: calc(52px + var(--titlebar-pad-top));
+
+  /*
+   * Window surfaces. In the Mac app, window opacity (Settings → Appearance) makes them
+   * see-through, with the desktop blurred behind; elsewhere they're always solid.
+   */
+  --window-alpha: 100%;
+  /* Matches CORNER_RADIUS in src-tauri/src/window_style.rs. */
+  --window-radius: 16px;
+  /* The light inner edge macOS gives windows, for see-through ones that lose it. */
+  --window-edge: rgba(255, 255, 255, 0.45);
+  --surface: color-mix(in srgb, var(--bg) var(--window-alpha), transparent);
+  --surface-list: color-mix(in srgb, var(--bg-list) var(--window-alpha), transparent);
+  --surface-sidebar: color-mix(in srgb, var(--bg-sidebar) var(--window-alpha), transparent);
+
+  /* Derived from each theme's base colors (themes.css). */
+  --border: color-mix(in srgb, var(--ink) 8%, transparent);
+  --hover: color-mix(in srgb, var(--ink) 4.5%, transparent);
+  --active: color-mix(in srgb, var(--ink) 7.5%, transparent);
+  --input: color-mix(in srgb, var(--ink) 5%, transparent);
+  --code-bg: color-mix(in srgb, var(--ink) 5%, transparent);
+  --accent-soft: color-mix(in srgb, var(--accent) 35%, transparent);
+  --selection: color-mix(in srgb, var(--accent) 18%, transparent);
+  --tag-bg: color-mix(in srgb, var(--accent) 10%, transparent);
+  --scrollbar: color-mix(in srgb, var(--ink) 20%, transparent);
+  --card-bg: color-mix(in srgb, var(--ink) 2.5%, var(--bg-elevated));
+  --card-border: color-mix(in srgb, var(--ink) 9%, transparent);
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.05);
+  --danger: #dc3e42;
+  --success: #2f9e63;
+  --pin: #f08c00;
+  /* Callouts in notes (`:::info`, `:::warning`…), the same in every theme. */
+  --callout-info: #2f6fdb;
+  --callout-question: #8250df;
+  --callout-warning: #d97706;
+  --callout-error: var(--danger);
+  --callout-decision: #12866f;
+  --callout-tint: 7%;
+  /* Text on an accent-colored button: white on light themes, the background on dark ones. */
+  --on-accent: #ffffff;
+  --disabled-opacity: 0.45;
+  --highlight-base: #ffd60a;
+  --highlight: color-mix(in srgb, var(--highlight-base) 40%, transparent);
+  /* Code block colors; themes with their own syntax palettes override these (themes.css). */
+  --syn-keyword: #cf222e;
+  --syn-string: #0a3069;
+  --syn-number: #0550ae;
+  --syn-comment: #6e7781;
+  --syn-function: #8250df;
+  --syn-type: #953800;
+  --scrim: rgba(0, 0, 0, 0.18);
+  --shadow-drawer: 0 0 40px rgba(0, 0, 0, 0.12);
+  --shadow-dialog: 0 24px 80px rgba(0, 0, 0, 0.25);
+  --shadow-segment: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-menu: 0 10px 32px rgba(0, 0, 0, 0.14), 0 1px 4px rgba(0, 0, 0, 0.06);
+  /* Sliding panes and rows, and popovers opening. */
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-pop: cubic-bezier(0.2, 0.9, 0.3, 1);
+
+  color-scheme: light;
+}
+
+:root[data-scheme="dark"] {
+  --border: color-mix(in srgb, var(--ink) 7%, transparent);
+  --active: color-mix(in srgb, var(--ink) 8%, transparent);
+  --input: color-mix(in srgb, var(--ink) 6%, transparent);
+  --code-bg: color-mix(in srgb, var(--ink) 6%, transparent);
+  --accent-soft: color-mix(in srgb, var(--accent) 40%, transparent);
+  --selection: color-mix(in srgb, var(--accent) 25%, transparent);
+  --tag-bg: color-mix(in srgb, var(--accent) 14%, transparent);
+  --scrollbar: color-mix(in srgb, var(--ink) 22%, transparent);
+  --card-bg: color-mix(in srgb, var(--ink) 4%, var(--bg-elevated));
+  --card-border: color-mix(in srgb, var(--ink) 8%, transparent);
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.22);
+  --danger: #ff6369;
+  --success: #4cc38a;
+  --pin: #f59f00;
+  --callout-info: #6aa2ff;
+  --callout-question: #b48cff;
+  --callout-warning: #f5a524;
+  --callout-decision: #3cc4a4;
+  --callout-tint: 11%;
+  --on-accent: var(--bg);
+  --highlight: color-mix(in srgb, var(--highlight-base) 25%, transparent);
+  --syn-keyword: #ff7b72;
+  --syn-string: #a5d6ff;
+  --syn-number: #79c0ff;
+  --syn-comment: #8b949e;
+  --syn-function: #d2a8ff;
+  --syn-type: #ffa657;
+  --scrim: rgba(0, 0, 0, 0.45);
+  --shadow-drawer: 0 0 40px rgba(0, 0, 0, 0.5);
+  --shadow-dialog: 0 24px 80px rgba(0, 0, 0, 0.55);
+  --shadow-segment: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --window-edge: rgba(255, 255, 255, 0.16);
+  --shadow-menu: 0 10px 32px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3);
+
+  color-scheme: dark;
+}
+
+:root[data-font="serif"] {
+  --font-text: var(--font-serif);
+}
+
+:root[data-font="rounded"] {
+  --font-text: var(--font-rounded);
+}
+
+:root[data-font="mono"] {
+  --font-text: var(--font-mono);
+}
+
+/*
+ * Native macOS window: the traffic lights are centered on the 52px title row
+ * (trafficLightPosition in tauri.conf.json), so whichever pane is leftmost leaves room for them.
+ */
+:root[data-translucent] body {
+  /* The panes paint the window; the page behind them stays clear so the desktop shows through. */
+  background: transparent;
+}
+
+/*
+ * A see-through window loses macOS's rounded corners, so round the page instead. (The window's
+ * shadow follows what's painted, so it rounds too.)
+ */
+:root[data-translucent] #app {
+  border-radius: var(--window-radius);
+  overflow: hidden;
+}
+
+/*
+ * The window's shadow has a dark rim that a normal window softens with a light line just inside
+ * its edge. A see-through window has nothing painted there, so draw that line over everything.
+ */
+:root[data-translucent]:not([data-borderless]) #app::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  border-radius: var(--window-radius);
+  box-shadow: inset 0 0 0 1px var(--window-edge);
+  pointer-events: none;
+}
+
+:root[data-platform="mac-app"] .sidebar .titlebar,
+:root[data-platform="mac-app"] .app:not(.sidebar-open) .note-list .titlebar,
+:root[data-platform="mac-app"] .app[data-layout="narrow"].has-selection .editor-pane .toolbar,
+:root[data-platform="mac-app"] .app.focus .editor-pane .toolbar {
+  padding-left: 92px;
+}
+
+:root[data-platform="mac-app"] .editor-pane .toolbar {
+  transition: padding-left 320ms var(--ease-sheet);
+}
+
+:root[data-platform="mac-app"] .note-list .titlebar {
+  transition: padding-left 320ms var(--ease-sheet);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/*
+ * Where scroll bars are always shown (Windows, Linux, or macOS set to "Always"), keep them slim
+ * with a transparent track so they sit on each theme instead of a gray strip. Overlay scroll
+ * bars on Macs and phones are left alone.
+ */
+:root {
+  scrollbar-color: var(--scrollbar) transparent;
+}
+
+* {
+  scrollbar-width: thin;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+/* The app never scrolls as a whole: no rubber-banding, and no swipe-to-go-back in browsers. */
+html,
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input,
+.cm-content {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+input[type="range"],
+input[type="checkbox"],
+summary {
+  cursor: pointer;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: -2px;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+@media (hover: hover) {
+  .icon-button:hover,
+  .text-button:hover {
+    background: var(--hover);
+    color: var(--text);
+  }
+}
+
+/* While the button's menu is open. */
+.icon-button.open {
+  background: var(--active);
+  color: var(--text);
+}
+
+.icon-button.on {
+  color: var(--accent);
+}
+
+.text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.text-button.danger {
+  color: var(--danger);
+}
+
+/* Lines a text button's label up with the text above it. */
+.text-button.flush {
+  margin-left: -10px;
+}
+
+@media (max-width: 699px) {
+  :root {
+    --editor-pad-x: calc(var(--editor-margin) / 2);
+  }
+}
+
+/* Menus, the icon picker and other panels that float over the app. */
+.popover {
+  position: fixed;
+  z-index: 100;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-menu);
+  outline: none;
+  animation: popover-in 140ms var(--ease-pop);
+}
+
+@keyframes popover-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "lines",
+  "short_name": "lines",
+  "description": "Beautiful, simple, local-first notes.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

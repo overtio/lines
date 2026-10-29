@@ -1,0 +1,852 @@
+/* Live preview styles. Markup is plain text; these classes make it look formatted. */
+
+.cm-lp-h {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.cm-lp-h1 {
+  font-size: 1.75em;
+  padding-top: calc(0.4em * var(--heading-space)) !important;
+  padding-bottom: calc(0.4em * var(--heading-space)) !important;
+}
+
+.cm-lp-h2 {
+  font-size: 1.4em;
+  padding-top: calc(0.6em * var(--heading-space)) !important;
+  padding-bottom: calc(0.35em * var(--heading-space)) !important;
+}
+
+.cm-lp-h3 {
+  font-size: 1.18em;
+  padding-top: calc(0.5em * var(--heading-space)) !important;
+  padding-bottom: calc(0.3em * var(--heading-space)) !important;
+}
+
+.cm-lp-h4,
+.cm-lp-h5,
+.cm-lp-h6 {
+  font-size: 1em;
+  padding-top: calc(0.4em * var(--heading-space)) !important;
+  padding-bottom: calc(0.25em * var(--heading-space)) !important;
+}
+
+/* The note's first line. Its top spacing comes from the top margin instead. */
+.cm-line.cm-lp-title {
+  padding-top: 0 !important;
+  padding-bottom: var(--title-gap) !important;
+}
+
+/* An empty line between paragraphs; its height sets the paragraph spacing. */
+.cm-lp-blank {
+  line-height: calc(var(--editor-line-height) * var(--paragraph-gap));
+}
+
+.cm-lp-h6 {
+  color: var(--text-muted);
+}
+
+.cm-lp-strong {
+  font-weight: 700;
+}
+
+.cm-lp-em {
+  font-style: italic;
+}
+
+.cm-lp-strike,
+.cm-lp-done {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-faint);
+}
+
+.cm-lp-done {
+  color: var(--text-faint);
+}
+
+.cm-lp-highlight {
+  background: var(--highlight);
+  border-radius: 3px;
+  padding: 0.05em 0;
+}
+
+.cm-lp-code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--code-bg);
+  border-radius: 5px;
+  padding: 0.15em 0.35em;
+}
+
+.cm-lp-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-soft);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.cm-lp-tag {
+  color: var(--tag-text);
+  background: var(--tag-bg);
+  border-radius: 6px;
+  padding: 0.1em 0.4em;
+  font-size: 0.92em;
+  font-weight: 500;
+}
+
+/*
+ * List items. The marker (bullet, number or checkbox, with the space after it) is one fixed
+ * width, each nesting level steps in by that much, and wrapped lines line up with the text.
+ */
+.cm-line.cm-lp-li {
+  --li-marker: 1.6em;
+  padding-left: calc(var(--li-depth) * var(--li-marker)) !important;
+  text-indent: calc(-1 * var(--li-marker));
+}
+
+.cm-line.cm-lp-quote.cm-lp-li {
+  padding-left: calc(1em + var(--li-depth) * var(--li-marker)) !important;
+}
+
+/* Widgets and marks inside the line shouldn't inherit the negative indent. */
+.cm-lp-li > * {
+  text-indent: 0;
+}
+
+.cm-lp-bullet,
+.cm-lp-list-marker {
+  display: inline-block;
+  min-width: var(--li-marker);
+  text-indent: 0;
+  /* As tall as text rather than the whole line, so the cursor on an empty item is text-sized. */
+  line-height: normal;
+}
+
+.cm-lp-bullet {
+  padding-left: 0.2em;
+  box-sizing: border-box;
+}
+
+.cm-lp-bullet::before {
+  content: "";
+  display: inline-block;
+  width: 0.36em;
+  height: 0.36em;
+  margin-bottom: 0.18em;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: middle;
+}
+
+/* Second level: a ring. */
+.cm-lp-bullet-1::before {
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+/* Third level: a small square. */
+.cm-lp-bullet-2::before {
+  width: 0.32em;
+  height: 0.32em;
+  border-radius: 1px;
+}
+
+.cm-lp-list-marker {
+  white-space: pre;
+}
+
+.cm-lp-list-number,
+.cm-lp-list-number * {
+  color: var(--accent) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A todo's checkbox, in a slot as wide as other list markers. */
+.cm-lp-task-marker {
+  display: inline-block;
+  min-width: var(--li-marker);
+  text-indent: 0;
+  line-height: normal;
+}
+
+.cm-lp-checkbox {
+  display: inline-grid;
+  place-items: center;
+  width: 1.05em;
+  height: 1.05em;
+  vertical-align: -0.15em;
+  border: 1.5px solid var(--text-faint);
+  border-radius: 0.3em;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.cm-lp-checkbox:hover {
+  border-color: var(--accent);
+}
+
+.cm-lp-checkbox.is-checked {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.cm-lp-checkbox svg {
+  width: 0.72em;
+  height: 0.72em;
+}
+
+.cm-lp-quote {
+  border-left: 3px solid var(--accent-soft);
+  padding-left: 1em !important;
+  color: var(--text-muted);
+}
+
+.cm-lp-hr {
+  display: inline-block;
+  width: 100%;
+  height: 1px;
+  vertical-align: middle;
+  background: var(--border);
+  box-shadow: 0 0 0 0.5px var(--border);
+}
+
+.cm-lp-codeblock {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  line-height: 1.6;
+  background: var(--code-bg);
+  padding: 0 1em !important;
+}
+
+.cm-lp-codeblock-first {
+  position: relative;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding-top: 0.5em !important;
+}
+
+/*
+ * A code block right after another one. The gap is a transparent border the background stops
+ * at; the radii (horizontal / vertical) keep its corners 8px round inside that border.
+ */
+.cm-lp-codeblock-after {
+  border-top: 10px solid transparent;
+  background-clip: padding-box;
+  border-radius: 8px 8px 0 0 / 18px 18px 0 0;
+}
+
+.cm-lp-codeblock-last {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding-bottom: 0.5em !important;
+}
+
+.cm-lp-fence {
+  color: var(--text-faint);
+  font-size: 0.75em;
+}
+
+/*
+ * A table being edited: aligned Markdown. Its rows are as tall as the drawn table's
+ * (0.94em × (1.45 + 2 × 0.4) ≈ 2.115em), so moving in and out of it doesn't shift the note.
+ */
+.cm-lp-table {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  line-height: calc(2.115 / 0.86);
+}
+
+/* The |---|---| row, about as tall as the drawn table's top and bottom space. */
+.cm-lp-table-delim {
+  line-height: 1.2;
+}
+
+/* A table away from the cursor, drawn as one. */
+.cm-lp-table-wrap {
+  --table-line: color-mix(in srgb, var(--ink) 12%, transparent);
+  padding: 0.5em 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.cm-lp-table-grid {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--table-line);
+  border-radius: 8px;
+  font-size: 0.94em;
+  line-height: 1.45;
+  /* Wrap cells between words; a table too wide for the note scrolls sideways instead. */
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.cm-lp-table-grid th,
+.cm-lp-table-grid td {
+  min-width: 3em;
+  padding: 0.4em 0.75em;
+  text-align: left;
+  vertical-align: top;
+  border-right: 1px solid var(--table-line);
+  border-bottom: 1px solid var(--table-line);
+  cursor: text;
+}
+
+.cm-lp-table-grid th {
+  font-weight: 600;
+  background: var(--code-bg);
+}
+
+.cm-lp-table-grid th:first-child {
+  border-top-left-radius: 7px;
+}
+
+.cm-lp-table-grid th:last-child {
+  border-top-right-radius: 7px;
+}
+
+.cm-lp-table-grid tr > :last-child {
+  border-right: none;
+}
+
+.cm-lp-table-grid tr:last-child > * {
+  border-bottom: none;
+}
+
+.cm-lp-table-grid thead:not(:last-child) tr > * {
+  border-bottom: 1px solid var(--table-line);
+}
+
+/* Drag handles (dragBlocks.ts): a grip left of the hovered line or block, and the line where it'll go. */
+.cm-drag-handle {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 24px;
+  border-radius: 5px;
+  color: var(--text-faint);
+  cursor: grab;
+  touch-action: none;
+  animation: cm-drag-handle-in 120ms ease-out;
+}
+
+.cm-drag-handle[hidden] {
+  display: none;
+}
+
+.cm-drag-handle:hover {
+  background: var(--hover);
+  color: var(--text-muted);
+}
+
+@keyframes cm-drag-handle-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.cm-drop-indicator {
+  position: absolute;
+  z-index: 3;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  pointer-events: none;
+}
+
+.cm-drop-indicator[hidden] {
+  display: none;
+}
+
+.cm-line.cm-drag-source {
+  opacity: 0.35;
+}
+
+:root.cm-dragging,
+:root.cm-dragging * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* A Mermaid diagram (mermaid.ts), in place of its code block or below it while it's edited. */
+.cm-lp-diagram {
+  min-height: 3em;
+  padding: 0.75em 0;
+  text-align: center;
+  line-height: normal;
+  cursor: text;
+  transition: opacity 150ms ease;
+}
+
+.cm-lp-diagram.is-preview {
+  border-bottom: 1px dashed var(--border);
+}
+
+.cm-lp-diagram.is-pending {
+  opacity: 0.55;
+}
+
+.cm-lp-diagram > svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.cm-lp-diagram-message {
+  margin: 0;
+  padding: 0.6em 0.9em;
+  border-radius: 8px;
+  background: var(--code-bg);
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  text-align: left;
+  white-space: pre-wrap;
+}
+
+.cm-lp-diagram-message.is-error {
+  color: var(--danger);
+}
+
+.cm-lp-image {
+  display: inline-block;
+  max-width: 100%;
+  max-height: 480px;
+  border-radius: 8px;
+  vertical-align: bottom;
+}
+
+/* An image on a line of its own (attachments.ts). */
+.cm-lp-image-block {
+  padding: 0.35em 0;
+  line-height: 0;
+  cursor: default;
+}
+
+.cm-lp-image-block .cm-lp-image {
+  display: block;
+  /* A hairline edge, so a white screenshot doesn't melt into a light note. */
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.cm-lp-image-block.is-preview {
+  padding-bottom: 0.75em;
+}
+
+/* Its Markdown is selected, as clicking it does: Delete or typing replaces it. */
+.cm-focused .cm-lp-image-block.is-selected .cm-lp-image {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* A file on a line of its own (attachments.ts): a card naming it, double-clicked to open. */
+.cm-lp-file-block {
+  padding: 0.3em 0;
+  line-height: 1.3;
+  cursor: default;
+}
+
+.cm-lp-file-block.is-preview {
+  padding-bottom: 0.6em;
+}
+
+.cm-lp-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+  max-width: min(100%, 26em);
+  padding: 0.55em 1em 0.55em 0.7em;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: var(--card-bg);
+  font-family: var(--font-ui);
+  vertical-align: bottom;
+}
+
+.cm-lp-file-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.1em;
+  height: 2.1em;
+  border-radius: 7px;
+  background: var(--tag-bg);
+  color: var(--accent);
+}
+
+.cm-lp-file-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cm-lp-file-name {
+  overflow: hidden;
+  font-size: 0.88em;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cm-lp-file-meta {
+  color: var(--text-faint);
+  font-size: 0.74em;
+}
+
+.cm-lp-file.is-missing .cm-lp-file-icon {
+  background: var(--input);
+  color: var(--text-faint);
+}
+
+.cm-focused .cm-lp-file-block.is-selected .cm-lp-file {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.cm-lp-image-missing {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14em;
+  min-height: 5em;
+  padding: 0.6em 1em;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text-faint);
+  font-family: var(--font-ui);
+  font-size: 0.8em;
+  line-height: 1.3;
+}
+
+/*
+ * Cards (`::: card` … `:::`). cards.ts draws each card behind its text; the lines inside are
+ * inset from its edges by CARD_PAD (1.4 × the text size) per card they're in.
+ */
+.cm-lp-card-bg {
+  box-sizing: border-box;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  box-shadow: var(--card-shadow);
+}
+
+.cm-line.cm-lp-card,
+.cm-lp-table-wrap.cm-lp-card,
+.cm-lp-diagram.cm-lp-card,
+.cm-lp-block.cm-lp-card {
+  --card-pad: calc(1.4 * var(--editor-size));
+  margin-inline: calc(var(--card-depth) * var(--card-pad));
+  /* Callouts' icon columns too. */
+  margin-left: calc(var(--card-depth) * var(--card-pad) + var(--card-icons, 0) * 1.8 * var(--editor-size));
+}
+
+/* The card's own fence gives it its top space, so a heading at the top doesn't add more. */
+.cm-line.cm-lp-card-top {
+  padding-top: 0 !important;
+}
+
+/* The `:::` lines give the card its top and bottom space, and show only while the cursor is on them. */
+.cm-line.cm-lp-card-fence {
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  line-height: 2.4;
+}
+
+.cm-lp-card-fence:not(.is-active),
+.cm-lp-card-fence:not(.is-active) * {
+  color: transparent !important;
+}
+
+/*
+ * Callouts (`:::info`, `:::warning`…, see cards.ts): a card tinted in its kind's color, with its
+ * icon in a column on the left (CALLOUT_GUTTER wide), level with the first line inside.
+ */
+.cm-lp-callout-info {
+  --callout: var(--callout-info);
+}
+
+.cm-lp-callout-question {
+  --callout: var(--callout-question);
+}
+
+.cm-lp-callout-warning {
+  --callout: var(--callout-warning);
+}
+
+.cm-lp-callout-error {
+  --callout: var(--callout-error);
+}
+
+.cm-lp-callout-decision {
+  --callout: var(--callout-decision);
+}
+
+.cm-lp-card-bg.cm-lp-callout {
+  background: color-mix(in srgb, var(--callout) var(--callout-tint), var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--callout) 24%, transparent);
+  box-shadow: none;
+}
+
+.cm-line.cm-lp-callout-head {
+  position: relative;
+}
+
+.cm-lp-callout-icon {
+  --size: calc(1.2 * var(--editor-size));
+  position: absolute;
+  top: calc(100% + (var(--editor-size) * var(--editor-line-height) - var(--size)) / 2);
+  left: calc(-1.8 * var(--editor-size) - 0.15em);
+  display: grid;
+  place-items: center;
+  width: calc(var(--size) + 0.3em);
+  height: calc(var(--size) + 0.3em);
+  margin: -0.15em 0 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 120ms ease, opacity 120ms ease;
+}
+
+/* Over the fence's hidden text, which would make it transparent too. */
+.cm-line.cm-lp-card-fence .cm-lp-callout-icon,
+.cm-line.cm-lp-card-fence .cm-lp-callout-icon * {
+  color: var(--callout) !important;
+}
+
+.cm-lp-callout-icon .icon {
+  width: var(--size) !important;
+  height: var(--size) !important;
+}
+
+.cm-lp-callout-icon:hover {
+  background: color-mix(in srgb, var(--callout) 14%, transparent);
+}
+
+/* No icon: a faint button for adding one, in the card's edge beside the fence, while it's hovered or edited. */
+.cm-lp-callout-icon.is-empty {
+  --size: calc(0.9 * var(--editor-size));
+  top: 50%;
+  left: calc(-1 * var(--card-pad) / 2);
+  transform: translate(-50%, -50%);
+  margin: 0;
+  opacity: 0;
+}
+
+.cm-lp-callout-head:hover .cm-lp-callout-icon.is-empty,
+.cm-lp-callout-icon.is-empty.is-active {
+  opacity: 0.6;
+}
+
+.cm-lp-callout-head .cm-lp-callout-icon.is-empty:hover {
+  opacity: 1;
+}
+
+/* "Key: Value" lines: hovering the value shows a button after it that copies it. */
+.cm-lp-kv-value {
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+/* Hovering the button marks exactly what it copies. The shadow widens the mark without moving text. */
+.cm-line:has(.cm-lp-copy:hover) .cm-lp-kv-value {
+  background: var(--selection);
+  box-shadow: 0 0 0 2px var(--selection);
+}
+
+.cm-lp-copy {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4em;
+  height: 1.4em;
+  /* Centred on the text (a little above the x-height middle, where caps and digits sit),
+     without making the line any taller. */
+  margin: -0.3em 0 -0.3em 0.3em;
+  padding: 0;
+  vertical-align: middle;
+  position: relative;
+  top: -0.08em;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--text-faint);
+  text-indent: 0;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+
+.cm-line:has(.cm-lp-kv-value:hover, .cm-lp-copy:hover) .cm-lp-copy,
+.cm-lp-copy:focus-visible,
+.cm-lp-copy.is-copied {
+  opacity: 1;
+}
+
+.cm-lp-copy:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.cm-lp-copy > span {
+  display: flex;
+}
+
+.cm-lp-copy-check,
+.cm-lp-copy.is-copied .cm-lp-copy-copy {
+  display: none !important;
+}
+
+.cm-lp-copy.is-copied .cm-lp-copy-check {
+  display: flex !important;
+  color: var(--success);
+}
+
+/* No hover on touch screens, so the button is always there, just quieter. */
+@media (hover: none) {
+  .cm-lp-copy {
+    opacity: 0.6;
+  }
+}
+
+/* The toolbar over selected text (formatting.ts). */
+.cm-tooltip.cm-format-bar {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-menu);
+  animation: cm-format-bar-in 120ms ease-out;
+}
+
+@keyframes cm-format-bar-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
+
+.cm-format-bar button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 100ms ease, color 100ms ease;
+}
+
+.cm-format-bar button:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.cm-format-bar button.is-active {
+  background: var(--tag-bg);
+  color: var(--accent);
+}
+
+@media (pointer: coarse) {
+  .cm-format-bar button {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* A code block's copy button, in its top right corner. Always there, quieter until hovered. */
+.cm-lp-copy.cm-lp-code-copy {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.75;
+}
+
+.cm-lp-copy.cm-lp-code-copy:hover,
+.cm-lp-copy.cm-lp-code-copy.is-copied {
+  opacity: 1;
+}
+
+/* Format, just left of Copy. */
+.cm-lp-copy.cm-lp-code-format {
+  right: 36px;
+}
+
+.cm-lp-copy.cm-lp-code-format.is-busy {
+  opacity: 0.4;
+  cursor: progress;
+}
+
+/* Why it couldn't be formatted, under the button for a few seconds. */
+.cm-lp-copy.cm-lp-code-format[data-error] {
+  opacity: 1;
+  color: var(--danger);
+}
+
+.cm-lp-copy.cm-lp-code-format[data-error]::after {
+  content: attr(data-error);
+  position: absolute;
+  top: calc(100% + 6px);
+  right: -30px;
+  z-index: 5;
+  width: max-content;
+  max-width: 320px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-menu);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  line-height: 1.35;
+  white-space: normal;
+  text-align: left;
+  pointer-events: none;
+}
+
+/* A table cell's copy button (tables.ts puts it in the cell under the pointer): a small chip
+   in the cell's top corner, on the left in right-aligned (number) columns, where the text isn't. */
+.cm-lp-table-grid :is(td, th) {
+  position: relative;
+}
+
+.cm-lp-copy.cm-lp-cell-copy {
+  position: absolute;
+  top: 0.4em;
+  right: 0.3em;
+  margin: 0;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-menu);
+  font-weight: normal;
+  opacity: 1;
+}
+
+.cm-lp-table-grid .is-right > .cm-lp-cell-copy {
+  right: auto;
+  left: 0.3em;
+}
+
+.cm-lp-copy.cm-lp-cell-copy:hover {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.cm-lp-table-grid :is(td, th):has(> .cm-lp-cell-copy:hover) {
+  background: var(--selection);
+}
