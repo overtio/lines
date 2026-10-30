@@ -29,6 +29,23 @@ export function extractTags(body: string): string[] {
   return [...tags].sort();
 }
 
+/** A line of nothing but tags, where another tag can go: `#work #ideas` (in LaTeX, `% #work`). */
+const TAG_LINE = /^(?:#[\p{L}\p{N}_\-/]+[ \t]*)+$/u;
+const LATEX_TAG_LINE = /^%[ \t]*(?:#[\p{L}\p{N}_\-/]+[ \t]*)+$/u;
+
+/**
+ * Adds `#tag` to a note's text, unless it has it: after the tags on its last line if that's a line
+ * of tags, else on a line of its own at the end. A LaTeX note gets it in a comment, which LaTeX ignores.
+ */
+export function addTagIn(body: string, tag: string, latex = false): string {
+  if (extractTags(body).includes(tag)) return body;
+  const text = body.replace(/\s+$/, "");
+  const end = body.slice(text.length);
+  const last = text.slice(text.lastIndexOf("\n") + 1);
+  if (text && (latex ? LATEX_TAG_LINE : TAG_LINE).test(last)) return `${text.replace(/[ \t]+$/, "")} #${tag}${end}`;
+  return `${text}${text ? "\n\n" : ""}${latex ? "% " : ""}#${tag}${end}`;
+}
+
 /**
  * Renames `from` (and tags nested under it) to `to` wherever it appears as a tag in `body`,
  * skipping code just like extractTags does.

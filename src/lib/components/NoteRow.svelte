@@ -8,7 +8,8 @@
   import { lockedNotes } from "../notes/locked.svelte";
   import { isClosed, notes, type Entry } from "../notes/store.svelte";
   import { longPress } from "../longPress";
-  import { copyText, reducedMotion } from "../platform";
+  import { copyText, isApple, reducedMotion } from "../platform";
+  import { deletePicked, pinPicked, restorePicked, tagPicked, trashPicked } from "../notes/picked";
   import { menuPoint } from "../popover";
   import { prefs } from "../prefs.svelte";
   import { typeIcons } from "../notes/tagIcons.svelte";
@@ -18,6 +19,7 @@
   let {
     entry,
     selected,
+    picked,
     tabbable,
     now,
     open,
@@ -25,7 +27,10 @@
     onkeydown,
   }: {
     entry: Entry;
+    /** Its note is the open one. */
     selected: boolean;
+    /** It's among the notes picked to act on together (⌘-click, ⇧-click, ⌘A). */
+    picked: boolean;
     /** Whether Tab lands on this row; the list's other rows are reached with the arrow keys. */
     tabbable: boolean;
     now: Date;
@@ -360,6 +365,11 @@
       return;
     }
     if (offset) return close();
+    // ⌘-click (Ctrl-click elsewhere; on a Mac that's a right-click) picks it along with others,
+    // ⇧-click every note from the last one clicked. A click on its own picks just this one.
+    if (isApple ? event.metaKey : event.ctrlKey) return notes.togglePick(id);
+    if (event.shiftKey) return notes.pickRange(id);
+    notes.clearPicks();
     notes.select(id);
     // Opened from the keyboard (Enter or Space, which click with no pointer: detail 0), the note's
     // text takes focus, ready to read or write. A click leaves focus in the list, for ↑ and ↓.
@@ -387,8 +397,38 @@
     ];
   }
 
+  /** The menu of every picked note, when this is one of them. */
+  function showPickedMenu(x: number, y: number) {
+    const entries = notes.pickedEntries;
+    const trashed = notes.filter.kind === "trash";
+    menuOpen = true;
+    ui.openMenu({
+      x,
+      y,
+      label: t("list.pickedMenu", { count: entries.length }),
+      items: trashed
+        ? [
+            { label: t("list.restore"), icon: "restore", run: restorePicked },
+            "separator",
+            { label: t("list.deleteForever"), icon: "trash", danger: true, run: deletePicked },
+          ]
+        : [
+            entries.some((e) => !e.note.pinned)
+              ? { label: t("list.pin"), icon: "pin", run: pinPicked }
+              : { label: t("list.unpin"), icon: "pin-off", run: pinPicked },
+            { label: t("list.addTag"), icon: "hash", run: () => tagPicked(x, y) },
+            "separator",
+            { label: t("list.trash"), icon: "trash", danger: true, run: trashPicked },
+          ],
+      onclose: () => (menuOpen = false),
+    });
+  }
+
   function showMenu(x: number, y: number) {
     if (offset) close();
+    if (picked && notes.pickedEntries.length > 1) return showPickedMenu(x, y);
+    // A note that isn't picked has its own menu, and the others are let go.
+    notes.clearPicks();
     menuOpen = true;
     ui.openMenu({
       x,
@@ -457,7 +497,7 @@
     <button
       bind:this={item}
       class="item"
-      class:selected
+      class:selected={notes.picked.size ? picked : selected}
       data-id={id}
       tabindex={tabbable ? 0 : -1}
       aria-current={selected}
@@ -475,6 +515,7 @@
       <span class="item-title" class:untitled={!entry.meta.title}>
         {#if icon}<Icon name={icon} size={15} strokeWidth={2} />{/if}
         <span>{entry.meta.title || t("list.untitled")}</span>
+        {#if picked && notes.picked.size}<span class="visually-hidden">, {t("list.picked")}</span>{/if}
       </span>
       {#if entry.meta.excerpt}<span class="excerpt" id="excerpt-{id}" aria-hidden="true">{entry.meta.excerpt}</span>{/if}
       <!-- Said after the title, by name: the icons alone would say nothing. -->

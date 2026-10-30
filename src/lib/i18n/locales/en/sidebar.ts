@@ -11,7 +11,6 @@ export default {
   "sidebar.typeName": "Type name",
   "sidebar.rename": "Rename…",
   "sidebar.changeIcon": "Change Icon…",
-  "sidebar.resetIcon": "Reset Icon",
   "sidebar.syncSettings": "Sync settings",
   "sidebar.saveToFolder": "Save to a folder",
   "sidebar.setUpSync": "Set up sync",
@@ -23,5 +22,9 @@ export default {
   "sidebar.syncedAt": "Synced {date}",
   "sidebar.syncOn": "Sync on",
   "sidebar.lock": "Lock lines",
+  // Above the sync button: that this is an early version, and where its source is.
+  "sidebar.alpha": "Alpha {version}",
+  "sidebar.alphaHint": "lines is in alpha: an early version that changes often and may have bugs. Don’t rely on it for important work yet, and export your notes now and then.",
+  "sidebar.source": "Source on GitHub",
   "sidebar.settings": "Settings",
 };

@@ -85,7 +85,7 @@ Several devices can share one bucket and folder. To keep separate libraries in o
 
 ## End-to-end encryption
 
-Settings → Sync & Data → **Set up encryption…** encrypts notes and attachments on the device before they're uploaded, so the bucket or drive (and whoever runs it) only ever holds files it can't read:
+Settings → Data → **Set up encryption…** encrypts notes and attachments on the device before they're uploaded, so the bucket or drive (and whoever runs it) only ever holds files it can't read:
 
 ```
 <bucket>/<folder>/encryption.json             the library key, locked with your passphrase
@@ -98,7 +98,7 @@ Settings → Sync & Data → **Set up encryption…** encrypts notes and attachm
 - Attachment names are hidden too: a content hash would show whether a known file is in your library.
 - Still visible: how many notes and attachments there are, their sizes, when they change, and note ids (random).
 
-Turning it on syncs once, uploads everything again encrypted, and removes the plain copies. Every other device stops syncing until you enter the passphrase there (Settings → Sync & Data). Turning it off does the reverse; other devices stop until it's turned off there too. lines never goes back to plain files on its own, since anyone who can change the bucket could make that happen.
+Turning it on syncs once, uploads everything again encrypted, and removes the plain copies. Every other device stops syncing until you enter the passphrase there (Settings → Data). Turning it off does the reverse; other devices stop until it's turned off there too. lines never goes back to plain files on its own, since anyone who can change the bucket could make that happen.
 
 If you forget the passphrase, any device that still syncs can set a new one (Change passphrase…), since it already has the key. With no such device left, the encrypted notes can't be recovered; the copies on each device are unaffected.
 
@@ -201,5 +201,5 @@ Browsers only let a web page call your bucket if the bucket allows the page's or
 
 - Credentials are stored on the device: in the browser's local storage for the web app, and in the app's data folder for native apps. Use a key limited to a single bucket, and revoke it if a device is lost.
 - Without end-to-end encryption (above), notes are stored in your bucket unencrypted, protected by your provider's access controls.
-- The app lock (Settings → Privacy) encrypts what's on the device too: notes, attachments, and these credentials.
+- The app lock (Settings → Data) encrypts what's on the device too: notes, attachments, and these credentials.
 - Locking a note replaces its plain copy in the bucket with the encrypted one. A bucket that keeps old versions (S3 versioning, a drive's file history) may still hold the plain one from before.

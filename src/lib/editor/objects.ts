@@ -176,6 +176,11 @@ export function openType(type: string) {
   if (found && !windowLabel().startsWith("note-")) notes.setFilter({ kind: "type", type: found });
 }
 
+/** Lists a tag's notes, as choosing it in the sidebar does. Not in a note's own window, which has no list. */
+export function openTag(tag: string) {
+  if (!windowLabel().startsWith("note-")) notes.setFilter({ kind: "tag", tag });
+}
+
 /** A menu option, with the icon the menu shows before it (null for none). */
 export interface IconCompletion extends Completion {
   icon: IconName | null;

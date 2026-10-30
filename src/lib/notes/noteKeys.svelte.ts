@@ -67,6 +67,11 @@ class NoteKeys {
     return !!this.settings || this.#seen.size > 0;
   }
 
+  /** Reads the settings again, once another window changed them (the main window, for Settings). */
+  refresh() {
+    this.settings = read();
+  }
+
   save(settings: NotesPassword | null) {
     this.settings = settings;
     if (settings) localStorage.setItem(SETTINGS, JSON.stringify(settings));

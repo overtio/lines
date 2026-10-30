@@ -13,7 +13,6 @@ export default {
   "sidebar.typeName": "Nombre del tipo",
   "sidebar.rename": "Renombrar…",
   "sidebar.changeIcon": "Cambiar icono…",
-  "sidebar.resetIcon": "Restablecer icono",
   "sidebar.syncSettings": "Ajustes de sincronización",
   "sidebar.saveToFolder": "Guardar en una carpeta",
   "sidebar.setUpSync": "Configurar la sincronización",
@@ -25,5 +24,8 @@ export default {
   "sidebar.syncedAt": "Sincronizado {date}",
   "sidebar.syncOn": "Sincronización activada",
   "sidebar.lock": "Bloquear lines",
+  "sidebar.alpha": "Alfa {version}",
+  "sidebar.alphaHint": "lines está en fase alfa: una versión temprana que cambia a menudo y puede tener errores. No dependas de ella todavía para trabajo importante, y exporta tus notas de vez en cuando.",
+  "sidebar.source": "Código fuente en GitHub",
   "sidebar.settings": "Ajustes",
 } satisfies Translation<typeof en>;

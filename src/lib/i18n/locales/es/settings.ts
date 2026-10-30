@@ -3,10 +3,9 @@ import type en from "../en/settings";
 
 export default {
   "settings.title": "Ajustes",
-  "settings.tabAppearance": "Apariencia",
+  "settings.tabTheme": "Tema",
   "settings.tabText": "Texto",
-  "settings.tabSync": "Sincronización y datos",
-  "settings.tabPrivacy": "Privacidad",
+  "settings.tabData": "Datos",
   "settings.tabAbout": "Acerca de",
   "settings.close": "Cerrar",
   "settings.sync": "Sincronización",
@@ -137,6 +136,12 @@ export default {
   "settings.resetQuestion":
     "{count, plural, one {¿Eliminar la única nota de este dispositivo y empezar de nuevo con la nota de bienvenida, el recorrido por las funciones y los ejemplos?} other {¿Eliminar las # notas de este dispositivo y empezar de nuevo con la nota de bienvenida, el recorrido por las funciones y los ejemplos?}}",
   "settings.resetConfirm": "Eliminar y restablecer",
+  "settings.startAgain": "Empezar de nuevo",
+  "settings.startAgainText":
+    "Empieza de nuevo con el recorrido por las funciones y los ejemplos, tal como están ahora en este sitio web. Antes se eliminan todas las notas de este navegador, también las bloqueadas y las de la papelera.",
+  "settings.startAgainFolderFirst": "Deja primero de guardar en la carpeta: al empezar de nuevo, también se eliminarían tus notas de la carpeta.",
+  "settings.startAgainQuestion":
+    "{count, plural, one {¿Eliminar la única nota de este navegador y empezar de nuevo con el recorrido por las funciones y los ejemplos?} other {¿Eliminar las # notas de este navegador y empezar de nuevo con el recorrido por las funciones y los ejemplos?}}",
   "settings.cancel": "Cancelar",
   "settings.resetting": "Restableciendo…",
   "settings.resetNotes": "Restablecer las notas predeterminadas…",

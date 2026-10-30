@@ -51,6 +51,10 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.notes", keys: ["ArrowUp", "ArrowDown"], note: "shortcuts.inList" },
       { action: "shortcuts.firstLast", keys: ["Home", "End"], note: "shortcuts.inList" },
       { action: "shortcuts.open", keys: ["Enter"], note: "shortcuts.inList" },
+      { action: "shortcuts.pickOne", keys: ["Mod-click"], note: "shortcuts.inList" },
+      { action: "shortcuts.pickRange", keys: ["Shift-click", "Shift-ArrowUp", "Shift-ArrowDown"], note: "shortcuts.inList" },
+      { action: "shortcuts.pickAll", keys: ["Mod-a"], note: "shortcuts.inList" },
+      { action: "shortcuts.trashPicked", keys: ["Backspace"], note: "shortcuts.inList" },
       { action: "shortcuts.menu", keys: ["Shift-F10"] },
       { action: "shortcuts.openAtCursor", keys: ["Alt-Enter"], note: "shortcuts.inNote" },
       { action: "shortcuts.openLink", keys: ["Mod-click"] },
@@ -133,6 +137,7 @@ function keyName(key: string, on: System): string {
     Escape: "shortcuts.key.escape",
     Home: "shortcuts.key.home",
     End: "shortcuts.key.end",
+    Backspace: "shortcuts.key.backspace",
   };
   if (named[key]) return t(named[key]);
   return key.length === 1 ? key.toUpperCase() : key;
@@ -178,6 +183,7 @@ export function speakKeys(keys: Keys, on: System): string {
     Escape: "shortcuts.key.escape",
     Home: "shortcuts.key.home",
     End: "shortcuts.key.end",
+    Backspace: "shortcuts.key.backspace",
     click: "shortcuts.key.click",
     "/": "shortcuts.key.slash",
     "\\": "shortcuts.key.backslash",

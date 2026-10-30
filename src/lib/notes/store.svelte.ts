@@ -3,7 +3,8 @@ import { isSite } from "../platform";
 import { announce } from "../windows/channel";
 import { noteKeys } from "./noteKeys.svelte";
 import type { SampleSet } from "./samples";
-import { computeMeta, normalizeTag, renameTagIn, renameTypeIn } from "./parse";
+import { SvelteSet } from "svelte/reactivity";
+import { addTagIn, computeMeta, normalizeTag, renameTagIn, renameTypeIn } from "./parse";
 import { nameOf } from "./properties";
 import { IndexedDBStorage, type NoteStorage } from "./storage";
 import type { Filter, Note, NoteFormat, NoteLock, NoteMeta, WrappedKey } from "./types";
@@ -79,8 +80,11 @@ class NotesStore {
   #flushers = new Set<() => void>();
   /** What new notes started as, so one left untouched can be discarded like a blank one. */
   #templates = new Map<string, string>();
-  /** Notes moved to the trash since the last edit, most recent last, for undo. */
-  #trashed: { id: string; pinned: boolean; selected: boolean }[] = [];
+  /** Notes moved to the trash since the last edit, most recent last, for undo; those trashed together share a batch. */
+  #trashed: { id: string; pinned: boolean; selected: boolean; batch: number }[] = [];
+  #batch = 0;
+  /** Where a ⇧-click range starts from: the note last ⌘-clicked, or the open one. */
+  #anchor: string | null = null;
 
   /** Immutable entries: an edit replaces one entry, so unrelated list rows never re-render. */
   entries = $state.raw<Entry[]>([]);
@@ -88,6 +92,11 @@ class NotesStore {
   /** Why notes couldn't be loaded, if they couldn't. */
   loadError = $state<string | null>(null);
   selectedId = $state<string | null>(null);
+  /**
+   * Notes picked in the list to act on together (⌘-click, ⇧-click, ⌘A), the open one among them.
+   * Empty when it's just the open note.
+   */
+  picked = new SvelteSet<string>();
   filter = $state<Filter>({ kind: "all" });
   query = $state("");
   /** A freshly created note that the editor should focus once it opens. */
@@ -250,6 +259,7 @@ class NotesStore {
 
   setFilter(filter: Filter) {
     this.filter = filter;
+    this.clearPicks();
     if (this.selected && !this.visible.some((e) => e.note.id === this.selectedId)) {
       this.select(null);
     }
@@ -282,6 +292,88 @@ class NotesStore {
     // Typing makes the editor's own undo the one ⌘Z should reach.
     this.#trashed = [];
     this.#patch(id, { body, updatedAt: Date.now() });
+  }
+
+  /** The picked notes still in the list, in its order. */
+  get pickedEntries(): Entry[] {
+    return this.picked.size ? this.visible.filter((e) => this.picked.has(e.note.id)) : [];
+  }
+
+  /** ⌘-click: adds the note to the picked ones (with the open one, the first time) and opens it, or takes it out. */
+  togglePick(id: string) {
+    if (!this.picked.size && this.selectedId && this.selectedId !== id && this.visible.some((e) => e.note.id === this.selectedId)) {
+      this.picked.add(this.selectedId);
+    }
+    this.#anchor = id;
+    if (this.picked.has(id)) {
+      this.picked.delete(id);
+      if (this.selectedId === id) this.select(this.pickedEntries.at(-1)?.note.id ?? null);
+    } else {
+      this.picked.add(id);
+      this.select(id);
+    }
+    this.#settlePicks();
+  }
+
+  /** ⇧-click (or ⇧↑, ⇧↓): picks every note from the last one clicked to this one, and opens it. */
+  pickRange(id: string) {
+    const ids = this.visible.map((e) => e.note.id);
+    this.#anchor ??= this.selectedId;
+    const from = ids.indexOf(this.#anchor ?? id);
+    const to = ids.indexOf(id);
+    if (to === -1) return;
+    const start = from === -1 ? to : Math.min(from, to);
+    const end = from === -1 ? to : Math.max(from, to);
+    this.picked.clear();
+    for (const pick of ids.slice(start, end + 1)) this.picked.add(pick);
+    this.select(id);
+    this.#settlePicks();
+  }
+
+  /** ⌘A in the list: every note in it. */
+  pickAll() {
+    for (const { note } of this.visible) this.picked.add(note.id);
+    this.#settlePicks();
+  }
+
+  clearPicks() {
+    this.picked.clear();
+    this.#anchor = null;
+  }
+
+  /** One note picked is just the open note. */
+  #settlePicks() {
+    if (this.picked.size > 1) return;
+    const [only] = this.picked;
+    this.picked.clear();
+    if (only) this.select(only);
+  }
+
+  /** Pins these notes, or unpins them. Like pinning one, it doesn't count as an edit. */
+  setPinned(ids: string[], pinned: boolean) {
+    for (const id of ids) if (this.get(id)) this.#patch(id, { pinned });
+  }
+
+  /** Adds `#tag` to these notes (not locked ones, whose text can't be read here), keeping their dates. */
+  addTag(ids: string[], tag: string) {
+    const target = normalizeTag(tag.replace(/^#/, ""));
+    if (!target) return 0;
+    const only = new Set(ids);
+    return this.#rewrite((body, note) => (only.has(note.id) ? addTagIn(body, target, note.format === "latex") : body));
+  }
+
+  /** Moves these notes to the trash together; ⌘Z brings them all back. */
+  trashMany(ids: string[]) {
+    const batch = ++this.#batch;
+    for (const id of ids) this.trash(id, batch);
+  }
+
+  restoreMany(ids: string[]) {
+    for (const id of ids) this.restore(id);
+  }
+
+  deleteForeverMany(ids: string[]) {
+    return this.#deleteForever(ids);
   }
 
   togglePin(id: string) {
@@ -368,20 +460,25 @@ class NotesStore {
     this.#patch(id, { format: format === "latex" ? "latex" : undefined });
   }
 
-  trash(id: string) {
+  trash(id: string, batch = ++this.#batch) {
     const entry = this.get(id);
     if (!entry || entry.note.trashed) return;
-    this.#trashed.push({ id, pinned: entry.note.pinned, selected: this.selectedId === id });
+    this.#trashed.push({ id, pinned: entry.note.pinned, selected: this.selectedId === id, batch });
+    this.picked.delete(id);
     this.#patch(id, { trashed: true, pinned: false });
     if (this.selectedId === id) this.selectedId = null;
   }
 
-  /** Brings back the note most recently moved to the trash, if nothing was edited since. */
+  /** Brings back the notes most recently moved to the trash (together), if nothing was edited since. */
   undoTrash() {
     for (let last = this.#trashed.pop(); last; last = this.#trashed.pop()) {
-      if (!this.get(last.id)?.note.trashed) continue;
-      this.#patch(last.id, { trashed: false, pinned: last.pinned });
-      if (last.selected && this.filter.kind !== "trash") this.select(last.id);
+      const batch = [last];
+      while (this.#trashed.at(-1)?.batch === last.batch) batch.push(this.#trashed.pop()!);
+      const back = batch.filter((trashed) => this.get(trashed.id)?.note.trashed);
+      if (!back.length) continue;
+      for (const trashed of back) this.#patch(trashed.id, { trashed: false, pinned: trashed.pinned });
+      const open = back.find((trashed) => trashed.selected);
+      if (open && this.filter.kind !== "trash") this.select(open.id);
       return true;
     }
     return false;
@@ -403,6 +500,7 @@ class NotesStore {
     if (!ids.length) return;
     const gone = new Set(ids);
     for (const id of ids) {
+      this.picked.delete(id);
       clearTimeout(this.#pending.get(id));
       this.#pending.delete(id);
       this.#templates.delete(id);
@@ -441,13 +539,16 @@ class NotesStore {
     if (this.filter.kind === "type" && this.filter.type === from) this.filter = { kind: "type", type: target };
   }
 
-  /** Rewrites every note's text with `rewrite` (but locked notes', which aren't listed), saving the ones it changes. */
-  #rewrite(rewrite: (body: string) => string) {
+  /**
+   * Rewrites every note's text with `rewrite` (but locked notes', which aren't listed), saving the
+   * ones it changes. Returns how many it changed.
+   */
+  #rewrite(rewrite: (body: string, note: Note) => string) {
     this.flush();
     const changed: string[] = [];
     this.entries = this.entries.map((entry) => {
       if (entry.note.locked) return entry;
-      const body = rewrite(entry.note.body);
+      const body = rewrite(entry.note.body, entry.note);
       if (body === entry.note.body) return entry;
       changed.push(entry.note.id);
       return entryOf({ ...entry.note, body });
@@ -457,6 +558,7 @@ class NotesStore {
       this.remoteRevision = { id: this.selectedId, n: this.remoteRevision.n + 1 };
     }
     if (changed.length) this.#notify();
+    return changed.length;
   }
 
   /** Called after every local change, e.g. to schedule a sync. */
@@ -489,10 +591,11 @@ class NotesStore {
     await this.flush();
     await this.#deleteForever(this.entries.map((e) => e.note.id));
     const { sampleNotes } = await import("./samples");
-    const welcome: Note = { id: crypto.randomUUID(), body: WELCOME_NOTE, createdAt: 0, updatedAt: 0, pinned: false, trashed: false };
+    // The demo website starts with the tour, whose first note welcomes; elsewhere the welcome note comes first.
+    const welcome: Note[] = isSite ? [] : [{ id: crypto.randomUUID(), body: WELCOME_NOTE, createdAt: 0, updatedAt: 0, pinned: false, trashed: false }];
     const now = Date.now();
     // A second apart, so the list shows them in this order: welcome, tour, examples.
-    const all = [welcome, ...(await sampleNotes("tour")), ...(await sampleNotes("examples"))].map((note, i) => ({
+    const all = [...welcome, ...(await sampleNotes("tour")), ...(await sampleNotes("examples"))].map((note, i) => ({
       ...note,
       createdAt: now - i * 1000,
       updatedAt: now - i * 1000,

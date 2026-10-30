@@ -1,7 +1,7 @@
 import type { IconName } from "./icons/icons";
 
 export type Layout = "wide" | "medium" | "narrow";
-export type SettingsTab = "appearance" | "text" | "sync" | "privacy" | "shortcuts" | "about";
+export type SettingsTab = "theme" | "text" | "data" | "shortcuts" | "about";
 
 export type MenuItem = { label: string; icon?: IconName; danger?: boolean; run: () => void } | "separator";
 
@@ -36,6 +36,15 @@ export interface IconTarget {
   y: number;
 }
 
+/** Notes a tag is being added to (the ones picked in the list), and where its box opens. */
+export interface TagPrompt {
+  ids: string[];
+  x: number;
+  y: number;
+  /** Opened from a button: its right edge lines up with `x`. */
+  align?: "start" | "end";
+}
+
 function layoutFor(width: number): Layout {
   return width >= 1000 ? "wide" : width >= 700 ? "medium" : "narrow";
 }
@@ -51,6 +60,8 @@ class UIState {
   menu = $state.raw<Menu | null>(null);
   /** What an icon is being picked for, and where the picker opens. */
   iconPicker = $state.raw<IconTarget | null>(null);
+  /** Notes a tag is being added to, and where its box opens. */
+  tagPrompt = $state.raw<TagPrompt | null>(null);
   /**
    * The note whose PDF is being previewed, and whether to save (or print) it as soon as it's ready,
    * or to offer its PNG images.

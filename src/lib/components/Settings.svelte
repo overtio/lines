@@ -10,21 +10,25 @@
   import ShortcutsPanel from "./ShortcutsPanel.svelte";
   import SyncPanel from "./SyncPanel.svelte";
   import TextPanel from "./TextPanel.svelte";
+  import { closeSettings } from "../windows/settings.svelte";
 
-  let dialog: HTMLDialogElement;
+  /** Shown as the whole of the Settings window (desktop apps) rather than as a dialog. */
+  let { windowed = false }: { windowed?: boolean } = $props();
+
+  let dialog = $state<HTMLDialogElement>();
   /** What had focus before Settings opened, to give it back on closing. */
   let opener: HTMLElement | null = null;
 
   const tabs: { id: SettingsTab; label: string; icon: IconName }[] = [
-    { id: "appearance", label: t("settings.tabAppearance"), icon: "palette" },
+    { id: "theme", label: t("settings.tabTheme"), icon: "palette" },
     { id: "text", label: t("settings.tabText"), icon: "type" },
-    { id: "sync", label: t("settings.tabSync"), icon: "cloud" },
-    { id: "privacy", label: t("settings.tabPrivacy"), icon: "lock" },
+    { id: "data", label: t("settings.tabData"), icon: "hard-drive" },
     { id: "shortcuts", label: t("shortcuts.tab"), icon: "keyboard" },
     { id: "about", label: t("settings.tabAbout"), icon: "info" },
   ];
 
   $effect(() => {
+    if (!dialog) return;
     if (ui.settings && !dialog.open) {
       opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       dialog.showModal();
@@ -32,6 +36,47 @@
       document.getElementById(`settings-tab-${ui.settings}`)?.focus();
     } else if (!ui.settings && dialog.open) dialog.close();
   });
+
+  let body = $state<HTMLElement>();
+
+  // Each tab starts at its top, not where the last one was scrolled to.
+  $effect(() => {
+    void ui.settings;
+    if (body) body.scrollTop = 0;
+  });
+
+  // The window starts again on the tab it's on (it reloads when lines locks or the language changes).
+  $effect(() => {
+    if (windowed && ui.settings) history.replaceState(null, "", `?tab=${ui.settings}`);
+  });
+
+  /** In the window, Esc or ⌘W (Ctrl+W) closes it, as Esc closes the dialog. */
+  function onWindowKeydown(event: KeyboardEvent) {
+    const closeKey = (event.metaKey || event.ctrlKey) && !event.shiftKey && !event.altKey && event.key.toLowerCase() === "w";
+    if (closeKey || (event.key === "Escape" && !event.defaultPrevented)) {
+      event.preventDefault();
+      void closeSettings();
+    }
+  }
+
+  /** On the backdrop: an event there lands on the dialog itself, outside its box. */
+  function onBackdrop(event: MouseEvent) {
+    if (!dialog || event.target !== dialog) return false;
+    const box = dialog.getBoundingClientRect();
+    return event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom;
+  }
+
+  /** Pressed on the backdrop, so a click there closes Settings (not a selection dragged out of it). */
+  let pressedOutside = false;
+
+  function onpointerdown(event: PointerEvent) {
+    pressedOutside = onBackdrop(event);
+  }
+
+  function onclick(event: MouseEvent) {
+    if (pressedOutside && onBackdrop(event)) ui.settings = null;
+    pressedOutside = false;
+  }
 
   function onclose() {
     ui.settings = null;
@@ -58,7 +103,7 @@
    * it's open, and the Mac app's web view would otherwise send focus nowhere.
    */
   function onDialogKeydown(event: KeyboardEvent) {
-    if (event.key !== "Tab") return;
+    if (event.key !== "Tab" || !dialog) return;
     const stops = [...dialog.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
       (element) => element.tabIndex >= 0 && !(element as HTMLButtonElement).disabled && element.getClientRects().length > 0,
     );
@@ -75,9 +120,10 @@
   }
 </script>
 
-<dialog bind:this={dialog} {onclose} onkeydown={onDialogKeydown} aria-modal="true" aria-labelledby="settings-title">
+{#snippet content()}
   <h2 id="settings-title" class="visually-hidden">{t("settings.title")}</h2>
-  <header>
+  <!-- In the window, the row of tabs is its title bar: drag it (not a tab) to move the window. -->
+  <header data-tauri-drag-region={windowed ? "" : undefined}>
     <div class="tabs" role="tablist" tabindex="-1" onkeydown={onTabKeydown}>
       {#each tabs as tab (tab.id)}
         <button
@@ -94,31 +140,44 @@
         </button>
       {/each}
     </div>
-    <button class="icon-button close" onclick={() => (ui.settings = null)} aria-label={t("settings.close")} title={t("settings.close")}>
-      <Icon name="x" size={18} />
-    </button>
+    {#if !windowed}
+      <button class="icon-button close" onclick={() => (ui.settings = null)} aria-label={t("settings.close")} title={t("settings.close")}>
+        <Icon name="x" size={18} />
+      </button>
+    {/if}
   </header>
 
-  <div class="body" role="tabpanel" id="settings-panel" aria-labelledby="settings-tab-{ui.settings}">
-    {#if ui.settings === "appearance"}
+  <div class="body" bind:this={body} role="tabpanel" id="settings-panel" aria-labelledby="settings-tab-{ui.settings}">
+    {#if ui.settings === "theme"}
       <AppearancePanel />
     {:else if ui.settings === "text"}
       <TextPanel />
-    {:else if ui.settings === "sync"}
-      <section>
-        <h3>{t("settings.sync")}</h3>
+    {:else if ui.settings === "data"}
+      <section aria-labelledby="settings-sync">
+        <h3 id="settings-sync" tabindex="-1">{t("settings.sync")}</h3>
         <SyncPanel />
       </section>
-      <DataPanel />
-    {:else if ui.settings === "privacy"}
       <PrivacyPanel />
+      <DataPanel />
     {:else if ui.settings === "shortcuts"}
       <ShortcutsPanel />
     {:else if ui.settings === "about"}
       <AboutPanel />
     {/if}
   </div>
-</dialog>
+{/snippet}
+
+<svelte:window onkeydown={windowed ? onWindowKeydown : undefined} />
+
+{#if windowed}
+  <main class="window" aria-labelledby="settings-title">
+    {@render content()}
+  </main>
+{:else}
+  <dialog bind:this={dialog} {onclose} {onpointerdown} {onclick} onkeydown={onDialogKeydown} aria-modal="true" aria-labelledby="settings-title">
+    {@render content()}
+  </dialog>
+{/if}
 
 <style>
   dialog {
@@ -139,10 +198,33 @@
   dialog[open] {
     display: flex;
     flex-direction: column;
+    /* Only the panel scrolls, never the dialog around it (a second scrollbar). */
+    overflow: hidden;
   }
 
   dialog::backdrop {
     background: var(--scrim);
+  }
+
+  /* The Settings window: the panels fill it, and only they scroll. */
+  .window {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--bg-elevated);
+    color: var(--text);
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  .window header {
+    padding: 14px 20px 0;
+  }
+
+  /* The Mac app draws its window buttons over the top left corner. */
+  :global([data-platform="mac-app"]) .window header {
+    padding: 14px 20px 0 84px;
   }
 
   header {
@@ -184,6 +266,11 @@
   }
 
   .body {
+    /* Shrinks to the dialog, so it scrolls; positioned, so text hidden for screen readers
+       (position: absolute) scrolls with it rather than stretching the dialog. */
+    flex: 1;
+    min-height: 0;
+    position: relative;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 16px 20px 20px;

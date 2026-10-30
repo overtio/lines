@@ -3,10 +3,9 @@ import type en from "../en/settings";
 
 export default {
   "settings.title": "Réglages",
-  "settings.tabAppearance": "Apparence",
+  "settings.tabTheme": "Thème",
   "settings.tabText": "Texte",
-  "settings.tabSync": "Synchronisation et données",
-  "settings.tabPrivacy": "Confidentialité",
+  "settings.tabData": "Données",
   "settings.tabAbout": "À propos",
   "settings.close": "Fermer",
   "settings.sync": "Synchronisation",
@@ -137,6 +136,12 @@ export default {
   "settings.resetQuestion":
     "{count, plural, one {Supprimer l’unique note de cet appareil et recommencer avec la note de bienvenue, la visite guidée et les exemples ?} other {Supprimer les # notes de cet appareil et recommencer avec la note de bienvenue, la visite guidée et les exemples ?}}",
   "settings.resetConfirm": "Supprimer et réinitialiser",
+  "settings.startAgain": "Recommencer",
+  "settings.startAgainText":
+    "Recommencez avec la visite guidée et les exemples, tels qu’ils sont maintenant sur ce site. Toutes les notes de ce navigateur sont d’abord supprimées, y compris celles qui sont verrouillées ou dans la corbeille.",
+  "settings.startAgainFolderFirst": "Arrêtez d’abord d’enregistrer dans le dossier : recommencer supprimerait aussi vos notes du dossier.",
+  "settings.startAgainQuestion":
+    "{count, plural, one {Supprimer l’unique note de ce navigateur et recommencer avec la visite guidée et les exemples ?} other {Supprimer les # notes de ce navigateur et recommencer avec la visite guidée et les exemples ?}}",
   "settings.cancel": "Annuler",
   "settings.resetting": "Réinitialisation…",
   "settings.resetNotes": "Réinitialiser les notes par défaut…",

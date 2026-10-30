@@ -79,7 +79,7 @@ Paste or drop an image or any other file into a note, or type \`/image\` or \`/f
 
 ## Private by design
 
-Your notes are stored on this device. Sync them through your own cloud drive or S3 bucket, encrypted end to end if you like, from Settings. Lock a note with a password from its toolbar, or lock all of lines from Settings → Privacy.
+Your notes are stored on this device. Sync them through your own cloud drive or S3 bucket, encrypted end to end if you like, from Settings. Lock a note with a password from its toolbar, or lock all of lines from Settings → Data.
 
 ---
 

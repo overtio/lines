@@ -203,6 +203,8 @@ export const windowLookAvailable = isMacApp;
 
 /** This window is a floating note (rather than the main window). */
 const isFloating = windowLabel().startsWith("note-");
+/** This window is Settings (desktop apps), which keeps the usual look: never see-through. */
+const isSettings = windowLabel() === "settings";
 
 /** Letter where it's the usual paper (the Americas mostly), A4 everywhere else. */
 function localPaper(): Paper {
@@ -360,7 +362,7 @@ class Prefs {
   constructor() {
     darkQuery.addEventListener("change", (event) => (this.#systemDark = event.matches));
     contrastQuery.addEventListener("change", (event) => (this.#systemMoreContrast = event.matches));
-    if (!windowLookAvailable) this.#markWindowReady();
+    if (!windowLookAvailable || isSettings) this.#markWindowReady();
     // Apply before the first paint so there's no flash of the default theme.
     this.#apply();
     $effect.root(() => {
@@ -374,7 +376,7 @@ class Prefs {
       // Below 100% opacity the window turns see-through, with the desktop blurred behind it;
       // at 100% it stays a normal Mac window (with the system's rounded corners and border).
       $effect(() => {
-        if (!windowLookAvailable) return;
+        if (!windowLookAvailable || isSettings) return;
         const look = { translucent: this.#translucent, blur: this.#blur, shadow: this.#shadow };
         void import("@tauri-apps/api/core")
           .then(({ invoke }) => invoke("set_window_effects", look))
@@ -419,7 +421,7 @@ class Prefs {
     style.setProperty("--editor-margin", `${s.margin}px`);
     style.setProperty("--editor-pad-top", `${s.top}px`);
     root.style.colorScheme = dark ? "dark" : "light";
-    const opacity = windowLookAvailable ? (isFloating ? this.floatingOpacity : this.windowOpacity) : 1;
+    const opacity = windowLookAvailable && !isSettings ? (isFloating ? this.floatingOpacity : this.windowOpacity) : 1;
     style.setProperty("--window-alpha", `${Math.round(opacity * 100)}%`);
     if (opacity < 1) root.dataset.translucent = "";
     else delete root.dataset.translucent;

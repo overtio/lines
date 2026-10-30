@@ -4,10 +4,10 @@
   import { lock, LOCK_AFTER, touchIdAvailable } from "../lock/lock.svelte";
   import { CLOSE_AFTER, lockedNotes } from "../notes/locked.svelte";
   import { noteKeys } from "../notes/noteKeys.svelte";
-  import { isApple, modKey } from "../platform";
-  import { ui } from "../ui.svelte";
+  import { isApple, modKey, reducedMotion } from "../platform";
   import PassphraseForm from "./PassphraseForm.svelte";
   import Segmented from "./Segmented.svelte";
+  import { closeSettings } from "../windows/settings.svelte";
 
   const id = $props.id();
 
@@ -80,8 +80,15 @@
     }
   }
 
+  /** Sync is at the top of the same tab. */
+  function showSync() {
+    const heading = document.getElementById("settings-sync");
+    heading?.scrollIntoView({ block: "start", behavior: reducedMotion.matches ? "auto" : "smooth" });
+    heading?.focus({ preventScroll: true });
+  }
+
   async function lockNow() {
-    ui.settings = null;
+    void closeSettings();
     await lock.lockNow();
   }
 </script>
@@ -290,7 +297,7 @@
 <section aria-labelledby="{id}-synced">
   <h3 id="{id}-synced">{t("lock.synced.title")}</h3>
   <p class="prose">{t("lock.synced.intro")}</p>
-  <button class="text-button flush" onclick={() => (ui.settings = "sync")}>
+  <button class="text-button flush" onclick={showSync}>
     <Icon name="cloud" size={15} /> {t("lock.synced.open")}
   </button>
 </section>

@@ -1,7 +1,7 @@
 import { isTauri } from "../platform";
 
 /**
- * Messages between the app's windows: the main window and any floating notes. They share one
+ * Messages between the app's windows: the main window, Settings and any floating notes. They share one
  * on-device database, so a message only says what changed; each window reloads it from storage.
  */
 export type WindowMessage =
@@ -26,12 +26,20 @@ export type WindowMessage =
   /** Locked notes were locked again. */
   | { type: "notes-locked" }
   /** A window that just opened asks whether locked notes are open. */
-  | { type: "notes-ask" };
+  | { type: "notes-ask" }
+  /** The Settings window should show this tab (see settings.svelte.ts). */
+  | { type: "settings-tab"; tab: string }
+  /** The Settings window asks the main window to do something, and hears how it went. */
+  | { type: "call"; id: string; target: string; method: string; args: unknown[] }
+  | { type: "reply"; id: string; result?: unknown; error?: string }
+  /** How sync is doing in the main window, and the Settings window asking for it. */
+  | { type: "sync-state"; state: import("./settings.svelte").SyncState }
+  | { type: "sync-ask" };
 
 const EVENT = "lines:window";
 const self = crypto.randomUUID();
 
-/** The Tauri label of this window: "main", or "note-<id>" for a floating note. */
+/** The Tauri label of this window: "main", "settings", or "note-<id>" for a floating note. */
 export function windowLabel(): string {
   if (!isTauri) return "main";
   const internals = (window as unknown as { __TAURI_INTERNALS__?: { metadata?: { currentWindow?: { label?: string } } } })

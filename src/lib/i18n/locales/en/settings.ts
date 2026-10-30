@@ -2,15 +2,14 @@
 export default {
   // The window and its tabs.
   "settings.title": "Settings",
-  "settings.tabAppearance": "Appearance",
+  "settings.tabTheme": "Theme",
   "settings.tabText": "Text",
-  "settings.tabSync": "Sync & Data",
-  "settings.tabPrivacy": "Privacy",
+  "settings.tabData": "Data",
   "settings.tabAbout": "About",
   "settings.close": "Close",
   "settings.sync": "Sync",
 
-  // Appearance.
+  // Theme.
   "settings.language": "Language",
   "settings.languageSystem": "System",
   "settings.languageNote": "lines starts again in the language chosen. System follows your device's language when lines speaks it, and English when it doesn't.",
@@ -124,7 +123,7 @@ export default {
   "settings.loading": "Loading…",
   "settings.noticesFailed": "The notices couldn’t be loaded.",
 
-  // Sync & Data: export.
+  // Data: export.
   "settings.export": "Export",
   // "attachments" is the folder's name in the .zip, so it stays as it is.
   "settings.exportText":
@@ -141,7 +140,7 @@ export default {
   "settings.showInFinder": "Show in Finder",
   "settings.showInFolder": "Show in folder",
 
-  // Sync & Data: sample notes.
+  // Data: sample notes.
   "settings.samples": "Sample notes",
   "settings.samplesText":
     "The feature tour shows what lines can do, a note per feature. The examples are notes written in LaTeX: a short paper, lecture notes and a problem set. The QA notes show everything a note can hold, on its own and combined, with a checklist for testing a release. They’re added alongside your notes.",
@@ -154,7 +153,7 @@ export default {
   "settings.addedExamples": "Added {count, plural, one {# example} other {# examples}}, tagged examples.",
   "settings.addedQa": "Added {count, plural, one {# QA note} other {# QA notes}}, tagged qa.",
 
-  // Sync & Data: starting again, in development builds only.
+  // Data: starting again, in development builds and on the demo website.
   "settings.development": "Development",
   "settings.developmentText":
     "Start again with the welcome note, the feature tour and the examples as they are in this build, to see new or changed sample notes. Every note on this device is deleted first, locked and trashed ones too. Only in development builds.",
@@ -162,6 +161,13 @@ export default {
   "settings.resetQuestion":
     "{count, plural, one {Delete the only note on this device, and start again with the welcome note, the feature tour and the examples?} other {Delete all # notes on this device, and start again with the welcome note, the feature tour and the examples?}}",
   "settings.resetConfirm": "Delete and Reset",
+  // The same, on the demo website.
+  "settings.startAgain": "Start Again",
+  "settings.startAgainText":
+    "Start again with the feature tour and the examples, as they are on this website now. Every note in this browser is deleted first, locked and trashed ones too.",
+  "settings.startAgainFolderFirst": "Stop saving to the folder first: starting again would delete your notes from the folder too.",
+  "settings.startAgainQuestion":
+    "{count, plural, one {Delete the only note in this browser, and start again with the feature tour and the examples?} other {Delete all # notes in this browser, and start again with the feature tour and the examples?}}",
   "settings.cancel": "Cancel",
   "settings.resetting": "Resetting…",
   "settings.resetNotes": "Reset Notes to Defaults…",

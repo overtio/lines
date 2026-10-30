@@ -4,6 +4,7 @@ import "./app.css";
 import { prefs } from "./lib/prefs.svelte";
 import "./lib/editor/editor.css";
 import FloatingNote from "./lib/components/FloatingNote.svelte";
+import Settings from "./lib/components/Settings.svelte";
 import LockedNote from "./lib/components/LockedNote.svelte";
 import LockScreen from "./lib/components/LockScreen.svelte";
 import { lock } from "./lib/lock/lock.svelte";
@@ -15,6 +16,8 @@ import { isMacApp, isTauri } from "./lib/platform";
 import { sync } from "./lib/sync/engine.svelte";
 import { announce, onAnnounce, windowLabel } from "./lib/windows/channel";
 import { canFloat, floatingOpen, restoreFloating } from "./lib/windows/floating";
+import { closeSettings, forwardToMain, initialTab, isSettingsWindow, serveSettings } from "./lib/windows/settings.svelte";
+import { ui } from "./lib/ui.svelte";
 
 if (isMacApp) document.documentElement.dataset.platform = "mac-app";
 
@@ -36,9 +39,10 @@ if (isTauri) {
 
 if (import.meta.env.DEV) Object.assign(window, { lines: { notes, sync, lock, lockedNotes, noteKeys } });
 
-/** A floating note's window is labelled "note-<id>"; everything else is the main window. */
+/** A floating note's window is labelled "note-<id>", Settings' "settings"; the main window "main". */
 const label = windowLabel();
 const floatingId = label.startsWith("note-") ? label.slice("note-".length) : null;
+const isMain = !floatingId && !isSettingsWindow;
 
 // Every window shares one database; this keeps them in step.
 void onAnnounce(async (message) => {
@@ -47,7 +51,7 @@ void onAnnounce(async (message) => {
     await notes.flush();
     location.reload();
   } else if (message.type === "unlocked") {
-    if (lock.locked && floatingId) location.reload();
+    if (lock.locked && !isMain) location.reload();
   } else if (message.type === "activity") {
     lock.active();
   }
@@ -65,7 +69,7 @@ void onAnnounce(async (message) => {
   } else if (message.type === "floating") {
     if (message.open) floatingOpen.add(message.id);
     else floatingOpen.delete(message.id);
-  } else if (message.type === "show" && !floatingId) {
+  } else if (message.type === "show" && isMain) {
     notes.show(message.id);
     if (isTauri) {
       const { getCurrentWindow } = await import("@tauri-apps/api/window");
@@ -78,6 +82,10 @@ void onAnnounce(async (message) => {
 const target = document.getElementById("app")!;
 
 async function start() {
+  if (lock.locked && isSettingsWindow) {
+    // Settings only opens with lines unlocked; locked since, it closes.
+    if (!(await lock.adopt().catch(() => false))) return closeSettings();
+  }
   if (lock.locked) {
     if (floatingId) {
       // Opened with the main window already unlocked, or else wait for it to be (see "unlocked" above).
@@ -91,6 +99,15 @@ async function start() {
   if (floatingId) {
     mount(FloatingNote, { target, props: { id: floatingId } });
     if (lock.enabled) watchActivity();
+  } else if (isSettingsWindow) {
+    ui.settings = initialTab();
+    forwardToMain({ sync, lock, lockedNotes, notes }, sync, () => {
+      lock.refresh();
+      noteKeys.refresh();
+    });
+    mount(Settings, { target, props: { windowed: true } });
+    if (lock.enabled) watchActivity();
+    void closeWithMain();
   } else {
     mount(App, { target });
     if (lock.enabled) lock.watch();
@@ -100,17 +117,34 @@ async function start() {
   // Locked notes open in another window open here too.
   void announce({ type: "notes-ask" });
   // Only the main window syncs; it hears about edits made in floating notes above.
-  if (floatingId || !notes.ready) return;
+  if (!isMain || !notes.ready) return;
   // Before syncing, which may bring in attachments for notes this list doesn't have yet.
   await removeUnusedAttachments(notes.entries.map((e) => e.note)).catch((error) =>
     console.error("lines: couldn't clean up attachments", error),
   );
   await sync.load();
   sync.start();
+  // Settings, in its own window, asks this one to sync, lock and add notes.
+  if (isTauri) {
+    serveSettings({ sync, lock, lockedNotes, notes }, () => ({
+      config: sync.config,
+      status: sync.status,
+      error: sync.error,
+      lastSynced: sync.lastSynced,
+      encryptionIssue: sync.encryptionIssue,
+    }));
+  }
   if (canFloat) restoreFloating();
 }
 
-/** Typing in a floating note keeps the main window from locking for being idle. */
+/** Settings belongs to the main window: closing that closes it too. */
+async function closeWithMain() {
+  const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
+  const main = await WebviewWindow.getByLabel("main");
+  void main?.once("tauri://destroyed", () => void closeSettings());
+}
+
+/** Typing in a floating note (or in Settings) keeps the main window from locking for being idle. */
 function watchActivity() {
   let last = 0;
   const active = () => {

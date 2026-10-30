@@ -22,8 +22,8 @@
   import { isTauri } from "../platform";
   import { sync } from "../sync/engine.svelte";
   import { inferRegion, isFolder, PROVIDERS, type ProviderId } from "../sync/providers";
-  import { ui } from "../ui.svelte";
   import Segmented from "./Segmented.svelte";
+  import { closeSettings } from "../windows/settings.svelte";
 
   const connected = $derived(!!sync.config && !isFolder(sync.config));
   draft ??= { ...(sync.config && !isFolder(sync.config) ? sync.config : empty) };
@@ -86,7 +86,7 @@
     try {
       await sync.test($state.snapshot(form));
       await sync.configure($state.snapshot(form));
-      ui.settings = null;
+      void closeSettings();
     } catch (error) {
       message = { ok: false, text: describe(error) };
     } finally {

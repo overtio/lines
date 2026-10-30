@@ -75,7 +75,6 @@
 
   function showMenu(tag: string, x: number, y: number) {
     menuFor = tag;
-    const custom = tagIcons.get(tag) !== "hash";
     ui.openMenu({
       x,
       y,
@@ -96,7 +95,6 @@
               y,
             }),
         },
-        ...(custom ? [{ label: t("sidebar.resetIcon"), icon: "hash" as const, run: () => tagIcons.set(tag, "hash") }] : []),
       ],
       onclose: () => (menuFor = null),
     });

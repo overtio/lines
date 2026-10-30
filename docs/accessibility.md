@@ -11,8 +11,8 @@ lines aims to work for everyone: with a keyboard alone, with a screen reader (Vo
 - **Announcements.** Changes that happen out of sight are announced: a sync problem, "Copied", a note moved to the trash. `speak()` in `src/lib/a11y.ts` says a message through a polite live region.
 - **Motion.** With reduced motion turned on in the system, slides and swipes don't animate, nor do a dragged block's drop line and its lines sliding into place.
 - **Size.** Targets are at least 24 × 24 px (WCAG 2.2's minimum), 44 × 44 on touch screens. Text sizes are relative, so the system's text size and zoom work; nothing is cut off at 200% zoom.
-- **Contrast.** Settings → Appearance → Contrast → **Increased** (or the system's Increase Contrast, which **System** follows) darkens each theme's grey text, accent and borders: text at least 9:1 against its background, secondary text 7:1 (AAA), faint text (dates, counts, hints), links and tags 4.5:1 (AA), borders 3:1. The colors are worked out for each theme in light and dark (`themes.css`). The standard look keeps its lighter greys, which are below AA for faint text (see [limitations.md](limitations.md)), except in the accessibility themes below. Nothing is told by color alone (a sync problem has its icon and its words, not only red).
-- **Themes for low vision and color blindness.** Settings → Appearance → Theme has a group of its own, Accessibility:
+- **Contrast.** Settings → Theme → Contrast → **Increased** (or the system's Increase Contrast, which **System** follows) darkens each theme's grey text, accent and borders: text at least 9:1 against its background, secondary text 7:1 (AAA), faint text (dates, counts, hints), links and tags 4.5:1 (AA), borders 3:1. The colors are worked out for each theme in light and dark (`themes.css`). The standard look keeps its lighter greys, which are below AA for faint text (see [limitations.md](limitations.md)), except in the accessibility themes below. Nothing is told by color alone (a sync problem has its icon and its words, not only red).
+- **Themes for low vision and color blindness.** Settings → Theme has a group of its own, Accessibility:
   - **High Contrast**: black on white or white on black. Every tier of text (secondary and faint too) is at least 7:1 (AAA) on every surface it sits on: the panes, a hovered or selected row, chips, code, callouts, highlights, selected text. The accent (deep blue in light, cyan in dark) is 7:1 too; borders are 6:1 or more; a chosen segment is ringed rather than shaded. Callout, danger, success and code colors are 4.5:1 or more.
   - **Red-Green Friendly**, for protanopia and deuteranopia (after GitHub's theme for them): built from the Okabe–Ito palette. Nothing relies on red against green: the accent and success are blue, danger is vermillion, and the five callout kinds and the code colors differ in lightness as well as hue.
   - **Blue-Yellow Friendly**, for tritanopia: nothing relies on blue against green or yellow against violet. The accent and danger are red, success is blue.
@@ -32,12 +32,18 @@ The editor is CodeMirror, whose text is real text a screen reader reads, with it
 - An image's resize handle is for a pointer only; from the keyboard, the width is the number after the bar in its Markdown (`![Lake|400](…)`), shown while the cursor is on its line. A diagram's is the same, with its width after the language on its first line (` ```mermaid |400 `).
 - Symbols shown for typed characters (`->` as →, `!=` as ≠) are read as the symbol ("right arrow", "not equal to"), as they look. With the cursor touching one, the typed characters are there to read and edit; Settings → Text turns symbols off for anyone who'd rather hear the characters.
 - Menus (`/`, `\`, `@`) are CodeMirror's autocomplete, a listbox the screen reader follows.
-- Everything a click opens in a note, ⌥↵ opens from the cursor: a link, an attached file, a mention's note (made if it isn't there yet). Buttons drawn in a note (copy, format, a table's controls) are reached with Esc, then Tab, as CodeMirror leaves the editor.
+- Everything a click opens in a note, ⌥↵ opens from the cursor: a link, an attached file, a mention's note (made if it isn't there yet), a tag's notes. Buttons drawn in a note (copy, format, a table's controls) are reached with Esc, then Tab, as CodeMirror leaves the editor.
 - The format toolbar over selected text is a toolbar: Tab into it, ← and → between its buttons, Esc back to the text.
 
 ## Pane edges
 
+- Several notes are picked from the keyboard too: ⇧↑ and ⇧↓ pick the way, ⌘A (Ctrl+A) picks every note, Esc lets them go, ⌫ moves them to the Trash. A picked row says "Selected" after its title, the count is announced as it changes ("3 notes selected"), and so is what's done to them ("Added #work to 3 notes"). The bar above the list is a toolbar of named icon buttons; the Add Tag box is a dialog whose field is a combobox, with its suggestions as a listbox (↑ ↓ to choose, Enter to add).
 - The sidebar's and the note list's right edges are window splitters (`role="separator"` with their width as `aria-valuenow`, named "Sidebar width" and "Note list width"), and Tab stops: ← and → resize by 10 px (⇧ by 50), Home and End go to the narrowest and widest, Enter back to the usual width. Focused or pointed at, the edge shows an accent line (`Highlight` in forced colors).
+
+## Settings
+
+- On the web and on phones and tablets, a modal dialog: Tab stays inside, Esc (or a click outside it) closes it, and focus goes back to what opened it. In the desktop apps, a window of its own: Esc or ⌘W closes it, and the window's own buttons work as in any app.
+- Its tabs are a tablist: ← and → move between them, Home and End go to the first and last. Only the panel scrolls, so the tabs stay in view. The Data tab's "Go to Sync" scrolls up to Sync and moves focus to its heading.
 
 ## Drawings
 

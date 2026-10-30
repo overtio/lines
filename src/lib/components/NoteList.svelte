@@ -14,13 +14,15 @@
 </script>
 
 <script lang="ts">
+  import { untrack } from "svelte";
   import { slide } from "svelte/transition";
   import { speak } from "../a11y";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { typeLabel } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
-  import { newNoteKey, reducedMotion } from "../platform";
+  import { isApple, newNoteKey, reducedMotion } from "../platform";
+  import { deletePicked, pinPicked, restorePicked, tagPicked, trashPicked } from "../notes/picked";
   import { ui } from "../ui.svelte";
   import NoteRow from "./NoteRow.svelte";
 
@@ -63,8 +65,58 @@
   /** The row that's swiped open, if any. */
   let swipedId = $state<string | null>(null);
 
-  /** ↑ and ↓ open the note above or below, Home and End the first and last. */
+  const picked = $derived(notes.pickedEntries);
+  const inTrash = $derived(notes.filter.kind === "trash");
+
+  // A new search lets go of the notes picked in the last one.
+  $effect(() => {
+    void notes.query;
+    untrack(() => notes.clearPicks());
+  });
+
+  // Screen readers hear how many are picked, once picking pauses.
+  $effect(() => {
+    const count = picked.length;
+    if (count < 2) return;
+    const timer = setTimeout(() => speak(t("list.pickedCount", { count })), 400);
+    return () => clearTimeout(timer);
+  });
+
+  /** Focus on the open note's row, or the row Tab lands on, once the list has redrawn. */
+  function focusList() {
+    requestAnimationFrame(() => {
+      const row = list.querySelector<HTMLElement>(`[data-id="${notes.selectedId}"]`) ?? list.querySelector<HTMLElement>('.item[tabindex="0"]');
+      row?.focus({ preventScroll: true });
+    });
+  }
+
+  /**
+   * ↑ and ↓ open the note above or below, Home and End the first and last; with ⇧ they pick every
+   * note on the way. ⌘A picks them all, Esc lets them go, and ⌫ moves the picked notes (or the
+   * open one) to the Trash.
+   */
   function onListKeydown(event: KeyboardEvent) {
+    const mod = isApple ? event.metaKey : event.ctrlKey;
+    if (mod && !event.shiftKey && !event.altKey && event.key.toLowerCase() === "a") {
+      event.preventDefault();
+      notes.pickAll();
+      return;
+    }
+    if (event.key === "Escape" && notes.picked.size) {
+      event.preventDefault();
+      notes.clearPicks();
+      return;
+    }
+    if ((event.key === "Backspace" || event.key === "Delete") && !mod && !inTrash) {
+      event.preventDefault();
+      if (picked.length > 1) trashPicked();
+      else if (notes.selectedId) {
+        notes.trashMany([notes.selectedId]);
+        speak(t("list.didTrash"));
+      }
+      focusList();
+      return;
+    }
     const ids = notes.visible.map((e) => e.note.id);
     const index = ids.indexOf(notes.selectedId ?? "");
     let to: number;
@@ -76,7 +128,11 @@
     event.preventDefault();
     const next = ids[Math.max(0, Math.min(ids.length - 1, to))];
     if (!next) return;
-    notes.select(next);
+    if (event.shiftKey) notes.pickRange(next);
+    else {
+      notes.clearPicks();
+      notes.select(next);
+    }
     list.querySelector<HTMLElement>(`[data-id="${next}"]`)?.focus();
   }
 </script>
@@ -131,6 +187,50 @@
     {/if}
   </div>
 
+  {#if picked.length > 1}
+    <div class="picked-bar" role="toolbar" aria-label={t("list.pickedActions")}>
+      <span class="count">{t("list.pickedCount", { count: picked.length })}</span>
+      {#if inTrash}
+        <button class="icon-button" onclick={restorePicked} aria-label={t("list.restore")} title={t("list.restore")}>
+          <Icon name="restore" size={16} />
+        </button>
+        <button class="icon-button danger" onclick={deletePicked} aria-label={t("list.deleteForever")} title={t("list.deleteForever")}>
+          <Icon name="trash" size={16} />
+        </button>
+      {:else}
+        {@const pin = picked.some((e) => !e.note.pinned)}
+        <button
+          class="icon-button"
+          onclick={(event) => {
+            const box = event.currentTarget.getBoundingClientRect();
+            tagPicked(box.right, box.bottom + 4, "end");
+          }}
+          aria-label={t("list.addTag")}
+          title={t("list.addTag")}
+        >
+          <Icon name="hash" size={16} />
+        </button>
+        <button class="icon-button" onclick={pinPicked} aria-label={pin ? t("list.pin") : t("list.unpin")} title={pin ? t("list.pin") : t("list.unpin")}>
+          <Icon name={pin ? "pin" : "pin-off"} size={16} />
+        </button>
+        <button
+          class="icon-button danger"
+          onclick={() => {
+            trashPicked();
+            focusList();
+          }}
+          aria-label={t("list.trash")}
+          title={t("list.trash")}
+        >
+          <Icon name="trash" size={16} />
+        </button>
+      {/if}
+      <button class="icon-button" onclick={() => notes.clearPicks()} aria-label={t("list.clearPicks")} title={t("list.clearPicks")}>
+        <Icon name="x" size={16} />
+      </button>
+    </div>
+  {/if}
+
   {#if notes.filter.kind === "trash" && notes.visible.length}
     <div class="trash-bar">
       <span>{t("list.trashHint")}</span>
@@ -153,6 +253,7 @@
         {entry}
         {now}
         selected={id === notes.selectedId}
+        picked={notes.picked.has(id)}
         tabbable={id === tabStop}
         open={swipedId === id}
         onswipe={(open) => (swipedId = open ? id : swipedId === id ? null : swipedId)}
@@ -163,6 +264,36 @@
 </section>
 
 <style>
+  /* Several notes picked: how many, and what can be done to them all. */
+  .picked-bar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin: 0 12px 8px;
+    padding: 4px 4px 4px 12px;
+    border-radius: 10px;
+    background: var(--input);
+  }
+
+  .picked-bar .count {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .picked-bar .icon-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .picked-bar .danger {
+    color: var(--danger);
+  }
+
   .note-list {
     display: flex;
     flex-direction: column;

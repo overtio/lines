@@ -31,29 +31,31 @@ lines is inspired by [Bear](https://bear.app): a calm, focused writing space wit
 - **Files.** Attach any other file the same way, or with `/file`. It shows as a card with its name and size and is linked as `[Report.pdf](../attachments/….pdf)`; double-click it to open it in its app (on the web, PDFs, pictures and media open in a tab and other files download). Files sync and export like images.
 - **Slash commands.** Type `/` at the start of a line for headings, todos, lists, quotes, cards, callouts, tables, code blocks, diagrams, math, images, files, drawings, dividers, links, mentions, type tables, properties and today's date. Keep typing to filter (`/to` → Todo). <kbd>Tab</kbd> completes like a shell: it runs the only command left, or fills in as much of the name as the ones left share (`/he` → `/heading`), then moves through them.
 - **Note info.** Words, characters, sentences, paragraphs, reading time and dates, from the ⓘ button, which also switches the note between Markdown and LaTeX.
-- **Export everything.** Settings → Sync & Data saves all notes as Markdown files in a .zip, named after their titles, with their images and files.
+- **Export everything.** Settings → Data saves all notes as Markdown files in a .zip, named after their titles, with their images and files.
 - **PDF.** <kbd>⌘P</kbd> (or Share → Preview as PDF) lays the note out on A4 or Letter pages, black on white whatever the theme: headings, lists, todos, tables, callouts, highlighted code, diagrams and math. Print… prints exactly those pages, or saves them as a PDF from the print dialog. A LaTeX note's pages look like a paper's, with its title, numbered sections, theorems and equations, and references that show their numbers. Save PNG saves those pages as images instead: the whole note as one tall picture, or one per page in a ZIP (Share → Export as PNG… goes straight there). Or have TeX itself typeset a LaTeX note (pdfLaTeX, in WebAssembly): the first time, it downloads TeX (about 125 MB), and Save PDF saves the PDF it makes.
-- **Sample notes.** Settings → Sync & Data adds the feature tour (a note per feature), LaTeX examples (a short paper, lecture notes, a problem set) or the QA notes (see [qa/README.md](qa/README.md)). Development builds can also reset the notes to the welcome note, the tour and the examples as they are in that build.
+- **Sample notes.** Settings → Data adds the feature tour (a note per feature), LaTeX examples (a short paper, lecture notes, a problem set) or the QA notes (see [qa/README.md](qa/README.md)). Development builds can also reset the notes to the welcome note, the tour and the examples as they are in that build, and the demo website to the tour and the examples as they are on it (Data → Start Again).
 - **Share.** The system share sheet where available, copy as Markdown (or LaTeX) or plain text, or download a `.md` (or `.tex`) file on the web.
 - **Fast search** across all your notes.
 - **Pin, trash, restore.** Right-click a note (or long-press on a phone) for a menu, or swipe it: right to pin, left to trash. Swipes work with touch and with two fingers on a trackpad.
+- **Several notes at once.** <kbd>⌘</kbd>-click notes in the list to select them, <kbd>⇧</kbd>-click for a run of them, or <kbd>⌘A</kbd> for all; then add a tag to them, pin them or move them to the Trash together (<kbd>⌫</kbd>), and <kbd>⌘Z</kbd> brings them all back.
 - **Themes.** Sixteen themes (Lines, Graphite, Sepia, Forest, Ocean, Solarized, Nord, Dracula, Catppuccin, Tokyo Night, Gruvbox, Everforest, Ayu, and three for accessibility: High Contrast, Red-Green Friendly and Blue-Yellow Friendly), each with light and dark variants that follow your system or a setting you choose.
 - **Fonts and text size.** System (San Francisco on Apple devices), Serif, Rounded or Mono, with an adjustable text size.
 - **Adjustable spacing.** Line height, paragraph and heading spacing, space below the title, text width and margins. Start from Compact, Default or Relaxed and fine-tune with a live preview.
 - **SF Symbols** in the Mac and iPhone apps, as an alternative to Lucide icons. They're drawn by macOS / iOS at runtime and never bundled, as Apple's license requires.
 - **Floating notes** (desktop apps). Pop any note into its own small window that can stay above everything else. Open as many as you like; they come back when you relaunch, and edits show up everywhere at once.
+- **Settings in its own window** (desktop apps), as in other desktop apps: Theme, Text, Data (sync, locks, export, samples), Shortcuts and About. On the web it opens over the notes, and a click outside closes it.
 - **Focus mode.** Hide the sidebar and note list to see just the note (<kbd>⇧⌘\\</kbd>).
-- **English, Spanish and French.** Settings → Appearance → Language, or follow the system's. Dates and numbers are written the way your device writes them. Adding a language is a folder of messages: see [docs/translations.md](docs/translations.md).
-- **Accessible.** Everything works from the keyboard and with a screen reader, at large text sizes and with reduced motion. Settings → Appearance → Contrast → Increased (or the system's Increase Contrast) darkens grey text, links and borders in every theme to meet WCAG AA. The High Contrast theme keeps all text at 7:1 (AAA) with strong borders; Red-Green Friendly (protanopia, deuteranopia) and Blue-Yellow Friendly (tritanopia) keep callouts, warnings and code colors apart for color blindness. In Windows' contrast themes (forced colors), selection, focus and chips are drawn in the system's colors. See [docs/accessibility.md](docs/accessibility.md).
+- **English, Spanish and French.** Settings → Theme → Language, or follow the system's. Dates and numbers are written the way your device writes them. Adding a language is a folder of messages: see [docs/translations.md](docs/translations.md).
+- **Accessible.** Everything works from the keyboard and with a screen reader, at large text sizes and with reduced motion. Settings → Theme → Contrast → Increased (or the system's Increase Contrast) darkens grey text, links and borders in every theme to meet WCAG AA. The High Contrast theme keeps all text at 7:1 (AAA) with strong borders; Red-Green Friendly (protanopia, deuteranopia) and Blue-Yellow Friendly (tritanopia) keep callouts, warnings and code colors apart for color blindness. In Windows' contrast themes (forced colors), selection, focus and chips are drawn in the system's colors. See [docs/accessibility.md](docs/accessibility.md).
 - **See-through windows** (Mac app). Adjustable opacity and background blur for the main window and floating notes.
 - **Responsive.** Three columns on desktop, a drawer on tablets, a navigation stack on phones. Drag the sidebar's or the note list's edge to make it wider or narrower (double-click it for the usual width); lines remembers.
 - **Local-first.** Notes live on your device and work offline. No account, no server.
-- **Save to a folder** (web, in Chrome and Edge). Settings → Sync & Data → Folder: pick a folder, and lines writes your notes there as `.md` files and keeps them up to date, both ways.
+- **Save to a folder** (web, in Chrome and Edge). Settings → Data → Folder: pick a folder, and lines writes your notes there as `.md` files and keeps them up to date, both ways.
 - **Sync through your cloud drive** (desktop apps). iCloud Drive, Google Drive, Proton Drive, Dropbox, OneDrive or any folder: lines writes your notes there as `.md` files and the drive's own app syncs them.
 - **Sync with your own storage.** Bring any S3-compatible bucket (Cloudflare R2, Backblaze B2, Amazon S3, MinIO, …). Notes are stored there as plain `.md` files, and conflicts never lose an edit. See [docs/sync.md](docs/sync.md).
-- **End-to-end encryption** (optional). Settings → Sync & Data → Set up encryption: notes and attachments are encrypted on your device (AES-256-GCM, key from your passphrase) before they reach the bucket or drive, which only ever sees unreadable files. Your other devices ask for the passphrase once.
+- **End-to-end encryption** (optional). Settings → Data → Set up encryption: notes and attachments are encrypted on your device (AES-256-GCM, key from your passphrase) before they reach the bucket or drive, which only ever sees unreadable files. Your other devices ask for the passphrase once.
 - **Locked notes.** Lock a note from its toolbar or menu (Lock Note), like in Apple Notes: one password (or Touch ID on the Mac) opens them all, until you lock them again or after 5 minutes without use. A locked note is encrypted on the device and wherever it syncs, with or without end-to-end encryption; its title stays readable so the list can show it.
-- **App lock** (optional). Settings → Privacy: notes, attachments and sync settings on the device are encrypted, and lines asks for your passphrase (or Touch ID on the Mac) when it opens and after a while without use. Lock it any time with the lock button or <kbd>⌃⌘L</kbd>.
+- **App lock** (optional). Settings → Data: notes, attachments and sync settings on the device are encrypted, and lines asks for your passphrase (or Touch ID on the Mac) when it opens and after a while without use. Lock it any time with the lock button or <kbd>⌃⌘L</kbd>.
 
 ## Keyboard shortcuts
 
@@ -74,8 +76,9 @@ Settings → Shortcuts (<kbd>⌘/</kbd>, <kbd>Ctrl+/</kbd> on Windows and Linux)
 | <kbd>⌘/</kbd> | Keyboard shortcuts |
 | <kbd>⌘P</kbd> | Preview the note as a PDF; in the preview, print or save it |
 | <kbd>↵</kbd> on a note in the list | Open it and move into its text |
-| <kbd>⌘-click</kbd> | Open link, mention or file |
-| <kbd>⌥↵</kbd> | Open the link, mention or file the cursor is on (<kbd>Alt+Enter</kbd> on Windows and Linux); on a mention of a note that isn't there yet, make it |
+| <kbd>⌘-click</kbd>, <kbd>⇧-click</kbd>, <kbd>⌘A</kbd> in the list | Select several notes (<kbd>⌫</kbd> moves them to the Trash) |
+| <kbd>⌘-click</kbd> | Open link, mention, tag or file |
+| <kbd>⌥↵</kbd> | Open the link, mention, tag or file the cursor is on (<kbd>Alt+Enter</kbd> on Windows and Linux); on a mention of a note that isn't there yet, make it |
 | <kbd>⌃⌘L</kbd> | Lock lines, when the app lock is on (<kbd>Ctrl+Alt+L</kbd> on Windows and Linux) |
 
 On Windows and Linux, use <kbd>Ctrl</kbd> instead of <kbd>⌘</kbd>.
@@ -207,6 +210,7 @@ src/
       tour/                  The feature tour: the demo website's first notes
       examples/              Notes written in LaTeX: a paper, lecture notes, a problem set
     components/              Sidebar, tag tree, note list, settings
+    windows/                 Floating notes, the Settings window, and messages between windows
   themes.css                 Theme colors (light and dark for each)
 src-tauri/                   Native shell (Rust); sf_symbols.rs draws SF Symbols, lock.rs shares the
                              unlocked key with floating notes and does Touch ID

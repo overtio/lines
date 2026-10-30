@@ -10,10 +10,10 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 0. Setup
 
-- [ ] Start from a fresh profile (a new browser profile, or Settings → Privacy → erase in the app), so first-launch behaviour can be checked
+- [ ] Start from a fresh profile (a new browser profile, or Settings → Data → erase in the app), so first-launch behaviour can be checked
 - [ ] A fresh start shows one note, **Welcome to lines** (the demo website: the feature tour instead), and everything in it renders
-- [ ] Settings → Sync & Data → **Add QA Notes**: the QA notes are added, tagged qa, and the list switches to that tag
-- [ ] Settings → Sync & Data → **Add Feature Tour**: the tour notes are added, with the picture and the CSV file working
+- [ ] Settings → Data → **Add QA Notes**: the QA notes are added, tagged qa, and the list switches to that tag
+- [ ] Settings → Data → **Add Feature Tour**: the tour notes are added, with the picture and the CSV file working
 - [ ] Look through every QA note (qa tag in the sidebar) in light and dark, and at phone width; each says what to check at the top
 
 ## 1. Typing and live Markdown
@@ -24,7 +24,8 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Enter in a list, todo or quote continues it; Enter on an empty item ends it
 - [ ] Markdown of a line shows when the cursor is on it and hides when it leaves; with the editor unfocused everything is rendered
 - [ ] Headings, links, autolinks, tags, quotes, rules, bullets (dot, ring, square by depth) and numbers render correctly
-- [ ] A tag shows a hash icon in place of its `#`, a little apart from its name, inside its pill; with the cursor on the tag the `#` shows. A screen reader still reads "#"
+- [ ] A tag shows its sidebar icon (a hash unless one was chosen) in place of its `#`, a little apart from its name, inside its pill; with the cursor on the tag the `#` shows. Choosing another icon for the tag in the sidebar changes it in the open note at once. A screen reader still reads "#"
+- [ ] ⌘-click (Ctrl-click) on a tag lists its notes, as choosing it in the sidebar does, and selects it there; a plain click puts the cursor in it; ⌥↵ with the cursor on a tag does the same as ⌘-click; a tap on a phone while not editing opens it too; in a note's own window nothing happens
 - [ ] Typing `#` at the start of a line leaves it as text, not a big heading; a space after it (`# `) makes the heading, and a letter (`#t`) a tag
 - [ ] Clicking a checkbox ticks it; not in a trashed note
 - [ ] ⌘-click a link opens it (system browser in the apps, new tab on the web); only http, https, mailto and tel open
@@ -162,20 +163,26 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] A note with properties shows the line after them as its title, and an excerpt without them
 - [ ] ↑ and ↓ move between notes when the list has focus
 - [ ] [Touch] Swiping right pins (restores in Trash), left trashes (in Trash, needs a tap to delete); a long swipe does the action; one row open at a time
-- [ ] [Desktop] Two-finger trackpad swipes do the same; Settings → Appearance → Trackpad reverses them
+- [ ] [Desktop] Two-finger trackpad swipes do the same; Settings → Theme → Trackpad reverses them
 - [ ] Right-click (long-press [Touch], context-menu key, ⇧F10) opens the menu: Pin, Floating Window [Desktop], Icon, Lock items, Copy Text, Move to Trash / Delete Forever
 - [ ] ⌘Z right after trashing a note brings it back
+- [ ] ⌘-click (Ctrl-click on Windows and Linux) picks a note along with the open one, and again takes it out; ⇧-click picks every note from the last one clicked; ⌘A with a row focused picks every note in the list; ⇧↑ and ⇧↓ pick the way from the keyboard; a plain click, or Esc, picks just the one again
+- [ ] With two or more picked, they're highlighted and the bar above the list says how many ("3 notes selected"), with Add Tag, Pin to Top (Unpin when they all are), Move to Trash and × (in Trash: Restore and Delete Forever); right-clicking a picked note opens the same as a menu named "3 notes"; right-clicking another note lets the others go
+- [ ] Add Tag… opens a box with the tags in use as suggestions (↑ ↓ and Enter choose one, Tab fills it in to nest under it); Add puts the tag on the last line if that's a line of tags, else on a line of its own at the end, in a LaTeX note as `% #tag`; notes that have it already, and locked notes, are left as they are; the notes keep their dates; a screen reader hears "Added #tag to 3 notes"
+- [ ] ⌫ (Delete) with a row focused moves the picked notes, or the open one, to the Trash, and focus stays in the list; ⌘Z brings them all back at once, pinned as they were
+- [ ] Changing the filter (a tag, Trash) or the search lets the picked notes go
 - [ ] Trash shows "Notes in the trash can be restored." and Empty Trash; empty states read right
 
 ## 11. Sidebar, tags and search
 
+- [ ] Above the sync button: "Alpha 0.1.0" (the version in package.json), with a tooltip saying it's an early version; the GitHub mark opens github.com/overtio/lines (in the browser, from the apps); screen readers hear the explanation and "Source on GitHub"
 - [ ] Notes, Todo, Untagged and Trash filter the list, with counts
 - [ ] Tags show as a tree with counts; the chevron expands nested tags; clicking filters to the tag and those under it
 - [ ] Rename… renames a tag in every note (not inside code, not in locked notes), keeps its icon, and the filter follows
-- [ ] Change Icon… and Reset Icon work for tags
+- [ ] Change Icon… works for tags, and Reset in its picker goes back to the hash; the menu has no separate Reset Icon
 - [ ] Types list each `type:` with a count and icon (`person` starts as a person, an unknown type as shapes); clicking filters to its notes, and the list's title is the type
 - [ ] Right-click a type → Rename… edits its name in place (Enter keeps it, Esc doesn't): every note of it gets the new `type`, every `@type.…` of it the new name (keeping its columns; not in code), the icon and the list's filter follow, and notes keep their dates; renaming onto another type merges them
-- [ ] Right-click (long-press [Touch]) a type: Change Icon… and Reset Icon; the icon changes in the sidebar, on the type's notes in the list, and on mentions of them in an open note
+- [ ] Right-click (long-press [Touch]) a type: Change Icon… (Reset in its picker goes back to the usual icon); the icon changes in the sidebar, on the type's notes in the list, and on mentions of them in an open note
 - [ ] Search finds notes by their property values
 - [ ] ⌘⇧F focuses search (leaving focus mode, or going back to the list on a phone); every word must match; Esc clears
 - [ ] Locked notes are found only by their title
@@ -189,12 +196,18 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 13. Settings
 
+- [ ] The tabs are Theme, Text, Data, Shortcuts and About; Data has Sync, App lock, Locked notes, Synced notes (its Go to Sync button scrolls up to Sync and focuses it), Export and Sample notes
 - [ ] ← and → move between tabs; Esc closes; every change applies at once, in every window
+- [ ] Only the panel scrolls, with one scrollbar, in every tab (Shortcuts too, all the way to the end); the tabs stay put
+- [ ] [Web] A click outside Settings closes it; a click inside, or selecting text and letting go outside, doesn't
+- [ ] [Desktop] Settings opens in its own window (the sidebar's gear, the sync button, ⌘/): one at a time, brought forward if it's open, on the tab asked for; it can be moved (by the row of tabs on the Mac), resized and minimized; Esc, ⌘W or the window's close button closes it; closing the main window closes it too
+- [ ] [Desktop] In the Settings window: themes and text settings change the main window and floating notes at once; connecting sync, setting up encryption, Sync Now and the sync status work as in the main window; the app lock turns on and off (Settings stays open, unlocked), Lock Now locks lines and closes Settings; locked notes' password, Touch ID and reset work; Add Feature Tour adds the notes to the main window's list and shows them there; Export saves every note
+- [ ] [Desktop] With the app lock on, lines locking for being idle closes Settings; using Settings counts as using lines
 - [ ] Shortcuts (also ⌘/ or Ctrl+/, even with the cursor in a note): every shortcut, grouped; shown the Mac way on a Mac (⌘⇧F, ⌃⌘L) and as Ctrl+Shift+F, Ctrl+Alt+L elsewhere, with the switch showing the other system's; new note is ⌘N (Ctrl+N) in the apps and ⌥N (Alt+N) on the web; Close a floating note only in the desktop apps; each shortcut listed does what it says; VoiceOver reads the keys in words ("Shift Command F")
 - [ ] The tabs fit on one row in English, and wrap rather than being cut off in French and Spanish
-- [ ] Appearance → Language: English, Español, Français and System; choosing one saves what's being typed and starts lines again in it, in every window (floating notes too); System follows the device (English when lines doesn't speak it); dates follow it (24-hour clock in French)
-- [ ] Appearance: each of the 16 themes in light and dark; System follows the OS live
-- [ ] Appearance: the Accessibility group (High Contrast, Red-Green Friendly, Blue-Yellow Friendly) sits below the other themes with its heading and note; Tab stops once on the theme picker and the arrow keys move through every theme, across both groups
+- [ ] Theme → Language: English, Español, Français and System; choosing one saves what's being typed and starts lines again in it, in every window (floating notes too); System follows the device (English when lines doesn't speak it); dates follow it (24-hour clock in French)
+- [ ] Theme: each of the 16 themes in light and dark; System follows the OS live
+- [ ] Theme: the Accessibility group (High Contrast, Red-Green Friendly, Blue-Yellow Friendly) sits below the other themes with its heading and note; Tab stops once on the theme picker and the arrow keys move through every theme, across both groups
 - [ ] High Contrast, light and dark: pure white or black, text black or white, borders clearly visible, the chosen segment ringed; a note with a callout of each kind, code, a tag, a mention, a highlight and a done todo reads clearly; the selected row's date stays readable
 - [ ] Red-Green Friendly and Blue-Yellow Friendly, light and dark: the same note; callout kinds, danger (Delete, errors) and success are told apart, and look apart in Chrome DevTools → Rendering → Emulate vision deficiencies (protanopia and deuteranopia for Red-Green, tritanopia for Blue-Yellow)
 - [ ] Icons: Lucide and SF Symbols [Mac]; on the web SF Symbols is disabled with a note
@@ -309,7 +322,8 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] The list shows the title and excerpt without commands; `% #tag` tags the note; note info counts the words as they read
 - [ ] A LaTeX note syncs to another device as LaTeX (`format: latex` in its file)
 - [ ] Each of the LaTeX examples (Settings → Add LaTeX Examples) draws with no red math: the paper's preamble folds into its title and authors, clicking it shows the LaTeX; theorems are numbered (Lemma 1, Theorem 2), the proof ends with ∎, citations and references are chips, the bibliography is headed References
-- [ ] [Dev] Settings → Sync & Data → Reset Notes to Defaults… asks in the panel (Delete and Reset, or Cancel), then leaves only the welcome note, the tour and the examples; it works in the Mac app; it's disabled while sync is on, and missing from release builds
+- [ ] [Dev] Settings → Data → Reset Notes to Defaults… asks in the panel (Delete and Reset, or Cancel), then leaves only the welcome note, the tour and the examples; it works in the Mac app; it's disabled while sync is on, and missing from release builds
+- [ ] [Web] On the demo website (`pnpm build:site`), Data → Start Again → Reset Notes to Defaults… asks in the panel, then leaves only the tour and the examples (no separate welcome note) and opens the tour's first note; it's disabled while saving to a folder, saying to stop that first
 
 ## 23. Properties and mentions
 
@@ -342,7 +356,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Reduced motion on (System Settings → Accessibility → Display): nothing slides or bounces
 - [ ] [Windows] A contrast theme on (Settings → Accessibility → Contrast themes), or Chrome DevTools → Rendering → Emulate CSS media feature forced-colors: focus rings show; the open note's row, the current sidebar item, the chosen segment, theme and tab, and a focused menu item are marked in the system's highlight color; mentions and links are link-colored; tags, mentions and code are outlined; a ticked checkbox is filled; highlights show; a callout's or card's hidden `:::` lines stay hidden; the theme swatches keep their colors
 - [ ] In Spanish and in French: every screen reads in that language, nothing is cut off (the sidebar's sync button, Settings' tabs, menu items), and plurals read right ("1 nota", "0 note")
-- [ ] ⌥↵ with the cursor on a link opens it; on an attached file, opens the file; on a mention, its note (the main window shows it); on `@type.…`, that type's list; on a mention of a note that isn't there, makes the note and says so
+- [ ] ⌥↵ with the cursor on a link opens it; on an attached file, opens the file; on a mention, its note (the main window shows it); on `@type.…`, that type's list; on a tag, its notes; on a mention of a note that isn't there, makes the note and says so
 - [ ] Format toolbar: with text selected, Tab reaches the toolbar, ← → move between its buttons, Enter applies one, Esc goes back to the text
 - [ ] A type table's column names sort from the keyboard (Enter), say which way they sort, and a row's title opens its note with Enter
 - [ ] `pnpm i18n` reports every message translated in Spanish and French

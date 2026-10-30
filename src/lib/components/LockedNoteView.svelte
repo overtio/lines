@@ -5,7 +5,7 @@
   import { lockedNotes } from "../notes/locked.svelte";
   import { noteKeys } from "../notes/noteKeys.svelte";
   import type { Entry } from "../notes/store.svelte";
-  import { ui } from "../ui.svelte";
+  import { openSettings } from "../windows/settings.svelte";
 
   /** Shown instead of the editor for a locked note that isn't open: the password (or Touch ID) opens it. */
   let { entry, compact = false }: { entry: Entry; compact?: boolean } = $props();
@@ -99,7 +99,7 @@
             type="button"
             class="text-button"
             aria-describedby="{id}-forgot"
-            onclick={() => (ui.settings = "privacy")}
+            onclick={() => void openSettings("data")}
             {@attach (node) => node.focus()}
           >
             {t("lock.note.openPrivacy")}

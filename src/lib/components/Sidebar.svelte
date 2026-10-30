@@ -9,11 +9,13 @@
   import { typeIcons } from "../notes/tagIcons.svelte";
   import { menuPoint } from "../popover";
   import { longPress } from "../longPress";
-  import { isSite } from "../platform";
+  import { isSite, openExternal } from "../platform";
   import { sync } from "../sync/engine.svelte";
   import type { Filter } from "../notes/types";
   import { ui } from "../ui.svelte";
+  import { openSettings } from "../windows/settings.svelte";
   import TagTree from "./TagTree.svelte";
+  import { GITHUB_MARK, REPO, VERSION } from "../release";
 
   const sections: { filter: Filter; label: string; icon: IconName; count: () => number }[] = [
     { filter: { kind: "all" }, label: t("sidebar.notes"), icon: "notes", count: () => notes.counts.all },
@@ -105,7 +107,6 @@
               y,
             }),
         },
-        ...(typeIcons.chosen(type) ? [{ label: t("sidebar.resetIcon"), icon: "shapes" as const, run: () => typeIcons.set(type, null) }] : []),
       ],
       onclose: () => (typeMenuFor = null),
     });
@@ -189,11 +190,21 @@
     {/if}
   </div>
 
+  <!-- That this is an early version (and which), and where its source is. -->
+  <div class="release">
+    <span class="stage" title={t("sidebar.alphaHint")}>
+      {t("sidebar.alpha", { version: VERSION })}<span class="visually-hidden">. {t("sidebar.alphaHint")}</span>
+    </span>
+    <button class="icon-button github" onclick={() => openExternal(REPO)} aria-label={t("sidebar.source")} title={t("sidebar.source")}>
+      {@html GITHUB_MARK}
+    </button>
+  </div>
+
   <footer>
     <button
       class="row sync"
       class:error={sync.status === "error"}
-      onclick={() => (ui.settings = "sync")}
+      onclick={() => void openSettings("data")}
       title={sync.error ?? t("sidebar.syncSettings")}
     >
       {#if sync.status === "syncing"}
@@ -214,7 +225,7 @@
         <Icon name="lock" size={16} />
       </button>
     {/if}
-    <button class="icon-button" onclick={() => (ui.settings = "appearance")} aria-label={t("sidebar.settings")} title={t("sidebar.settings")}>
+    <button class="icon-button" onclick={() => void openSettings("theme")} aria-label={t("sidebar.settings")} title={t("sidebar.settings")}>
       <Icon name="settings" size={17} />
     </button>
   </footer>
@@ -251,6 +262,43 @@
     flex-shrink: 0;
     padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--border);
+  }
+
+  .release {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 4px 10px 6px 16px;
+  }
+
+  /* A quiet badge: it's there to be read once, not to shout. */
+  .stage {
+    padding: 2px 7px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-faint);
+    cursor: default;
+  }
+
+  .github {
+    width: 28px;
+    height: 28px;
+    color: var(--text-faint);
+  }
+
+  .github:hover {
+    color: var(--text);
+  }
+
+  .github :global(svg) {
+    width: 16px;
+    height: 16px;
   }
 
   /* Takes the room the buttons beside it leave; a long label (other languages) is cut short, not them. */

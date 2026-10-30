@@ -6,7 +6,7 @@
   import { exportNotes } from "../notes/export";
   import type { SampleSet } from "../notes/samples";
   import { isClosed, notes } from "../notes/store.svelte";
-  import { isApple, isDesktopApp, revealFile, saveFile } from "../platform";
+  import { isApple, isDesktopApp, isSite, revealFile, saveFile } from "../platform";
   import { sync } from "../sync/engine.svelte";
 
   let includeTrash = $state(false);
@@ -50,7 +50,7 @@
   /** Asking first, in the panel: the Mac app's web view has no confirm() (it returns false without asking). */
   let confirmingReset = $state(false);
   let resetButton = $state<HTMLButtonElement>();
-  const resetQuestion = $derived(t("settings.resetQuestion", { count: notes.entries.length }));
+  const resetQuestion = $derived(t(isSite ? "settings.startAgainQuestion" : "settings.resetQuestion", { count: notes.entries.length }));
 
   function askReset() {
     confirmingReset = true;
@@ -71,7 +71,7 @@
     void focusResetButton();
   }
 
-  /** Deletes every note here and adds this build's welcome note, tour and examples (development builds only). */
+  /** Deletes every note here and adds this build's welcome note, tour and examples (development builds and the demo website). */
   async function resetNotes() {
     confirmingReset = false;
     resetting = true;
@@ -181,12 +181,13 @@
   {/if}
 </section>
 
-{#if import.meta.env.DEV}
+<!-- On the demo website, a way back to the notes it started with; elsewhere, for development. -->
+{#if import.meta.env.DEV || isSite}
   <section>
-    <h3>{t("settings.development")}</h3>
-    <p class="prose">{t("settings.developmentText")}</p>
+    <h3>{isSite ? t("settings.startAgain") : t("settings.development")}</h3>
+    <p class="prose">{isSite ? t("settings.startAgainText") : t("settings.developmentText")}</p>
     {#if sync.config}
-      <p class="note">{t("settings.resetSyncFirst")}</p>
+      <p class="note">{isSite ? t("settings.startAgainFolderFirst") : t("settings.resetSyncFirst")}</p>
     {/if}
     {#if confirmingReset}
       <p class="note" id="reset-question">{resetQuestion}</p>

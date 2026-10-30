@@ -4,7 +4,7 @@
   import { untrack } from "svelte";
   import { frontMatter } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
-  import { typeIcons } from "../notes/tagIcons.svelte";
+  import { tagIcons, typeIcons } from "../notes/tagIcons.svelte";
   import { prefs } from "../prefs.svelte";
   import { objectsChanged } from "./objects";
   import { createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment } from "./setup";
@@ -166,10 +166,11 @@
     view?.dispatch({ effects: readOnlyCompartment.reconfigure(readOnly(value)) });
   });
 
-  // Mentions show other notes' titles, icons and properties; draw them again when those change.
+  // Mentions show other notes' titles, icons and properties, and tags their icons; draw them again when those change.
   $effect(() => {
     void notes.objectsSignature;
     void typeIcons.signature();
+    void tagIcons.signature();
     untrack(() => view?.dispatch({ effects: objectsChanged.of(null) }));
   });
 

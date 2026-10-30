@@ -48,6 +48,25 @@ export default {
   "list.didRestore": "Restored",
   "list.didDelete": "Deleted forever",
   "list.copied": "Copied",
+  // Several notes picked in the list (⌘-click, ⇧-click, ⌘A), and acting on them together.
+  "list.pickedCount": "{count, plural, one {# note selected} other {# notes selected}}",
+  // Said after a row's title by screen readers, when it's among the notes picked.
+  "list.picked": "Selected",
+  // The menu of the picked notes: its name.
+  "list.pickedMenu": "{count, plural, one {# note} other {# notes}}",
+  "list.addTag": "Add Tag…",
+  "list.clearPicks": "Clear selection",
+  "list.pickedActions": "Selected notes",
+  "list.didTrashMany": "{count, plural, one {# note moved to the Trash} other {# notes moved to the Trash}}",
+  "list.didRestoreMany": "{count, plural, one {# note restored} other {# notes restored}}",
+  "list.didDeleteMany": "{count, plural, one {# note deleted forever} other {# notes deleted forever}}",
+  "list.didPinMany": "{count, plural, one {# note pinned} other {# notes pinned}}",
+  "list.didUnpinMany": "{count, plural, one {# note unpinned} other {# notes unpinned}}",
+  // Adding a tag to the picked notes: a small box with the tag's name.
+  "list.tagFor": "{count, plural, one {Add a tag to # note} other {Add a tag to # notes}}",
+  "list.tagAdd": "Add",
+  "list.tagged": "{count, plural, =0 {They all have #{tag} already} one {Added #{tag} to # note} other {Added #{tag} to # notes}}",
+  "list.taggedLocked": "Locked notes keep their tags.",
   // A tag being renamed in the sidebar.
   "list.tagName": "Tag name",
   // The button that shows or hides the tags nested in {tag}.

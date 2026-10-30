@@ -77,8 +77,8 @@ export default {
 
   "lock.synced.title": "Notes synchronisées",
   "lock.synced.intro":
-    "Pour chiffrer les notes avant qu’elles ne quittent cet appareil, afin que votre fournisseur de stockage ne puisse pas les lire, activez le chiffrement de bout en bout dans Synchronisation et données.",
-  "lock.synced.open": "Ouvrir Synchronisation et données",
+    "Pour chiffrer les notes avant qu’elles ne quittent cet appareil, afin que votre fournisseur de stockage ne puisse pas les lire, activez le chiffrement de bout en bout dans Synchronisation, plus haut.",
+  "lock.synced.open": "Aller à Synchronisation",
 
   "lock.screen.title": "lines est verrouillé",
   "lock.screen.hint": "Saisissez votre phrase secrète pour ouvrir vos notes.",

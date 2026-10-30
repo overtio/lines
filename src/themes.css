@@ -719,7 +719,7 @@
 }
 
 /*
- * Increased contrast (Settings → Appearance → Contrast, or the system's Increase Contrast):
+ * Increased contrast (Settings → Theme → Contrast, or the system's Increase Contrast):
  * text at least 9:1 against the backgrounds it's on, muted text 7:1 (WCAG AAA), faint text and the
  * accent (links, mentions, tags) 4.5:1 (AA, tinted chips' backgrounds included), and borders 3:1. Each theme's own colors, darkened
  * (lightened in dark) only as far as that takes; worked out from each theme's colors, so a theme

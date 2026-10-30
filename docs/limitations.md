@@ -15,7 +15,7 @@ Each of these has only run in Chrome, through the end-to-end tests (two browser 
 ## Saving to a folder on the web
 
 - Only Chrome, Edge and other Chromium browsers have the File System Access API. Safari and Firefox keep notes in the browser, and can export them.
-- After the browser restarts, it asks again before lines may use the folder; until someone clicks Allow access in Settings → Sync & Data, sync shows an error.
+- After the browser restarts, it asks again before lines may use the folder; until someone clicks Allow access in Settings → Data, sync shows an error.
 - The browser blocks some folders (the home folder itself, system folders, Downloads on some systems).
 
 ## The web app's own storage

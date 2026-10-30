@@ -9,7 +9,7 @@
   import { allowFolder, canUseFolders, folderAllowed, isBrowserFolder, pickBrowserFolder } from "../sync/browserFolder";
   import { sync } from "../sync/engine.svelte";
   import { isFolder, type FolderConfig } from "../sync/providers";
-  import { ui } from "../ui.svelte";
+  import { closeSettings } from "../windows/settings.svelte";
 
   const current = $derived(sync.config && isFolder(sync.config) && isBrowserFolder(sync.config.path) ? sync.config : null);
   let busy = $state(false);
@@ -33,7 +33,7 @@
       const config: FolderConfig = { kind: "folder", provider: "folder", name: picked.name, path: picked.path };
       await sync.test(config);
       await sync.configure(config);
-      ui.settings = null;
+      void closeSettings();
     } catch (error) {
       message = describe(error);
     } finally {

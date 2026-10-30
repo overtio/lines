@@ -31,11 +31,12 @@ import { drawnAsBlock, imageElement } from "./attachments";
 import { GitHubWidget, githubText } from "./github";
 import { CopyWidget, keyValue } from "./keyValue";
 import { InlineMathWidget } from "./math";
-import { drawMention, frontMatterField, objectsChanged, openMention, openNote, openType, valueText } from "./objects";
+import { drawMention, frontMatterField, objectsChanged, openMention, openNote, openTag, openType, valueText } from "./objects";
+import { normalizeTag } from "../notes/parse";
 import { keyOf } from "../notes/properties";
 import { plainLine } from "../notes/stats";
 import { t } from "../i18n/index.svelte";
-import { typeIcons } from "../notes/tagIcons.svelte";
+import { tagIcons, typeIcons } from "../notes/tagIcons.svelte";
 
 /*
  * Live preview: the document is always plain Markdown, and this plugin only
@@ -188,15 +189,18 @@ class TypeIconWidget extends WidgetType {
 
 const tagIconCleanups = new WeakMap<HTMLElement, Record<string, unknown>>();
 
-/** A tag's `#`, drawn as a hash icon; screen readers still hear "#". */
+/** A tag's `#`, drawn as the tag's icon in the sidebar (a hash unless one was chosen); screen readers still hear "#". */
 class TagIconWidget extends WidgetType {
-  eq() {
-    return true;
+  constructor(readonly icon: IconName) {
+    super();
+  }
+  eq(other: TagIconWidget) {
+    return other.icon === this.icon;
   }
   toDOM() {
     const el = document.createElement("span");
     el.className = "cm-lp-tag-icon";
-    tagIconCleanups.set(el, mount(Icon, { target: el, props: { name: "hash", size: 13, strokeWidth: 2.25 } }));
+    tagIconCleanups.set(el, mount(Icon, { target: el, props: { name: this.icon, size: 13, strokeWidth: 2.25 } }));
     const spoken = document.createElement("span");
     spoken.className = "visually-hidden";
     spoken.textContent = "#";
@@ -437,12 +441,14 @@ function build(view: EditorView): DecorationSet {
         }
 
         case "Tag": {
-          // Opened before the icon at its start, so the icon is inside the tag's pill.
-          decos.push(Decoration.mark({ class: "cm-lp-tag", inclusiveStart: true }).range(node.from, node.to));
-          // Its `#` as an icon, unless the cursor is on it.
           const hash = node.getChild("TagMark");
+          const tag = hash ? normalizeTag(doc.sliceString(hash.to, node.to)) : null;
+          // Opened before the icon at its start, so the icon is inside the tag's pill. ⌘-click lists its notes.
+          const attributes: Record<string, string> = tag ? { "data-tag": tag } : {};
+          decos.push(Decoration.mark({ class: "cm-lp-tag", attributes, inclusiveStart: true }).range(node.from, node.to));
+          // Its `#` as an icon, unless the cursor is on it.
           if (hash && !touches(node.from, node.to)) {
-            decos.push(Decoration.replace({ widget: new TagIconWidget() }).range(hash.from, hash.to));
+            decos.push(Decoration.replace({ widget: new TagIconWidget(tag ? tagIcons.get(tag) : "hash") }).range(hash.from, hash.to));
           }
           return false;
         }
@@ -706,7 +712,7 @@ function openHref(href: string, text: string) {
 
 /**
  * ⌥↵ opens what the cursor is on, as ⌘-click does: a mention's note (made, if it isn't there yet),
- * a type's notes, a link, or an attached file. The keyboard's way to everything a click opens.
+ * a type's or a tag's notes, a link, or an attached file. The keyboard's way to everything a click opens.
  */
 export const openAtCursor: Command = (view) => {
   const { state } = view;
@@ -716,6 +722,11 @@ export const openAtCursor: Command = (view) => {
       if (node.name === "Mention") {
         openMention(state.sliceDoc(node.from, node.to));
         return true;
+      }
+      if (node.name === "Tag") {
+        const tag = normalizeTag(state.sliceDoc(node.from + 1, node.to));
+        if (tag) openTag(tag);
+        return !!tag;
       }
       const url = node.name === "URL" ? node : node.name === "Link" || node.name === "Autolink" || node.name === "Image" ? node.getChild("URL") : null;
       if (url) {
@@ -772,6 +783,12 @@ export const livePreview = ViewPlugin.fromClass(
         if (mention && (event.metaKey || event.ctrlKey || (coarsePointer.matches && !view.hasFocus))) {
           if (mention.dataset.note) openNote(mention.dataset.note);
           else if (mention.dataset.type) openType(mention.dataset.type);
+          event.preventDefault();
+          return true;
+        }
+        const tag = target.closest<HTMLElement>(".cm-lp-tag");
+        if (tag?.dataset.tag && (event.metaKey || event.ctrlKey || (coarsePointer.matches && !view.hasFocus))) {
+          openTag(tag.dataset.tag);
           event.preventDefault();
           return true;
         }

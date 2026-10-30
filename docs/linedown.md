@@ -37,7 +37,7 @@ A note has no separate title field: its title is its **first line with text on i
 
 ## Tags
 
-`#tag` anywhere in a note files it under that tag in the sidebar. `#work/meetings` is a nested tag: it shows under `work` there. A tag is drawn with a hash icon in place of its `#`, which shows again with the cursor on the tag.
+`#tag` anywhere in a note files it under that tag in the sidebar. `#work/meetings` is a nested tag: it shows under `work` there. A tag is drawn with its icon in the sidebar in place of its `#` (a hash, unless one was chosen there), and the `#` shows again with the cursor on the tag. ⌘-click a tag (or ⌥↵ with the cursor on it) to list its notes, as choosing it in the sidebar does.
 
 - A tag starts at the beginning of a line, after a space, or after `(`. It doesn't start in the middle of a word (`C#`), and not as a link's URL (`[x](#anchor)`).
 - It runs on while there are letters, digits, `_`, `-` or `/` (any script: `#café`, `#日本`). A trailing `/` isn't part of it.
@@ -268,7 +268,7 @@ lines shows some pairs of characters as the symbol they stand for, without chang
 
 ## Files on disk
 
-When lines saves notes to a folder or a bucket, each note is a Markdown file named after its id, with a small front matter block (id, dates, pin, trash, icon, format) ahead of its Linedown; a note's own properties come after it, as part of its text. Locked notes and end-to-end encryption change what's stored. See [sync.md](sync.md). An export (Settings → Sync & Data) writes plain Linedown files named after their titles, without front matter.
+When lines saves notes to a folder or a bucket, each note is a Markdown file named after its id, with a small front matter block (id, dates, pin, trash, icon, format) ahead of its Linedown; a note's own properties come after it, as part of its text. Locked notes and end-to-end encryption change what's stored. See [sync.md](sync.md). An export (Settings → Data) writes plain Linedown files named after their titles, without front matter.
 
 ## LaTeX notes
 

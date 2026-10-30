@@ -22,7 +22,7 @@
   --titlebar-h: calc(52px + var(--titlebar-pad-top));
 
   /*
-   * Window surfaces. In the Mac app, window opacity (Settings → Appearance) makes them
+   * Window surfaces. In the Mac app, window opacity (Settings → Theme) makes them
    * see-through, with the desktop blurred behind; elsewhere they're always solid.
    */
   --window-alpha: 100%;

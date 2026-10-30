@@ -18,7 +18,7 @@
   import { sync } from "../sync/engine.svelte";
   import { findCloudFolders, pickFolder, type DriveId } from "../sync/folder";
   import { isFolder, type FolderConfig } from "../sync/providers";
-  import { ui } from "../ui.svelte";
+  import { closeSettings } from "../windows/settings.svelte";
 
   const SUBFOLDER = "lines";
 
@@ -96,7 +96,7 @@
       // Creates the folder if needed, and checks lines may use it.
       await sync.test(config);
       await sync.configure(config);
-      ui.settings = null;
+      void closeSettings();
     } catch (error) {
       message = describe(error);
     } finally {

@@ -75,9 +75,9 @@ export default {
   "sync.browser.choose": "Elegir una carpeta…",
   "sync.browser.chooseAnother": "Elegir otra carpeta…",
   "sync.browser.cantPick": "Este navegador no puede guardar en una carpeta. Prueba con Chrome o Edge.",
-  "sync.browser.gone": "La carpeta ya no está disponible. Vuelve a elegirla en Ajustes → Sincronización y datos.",
+  "sync.browser.gone": "La carpeta ya no está disponible. Vuelve a elegirla en Ajustes → Datos.",
   "sync.browser.permission":
-    "lines necesita tu permiso para volver a usar “{name}”. Abre Ajustes → Sincronización y datos y permítelo.",
+    "lines necesita tu permiso para volver a usar “{name}”. Abre Ajustes → Datos y permítelo.",
 
   "sync.e2e.title": "Cifrado de extremo a extremo",
   "sync.e2e.intro":

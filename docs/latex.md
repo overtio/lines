@@ -92,7 +92,7 @@ A note that has a `\begin{document}` line is a whole document, as you'd download
 
 ## Export
 
-Download (in the note's share menu, on the web) and Export (Settings → Sync & Data) write a LaTeX note as a `.tex` file that compiles on its own:
+Download (in the note's share menu, on the web) and Export (Settings → Data) write a LaTeX note as a `.tex` file that compiles on its own:
 
 ```latex
 \documentclass{article}
@@ -123,4 +123,4 @@ In a synced folder or bucket, a LaTeX note is a file like any other note's (`not
 
 ## Examples
 
-Settings → Sync & Data → **Add LaTeX Examples** adds three notes written in LaTeX, tagged `examples` (in `src/lib/notes/examples/`): a short paper (a whole document with a preamble, its own math commands, theorems, a table and a bibliography), lecture notes, and a problem set.
+Settings → Data → **Add LaTeX Examples** adds three notes written in LaTeX, tagged `examples` (in `src/lib/notes/examples/`): a short paper (a whole document with a preamble, its own math commands, theorems, a table and a bibliography), lecture notes, and a problem set.

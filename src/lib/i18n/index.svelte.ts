@@ -12,7 +12,7 @@ import fr from "./locales/fr";
  *   t("list.count", { count: 3 })           → "3 notes"
  *
  * Adding a language is a folder in locales/ and a line in LANGUAGES; see docs/translations.md.
- * The language is chosen in Settings → Appearance, or follows the system's.
+ * The language is chosen in Settings → Theme, or follows the system's.
  */
 
 export type MessageKey = keyof typeof en;

@@ -6,6 +6,7 @@
   import NoteInfo from "./lib/components/NoteInfo.svelte";
   import Settings from "./lib/components/Settings.svelte";
   import IconPicker from "./lib/components/IconPicker.svelte";
+  import TagPrompt from "./lib/components/TagPrompt.svelte";
   import LockedNoteView from "./lib/components/LockedNoteView.svelte";
   import NotesPasswordDialog from "./lib/components/NotesPasswordDialog.svelte";
   import PdfPreview from "./lib/components/PdfPreview.svelte";
@@ -21,6 +22,7 @@
   import { plainText } from "./lib/notes/stats";
   import { copyText, downloadText, isApple, isNewNoteShortcut, isTauri, newNoteKey } from "./lib/platform";
   import { ui, type MenuItem } from "./lib/ui.svelte";
+  import { openSettings } from "./lib/windows/settings.svelte";
   import { PANE_WIDTHS, prefs } from "./lib/prefs.svelte";
   import { canFloat, floatingOpen, toggleFloating } from "./lib/windows/floating";
 
@@ -189,7 +191,7 @@
     if ((event.metaKey || event.ctrlKey) && !event.shiftKey && !event.altKey && event.key === "/") {
       event.preventDefault();
       event.stopPropagation();
-      ui.settings = "shortcuts";
+      void openSettings("shortcuts");
       return;
     }
     // ⌘P (Ctrl+P) previews the open note as a PDF, rather than printing the window. In the
@@ -504,6 +506,7 @@
 {/if}
 <ContextMenu />
 <IconPicker />
+<TagPrompt />
 
 <style>
   .app {

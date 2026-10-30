@@ -23,7 +23,7 @@ Start a line with `#`, `##` or `###`. The first line of a note is its title in t
 
 ## Tags
 
-Add a tag anywhere, like #tour/writing, and the note shows under it in the sidebar. Nested tags use a slash. Right-click a tag in the sidebar to rename it everywhere or give it an icon.
+Add a tag anywhere, like #tour/writing, and the note shows under it in the sidebar. Nested tags use a slash. ⌘-click a tag to see all its notes. Right-click a tag in the sidebar to rename it everywhere or give it an icon.
 
 ---
 

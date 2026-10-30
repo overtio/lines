@@ -2,9 +2,7 @@
   import Icon from "../icons/Icon.svelte";
   import { t } from "../i18n/index.svelte";
   import { openExternal } from "../platform";
-
-  const REPO = "https://github.com/overtio/lines";
-  const version = __APP_VERSION__;
+  import { REPO, VERSION as version } from "../release";
 
   /** The open source projects lines is built on; every license is in the full notices below. */
   const CREDITS = [
