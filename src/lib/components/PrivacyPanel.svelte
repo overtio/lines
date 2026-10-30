@@ -1,12 +1,15 @@
 <script lang="ts">
   import Icon from "../icons/Icon.svelte";
+  import { t } from "../i18n/index.svelte";
   import { lock, LOCK_AFTER, touchIdAvailable } from "../lock/lock.svelte";
-  import { lockedNotes } from "../notes/locked.svelte";
+  import { CLOSE_AFTER, lockedNotes } from "../notes/locked.svelte";
   import { noteKeys } from "../notes/noteKeys.svelte";
   import { isApple, modKey } from "../platform";
   import { ui } from "../ui.svelte";
   import PassphraseForm from "./PassphraseForm.svelte";
   import Segmented from "./Segmented.svelte";
+
+  const id = $props.id();
 
   /** What's being asked for: turning the lock on or off, or a new passphrase. */
   let asking = $state<"on" | "off" | "change" | null>(null);
@@ -21,7 +24,18 @@
 
   void touchIdAvailable.then((available) => (touchId = available));
 
+  /** What was asked last in each section, so its button has focus again once the form closes. */
+  let returnTo = $state<typeof asking>(null);
+  let notesReturnTo = $state<typeof notesAsking>(null);
+  const refocus = (what: NonNullable<typeof asking>) => (node: HTMLElement) => {
+    if (returnTo === what) node.focus();
+  };
+  const refocusNotes = (what: NonNullable<typeof notesAsking>) => (node: HTMLElement) => {
+    if (notesReturnTo === what) node.focus();
+  };
+
   function askNotes(what: typeof notesAsking) {
+    notesReturnTo = notesAsking;
     notesAsking = what;
     notesDone = null;
     notesError = null;
@@ -39,16 +53,18 @@
       await lockedNotes.setTouchId(input.checked);
     } catch (e) {
       input.checked = !input.checked;
-      notesError = `Couldn't ${input.checked ? "turn off" : "turn on"} Touch ID: ${e}`;
+      // Put back as it was: checked now means it was being turned off.
+      notesError = t(input.checked ? "lock.touchId.turnOffFailed" : "lock.touchId.turnOnFailed", { error: String(e) });
     }
   }
 
   const afterOptions = LOCK_AFTER.map((minutes) => ({
     id: String(minutes),
-    label: minutes === 0 ? "Never" : minutes < 60 ? `${minutes} min` : "1 hour",
+    label: minutes === 0 ? t("lock.app.never") : minutes < 60 ? t("lock.app.minutes", { count: minutes }) : t("lock.app.hour"),
   }));
 
   function ask(what: typeof asking) {
+    returnTo = asking;
     asking = what;
     done = null;
   }
@@ -60,7 +76,7 @@
       await lock.setTouchId(input.checked);
     } catch (e) {
       input.checked = !input.checked;
-      touchIdError = `Couldn't ${input.checked ? "turn off" : "turn on"} Touch ID: ${e}`;
+      touchIdError = t(input.checked ? "lock.touchId.turnOffFailed" : "lock.touchId.turnOnFailed", { error: String(e) });
     }
   }
 
@@ -70,89 +86,93 @@
   }
 </script>
 
-<section>
-  <h3>App lock</h3>
+<section aria-labelledby="{id}-app">
+  <h3 id="{id}-app">{t("lock.app.title")}</h3>
   {#if !lock.enabled}
-    <p class="prose">
-      Lock lines with a passphrase. Your notes, attachments and sync settings on this device are encrypted, and lines asks
-      for the passphrase when it opens.
-    </p>
+    <p class="prose">{t("lock.app.intro")}</p>
     {#if asking === "on"}
       <PassphraseForm
         kind="new"
-        submit="Turn on app lock"
-        busyLabel="Encrypting notes…"
+        submit={t("lock.app.turnOn")}
+        busyLabel={t("lock.app.encrypting")}
+        describedby="{id}-forget"
         oncancel={() => ask(null)}
         onsubmit={async (passphrase) => {
           await lock.enable(passphrase);
-          asking = null;
-          done = "App lock is on. lines will ask for the passphrase when it opens.";
+          ask(null);
+          done = t("lock.app.turnedOn");
         }}
       />
-      <p class="note">
-        If you forget it, the notes on this device can't be opened, not even by lines. Synced notes stay safe in your sync
-        storage.
-      </p>
+      <p class="note" id="{id}-forget">{t("lock.app.forget")}</p>
     {:else}
-      <button class="primary" onclick={() => ask("on")}><Icon name="lock" size={15} /> Set up app lock…</button>
+      <button class="primary" onclick={() => ask("on")} {@attach refocus("on")}>
+        <Icon name="lock" size={15} /> {t("lock.app.setUp")}
+      </button>
     {/if}
   {:else}
     <div class="status">
       <Icon name="shield-check" size={16} />
-      <span>Notes on this device are encrypted, and lines asks for your passphrase when it opens.</span>
+      <span>{t("lock.app.on")}</span>
     </div>
 
     <div class="setting">
-      <span class="label">Lock after</span>
+      <span class="label" aria-hidden="true">{t("lock.app.after")}</span>
       <Segmented
-        label="Lock after this long without use"
+        label={t("lock.app.afterLabel")}
         options={afterOptions}
         value={String(lock.settings?.after ?? 5)}
-        onselect={(id) => lock.setAfter(Number(id))}
+        onselect={(minutes) => lock.setAfter(Number(minutes))}
       />
     </div>
-    <p class="note">{lock.settings?.after ? "Without use for that long, lines locks itself." : "lines locks when it quits, or when you lock it."}</p>
+    <p class="note">{lock.settings?.after ? t("lock.app.afterHint") : t("lock.app.neverHint")}</p>
 
     {#if touchId}
       <label class="check">
-        <input type="checkbox" checked={lock.settings?.touchId} onchange={setTouchId} />
-        <Icon name="fingerprint" size={15} /> Unlock with Touch ID
+        <input
+          type="checkbox"
+          checked={lock.settings?.touchId}
+          onchange={setTouchId}
+          aria-invalid={!!touchIdError}
+          aria-describedby={touchIdError ? `${id}-touch-id-error` : undefined}
+        />
+        <Icon name="fingerprint" size={15} /> {t("lock.unlockWithTouchId")}
       </label>
-      {#if touchIdError}<p class="message" role="alert">{touchIdError}</p>{/if}
+      {#if touchIdError}<p class="message" id="{id}-touch-id-error" role="alert">{touchIdError}</p>{/if}
     {/if}
 
     {#if asking === "change"}
       <PassphraseForm
         kind="change"
-        submit="Change passphrase"
-        busyLabel="Changing…"
+        submit={t("lock.app.change")}
+        busyLabel={t("lock.changing")}
         oncancel={() => ask(null)}
         onsubmit={async (passphrase, current) => {
           await lock.changePassphrase(current, passphrase);
-          asking = null;
-          done = "Passphrase changed.";
+          ask(null);
+          done = t("lock.app.changed");
         }}
       />
     {:else if asking === "off"}
-      <p class="prose off">Your notes will be stored on this device without encryption, as before.</p>
+      <p class="prose off" id="{id}-off">{t("lock.app.turnOffHint")}</p>
       <PassphraseForm
         kind="current"
-        submit="Turn off app lock"
-        busyLabel="Decrypting notes…"
+        submit={t("lock.app.turnOff")}
+        busyLabel={t("lock.app.decrypting")}
         danger
+        describedby="{id}-off"
         oncancel={() => ask(null)}
         onsubmit={async (passphrase) => {
           await lock.disable(passphrase);
-          asking = null;
-          done = "App lock is off.";
+          ask(null);
+          done = t("lock.app.turnedOff");
         }}
       />
     {:else}
       <footer class="form-footer actions">
-        <button class="text-button danger" onclick={() => ask("off")}>Turn off…</button>
-        <button class="text-button push" onclick={() => ask("change")}>Change passphrase…</button>
-        <button class="primary" onclick={lockNow} title={isApple ? "Lock (⌃⌘L)" : `Lock (${modKey}Alt+L)`}>
-          <Icon name="lock" size={15} /> Lock now
+        <button class="text-button danger" onclick={() => ask("off")} {@attach refocus("off")}>{t("lock.app.askTurnOff")}</button>
+        <button class="text-button push" onclick={() => ask("change")} {@attach refocus("change")}>{t("lock.app.askChange")}</button>
+        <button class="primary" onclick={lockNow} title={t("lock.lockShortcut", { shortcut: isApple ? "⌃⌘L" : `${modKey}Alt+L` })}>
+          <Icon name="lock" size={15} /> {t("lock.lockNow")}
         </button>
       </footer>
     {/if}
@@ -163,91 +183,97 @@
   {/if}
 </section>
 
-<section>
-  <h3>Locked notes</h3>
+<section aria-labelledby="{id}-notes">
+  <h3 id="{id}-notes">{t("lock.notes.title")}</h3>
   {#if !noteKeys.known}
-    <p class="prose">
-      Lock a note to keep what it says out of sight until you enter a password: choose Lock Note from its menu, or the lock
-      in its toolbar. The first time, you choose the password.
-    </p>
-    <p class="note">
-      A locked note is encrypted, here and wherever it syncs to. Its title stays readable, so the list can show it.
-    </p>
+    <p class="prose">{t("lock.notes.intro")}</p>
+    <p class="note">{t("lock.notes.introHint")}</p>
   {:else}
     <div class="status">
       <Icon name={noteKeys.anyOpen ? "lock-open" : "shield-check"} size={16} />
       <span>
         {#if noteKeys.anyOpen}
-          Locked notes are open. They lock again after 5 minutes without use, or when you lock them.
+          {t("lock.notes.open", { minutes: CLOSE_AFTER / 60_000 })}
         {:else if noteKeys.settings}
-          Locked notes open with your password{noteKeys.settings.touchId && touchId ? " or Touch ID" : ""}.
+          {noteKeys.settings.touchId && touchId ? t("lock.notes.withPasswordOrTouchId") : t("lock.notes.withPassword")}
         {:else}
-          Notes locked on your other devices open with the password you chose there.
+          {t("lock.notes.fromOtherDevices")}
         {/if}
       </span>
     </div>
 
     {#if touchId && noteKeys.settings}
       <label class="check">
-        <input type="checkbox" checked={noteKeys.settings.touchId} onchange={setNotesTouchId} />
-        <Icon name="fingerprint" size={15} /> Open locked notes with Touch ID
+        <input
+          type="checkbox"
+          checked={noteKeys.settings.touchId}
+          onchange={setNotesTouchId}
+          {@attach refocusNotes("touch-id")}
+          aria-invalid={!!notesError}
+          aria-describedby={notesError ? `${id}-notes-error` : undefined}
+        />
+        <Icon name="fingerprint" size={15} /> {t("lock.notes.touchId")}
       </label>
     {/if}
 
     {#if notesAsking === "change"}
-      <p class="prose off">Every note locked with the current password opens with the new one, on all your devices.</p>
+      <p class="prose off" id="{id}-notes-change">{t("lock.notes.changeHint")}</p>
       <PassphraseForm
         kind="change"
         noun="password"
-        submit="Change password"
-        busyLabel="Changing…"
+        submit={t("lock.notes.change")}
+        busyLabel={t("lock.changing")}
+        describedby="{id}-notes-change"
         oncancel={() => askNotes(null)}
         onsubmit={async (password, current) => {
           await lockedNotes.changePassword(current, password);
-          notesAsking = null;
-          notesDone = "Password changed.";
+          askNotes(null);
+          notesDone = t("lock.notes.changed");
         }}
       />
     {:else if notesAsking === "reset"}
-      <p class="prose off">
-        Choose a new password for the notes you lock from now on. Notes already locked still open only with the old one,
-        so keep them locked until you remember it.
-      </p>
+      <p class="prose off" id="{id}-notes-reset">{t("lock.notes.resetHint")}</p>
       <PassphraseForm
         kind="new"
         noun="password"
-        submit="Set new password"
-        busyLabel="Setting…"
+        submit={t("lock.notes.reset")}
+        busyLabel={t("lock.notes.resetting")}
+        describedby="{id}-notes-reset"
         oncancel={() => askNotes(null)}
         onsubmit={async (password) => {
           await lockedNotes.reset(password);
-          notesAsking = null;
-          notesDone = "New password set. Notes you lock from now on use it.";
+          askNotes(null);
+          notesDone = t("lock.notes.wasReset");
         }}
       />
     {:else if notesAsking === "touch-id"}
-      <p class="prose off">Enter the password for locked notes to let Touch ID open them.</p>
+      <p class="prose off" id="{id}-notes-touch-id">{t("lock.notes.touchIdHint")}</p>
       <PassphraseForm
         kind="current"
         noun="password"
-        submit="Use Touch ID"
-        busyLabel="Turning on…"
+        submit={t("lock.useTouchId")}
+        busyLabel={t("lock.notes.turningOn")}
+        describedby="{id}-notes-touch-id"
         oncancel={() => askNotes(null)}
         onsubmit={async (password) => {
           await lockedNotes.unlock(password, noteKeys.settings?.key.id);
           await lockedNotes.setTouchId(true);
-          notesAsking = null;
+          askNotes(null);
         }}
       />
     {:else if noteKeys.settings || noteKeys.anyOpen}
       <footer class="form-footer actions">
         {#if noteKeys.settings}
-          <button class="text-button" onclick={() => askNotes("reset")}>Forgot password…</button>
-          <button class="text-button push" onclick={() => askNotes("change")}>Change password…</button>
+          <button class="text-button" onclick={() => askNotes("reset")} {@attach refocusNotes("reset")}>
+            {t("lock.notes.askForgot")}
+          </button>
+          <button class="text-button push" onclick={() => askNotes("change")} {@attach refocusNotes("change")}>
+            {t("lock.notes.askChange")}
+          </button>
         {/if}
         {#if noteKeys.anyOpen}
           <button class="primary" class:push={!noteKeys.settings} onclick={() => lockedNotes.close()}>
-            <Icon name="lock" size={15} /> Lock now
+            <Icon name="lock" size={15} /> {t("lock.lockNow")}
           </button>
         {/if}
       </footer>
@@ -255,20 +281,17 @@
   {/if}
 
   {#if notesError}
-    <p class="message" role="alert">{notesError}</p>
+    <p class="message" id="{id}-notes-error" role="alert">{notesError}</p>
   {:else if notesDone}
     <p class="message ok" role="status">{notesDone}</p>
   {/if}
 </section>
 
-<section>
-  <h3>Synced notes</h3>
-  <p class="prose">
-    To encrypt notes before they leave this device, so your storage provider can't read them, turn on end-to-end
-    encryption in Sync & Data.
-  </p>
+<section aria-labelledby="{id}-synced">
+  <h3 id="{id}-synced">{t("lock.synced.title")}</h3>
+  <p class="prose">{t("lock.synced.intro")}</p>
   <button class="text-button flush" onclick={() => (ui.settings = "sync")}>
-    <Icon name="cloud" size={15} /> Open Sync & Data
+    <Icon name="cloud" size={15} /> {t("lock.synced.open")}
   </button>
 </section>
 

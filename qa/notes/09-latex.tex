@@ -1,0 +1,148 @@
+\section{QA · LaTeX note}
+% #qa/latex
+
+A note written in LaTeX. Check: each construct is drawn as its heading says, its LaTeX shows while the cursor is on it, and the title in the list is "QA · LaTeX note".
+
+\paragraph{1. Headings}
+
+\subsection{A subsection}
+\subsubsection*{A starred subsubsection}
+
+\paragraph{2. Styles}
+
+\textbf{bold}, \textit{italic}, \emph{emphasis}, \texttt{code}, \underline{underlined}, \textsc{Small Caps}, \textbf{bold with \emph{emphasis} inside}.
+
+\paragraph{3. Characters}
+
+50\% of \$10 \& \#1, a~tie, en--dash, em---dash, ``quoted'', and so on\ldots{} \LaTeX.
+
+\paragraph{4. Lists}
+
+\begin{itemize}
+  \item First
+  \item Second
+  \begin{enumerate}
+    \item Nested, numbered
+    \item Again
+  \end{enumerate}
+  \item[--] Its own marker
+\end{itemize}
+
+\begin{description}
+  \item[Term] Its description.
+\end{description}
+
+\paragraph{5. Math}
+
+Inline $e^{i\pi} + 1 = 0$ and \(a^2 + b^2 = c^2\).
+
+\[ \sum_{n=1}^\infty \frac{1}{n^2} = \frac{\pi^2}{6} \]
+
+\begin{equation}
+  \int_0^1 x^2\,dx = \frac{1}{3} \label{eq:integral}
+\end{equation}
+
+\begin{align*}
+  a &= b + c \\
+  d &= e
+\end{align*}
+
+\paragraph{6. Broken math}
+
+Red, as written, with the reason on hover: $\frac{1}{$
+
+\paragraph{7. Table}
+
+\begin{tabular}{|l|c|r|}
+  \hline
+  Left & Center & Right \\
+  \hline
+  a & $x^2$ & 1 \\
+  longer cell & b & 22 \\
+  \hline
+\end{tabular}
+
+\paragraph{8. Quote and centered}
+
+\begin{quote}
+A quote.
+\end{quote}
+
+\begin{center}
+Centered text.
+\end{center}
+
+\paragraph{9. Code}
+
+\begin{verbatim}
+raw \textbf{not bold} $not math$
+\end{verbatim}
+
+\paragraph{10. Links and footnotes}
+
+A \href{https://example.com}{named link}, a bare \url{https://example.com}, and a footnote.\footnote{The footnote's text.}
+
+\paragraph{11. Comments and other commands}
+
+Text % a comment with #qa/latex-tag
+\maketitle \vspace{1em} \label{x} stay faint.
+
+\paragraph{12. Line break}
+
+First line\\
+second line.
+
+\paragraph{13. Theorems}
+
+\newtheorem{lem}[theorem]{Lemma}
+
+\begin{lem}[Small]
+A lemma, numbered along with theorems: Lemma 1.
+\end{lem}
+
+\begin{theorem}
+Theorem 2, with math in its frame:
+\[ a^2 + b^2 = c^2 \]
+\end{theorem}
+
+\begin{proof}
+Italic Proof., and a box at the end.
+\end{proof}
+
+\paragraph{14. Citations and references}
+
+As shown in \cite{knuth1984, lamport1994} and Section~\ref{sec:intro}, see \eqref{eq:one}. \label{qa:hidden} The label before this is hidden.
+
+\paragraph{15. Own math commands}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\DeclareMathOperator{\sinc}{sinc}
+Drawn with the note's commands: $\abs{x} \in \R$ and $\sinc x$.
+
+\paragraph{16. Accents, letters, verb}
+
+Gödel, Erdős, Łukasiewicz, façade: G\"odel, Erd\H{o}s, \L ukasiewicz, fa\c{c}ade. Code: \verb|x = {a & b}|.
+
+\paragraph{17. Nested numbering}
+
+\begin{enumerate}
+  \item One
+  \begin{enumerate}
+    \item (a)
+    \begin{enumerate}
+      \item i.
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+
+\paragraph{18. Bibliography}
+
+\begin{thebibliography}{9}
+\bibitem{knuth1984} D. Knuth, \emph{The \TeX book}, 1984.
+\bibitem{lamport1994} L. Lamport, \emph{\LaTeX: A Document Preparation System}, 1994.
+\end{thebibliography}
+
+\paragraph{19. Not closed}
+
+\textbf{never closed, and \begin{itemize} with no end: shown as written.

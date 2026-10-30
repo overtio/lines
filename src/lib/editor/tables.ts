@@ -4,8 +4,14 @@ import { type EditorState, type Extension, Prec, type Range, StateField, type Te
 import { Decoration, type DecorationSet, EditorView, keymap, WidgetType } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
+import { githubLink, githubText } from "./github";
 import { copyButton, destroyCopyButton } from "./keyValue";
 import { opensLink } from "./livePreview";
+import { mathElement } from "./math";
+import { symbolsChanged } from "./symbols";
+import { withSymbols } from "../notes/symbols";
+import { prefs } from "../prefs.svelte";
+import { t } from "../i18n/index.svelte";
 import { ancestors, focusChanged, focused, hasText, isEditing } from "./util";
 
 /*
@@ -265,6 +271,12 @@ function looksTabular(rows: string[][]) {
 
 const NUMBER = /^[-+]?[\d.,]*\d%?$/;
 
+/** Whether the column `col` of `body` is all numbers, and so right-aligned. */
+export const numericColumn = (body: string[][], col: number) => {
+  const values = body.map((row) => row[col]).filter(Boolean);
+  return values.length > 0 && values.every((v) => NUMBER.test(v));
+};
+
 /** The pasted rows as an aligned Markdown table; numeric columns are right-aligned. */
 function tableMarkdown(cells: string[][]) {
   const columns = Math.max(...cells.map((row) => row.length));
@@ -272,73 +284,75 @@ function tableMarkdown(cells: string[][]) {
     Array.from({ length: columns }, (_, col) => (row[col] ?? "").replace(/\s+/g, " ").trim().replace(/\|/g, "\\|")),
   );
   const [header, ...body] = clean;
-  const aligns = Array.from({ length: columns }, (_, col): Align => {
-    const values = body.map((row) => row[col]).filter(Boolean);
-    return values.length && values.every((v) => NUMBER.test(v)) ? "right" : "";
-  });
+  const aligns = Array.from({ length: columns }, (_, col): Align => (numericColumn(body, col) ? "right" : ""));
   return writeGrid({ rows: [header, [], ...body], aligns, columns }).text;
 }
 
 /** Code, and tables that are already being edited, where a paste stays as it is. */
 const KEEP_PASTE = new Set(["FencedCode", "CodeBlock", "InlineCode", "Table", "HTMLBlock"]);
 
+const inMarkdownCode = (state: EditorState, pos: number) => {
+  for (const node of ancestors(state, pos, -1)) if (KEEP_PASTE.has(node.name)) return true;
+  return false;
+};
+
 /**
- * Pasting rows copied from a spreadsheet, pgAdmin or a web page makes a table. The paste goes in
- * as text first, so undo turns the table back into what was copied.
+ * Pasting rows copied from a spreadsheet, pgAdmin or a web page makes a table, as `write` writes
+ * one (Markdown here, a tabular in LaTeX notes), unless `keep(state, pos)` says the paste stays as
+ * it is there. The paste goes in as text first, so undo turns the table back into what was copied.
  */
-const pasteTable = EditorView.domEventHandlers({
-  paste(event, view) {
-    const { state } = view;
-    const data = event.clipboardData;
-    if (!data || state.readOnly || state.selection.ranges.length > 1) return false;
-    const range = state.selection.main;
-    for (const node of ancestors(state, range.from, -1)) {
-      if (KEEP_PASTE.has(node.name)) return false;
-    }
-    // As the editor stores it: pgAdmin and Windows apps copy \r\n line breaks.
-    const plain = data.getData("text/plain").replace(/\r\n?/g, "\n");
-    const html = data.getData("text/html");
-    let rows = html.includes("<table") ? htmlTable(html) : null;
-    if (!rows || rows.length < 2) {
-      if (!plain.includes("\t")) return false;
-      rows = parseTabbed(plain);
-      if (!looksTabular(rows)) return false;
-    }
-    event.preventDefault();
-    // First the paste as it was copied…
-    view.dispatch({
-      changes: { from: range.from, to: range.to, insert: plain },
-      selection: { anchor: range.from + plain.length },
-      userEvent: "input.paste",
-      scrollIntoView: true,
-    });
-    // …then, as its own undo step, the table in its place, on lines of its own.
-    const { doc } = view.state;
-    const from = range.from;
-    const to = range.from + plain.length;
-    const first = doc.lineAt(from);
-    const last = doc.lineAt(to);
-    const before = from > first.from ? "\n\n" : first.number > 1 && doc.line(first.number - 1).text.trim() ? "\n" : "";
-    // A blank line between the table and any text after it (which would otherwise become a row).
-    const next = last.number < doc.lines ? doc.line(last.number + 1) : null;
-    const after = to < last.to ? "\n\n" : next && !next.text.trim() ? "" : "\n";
-    const table = tableMarkdown(rows);
-    view.dispatch({
-      changes: { from, to, insert: before + table + after },
-      // On the line below the table, so it shows as one.
-      selection: { anchor: from + before.length + table.length + 1 },
-      annotations: isolateHistory.of("before"),
-      userEvent: "input.paste",
-      scrollIntoView: true,
-    });
-    return true;
-  },
-});
+export const tablePasting = (write: (rows: string[][]) => string, keep: (state: EditorState, pos: number) => boolean) =>
+  EditorView.domEventHandlers({
+    paste(event, view) {
+      const { state } = view;
+      const data = event.clipboardData;
+      if (!data || state.readOnly || state.selection.ranges.length > 1) return false;
+      const range = state.selection.main;
+      if (keep(state, range.from)) return false;
+      // As the editor stores it: pgAdmin and Windows apps copy \r\n line breaks.
+      const plain = data.getData("text/plain").replace(/\r\n?/g, "\n");
+      const html = data.getData("text/html");
+      let rows = html.includes("<table") ? htmlTable(html) : null;
+      if (!rows || rows.length < 2) {
+        if (!plain.includes("\t")) return false;
+        rows = parseTabbed(plain);
+        if (!looksTabular(rows)) return false;
+      }
+      event.preventDefault();
+      // First the paste as it was copied…
+      view.dispatch({
+        changes: { from: range.from, to: range.to, insert: plain },
+        selection: { anchor: range.from + plain.length },
+        userEvent: "input.paste",
+        scrollIntoView: true,
+      });
+      // …then, as its own undo step, the table in its place, on lines of its own.
+      const { doc } = view.state;
+      const from = range.from;
+      const to = range.from + plain.length;
+      const first = doc.lineAt(from);
+      const last = doc.lineAt(to);
+      const before = from > first.from ? "\n\n" : first.number > 1 && doc.line(first.number - 1).text.trim() ? "\n" : "";
+      // A blank line between the table and any text after it (which would otherwise become a row).
+      const next = last.number < doc.lines ? doc.line(last.number + 1) : null;
+      const after = to < last.to ? "\n\n" : next && !next.text.trim() ? "" : "\n";
+      const table = write(rows);
+      view.dispatch({
+        changes: { from, to, insert: before + table + after },
+        // On the line below the table, so it shows as one.
+        selection: { anchor: from + before.length + table.length + 1 },
+        annotations: isolateHistory.of("before"),
+        userEvent: "input.paste",
+        scrollIntoView: true,
+      });
+      return true;
+    },
+  });
 
 // Rendering
 
-/** A cell's formatted text: plain strings, or styled spans around more of the same. */
-type Inline = string | { cls: string; href?: string; children: Inline[] };
+/** A cell's formatted text: plain strings, math, or styled spans around more of the same. */
+type Inline = string | { tex: string; display: boolean } | { cls: string; href?: string; children: Inline[] };
 
 const STYLES: Record<string, string> = {
   Emphasis: "cm-lp-em",
@@ -360,6 +374,10 @@ function inlines(doc: Text, parent: SyntaxNode, from: number, to: number): Inlin
     pos = c.to;
     if (MARKS.has(c.name)) continue;
     if (c.name === "Escape") out.push(doc.sliceString(c.from + 1, c.to));
+    else if (c.name === "InlineMath") {
+      const marks = c.getChildren("MathMark");
+      if (marks.length === 2) out.push({ tex: doc.sliceString(marks[0].to, marks[1].from), display: marks[0].to - marks[0].from === 2 });
+    }
     else if (c.name in STYLES) out.push({ cls: STYLES[c.name], children: inlines(doc, c, c.from, c.to) });
     else if (c.name === "Link" || c.name === "Image") {
       const url = c.getChild("URL");
@@ -379,19 +397,32 @@ function inlines(doc: Text, parent: SyntaxNode, from: number, to: number): Inlin
 
 /** A cell's text as it reads, without formatting. */
 function plainInline(content: Inline[]): string {
-  return content.map((item) => (typeof item === "string" ? item : plainInline(item.children))).join("");
+  return content.map((item) => (typeof item === "string" ? item : "tex" in item ? item.tex : plainInline(item.children))).join("");
 }
 
-function renderInline(parent: HTMLElement, content: Inline[]) {
+/** `code`: inside a code span, which shows symbols (notes/symbols.ts) as Settings → Text has it for code. */
+function renderInline(parent: HTMLElement, content: Inline[], view: EditorView, code = false) {
   for (const item of content) {
     if (typeof item === "string") {
-      parent.append(item);
+      parent.append((code ? prefs.symbolsInCode : prefs.symbolsInText) ? withSymbols(item) : item);
       continue;
     }
+    if ("tex" in item) {
+      parent.append(mathElement(item.tex, item.display, () => view.requestMeasure()));
+      continue;
+    }
+    // A GitHub link reads short, or gets the mark in front of its own text (see github.ts).
+    const github = item.href ? githubText(item.href) : null;
+    const bare = item.children.length === 1 && item.children[0] === item.href;
+    if (github && bare) {
+      parent.append(githubLink(item.href!, github));
+      continue;
+    }
+    if (github) parent.append(githubLink(item.href!, ""));
     const span = document.createElement("span");
     span.className = item.cls;
     if (item.href) span.dataset.href = item.href;
-    renderInline(span, item.children);
+    renderInline(span, item.children, view, code || item.cls === "cm-lp-code");
     parent.append(span);
   }
 }
@@ -412,13 +443,15 @@ class TableWidget extends WidgetType {
     readonly parse: () => TableModel,
     /** How far in it sits, in cards. */
     readonly inset: CardInset,
+    /** Which symbols it shows (Settings → Text), so changing them draws it again. */
+    readonly symbols = `${prefs.symbolsInText} ${prefs.symbolsInCode}`,
   ) {
     super();
   }
   eq(other: TableWidget) {
-    return other.source === this.source && sameInset(other.inset, this.inset);
+    return other.source === this.source && sameInset(other.inset, this.inset) && other.symbols === this.symbols;
   }
-  toDOM() {
+  toDOM(view: EditorView) {
     const wrap = document.createElement("div");
     wrap.className = "cm-lp-table-wrap";
     setInset(wrap, this.inset);
@@ -432,12 +465,13 @@ class TableWidget extends WidgetType {
         const tr = document.createElement("tr");
         for (let col = 0; col < model.columns; col++) {
           const cell = document.createElement(tag === "thead" ? "th" : "td");
+          if (tag === "thead") cell.setAttribute("scope", "col");
           cell.dataset.line = String(row.line);
           cell.dataset.col = String(col);
           if (model.aligns[col]) cell.style.textAlign = model.aligns[col];
           if (model.aligns[col] === "right") cell.classList.add("is-right");
           cell.dataset.text = plainInline(row.cells[col] ?? []).trim();
-          renderInline(cell, row.cells[col] ?? []);
+          renderInline(cell, row.cells[col] ?? [], view);
           tr.append(cell);
         }
         el.append(tr);
@@ -449,13 +483,13 @@ class TableWidget extends WidgetType {
     wrap.append(table);
     // One copy button for the whole table, moved into whichever cell the pointer is over.
     let text = "";
-    const copy = copyButton(() => text, "Copy cell", "cm-lp-copy cm-lp-cell-copy");
+    const copy = copyButton(() => text, t("editor.copyCell"), "cm-lp-copy cm-lp-cell-copy");
     wrap.addEventListener("mouseover", (event) => {
       const cell = (event.target as HTMLElement).closest<HTMLElement>("td, th");
       if (!cell || cell === copy.parentElement) return;
       text = cell.dataset.text ?? "";
       if (!text) return copy.remove();
-      copy.setAttribute("aria-label", `Copy ${text}`);
+      copy.setAttribute("aria-label", t("editor.copyValue", { value: text }));
       cell.append(copy);
     });
     wrap.addEventListener("mouseleave", () => copy.remove());
@@ -520,6 +554,7 @@ const tableDecorations = StateField.define<DecorationSet>({
       tr.docChanged ||
       tr.selection ||
       focusChanged(tr) ||
+      tr.effects.some((effect) => effect.is(symbolsChanged)) ||
       syntaxTree(tr.startState) !== syntaxTree(tr.state)
     ) {
       return buildTables(tr.state);
@@ -557,5 +592,5 @@ export const tables: Extension = [
   tableDecorations,
   clickToEdit,
   tableKeymap,
-  Prec.high(pasteTable),
+  Prec.high(tablePasting(tableMarkdown, inMarkdownCode)),
 ];

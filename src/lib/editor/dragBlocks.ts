@@ -4,6 +4,8 @@ import { Decoration, EditorView, ViewPlugin, type ViewUpdate } from "@codemirror
 import type { SyntaxNode } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
+import { t } from "../i18n/index.svelte";
+import { reducedMotion } from "../platform";
 import { CALLOUT_GUTTER, CARD_PAD, calloutOf, cardInset } from "./cards";
 import { ancestors } from "./util";
 
@@ -78,9 +80,13 @@ function spanning(state: EditorState, k: number) {
   return nodes;
 }
 
+/** Whether the boundary above line `b` is in the note and not inside a code block, table or quote. */
+const droppable = (state: EditorState, b: number) =>
+  b >= 1 && b <= state.doc.lines + 1 && !spanning(state, b).some((n) => ATOMIC.has(n.name));
+
 /** The nearest boundary to `k` that's not inside a code block, table or quote. */
 function snap(state: EditorState, k: number) {
-  const ok = (b: number) => b >= 1 && b <= state.doc.lines + 1 && !spanning(state, b).some((n) => ATOMIC.has(n.name));
+  const ok = (b: number) => droppable(state, b);
   for (let d = 0; d <= state.doc.lines; d++) {
     if (ok(k - d)) return k - d;
     if (ok(k + d)) return k + d;
@@ -177,7 +183,140 @@ const dragSource = StateField.define({
   provide: (field) => EditorView.decorations.from(field),
 });
 
+/* Sliding lines into place after a drop. */
+
+const SLIDE = { duration: 220, easing: "cubic-bezier(0.2, 0, 0, 1)" };
+
+/** The lines and blocks drawn in the editor, with the line number each one starts on. */
+function drawn(view: EditorView) {
+  const found: { el: HTMLElement; line: number }[] = [];
+  for (const el of view.contentDOM.children) {
+    if (!(el instanceof HTMLElement)) continue;
+    try {
+      found.push({ el, line: view.state.doc.lineAt(view.posAtDOM(el)).number });
+    } catch {
+      // Not one of the note's lines.
+    }
+  }
+  return found;
+}
+
+/**
+ * Moves `block` to the boundary above line `k`, and slides it and the lines it passed from where
+ * they were drawn to where they are now, rather than leaving them to jump there.
+ */
+function drop(view: EditorView, block: Block, k: number) {
+  const spec = moveBlock(view.state, block, k);
+  if (!spec) return;
+  const still = reducedMotion.matches;
+  // Where each line was on screen, by line number.
+  const before = new Map<number, number>();
+  if (!still) for (const { el, line } of drawn(view)) before.set(line, el.getBoundingClientRect().top);
+
+  const tr = view.state.update(spec);
+  view.dispatch(tr);
+  if (still) return;
+
+  // Where the block went: the text inserted, after any blank lines put before it.
+  const { doc } = tr.state;
+  let first = 0;
+  const added: [number, number][] = [];
+  tr.changes.iterChanges((_fromA, _toA, fromB, toB, inserted) => {
+    if (!inserted.length) return;
+    added.push([fromB, toB]);
+    first = doc.lineAt(fromB + /^\n*/.exec(inserted.toString())![0].length).number;
+  });
+  const count = block.last - block.first + 1;
+  const inverted = tr.changes.invertedDesc;
+
+  for (const { el, line } of drawn(view)) {
+    const moved = line >= first && line < first + count;
+    let old: number;
+    if (moved) old = block.first + line - first;
+    else {
+      // A blank line put in beside the block is new: nothing to slide from.
+      const from = doc.line(line).from;
+      if (added.some(([a, b]) => from >= a && from < b)) continue;
+      old = tr.startState.doc.lineAt(inverted.mapPos(from, 1)).number;
+    }
+    const was = before.get(old);
+    if (was === undefined) {
+      // It was scrolled out of sight: fade in where it lands.
+      if (moved) el.animate([{ opacity: 0.35 }, { opacity: 1 }], SLIDE);
+      continue;
+    }
+    const by = was - el.getBoundingClientRect().top;
+    if (Math.abs(by) < 1) continue;
+    const start: Keyframe = { transform: `translateY(${by}px)` };
+    // The block comes back from the dimmed look it had while dragged.
+    if (moved) start.opacity = 0.35;
+    el.animate([start, { transform: "none", opacity: 1 }], SLIDE);
+  }
+}
+
 /* The handle and the drop line. */
+
+/** About how long, in seconds, the drop line takes to catch up with where it's going. */
+const GLIDE = 0.07;
+
+/**
+ * A number that follows its target like a damped spring: when the target moves again before it
+ * gets there, it keeps its speed rather than starting over, so the drop line flows from place to
+ * place as the pointer sweeps past lines instead of stepping.
+ */
+class Spring {
+  value = 0;
+  speed = 0;
+  target = 0;
+
+  jump(value: number) {
+    this.value = this.target = value;
+    this.speed = 0;
+  }
+
+  /** Moves on by `dt` seconds (a critically damped spring, as in Unity's SmoothDamp). */
+  step(dt: number) {
+    const omega = 2 / GLIDE;
+    const x = omega * dt;
+    const decay = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
+    const change = this.value - this.target;
+    const pull = (this.speed + omega * change) * dt;
+    this.speed = (this.speed - omega * pull) * decay;
+    this.value = this.target + (change + pull) * decay;
+  }
+}
+
+/**
+ * The space the boundary above line `k` is in: between the nearest lines with text above and
+ * below it (`above` and `below`, past any blank lines), and where that text ends and starts on
+ * screen (`top`, `bottom`, client coordinates; null at the note's start or end). The line is
+ * drawn in it, clear of a heading's letters whatever spacing the heading has.
+ */
+function gapAround(view: EditorView, k: number) {
+  const { state } = view;
+  const { doc } = state;
+  /** The top or bottom of line `n`'s text, or of what's drawn in its place: a table, a diagram, a card's edge. */
+  const edge = (n: number, bottom: boolean) => {
+    const line = doc.line(n);
+    const info = view.lineBlockAt(line.from);
+    // A card's ::: lines are drawn as its padding, so its edge is the bottom or top of theirs.
+    const drawn = info.widget || blockAt(state, n)?.kind === "card";
+    const coords = drawn ? null : view.coordsAtPos(bottom ? line.to : line.from, bottom ? -1 : 1);
+    if (coords) return bottom ? coords.bottom : coords.top;
+    return view.documentTop + (bottom ? info.bottom : info.top);
+  };
+  const blank = (n: number) => !doc.line(n).text.trim();
+  let above = k - 1;
+  while (above >= 1 && blank(above)) above--;
+  let below = k;
+  while (below <= doc.lines && blank(below)) below++;
+  return {
+    above,
+    below,
+    top: above >= 1 ? edge(above, true) : null,
+    bottom: below <= doc.lines ? edge(below, false) : null,
+  };
+}
 
 const HANDLE_WIDTH = 18;
 const HANDLE_HEIGHT = 24;
@@ -189,8 +328,10 @@ interface Drag {
   column: { left: number; width: number; pad: number; gutter: number };
   /** The note changed during the drag (sync, another window), so `block`'s lines may be stale. */
   stale: boolean;
-  /** The boundary it would go to: above this line number. */
+  /** The boundary it would go to: above this line number; null where dropping changes nothing. */
   target: number | null;
+  /** The note as dropping at each boundary would leave it, or null where that's as it is now. */
+  outcomes: Map<number, string | null>;
   startY: number;
   lastY: number;
   moved: boolean;
@@ -204,10 +345,14 @@ const handles = ViewPlugin.fromClass(
     block: Block | null = null;
     drag: Drag | null = null;
     frame = 0;
+    /** The drop line's place and width in the scroller, and when it last moved. */
+    glide = { x: new Spring(), y: new Spring(), width: new Spring(), shown: new Spring(), time: 0 };
 
     constructor(readonly view: EditorView) {
       this.handle.className = "cm-drag-handle";
-      this.handle.title = "Drag to move, click to select";
+      this.handle.title = t("editor.dragHandle");
+      // Only for the mouse: ⌥↑ and ⌥↓ move lines from the keyboard, and selecting is the keyboard's own.
+      this.handle.setAttribute("aria-hidden", "true");
       this.handle.hidden = true;
       this.icon = mount(Icon, { target: this.handle, props: { name: "grip-vertical", size: 16, strokeWidth: 2 } });
       this.indicator.className = "cm-drop-indicator";
@@ -224,7 +369,10 @@ const handles = ViewPlugin.fromClass(
     }
 
     update(update: ViewUpdate) {
-      if (this.drag && update.docChanged) this.drag.stale = true;
+      if (this.drag && update.docChanged) {
+        this.drag.stale = true;
+        this.drag.outcomes.clear();
+      }
       if (!this.drag && (update.docChanged || update.geometryChanged || update.viewportChanged)) this.hide();
     }
 
@@ -314,6 +462,7 @@ const handles = ViewPlugin.fromClass(
         column: this.column(),
         stale: false,
         target: null,
+        outcomes: new Map(),
         startY: event.clientY,
         lastY: event.clientY,
         moved: false,
@@ -332,13 +481,15 @@ const handles = ViewPlugin.fromClass(
         drag.moved = true;
         document.documentElement.classList.add("cm-dragging");
         this.view.dispatch({ effects: setSource.of({ first: drag.block.first, last: drag.block.last }) });
-        this.frame = requestAnimationFrame(this.autoscroll);
+        this.glide.time = performance.now();
+        this.glide.shown.jump(0);
+        this.frame = requestAnimationFrame(this.tick);
       }
       this.aim();
     };
 
-    /** Scrolls while the pointer is near the top or bottom edge. */
-    autoscroll = () => {
+    /** Each frame of a drag: scrolls while the pointer is near the top or bottom edge, and moves the drop line on. */
+    tick = (time: number) => {
       if (!this.drag) return;
       const { scrollDOM } = this.view;
       const box = scrollDOM.getBoundingClientRect();
@@ -349,7 +500,12 @@ const handles = ViewPlugin.fromClass(
         scrollDOM.scrollTop += speed / 3;
         this.aim();
       }
-      this.frame = requestAnimationFrame(this.autoscroll);
+      const { glide } = this;
+      const dt = Math.min((time - glide.time) / 1000, 0.05);
+      glide.time = time;
+      if (dt > 0) for (const spring of [glide.x, glide.y, glide.width, glide.shown]) spring.step(dt);
+      this.draw();
+      this.frame = requestAnimationFrame(this.tick);
     };
 
     /** Works out where a drop would go and draws the line there. */
@@ -364,18 +520,72 @@ const handles = ViewPlugin.fromClass(
       if (y > view.lineBlockAt(doc.length).bottom) k = doc.lines + 1;
       else k = y < line.top + line.height / 2 ? doc.lineAt(line.from).number : doc.lineAt(line.to).number + 1;
       k = snap(state, Math.max(1, Math.min(k, doc.lines + 1)));
-      drag.target = k;
-      const top = k <= doc.lines ? view.lineBlockAt(doc.line(k).from).top : view.lineBlockAt(doc.length).bottom;
-      const cards = spanning(state, k).filter((n) => n.name === "Card");
+      // The boundaries in one gap that leave the note the same are one place to drop, and one that
+      // leaves it as it is (the blank lines around a card are put back either way) is none: the
+      // line fades out there, and letting go does nothing.
+      const gap = gapAround(view, k);
+      const places: { k: number; outcome: string }[] = [];
+      for (let b = gap.above + 1; b <= gap.below; b++) {
+        const outcome = droppable(state, b) ? this.outcome(b) : null;
+        if (outcome !== null && !places.some((place) => place.outcome === outcome)) places.push({ k: b, outcome });
+      }
+      const outcome = this.outcome(k);
+      const index = places.findIndex((place) => place.outcome === outcome);
+      const { glide } = this;
+      if (outcome === null || index < 0) {
+        drag.target = null;
+        glide.shown.target = 0;
+        if (reducedMotion.matches) glide.shown.jump(0);
+        return;
+      }
+      drag.target = places[index].k;
+      glide.shown.target = 1;
+      const cards = spanning(state, drag.target).filter((n) => n.name === "Card");
       const icons = cards.filter((card) => calloutOf(doc.lineAt(card.from).text)?.icon).length;
       const { column } = drag;
       const scroller = view.scrollDOM.getBoundingClientRect();
       const right = cards.length * column.pad;
       const inset = right + icons * column.gutter;
-      this.indicator.style.top = `${view.documentTop + top - scroller.top + view.scrollDOM.scrollTop - 1}px`;
-      this.indicator.style.left = `${column.left + inset - scroller.left}px`;
-      this.indicator.style.width = `${column.width - inset - right}px`;
-      this.indicator.hidden = false;
+      // In the space between the text above and below, with the places in it spread evenly.
+      const top = gap.top ?? gap.bottom! - 6;
+      const bottom = gap.bottom ?? top + 6;
+      const at = top + ((bottom - top) * (index + 1)) / (places.length + 1);
+      glide.x.target = column.left + inset - scroller.left;
+      glide.y.target = at - scroller.top + view.scrollDOM.scrollTop - 1;
+      glide.width.target = column.width - inset - right;
+      // It starts where it first shows rather than gliding in; tick() moves it on from there.
+      if (this.indicator.hidden || reducedMotion.matches) {
+        for (const spring of [glide.x, glide.y, glide.width]) spring.jump(spring.target);
+        if (reducedMotion.matches) glide.shown.jump(1);
+        this.draw();
+        this.indicator.hidden = false;
+      }
+    }
+
+    /** What dropping above line `k` would leave the note as, or null where it's as it is now. */
+    outcome(k: number) {
+      const drag = this.drag!;
+      let outcome = drag.outcomes.get(k);
+      if (outcome === undefined) {
+        const { state } = this.view;
+        const spec = moveBlock(state, drag.block, k);
+        const text = spec && state.update(spec).state.doc.toString();
+        outcome = !text || text === state.doc.toString() ? null : text;
+        drag.outcomes.set(k, outcome);
+      }
+      return outcome;
+    }
+
+    draw() {
+      const { x, y, width } = this.glide;
+      // On its way it draws in a little from both ends and fades a little, and goes behind the text
+      // so the letters it passes stay whole; it opens to its full length, in front, as it settles
+      // (in a gap between lines, clear of any text).
+      const moving = Math.min(Math.abs(y.speed) / 1500, 1);
+      this.indicator.style.transform = `translate(${x.value}px, ${y.value}px) scaleX(${1 - 0.15 * moving})`;
+      this.indicator.style.opacity = `${this.glide.shown.value * (1 - 0.4 * moving)}`;
+      this.indicator.classList.toggle("is-moving", moving > 0.03);
+      this.indicator.style.width = `${width.value}px`;
     }
 
     end = () => {
@@ -390,8 +600,7 @@ const handles = ViewPlugin.fromClass(
         view.focus();
         return;
       }
-      const spec = drag.target === null ? null : moveBlock(view.state, drag.block, drag.target);
-      if (spec) view.dispatch(spec);
+      if (drag.target !== null) drop(view, drag.block, drag.target);
     };
 
     cancel = () => this.stop();

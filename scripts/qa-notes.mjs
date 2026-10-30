@@ -42,6 +42,8 @@ const ELEMENTS = [
   { id: "code-ts", name: "Code block (TypeScript)", md: '```ts\nconst greeting: string = "hello";\nconsole.log(greeting);\n```' },
   { id: "json", name: "JSON block (no language)", md: '```\n{"name":"lines","tags":["a","b"],"id":12345678901234567890}\n```' },
   { id: "diagram", name: "Diagram", md: "```mermaid\nflowchart LR\n  A[Start] --> B{Choice}\n  B --> C[Done]\n```" },
+  { id: "diagram-sized", name: "Diagram (240 px wide)", md: "```mermaid |240\nflowchart LR\n  A[Small] --> B[Diagram]\n```" },
+  { id: "math", name: "Math block", md: "$$\n\\int_0^1 x^2\\,dx = \\frac{1}{3}\n$$" },
   {
     id: "table",
     name: "Table",
@@ -49,7 +51,20 @@ const ELEMENTS = [
   },
   { id: "divider", name: "Divider", md: "---" },
   { id: "key-value", name: "Key: Value line", md: "**Wi-Fi password:** correct-horse-battery" },
+  { id: "mention", name: "Mention", md: "Ask @[QA · Ada] at @[QA · Ada].email." },
+  { id: "wiki-link", name: "Wiki link", md: "Ask [[QA · Ada]], or [[QA · Ada|her]]." },
+  {
+    id: "symbols",
+    name: "Symbols",
+    md: "Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \\-> and `a -> b` in code.",
+  },
+  {
+    id: "github",
+    name: "GitHub links",
+    md: "Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)",
+  },
   { id: "image", name: "Image", md: "![A sample picture](attachment:photo.png)" },
+  { id: "drawing", name: "Drawing", md: "![A sample drawing](attachment:drawing.svg)" },
   { id: "file", name: "File", md: "[Budget.csv](attachment:budget.csv)" },
   { id: "missing-file", name: "Missing file", md: "[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)" },
   { id: "card", name: "Card", md: "::: card\nText in a card.\n:::" },
@@ -70,7 +85,7 @@ const CONTAINERS = [
 ];
 
 /** Some things are only drawn at the top level and in cards; elsewhere they stay Markdown. */
-const DRAWN = new Set(["diagram", "table", "image", "file", "missing-file"]);
+const DRAWN = new Set(["diagram", "diagram-sized", "math", "table", "image", "drawing", "file", "missing-file"]);
 const DRAWN_ONLY_IN = new Set(["top-level", "card", "callout", "callout-none", "nested"]);
 
 const notes = [];
@@ -93,6 +108,8 @@ const INLINE = [
   "`code`",
   "[link](https://example.com)",
   "#qa/inline-tag",
+  "@[QA · Ada]",
+  "$e^{i\\pi} + 1 = 0$",
   "**bold with *italic* inside**",
   "==highlight with **bold** and `code`==",
   "**[bold link](https://example.com)**",
@@ -200,6 +217,15 @@ note(
     `${label(12, "Fence in a code block in a card")}\n\n::: card\n\`\`\`\n:::\n\`\`\`\nThe ::: in the code above doesn't close the card; this line is still in it.\n:::`,
     `${label(13, "Three cards closing on three lines, after a code block in a language not loaded yet")}\n\n\`\`\`haskell\nmain = putStrLn "hello"\n\`\`\`\n\n::: card\n:::!\n:::i\nThree cards, each inside the last. Check all three close here, and the next heading is outside them.\n:::\n:::\n:::`,
     `${label(14, "After the cards above")}\n\nThis line is outside every card.`,
+    `${label(15, "Photo from Unsplash, by the link to its page")}\n\n![Snow-covered mountain peak](https://unsplash.com/photos/snow-covered-mountain-peak-illuminated-by-sunset-light-mevyYnC5xCo)`,
+    `${label(16, "Unsplash photo inside a line of text")}\n\nA mountain ![ice-capped mountain](https://unsplash.com/photos/xfngap_DToE) inside a line.`,
+    `${label(17, "Dollars that aren't math")}\n\n- $5 and $10 stay text (a space before the second $, a digit after it).\n- An escaped \\$x\\$ stays text.\n- \`$x$\` in code stays code.`,
+    `${label(18, "Math that isn't Markdown")}\n\n$a_1 * b_2 * c_3$ is math, with no italics.`,
+    `${label(19, "Display math within a paragraph")}\n\nThe Basel problem: $$\\sum_{n=1}^\\infty \\frac{1}{n^2} = \\frac{\\pi^2}{6}$$ centered on a line of its own.`,
+    `${label(20, "LaTeX that KaTeX can't read")}\n\nShown red, as written, with the reason on hover: $\\frac{1}{$\n\n$$\n\\begin{matrix} a\n$$`,
+    `${label(21, "Math code block")}\n\n\`\`\`math\n\\begin{aligned}\na &= b + c \\\\\nd &= e\n\\end{aligned}\n\`\`\``,
+    `${label(22, "Empty math block")}\n\n$$\n$$`,
+    `${label(23, "A line of only #")}\n\n#\n\nThe # above is text, not an empty heading; a tag is typed this way.`,
   ],
   "edge-cases",
 );
@@ -224,6 +250,85 @@ note(
   "The code block below is never closed, so it runs to the end of the note. Check it ends cleanly at the bottom.",
   ["```\nThis code block has no closing fence.\n\n#qa/not-a-tag stays code"],
   "edge-cases",
+);
+
+note(
+  "08-github-links.md",
+  "GitHub links",
+  "Each kind of GitHub link. Check: each one shows as written in code after the arrow, with GitHub's mark, and shows its URL while the cursor is on it; ⌘-click opens it. A link with text of its own keeps its text, with the mark in front.",
+  [
+    `${label(1, "Bare URLs")}\n\n${[
+      ["https://github.com/overtio", "@overtio"],
+      ["https://github.com/overtio/lines", "overtio/lines"],
+      ["https://github.com/overtio/lines.git", "overtio/lines"],
+      ["https://github.com/overtio/lines/issues/12", "overtio/lines#12"],
+      ["https://github.com/overtio/lines/pull/34/files", "overtio/lines#34"],
+      ["https://github.com/overtio/lines/discussions/5", "overtio/lines#5"],
+      ["https://github.com/overtio/lines/commit/6781dd7f00ba", "overtio/lines@6781dd7"],
+      ["https://github.com/overtio/lines/pull/34/commits/abcdef1234567", "overtio/lines@abcdef1"],
+      ["https://github.com/overtio/lines/tree/main", "overtio/lines@main"],
+      ["https://github.com/overtio/lines/releases/tag/v1.0.0", "overtio/lines@v1.0.0"],
+      ["https://github.com/overtio/lines/compare/v1.0...main", "overtio/lines@v1.0...main"],
+      ["https://github.com/overtio/lines/blob/main/src/lib/editor/github.ts#L10-L20", "overtio/lines › github.ts:10-20"],
+      ["https://github.com/overtio/lines/tree/main/docs", "overtio/lines › docs"],
+      ["https://github.com/overtio/lines/actions", "overtio/lines › actions"],
+      ["www.github.com/overtio/lines", "overtio/lines"],
+    ]
+      .map(([url, short]) => `- ${url} → \`${short}\``)
+      .join("\n")}`,
+    `${label(2, "Other ways of writing them")}\n\n- <https://github.com/overtio/lines/issues/3> (angle brackets) → \`overtio/lines#3\`\n- [https://github.com/overtio/lines/issues/4](https://github.com/overtio/lines/issues/4) (text is the URL) → \`overtio/lines#4\`\n- [the parser bug](https://github.com/overtio/lines/issues/7) → the mark, then "the parser bug"`,
+    `${label(3, "Not shortened")}\n\n- https://github.com stays a plain link\n- https://github.com/settings/profile stays a plain link\n- https://gist.github.com/overtio/1 stays a plain link\n- https://example.com/overtio/lines stays a plain link\n- \`https://github.com/overtio/lines\` in code stays code`,
+    `${label(4, "In a table")}\n\n| Link | Shows |\n| --- | --- |\n| https://github.com/overtio/lines/issues/12 | \`overtio/lines#12\` |\n| [docs](https://github.com/overtio/lines/tree/main/docs) | the mark, then docs |`,
+  ],
+  "github",
+);
+
+/* Objects (notes/properties.ts): two notes with properties, and mentions of them. */
+
+notes.push(
+  {
+    file: "17-object-person.md",
+    text: [
+      "---",
+      "type: qa-person",
+      "fullname: Ada Lovelace",
+      "email: ada@example.org",
+      "Born on: 10 December 1815",
+      "employer: @[QA · Company]",
+      'motto: "That brain of mine is something more than merely mortal"',
+      "languages:",
+      "  - English",
+      "  - French",
+      "# a YAML comment, ignored",
+      "---",
+      "# QA · Ada",
+      "",
+      "A note with properties, of the type qa-person. Check: the properties show as a column of keys and their values, with its type's icon before qa-person (shapes, until one is chosen) and a line under them; the `---` lines show only while the cursor is in them; the employer is a chip that ⌘-click opens; hovering a value shows a copy button. In the list this note is called \"QA · Ada\", and the sidebar lists Qa-person under Types.",
+      "",
+      "#qa/objects",
+      "",
+    ].join("\n"),
+  },
+  {
+    file: "18-object-company.md",
+    text: "---\ntype: qa-company\nwebsite: https://example.com\nfounded: 1843\n---\n# QA · Company\n\nAnother object, of the type qa-company. Check: right-click Qa-company in the sidebar and change its icon; it changes here, in the list, and on every mention of this note.\n\n#qa/objects\n",
+  },
+);
+
+note(
+  "19-mentions.md",
+  "Mentions",
+  "Mentions of other notes and their properties. Check each line against what it says should happen. ⌘-click a chip or a value to open its note; with the cursor on a mention it shows as written.",
+  [
+    `${label(1, "Mentions")}\n\n- @[QA · Ada] is a chip with its type's icon and \"QA · Ada\"\n- @[qa · ada] and @[QA  ·  Ada] are the same chip (case and spaces don't matter)\n- @[QA · Company] has the icon of its type, qa-company`,
+    `${label(2, "Properties")}\n\n- @[QA · Ada].fullname reads \"Ada Lovelace\", underlined\n- @[QA · Ada].born_on and @[QA · Ada].bornOn both read \"10 December 1815\" (the key is \"Born on\")\n- @[QA · Ada].employer reads \"QA · Company\"\n- @[QA · Ada].languages reads \"English, French\"\n- @[QA · Ada].motto reads without its quotes`,
+    `${label(3, "Not found")}\n\n- @[No such note] stays as written, grey with a dashed underline; hovering it offers to create it (don't, so the line stays a test)\n- @[QA · Ada].phone stays as written: Ada has no phone`,
+    `${label(4, "Not mentions")}\n\n- ada@example.org is an email address\n- overtio/lines@main is not a mention\n- \\@[QA · Ada] (escaped) stays text\n- \`@[QA · Ada]\` in code stays code\n- A sentence ending after @[QA · Ada]. The full stop isn't a property: typing it opens the properties menu, and Enter then starts a new line.`,
+    `${label(5, "Type tables")}\n\nEvery note of the type qa-person, with every property:\n\n@type.qa-person\n\nJust two columns:\n\n@type.qa-person(fullname, email)\n\nA type with no notes:\n\n@type.qa-nothing\n\nWithin text, @type.qa-person is a chip.`,
+    `${label(6, "Typing")}\n\nType @ and a letter on the line below: a menu of notes opens, with types on the right. Enter or Tab writes the mention. Then type . for a menu of its properties.\n\n`,
+    `${label(7, "Wiki links")}\n\n- [[QA · Ada]] is the same chip as @[QA · Ada]\n- [[QA · Ada|her]] reads \"her\", with Ada's icon; hovering it shows \"QA · Ada\"\n- [[QA · Ada#Born]] is Ada's chip (the heading is read past)\n- [[No such note]] stays as written, grey with a dashed underline, and offers to create it on hover (don't)\n- ![[QA · Ada]] (an embed) and \\[[QA · Ada]] (escaped) stay text\n\nType two opening square brackets on the line below: the menu of notes opens at once, and Enter writes the wiki link.\n\n`,
+  ],
+  "objects",
 );
 
 /* Every element in every container. */
@@ -253,6 +358,41 @@ ELEMENTS.forEach((first, f) => {
     sections,
     "adjacent",
   );
+});
+
+/* A note written in LaTeX (docs/latex.md), with everything lines draws in one. */
+
+const LATEX = [
+  ["Headings", "\\subsection{A subsection}\n\\subsubsection*{A starred subsubsection}"],
+  ["Styles", "\\textbf{bold}, \\textit{italic}, \\emph{emphasis}, \\texttt{code}, \\underline{underlined}, \\textsc{Small Caps}, \\textbf{bold with \\emph{emphasis} inside}."],
+  ["Characters", "50\\% of \\$10 \\& \\#1, a~tie, en--dash, em---dash, ``quoted'', and so on\\ldots{} \\LaTeX."],
+  ["Lists", "\\begin{itemize}\n  \\item First\n  \\item Second\n  \\begin{enumerate}\n    \\item Nested, numbered\n    \\item Again\n  \\end{enumerate}\n  \\item[--] Its own marker\n\\end{itemize}\n\n\\begin{description}\n  \\item[Term] Its description.\n\\end{description}"],
+  ["Math", "Inline $e^{i\\pi} + 1 = 0$ and \\(a^2 + b^2 = c^2\\).\n\n\\[ \\sum_{n=1}^\\infty \\frac{1}{n^2} = \\frac{\\pi^2}{6} \\]\n\n\\begin{equation}\n  \\int_0^1 x^2\\,dx = \\frac{1}{3} \\label{eq:integral}\n\\end{equation}\n\n\\begin{align*}\n  a &= b + c \\\\\n  d &= e\n\\end{align*}"],
+  ["Broken math", "Red, as written, with the reason on hover: $\\frac{1}{$"],
+  ["Table", "\\begin{tabular}{|l|c|r|}\n  \\hline\n  Left & Center & Right \\\\\n  \\hline\n  a & $x^2$ & 1 \\\\\n  longer cell & b & 22 \\\\\n  \\hline\n\\end{tabular}"],
+  ["Quote and centered", "\\begin{quote}\nA quote.\n\\end{quote}\n\n\\begin{center}\nCentered text.\n\\end{center}"],
+  ["Code", "\\begin{verbatim}\nraw \\textbf{not bold} $not math$\n\\end{verbatim}"],
+  ["Links and footnotes", "A \\href{https://example.com}{named link}, a bare \\url{https://example.com}, and a footnote.\\footnote{The footnote's text.}"],
+  ["Comments and other commands", "Text % a comment with #qa/latex-tag\n\\maketitle \\vspace{1em} \\label{x} stay faint."],
+  ["Line break", "First line\\\\\nsecond line."],
+  ["Theorems", "\\newtheorem{lem}[theorem]{Lemma}\n\n\\begin{lem}[Small]\nA lemma, numbered along with theorems: Lemma 1.\n\\end{lem}\n\n\\begin{theorem}\nTheorem 2, with math in its frame:\n\\[ a^2 + b^2 = c^2 \\]\n\\end{theorem}\n\n\\begin{proof}\nItalic Proof., and a box at the end.\n\\end{proof}"],
+  ["Citations and references", "As shown in \\cite{knuth1984, lamport1994} and Section~\\ref{sec:intro}, see \\eqref{eq:one}. \\label{qa:hidden} The label before this is hidden."],
+  ["Own math commands", "\\newcommand{\\R}{\\mathbb{R}}\n\\newcommand{\\abs}[1]{\\left\\lvert #1 \\right\\rvert}\n\\DeclareMathOperator{\\sinc}{sinc}\nDrawn with the note's commands: $\\abs{x} \\in \\R$ and $\\sinc x$."],
+  ["Accents, letters, verb", "Gödel, Erdős, Łukasiewicz, façade: G\\\"odel, Erd\\H{o}s, \\L ukasiewicz, fa\\c{c}ade. Code: \\verb|x = {a & b}|."],
+  ["Nested numbering", "\\begin{enumerate}\n  \\item One\n  \\begin{enumerate}\n    \\item (a)\n    \\begin{enumerate}\n      \\item i.\n    \\end{enumerate}\n  \\end{enumerate}\n\\end{enumerate}"],
+  ["Bibliography", "\\begin{thebibliography}{9}\n\\bibitem{knuth1984} D. Knuth, \\emph{The \\TeX book}, 1984.\n\\bibitem{lamport1994} L. Lamport, \\emph{\\LaTeX: A Document Preparation System}, 1994.\n\\end{thebibliography}"],
+  ["Not closed", "\\textbf{never closed, and \\begin{itemize} with no end: shown as written."],
+];
+notes.push({
+  file: "09-latex.tex",
+  text: [
+    "\\section{QA · LaTeX note}",
+    "% #qa/latex",
+    "",
+    "A note written in LaTeX. Check: each construct is drawn as its heading says, its LaTeX shows while the cursor is on it, and the title in the list is \"QA · LaTeX note\".",
+    "",
+    ...LATEX.flatMap(([name, latex], i) => [`\\paragraph{${i + 1}. ${name}}`, "", latex, ""]),
+  ].join("\n"),
 });
 
 rmSync(OUT, { recursive: true, force: true });

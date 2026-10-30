@@ -1,0 +1,30 @@
+import type { Translation } from "../../format";
+import type en from "../en/picker";
+
+export default {
+  "picker.iconFor": "Icône de {name}",
+  "picker.noIcon": "Aucune icône",
+  "picker.reset": "Réinitialiser",
+  "picker.search": "Rechercher des icônes",
+  "picker.icons": "Icônes",
+  "picker.matches": "Résultats",
+  "picker.noMatches": "Aucune icône ne correspond à « {query} ».",
+  "picker.groupBasics": "Essentiels",
+  "picker.groupSigns": "Signes",
+  "picker.groupWork": "Travail et études",
+  "picker.groupTech": "Technologie",
+  "picker.groupHome": "Maison et vie",
+  "picker.groupPeople": "Personnes et santé",
+  "picker.groupCreative": "Création",
+  "picker.groupTravel": "Voyages et lieux",
+  "picker.groupNature": "Nature",
+  "picker.writtenIn": "Rédigée en",
+  "picker.words": "Mots",
+  "picker.characters": "Caractères",
+  "picker.sentences": "Phrases",
+  "picker.paragraphs": "Paragraphes",
+  "picker.readingTime": "Temps de lecture",
+  "picker.minutes": "{count, plural, one {# min} other {# min}}",
+  "picker.created": "Créée",
+  "picker.edited": "Modifiée",
+} satisfies Translation<typeof en>;

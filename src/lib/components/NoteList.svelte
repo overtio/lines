@@ -15,9 +15,12 @@
 
 <script lang="ts">
   import { slide } from "svelte/transition";
+  import { speak } from "../a11y";
+  import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
+  import { typeLabel } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
-  import { newNoteKey } from "../platform";
+  import { newNoteKey, reducedMotion } from "../platform";
   import { ui } from "../ui.svelte";
   import NoteRow from "./NoteRow.svelte";
 
@@ -26,8 +29,32 @@
   const title = $derived.by(() => {
     const f = notes.filter;
     if (f.kind === "tag") return `#${f.tag}`;
-    return { all: "Notes", todo: "Todo", untagged: "Untagged", trash: "Trash" }[f.kind];
+    if (f.kind === "type") return typeLabel(f.type);
+    return { all: t("sidebar.notes"), todo: t("sidebar.todo"), untagged: t("sidebar.untagged"), trash: t("sidebar.trash") }[f.kind];
   });
+
+  /**
+   * The row Tab lands on: the open note's, else the first. The others are reached with the arrow
+   * keys, so the list is one stop on the way through the app rather than one per note.
+   */
+  const tabStop = $derived(
+    notes.visible.some((e) => e.note.id === notes.selectedId) ? notes.selectedId : (notes.visible[0]?.note.id ?? null),
+  );
+
+  // Screen readers hear how many notes a search finds, once typing pauses.
+  $effect(() => {
+    if (!notes.query.trim()) return;
+    const count = notes.visible.length;
+    const timer = setTimeout(() => speak(t("list.results", { count })), 700);
+    return () => clearTimeout(timer);
+  });
+
+  function emptyTrash() {
+    void notes.emptyTrash();
+    speak(t("list.trashEmptied"));
+    // Its button goes with the notes; the search field is what's left to hold focus.
+    searchInput?.focus();
+  }
 
   // Only a new day re-renders the rows' dates; a new Date for each edit would redo every row.
   const now = $derived(new Date(today));
@@ -36,34 +63,45 @@
   /** The row that's swiped open, if any. */
   let swipedId = $state<string | null>(null);
 
+  /** ↑ and ↓ open the note above or below, Home and End the first and last. */
   function onListKeydown(event: KeyboardEvent) {
-    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
-    event.preventDefault();
     const ids = notes.visible.map((e) => e.note.id);
     const index = ids.indexOf(notes.selectedId ?? "");
-    const next = ids[Math.max(0, Math.min(ids.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)))];
+    let to: number;
+    if (event.key === "ArrowDown") to = index + 1;
+    else if (event.key === "ArrowUp") to = index - 1;
+    else if (event.key === "Home") to = 0;
+    else if (event.key === "End") to = ids.length - 1;
+    else return;
+    event.preventDefault();
+    const next = ids[Math.max(0, Math.min(ids.length - 1, to))];
     if (!next) return;
     notes.select(next);
     list.querySelector<HTMLElement>(`[data-id="${next}"]`)?.focus();
   }
 </script>
 
-<section class="note-list" aria-label={title}>
+<section class="note-list" aria-labelledby="note-list-title">
   <header class="titlebar" data-tauri-drag-region>
     {#if !ui.sidebarOpen || ui.layout !== "wide"}
       <button
         class="icon-button"
         onclick={() => ui.toggleSidebar()}
-        aria-label="Show sidebar"
-        title="Show sidebar"
-        transition:slide={{ axis: "x", duration: 200 }}
+        aria-label={t("list.showSidebar")}
+        title={t("list.showSidebar")}
+        transition:slide={{ axis: "x", duration: reducedMotion.matches ? 0 : 200 }}
       >
         <Icon name="panel-left" size={18} />
       </button>
     {/if}
-    <h1 data-tauri-drag-region>{title}</h1>
+    <h1 id="note-list-title" data-tauri-drag-region>{title}</h1>
     {#if notes.filter.kind !== "trash"}
-      <button class="icon-button" onclick={() => notes.create()} aria-label="New note" title="New note ({newNoteKey})">
+      <button
+        class="icon-button"
+        onclick={() => notes.create()}
+        aria-label={t("list.newNote")}
+        title={t("list.newNoteWithKey", { key: newNoteKey })}
+      >
         <Icon name="square-pen" size={18} />
       </button>
     {/if}
@@ -75,37 +113,47 @@
       bind:this={searchInput}
       bind:value={notes.query}
       type="search"
-      placeholder="Search"
-      aria-label="Search notes"
+      placeholder={t("list.search")}
+      aria-label={t("list.searchLabel")}
       autocomplete="off"
       spellcheck="false"
       onkeydown={(e) => e.key === "Escape" && ((notes.query = ""), e.currentTarget.blur())}
     />
     {#if notes.query}
-      <button class="clear" onclick={() => (notes.query = "")} aria-label="Clear search"><Icon name="x" size={14} /></button>
+      <button
+        class="clear"
+        onclick={() => ((notes.query = ""), searchInput?.focus())}
+        aria-label={t("list.clearSearch")}
+        title={t("list.clearSearch")}
+      >
+        <Icon name="x" size={14} />
+      </button>
     {/if}
   </div>
 
   {#if notes.filter.kind === "trash" && notes.visible.length}
     <div class="trash-bar">
-      <span>Notes in the trash can be restored.</span>
-      <button onclick={() => notes.emptyTrash()}>Empty trash</button>
+      <span>{t("list.trashHint")}</span>
+      <button onclick={emptyTrash}>{t("list.emptyTrash")}</button>
     </div>
   {/if}
 
   {#if notes.ready && !notes.visible.length}
     <p class="empty">
-      {#if notes.query}No notes match “{notes.query}”.{:else if notes.filter.kind === "trash"}Trash is empty.{:else}No notes yet.{/if}
+      {#if notes.query}{t("list.noMatches", { query: notes.query })}{:else if notes.filter.kind === "trash"}{t(
+          "list.trashIsEmpty",
+        )}{:else}{t("list.noNotes")}{/if}
     </p>
   {/if}
 
-  <ul class="items" bind:this={list} onscroll={() => (swipedId = null)}>
+  <ul class="items" bind:this={list} aria-labelledby="note-list-title" onscroll={() => (swipedId = null)}>
     {#each notes.visible as entry (entry.note.id)}
       {@const id = entry.note.id}
       <NoteRow
         {entry}
         {now}
         selected={id === notes.selectedId}
+        tabbable={id === tabStop}
         open={swipedId === id}
         onswipe={(open) => (swipedId = open ? id : swipedId === id ? null : swipedId)}
         onkeydown={onListKeydown}
@@ -178,13 +226,26 @@
 
   .clear {
     position: absolute;
-    right: 6px;
+    right: 5px;
     display: grid;
     place-items: center;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     border-radius: 6px;
     color: var(--text-faint);
+  }
+
+  /* As tall as the field, and wide enough for a finger. */
+  @media (pointer: coarse) {
+    .search input {
+      padding-right: 44px;
+    }
+
+    .clear {
+      right: 0;
+      width: 44px;
+      height: 34px;
+    }
   }
 
   .trash-bar {
@@ -201,9 +262,18 @@
   }
 
   .trash-bar button {
+    min-height: 24px;
+    margin: -4px 0;
     color: var(--danger);
     font-weight: 600;
     white-space: nowrap;
+  }
+
+  @media (pointer: coarse) {
+    .trash-bar button {
+      min-height: 44px;
+      margin: -12px 0;
+    }
   }
 
   .empty {

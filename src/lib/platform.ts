@@ -12,6 +12,12 @@ export const isMacApp = isTauri && /Macintosh/.test(ua) && !isTouch;
 /** A touch screen is the main pointer; it may change, so read `.matches` when it matters. */
 export const coarsePointer = matchMedia("(pointer: coarse)");
 
+/**
+ * Reduced motion is turned on in the system. app.css stops CSS transitions for it; animations run
+ * from script (Web Animations, Svelte transitions, waits for a slide) check this themselves.
+ */
+export const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+
 export const modKey = isApple ? "⌘" : "Ctrl+";
 
 /** The Mac, Windows or Linux app (not the web, and not phones or tablets). */

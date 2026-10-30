@@ -130,7 +130,28 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Numbered list, then Table
+#### 14. Numbered list, then Diagram (240 px wide)
+
+1. First
+2. Second
+   1. Nested
+3. Third
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+
+#### 15. Numbered list, then Math block
+
+1. First
+2. Second
+   1. Nested
+3. Third
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+
+#### 16. Numbered list, then Table
 
 1. First
 2. Second
@@ -141,7 +162,7 @@ flowchart LR
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 15. Numbered list, then Divider
+#### 17. Numbered list, then Divider
 
 1. First
 2. Second
@@ -149,7 +170,7 @@ flowchart LR
 3. Third
 ---
 
-#### 16. Numbered list, then Key: Value line
+#### 18. Numbered list, then Key: Value line
 
 1. First
 2. Second
@@ -157,7 +178,39 @@ flowchart LR
 3. Third
 **Wi-Fi password:** correct-horse-battery
 
-#### 17. Numbered list, then Image
+#### 19. Numbered list, then Mention
+
+1. First
+2. Second
+   1. Nested
+3. Third
+Ask @[QA · Ada] at @[QA · Ada].email.
+
+#### 20. Numbered list, then Wiki link
+
+1. First
+2. Second
+   1. Nested
+3. Third
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+
+#### 21. Numbered list, then Symbols
+
+1. First
+2. Second
+   1. Nested
+3. Third
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+
+#### 22. Numbered list, then GitHub links
+
+1. First
+2. Second
+   1. Nested
+3. Third
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+
+#### 23. Numbered list, then Image
 
 1. First
 2. Second
@@ -165,7 +218,15 @@ flowchart LR
 3. Third
 ![A sample picture](attachment:photo.png)
 
-#### 18. Numbered list, then File
+#### 24. Numbered list, then Drawing
+
+1. First
+2. Second
+   1. Nested
+3. Third
+![A sample drawing](attachment:drawing.svg)
+
+#### 25. Numbered list, then File
 
 1. First
 2. Second
@@ -173,7 +234,7 @@ flowchart LR
 3. Third
 [Budget.csv](attachment:budget.csv)
 
-#### 19. Numbered list, then Missing file
+#### 26. Numbered list, then Missing file
 
 1. First
 2. Second
@@ -181,7 +242,7 @@ flowchart LR
 3. Third
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 20. Numbered list, then Card
+#### 27. Numbered list, then Card
 
 1. First
 2. Second
@@ -191,7 +252,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 21. Numbered list, then Callout (info)
+#### 28. Numbered list, then Callout (info)
 
 1. First
 2. Second
@@ -201,7 +262,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 22. Numbered list, then Callout (warning, chosen icon)
+#### 29. Numbered list, then Callout (warning, chosen icon)
 
 1. First
 2. Second
@@ -211,7 +272,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 23. Numbered list, then Callout (decision, no icon)
+#### 30. Numbered list, then Callout (decision, no icon)
 
 1. First
 2. Second

@@ -15,31 +15,39 @@ import { fenceInput } from "./fences";
 import { attachmentBlocks } from "./attachments";
 import { formatToolbar, toggleFormat } from "./formatting";
 import { listKeymap } from "./lists";
-import { livePreview } from "./livePreview";
+import { livePreview, openAtCursor } from "./livePreview";
+import type { NoteFormat } from "../notes/types";
+import { latexEditing } from "./latex";
+import { mathBlocks } from "./math";
 import { mermaidDiagrams } from "./mermaid";
 import { slashCommands } from "./slashCommands";
+import { symbols } from "./symbols";
 import { tables } from "./tables";
-import { Card, Highlight, Tag } from "./syntax";
+import { typeTables } from "./typeTables";
+import { frontMatterField, missingNotes } from "./objects";
+import { Card, Highlight, Mention, Tag, TexMath } from "./syntax";
+import { t as message } from "../i18n/index.svelte";
 
 /**
  * The parser for a code block's language (```sql, ```ts…). Each language is loaded the first time
  * a note uses it; until then the block shows as plain code.
  */
 function codeParser(info: string): Parser | null {
-  const name = /\S*/.exec(info)![0];
+  // ```math is LaTeX, drawn as math (math.ts).
+  const name = /\S*/.exec(info)![0].replace(/^math$/i, "latex");
   const found = name ? LanguageDescription.matchLanguageName(languages, name, true) : null;
   if (!found) return null;
   return found.support ? found.support.language.parser : ParseContext.getSkippingParser(found.load());
 }
 
 /**
- * GFM plus our #tags, ==highlights==, cards and highlighted code blocks. Built directly rather
+ * GFM plus our #tags, ==highlights==, cards, $math$, @mentions and highlighted code blocks. Built directly rather
  * than through `markdown()`, which would also bundle HTML, CSS and JavaScript parsers up front.
  * Sharing `markdownLanguage.data` keeps list continuation on Enter working.
  */
 const language = new Language(
   markdownLanguage.data,
-  (markdownLanguage.parser as MarkdownParser).configure([Tag, Highlight, Card, parseCode({ codeParser })]),
+  (markdownLanguage.parser as MarkdownParser).configure([Tag, Highlight, Card, TexMath, Mention, parseCode({ codeParser })]),
   [],
   "markdown",
 );
@@ -75,6 +83,8 @@ const formattingKeymap = keymap.of([
   { key: "Mod-Shift-x", run: toggleFormat("strike") },
   { key: "Mod-Shift-h", run: toggleFormat("highlight") },
   { key: "Mod-Enter", run: toggleTodo },
+  // Opens the mention, link or file under the cursor (as ⌘-click does), as Obsidian's ⌥↵ does.
+  { key: "Alt-Enter", run: openAtCursor },
 ]);
 
 const highlightStyle = HighlightStyle.define([
@@ -164,9 +174,13 @@ const theme = EditorView.theme({
   },
   ".cm-tooltip.cm-tooltip-autocomplete > ul > completion-section:first-child": { marginTop: "2px" },
   ".cm-slash-icon": { display: "flex", color: "var(--text-muted)" },
-  ".cm-completionLabel": { flex: "1" },
+  ".cm-completionLabel": { flex: "1 0 auto" },
   ".cm-completionMatchedText": { textDecoration: "none", fontWeight: "600" },
   ".cm-completionDetail": {
+    minWidth: "0",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
     marginLeft: "12px",
     fontFamily: "var(--font-mono)",
     fontSize: "11.5px",
@@ -179,6 +193,58 @@ const theme = EditorView.theme({
     borderColor: "var(--border) !important",
   },
 });
+
+/** CodeMirror's own words (its find bar, and what it says to screen readers), in the app's language. */
+const phrases = EditorState.phrases.of({
+  Find: message("editor.cm.find"),
+  Replace: message("editor.cm.replace"),
+  next: message("editor.cm.next"),
+  previous: message("editor.cm.previous"),
+  all: message("editor.cm.all"),
+  "match case": message("editor.cm.matchCase"),
+  regexp: message("editor.cm.regexp"),
+  "by word": message("editor.cm.byWord"),
+  replace: message("editor.cm.replaceOne"),
+  "replace all": message("editor.cm.replaceAll"),
+  close: message("editor.cm.close"),
+  "current match": message("editor.cm.currentMatch"),
+  "on line": message("editor.cm.onLine"),
+  "replaced $ matches": message("editor.cm.replacedMatches"),
+  "replaced match on line $": message("editor.cm.replacedMatchOnLine"),
+  "Go to line": message("editor.cm.goToLine"),
+  go: message("editor.cm.go"),
+  Completions: message("editor.cm.completions"),
+  "Control character": message("editor.cm.controlCharacter"),
+  "Selection deleted": message("editor.cm.selectionDeleted"),
+});
+
+/** What only a Markdown note's editor has: the parser, live preview, blocks, menus and keys. */
+const markdownEditing: Extension = [
+  language,
+  frontMatterField,
+  missingNotes,
+  pasteURLAsLink,
+  tables,
+  mermaidDiagrams,
+  mathBlocks,
+  typeTables,
+  attachmentBlocks,
+  cards,
+  dragBlocks,
+  listKeymap,
+  Prec.high(keymap.of(markdownKeymap)),
+  // Before live preview, so its marks (a code span, a link) wrap the symbols inside them.
+  symbols,
+  livePreview,
+  slashCommands,
+  formatToolbar,
+  fenceInput,
+  formattingKeymap,
+];
+
+/** The editing for a note's format: Markdown, or LaTeX (latex.ts). */
+export const formatCompartment = new Compartment();
+export const formatEditing = (format: NoteFormat = "markdown") => (format === "latex" ? latexEditing : markdownEditing);
 
 export const readOnlyCompartment = new Compartment();
 
@@ -194,27 +260,18 @@ export function createExtensions(onChange: () => void): Extension[] {
       spellcheck: "true",
       autocorrect: "on",
       autocapitalize: "sentences",
-      "aria-label": "Note",
+      "aria-label": message("editor.note"),
+      // A note is in whatever language it's written in, not the app's: unknown, so screen readers
+      // and the spellchecker use the device's own languages rather than reading it as French, say.
+      lang: "",
     }),
-    language,
-    pasteURLAsLink,
-    tables,
-    mermaidDiagrams,
-    attachmentBlocks,
-    cards,
+    formatCompartment.of(markdownEditing),
     cursor,
-    dragBlocks,
-    listKeymap,
-    Prec.high(keymap.of(markdownKeymap)),
     syntaxHighlighting(highlightStyle),
-    livePreview,
-    slashCommands,
-    formatToolbar,
-    fenceInput,
     search({ top: true }),
     highlightSelectionMatches(),
-    placeholder("Start writing…"),
-    formattingKeymap,
+    placeholder(message("editor.placeholder")),
+    phrases,
     keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, indentWithTab]),
     readOnlyCompartment.of(readOnly(false)),
     theme,

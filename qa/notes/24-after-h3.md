@@ -91,7 +91,22 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Heading 3, then Table
+#### 14. Heading 3, then Diagram (240 px wide)
+
+### Heading three
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+
+#### 15. Heading 3, then Math block
+
+### Heading three
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+
+#### 16. Heading 3, then Table
 
 ### Heading three
 | Left | Center | Right |
@@ -99,53 +114,78 @@ flowchart LR
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 15. Heading 3, then Divider
+#### 17. Heading 3, then Divider
 
 ### Heading three
 ---
 
-#### 16. Heading 3, then Key: Value line
+#### 18. Heading 3, then Key: Value line
 
 ### Heading three
 **Wi-Fi password:** correct-horse-battery
 
-#### 17. Heading 3, then Image
+#### 19. Heading 3, then Mention
+
+### Heading three
+Ask @[QA · Ada] at @[QA · Ada].email.
+
+#### 20. Heading 3, then Wiki link
+
+### Heading three
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+
+#### 21. Heading 3, then Symbols
+
+### Heading three
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+
+#### 22. Heading 3, then GitHub links
+
+### Heading three
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+
+#### 23. Heading 3, then Image
 
 ### Heading three
 ![A sample picture](attachment:photo.png)
 
-#### 18. Heading 3, then File
+#### 24. Heading 3, then Drawing
+
+### Heading three
+![A sample drawing](attachment:drawing.svg)
+
+#### 25. Heading 3, then File
 
 ### Heading three
 [Budget.csv](attachment:budget.csv)
 
-#### 19. Heading 3, then Missing file
+#### 26. Heading 3, then Missing file
 
 ### Heading three
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 20. Heading 3, then Card
+#### 27. Heading 3, then Card
 
 ### Heading three
 ::: card
 Text in a card.
 :::
 
-#### 21. Heading 3, then Callout (info)
+#### 28. Heading 3, then Callout (info)
 
 ### Heading three
 :::i
 Text in an info callout.
 :::
 
-#### 22. Heading 3, then Callout (warning, chosen icon)
+#### 29. Heading 3, then Callout (warning, chosen icon)
 
 ### Heading three
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 23. Heading 3, then Callout (decision, no icon)
+#### 30. Heading 3, then Callout (decision, no icon)
 
 ### Heading three
 :::^ icon=none

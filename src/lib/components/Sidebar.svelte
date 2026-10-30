@@ -2,8 +2,13 @@
   import Icon from "../icons/Icon.svelte";
   import type { IconName } from "../icons/icons";
   import { formatDate } from "../format";
+  import { t } from "../i18n/index.svelte";
   import { lock } from "../lock/lock.svelte";
+  import { typeLabel } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
+  import { typeIcons } from "../notes/tagIcons.svelte";
+  import { menuPoint } from "../popover";
+  import { longPress } from "../longPress";
   import { isSite } from "../platform";
   import { sync } from "../sync/engine.svelte";
   import type { Filter } from "../notes/types";
@@ -11,25 +16,25 @@
   import TagTree from "./TagTree.svelte";
 
   const sections: { filter: Filter; label: string; icon: IconName; count: () => number }[] = [
-    { filter: { kind: "all" }, label: "Notes", icon: "notes", count: () => notes.counts.all },
-    { filter: { kind: "todo" }, label: "Todo", icon: "square-check", count: () => notes.counts.todo },
-    { filter: { kind: "untagged" }, label: "Untagged", icon: "tag", count: () => notes.counts.untagged },
-    { filter: { kind: "trash" }, label: "Trash", icon: "trash", count: () => notes.counts.trash },
+    { filter: { kind: "all" }, label: t("sidebar.notes"), icon: "notes", count: () => notes.counts.all },
+    { filter: { kind: "todo" }, label: t("sidebar.todo"), icon: "square-check", count: () => notes.counts.todo },
+    { filter: { kind: "untagged" }, label: t("sidebar.untagged"), icon: "tag", count: () => notes.counts.untagged },
+    { filter: { kind: "trash" }, label: t("sidebar.trash"), icon: "trash", count: () => notes.counts.trash },
   ];
 
   const syncLabel = $derived.by(() => {
     switch (sync.status) {
       case "off":
-        return isSite ? "Save to a folder" : "Set up sync";
+        return isSite ? t("sidebar.saveToFolder") : t("sidebar.setUpSync");
       case "syncing":
-        return "Syncing…";
+        return t("sidebar.syncing");
       case "offline":
-        return "Offline";
+        return t("sidebar.offline");
       case "error":
-        return "Sync problem";
+        return t("sidebar.syncProblem");
       default:
-        if (isSite) return sync.lastSynced ? `Saved ${formatDate(sync.lastSynced)}` : "Saving to a folder";
-        return sync.lastSynced ? `Synced ${formatDate(sync.lastSynced)}` : "Sync on";
+        if (isSite) return sync.lastSynced ? t("sidebar.savedAt", { date: formatDate(sync.lastSynced) }) : t("sidebar.savingToFolder");
+        return sync.lastSynced ? t("sidebar.syncedAt", { date: formatDate(sync.lastSynced) }) : t("sidebar.syncOn");
     }
   });
 
@@ -37,11 +42,87 @@
     notes.setFilter(filter);
     ui.closeDrawer();
   }
+
+  /** The type whose menu is open, outlined like a right-clicked note. */
+  let typeMenuFor = $state<string | null>(null);
+  /** The type being renamed in place, and the name typed so far. */
+  let renamingType = $state<string | null>(null);
+  let typeDraft = $state("");
+
+  function finishTypeRename() {
+    const from = renamingType;
+    renamingType = null;
+    const to = typeDraft.trim();
+    if (!from || !to || to.toLowerCase() === from) return;
+    notes.renameType(from, to);
+    typeIcons.rename(from, to.toLowerCase());
+  }
+
+  /** Only what a type can be called: letters, digits, spaces, `-` and `_`. */
+  function onTypeInput(event: Event & { currentTarget: HTMLInputElement }) {
+    event.currentTarget.value = typeDraft = event.currentTarget.value.replace(/[^\p{L}\p{N} _-]/gu, "");
+  }
+
+  function onTypeRenameKeydown(event: KeyboardEvent) {
+    if (event.key === "Enter" || event.key === "Escape") {
+      event.preventDefault();
+      if (event.key === "Escape") typeDraft = renamingType ?? "";
+      (event.currentTarget as HTMLInputElement).blur();
+    }
+  }
+
+  const focusAndSelect = (input: HTMLInputElement) => {
+    input.focus();
+    input.select();
+  };
+
+  function showTypeMenu(type: string, x: number, y: number) {
+    typeMenuFor = type;
+    ui.openMenu({
+      x,
+      y,
+      label: typeLabel(type),
+      items: [
+        {
+          label: t("sidebar.rename"),
+          icon: "pencil",
+          run: () => {
+            renamingType = type;
+            typeDraft = type;
+          },
+        },
+        {
+          label: t("sidebar.changeIcon"),
+          icon: "smile",
+          run: () =>
+            (ui.iconPicker = {
+              key: `type:${type}`,
+              label: typeLabel(type),
+              fallback: typeIcons.get(type),
+              icon: () => typeIcons.chosen(type) ?? null,
+              set: (icon) => typeIcons.set(type, icon),
+              x,
+              y,
+            }),
+        },
+        ...(typeIcons.chosen(type) ? [{ label: t("sidebar.resetIcon"), icon: "shapes" as const, run: () => typeIcons.set(type, null) }] : []),
+      ],
+      onclose: () => (typeMenuFor = null),
+    });
+  }
+
+  function onTypeContextMenu(event: MouseEvent, type: string) {
+    event.preventDefault();
+    // Android also fires this after a long press, when the menu is already up.
+    if (typeMenuFor === type) return;
+    const { x, y } = menuPoint(event);
+    showTypeMenu(type, x, y);
+  }
 </script>
 
-<nav class="sidebar" aria-label="Library">
+<nav class="sidebar" aria-label={t("sidebar.label")}>
   <header class="titlebar" data-tauri-drag-region>
-    <button class="icon-button" onclick={() => ui.toggleSidebar()} aria-label="Hide sidebar" title="Hide sidebar">
+    <button class="icon-button" onclick={() => ui.toggleSidebar()} aria-label={t("sidebar.hide")} title={t("sidebar.hide")}>
       <Icon name="panel-left" size={18} />
     </button>
   </header>
@@ -60,9 +141,51 @@
       {/each}
     </ul>
 
+    {#if notes.types.length}
+      <h2 class="heading" id="sidebar-types">{t("sidebar.types")}</h2>
+      <ul class="types" aria-labelledby="sidebar-types">
+        {#each notes.types as { type, count } (type)}
+          {@const active = notes.filter.kind === "type" && notes.filter.type === type}
+          <li>
+            {#if renamingType === type}
+              <div class="row renaming">
+                <Icon name={typeIcons.get(type)} size={16} strokeWidth={1.75} />
+                <input
+                  class="label"
+                  value={typeDraft}
+                  aria-label={t("sidebar.typeName")}
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  oninput={onTypeInput}
+                  onkeydown={onTypeRenameKeydown}
+                  onblur={finishTypeRename}
+                  {@attach focusAndSelect}
+                />
+              </div>
+            {:else}
+              <button
+                class="row"
+                class:active
+                class:menu-target={typeMenuFor === type || ui.iconPicker?.key === `type:${type}`}
+                onclick={() => choose({ kind: "type", type })}
+                oncontextmenu={(event) => onTypeContextMenu(event, type)}
+                {@attach longPress((x, y) => showTypeMenu(type, x, y))}
+                aria-current={active}
+              >
+                <Icon name={typeIcons.get(type)} size={16} strokeWidth={1.75} />
+                <span class="label">{typeLabel(type)}</span>
+                <span class="count">{count}</span>
+              </button>
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    {/if}
+
     {#if notes.tagTree.length}
-      <h2 class="heading">Tags</h2>
-      <TagTree nodes={notes.tagTree} onchoose={(tag) => choose({ kind: "tag", tag })} />
+      <h2 class="heading" id="sidebar-tags">{t("sidebar.tags")}</h2>
+      <TagTree nodes={notes.tagTree} onchoose={(tag) => choose({ kind: "tag", tag })} labelledby="sidebar-tags" />
     {/if}
   </div>
 
@@ -71,7 +194,7 @@
       class="row sync"
       class:error={sync.status === "error"}
       onclick={() => (ui.settings = "sync")}
-      title={sync.error ?? "Sync settings"}
+      title={sync.error ?? t("sidebar.syncSettings")}
     >
       {#if sync.status === "syncing"}
         <Icon name="loader" size={16} class="spin" />
@@ -87,11 +210,11 @@
       <span class="label">{syncLabel}</span>
     </button>
     {#if lock.enabled}
-      <button class="icon-button" onclick={() => lock.lockNow()} aria-label="Lock lines" title="Lock lines">
+      <button class="icon-button" onclick={() => lock.lockNow()} aria-label={t("sidebar.lock")} title={t("sidebar.lock")}>
         <Icon name="lock" size={16} />
       </button>
     {/if}
-    <button class="icon-button" onclick={() => (ui.settings = "appearance")} aria-label="Settings" title="Settings">
+    <button class="icon-button" onclick={() => (ui.settings = "appearance")} aria-label={t("sidebar.settings")} title={t("sidebar.settings")}>
       <Icon name="settings" size={17} />
     </button>
   </footer>
@@ -130,7 +253,11 @@
     border-top: 1px solid var(--border);
   }
 
+  /* Takes the room the buttons beside it leave; a long label (other languages) is cut short, not them. */
   footer .sync {
+    flex: 1;
+    width: auto;
+    min-width: 0;
     font-size: 13px;
     color: var(--text-muted);
   }
@@ -140,8 +267,32 @@
     color: var(--danger);
   }
 
-  .sections {
+  .sections,
+  .types {
     margin-bottom: 18px;
+  }
+
+  .types .row {
+    -webkit-touch-callout: none;
+  }
+
+  .row.menu-target {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+
+  .renaming {
+    box-shadow: inset 0 0 0 2px var(--accent-soft);
+    background: var(--bg);
+  }
+
+  .renaming input {
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font: inherit;
+    outline: none;
   }
 
   .heading {
@@ -201,9 +352,21 @@
     white-space: nowrap;
   }
 
+  /* With increased contrast, a count on the chosen row keeps 4.5:1 over its darker background. */
+  :global(:root[data-contrast="more"]) .sidebar :global(.row.active .count) {
+    color: var(--text-muted);
+  }
+
   .sidebar :global(.count) {
     font-size: 12px;
     color: var(--text-faint);
     font-variant-numeric: tabular-nums;
+  }
+
+  /* Fingers need bigger targets. */
+  @media (pointer: coarse) {
+    .sidebar :global(.row) {
+      height: 44px;
+    }
   }
 </style>

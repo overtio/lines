@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { touchIdAvailable } from "../lock/lock.svelte";
   import { lockedNotes } from "../notes/locked.svelte";
@@ -10,6 +11,8 @@
   let dialog: HTMLDialogElement;
   let touchIdError = $state<string | null>(null);
   let hasTouchId = $state(false);
+  /** What had focus before the dialog opened, to give it back after. */
+  let opener: HTMLElement | null = null;
 
   void touchIdAvailable.then((available) => (hasTouchId = available));
 
@@ -19,9 +22,18 @@
   $effect(() => {
     if (request && !dialog.open) {
       touchIdError = null;
+      opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       dialog.showModal();
     } else if (!request && dialog.open) dialog.close();
   });
+
+  function onclose() {
+    lockedNotes.asking = null;
+    // Not every web view gives focus back by itself. Locking a note may have moved it on (to the
+    // note's lock), so only where nothing has it.
+    if (opener?.isConnected && (document.activeElement === document.body || !document.activeElement)) opener.focus();
+    opener = null;
+  }
 
   function done() {
     const then = request?.then;
@@ -34,39 +46,44 @@
     try {
       if (await lockedNotes.unlockWithTouchId()) done();
     } catch (e) {
-      touchIdError = String(e);
+      touchIdError = t("lock.touchId.failed", { error: String(e) });
     }
   }
 </script>
 
-<dialog bind:this={dialog} onclose={() => (lockedNotes.asking = null)} aria-labelledby="notes-password-title">
+<dialog
+  bind:this={dialog}
+  {onclose}
+  aria-modal="true"
+  aria-labelledby="notes-password-title"
+  aria-describedby="notes-password-intro"
+>
   {#if request}
     <div class="badge" aria-hidden="true"><Icon name="lock" size={20} strokeWidth={1.75} /></div>
     {#if request.purpose === "set"}
-      <h2 id="notes-password-title">Set a password for locked notes</h2>
-      <p class="prose">
-        It opens every note you lock, here and on your other devices. Locked notes' titles still show in the list.
-      </p>
+      <h2 id="notes-password-title">{t("lock.dialog.setTitle")}</h2>
+      <p class="prose" id="notes-password-intro">{t("lock.dialog.setIntro")}</p>
       <PassphraseForm
         kind="new"
         noun="password"
-        submit="Lock Note"
-        busyLabel="Locking…"
+        submit={t("lock.dialog.lockNote")}
+        busyLabel={t("lock.dialog.locking")}
+        describedby="notes-password-forget"
         oncancel={() => (lockedNotes.asking = null)}
         onsubmit={async (password) => {
           await lockedNotes.setUp(password);
           done();
         }}
       />
-      <p class="note">If you forget it, the notes you lock with it can't be opened, not even by lines.</p>
+      <p class="note" id="notes-password-forget">{t("lock.dialog.setHint")}</p>
     {:else}
-      <h2 id="notes-password-title">Enter the password for locked notes</h2>
-      <p class="prose">Your locked notes open too, until you lock them again.</p>
+      <h2 id="notes-password-title">{t("lock.dialog.openTitle")}</h2>
+      <p class="prose" id="notes-password-intro">{t("lock.dialog.openIntro")}</p>
       <PassphraseForm
         kind="current"
         noun="password"
-        submit="Lock Note"
-        busyLabel="Locking…"
+        submit={t("lock.dialog.lockNote")}
+        busyLabel={t("lock.dialog.locking")}
         oncancel={() => (lockedNotes.asking = null)}
         onsubmit={async (password) => {
           await lockedNotes.unlock(password, noteKeys.settings?.key.id);
@@ -75,7 +92,7 @@
       />
       {#if touchId}
         <button type="button" class="text-button touch-id" onclick={useTouchId}>
-          <Icon name="fingerprint" size={16} /> Use Touch ID
+          <Icon name="fingerprint" size={16} /> {t("lock.useTouchId")}
         </button>
         {#if touchIdError}<p class="message" role="alert">{touchIdError}</p>{/if}
       {/if}
@@ -176,5 +193,13 @@
 
   dialog :global(button:disabled) {
     opacity: var(--disabled-opacity);
+  }
+
+  /* Touch screens: targets a finger can hit (44 px high). */
+  @media (pointer: coarse) {
+    dialog :global(.primary),
+    dialog :global(.text-button) {
+      min-height: 44px;
+    }
   }
 </style>

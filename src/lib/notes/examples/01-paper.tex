@@ -1,0 +1,96 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+% Shorthands the math below uses; lines draws them too.
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\partialsum}[1]{S_{#1}}
+\DeclareMathOperator{\sinc}{sinc}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
+
+\title{A Short Note on the Basel Problem}
+\author{Ada Example \\ Department of Mathematics \\ \texttt{ada@example.org} \and Ben Sample \\ Institute of Examples}
+\date{October 2026}
+
+\begin{document}
+
+\maketitle
+% #examples
+
+\begin{abstract}
+We recall Euler's evaluation of $\sum_{n \in \N} 1/n^2$, sketch his argument through the product for $\sin x$, and compare how quickly the partial sums approach the limit. Nothing here is new; it is an example of a paper written in lines.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+The \emph{Basel problem} asks for the exact value of the series
+\begin{equation}
+  \zeta(2) = \sum_{n=1}^{\infty} \frac{1}{n^2} = 1 + \frac{1}{4} + \frac{1}{9} + \cdots
+  \label{eq:basel}
+\end{equation}
+It was posed by Mengoli in 1650 and solved by Euler in 1734~\cite{euler1740}, who showed that the sum is $\pi^2/6$. Section~\ref{sec:proof} follows his argument, and Section~\ref{sec:numbers} looks at the numbers.\footnote{All numbers here can be checked with a few lines of code.}
+
+\section{Euler's argument}
+\label{sec:proof}
+
+\begin{defn}[Partial sums]
+For $N \in \N$, let $\partialsum{N} = \sum_{n=1}^{N} n^{-2}$.
+\end{defn}
+
+\begin{lemma}[Product formula]
+For every $x \in \R$,
+\[ \sinc x = \frac{\sin x}{x} = \prod_{n=1}^{\infty} \left( 1 - \frac{x^2}{n^2 \pi^2} \right). \]
+\end{lemma}
+
+\begin{theorem}[Euler]
+\label{thm:basel}
+The series~\eqref{eq:basel} converges, and $\zeta(2) = \pi^2 / 6$.
+\end{theorem}
+
+\begin{proof}
+Expand both sides of the lemma as power series in $x$. On the left,
+\begin{align*}
+  \frac{\sin x}{x} &= 1 - \frac{x^2}{3!} + \frac{x^4}{5!} - \cdots
+\end{align*}
+On the right, the coefficient of $x^2$ is $-\sum_{n} 1/(n^2 \pi^2)$. Comparing the two gives $\frac{1}{6} = \frac{1}{\pi^2} \zeta(2)$, as claimed.
+\end{proof}
+
+Euler's step from the zeros of $\sin x$ to the product was only justified a century later, by Weierstrass~\cite{weierstrass1876}.
+
+\section{How fast the sums converge}
+\label{sec:numbers}
+
+The error $\abs{\zeta(2) - \partialsum{N}}$ is about $1/N$, so each extra digit costs ten times as many terms (Table~\ref{tab:sums}).
+
+\begin{center}
+\begin{tabular}{rrr}
+  \toprule
+  \multicolumn{3}{c}{Partial sums of $\zeta(2) \approx 1.644934$} \\
+  \midrule
+  $N$ & $\partialsum{N}$ & Error \\
+  \midrule
+  10 & 1.549768 & $9.5 \times 10^{-2}$ \\
+  100 & 1.634984 & $9.9 \times 10^{-3}$ \\
+  1000 & 1.643935 & $1.0 \times 10^{-3}$ \\
+  \bottomrule
+\end{tabular}
+\end{center}
+\label{tab:sums}
+
+In code the sum is one line, \verb|sum(1 / n**2 for n in range(1, N + 1))|, which is how the table was made.
+
+\begin{thebibliography}{9}
+\bibitem{euler1740} L. Euler, \emph{De summis serierum reciprocarum}, Commentarii academiae scientiarum Petropolitanae 7 (1740), 123--134.
+\bibitem{weierstrass1876} K. Weierstrass, \emph{Zur Theorie der eindeutigen analytischen Functionen}, Abhandlungen der Königlich Preussischen Akademie der Wissenschaften (1876).
+\end{thebibliography}
+
+\end{document}

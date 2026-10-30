@@ -1,0 +1,62 @@
+\section{Linear Algebra · Lecture 7: Eigenvalues}
+% #examples
+
+Today: what eigenvalues are, how to find them, and why a symmetric matrix always has real ones. Read Chapter~5 before Thursday.
+
+\subsection{Definitions}
+
+\begin{definition}
+Let $A$ be an $n \times n$ matrix. A number $\lambda$ is an \emph{eigenvalue} of $A$ if there is a vector $v \neq 0$ with
+\[ A v = \lambda v. \]
+Such a $v$ is an \emph{eigenvector} for $\lambda$.
+\end{definition}
+
+\begin{remark}
+Eigenvectors are only defined up to a scalar: if $Av = \lambda v$, then $A(cv) = \lambda (cv)$.
+\end{remark}
+
+\subsection{Finding them}
+
+$Av = \lambda v$ has a solution $v \neq 0$ exactly when $A - \lambda I$ isn't invertible, so:
+
+\begin{theorem}
+The eigenvalues of $A$ are the roots of its \textbf{characteristic polynomial}
+\[ p(\lambda) = \det(A - \lambda I). \]
+\end{theorem}
+
+\begin{example}
+For
+\[ A = \begin{pmatrix} 2 & 1 \\ 1 & 2 \end{pmatrix}, \]
+we get
+\begin{align*}
+  p(\lambda) &= (2 - \lambda)^2 - 1 \\
+             &= (\lambda - 1)(\lambda - 3),
+\end{align*}
+so the eigenvalues are $1$ and $3$, with eigenvectors $(1, -1)$ and $(1, 1)$.
+\end{example}
+
+Steps, for any square matrix:
+\begin{enumerate}
+  \item Compute $p(\lambda) = \det(A - \lambda I)$.
+  \item Find its roots $\lambda_1, \ldots, \lambda_k$.
+  \item For each $\lambda_i$, solve $(A - \lambda_i I) v = 0$.
+\end{enumerate}
+
+\subsection{Symmetric matrices}
+
+\begin{theorem}[Spectral theorem, real case]
+If $A = A^{\mathsf{T}}$, every eigenvalue of $A$ is real, and $A$ has an orthonormal basis of eigenvectors.
+\end{theorem}
+
+\begin{proof}
+Let $Av = \lambda v$ with $v \neq 0$, possibly complex. Then
+\[ \lambda \, \bar{v}^{\mathsf{T}} v = \bar{v}^{\mathsf{T}} A v = \overline{(A \bar{v})}^{\mathsf{T}} v = \bar{\lambda} \, \bar{v}^{\mathsf{T}} v, \]
+and since $\bar{v}^{\mathsf{T}} v = \|v\|^2 > 0$, $\lambda = \bar{\lambda}$. The basis is in the book.\footnote{Theorem 5.3, by induction on $n$.}
+\end{proof}
+
+\subsection{To remember}
+\begin{itemize}
+  \item Eigenvalues: roots of $\det(A - \lambda I)$.
+  \item $\operatorname{tr} A = \sum_i \lambda_i$ and $\det A = \prod_i \lambda_i$.
+  \item Symmetric matrices: real eigenvalues, orthogonal eigenvectors.
+\end{itemize}

@@ -1,5 +1,6 @@
 import type { LockedKey } from "../crypto";
 import type { IconName } from "../icons/icons";
+import type { Property } from "./properties";
 
 export interface Note {
   id: string;
@@ -11,9 +12,13 @@ export interface Note {
   trashed: boolean;
   /** An icon chosen for the note, shown before its title in the list. */
   icon?: IconName;
+  /** Set for a note written in LaTeX rather than Markdown (docs/latex.md). */
+  format?: "latex";
   /** Set for a note locked with the locked-notes password (see notes/noteKeys.svelte.ts). */
   locked?: NoteLock;
 }
+
+export type NoteFormat = "markdown" | "latex";
 
 /** The key a locked note is encrypted with, locked with the password. Notes locked with the same password share it. */
 export interface WrappedKey extends LockedKey {
@@ -46,6 +51,10 @@ export interface NoteMeta {
   tags: string[];
   hasOpenTodos: boolean;
   searchText: string;
+  /** The `key: value` lines of its front matter (notes/properties.ts). */
+  properties: Property[];
+  /** Its `type` property, lowercased; empty for a note without one. */
+  type: string;
 }
 
 export type Filter =
@@ -53,4 +62,5 @@ export type Filter =
   | { kind: "todo" }
   | { kind: "untagged" }
   | { kind: "trash" }
-  | { kind: "tag"; tag: string };
+  | { kind: "tag"; tag: string }
+  | { kind: "type"; type: string };

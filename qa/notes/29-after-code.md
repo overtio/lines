@@ -130,7 +130,28 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Code block, then Table
+#### 14. Code block, then Diagram (240 px wide)
+
+```
+plain code
+  indented line
+```
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+
+#### 15. Code block, then Math block
+
+```
+plain code
+  indented line
+```
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+
+#### 16. Code block, then Table
 
 ```
 plain code
@@ -141,7 +162,7 @@ plain code
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 15. Code block, then Divider
+#### 17. Code block, then Divider
 
 ```
 plain code
@@ -149,7 +170,7 @@ plain code
 ```
 ---
 
-#### 16. Code block, then Key: Value line
+#### 18. Code block, then Key: Value line
 
 ```
 plain code
@@ -157,7 +178,39 @@ plain code
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 17. Code block, then Image
+#### 19. Code block, then Mention
+
+```
+plain code
+  indented line
+```
+Ask @[QA · Ada] at @[QA · Ada].email.
+
+#### 20. Code block, then Wiki link
+
+```
+plain code
+  indented line
+```
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+
+#### 21. Code block, then Symbols
+
+```
+plain code
+  indented line
+```
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+
+#### 22. Code block, then GitHub links
+
+```
+plain code
+  indented line
+```
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+
+#### 23. Code block, then Image
 
 ```
 plain code
@@ -165,7 +218,15 @@ plain code
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 18. Code block, then File
+#### 24. Code block, then Drawing
+
+```
+plain code
+  indented line
+```
+![A sample drawing](attachment:drawing.svg)
+
+#### 25. Code block, then File
 
 ```
 plain code
@@ -173,7 +234,7 @@ plain code
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 19. Code block, then Missing file
+#### 26. Code block, then Missing file
 
 ```
 plain code
@@ -181,7 +242,7 @@ plain code
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 20. Code block, then Card
+#### 27. Code block, then Card
 
 ```
 plain code
@@ -191,7 +252,7 @@ plain code
 Text in a card.
 :::
 
-#### 21. Code block, then Callout (info)
+#### 28. Code block, then Callout (info)
 
 ```
 plain code
@@ -201,7 +262,7 @@ plain code
 Text in an info callout.
 :::
 
-#### 22. Code block, then Callout (warning, chosen icon)
+#### 29. Code block, then Callout (warning, chosen icon)
 
 ```
 plain code
@@ -211,7 +272,7 @@ plain code
 Text in a warning callout with the flag icon.
 :::
 
-#### 23. Code block, then Callout (decision, no icon)
+#### 30. Code block, then Callout (decision, no icon)
 
 ```
 plain code

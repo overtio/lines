@@ -22,8 +22,8 @@ const BLOCKS: Record<string, Block> = {
   ":": { node: "Card", closer: /^\s*:{3,}\s*$/ },
 };
 
-/** Code, where these characters are just text. */
-const CODE = new Set(["FencedCode", "CodeBlock", "InlineCode"]);
+/** Code (and LaTeX), where these characters are just text. */
+const CODE = new Set(["FencedCode", "CodeBlock", "InlineCode", "InlineMath", "MathBlock"]);
 
 function inCode(state: EditorState, pos: number) {
   for (const node of ancestors(state, pos, -1)) {

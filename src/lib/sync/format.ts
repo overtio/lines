@@ -13,10 +13,12 @@ import type { Note, NoteLock } from "../notes/types";
  *   pinned: false
  *   trashed: false
  *   icon: rocket
+ *   format: latex
  *   ---
  *   # My note
  *
- * `icon` is only there for a note that has one, so notes without stay byte for byte as they were.
+ * `icon` is only there for a note that has one, and `format` for a note written in LaTeX, so
+ * other notes stay byte for byte as they were.
  *
  * A locked note's Markdown is encrypted (see notes/noteKeys.svelte.ts). What it keeps readable,
  * its title and its key (itself locked with the password), is one line of JSON, and the
@@ -37,6 +39,7 @@ export function serialize(note: Note): string {
     `pinned: ${note.pinned}`,
     `trashed: ${note.trashed}`,
     ...(note.icon ? [`icon: ${note.icon}`] : []),
+    ...(note.format ? [`format: ${note.format}`] : []),
     ...(lock ? [`locked: ${JSON.stringify(lock)}`] : []),
     "---",
     note.locked ? note.locked.sealed : note.body,
@@ -65,6 +68,7 @@ export function deserialize(text: string, fallbackId: string): Note {
     pinned: fields.get("pinned") === "true",
     trashed: fields.get("trashed") === "true",
     ...(icon && icon in ICONS ? { icon: icon as IconName } : {}),
+    ...(fields.get("format") === "latex" ? { format: "latex" as const } : {}),
     ...(locked ? { locked } : {}),
   };
 }

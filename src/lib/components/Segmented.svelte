@@ -110,4 +110,11 @@
   button:disabled {
     opacity: var(--disabled-opacity);
   }
+
+  /* Fingers need bigger targets. */
+  @media (pointer: coarse) {
+    button {
+      min-height: 44px;
+    }
+  }
 </style>

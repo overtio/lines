@@ -3,9 +3,10 @@ import { isSite } from "../platform";
 import { announce } from "../windows/channel";
 import { noteKeys } from "./noteKeys.svelte";
 import type { SampleSet } from "./samples";
-import { computeMeta, normalizeTag, renameTagIn } from "./parse";
+import { computeMeta, normalizeTag, renameTagIn, renameTypeIn } from "./parse";
+import { nameOf } from "./properties";
 import { IndexedDBStorage, type NoteStorage } from "./storage";
-import type { Filter, Note, NoteLock, NoteMeta, WrappedKey } from "./types";
+import type { Filter, Note, NoteFormat, NoteLock, NoteMeta, WrappedKey } from "./types";
 import { WELCOME_NOTE } from "./welcome";
 
 export interface Entry {
@@ -53,9 +54,9 @@ export const isClosed = (note: Note) => !!note.locked && !note.locked.open;
  * to-dos and words stay out of the sidebar and search, so they don't come and go as it opens.
  */
 function metaOf(note: Note): NoteMeta {
-  if (!note.locked) return computeMeta(note.body);
-  const title = note.locked.open ? computeMeta(note.body).title : note.locked.title;
-  return { title, excerpt: "", tags: [], hasOpenTodos: false, searchText: title.toLowerCase() };
+  if (!note.locked) return computeMeta(note.body, note.format);
+  const title = note.locked.open ? computeMeta(note.body, note.format).title : note.locked.title;
+  return { title, excerpt: "", tags: [], hasOpenTodos: false, searchText: title.toLowerCase(), properties: [], type: "" };
 }
 
 const entryOf = (note: Note): Entry => ({ note, meta: metaOf(note) });
@@ -110,6 +111,7 @@ class NotesStore {
           if (f.kind === "todo" && !meta.hasOpenTodos) return false;
           if (f.kind === "untagged" && meta.tags.length) return false;
           if (f.kind === "tag" && !matchesTag(meta.tags, f.tag)) return false;
+          if (f.kind === "type" && meta.type !== f.type) return false;
         }
         return terms.every((t) => meta.searchText.includes(t));
       })
@@ -161,6 +163,42 @@ class NotesStore {
     return root;
   });
 
+  /** Each type (`type: person`, see properties.ts) and how many notes have it, by name. */
+  types = $derived.by(() => {
+    const counts = new Map<string, number>();
+    for (const { note, meta } of this.entries) {
+      if (!note.trashed && meta.type) counts.set(meta.type, (counts.get(meta.type) ?? 0) + 1);
+    }
+    return [...counts].sort(([a], [b]) => a.localeCompare(b)).map(([type, count]) => ({ type, count }));
+  });
+
+  /**
+   * The note each mention (`@Oleks`) finds, by its title (see properties.ts `nameOf`). Two notes
+   * with one title: the one with a type, then the one edited last. Trashed notes aren't found.
+   */
+  objects = $derived.by(() => {
+    const found = new Map<string, Entry>();
+    for (const entry of this.entries) {
+      const name = nameOf(entry.meta.title);
+      if (!name || entry.note.trashed) continue;
+      const other = found.get(name);
+      const typed = !!entry.meta.type;
+      if (!other || (typed !== !!other.meta.type ? typed : entry.note.updatedAt > other.note.updatedAt)) found.set(name, entry);
+    }
+    return found;
+  });
+
+  /**
+   * What mentions and type tables show of other notes, as a string: their titles, icons, types and
+   * properties. Typing that changes none of these leaves it the same, so editors don't redraw for it.
+   */
+  objectsSignature = $derived.by(() =>
+    this.entries
+      .filter(({ note }) => !note.trashed)
+      .map(({ note, meta }) => [note.id, meta.title, note.icon, meta.type, ...meta.properties.map((p) => `${p.key}:${p.value}`)].join("\u0001"))
+      .join("\n"),
+  );
+
   constructor(storage: NoteStorage) {
     this.#storage = storage;
   }
@@ -187,6 +225,23 @@ class NotesStore {
     return this.entries.find((e) => e.note.id === id);
   }
 
+  /** The note a mention of `name` finds (see `objects`). */
+  find(name: string): Entry | undefined {
+    return this.objects.get(nameOf(name));
+  }
+
+  /** The notes of a type (`@type.recipe` finds `recipe`; `_`, `-` and spaces alike), not trashed. */
+  ofType(type: string): Entry[] {
+    const wanted = nameOf(type);
+    return this.entries.filter(({ note, meta }) => !note.trashed && meta.type && nameOf(meta.type) === wanted);
+  }
+
+  /** Opens a note, showing all notes if the list hides it. */
+  show(id: string) {
+    if (!this.visible.some((e) => e.note.id === id)) this.setFilter({ kind: "all" });
+    this.select(id);
+  }
+
   select(id: string | null) {
     const previous = this.selectedId;
     this.selectedId = id;
@@ -200,12 +255,14 @@ class NotesStore {
     }
   }
 
-  create(): string {
+  /** Makes a new note and opens it, ready to type its title; `body` is what it starts as, if not the usual. */
+  create(body?: string): string {
     const now = Date.now();
-    const tag = this.filter.kind === "tag" ? this.filter.tag : null;
+    const f = this.filter;
+    // Made under a tag it has the tag; made under a type, it's one of that type.
     const note: Note = {
       id: crypto.randomUUID(),
-      body: tag ? `# \n\n#${tag}` : "# ",
+      body: body ?? (f.kind === "tag" ? `# \n\n#${f.tag}` : f.kind === "type" ? `---\ntype: ${f.type}\n---\n# ` : "# "),
       createdAt: now,
       updatedAt: now,
       pinned: false,
@@ -292,6 +349,25 @@ class NotesStore {
     this.#patch(id, { icon: icon ?? undefined });
   }
 
+  /**
+   * Writes the note in LaTeX or Markdown. Its text stays as it is, except a new note's: its "# "
+   * goes, and a tag it was made under moves into a comment, where LaTeX ignores it.
+   */
+  setFormat(id: string, format: NoteFormat) {
+    const entry = this.get(id);
+    if (!entry || (entry.note.format ?? "markdown") === format) return;
+    this.flush();
+    const template = this.#templates.get(id);
+    if (format === "latex" && entry.note.body === template) {
+      const body = template.replace(/^# ?/, "").replace(/^#(?=\S)/m, "% #");
+      this.#templates.set(id, body);
+      this.#patch(id, { body, format: "latex" });
+      if (this.selectedId === id) this.remoteRevision = { id, n: this.remoteRevision.n + 1 };
+      return;
+    }
+    this.#patch(id, { format: format === "latex" ? "latex" : undefined });
+  }
+
   trash(id: string) {
     const entry = this.get(id);
     if (!entry || entry.note.trashed) return;
@@ -345,12 +421,33 @@ class NotesStore {
   renameTag(from: string, to: string) {
     const target = normalizeTag(to);
     if (!target || target === from) return;
+    this.#rewrite((body) => renameTagIn(body, from, to));
+    // Keep showing the same notes under their new name.
+    const f = this.filter;
+    if (f.kind === "tag" && (f.tag === from || f.tag.startsWith(from + "/"))) {
+      this.filter = { kind: "tag", tag: target + f.tag.slice(from.length) };
+    }
+  }
+
+  /**
+   * Renames a type: the `type` of every note of it (trashed ones too), and every `@type.…` of it.
+   * As with tags, notes keep their dates. Renamed onto a type there is already, the two become one.
+   */
+  renameType(from: string, to: string) {
+    const target = to.trim().toLowerCase();
+    if (!target || nameOf(target) === nameOf(from)) return;
+    this.#rewrite((body) => renameTypeIn(body, from, to.trim()));
+    // Keep showing the same notes under their new name.
+    if (this.filter.kind === "type" && this.filter.type === from) this.filter = { kind: "type", type: target };
+  }
+
+  /** Rewrites every note's text with `rewrite` (but locked notes', which aren't listed), saving the ones it changes. */
+  #rewrite(rewrite: (body: string) => string) {
     this.flush();
     const changed: string[] = [];
     this.entries = this.entries.map((entry) => {
-      // A locked note's tags aren't listed, so they aren't renamed either.
       if (entry.note.locked) return entry;
-      const body = renameTagIn(entry.note.body, from, to);
+      const body = rewrite(entry.note.body);
       if (body === entry.note.body) return entry;
       changed.push(entry.note.id);
       return entryOf({ ...entry.note, body });
@@ -358,11 +455,6 @@ class NotesStore {
     for (const id of changed) void this.#save(id);
     if (this.selectedId && changed.includes(this.selectedId)) {
       this.remoteRevision = { id: this.selectedId, n: this.remoteRevision.n + 1 };
-    }
-    // Keep showing the same notes under their new name.
-    const f = this.filter;
-    if (f.kind === "tag" && (f.tag === from || f.tag.startsWith(from + "/"))) {
-      this.filter = { kind: "tag", tag: target + f.tag.slice(from.length) };
     }
     if (changed.length) this.#notify();
   }
@@ -386,6 +478,38 @@ class NotesStore {
     const added = await sampleNotes(set);
     for (const note of added) await this.insert(note);
     return added.length;
+  }
+
+  /**
+   * Deletes every note on this device, locked and trashed ones too, and starts again with the
+   * welcome note, the feature tour and the examples, as they are in this build. For trying out
+   * new sample notes while developing; with sync on it would delete the synced notes too.
+   */
+  async reset() {
+    await this.flush();
+    await this.#deleteForever(this.entries.map((e) => e.note.id));
+    const { sampleNotes } = await import("./samples");
+    const welcome: Note = { id: crypto.randomUUID(), body: WELCOME_NOTE, createdAt: 0, updatedAt: 0, pinned: false, trashed: false };
+    const now = Date.now();
+    // A second apart, so the list shows them in this order: welcome, tour, examples.
+    const all = [welcome, ...(await sampleNotes("tour")), ...(await sampleNotes("examples"))].map((note, i) => ({
+      ...note,
+      createdAt: now - i * 1000,
+      updatedAt: now - i * 1000,
+    }));
+    for (const note of [...all].reverse()) await this.insert(note);
+    this.filter = { kind: "all" };
+    this.query = "";
+    this.select(all[0].id);
+    return all.length;
+  }
+
+  /** Adds a note with this text without opening it (one made from a mention, say); returns its id. */
+  add(body: string): string {
+    const now = Date.now();
+    const note: Note = { id: crypto.randomUUID(), body, createdAt: now, updatedAt: now, pinned: false, trashed: false };
+    void this.insert(note);
+    return note.id;
   }
 
   async insert(note: Note) {
@@ -468,7 +592,7 @@ class NotesStore {
       const note = { ...e.note, ...changes };
       // An edit to a locked note waits to be encrypted again, which saving does.
       if (note.locked && changes.body !== undefined) note.locked = { ...note.locked, sealed: "" };
-      return changes.body === undefined && !("locked" in changes) ? { note, meta: e.meta } : entryOf(note);
+      return changes.body === undefined && !("locked" in changes) && !("format" in changes) ? { note, meta: e.meta } : entryOf(note);
     });
     clearTimeout(this.#pending.get(id));
     this.#pending.set(id, setTimeout(() => this.#save(id), SAVE_DELAY));

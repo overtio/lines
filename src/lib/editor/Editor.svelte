@@ -2,9 +2,13 @@
   import { EditorSelection, EditorState, type StateEffect, Transaction } from "@codemirror/state";
   import { EditorView } from "@codemirror/view";
   import { untrack } from "svelte";
+  import { frontMatter } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
+  import { typeIcons } from "../notes/tagIcons.svelte";
   import { prefs } from "../prefs.svelte";
-  import { createExtensions, readOnly, readOnlyCompartment } from "./setup";
+  import { objectsChanged } from "./objects";
+  import { createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment } from "./setup";
+  import { symbolsChanged } from "./symbols";
 
   let { noteId, trashed }: { noteId: string; trashed: boolean } = $props();
 
@@ -40,6 +44,13 @@
     if (notes.get(currentId)?.note.body !== body) notes.update(currentId, body);
   }
 
+  /** Sets the editor up for the open note's format, Markdown or LaTeX, unless it is already. */
+  function applyFormat() {
+    if (!view || !currentId) return;
+    const editing = formatEditing(notes.get(currentId)?.note.format);
+    if (formatCompartment.get(view.state) !== editing) view.dispatch({ effects: formatCompartment.reconfigure(editing) });
+  }
+
   function cachedFor(id: string) {
     const body = notes.get(id)?.note.body ?? "";
     const cached = cache.get(id);
@@ -58,13 +69,16 @@
     currentId = id;
     const { state, scroll } = cachedFor(id);
     view.setState(state);
+    applyFormat();
     if (scroll) view.dispatch({ effects: scroll });
     else view.scrollDOM.scrollTop = 0;
 
     if (notes.pendingFocus === id) {
       notes.pendingFocus = null;
-      const firstLine = view.state.doc.line(1);
-      view.dispatch({ selection: EditorSelection.cursor(firstLine.to) });
+      // The title's line, after the properties of a note made under a type.
+      const { doc } = view.state;
+      const titleLine = doc.line(Math.min(doc.lines, (frontMatter(doc.toString())?.lines ?? 0) + 1));
+      view.dispatch({ selection: EditorSelection.cursor(titleLine.to) });
       view.focus();
     }
   }
@@ -137,13 +151,33 @@
       clearTimeout(syncTimer);
       view.setState(EditorState.create({ doc: note.body, extensions }));
       view.dispatch({ effects: readOnlyCompartment.reconfigure(readOnly(trashed)) });
+      applyFormat();
     });
+  });
+
+  $effect(() => {
+    void notes.get(noteId)?.note.format;
+    untrack(applyFormat);
   });
 
   $effect(() => {
     const value = trashed;
     noteId;
     view?.dispatch({ effects: readOnlyCompartment.reconfigure(readOnly(value)) });
+  });
+
+  // Mentions show other notes' titles, icons and properties; draw them again when those change.
+  $effect(() => {
+    void notes.objectsSignature;
+    void typeIcons.signature();
+    untrack(() => view?.dispatch({ effects: objectsChanged.of(null) }));
+  });
+
+  // Settings → Text: `->` shown as →, or as typed.
+  $effect(() => {
+    void prefs.symbolsInText;
+    void prefs.symbolsInCode;
+    untrack(() => view?.dispatch({ effects: symbolsChanged.of(null) }));
   });
 
   $effect(() => {

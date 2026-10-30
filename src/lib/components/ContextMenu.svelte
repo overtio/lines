@@ -5,12 +5,13 @@
 
   let el = $state<HTMLDivElement>();
 
-  // Open at the pointer, flipping left or up near the window edges.
+  // Open at the pointer, flipping left or up near the window edges, with the first item focused
+  // (focus goes back where it was when the menu closes).
   $effect(() => {
     const menu = ui.menu;
     if (!menu || !el) return;
     placeAt(el, menu.x, menu.y, menu.align);
-    return takeFocus(el);
+    return takeFocus(el, el.querySelector<HTMLElement>('[role="menuitem"]') ?? el);
   });
 
   $effect(() => {
@@ -23,11 +24,22 @@
       ui.closeMenu();
       return;
     }
-    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
-    event.preventDefault();
     const items = [...el!.querySelectorAll<HTMLElement>('[role="menuitem"]')];
     const index = items.indexOf(document.activeElement as HTMLElement);
-    const next = event.key === "ArrowDown" ? (index + 1) % items.length : (index <= 0 ? items.length : index) - 1;
+    let next: number;
+    if (event.key === "ArrowDown") next = (index + 1) % items.length;
+    else if (event.key === "ArrowUp") next = (index <= 0 ? items.length : index) - 1;
+    else if (event.key === "Home" || event.key === "PageUp") next = 0;
+    else if (event.key === "End" || event.key === "PageDown") next = items.length - 1;
+    else if (event.key.length === 1 && /\S/.test(event.key) && !event.metaKey && !event.ctrlKey && !event.altKey) {
+      // A letter jumps to the next item starting with it, as in native menus.
+      const key = event.key.toLocaleLowerCase();
+      const order = [...items.slice(index + 1), ...items.slice(0, index + 1)];
+      const found = order.find((item) => item.textContent?.trim().toLocaleLowerCase().startsWith(key));
+      if (!found) return;
+      next = items.indexOf(found);
+    } else return;
+    event.preventDefault();
     items[next]?.focus();
   }
 
@@ -42,6 +54,7 @@
     class="menu popover"
     role="menu"
     tabindex="-1"
+    aria-label={ui.menu.label}
     bind:this={el}
     {onkeydown}
     oncontextmenu={(event) => event.preventDefault()}
@@ -50,7 +63,7 @@
       {#if item === "separator"}
         <div class="separator" role="separator"></div>
       {:else}
-        <button role="menuitem" class:danger={item.danger} onclick={() => choose(item)}>
+        <button role="menuitem" tabindex="-1" class:danger={item.danger} onclick={() => choose(item)}>
           {#if item.icon}<Icon name={item.icon} size={15} />{/if}
           {item.label}
         </button>
@@ -103,7 +116,7 @@
   /* Fingers need bigger targets. */
   @media (pointer: coarse) {
     button {
-      height: 42px;
+      height: 44px;
       font-size: 15px;
     }
   }

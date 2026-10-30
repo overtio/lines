@@ -1,6 +1,7 @@
 import { fromBase64, unlockKey, WrongPassphrase } from "../crypto";
 import { native } from "../lock/lock.svelte";
 import { checkPassphrase } from "../sync/engine.svelte";
+import { t } from "../i18n/index.svelte";
 import { announce } from "../windows/channel";
 import { noteKeys } from "./noteKeys.svelte";
 import { notes } from "./store.svelte";
@@ -15,11 +16,11 @@ import { notes } from "./store.svelte";
  */
 
 /** Open locked notes close again after this long without use. */
-const CLOSE_AFTER = 5 * 60_000;
+export const CLOSE_AFTER = 5 * 60_000;
 const ACTIVITY = ["pointermove", "pointerdown", "keydown", "wheel", "touchstart"] as const;
 
 export class WrongPassword extends Error {
-  constructor(message = "That password isn't right.") {
+  constructor(message = t("lock.error.wrongPassword")) {
     super(message);
   }
 }
@@ -61,7 +62,7 @@ class LockedNotes {
     if (opened.length) await this.#opened();
     if (key ? !noteKeys.isOpen(key) : !opened.length) {
       throw new WrongPassword(
-        opened.length ? "That opened other locked notes, but this one was locked with a different password." : undefined,
+        opened.length ? t("lock.error.otherPassword") : undefined,
       );
     }
   }
@@ -138,7 +139,7 @@ class LockedNotes {
     if (!settings) return;
     if (on) {
       const raw = noteKeys.raw(settings.key.id);
-      if (!raw) throw new Error("open your locked notes first");
+      if (!raw) throw new Error(t("lock.notes.notOpen"));
       await native("touch_id_keep", { which: "notes", key: Array.from(raw) });
     } else {
       await native("touch_id_forget", { which: "notes" });

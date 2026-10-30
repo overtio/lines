@@ -91,7 +91,22 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Paragraph, then Table
+#### 14. Paragraph, then Diagram (240 px wide)
+
+A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+
+#### 15. Paragraph, then Math block
+
+A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+
+#### 16. Paragraph, then Table
 
 A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 | Left | Center | Right |
@@ -99,53 +114,78 @@ A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [lin
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 15. Paragraph, then Divider
+#### 17. Paragraph, then Divider
 
 A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ---
 
-#### 16. Paragraph, then Key: Value line
+#### 18. Paragraph, then Key: Value line
 
 A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 **Wi-Fi password:** correct-horse-battery
 
-#### 17. Paragraph, then Image
+#### 19. Paragraph, then Mention
+
+A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+Ask @[QA · Ada] at @[QA · Ada].email.
+
+#### 20. Paragraph, then Wiki link
+
+A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+
+#### 21. Paragraph, then Symbols
+
+A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+
+#### 22. Paragraph, then GitHub links
+
+A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+
+#### 23. Paragraph, then Image
 
 A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ![A sample picture](attachment:photo.png)
 
-#### 18. Paragraph, then File
+#### 24. Paragraph, then Drawing
+
+A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+![A sample drawing](attachment:drawing.svg)
+
+#### 25. Paragraph, then File
 
 A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Budget.csv](attachment:budget.csv)
 
-#### 19. Paragraph, then Missing file
+#### 26. Paragraph, then Missing file
 
 A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 20. Paragraph, then Card
+#### 27. Paragraph, then Card
 
 A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ::: card
 Text in a card.
 :::
 
-#### 21. Paragraph, then Callout (info)
+#### 28. Paragraph, then Callout (info)
 
 A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::i
 Text in an info callout.
 :::
 
-#### 22. Paragraph, then Callout (warning, chosen icon)
+#### 29. Paragraph, then Callout (warning, chosen icon)
 
 A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 23. Paragraph, then Callout (decision, no icon)
+#### 30. Paragraph, then Callout (decision, no icon)
 
 A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::^ icon=none

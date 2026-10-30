@@ -1,3 +1,4 @@
+import { isolateHistory } from "@codemirror/commands";
 import { syntaxTree } from "@codemirror/language";
 import { EditorSelection, type EditorState, type Extension, Prec, type Range, StateField } from "@codemirror/state";
 import { Decoration, type DecorationSet, EditorView, keymap, WidgetType } from "@codemirror/view";
@@ -10,50 +11,63 @@ import {
   attachmentName,
   attachmentURL,
   getAttachment,
+  imageSize,
   isImage,
   openAttachment,
+  withWidth,
   saveAttachment,
   whenArrived,
 } from "../notes/attachments";
 import { coarsePointer } from "../platform";
+import { locale, type MessageKey, t } from "../i18n/index.svelte";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
+import { editDrawing, isDrawing, knownDrawing } from "./drawings";
+import { isUnsplashPhoto, unsplashImage, unsplashPhoto } from "./unsplash";
 import { ancestors, focusChanged, focused, isEditing } from "./util";
 
 /*
  * Images and files in notes. One on a line of its own is drawn as a block in its place (the image,
  * or a card naming the file); with the cursor on that line its Markdown shows, with the block
- * below it. Images within text are drawn inline by livePreview.ts, and files within text are links.
+ * below it. Such an image has a handle on its corner that resizes it, written into its label as
+ * Obsidian does (`![Lake|400](…)`), and a drawing (drawings.ts) a button to edit it. Images within text are drawn inline by livePreview.ts, and files within text are links.
  * Pasting or dropping files, or the /image and /file commands, saves them on the device (see
  * notes/attachments.ts) and puts each on its own line.
  */
 
-/** Heights images were drawn at, so a block that scrolls back into view takes its place at once. */
+/**
+ * Heights images were drawn at (by address and label, which holds the width), so a block that
+ * scrolls back into view takes its place at once.
+ */
 const heights = new Map<string, number>();
 
 /**
- * An `<img>` for a note's image, or a quiet placeholder while it can't be shown: an attachment
- * that sync hasn't brought to this device yet (it appears when it arrives), or a web image that
- * didn't load. Calls `onChange` whenever its size may have changed.
+ * An `<img>` for a note's image, at the width its label gives (`|400`), or a quiet placeholder
+ * while it can't be shown: an attachment that sync hasn't brought to this device yet (it appears
+ * when it arrives), or a web image that didn't load. Calls `onChange` whenever its size may have
+ * changed.
  */
-export function imageElement(src: string, alt: string, onChange: () => void): { dom: HTMLElement; destroy: () => void } {
+export function imageElement(src: string, label: string, onChange: () => void): { dom: HTMLElement; destroy: () => void } {
   const dom = document.createElement("span");
   dom.className = "cm-lp-image-slot";
   const img = document.createElement("img");
   img.className = "cm-lp-image";
-  img.alt = alt;
+  const { alt, width } = imageSize(label);
+  // An image with no alt text of its own is still named, so screen readers don't skip it or read its address.
+  img.alt = alt || t("editor.image");
   img.draggable = false;
+  if (width) setWidth(img, width);
   img.onload = () => {
-    heights.set(src, img.offsetHeight);
+    heights.set(`${src}\n${label}`, img.offsetHeight);
     onChange();
   };
   img.onerror = () => {
-    dom.replaceChildren(placeholder("This image couldn't be shown"));
+    dom.replaceChildren(placeholder(t("editor.imageFailed")));
     onChange();
   };
   let cancel = () => {};
   const name = attachmentName(src);
   if (!name) {
-    img.src = src;
+    img.src = unsplashImage(src) ?? src;
     dom.append(img);
   } else {
     const show = () =>
@@ -62,7 +76,7 @@ export function imageElement(src: string, alt: string, onChange: () => void): { 
           img.src = url;
           dom.replaceChildren(img);
         } else {
-          dom.replaceChildren(placeholder("This image isn't on this device yet"));
+          dom.replaceChildren(placeholder(t("editor.imageNotHere")));
           cancel = whenArrived(name, show);
         }
         onChange();
@@ -87,11 +101,14 @@ const ICONS: [RegExp, IconName][] = [
   [/^(png|jpg|gif|webp|avif|heic|svg)$/, "image"],
 ];
 
+const oneDecimal = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const whole = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 });
+
 function formatSize(bytes: number) {
-  if (bytes < 1000) return `${bytes} bytes`;
-  const [value, unit] =
-    bytes < 1e6 ? [bytes / 1e3, "KB"] : bytes < 1e9 ? [bytes / 1e6, "MB"] : [bytes / 1e9, "GB"];
-  return `${value < 10 ? value.toFixed(1) : Math.round(value)} ${unit}`;
+  if (bytes < 1000) return t("editor.size.bytes", { count: bytes });
+  const [value, unit]: [number, MessageKey] =
+    bytes < 1e6 ? [bytes / 1e3, "editor.size.kb"] : bytes < 1e9 ? [bytes / 1e6, "editor.size.mb"] : [bytes / 1e9, "editor.size.gb"];
+  return t(unit, { size: (value < 10 ? oneDecimal : whole).format(value) });
 }
 
 /** A card for an attached file: its kind, name and size, or a note that it hasn't arrived yet. */
@@ -99,7 +116,7 @@ function fileElement(name: string, label: string, onChange: () => void): { dom: 
   const ext = name.slice(name.lastIndexOf(".") + 1);
   const dom = document.createElement("span");
   dom.className = "cm-lp-file";
-  dom.title = coarsePointer.matches ? "" : "Double-click to open";
+  dom.title = coarsePointer.matches ? "" : t("editor.file.open");
   const icon = document.createElement("span");
   icon.className = "cm-lp-file-icon";
   const iconName = ICONS.find(([pattern]) => pattern.test(ext))?.[1] ?? "paperclip";
@@ -117,7 +134,7 @@ function fileElement(name: string, label: string, onChange: () => void): { dom: 
   const show = () =>
     void getAttachment(name).then((data) => {
       dom.classList.toggle("is-missing", !data);
-      meta.textContent = data ? `${ext.toUpperCase()} · ${formatSize(data.size)}` : "Not on this device yet";
+      meta.textContent = data ? t("editor.file.meta", { kind: ext.toUpperCase(), size: formatSize(data.size) }) : t("editor.file.notHere");
       if (!data) cancel = whenArrived(name, show);
       onChange();
     });
@@ -170,8 +187,36 @@ class BlockWidget extends WidgetType {
     this.#classes(dom);
     const onChange = () => view.requestMeasure();
     const content = kind === "image" ? imageElement(src, label, onChange) : fileElement(attachmentName(src)!, label, onChange);
-    dom.append(content.dom);
-    cleanups.set(dom, content.destroy);
+    let destroy = content.destroy;
+    // An image sits in a frame with its resize handle (and a drawing's edit button) on its corners.
+    const frame = document.createElement("span");
+    frame.className = "cm-lp-image-frame";
+    frame.append(content.dom);
+    dom.append(kind === "image" ? frame : content.dom);
+    if (kind === "image") frame.append(resizeHandle(view, dom));
+    const name = attachmentName(src);
+    if (kind === "image" && name) {
+      void isDrawing(name).then((drawing) => {
+        if (!drawing || dom.dataset.src !== src) return;
+        dom.dataset.drawing = "";
+        const edit = document.createElement("button");
+        edit.className = "cm-lp-drawing-edit";
+        edit.type = "button";
+        // Not a Tab stop in the text: Enter on the selected drawing does the same.
+        edit.tabIndex = -1;
+        edit.title = t("editor.drawing.editHint");
+        edit.setAttribute("aria-label", t("editor.drawing.edit"));
+        const icon = mount(Icon, { target: edit, props: { name: "pencil", size: 15 } });
+        frame.append(edit);
+        onChange();
+        destroy = () => {
+          content.destroy();
+          void unmount(icon);
+        };
+        cleanups.set(dom, destroy);
+      });
+    }
+    cleanups.set(dom, destroy);
     return dom;
   }
   /** Moving the cursor onto or off the block keeps it as it is. */
@@ -184,11 +229,92 @@ class BlockWidget extends WidgetType {
     cleanups.get(dom)?.();
   }
   get estimatedHeight() {
-    return this.block.kind === "file" ? 60 : (heights.get(this.block.src) ?? 200);
+    return this.block.kind === "file" ? 60 : (heights.get(`${this.block.src}\n${this.block.label}`) ?? 200);
   }
   ignoreEvent() {
     return false;
   }
+}
+
+/* Resizing images. */
+
+/** The narrowest an image can be dragged. */
+const MIN_WIDTH = 48;
+
+function setWidth(img: HTMLImageElement, width: number) {
+  img.style.width = `${width}px`;
+  // A width chosen is kept, whatever its height.
+  img.style.maxHeight = "none";
+}
+
+/** The block drawn at `dom`. */
+function blockAt(view: EditorView, dom: HTMLElement) {
+  const pos = view.posAtDOM(dom);
+  // A preview sits after its line's end; the block it shows is on that line.
+  const line = view.state.doc.lineAt(dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos);
+  return blockOnLine(view.state, line.number);
+}
+
+/** Writes an image's width into its label (`![Lake|400](…)`), or takes it out (null). */
+function writeWidth(view: EditorView, dom: HTMLElement, width: number | null) {
+  const block = blockAt(view, dom);
+  if (!block || block.kind !== "image") return;
+  const label = withWidth(block.label, width);
+  if (label === block.label) return;
+  // After "![".
+  const from = block.from + 2;
+  view.dispatch({ changes: { from, to: from + block.label.length, insert: label }, userEvent: "input.resize" });
+}
+
+/**
+ * The handle on an image's bottom right corner: dragged, it makes the image wider or narrower
+ * (keeping its shape, and no wider than the note); double-clicked, back to its own size. From the
+ * keyboard, the width is the number after the bar in its Markdown.
+ */
+function resizeHandle(view: EditorView, dom: HTMLElement) {
+  const handle = document.createElement("span");
+  handle.className = "cm-lp-image-resize";
+  handle.title = coarsePointer.matches ? "" : t("editor.image.resizeHint");
+  handle.setAttribute("aria-hidden", "true");
+  handle.addEventListener("pointerdown", (event) => {
+    const img = dom.querySelector<HTMLImageElement>(".cm-lp-image");
+    if (event.button !== 0 || view.state.readOnly || !img) return;
+    // No mousedown follows, so the editor doesn't select the image or move the cursor.
+    event.preventDefault();
+    event.stopPropagation();
+    try {
+      handle.setPointerCapture(event.pointerId);
+    } catch {
+      // A pointer the browser no longer tracks: moves over the handle still resize.
+    }
+    const style = getComputedStyle(dom);
+    const max = dom.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    const start = img.getBoundingClientRect().width;
+    const x = event.clientX;
+    let width = start;
+    dom.classList.add("is-resizing");
+    const move = (moved: PointerEvent) => {
+      width = Math.round(Math.min(max, Math.max(MIN_WIDTH, start + moved.clientX - x)));
+      setWidth(img, width);
+      view.requestMeasure();
+    };
+    const end = () => {
+      handle.removeEventListener("pointermove", move);
+      handle.removeEventListener("pointerup", end);
+      handle.removeEventListener("pointercancel", end);
+      dom.classList.remove("is-resizing");
+      if (Math.abs(width - start) >= 1) writeWidth(view, dom, width);
+    };
+    handle.addEventListener("pointermove", move);
+    handle.addEventListener("pointerup", end);
+    handle.addEventListener("pointercancel", end);
+  });
+  handle.addEventListener("dblclick", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!view.state.readOnly) writeWidth(view, dom, null);
+  });
+  return handle;
 }
 
 /** An image or file drawn as a block, and where its Markdown is. */
@@ -335,25 +461,45 @@ function backspace(view: EditorView) {
   return above ? selectBlock(view, above, false) : false;
 }
 
+/** Enter on a selected drawing opens it, rather than replacing it with a new line. */
+function openDrawing(view: EditorView) {
+  const block = selectedBlock(view.state);
+  if (!block || block.kind !== "image" || !knownDrawing(block.src) || view.state.readOnly) return false;
+  void editDrawing(view, block.src, block.from);
+  return true;
+}
+
 const blockKeymap = Prec.high(
   keymap.of([
     { key: "ArrowUp", run: arrow(false) },
     { key: "ArrowDown", run: arrow(true) },
     { key: "Backspace", run: backspace },
+    { key: "Enter", run: openDrawing },
   ]),
 );
 
 /**
  * Clicking a block selects its Markdown, so it can be deleted, cut or typed over. Double-clicking
- * (or ⌘-clicking, or tapping while not editing) opens an attachment.
+ * (or ⌘-clicking, or tapping while not editing) opens an attachment, or edits a drawing, as its
+ * button does.
  */
 const clickToSelect = EditorView.domEventHandlers({
   mousedown(event, view) {
     const dom = (event.target as HTMLElement).closest<HTMLElement>(".cm-lp-block");
     if (!dom) return false;
     event.preventDefault();
-    const name = attachmentName(dom.dataset.src ?? "");
+    // The resize handle's own (resizeHandle).
+    if ((event.target as HTMLElement).closest(".cm-lp-image-resize")) return true;
+    const src = dom.dataset.src ?? "";
+    const name = attachmentName(src);
     const opens = event.detail === 2 || event.metaKey || event.ctrlKey || (coarsePointer.matches && !view.hasFocus);
+    const button = !!(event.target as HTMLElement).closest(".cm-lp-drawing-edit");
+    if ("drawing" in dom.dataset && event.button === 0 && (opens || button) && !view.state.readOnly) {
+      const pos = view.posAtDOM(dom);
+      const line = view.state.doc.lineAt(dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos);
+      void editDrawing(view, src, line.from);
+      return true;
+    }
     if (name && event.button === 0 && opens) {
       void openAttachment(name, dom.dataset.label || name).catch((error) => console.error("lines: couldn't open", error));
       return true;
@@ -392,13 +538,22 @@ async function normalize(file: File): Promise<Blob | null> {
   }
 }
 
-/** Saves a file and returns the Markdown for it: an image, or a link named after the file. */
-async function attach(file: File): Promise<string | null> {
+/**
+ * How a note's format writes what's pasted or dropped into it: Markdown (`![](…)`, `[Name](…)`), or
+ * LaTeX (latex.ts), and where in the note an attachment can't go (code, tables…).
+ */
+export interface AttachmentWriter {
+  image(src: string, alt: string): string;
+  file(href: string, name: string): string;
+  allowed(state: EditorState, pos: number): boolean;
+}
+
+/** Saves a file and returns how `writer` writes it: an image, or a link named after the file. */
+async function attach(file: File, writer: AttachmentWriter): Promise<string | null> {
   try {
     const image = await normalize(file);
-    if (image) return `![](${ATTACHMENT_PATH}${await saveAttachment(image)})`;
-    const label = (file.name || "File").replace(/[\\[\]]/g, "\\$&");
-    return `[${label}](${ATTACHMENT_PATH}${await saveAttachment(file)})`;
+    if (image) return writer.image(ATTACHMENT_PATH + (await saveAttachment(image)), "");
+    return writer.file(ATTACHMENT_PATH + (await saveAttachment(file)), file.name || t("editor.file.name"));
   } catch (error) {
     // A folder dropped from Finder, say, which can't be read as a file.
     console.error("lines: couldn't attach", file.name, error);
@@ -410,18 +565,27 @@ async function attach(file: File): Promise<string | null> {
 const NO_ATTACHMENTS = new Set(["FencedCode", "CodeBlock", "InlineCode", "Table", "HTMLBlock"]);
 
 function canAttach(state: EditorState, pos: number) {
-  if (state.readOnly) return false;
   for (const node of ancestors(state, pos, -1)) if (NO_ATTACHMENTS.has(node.name)) return false;
   return true;
 }
+
+const escapeLabel = (text: string) => text.replace(/[\\[\]]/g, "\\$&");
+
+const markdownWriter: AttachmentWriter = {
+  image: (src, alt) => `![${escapeLabel(alt)}](${src})`,
+  file: (href, name) => `[${escapeLabel(name)}](${href})`,
+  allowed: canAttach,
+};
+
+const allowed = (writer: AttachmentWriter, state: EditorState, pos: number) => !state.readOnly && writer.allowed(state, pos);
 
 /**
  * Saves `files` and puts them at `from`–`to` (replacing any selection there), each on a line of
  * its own, with the cursor on the line after them so they show at once. `snap` puts them above
  * or below the line instead of splitting its text, as a drop does.
  */
-async function insertFiles(view: EditorView, files: File[], from: number, to = from, snap = false) {
-  const saved = (await Promise.all(files.map(attach))).filter((markdown): markdown is string => !!markdown);
+async function insertFiles(view: EditorView, writer: AttachmentWriter, files: File[], from: number, to = from, snap = false) {
+  const saved = (await Promise.all(files.map((file) => attach(file, writer)))).filter((text): text is string => !!text);
   if (!saved.length || !view.dom.isConnected) return;
   const { doc } = view.state;
   // The note may have changed while the files were saved.
@@ -455,7 +619,39 @@ async function insertFiles(view: EditorView, files: File[], from: number, to = f
 /** Text copied along with a file that's only its name or address, as Finder and browsers add. */
 const FILE_LABEL = /^(?:\S+\.[a-z0-9]{1,10}|https?:\/\/\S+)$/i;
 
-const dropAndPaste = EditorView.domEventHandlers({
+/**
+ * Pasting the link to an Unsplash photo (its page, or the picture) on an empty line puts the photo
+ * there. The link goes in as text first, so undo turns the photo back into the link.
+ */
+const pastePhoto = (writer: AttachmentWriter) => EditorView.domEventHandlers({
+  paste(event, view) {
+    const { state } = view;
+    const link = event.clipboardData?.getData("text/plain").trim() ?? "";
+    const range = state.selection.main;
+    if (!isUnsplashPhoto(link) || state.selection.ranges.length > 1 || !range.empty) return false;
+    if (state.doc.lineAt(range.from).text.trim() || !allowed(writer, state, range.from)) return false;
+    event.preventDefault();
+    const { from } = range;
+    view.dispatch({
+      changes: { from, insert: link },
+      selection: { anchor: from + link.length },
+      userEvent: "input.paste",
+      scrollIntoView: true,
+    });
+    const insert = `${writer.image(link, unsplashPhoto(link)?.alt ?? "")}\n`;
+    view.dispatch({
+      changes: { from, to: from + link.length, insert },
+      // On the line below, so the photo shows.
+      selection: { anchor: from + insert.length },
+      annotations: isolateHistory.of("before"),
+      userEvent: "input.paste",
+      scrollIntoView: true,
+    });
+    return true;
+  },
+});
+
+const dropAndPaste = (writer: AttachmentWriter) => EditorView.domEventHandlers({
   paste(event, view) {
     const data = event.clipboardData;
     const files = [...(data?.files ?? [])];
@@ -464,9 +660,9 @@ const dropAndPaste = EditorView.domEventHandlers({
     const text = data.getData("text/plain").trim();
     if (text && !FILE_LABEL.test(text) && !files.some((file) => file.name === text)) return false;
     const { main } = view.state.selection;
-    if (!canAttach(view.state, main.from)) return false;
+    if (!allowed(writer, view.state, main.from)) return false;
     event.preventDefault();
-    void insertFiles(view, files, main.from, main.to);
+    void insertFiles(view, writer, files, main.from, main.to);
     return true;
   },
   dragover(event, view) {
@@ -480,16 +676,16 @@ const dropAndPaste = EditorView.domEventHandlers({
     if (!files.length) return false;
     event.preventDefault();
     const pos = view.posAtCoords({ x: event.clientX, y: event.clientY }, false);
-    if (!canAttach(view.state, pos)) return true;
-    void insertFiles(view, files, pos, pos, true);
+    if (!allowed(writer, view.state, pos)) return true;
+    void insertFiles(view, writer, files, pos, pos, true);
     return true;
   },
 });
 
 let picker: HTMLInputElement | undefined;
 
-/** The /image and /file commands: choose files from the device, put in place of the typed command. */
-function choose(accept: string) {
+/** The /image and /file commands: choose files from the device, put in place of the typed command as `writer` writes them. */
+export function choose(accept: string, writer = markdownWriter) {
   return (view: EditorView, from: number, to: number) => {
     view.dispatch({ changes: { from, to }, userEvent: "delete" });
     if (!picker) {
@@ -502,7 +698,7 @@ function choose(accept: string) {
     picker.onchange = () => {
       const files = [...(picker!.files ?? [])];
       const pos = view.state.selection.main.head;
-      if (files.length && canAttach(view.state, pos)) void insertFiles(view, files, pos);
+      if (files.length && allowed(writer, view.state, pos)) void insertFiles(view, writer, files, pos);
     };
     picker.click();
   };
@@ -511,4 +707,7 @@ function choose(accept: string) {
 export const chooseImages = choose("image/*");
 export const chooseFiles = choose("");
 
-export const attachmentBlocks: Extension = [focused, blocks, blockKeymap, clickToSelect, dropAndPaste];
+/** Pasting and dropping files, and pasting Unsplash links, written by `writer`. */
+export const attachmentPasting = (writer: AttachmentWriter): Extension => [dropAndPaste(writer), pastePhoto(writer)];
+
+export const attachmentBlocks: Extension = [focused, blocks, blockKeymap, clickToSelect, attachmentPasting(markdownWriter)];

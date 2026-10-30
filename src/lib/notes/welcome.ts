@@ -12,8 +12,9 @@ Type \`/\` at the start of a line for headings, lists, tables, callouts, code, i
 - Start a line with \`#\`, \`##\` or \`###\` for headings
 - Use \`-\` for lists and \`- [ ]\` for todos
   - Tab nests an item, Shift-Tab moves it back out
-- Add a [link](https://github.com) and ⌘-click to open it
+- Add a [link](https://example.com) and ⌘-click to open it. GitHub links read short: https://github.com/overtio/lines
 - Hover a line for the grip on its left, and drag it to move the line
+- Type \`-\` and then \`>\` for an arrow: Home -> cabin. \`!\` and \`=\` make ≠
 
 ## Todos
 
@@ -26,6 +27,10 @@ Type \`/\` at the start of a line for headings, lists, tables, callouts, code, i
 ## Tags
 
 Add a tag anywhere in a note, like #getting-started. Nested tags work too: #lines/tips. Tags show up in the sidebar.
+
+## People, projects and other objects
+
+Start a note with \`/properties\` to give it a type, like \`type: person\`, and other properties. It shows under Types in the sidebar. Mention any note with \`@\` and its title (or \`[[\` for a wiki link), and show its properties with \`@Name.key\`. \`@type.person\` on a line of its own is a table of every person.
 
 ## Callouts and cards
 
@@ -49,7 +54,7 @@ A card groups anything: text, lists, tables, even other cards.
 | ⌘I | Italic |
 | ⌘↵ | Todo |
 
-## Code and diagrams
+## Code, diagrams and math
 
 \`\`\`sql
 select title from notes where pinned;
@@ -60,13 +65,17 @@ flowchart LR
   Idea --> Note --> Done
 \`\`\`
 
+Math is LaTeX between dollar signs: $e^{i\\pi} + 1 = 0$. To write a whole note in LaTeX, switch it in the ⓘ panel.
+
+Press ⌘P to see a note on pages, ready to print or save as a PDF.
+
 Hover the value in a "Key: Value" line to copy it:
 
 **Wi-Fi password:** correct-horse-battery
 
 ## Images and files
 
-Paste or drop an image or any other file into a note, or type \`/image\` or \`/file\`.
+Paste or drop an image or any other file into a note, or type \`/image\` or \`/file\`. Paste the link to a photo on Unsplash on an empty line and the photo shows. Type \`/drawing\` to sketch in Excalidraw; double-click a drawing to change it.
 
 ## Private by design
 

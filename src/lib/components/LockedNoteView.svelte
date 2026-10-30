@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { touchIdAvailable } from "../lock/lock.svelte";
   import { lockedNotes } from "../notes/locked.svelte";
@@ -17,6 +18,7 @@
   let forgot = $state(false);
   let input = $state<HTMLInputElement>();
   let hasTouchId = $state(false);
+  const id = $props.id();
 
   void touchIdAvailable.then((available) => (hasTouchId = available));
 
@@ -48,17 +50,17 @@
     try {
       await lockedNotes.unlockWithTouchId();
     } catch (e) {
-      error = String(e);
+      error = t("lock.touchId.failed", { error: String(e) });
     }
     busy = false;
   }
 </script>
 
 <div class="locked" class:compact>
-  <form class="card" onsubmit={unlock}>
+  <form class="card" onsubmit={unlock} aria-labelledby="{id}-title" aria-describedby="{id}-hint" aria-busy={busy}>
     <div class="badge" aria-hidden="true"><Icon name="lock" size={compact ? 20 : 24} strokeWidth={1.75} /></div>
-    <h2 class:untitled={!entry.meta.title}>{entry.meta.title || "Untitled"}</h2>
-    <p class="hint">This note is locked. Enter the password for locked notes to view it.</p>
+    <h2 id="{id}-title" class:untitled={!entry.meta.title}>{entry.meta.title || t("lock.note.untitled")}</h2>
+    <p class="hint" id="{id}-hint">{t("lock.note.hint")}</p>
 
     {#key shakes}
       <div class="field" class:shake={shakes > 0}>
@@ -66,37 +68,44 @@
           bind:this={input}
           bind:value={password}
           type="password"
-          placeholder="Password"
-          aria-label="Password for locked notes"
+          placeholder={t("lock.form.password")}
+          aria-label={t("lock.note.passwordLabel")}
           aria-invalid={!!error}
+          aria-describedby={error ? `${id}-error` : undefined}
           autocomplete="current-password"
           disabled={busy}
           {@attach (node) => void (shakes > 0 && node.focus())}
         />
-        <button class="go" type="submit" disabled={!password || busy} aria-label="View note">
+        <button class="go" type="submit" disabled={!password || busy} aria-label={busy ? t("lock.note.opening") : t("lock.note.view")}>
           <Icon name={busy ? "loader" : "chevron-right"} size={18} class={busy ? "spin" : ""} />
         </button>
       </div>
     {/key}
 
-    <p class="error" role="alert">{error ?? ""}</p>
+    <p class="error" id="{id}-error" role="alert">{error ?? ""}</p>
 
     {#if touchId}
       <button type="button" class="text-button" onclick={useTouchId} disabled={busy}>
-        <Icon name="fingerprint" size={16} /> Use Touch ID
+        <Icon name="fingerprint" size={16} /> {t("lock.useTouchId")}
       </button>
     {/if}
 
     {#if !compact}
       <div class="forgot">
         {#if forgot}
-          <p>
-            Without its password, a locked note can't be opened, not even by lines. You can set a new password for the notes
-            you lock from now on.
-          </p>
-          <button type="button" class="text-button" onclick={() => (ui.settings = "privacy")}>Open Privacy settings</button>
+          <p id="{id}-forgot">{t("lock.note.forgotHint")}</p>
+          <!-- Focus comes here when the explanation shows. -->
+          <button
+            type="button"
+            class="text-button"
+            aria-describedby="{id}-forgot"
+            onclick={() => (ui.settings = "privacy")}
+            {@attach (node) => node.focus()}
+          >
+            {t("lock.note.openPrivacy")}
+          </button>
         {:else}
-          <button type="button" class="text-button" onclick={() => (forgot = true)}>Forgot the password?</button>
+          <button type="button" class="text-button" onclick={() => (forgot = true)}>{t("lock.note.forgot")}</button>
         {/if}
       </div>
     {/if}
@@ -189,12 +198,15 @@
     transition: border-color 120ms ease, box-shadow 120ms ease;
   }
 
+  /* The accent at full strength, two pixels wide, so focus shows (3:1) in place of the outline. */
   input:focus {
-    border-color: var(--accent-soft);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: var(--accent);
+    box-shadow:
+      0 0 0 1px var(--accent),
+      0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
   }
 
-  input[aria-invalid="true"] {
+  input[aria-invalid="true"]:not(:focus) {
     border-color: color-mix(in srgb, var(--danger) 55%, transparent);
   }
 
@@ -215,6 +227,25 @@
   .go:disabled {
     opacity: 0;
     pointer-events: none;
+  }
+
+  /* Touch screens: a target a finger can hit (44 × 44). */
+  @media (pointer: coarse) {
+    input {
+      height: 50px;
+      padding-right: 56px;
+    }
+
+    .go {
+      top: 3px;
+      right: 3px;
+      width: 44px;
+      height: 44px;
+    }
+
+    .text-button {
+      min-height: 44px;
+    }
   }
 
   .error {

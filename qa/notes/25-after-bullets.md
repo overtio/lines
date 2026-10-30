@@ -143,7 +143,30 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Bullet list, then Table
+#### 14. Bullet list, then Diagram (240 px wide)
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+
+#### 15. Bullet list, then Math block
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+
+#### 16. Bullet list, then Table
 
 - First item
 - Second item
@@ -155,7 +178,7 @@ flowchart LR
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 15. Bullet list, then Divider
+#### 17. Bullet list, then Divider
 
 - First item
 - Second item
@@ -164,7 +187,7 @@ flowchart LR
 - Last item
 ---
 
-#### 16. Bullet list, then Key: Value line
+#### 18. Bullet list, then Key: Value line
 
 - First item
 - Second item
@@ -173,7 +196,43 @@ flowchart LR
 - Last item
 **Wi-Fi password:** correct-horse-battery
 
-#### 17. Bullet list, then Image
+#### 19. Bullet list, then Mention
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+Ask @[QA · Ada] at @[QA · Ada].email.
+
+#### 20. Bullet list, then Wiki link
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+
+#### 21. Bullet list, then Symbols
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+
+#### 22. Bullet list, then GitHub links
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+
+#### 23. Bullet list, then Image
 
 - First item
 - Second item
@@ -182,7 +241,16 @@ flowchart LR
 - Last item
 ![A sample picture](attachment:photo.png)
 
-#### 18. Bullet list, then File
+#### 24. Bullet list, then Drawing
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+![A sample drawing](attachment:drawing.svg)
+
+#### 25. Bullet list, then File
 
 - First item
 - Second item
@@ -191,7 +259,7 @@ flowchart LR
 - Last item
 [Budget.csv](attachment:budget.csv)
 
-#### 19. Bullet list, then Missing file
+#### 26. Bullet list, then Missing file
 
 - First item
 - Second item
@@ -200,7 +268,7 @@ flowchart LR
 - Last item
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 20. Bullet list, then Card
+#### 27. Bullet list, then Card
 
 - First item
 - Second item
@@ -211,7 +279,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 21. Bullet list, then Callout (info)
+#### 28. Bullet list, then Callout (info)
 
 - First item
 - Second item
@@ -222,7 +290,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 22. Bullet list, then Callout (warning, chosen icon)
+#### 29. Bullet list, then Callout (warning, chosen icon)
 
 - First item
 - Second item
@@ -233,7 +301,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 23. Bullet list, then Callout (decision, no icon)
+#### 30. Bullet list, then Callout (decision, no icon)
 
 - First item
 - Second item

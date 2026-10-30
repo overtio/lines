@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from "../icons/Icon.svelte";
+  import { t } from "../i18n/index.svelte";
   import { sync } from "../sync/engine.svelte";
   import PassphraseForm from "./PassphraseForm.svelte";
 
@@ -9,11 +10,19 @@
   let done = $state<string | null>(null);
   let busy = $state(false);
   let error = $state<string | null>(null);
+  const id = $props.id();
 
   const encrypted = $derived(!!sync.config?.encryption);
   const issue = $derived(sync.encryptionIssue);
 
+  /** What was asked last, so its button has focus again once the form closes. */
+  let returnTo = $state<typeof asking>(null);
+  const refocus = (what: NonNullable<typeof asking>) => (node: HTMLElement) => {
+    if (returnTo === what) node.focus();
+  };
+
   function ask(what: typeof asking) {
+    returnTo = asking;
     asking = what;
     done = null;
     error = null;
@@ -33,79 +42,74 @@
   }
 </script>
 
-<section class="encryption">
-  <h3>End-to-end encryption</h3>
+<section class="encryption" aria-labelledby="{id}-title">
+  <h3 id="{id}-title">{t("sync.e2e.title")}</h3>
 
   {#if issue === "locked" || issue === "rekeyed"}
-    <p class="prose">
-      {issue === "locked"
-        ? "The notes there are encrypted. Enter the passphrase they were encrypted with to sync them."
-        : "Encryption was set up again on another device. Enter its new passphrase to keep syncing."}
-    </p>
-    <PassphraseForm kind="current" submit="Unlock" busyLabel="Unlocking…" onsubmit={(passphrase) => sync.unlockLibrary(passphrase)} />
+    <p class="prose" id="{id}-why">{issue === "locked" ? t("sync.e2e.locked") : t("sync.error.rekeyed")}</p>
+    <PassphraseForm
+      kind="current"
+      submit={t("sync.e2e.unlock")}
+      busyLabel={t("sync.e2e.unlocking")}
+      describedby="{id}-why"
+      onsubmit={(passphrase) => sync.unlockLibrary(passphrase)}
+    />
   {:else if issue === "turned-off"}
-    <p class="prose">Encryption was turned off on another device, so the notes there are plain Markdown files again.</p>
+    <p class="prose">{t("sync.e2e.turnedOff")}</p>
     <footer class="form-footer">
-      <button class="primary push" onclick={turnOff} disabled={busy}>Turn off here too</button>
+      <button class="primary push" onclick={turnOff} disabled={busy} aria-busy={busy}>{t("sync.e2e.turnOffToo")}</button>
     </footer>
   {:else if encrypted}
     <div class="status">
       <Icon name="shield-check" size={16} />
-      <span>Notes are encrypted on this device before they're synced. Only your devices can read them.</span>
+      <span>{t("sync.e2e.on")}</span>
     </div>
     {#if asking === "change"}
-      <p class="prose spaced">Your other devices keep syncing. A new device will need the new passphrase.</p>
+      <p class="prose spaced" id="{id}-why">{t("sync.e2e.changeHint")}</p>
       <PassphraseForm
         kind="new"
-        submit="Change passphrase"
-        busyLabel="Changing…"
+        submit={t("sync.e2e.change")}
+        busyLabel={t("sync.e2e.changing")}
+        describedby="{id}-why"
         oncancel={() => ask(null)}
         onsubmit={async (passphrase) => {
           await sync.changePassphrase(passphrase);
-          asking = null;
-          done = "Passphrase changed.";
+          ask(null);
+          done = t("sync.e2e.changed");
         }}
       />
     {:else if asking === "off"}
-      <p class="prose spaced">
-        Your notes will be uploaded again as plain Markdown files that your storage provider can read. Other devices stop
-        syncing until encryption is turned off there too.
-      </p>
-      <footer class="form-footer">
-        <button class="text-button push" onclick={() => ask(null)} disabled={busy}>Cancel</button>
-        <button class="primary danger" onclick={turnOff} disabled={busy}>
-          {busy ? "Turning off…" : "Turn off encryption"}
+      <p class="prose spaced" id="{id}-why">{t("sync.e2e.turnOffHint")}</p>
+      <footer class="form-footer" role="group" aria-labelledby="{id}-why">
+        <button class="text-button push" onclick={() => ask(null)} disabled={busy}>{t("sync.cancel")}</button>
+        <button class="primary danger" onclick={turnOff} disabled={busy} aria-busy={busy} {@attach (node) => node.focus()}>
+          {busy ? t("sync.e2e.turningOff") : t("sync.e2e.turnOff")}
         </button>
       </footer>
     {:else}
       <footer class="form-footer actions">
-        <button class="text-button danger flush" onclick={() => ask("off")}>Turn off…</button>
-        <button class="text-button push" onclick={() => ask("change")}>Change passphrase…</button>
+        <button class="text-button danger flush" onclick={() => ask("off")} {@attach refocus("off")}>{t("sync.e2e.askTurnOff")}</button>
+        <button class="text-button push" onclick={() => ask("change")} {@attach refocus("change")}>{t("sync.e2e.askChange")}</button>
       </footer>
     {/if}
   {:else}
-    <p class="prose">
-      Encrypt notes and attachments on this device before they're synced, so your storage provider can't read them. Your
-      other devices ask for the passphrase once.
-    </p>
+    <p class="prose">{t("sync.e2e.intro")}</p>
     {#if asking === "on"}
       <PassphraseForm
         kind="new"
-        submit="Encrypt synced notes"
-        busyLabel="Encrypting…"
+        submit={t("sync.e2e.encrypt")}
+        busyLabel={t("sync.e2e.encrypting")}
+        describedby="{id}-forget"
         oncancel={() => ask(null)}
         onsubmit={async (passphrase) => {
           await sync.encrypt(passphrase);
-          asking = null;
-          done = "Encryption is on. Your notes are being uploaded again, encrypted.";
+          ask(null);
+          done = t("sync.e2e.encrypted");
         }}
       />
-      <p class="note">
-        If you forget the passphrase, a device that already has it can set a new one. The bucket or folder no longer holds
-        Markdown files other apps can open; Export still makes them.
-      </p>
+      <p class="note" id="{id}-forget">{t("sync.e2e.forget")}</p>
     {:else}
-      <button class="primary" onclick={() => ask("on")}><Icon name="lock" size={15} /> Set up encryption…</button>
+      <button class="primary" onclick={() => ask("on")} {@attach refocus("on")}><Icon name="lock" size={15} /> {t("sync.e2e.setUp")}</button>
     {/if}
   {/if}
 
@@ -148,7 +152,7 @@
 
   .primary.danger {
     background: var(--danger);
-    color: #fff;
+    color: var(--on-danger);
   }
 
   .message {

@@ -12,6 +12,7 @@ import type { SyntaxNode } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
 import type { IconName } from "../icons/icons";
+import { t } from "../i18n/index.svelte";
 import { coarsePointer, isApple } from "../platform";
 import { selectedBlock } from "./attachments";
 import { ancestors } from "./util";
@@ -27,20 +28,25 @@ interface Format {
   name: string;
   icon: IconName;
   shortcut: string;
+  /** The shortcut as `aria-keyshortcuts` writes it. */
+  keys: string;
   marker: string;
   /** The syntax node for text formatted this way, and the node for its markers. */
   node: string;
   mark: string;
 }
 
-const key = (k: string, shift = false) => (isApple ? `${shift ? "⇧" : ""}⌘${k}` : `Ctrl+${shift ? "Shift+" : ""}${k}`);
+const key = (k: string, shift = false) => ({
+  shortcut: isApple ? `${shift ? "⇧" : ""}⌘${k}` : `Ctrl+${shift ? "Shift+" : ""}${k}`,
+  keys: `${isApple ? "Meta" : "Control"}+${shift ? "Shift+" : ""}${k}`,
+});
 
 export const FORMATS = {
-  bold: { name: "Bold", icon: "bold", shortcut: key("B"), marker: "**", node: "StrongEmphasis", mark: "EmphasisMark" },
-  italic: { name: "Italic", icon: "italic", shortcut: key("I"), marker: "*", node: "Emphasis", mark: "EmphasisMark" },
-  strike: { name: "Strikethrough", icon: "strikethrough", shortcut: key("X", true), marker: "~~", node: "Strikethrough", mark: "StrikethroughMark" },
-  code: { name: "Code", icon: "code", shortcut: key("E"), marker: "`", node: "InlineCode", mark: "CodeMark" },
-  highlight: { name: "Highlight", icon: "highlighter", shortcut: key("H", true), marker: "==", node: "Highlight", mark: "HighlightMark" },
+  bold: { name: t("editor.format.bold"), icon: "bold", ...key("B"), marker: "**", node: "StrongEmphasis", mark: "EmphasisMark" },
+  italic: { name: t("editor.format.italic"), icon: "italic", ...key("I"), marker: "*", node: "Emphasis", mark: "EmphasisMark" },
+  strike: { name: t("editor.format.strike"), icon: "strikethrough", ...key("X", true), marker: "~~", node: "Strikethrough", mark: "StrikethroughMark" },
+  code: { name: t("editor.format.code"), icon: "code", ...key("E"), marker: "`", node: "InlineCode", mark: "CodeMark" },
+  highlight: { name: t("editor.format.highlight"), icon: "highlighter", ...key("H", true), marker: "==", node: "Highlight", mark: "HighlightMark" },
 } satisfies Record<string, Format>;
 
 export type FormatId = keyof typeof FORMATS;
@@ -181,16 +187,19 @@ function createToolbar(view: EditorView): TooltipView {
   const dom = document.createElement("div");
   dom.className = "cm-format-bar";
   dom.setAttribute("role", "toolbar");
-  dom.setAttribute("aria-label", "Format");
+  dom.setAttribute("aria-label", t("editor.format"));
   // Keep the editor focused and the selection as it is.
   dom.addEventListener("mousedown", (event) => event.preventDefault());
   const icons: Record<string, unknown>[] = [];
-  const buttons = (Object.keys(FORMATS) as FormatId[]).map((id) => {
+  const buttons = (Object.keys(FORMATS) as FormatId[]).map((id, i) => {
     const format = FORMATS[id];
     const button = document.createElement("button");
     button.type = "button";
-    button.title = `${format.name} (${format.shortcut})`;
+    button.title = t("editor.format.withShortcut", { format: format.name, shortcut: format.shortcut });
     button.setAttribute("aria-label", format.name);
+    button.setAttribute("aria-keyshortcuts", format.keys);
+    // One stop for Tab; the arrow keys move between the buttons (below).
+    button.tabIndex = i === 0 ? 0 : -1;
     icons.push(mount(Icon, { target: button, props: { name: format.icon, size: 16, strokeWidth: 2 } }));
     button.addEventListener("click", () => {
       toggleFormat(id)(view);
@@ -198,6 +207,33 @@ function createToolbar(view: EditorView): TooltipView {
     });
     dom.append(button);
     return { id, button };
+  });
+  // A toolbar's keys: ← and → (and Home, End) between its buttons, Esc back to the text.
+  dom.addEventListener("keydown", (event) => {
+    const list = buttons.map(({ button }) => button);
+    const at = list.indexOf(document.activeElement as HTMLButtonElement);
+    if (event.key === "Escape") {
+      event.preventDefault();
+      view.focus();
+      return;
+    }
+    const next =
+      event.key === "ArrowRight" ? (at + 1) % list.length
+      : event.key === "ArrowLeft" ? (at - 1 + list.length) % list.length
+      : event.key === "Home" ? 0
+      : event.key === "End" ? list.length - 1
+      : -1;
+    if (next < 0 || at < 0) return;
+    event.preventDefault();
+    for (const [j, button] of list.entries()) button.tabIndex = j === next ? 0 : -1;
+    list[next].focus();
+  });
+  // Focus going from the toolbar to somewhere other than the note hides it, as leaving the note does.
+  dom.addEventListener("focusout", (event) => {
+    const to = event.relatedTarget as Node | null;
+    if (to && (dom.contains(to) || view.contentDOM.contains(to))) return;
+    // Later, as this can happen while CodeMirror is taking the toolbar away.
+    setTimeout(() => view.dom.isConnected && !view.hasFocus && view.dispatch({ effects: focus.of(false) }));
   });
   const sync = (state: EditorState) => {
     for (const { id, button } of buttons) {
@@ -271,5 +307,6 @@ export const formatToolbar: Extension = [
   toolbarState,
   watchPointer,
   hideOnEscape,
-  EditorView.focusChangeEffect.of((_state, focusing) => focus.of(focusing)),
+  // Focus moving into the toolbar (a screen reader's, say) keeps it there rather than hiding it.
+  EditorView.focusChangeEffect.of((_state, focusing) => focus.of(focusing || !!document.activeElement?.closest(".cm-format-bar"))),
 ];

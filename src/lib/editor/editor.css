@@ -79,12 +79,43 @@
   padding: 0.15em 0.35em;
 }
 
+/* `->` shown as → (symbols.ts); in code, as wide as the characters it stands for. */
+.cm-lp-symbol[style*="width"] {
+  display: inline-block;
+  text-align: center;
+}
+
 .cm-lp-link {
   color: var(--accent);
   text-decoration: underline;
   text-decoration-color: var(--accent-soft);
   text-underline-offset: 3px;
   cursor: pointer;
+}
+
+/* A GitHub link drawn short (github.ts): the mark and owner/repo#123, in a pill like a tag's. */
+.cm-lp-github {
+  text-decoration: none;
+  white-space: nowrap;
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: 0.1em 0.4em;
+  font-size: 0.92em;
+  font-weight: 500;
+}
+
+.cm-lp-github svg,
+.cm-lp-github-mark svg {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.3em;
+  vertical-align: -0.125em;
+  fill: currentColor;
+}
+
+/* Only the mark, in front of a GitHub link with text of its own. */
+.cm-lp-github-mark {
+  text-decoration: none;
 }
 
 .cm-lp-tag {
@@ -94,6 +125,116 @@
   padding: 0.1em 0.4em;
   font-size: 0.92em;
   font-weight: 500;
+}
+
+/* Its `#` (livePreview.ts), as an icon a little apart from the name. */
+.cm-lp-tag-icon {
+  display: inline-flex;
+  margin-right: 0.15em;
+  vertical-align: -0.1em;
+  opacity: 0.7;
+}
+
+/* A mention of another note (`@Oleks`, objects.ts): its icon and title, as a link (⌘-click opens it). */
+.cm-lp-mention {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-radius: 6px;
+  padding: 0.05em 0.35em;
+  font-weight: 500;
+  cursor: pointer;
+  /* Its icon stays with its title rather than ending one line while the title starts the next. */
+  white-space: nowrap;
+}
+
+.cm-lp-mention-icon {
+  display: inline-flex;
+  margin-right: 0.25em;
+  vertical-align: -0.1em;
+}
+
+/*
+ * A property's value (`@Oleks.fullname`): the value as text, underlined like a link. The underlines
+ * here are borders, inside the text's box: an underline drawn below it was left on screen when a
+ * mention changed from one kind to another (a note made from it, say).
+ */
+.cm-lp-mention.cm-lp-mention-value {
+  color: inherit;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-weight: inherit;
+  white-space: inherit;
+  border-bottom: 1px dotted var(--accent);
+}
+
+.cm-lp-mention-source {
+  color: var(--accent);
+}
+
+/* A mention of a note (or property) there isn't, as written. */
+.cm-lp-mention-missing {
+  color: var(--text-muted);
+  border-bottom: 1px dashed var(--text-faint);
+}
+
+/*
+ * A note's properties (its front matter, see notes/properties.ts): keys in a column, values beside
+ * them, and a line under them. The `---` lines shrink away until the cursor is in the properties.
+ */
+.cm-line.cm-lp-prop {
+  font-size: 0.92em;
+}
+
+.cm-lp-prop-key {
+  display: inline-block;
+  min-width: 8em;
+  padding-right: 0.8em;
+  color: var(--text-muted);
+  vertical-align: top;
+}
+
+/* A value's list items and further lines, in line with the values (the key column's width). */
+.cm-line.cm-lp-prop-more {
+  padding-left: 8em !important;
+}
+
+.cm-line.cm-lp-prop-comment,
+.cm-line.cm-lp-prop-comment * {
+  color: var(--text-faint) !important;
+  font-style: italic;
+}
+
+.cm-lp-prop-type {
+  font-weight: 500;
+}
+
+.cm-lp-prop-type-icon {
+  display: inline-flex;
+  margin-right: 0.3em;
+  vertical-align: -0.1em;
+  color: var(--text-muted);
+}
+
+.cm-line.cm-lp-props-fence {
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  color: var(--text-faint);
+}
+
+.cm-line.cm-lp-props-fence:not(.is-active) {
+  font-size: 0.45em;
+}
+
+.cm-line.cm-lp-props-fence:not(.is-active),
+.cm-line.cm-lp-props-fence:not(.is-active) * {
+  color: transparent !important;
+}
+
+/* A line across, through the middle of the closing `---`. (Padding, not margins: CodeMirror measures lines.) */
+.cm-line.cm-lp-props-close:not(.is-active) {
+  padding-block: calc(0.4 * var(--editor-size)) calc(0.6 * var(--editor-size)) !important;
+  background: linear-gradient(var(--border), var(--border)) 0 calc(50% - 0.1 * var(--editor-size)) / 100% 1px no-repeat;
 }
 
 /*
@@ -172,8 +313,8 @@
 }
 
 .cm-lp-checkbox {
-  display: inline-grid;
-  place-items: center;
+  position: relative;
+  display: inline-block;
   width: 1.05em;
   height: 1.05em;
   vertical-align: -0.15em;
@@ -193,7 +334,11 @@
   color: var(--on-accent);
 }
 
+/* Out of the flow, so a ticked box keeps the same baseline as an empty one (its bottom edge). */
 .cm-lp-checkbox svg {
+  position: absolute;
+  inset: 0;
+  margin: auto;
   width: 0.72em;
   height: 0.72em;
 }
@@ -322,6 +467,151 @@
   border-bottom: 1px solid var(--table-line);
 }
 
+/*
+ * A table of the notes of a type (`@type.recipe`, typeTables.ts): a drawn table whose header sorts
+ * by a column when clicked, and shows a × to remove it on hover, with a + to add one at its end.
+ */
+.cm-lp-type-table.is-preview {
+  opacity: 0.85;
+}
+
+.cm-lp-type-table th.is-sortable {
+  position: relative;
+  padding-right: 1.6em;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* The header's text is a button, for the keyboard, that looks like the rest of the header. */
+.cm-lp-type-table-sort {
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: inherit;
+}
+
+.cm-lp-type-table th.is-sortable:first-child {
+  padding-right: 0.75em;
+}
+
+.cm-lp-type-table th.is-sorted {
+  color: var(--accent);
+}
+
+.cm-lp-type-table td {
+  cursor: default;
+}
+
+.cm-lp-type-table td:first-child,
+.cm-lp-type-table td.is-short {
+  white-space: nowrap;
+}
+
+.cm-lp-type-table th {
+  vertical-align: middle;
+}
+
+.cm-lp-type-table-icon {
+  display: inline-flex;
+  margin-right: 0.35em;
+  vertical-align: -0.1em;
+  color: var(--text-muted);
+}
+
+.cm-lp-type-table-remove,
+.cm-lp-type-table-add-button,
+.cm-lp-type-table-new {
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cm-lp-type-table-remove {
+  position: absolute;
+  top: 50%;
+  right: 0.3em;
+  width: 1.2em;
+  height: 1.2em;
+  margin-top: -0.6em;
+  padding: 0;
+  border-radius: 4px;
+  color: var(--text-faint);
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.cm-lp-type-table-remove::before {
+  content: "×";
+}
+
+.cm-lp-type-table th:hover .cm-lp-type-table-remove,
+.cm-lp-type-table-remove:focus-visible {
+  opacity: 1;
+}
+
+.cm-lp-type-table-remove:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.cm-lp-type-table th.cm-lp-type-table-add {
+  width: 1%;
+  min-width: 0;
+  padding: 0.2em 0.4em;
+}
+
+.cm-lp-type-table-add-button {
+  display: grid;
+  place-items: center;
+  padding: 0.25em;
+  border-radius: 5px;
+  color: var(--text-muted);
+}
+
+.cm-lp-type-table-add-button .cm-lp-type-table-icon {
+  margin: 0;
+}
+
+.cm-lp-type-table-add-button:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.cm-lp-type-table-footer {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  padding-top: 0.35em;
+  font-family: var(--font-ui);
+  font-size: 0.82em;
+  color: var(--text-faint);
+}
+
+.cm-lp-type-table-new {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2em 0.5em 0.2em 0.3em;
+  border-radius: 6px;
+  color: var(--text-muted);
+}
+
+.cm-lp-type-table-new:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+@media (hover: none) {
+  .cm-lp-type-table-remove {
+    opacity: 0.6;
+  }
+}
+
 /* Drag handles (dragBlocks.ts): a grip left of the hovered line or block, and the line where it'll go. */
 .cm-drag-handle {
   position: absolute;
@@ -354,11 +644,20 @@
 
 .cm-drop-indicator {
   position: absolute;
+  top: 0;
+  left: 0;
   z-index: 3;
   height: 2px;
   border-radius: 1px;
   background: var(--accent);
   pointer-events: none;
+  /* Moved by dragBlocks.ts each frame, which glides it from one place to the next. */
+  will-change: transform;
+}
+
+/* Behind the text while it glides past it (the scroller is the editor's stacking context). */
+.cm-drop-indicator.is-moving {
+  z-index: -1;
 }
 
 .cm-drop-indicator[hidden] {
@@ -377,6 +676,7 @@
 
 /* A Mermaid diagram (mermaid.ts), in place of its code block or below it while it's edited. */
 .cm-lp-diagram {
+  position: relative;
   min-height: 3em;
   padding: 0.75em 0;
   text-align: center;
@@ -389,11 +689,60 @@
   border-bottom: 1px dashed var(--border);
 }
 
+/* The diagram, with its resize handle (mermaid.ts) on its corner. */
+.cm-lp-diagram-frame {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+}
+
+/* Its "Copy and Edit as Drawing" button, top right on hover, like a drawing's pencil. */
+.cm-lp-diagram-draw {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.cm-lp-diagram-draw:hover {
+  color: var(--text);
+}
+
+.cm-lp-diagram:hover .cm-lp-diagram-draw,
+.cm-lp-diagram-draw:focus-visible {
+  opacity: 1;
+}
+
+/* Not for a diagram that's empty or has an error, nor in the Trash. */
+.cm-lp-diagram:has(> .cm-lp-diagram-message) .cm-lp-diagram-draw,
+.cm-content[contenteditable="false"] .cm-lp-diagram-draw {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .cm-lp-diagram-draw {
+    opacity: 1;
+  }
+}
+
 .cm-lp-diagram.is-pending {
   opacity: 0.55;
 }
 
-.cm-lp-diagram > svg {
+.cm-lp-diagram-frame > svg {
+  display: block;
   max-width: 100%;
   height: auto;
 }
@@ -412,6 +761,52 @@
 
 .cm-lp-diagram-message.is-error {
   color: var(--danger);
+}
+
+/* LaTeX math (math.ts): within text, and in blocks drawn like diagrams. */
+.cm-lp-math.is-pending,
+.cm-lp-math.is-error {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: var(--text-faint);
+}
+
+.cm-lp-math.is-error {
+  color: var(--danger);
+  cursor: help;
+}
+
+/* $$x$$ within a paragraph: centered on a line of its own. */
+.cm-lp-math.is-display {
+  display: inline-block;
+  width: 100%;
+}
+
+.cm-lp-math .katex-display {
+  margin: 0.4em 0;
+  /* A long equation scrolls rather than spilling out of the column. */
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.cm-lp-math-block {
+  padding: 0.5em 0;
+  text-align: center;
+  line-height: normal;
+  cursor: text;
+}
+
+.cm-lp-math-block .katex-display {
+  margin: 0;
+}
+
+.cm-lp-math-block.is-preview {
+  border-bottom: 1px dashed var(--border);
+}
+
+.cm-lp-math-block.is-empty {
+  color: var(--text-faint);
+  font-size: 0.86em;
 }
 
 .cm-lp-image {
@@ -442,6 +837,129 @@
 /* Its Markdown is selected, as clicking it does: Delete or typing replaces it. */
 .cm-focused .cm-lp-image-block.is-selected .cm-lp-image {
   box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* The image with its resize handle (bottom right) and, for a drawing, its edit button (top right). */
+.cm-lp-image-frame {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: bottom;
+}
+
+.cm-lp-image-resize,
+.cm-lp-diagram-resize {
+  position: absolute;
+  right: -8px;
+  bottom: -8px;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  cursor: nwse-resize;
+  touch-action: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+/* A round grip, small inside its larger target. */
+.cm-lp-image-resize::after,
+.cm-lp-diagram-resize::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 2px solid var(--bg);
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.cm-lp-image-block:hover .cm-lp-image-resize,
+.cm-lp-image-block.is-preview .cm-lp-image-resize,
+.cm-lp-image-block.is-selected .cm-lp-image-resize,
+.cm-lp-image-block.is-resizing .cm-lp-image-resize,
+.cm-lp-diagram:hover .cm-lp-diagram-resize,
+.cm-lp-diagram.is-preview .cm-lp-diagram-resize,
+.cm-lp-diagram.is-resizing .cm-lp-diagram-resize {
+  opacity: 1;
+}
+
+.cm-lp-image-block.is-resizing,
+.cm-lp-diagram.is-resizing {
+  cursor: nwse-resize;
+}
+
+.cm-lp-diagram.is-resizing .cm-lp-diagram-frame {
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.cm-lp-image-block.is-resizing .cm-lp-image {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Nothing to resize in a note that can't change (the Trash), or before the image has loaded. */
+.cm-content[contenteditable="false"] .cm-lp-image-resize,
+.cm-content[contenteditable="false"] .cm-lp-diagram-resize,
+.cm-lp-image-frame:not(:has(.cm-lp-image)) .cm-lp-image-resize {
+  display: none;
+}
+
+/*
+ * A drawing (drawings.ts): clear behind, so no edge, and in dark themes drawn light on dark as
+ * Excalidraw shows it.
+ */
+.cm-lp-image-block[data-drawing] .cm-lp-image-slot {
+  display: inline-block;
+  border-radius: 8px;
+}
+
+.cm-lp-image-block[data-drawing] .cm-lp-image,
+.cm-focused .cm-lp-image-block[data-drawing].is-selected .cm-lp-image {
+  box-shadow: none;
+}
+
+.cm-focused .cm-lp-image-block[data-drawing].is-selected .cm-lp-image-slot {
+  outline: 2px solid var(--accent);
+}
+
+:root[data-scheme="dark"] .cm-lp-image-block[data-drawing] .cm-lp-image {
+  filter: invert(93%) hue-rotate(180deg);
+}
+
+.cm-lp-drawing-edit {
+  /* Above the drawing, which its dark-theme filter would otherwise paint over. */
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.cm-lp-drawing-edit:hover {
+  color: var(--text);
+}
+
+.cm-lp-image-block[data-drawing]:hover .cm-lp-drawing-edit,
+.cm-lp-image-block[data-drawing].is-preview .cm-lp-drawing-edit,
+.cm-lp-image-block[data-drawing].is-selected .cm-lp-drawing-edit {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .cm-lp-drawing-edit,
+  .cm-lp-image-resize,
+  .cm-lp-diagram-resize {
+    opacity: 1;
+  }
 }
 
 /* A file on a line of its own (attachments.ts): a card naming it, double-clicked to open. */
@@ -539,6 +1057,7 @@
 .cm-line.cm-lp-card,
 .cm-lp-table-wrap.cm-lp-card,
 .cm-lp-diagram.cm-lp-card,
+.cm-lp-math-block.cm-lp-card,
 .cm-lp-block.cm-lp-card {
   --card-pad: calc(1.4 * var(--editor-size));
   margin-inline: calc(var(--card-depth) * var(--card-pad));
@@ -593,6 +1112,11 @@
   box-shadow: none;
 }
 
+/* With more contrast (the High Contrast theme, or Contrast → Increased), a callout is outlined in its color. */
+:root:is([data-theme="high-contrast"], [data-contrast="more"]) .cm-lp-card-bg.cm-lp-callout {
+  border-color: var(--callout);
+}
+
 .cm-line.cm-lp-callout-head {
   position: relative;
 }
@@ -610,6 +1134,21 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 120ms ease, opacity 120ms ease;
+}
+
+/* An empty callout: in the middle of the card instead, between its two fences or on its only one. */
+.cm-lp-callout-icon.at-middle,
+.cm-lp-callout-icon.at-fence {
+  margin: 0;
+  transform: translateY(-50%);
+}
+
+.cm-lp-callout-icon.at-middle {
+  top: 100%;
+}
+
+.cm-lp-callout-icon.at-fence {
+  top: 50%;
 }
 
 /* Over the fence's hidden text, which would make it transparent too. */
@@ -642,7 +1181,8 @@
   opacity: 0.6;
 }
 
-.cm-lp-callout-head .cm-lp-callout-icon.is-empty:hover {
+.cm-lp-callout-head .cm-lp-callout-icon.is-empty:hover,
+.cm-lp-callout-icon.is-empty:focus-visible {
   opacity: 1;
 }
 
@@ -712,6 +1252,41 @@
   .cm-lp-copy {
     opacity: 0.6;
   }
+}
+
+/* The card over a mention of a note there isn't, offering to make it (objects.ts). */
+.cm-tooltip.cm-tooltip-hover:has(.cm-mention-card) {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-menu);
+  animation: cm-format-bar-in 120ms ease-out;
+}
+
+.cm-mention-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 5px 5px 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.cm-mention-card button {
+  height: 28px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 7px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cm-mention-card button:hover {
+  filter: brightness(1.08);
 }
 
 /* The toolbar over selected text (formatting.ts). */
@@ -849,4 +1424,228 @@
 
 .cm-lp-table-grid :is(td, th):has(> .cm-lp-cell-copy:hover) {
   background: var(--selection);
+}
+
+/* Notes written in LaTeX (latex.ts). */
+
+/* A command's markup while the cursor is on it, and commands lines doesn't draw. */
+.cm-lt-mark {
+  color: var(--text-faint);
+}
+
+.cm-lt-command {
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+}
+
+.cm-lt-comment {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/* LaTeX being edited: inline math, and the lines of math blocks and tables. */
+.cm-lt-code,
+.cm-line.cm-lt-source {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+}
+
+/* \begin{…} and \end{…} on lines of their own: a small gap, until the cursor is on one. */
+.cm-line.cm-lt-fence:not(.is-active) {
+  font-size: 0.45em;
+}
+
+.cm-line.cm-lt-fence.is-active {
+  color: var(--text-faint);
+}
+
+/* A list's text that isn't an item's first line, and description items: in line with the items' text. */
+.cm-line.cm-lt-li-text {
+  --li-marker: 1.6em;
+  padding-left: calc(var(--li-depth) * var(--li-marker)) !important;
+}
+
+.cm-line.cm-lt-center {
+  text-align: center;
+}
+
+.cm-line.cm-lt-right {
+  text-align: right;
+}
+
+.cm-lt-underline {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.cm-lt-smallcaps {
+  font-variant: small-caps;
+}
+
+.cm-lt-footnote {
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
+.cm-lt-footnote-mark {
+  margin: 0 0.3em 0 0.1em;
+  font-size: 0.7em;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.cm-lt-hidden {
+  display: none;
+}
+
+.cm-lt-table {
+  cursor: text;
+}
+
+.cm-lt-caption {
+  font-size: 0.9em;
+  color: var(--text-muted);
+}
+
+/* A whole document's preamble, folded: its title, authors, and a chip that opens its LaTeX. */
+.cm-lt-preamble {
+  padding: 0 0 calc(0.6em * var(--heading-space));
+  line-height: 1.3;
+  cursor: text;
+}
+
+.cm-lt-preamble-title {
+  font-size: 1.75em;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.cm-lt-preamble-author {
+  margin-top: 0.35em;
+  color: var(--text-muted);
+}
+
+.cm-lt-preamble-chip {
+  display: inline-block;
+  margin-top: 0.6em;
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  background: var(--code-bg);
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+}
+
+/* \cite{…} and \ref{…}. */
+.cm-lt-ref {
+  padding: 0.05em 0.35em;
+  border-radius: 5px;
+  background: var(--code-bg);
+  color: var(--accent);
+  font-size: 0.82em;
+  white-space: nowrap;
+}
+
+.cm-lt-ref.is-cite {
+  color: var(--text-muted);
+}
+
+/* Theorems, lemmas, proofs: a line down the side, and the label in bold (a proof's in italics). */
+.cm-lp-math-block.cm-lt-theorem,
+.cm-line.cm-lt-theorem {
+  border-left: 3px solid var(--accent-soft);
+  padding-left: 1em !important;
+}
+
+.cm-lt-theorem-label {
+  font-weight: 700;
+}
+
+.cm-lt-theorem-label.is-proof {
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* With increased contrast, faint text on code's darker background (a block's language, its fences, a table's header) is muted, keeping 4.5:1. */
+:root[data-contrast="more"] :is(.cm-lp-codeblock, .cm-lp-table-grid th, .cm-lp-math-source) {
+  --text-faint: var(--text-muted);
+}
+
+/*
+ * Forced colors (Windows' contrast themes): backgrounds and shadows are dropped and text takes the
+ * system's colors, so chips, highlights, ticked boxes, code blocks and dividers get borders or
+ * system colors of their own, and Markdown hidden by making it transparent is kept hidden.
+ */
+@media (forced-colors: active) {
+  .cm-line.cm-lp-props-fence:not(.is-active),
+  .cm-line.cm-lp-props-fence:not(.is-active) *,
+  .cm-lp-card-fence:not(.is-active),
+  .cm-lp-card-fence:not(.is-active) * {
+    forced-color-adjust: none;
+  }
+
+  /* A callout's icon on its fence line stays visible, in the system's text color. */
+  .cm-line.cm-lp-card-fence .cm-lp-callout-icon {
+    forced-color-adjust: auto;
+    color: CanvasText !important;
+  }
+
+  .cm-lp-mention,
+  .cm-lp-link,
+  .cm-lp-github {
+    color: LinkText;
+  }
+
+  .cm-lp-mention-missing {
+    color: GrayText;
+  }
+
+  /* Chips keep their shape as an outline, which (unlike a border) doesn't move the text. */
+  .cm-lp-mention,
+  .cm-lp-github,
+  .cm-lp-tag,
+  .cm-lp-code {
+    outline: 1px solid;
+    outline-offset: -1px;
+  }
+
+  .cm-lp-highlight {
+    background: Highlight;
+    color: HighlightText;
+    /* The system's own color for marked text, where the browser has it. */
+    background: Mark;
+    color: MarkText;
+  }
+
+  .cm-lp-checkbox.is-checked {
+    background: Highlight;
+    border-color: Highlight;
+    color: HighlightText;
+  }
+
+  .cm-lp-hr {
+    background: CanvasText;
+  }
+
+  .cm-lp-codeblock {
+    border-inline: 1px solid CanvasText;
+  }
+
+  .cm-lp-codeblock-first {
+    border-top: 1px solid CanvasText;
+  }
+
+  .cm-lp-codeblock-last {
+    border-bottom: 1px solid CanvasText;
+  }
+
+  /* The gap between two code blocks is a border (its width as above); keep it the page's color. */
+  .cm-lp-codeblock-after {
+    border-top: 10px solid Canvas;
+  }
+
+  .cm-focused .cm-lp-file-block.is-selected .cm-lp-file {
+    outline: 2px solid Highlight;
+  }
 }

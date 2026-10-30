@@ -1,3 +1,4 @@
+import { t } from "../i18n/index.svelte";
 import type { Remote, RemoteObject } from "./remote";
 import { SyncError } from "./remote";
 
@@ -69,7 +70,7 @@ async function loadHandle(id: string): Promise<DirectoryHandle | null> {
 
 /** The browser's folder picker; the folder's name and the path to save in the sync config, or null if cancelled. */
 export async function pickBrowserFolder(): Promise<{ name: string; path: string } | null> {
-  if (!window.showDirectoryPicker) throw new SyncError("This browser can't save to a folder. Try Chrome or Edge.");
+  if (!window.showDirectoryPicker) throw new SyncError(t("sync.browser.cantPick"));
   let handle: DirectoryHandle;
   try {
     handle = await window.showDirectoryPicker({ id: "lines", mode: "readwrite" });
@@ -105,10 +106,10 @@ export class BrowserFolderRemote implements Remote {
   #handle() {
     this.#root ??= (async () => {
       const handle = await loadHandle(this.path.slice(PREFIX.length));
-      if (!handle) throw new SyncError("The folder isn't available any more. Choose it again in Settings → Sync & Data.");
+      if (!handle) throw new SyncError(t("sync.browser.gone"));
       if ((await handle.queryPermission({ mode: "readwrite" })) !== "granted") {
         this.#root = undefined;
-        throw new SyncError(`lines needs your permission to use “${handle.name}” again. Open Settings → Sync & Data and allow it.`);
+        throw new SyncError(t("sync.browser.permission", { name: handle.name }));
       }
       return handle;
     })();

@@ -1,0 +1,216 @@
+import { LanguageDescription } from "@codemirror/language";
+import { languages } from "@codemirror/language-data";
+import { highlightCode, tagHighlighter, tags } from "@lezer/highlight";
+import { mount, unmount } from "svelte";
+import Icon from "../icons/Icon.svelte";
+import type { IconName } from "../icons/icons";
+import { t } from "../i18n/index.svelte";
+import { loadMath, type Macros, NO_MACROS } from "../editor/math";
+import { loadMermaid } from "../editor/mermaid";
+import { unsplashImage } from "../editor/unsplash";
+import { attachmentName, attachmentURL, imageSize } from "../notes/attachments";
+import { symbolPieces } from "../notes/symbols";
+
+/*
+ * The pieces a printed note is made of that take a moment to draw: math (KaTeX), diagrams
+ * (Mermaid), highlighted code and images. Each is drawn into an element now and finished
+ * later; `ready()` waits for all of them, so pages are measured only once everything has its size.
+ */
+
+/** Code's colors on paper, by kind, as the editor groups them (setup.ts). See print.css. */
+const highlighter = tagHighlighter([
+  { tag: [tags.keyword, tags.modifier, tags.self, tags.operatorKeyword, tags.tagName], class: "doc-k" },
+  { tag: [tags.string, tags.special(tags.string), tags.regexp, tags.character], class: "doc-s" },
+  { tag: [tags.number, tags.bool, tags.null, tags.atom, tags.unit, tags.constant(tags.variableName)], class: "doc-n" },
+  { tag: [tags.comment, tags.meta], class: "doc-c" },
+  { tag: [tags.function(tags.variableName), tags.function(tags.propertyName), tags.macroName, tags.attributeName], class: "doc-f" },
+  { tag: [tags.typeName, tags.className, tags.namespace, tags.standard(tags.variableName), tags.propertyName], class: "doc-t" },
+]);
+
+/** Mermaid's colors on paper: black lines and text, light fills. */
+const DIAGRAM_THEME = {
+  look: "classic" as const,
+  themeVariables: {
+    darkMode: false,
+    fontSize: "14px",
+    background: "#ffffff",
+    edgeLabelBackground: "#ffffff",
+    labelBackgroundColor: "#ffffff",
+    dropShadow: "none",
+    primaryColor: "#eef1f6",
+    primaryBorderColor: "#7d8796",
+    primaryTextColor: "#1a1a1a",
+    secondaryColor: "#f3f3f3",
+    tertiaryColor: "#f8f8f8",
+    lineColor: "#555555",
+    textColor: "#1a1a1a",
+    noteBkgColor: "#fff5c4",
+    noteBorderColor: "#d8c25a",
+    noteTextColor: "#1a1a1a",
+    // Pie slices, apart from each other in print and in grey.
+    pie1: "#9dbbe6",
+    pie2: "#f0c48a",
+    pie3: "#a8d5ac",
+    pie4: "#e3a3a8",
+    pie5: "#c5b3e3",
+    pie6: "#96d0cf",
+    pie7: "#e8d58f",
+    pie8: "#c9c9c9",
+    pieStrokeColor: "#ffffff",
+    pieOuterStrokeColor: "#ffffff",
+  },
+};
+
+let diagrams = 0;
+
+export function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = "", ...children: (Node | string)[]): HTMLElementTagNameMap[K] {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  element.append(...children);
+  return element;
+}
+
+export class Parts {
+  #pending: Promise<unknown>[] = [];
+  #icons: Record<string, unknown>[] = [];
+  #katex: Awaited<ReturnType<typeof loadMath>> | undefined;
+  #katexLoading: Promise<void> | undefined;
+
+  /** Waits for everything still being drawn. */
+  async ready() {
+    // Drawing one piece can start another (a diagram's fonts), so wait until nothing new is added.
+    for (let seen = 0; seen < this.#pending.length; ) {
+      const batch = this.#pending.slice(seen);
+      seen = this.#pending.length;
+      await Promise.allSettled(batch);
+    }
+    await document.fonts?.ready;
+  }
+
+  /** Takes down what was mounted for the document (its icons). */
+  destroy() {
+    for (const mounted of this.#icons) void unmount(mounted);
+    this.#icons = [];
+  }
+
+  #later(work: Promise<unknown>) {
+    this.#pending.push(work);
+  }
+
+  /** Math: within text, or displayed on its own. */
+  math(tex: string, display: boolean, macros: Macros = NO_MACROS): HTMLElement {
+    const dom = el(display ? "div" : "span", display ? "doc-math is-display" : "doc-math");
+    const draw = () => {
+      try {
+        this.#katex!.render(tex, dom, { displayMode: display, output: "htmlAndMathml", throwOnError: true, strict: "ignore", macros: { ...macros.map } });
+      } catch {
+        // As written, the way the editor shows math KaTeX can't read.
+        dom.textContent = tex;
+        dom.classList.add("is-error");
+      }
+    };
+    if (this.#katex) draw();
+    else {
+      this.#katexLoading ??= loadMath().then((katex) => void (this.#katex = katex));
+      this.#later(this.#katexLoading.then(draw));
+    }
+    return dom;
+  }
+
+  /** A code block, highlighted for its language once that has loaded; with `symbols`, `->` shows as → (notes/symbols.ts). */
+  code(source: string, language: string, symbols = false): HTMLElement {
+    const shown = symbols ? symbolPieces(source) : (from: number, to: number) => source.slice(from, to);
+    const code = el("code", "", shown(0, source.length));
+    const pre = el("pre", "doc-code", code);
+    const found = language ? LanguageDescription.matchLanguageName(languages, language, true) : null;
+    if (found) {
+      this.#later(
+        found.load().then((support) => {
+          const parts = document.createDocumentFragment();
+          let pos = 0;
+          highlightCode(
+            source,
+            support.language.parser.parse(source),
+            highlighter,
+            (text, classes) => {
+              const piece = shown(pos, (pos += text.length));
+              if (piece) parts.append(classes ? el("span", classes, piece) : piece);
+            },
+            () => {
+              parts.append("\n");
+              pos++;
+            },
+          );
+          code.replaceChildren(parts);
+        }),
+      );
+    }
+    return pre;
+  }
+
+  /** A Mermaid diagram, in black and white, at the width its code block gives (```mermaid |400) if it does. */
+  diagram(source: string, width: number | null = null): HTMLElement {
+    const dom = el("div", "doc-diagram");
+    const id = `lines-print-diagram-${++diagrams}`;
+    this.#later(
+      loadMermaid()
+        .then(async (mermaid) => {
+          mermaid.initialize({ startOnLoad: false, securityLevel: "strict", suppressErrorRendering: true, theme: "base", ...DIAGRAM_THEME });
+          const { svg } = await mermaid.render(id, source);
+          dom.innerHTML = svg;
+          // No wider than the page (print.css).
+          const drawn = dom.querySelector("svg");
+          if (width && drawn) Object.assign(drawn.style, { width: `${width}px`, maxWidth: "" });
+        })
+        .catch(() => {
+          document.getElementById(id)?.remove();
+          document.getElementById(`d${id}`)?.remove();
+          dom.replaceChildren(this.code(source, ""));
+        }),
+    );
+    return dom;
+  }
+
+  /**
+   * An image: an attachment, a photo on Unsplash, or one on the web, at the width its label gives
+   * (`|400`) if it does. A missing one says so.
+   */
+  image(src: string, label: string): HTMLElement {
+    const img = el("img", "doc-image");
+    const { alt, width } = imageSize(label);
+    img.alt = alt || t("editor.image");
+    if (width) {
+      img.style.width = `${width}px`;
+      img.style.maxHeight = "none";
+    }
+    const missing = (message: string) => img.replaceWith(el("span", "doc-image-missing", message));
+    const loaded = (url: string) =>
+      new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => {
+          missing(t("editor.imageFailed"));
+          resolve();
+        };
+        // An image that never answers doesn't hold up the pages.
+        setTimeout(resolve, 15000);
+        img.src = url;
+      });
+    const name = attachmentName(src);
+    if (name) {
+      this.#later(
+        attachmentURL(name).then((url) => {
+          if (url) return loaded(url);
+          missing(t("editor.imageNotHere"));
+        }),
+      );
+    } else this.#later(loaded(unsplashImage(src) ?? src));
+    return img;
+  }
+
+  /** An icon, as the app draws it (Lucide, so it prints the same everywhere). */
+  icon(name: IconName, size = 15): HTMLElement {
+    const span = el("span", "doc-icon");
+    this.#icons.push(mount(Icon, { target: span, props: { name, size, set: "lucide" } }));
+    return span;
+  }
+}

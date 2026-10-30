@@ -2,6 +2,8 @@ import { type EditorView, WidgetType } from "@codemirror/view";
 import type { Plugin } from "prettier";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
+import { speak } from "../a11y";
+import { t } from "../i18n/index.svelte";
 import { ancestors } from "./util";
 
 /*
@@ -149,8 +151,8 @@ export class FormatWidget extends WidgetType {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "cm-lp-copy cm-lp-code-copy cm-lp-code-format";
-    button.title = "Format code";
-    button.setAttribute("aria-label", "Format code");
+    button.title = t("editor.formatCode");
+    button.setAttribute("aria-label", t("editor.formatCode"));
     mounted.set(button, mount(Icon, { target: button, props: { name: "wand-sparkles", size: 14, strokeWidth: 2 } }));
     let shown: ReturnType<typeof setTimeout> | undefined;
     button.addEventListener("mousedown", (event) => event.preventDefault());
@@ -168,10 +170,13 @@ export class FormatWidget extends WidgetType {
         if (tidy !== code && now && view.state.sliceDoc(now.from, now.to) === code) {
           view.dispatch({ changes: { from: now.from, to: now.to, insert: tidy }, userEvent: "input.format" });
         }
+        speak(t("editor.codeFormatted"));
       } catch (error) {
         // The first line of the parser's message says what's wrong and where.
         const message = error instanceof Error ? error.message : String(error);
-        button.dataset.error = `Couldn't format: ${message.split("\n")[0].replace(/\s*\(\d+:\d+\)$/, "")}`;
+        button.dataset.error = t("editor.formatFailed", { error: message.split("\n")[0].replace(/\s*\(\d+:\d+\)$/, "") });
+        // Drawn under the button, out of a screen reader's way, so said too.
+        speak(button.dataset.error);
         clearTimeout(shown);
         shown = setTimeout(() => delete button.dataset.error, 4000);
       } finally {

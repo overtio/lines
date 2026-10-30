@@ -1,4 +1,5 @@
 import { aesKey, fromBase64, fromUtf8, isLockedKey, lockKey, open, randomBytes, seal, toBase64, unlockKey, utf8, WrongPassphrase, type Bytes } from "../crypto";
+import { t } from "../i18n/index.svelte";
 import { referencedAttachments } from "./attachments";
 import { computeMeta } from "./parse";
 import type { Note, NoteLock, WrappedKey } from "./types";
@@ -145,7 +146,7 @@ class NoteKeys {
   /** Locks an open key with a new password. */
   async rewrap(id: string, password: string): Promise<WrappedKey> {
     const raw = this.#open.get(id)?.raw;
-    if (!raw) throw new Error("Open your locked notes first.");
+    if (!raw) throw new Error(t("lock.notes.notOpen"));
     const key: WrappedKey = { id, changed: Date.now(), ...(await lockKey(raw, password)) };
     this.#seen.set(id, key);
     return key;
@@ -155,11 +156,11 @@ class NoteKeys {
   async seal(note: Note): Promise<NoteLock> {
     const lock = note.locked!;
     const open = this.#open.get(lock.key.id);
-    if (!open) throw new Error("Locked notes are locked");
+    if (!open) throw new Error(t("lock.notes.notOpen"));
     return {
       ...lock,
       key: this.newest(lock.key.id) ?? lock.key,
-      title: computeMeta(note.body).title,
+      title: computeMeta(note.body, note.format).title,
       files: [...referencedAttachments([note.body])],
       sealed: toBase64(await seal(open.key, utf8(note.body), CONTEXT)),
     };

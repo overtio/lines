@@ -1,3 +1,7 @@
+import { latexContent, latexLines, latexPlainText } from "./latex";
+import { frontMatter } from "./properties";
+import type { NoteFormat } from "./types";
+
 export interface NoteStats {
   words: number;
   characters: number;
@@ -28,15 +32,24 @@ export function plainLine(line: string): string {
     .replace(/!\[(?:\\.|[^\]\\])*\]\([^)]*\)/g, "")
     .replace(/\[((?:\\.|[^\]\\])*)\]\([^)]*\)/g, (_, text: string) => text.replace(/\\([[\]\\])/g, "$1"))
     .replace(/\*\*|__|~~|==|`|\*/g, "")
+    // A wiki link reads as what it shows: `[[Ada Lovelace]]` as `Ada Lovelace`, `[[Ada Lovelace|Ada]]` as `Ada`.
+    .replace(/(?<![!\\])\[\[([^[\]\n|#]+)(?:#[^[\]\n|]*)?(?:\|([^[\]\n]+))?\]\]/gu, (_, name: string, shown?: string) => (shown ?? name).trim())
+    // A mention of a note with spaces in its title: `@[Ada Lovelace]` reads `@Ada Lovelace`.
+    .replace(/(?<![\p{L}\p{N}_.\/\\@])@\[([^\]\n]+)\]/gu, "@$1")
     // _emphasis_, but not the underscores inside snake_case words.
     .replace(/(?<![\p{L}\p{N}])_([^_\n]+)_(?![\p{L}\p{N}])/gu, "$1")
     .trimEnd();
 }
 
-/** The note as plain text: Markdown removed, code kept, fences, dividers and card fences dropped, table cells tab-separated. */
-export function plainText(body: string): string {
-  return body
-    .split("\n")
+/** The note's lines after its properties (notes/properties.ts), which aren't part of its text. */
+function textLines(body: string): string[] {
+  return body.split("\n").slice(frontMatter(body)?.lines ?? 0);
+}
+
+/** The note as plain text: Markdown and properties removed, code kept, fences, dividers and card fences dropped, table cells tab-separated. */
+export function plainText(body: string, format: NoteFormat = "markdown"): string {
+  if (format === "latex") return latexPlainText(body);
+  return textLines(body)
     .filter((line) => !FENCE_RE.test(line) && !RULE_RE.test(line) && !TABLE_DELIM_RE.test(line) && !CARD_FENCE_RE.test(line))
     .map(plainLine)
     .join("\n")
@@ -55,22 +68,30 @@ function countSentences(text: string): number {
  * Counts what a reader sees. Every line with words is a paragraph (that's how the editor shows
  * them), except headings, which also don't count as sentences.
  */
-export function noteStats(body: string): NoteStats {
+export function noteStats(body: string, format: NoteFormat = "markdown"): NoteStats {
   const stats: NoteStats = { words: 0, characters: 0, sentences: 0, paragraphs: 0 };
+  if (format === "latex") {
+    for (const { text, heading } of latexLines(latexContent(body).text)) count(stats, text, heading);
+    return stats;
+  }
   let inFence = false;
-  for (const line of body.split("\n")) {
+  for (const line of textLines(body)) {
     if (FENCE_RE.test(line)) {
       inFence = !inFence;
       continue;
     }
     if (!inFence && (RULE_RE.test(line) || TABLE_DELIM_RE.test(line) || CARD_FENCE_RE.test(line))) continue;
-    const text = inFence ? line : plainLine(line);
-    const words = text.match(WORD_RE)?.length ?? 0;
-    stats.words += words;
-    stats.characters += [...text.trim()].length;
-    if (!words || inFence || HEADING_RE.test(line)) continue;
-    stats.paragraphs++;
-    stats.sentences += countSentences(text);
+    count(stats, inFence ? line : plainLine(line), inFence || HEADING_RE.test(line));
   }
   return stats;
+}
+
+/** Adds a line's words and characters, and unless it's a heading (or code), a paragraph and its sentences. */
+function count(stats: NoteStats, text: string, heading: boolean) {
+  const words = text.match(WORD_RE)?.length ?? 0;
+  stats.words += words;
+  stats.characters += [...text.trim()].length;
+  if (!words || heading) return;
+  stats.paragraphs++;
+  stats.sentences += countSentences(text);
 }

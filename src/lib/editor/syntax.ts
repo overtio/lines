@@ -12,11 +12,27 @@ function charBefore(cx: InlineContext, pos: number) {
   return pos === cx.offset ? -1 : cx.char(pos - 1);
 }
 
-/** Bear-style `#tag` and `#nested/tag`. */
+/**
+ * Bear-style `#tag` and `#nested/tag`. A line of only `#` is where one is being typed, so it's text
+ * rather than an empty heading; a heading needs the space after its `#`.
+ */
 export const Tag: MarkdownConfig = {
   defineNodes: [
     { name: "Tag", style: t.labelName },
     { name: "TagMark", style: t.processingInstruction },
+  ],
+  parseBlock: [
+    {
+      name: "BareHash",
+      before: "ATXHeading",
+      parse(cx, line) {
+        if (!/^#{1,6}$/.test(line.text.slice(line.pos))) return false;
+        const from = cx.lineStart + line.pos;
+        cx.addElement(cx.elt("Paragraph", from, cx.lineStart + line.text.length));
+        cx.nextLine();
+        return true;
+      },
+    },
   ],
   parseInline: [
     {
@@ -36,6 +52,46 @@ export const Tag: MarkdownConfig = {
         while (end > pos + 1 && cx.char(end - 1) === SLASH) end--;
         if (end === pos + 1 || /^\d+$/.test(cx.slice(pos + 1, end))) return -1;
         return cx.addElement(cx.elt("Tag", pos, end, [cx.elt("TagMark", pos, pos + 1)]));
+      },
+    },
+  ],
+};
+
+const AT = 64, OPEN_BRACKET = 91, BANG = 33;
+/** A mention at the start of the text (see notes/properties.ts `MENTION`, which also checks what's before it). */
+const MENTION_AT = /@(?:\[[^\]\n]+\]|[\p{L}\p{N}_][\p{L}\p{N}_-]*)(?:\.[\p{L}_][\p{L}\p{N}_-]*)?/uy;
+const TYPE_AT = /@type\.[\p{L}\p{N}_][\p{L}\p{N}_-]*(?:\([^()\n]*\))?/iuy;
+/** What can't come right before a mention's `@`: emails, `owner/repo@sha`, `\@`. */
+const NOT_BEFORE_MENTION = /[\p{L}\p{N}_.\/\\@`]/u;
+/** A wiki link at the start of the text (see notes/properties.ts `MENTION`). */
+const WIKI_AT = /\[\[[^[\]\n|#]*[^\s[\]|#][^[\]\n|#]*(?:#[^[\]\n|]*)?(?:\|[^[\]\n]+)?\]\]/uy;
+
+/**
+ * A mention of another note, `@Oleks`, `@[Two Words]` or `[[Two Words]]`, or of one of its
+ * properties, `@Oleks.fullname`; or of a type, `@type.recipe` (notes/properties.ts).
+ */
+export const Mention: MarkdownConfig = {
+  defineNodes: [{ name: "Mention", style: t.link }],
+  parseInline: [
+    {
+      name: "Mention",
+      before: "Link",
+      parse(cx, next, pos) {
+        if (next === OPEN_BRACKET) {
+          // Not an embed, `![[…]]`.
+          if (cx.char(pos + 1) !== OPEN_BRACKET || charBefore(cx, pos) === BANG) return -1;
+          WIKI_AT.lastIndex = 0;
+          const wiki = WIKI_AT.exec(cx.slice(pos, Math.min(cx.end, pos + 300)));
+          return wiki ? cx.addElement(cx.elt("Mention", pos, pos + wiki[0].length)) : -1;
+        }
+        if (next !== AT) return -1;
+        const prev = charBefore(cx, pos);
+        if (prev !== -1 && NOT_BEFORE_MENTION.test(String.fromCharCode(prev))) return -1;
+        const text = cx.slice(pos, Math.min(cx.end, pos + 300));
+        // A type, `@type.recipe`, can name a table's columns after it: `@type.recipe(time, servings)`.
+        TYPE_AT.lastIndex = MENTION_AT.lastIndex = 0;
+        const match = TYPE_AT.exec(text) ?? MENTION_AT.exec(text);
+        return match ? cx.addElement(cx.elt("Mention", pos, pos + match[0].length)) : -1;
       },
     },
   ],
@@ -180,6 +236,77 @@ export const Card: MarkdownConfig = {
         return null;
       },
       endLeaf: (_cx, line) => cardFence(line) !== null,
+    },
+  ],
+};
+
+const DOLLAR = 36, BACKSLASH = 92;
+
+const isDigit = (code: number) => code >= 48 && code <= 57;
+
+/** A `$$` line, which opens and closes a block of math. */
+const isMathFence = (line: Line) => line.next === DOLLAR && line.indent - line.baseIndent < 4 && line.text.slice(line.pos).trim() === "$$";
+
+/**
+ * LaTeX math, as in Pandoc and GitHub: `$x^2$` within text, `$$\sum x$$` displayed, and a block
+ * between `$$` lines. Nothing inside is read as Markdown, so `$a_1 * b_2$` stays math.
+ */
+export const TexMath: MarkdownConfig = {
+  defineNodes: [
+    { name: "InlineMath", style: t.monospace },
+    { name: "MathBlock", block: true, style: t.monospace },
+    { name: "MathMark", style: t.processingInstruction },
+  ],
+  parseInline: [
+    {
+      name: "InlineMath",
+      before: "Emphasis",
+      parse(cx, next, pos) {
+        if (next !== DOLLAR) return -1;
+        const size = cx.char(pos + 1) === DOLLAR ? 2 : 1;
+        // Like Pandoc: no space just inside a single `$`, and no digit right after the closing one,
+        // so prices ("$5 and $10") stay text.
+        const first = cx.char(pos + size);
+        if (first === -1 || first === DOLLAR || (size === 1 && isSpace(first))) return -1;
+        for (let i = pos + size; i < cx.end; i++) {
+          const char = cx.char(i);
+          if (char === BACKSLASH) i++;
+          else if (char === DOLLAR) {
+            if (size === 2) {
+              if (cx.char(i + 1) !== DOLLAR) continue;
+            } else if (isSpace(cx.char(i - 1)) || isDigit(cx.char(i + 1))) continue;
+            const end = i + size;
+            return cx.addElement(
+              cx.elt("InlineMath", pos, end, [cx.elt("MathMark", pos, pos + size), cx.elt("MathMark", i, end)]),
+            );
+          }
+        }
+        return -1;
+      },
+    },
+  ],
+  parseBlock: [
+    {
+      name: "MathBlock",
+      before: "FencedCode",
+      parse(cx, line) {
+        if (!isMathFence(line)) return false;
+        const from = cx.lineStart + line.pos;
+        const marks = [cx.elt("MathMark", from, from + 2)];
+        // Lezer has the line's depth, though not in its types: lines past the block's quote or list item end it.
+        while (cx.nextLine() && (line as Line & { depth: number }).depth >= cx.depth) {
+          marks.push(...line.markers);
+          if (isMathFence(line)) {
+            const at = cx.lineStart + line.pos;
+            marks.push(cx.elt("MathMark", at, at + 2));
+            cx.nextLine();
+            break;
+          }
+        }
+        cx.addElement(cx.elt("MathBlock", from, cx.prevLineEnd(), marks));
+        return true;
+      },
+      endLeaf: (_cx, line) => isMathFence(line),
     },
   ],
 };

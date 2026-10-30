@@ -78,52 +78,85 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 >   B --> C[Done]
 > ```
 
-#### 14. Table in a quote (stays Markdown here)
+#### 14. Diagram (240 px wide) in a quote (stays Markdown here)
+
+> ```mermaid |240
+> flowchart LR
+>   A[Small] --> B[Diagram]
+> ```
+
+#### 15. Math block in a quote (stays Markdown here)
+
+> $$
+> \int_0^1 x^2\,dx = \frac{1}{3}
+> $$
+
+#### 16. Table in a quote (stays Markdown here)
 
 > | Left | Center | Right |
 > | :--- | :----: | ----: |
 > | a | **b** | 1 |
 > | longer cell text | `code` | 22 |
 
-#### 15. Divider in a quote
+#### 17. Divider in a quote
 
 > ---
 
-#### 16. Key: Value line in a quote
+#### 18. Key: Value line in a quote
 
 > **Wi-Fi password:** correct-horse-battery
 
-#### 17. Image in a quote (stays Markdown here)
+#### 19. Mention in a quote
+
+> Ask @[QA · Ada] at @[QA · Ada].email.
+
+#### 20. Wiki link in a quote
+
+> Ask [[QA · Ada]], or [[QA · Ada|her]].
+
+#### 21. Symbols in a quote
+
+> Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+
+#### 22. GitHub links in a quote
+
+> Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+
+#### 23. Image in a quote (stays Markdown here)
 
 > ![A sample picture](attachment:photo.png)
 
-#### 18. File in a quote (stays Markdown here)
+#### 24. Drawing in a quote (stays Markdown here)
+
+> ![A sample drawing](attachment:drawing.svg)
+
+#### 25. File in a quote (stays Markdown here)
 
 > [Budget.csv](attachment:budget.csv)
 
-#### 19. Missing file in a quote (stays Markdown here)
+#### 26. Missing file in a quote (stays Markdown here)
 
 > [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 20. Card in a quote
+#### 27. Card in a quote
 
 > ::: card
 > Text in a card.
 > :::
 
-#### 21. Callout (info) in a quote
+#### 28. Callout (info) in a quote
 
 > :::i
 > Text in an info callout.
 > :::
 
-#### 22. Callout (warning, chosen icon) in a quote
+#### 29. Callout (warning, chosen icon) in a quote
 
 > :::! icon=flag
 > Text in a warning callout with the flag icon.
 > :::
 
-#### 23. Callout (decision, no icon) in a quote
+#### 30. Callout (decision, no icon) in a quote
 
 > :::^ icon=none
 > Text in a decision callout with no icon.

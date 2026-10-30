@@ -5,6 +5,7 @@ import type { SyntaxNode } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
 import { ICONS, type IconName } from "../icons/icons";
+import { t } from "../i18n/index.svelte";
 import { ui } from "../ui.svelte";
 import { ancestors, hasText } from "./util";
 
@@ -19,11 +20,11 @@ import { ancestors, hasText } from "./util";
  * own unless the fence names another (`:::! icon=flag`) or none (`:::! icon=none`).
  */
 export const CALLOUTS = {
-  info: { short: "i", label: "Info", icon: "info" },
-  question: { short: "?", label: "Question", icon: "circle-question" },
-  warning: { short: "!", label: "Warning", icon: "triangle-alert" },
-  error: { short: "!!!", label: "Error", icon: "octagon-x" },
-  decision: { short: "^", label: "Decision", icon: "signpost" },
+  info: { short: "i", label: t("editor.callout.info"), icon: "info" },
+  question: { short: "?", label: t("editor.callout.question"), icon: "circle-question" },
+  warning: { short: "!", label: t("editor.callout.warning"), icon: "triangle-alert" },
+  error: { short: "!!!", label: t("editor.callout.error"), icon: "octagon-x" },
+  decision: { short: "^", label: t("editor.callout.decision"), icon: "signpost" },
 } satisfies Record<string, { short: string; label: string; icon: IconName }>;
 
 export type CalloutKind = keyof typeof CALLOUTS;
@@ -77,7 +78,7 @@ function pickIcon(view: EditorView, fenceFrom: number, anchor: HTMLElement) {
   const rect = anchor.getBoundingClientRect();
   ui.iconPicker = {
     key: `callout:${fenceFrom}`,
-    label: `${CALLOUTS[callout.kind].label} callout`,
+    label: t("editor.callout.named", { kind: CALLOUTS[callout.kind].label }),
     fallback: CALLOUTS[callout.kind].icon,
     icon: () => {
       const now = current();
@@ -93,6 +94,12 @@ function pickIcon(view: EditorView, fenceFrom: number, anchor: HTMLElement) {
 const calloutIcons = new WeakMap<HTMLElement, Record<string, unknown>>();
 
 /**
+ * Where a callout's icon goes: level with its first line inside, or with nothing inside, in the
+ * middle of the card (between its two fences, or on its only one when it's never closed).
+ */
+export type CalloutIconPlace = "line" | "middle" | "fence";
+
+/**
  * A callout's icon, drawn on its opening fence line but placed in the column to the left of its
  * first line. Clicking it picks another. Without an icon, there's a faint button for adding one
  * while the fence is hovered or has the cursor.
@@ -101,23 +108,34 @@ export class CalloutIcon extends WidgetType {
   constructor(
     readonly icon: IconName | null,
     readonly active: boolean,
+    readonly place: CalloutIconPlace = "line",
   ) {
     super();
   }
   eq(other: CalloutIcon) {
-    return other.icon === this.icon && other.active === this.active;
+    return other.icon === this.icon && other.active === this.active && other.place === this.place;
   }
   toDOM(view: EditorView) {
     const dom = document.createElement("span");
-    dom.className = "cm-lp-callout-icon" + (this.icon ? "" : " is-empty") + (this.active ? " is-active" : "");
+    dom.className = `cm-lp-callout-icon at-${this.place}` + (this.icon ? "" : " is-empty") + (this.active ? " is-active" : "");
+    const label = t(this.icon ? "editor.callout.changeIcon" : "editor.callout.addIcon");
+    // A button that can't be a <button>: it sits in the editable text, where one would take the caret.
     dom.setAttribute("role", "button");
-    dom.setAttribute("aria-label", this.icon ? "Change icon" : "Add icon");
-    dom.title = this.icon ? "Change icon" : "Add icon";
+    dom.setAttribute("aria-label", label);
+    dom.setAttribute("aria-haspopup", "dialog");
+    dom.tabIndex = 0;
+    dom.title = label;
     calloutIcons.set(dom, mount(Icon, { target: dom, props: { name: this.icon ?? "plus", size: 18, strokeWidth: 2 } }));
     // Keeps the cursor and focus where they are.
     dom.addEventListener("mousedown", (event) => event.preventDefault());
-    dom.addEventListener("click", () => {
+    const open = () => {
       if (!view.state.readOnly) pickIcon(view, view.state.doc.lineAt(view.posAtDOM(dom)).from, dom);
+    };
+    dom.addEventListener("click", open);
+    dom.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      open();
     });
     return dom;
   }
@@ -162,12 +180,12 @@ export function setInset(dom: HTMLElement, { depth, icons }: CardInset) {
   dom.style.setProperty("--card-icons", String(icons));
 }
 
-/** Whether a code block or a card ends on line `n`, so a block starting on the next line would touch it. */
+/** Whether a code block (or math block) or a card ends on line `n`, so a block starting on the next line would touch it. */
 export function endsBlock(state: EditorState, n: number) {
   if (n < 1) return false;
   const end = state.doc.line(n).to;
   for (const node of ancestors(state, end, -1)) {
-    if ((node.name === "FencedCode" || node.name === "Card") && node.to === end) return true;
+    if ((node.name === "FencedCode" || node.name === "MathBlock" || node.name === "Card") && node.to === end) return true;
   }
   return false;
 }

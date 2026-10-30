@@ -104,7 +104,24 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
     B --> C[Done]
   ```
 
-#### 14. Table in a list item (stays Markdown here)
+#### 14. Diagram (240 px wide) in a list item (stays Markdown here)
+
+- List item
+
+  ```mermaid |240
+  flowchart LR
+    A[Small] --> B[Diagram]
+  ```
+
+#### 15. Math block in a list item (stays Markdown here)
+
+- List item
+
+  $$
+  \int_0^1 x^2\,dx = \frac{1}{3}
+  $$
+
+#### 16. Table in a list item (stays Markdown here)
 
 - List item
 
@@ -113,37 +130,67 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   | a | **b** | 1 |
   | longer cell text | `code` | 22 |
 
-#### 15. Divider in a list item
+#### 17. Divider in a list item
 
 - List item
 
   ---
 
-#### 16. Key: Value line in a list item
+#### 18. Key: Value line in a list item
 
 - List item
 
   **Wi-Fi password:** correct-horse-battery
 
-#### 17. Image in a list item (stays Markdown here)
+#### 19. Mention in a list item
+
+- List item
+
+  Ask @[QA · Ada] at @[QA · Ada].email.
+
+#### 20. Wiki link in a list item
+
+- List item
+
+  Ask [[QA · Ada]], or [[QA · Ada|her]].
+
+#### 21. Symbols in a list item
+
+- List item
+
+  Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+
+#### 22. GitHub links in a list item
+
+- List item
+
+  Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+
+#### 23. Image in a list item (stays Markdown here)
 
 - List item
 
   ![A sample picture](attachment:photo.png)
 
-#### 18. File in a list item (stays Markdown here)
+#### 24. Drawing in a list item (stays Markdown here)
+
+- List item
+
+  ![A sample drawing](attachment:drawing.svg)
+
+#### 25. File in a list item (stays Markdown here)
 
 - List item
 
   [Budget.csv](attachment:budget.csv)
 
-#### 19. Missing file in a list item (stays Markdown here)
+#### 26. Missing file in a list item (stays Markdown here)
 
 - List item
 
   [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 20. Card in a list item
+#### 27. Card in a list item
 
 - List item
 
@@ -151,7 +198,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a card.
   :::
 
-#### 21. Callout (info) in a list item
+#### 28. Callout (info) in a list item
 
 - List item
 
@@ -159,7 +206,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in an info callout.
   :::
 
-#### 22. Callout (warning, chosen icon) in a list item
+#### 29. Callout (warning, chosen icon) in a list item
 
 - List item
 
@@ -167,7 +214,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a warning callout with the flag icon.
   :::
 
-#### 23. Callout (decision, no icon) in a list item
+#### 30. Callout (decision, no icon) in a list item
 
 - List item
 

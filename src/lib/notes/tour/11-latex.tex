@@ -1,0 +1,35 @@
+\section{Written in LaTeX}
+% #tour
+
+This note is written in \LaTeX{} instead of Markdown. Switch any note in its info panel, and write as you would in a paper: \textbf{bold}, \emph{emphasis}, \texttt{code}, ``quotes'' and dashes---all drawn as you type. Click a word to see its LaTeX, and type a backslash for a menu of commands: \texttt{\textbackslash te} finds \texttt{\textbackslash textbf}, and inside math, \texttt{\textbackslash fr} finds \texttt{\textbackslash frac}, with Tab moving between its braces.
+
+\subsection{Lists}
+\begin{itemize}
+  \item Enter after an item starts the next one
+  \item Enter on an empty item ends the list
+  \begin{enumerate}
+    \item Lists nest
+    \item and number themselves
+  \end{enumerate}
+\end{itemize}
+
+\subsection{Math}
+Euler's identity, $e^{i\pi} + 1 = 0$, sits in a line of text. Equations get lines of their own:
+
+\begin{align*}
+  \nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0} \\
+  \nabla \times \mathbf{B} &= \mu_0 \mathbf{J} + \mu_0 \varepsilon_0 \frac{\partial \mathbf{E}}{\partial t}
+\end{align*}
+
+\subsection{Tables}
+\begin{tabular}{lcr}
+  Planet & Moons & Day (hours) \\
+  \hline
+  Earth & 1 & 24 \\
+  Mars & 2 & 24.6 \\
+  Jupiter & 95 & 9.9 \\
+\end{tabular}
+
+\begin{quote}
+Tags go in comments, where \LaTeX{} ignores them, like the one at the top of this note.\footnote{Exporting makes each LaTeX note a .tex file that compiles. For a PDF, press ⌘P: lines lays it out like a paper, or TeX itself typesets it.}
+\end{quote}

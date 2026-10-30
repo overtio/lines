@@ -1,0 +1,655 @@
+/*
+ * A note on paper (src/lib/print/): black on white whatever the theme, in the note's font for
+ * Markdown and in Computer Modern (KaTeX's) for LaTeX. The pages themselves are laid out by
+ * pages.ts; this is how the document inside them looks.
+ */
+
+.doc {
+  --doc-text: #1a1a1a;
+  --doc-muted: #5f5f5f;
+  --doc-faint: #8a8a8a;
+  --doc-rule: #d4d4d4;
+  --doc-fill: #f4f4f2;
+  --doc-link: #1f5fbf;
+  color: var(--doc-text);
+  font-family: var(--font-text);
+  font-size: 11pt;
+  line-height: 1.5;
+  text-align: left;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Laid out the same in the column it's measured in and on its pages, where each block stands alone. */
+.doc > :not(table) {
+  display: flow-root;
+}
+
+.doc p {
+  margin: 0 0 0.6em;
+}
+
+.doc h1,
+.doc h2,
+.doc h3,
+.doc h4,
+.doc h5,
+.doc h6 {
+  margin: 1.2em 0 0.45em;
+  line-height: 1.25;
+  font-weight: 650;
+  color: var(--doc-text);
+}
+
+.doc h1 {
+  font-size: 1.75em;
+}
+
+.doc h2 {
+  font-size: 1.4em;
+}
+
+.doc h3 {
+  font-size: 1.18em;
+}
+
+.doc h4,
+.doc h5,
+.doc h6 {
+  font-size: 1em;
+}
+
+.doc > :first-child {
+  margin-top: 0;
+}
+
+.doc a {
+  color: var(--doc-link);
+  text-decoration: none;
+}
+
+.doc strong {
+  font-weight: 650;
+}
+
+.doc mark {
+  padding: 0 0.1em;
+  border-radius: 2px;
+  background: #fff1a8;
+  color: inherit;
+}
+
+.doc ul,
+.doc ol {
+  margin: 0 0 0.6em;
+  padding-left: 1.6em;
+}
+
+/* Bullets and numbers are text (markdown.ts), hung in the list's indent. */
+.doc ul,
+.doc ol {
+  list-style: none;
+}
+
+.doc li {
+  position: relative;
+}
+
+.doc .doc-mark {
+  position: absolute;
+  right: calc(100% + 0.5em);
+  white-space: nowrap;
+}
+
+.doc li > p,
+.doc li > ul,
+.doc li > ol {
+  margin-bottom: 0.15em;
+}
+
+.doc .doc-tasks {
+  padding-left: 0.2em;
+  list-style: none;
+}
+
+.doc .doc-task.is-done {
+  color: var(--doc-muted);
+}
+
+.doc .doc-box {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 0.85em;
+  height: 0.85em;
+  margin-right: 0.5em;
+  border: 1.2px solid var(--doc-muted);
+  border-radius: 3px;
+  vertical-align: -0.08em;
+}
+
+.doc .is-done > p > .doc-box {
+  border-color: var(--doc-muted);
+  background: var(--doc-muted)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-5' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 100% no-repeat;
+  print-color-adjust: exact;
+}
+
+.doc blockquote {
+  margin: 0 0 0.6em;
+  padding: 0 0 0 1em;
+  border-left: 3px solid var(--doc-rule);
+  color: var(--doc-muted);
+}
+
+.doc hr {
+  height: 0;
+  margin: 1.1em 0;
+  border: 0;
+  border-top: 1px solid var(--doc-rule);
+}
+
+.doc code,
+.doc pre {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+}
+
+.doc .doc-inline-code {
+  padding: 0.05em 0.3em;
+  border-radius: 4px;
+  background: var(--doc-fill);
+  print-color-adjust: exact;
+}
+
+.doc pre.doc-code {
+  margin: 0 0 0.8em;
+  padding: 0.7em 0.9em;
+  border-radius: 6px;
+  background: var(--doc-fill);
+  line-height: 1.45;
+  white-space: pre-wrap;
+  print-color-adjust: exact;
+}
+
+.doc pre.doc-code code {
+  font-size: 1em;
+}
+
+.doc .doc-k {
+  color: #a3227f;
+}
+
+.doc .doc-s {
+  color: #2c7a32;
+}
+
+.doc .doc-n {
+  color: #b2560b;
+}
+
+.doc .doc-c {
+  color: #7b7b7b;
+  font-style: italic;
+}
+
+.doc .doc-f {
+  color: #2457a8;
+}
+
+.doc .doc-t {
+  color: #7a4fb0;
+}
+
+.doc .doc-table {
+  margin: 0 0 0.8em;
+  overflow: hidden;
+}
+
+.doc table {
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.doc th,
+.doc td {
+  padding: 0.3em 0.75em 0.3em 0;
+  border-bottom: 1px solid var(--doc-rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.doc th {
+  font-weight: 650;
+  border-bottom-color: var(--doc-muted);
+}
+
+.doc .doc-figure {
+  margin: 0.4em 0 0.9em;
+  text-align: center;
+}
+
+.doc .doc-image {
+  max-width: 100%;
+  max-height: 200mm;
+  border-radius: 4px;
+}
+
+/* Within a line of text, as the editor draws it: smaller. */
+.doc p .doc-image {
+  max-height: 120mm;
+  vertical-align: bottom;
+}
+
+.doc .doc-image-missing {
+  display: inline-block;
+  padding: 0.6em 1em;
+  border: 1px dashed var(--doc-rule);
+  border-radius: 6px;
+  color: var(--doc-muted);
+  font-size: 0.9em;
+}
+
+.doc .doc-diagram {
+  margin: 0.4em 0 0.9em;
+  text-align: center;
+}
+
+.doc .doc-diagram svg {
+  max-width: 100%;
+  max-height: 200mm;
+  height: auto;
+}
+
+.doc .doc-math.is-display {
+  margin: 0.5em 0 0.8em;
+  overflow: hidden;
+}
+
+.doc .doc-math.is-error {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: #b42318;
+}
+
+.doc .doc-tag,
+.doc .doc-file {
+  color: var(--doc-muted);
+}
+
+.doc .doc-icon {
+  display: inline-flex;
+  vertical-align: -0.12em;
+}
+
+.doc .doc-file .doc-icon {
+  margin-right: 0.2em;
+}
+
+/* Cards and callouts: a frame, and a callout's color down its side. */
+.doc .doc-card {
+  display: flex;
+  gap: 0.6em;
+  margin: 0 0 0.8em;
+  padding: 0.65em 0.9em;
+  border: 1px solid var(--doc-rule);
+  border-radius: 8px;
+}
+
+.doc .doc-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.doc .doc-card-content > :first-child {
+  margin-top: 0;
+}
+
+.doc .doc-card-content > :last-child {
+  margin-bottom: 0;
+}
+
+.doc .doc-callout {
+  border-left: 4px solid var(--doc-callout);
+  color: var(--doc-text);
+}
+
+.doc .doc-callout > .doc-icon {
+  margin-top: 0.2em;
+  color: var(--doc-callout);
+}
+
+.doc .doc-callout.is-info {
+  --doc-callout: #2f6fdb;
+}
+
+.doc .doc-callout.is-question {
+  --doc-callout: #8e4ec6;
+}
+
+.doc .doc-callout.is-warning {
+  --doc-callout: #c48a00;
+}
+
+.doc .doc-callout.is-error {
+  --doc-callout: #d53c40;
+}
+
+.doc .doc-callout.is-decision {
+  --doc-callout: #12877a;
+}
+
+.doc .doc-properties {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.15em 1.2em;
+  margin: 0 0 1.2em;
+  padding-bottom: 0.8em;
+  border-bottom: 1px solid var(--doc-rule);
+  font-size: 0.9em;
+}
+
+.doc .doc-properties dt {
+  color: var(--doc-muted);
+}
+
+.doc .doc-properties dd {
+  margin: 0;
+}
+
+/* LaTeX: set as a LaTeX article is. */
+
+.doc-latex {
+  font-family: KaTeX_Main, "Latin Modern Roman", "Times New Roman", serif;
+  font-size: 11pt;
+  line-height: 1.36;
+  text-align: justify;
+}
+
+.doc-latex p {
+  margin: 0;
+}
+
+/* Math the size of the text around it, both being Computer Modern (KaTeX's own is a size up). */
+.doc-latex .katex {
+  font-size: 1em;
+}
+
+.doc-latex p + p {
+  text-indent: 1.5em;
+}
+
+.doc-latex h1,
+.doc-latex h2,
+.doc-latex h3 {
+  margin: 1.3em 0 0.6em;
+  font-weight: 700;
+  text-align: left;
+}
+
+.doc-latex h1 {
+  font-size: 1.44em;
+}
+
+.doc-latex h2 {
+  font-size: 1.2em;
+}
+
+.doc-latex h3 {
+  font-size: 1em;
+}
+
+.doc-latex .doc-section-number {
+  margin-right: 0.75em;
+}
+
+.doc-latex code,
+.doc-latex pre {
+  font-family: "Latin Modern Mono", var(--font-mono);
+}
+
+.doc-latex pre.doc-code {
+  margin: 0.6em 0;
+  padding: 0;
+  background: none;
+  text-align: left;
+}
+
+.doc-latex .doc-smallcaps {
+  font-variant: small-caps;
+}
+
+.doc-latex .doc-title {
+  margin: 0.5em 0 2em;
+  text-align: center;
+}
+
+.doc-latex .doc-title-text {
+  font-size: 1.6em;
+  line-height: 1.25;
+}
+
+.doc-latex .doc-authors {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4em 2.5em;
+  margin-top: 1.2em;
+  font-size: 1.1em;
+}
+
+.doc-latex .doc-affiliation {
+  font-size: 0.85em;
+}
+
+.doc-latex .doc-date {
+  margin-top: 0.9em;
+  font-size: 1.1em;
+}
+
+.doc-latex .doc-abstract {
+  margin: 0 2.5em 1.2em;
+  font-size: 0.92em;
+}
+
+.doc-latex .doc-abstract-title {
+  margin-bottom: 0.4em;
+  font-weight: 700;
+  text-align: center;
+}
+
+.doc-latex .doc-quote {
+  margin: 0.5em 2.5em;
+  padding: 0;
+  border: 0;
+  color: inherit;
+}
+
+.doc-latex .doc-center,
+.doc-latex .doc-float {
+  margin: 0.8em 0;
+  text-align: center;
+}
+
+.doc-latex .doc-center p + p,
+.doc-latex .doc-float p + p,
+.doc-latex .doc-right p + p {
+  text-indent: 0;
+}
+
+.doc-latex .doc-right {
+  text-align: right;
+}
+
+.doc-latex :is(.doc-center, .doc-float) table {
+  margin: 0 auto;
+}
+
+/* References are mostly names and titles, which justify into wide gaps. */
+.doc-latex .doc-bibliography {
+  text-align: left;
+}
+
+.doc-latex .doc-caption {
+  margin: 0.5em 0;
+  font-size: 0.92em;
+}
+
+.doc-latex .doc-table {
+  margin: 0.6em 0;
+}
+
+.doc-latex th,
+.doc-latex td {
+  padding: 0.2em 0.6em;
+  border-bottom: 0;
+}
+
+.doc-latex thead tr {
+  border-top: 1px solid var(--doc-text);
+  border-bottom: 0.6px solid var(--doc-text);
+}
+
+.doc-latex tbody tr:last-child {
+  border-bottom: 1px solid var(--doc-text);
+}
+
+.doc-latex th {
+  font-weight: 400;
+}
+
+.doc-latex .doc-theorem {
+  margin: 0.7em 0;
+  font-style: italic;
+}
+
+.doc-latex .doc-theorem.is-upright {
+  font-style: normal;
+}
+
+.doc-latex .doc-theorem p + p {
+  text-indent: 0;
+}
+
+.doc-latex .doc-theorem-label {
+  font-style: normal;
+  font-weight: 700;
+}
+
+.doc-latex .doc-theorem.is-proof .doc-theorem-label {
+  font-style: italic;
+  font-weight: 400;
+}
+
+.doc-latex .doc-qed {
+  float: right;
+}
+
+.doc-latex .doc-list {
+  margin: 0.4em 0 0.6em;
+}
+
+.doc-latex .doc-li {
+  display: flex;
+  gap: 0.6em;
+  margin-bottom: 0.2em;
+}
+
+.doc-latex .doc-li-mark {
+  flex: 0 0 1.4em;
+  text-align: right;
+}
+
+.doc-latex .doc-li.is-term .doc-li-mark {
+  flex: 0 0 auto;
+  font-weight: 700;
+}
+
+.doc-latex .is-thebibliography .doc-li-mark {
+  flex-basis: auto;
+}
+
+.doc-latex .doc-li-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.doc-latex .doc-li-body p + p {
+  text-indent: 0;
+  margin-top: 0.3em;
+}
+
+.doc-latex .doc-cite,
+.doc-latex .doc-ref {
+  white-space: nowrap;
+}
+
+.doc-latex .doc-footnote-mark {
+  font-size: 0.7em;
+  line-height: 0;
+}
+
+.doc-latex .doc-footnotes-rule {
+  width: 35%;
+  margin: 1.5em 0 0.5em;
+  border-top-color: var(--doc-text);
+}
+
+.doc-latex .doc-footnotes {
+  margin: 0;
+  padding-left: 1.4em;
+  font-size: 0.85em;
+}
+
+/* Pages (pages.ts): white sheets, each showing its part of the document. */
+
+.print-page {
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #ffffff;
+  print-color-adjust: exact;
+}
+
+.print-area {
+  position: absolute;
+  overflow: hidden;
+}
+
+.print-area > .doc {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+
+.print-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  color: #1a1a1a;
+  font-family: var(--font-text);
+  font-size: 9pt;
+  text-align: center;
+}
+
+.print-page:has(.doc-latex) .print-footer {
+  font-family: KaTeX_Main, "Times New Roman", serif;
+  font-size: 10pt;
+}
+
+/* The column a document is measured in, out of sight. */
+.print-measure {
+  position: absolute;
+  top: 0;
+  left: -100000px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Where a page is copied to be drawn as a PNG (images.ts): full size, behind the preview. */
+.print-stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}

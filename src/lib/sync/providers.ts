@@ -1,3 +1,4 @@
+import { t } from "../i18n/index.svelte";
 import type { DriveId } from "./folder";
 import type { S3Config } from "./s3";
 import type { LibraryKey } from "./sealed";
@@ -30,22 +31,22 @@ export const PROVIDERS: Record<ProviderId, { name: string; endpoint: string; hel
   r2: {
     name: "Cloudflare R2",
     endpoint: "https://<account-id>.r2.cloudflarestorage.com",
-    help: "In R2, open “Manage API tokens” and create an Object Read & Write token for this bucket.",
+    help: t("sync.provider.r2.help"),
   },
   b2: {
     name: "Backblaze B2",
     endpoint: "https://s3.us-west-004.backblazeb2.com",
-    help: "In Application Keys, add a key with Read and Write access to this bucket. The endpoint is shown on the bucket page.",
+    help: t("sync.provider.b2.help"),
   },
   s3: {
     name: "Amazon S3",
     endpoint: "https://s3.us-east-1.amazonaws.com",
-    help: "Use an IAM key limited to this bucket: s3:ListBucket, s3:GetObject, s3:PutObject and s3:DeleteObject.",
+    help: t("sync.provider.s3.help"),
   },
   other: {
-    name: "Other",
+    name: t("sync.provider.other"),
     endpoint: "https://s3.example.com",
-    help: "Any S3-compatible storage: MinIO, Wasabi, Tigris, DigitalOcean Spaces, Garage, Hetzner…",
+    help: t("sync.provider.other.help"),
   },
 };
 

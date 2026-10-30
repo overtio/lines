@@ -1,4 +1,5 @@
 import { AwsClient } from "aws4fetch";
+import { t } from "../i18n/index.svelte";
 import { isTauri } from "../platform";
 import { SyncError, type Remote, type RemoteObject } from "./remote";
 
@@ -58,9 +59,7 @@ export class S3Remote implements Remote {
     } catch (error) {
       console.error("lines: storage request failed", error);
       throw new SyncError(
-        isTauri
-          ? "Couldn't reach the storage endpoint. Check the URL and your connection."
-          : "Couldn't reach the bucket. Check the endpoint, and that the bucket's CORS rules allow this site.",
+        isTauri ? t("sync.error.unreachableApp") : t("sync.error.unreachableBrowser"),
       );
     }
     if (!response.ok && response.status !== 404) {
@@ -69,12 +68,15 @@ export class S3Remote implements Remote {
       const message = /<Message>([^<]+)<\/Message>/.exec(text)?.[1];
       throw new SyncError(
         code === "SignatureDoesNotMatch" || code === "InvalidAccessKeyId"
-          ? "The access key or secret is wrong."
+          ? t("sync.error.wrongKey")
           : code === "NoSuchBucket"
-            ? `Bucket “${this.config.bucket}” doesn't exist at this endpoint.`
+            ? t("sync.error.noBucket", { bucket: this.config.bucket })
             : code === "AccessDenied" || response.status === 403
-              ? "Access denied. Make sure the key can read and write this bucket."
-              : message || `The storage service returned ${response.status}.`,
+              ? t("sync.error.denied")
+              : // The status as text, so it isn't written as a number ("1 000").
+                message
+                ? t("sync.error.service", { status: String(response.status), message })
+                : t("sync.error.status", { status: String(response.status) }),
       );
     }
     return response;
@@ -88,11 +90,11 @@ export class S3Remote implements Remote {
       const params = new URLSearchParams({ "list-type": "2", prefix });
       if (token) params.set("continuation-token", token);
       const response = await this.#request(`?${params}`);
-      if (response.status === 404) throw new SyncError(`Bucket “${this.config.bucket}” doesn't exist at this endpoint.`);
+      if (response.status === 404) throw new SyncError(t("sync.error.noBucket", { bucket: this.config.bucket }));
       const xml = new DOMParser().parseFromString(await response.text(), "application/xml");
       // Anything else (a proxy's login page, a misconfigured endpoint) would read as an empty bucket.
       if (xml.documentElement.localName !== "ListBucketResult") {
-        throw new SyncError("The endpoint didn't answer like S3 storage. Check the endpoint URL.");
+        throw new SyncError(t("sync.error.notS3"));
       }
       for (const item of xml.getElementsByTagName("Contents")) {
         const key = item.getElementsByTagName("Key")[0]?.textContent;

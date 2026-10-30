@@ -1,4 +1,4 @@
-# Code and diagrams
+# Code, diagrams and math
 
 Write the language after the three backticks for syntax highlighting in your theme's colors:
 
@@ -20,7 +20,7 @@ Hover a block for a copy button. The wand next to it tidies the code. Try it on 
 
 ## Diagrams
 
-A `mermaid` code block is drawn as a diagram. Click it to edit the code, and the diagram follows as you type.
+A `mermaid` code block is drawn as a diagram. Click it to edit the code, and the diagram follows as you type. Drag its corner to make it bigger or smaller. To arrange one by hand, hover it and use its shapes button, Copy and Edit as Drawing: the copy opens as a drawing below, and the code stays.
 
 ```mermaid
 flowchart LR
@@ -34,5 +34,19 @@ pie title Where the time goes
   "Thinking" : 35
   "Formatting" : 10
 ```
+
+## Drawings
+
+Type `/drawing` to sketch in [Excalidraw](https://excalidraw.com): boxes, arrows, handwriting. The check mark at the top right (⌘S) puts it in the note as an image that other Markdown apps show too. Double-click it, or use its pencil button, to draw more; undo brings back the drawing before.
+
+![An idea becomes a note, then a Markdown file](attachment:drawing.svg)
+
+## Math
+
+LaTeX between dollar signs is drawn as math, within text like $e^{i\pi} + 1 = 0$, or in a block between `$$` lines. Click it to edit, and the math follows as you type. `/math` starts a block, and a backslash inside math opens a menu of commands: `\fr` finds `\frac`, and Tab moves between its braces.
+
+$$
+\hat f(\xi) = \int_{-\infty}^{\infty} f(x)\, e^{-2\pi i x \xi}\, dx
+$$
 
 #tour

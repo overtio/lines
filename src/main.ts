@@ -66,8 +66,7 @@ void onAnnounce(async (message) => {
     if (message.open) floatingOpen.add(message.id);
     else floatingOpen.delete(message.id);
   } else if (message.type === "show" && !floatingId) {
-    if (!notes.visible.some((e) => e.note.id === message.id)) notes.setFilter({ kind: "all" });
-    notes.select(message.id);
+    notes.show(message.id);
     if (isTauri) {
       const { getCurrentWindow } = await import("@tauri-apps/api/window");
       await getCurrentWindow().unminimize();

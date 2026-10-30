@@ -117,7 +117,26 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Todo list, then Table
+#### 14. Todo list, then Diagram (240 px wide)
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+
+#### 15. Todo list, then Math block
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+
+#### 16. Todo list, then Table
 
 - [x] Done todo
 - [ ] Open todo
@@ -127,42 +146,77 @@ flowchart LR
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 15. Todo list, then Divider
+#### 17. Todo list, then Divider
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ---
 
-#### 16. Todo list, then Key: Value line
+#### 18. Todo list, then Key: Value line
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 **Wi-Fi password:** correct-horse-battery
 
-#### 17. Todo list, then Image
+#### 19. Todo list, then Mention
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+Ask @[QA · Ada] at @[QA · Ada].email.
+
+#### 20. Todo list, then Wiki link
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+
+#### 21. Todo list, then Symbols
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+
+#### 22. Todo list, then GitHub links
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+
+#### 23. Todo list, then Image
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample picture](attachment:photo.png)
 
-#### 18. Todo list, then File
+#### 24. Todo list, then Drawing
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+![A sample drawing](attachment:drawing.svg)
+
+#### 25. Todo list, then File
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Budget.csv](attachment:budget.csv)
 
-#### 19. Todo list, then Missing file
+#### 26. Todo list, then Missing file
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 20. Todo list, then Card
+#### 27. Todo list, then Card
 
 - [x] Done todo
 - [ ] Open todo
@@ -171,7 +225,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 21. Todo list, then Callout (info)
+#### 28. Todo list, then Callout (info)
 
 - [x] Done todo
 - [ ] Open todo
@@ -180,7 +234,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 22. Todo list, then Callout (warning, chosen icon)
+#### 29. Todo list, then Callout (warning, chosen icon)
 
 - [x] Done todo
 - [ ] Open todo
@@ -189,7 +243,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 23. Todo list, then Callout (decision, no icon)
+#### 30. Todo list, then Callout (decision, no icon)
 
 - [x] Done todo
 - [ ] Open todo

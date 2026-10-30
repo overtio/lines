@@ -1,13 +1,14 @@
 <script lang="ts">
   import { getCurrentWindow } from "@tauri-apps/api/window";
+  import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { prefs } from "../prefs.svelte";
 
   /** A floating note while lines is locked: nothing of the note shows until the main window is unlocked. */
 
   const win = getCurrentWindow();
-  document.title = "Locked";
-  void win.setTitle("Locked");
+  document.title = t("lock.floating.title");
+  void win.setTitle(t("lock.floating.title"));
   // Hidden until drawn, as floating notes are.
   void prefs.windowReady.then(() => win.show());
 
@@ -21,8 +22,8 @@
 
 <div class="locked" data-tauri-drag-region>
   <Icon name="lock" size={22} strokeWidth={1.75} />
-  <p>lines is locked</p>
-  <button type="button" class="text-button" onclick={showMain}>Unlock…</button>
+  <p>{t("lock.screen.title")}</p>
+  <button type="button" class="text-button" onclick={showMain}>{t("lock.floating.unlock")}</button>
 </div>
 
 <style>

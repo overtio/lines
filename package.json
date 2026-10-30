@@ -13,6 +13,8 @@
     "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
     "notices": "node scripts/notices.mjs",
     "qa-notes": "node scripts/qa-notes.mjs",
+    "i18n": "node scripts/i18n-check.mjs",
+    "tex-assets": "node scripts/tex-assets.mjs",
     "tauri": "tauri"
   },
   "dependencies": {
@@ -24,6 +26,8 @@
     "@codemirror/search": "^6.7.2",
     "@codemirror/state": "^6.7.6",
     "@codemirror/view": "^6.43.15",
+    "@excalidraw/excalidraw": "0.18.1",
+    "@excalidraw/mermaid-to-excalidraw": "2.2.2",
     "@lezer/common": "^1.5.4",
     "@lezer/highlight": "^1.2.5",
     "@lezer/markdown": "^1.8.1",
@@ -32,15 +36,22 @@
     "@tauri-apps/plugin-http": "^2.8.3",
     "@tauri-apps/plugin-opener": "^2.7.2",
     "aws4fetch": "^1.0.20",
+    "katex": "0.18.10",
     "mermaid": "12.2.0",
+    "modern-screenshot": "4.7.0",
     "prettier": "3.9.10",
-    "sql-formatter": "15.9.0"
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "sql-formatter": "15.9.0",
+    "texlyre-busytex": "1.4.1"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@tauri-apps/cli": "^2.12.4",
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^26.6.5",
+    "@types/react": "~19.2.18",
+    "@types/react-dom": "~19.2.7",
     "svelte": "^5.57.3",
     "svelte-check": "^4.7.7",
     "typescript": "^6.0.3",

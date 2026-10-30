@@ -97,6 +97,12 @@ Night (c) enkia; Gruvbox (c) Pavel Pertsev; Everforest (c) sainnhe; Ayu (c) Ike
 Ku. SF Symbols are Apple's and are drawn by macOS and iOS on your device; they
 are not included in lines.
 
+Excalidraw's fonts, served with lines for drawings: Excalifont and Virgil
+(c) Excalidraw, Nunito (c) The Nunito Project Authors, Lilita One (c) Juan
+Montoreano, Assistant (c) The Assistant Project Authors, Cascadia Code (c)
+Microsoft, Liberation Sans (c) Red Hat, all under the SIL Open Font License
+1.1; Comic Shanns (c) Shannon Miwa, MIT.
+
 `;
 
 const text =

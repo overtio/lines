@@ -91,7 +91,22 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Heading 2, then Table
+#### 14. Heading 2, then Diagram (240 px wide)
+
+## Heading two
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+
+#### 15. Heading 2, then Math block
+
+## Heading two
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+
+#### 16. Heading 2, then Table
 
 ## Heading two
 | Left | Center | Right |
@@ -99,53 +114,78 @@ flowchart LR
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 15. Heading 2, then Divider
+#### 17. Heading 2, then Divider
 
 ## Heading two
 ---
 
-#### 16. Heading 2, then Key: Value line
+#### 18. Heading 2, then Key: Value line
 
 ## Heading two
 **Wi-Fi password:** correct-horse-battery
 
-#### 17. Heading 2, then Image
+#### 19. Heading 2, then Mention
+
+## Heading two
+Ask @[QA · Ada] at @[QA · Ada].email.
+
+#### 20. Heading 2, then Wiki link
+
+## Heading two
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+
+#### 21. Heading 2, then Symbols
+
+## Heading two
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+
+#### 22. Heading 2, then GitHub links
+
+## Heading two
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+
+#### 23. Heading 2, then Image
 
 ## Heading two
 ![A sample picture](attachment:photo.png)
 
-#### 18. Heading 2, then File
+#### 24. Heading 2, then Drawing
+
+## Heading two
+![A sample drawing](attachment:drawing.svg)
+
+#### 25. Heading 2, then File
 
 ## Heading two
 [Budget.csv](attachment:budget.csv)
 
-#### 19. Heading 2, then Missing file
+#### 26. Heading 2, then Missing file
 
 ## Heading two
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 20. Heading 2, then Card
+#### 27. Heading 2, then Card
 
 ## Heading two
 ::: card
 Text in a card.
 :::
 
-#### 21. Heading 2, then Callout (info)
+#### 28. Heading 2, then Callout (info)
 
 ## Heading two
 :::i
 Text in an info callout.
 :::
 
-#### 22. Heading 2, then Callout (warning, chosen icon)
+#### 29. Heading 2, then Callout (warning, chosen icon)
 
 ## Heading two
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 23. Heading 2, then Callout (decision, no icon)
+#### 30. Heading 2, then Callout (decision, no icon)
 
 ## Heading two
 :::^ icon=none

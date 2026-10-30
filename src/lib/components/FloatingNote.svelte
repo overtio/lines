@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import Editor from "../editor/Editor.svelte";
+  import { t } from "../i18n/index.svelte";
   import { isClosed, notes } from "../notes/store.svelte";
   import LockedNoteView from "./LockedNoteView.svelte";
   import { prefs } from "../prefs.svelte";
@@ -12,7 +13,7 @@
 
   const win = getCurrentWindow();
   const entry = $derived(notes.get(id));
-  const title = $derived(entry?.meta.title || "Untitled");
+  const title = $derived(entry?.meta.title || t("list.untitled"));
   const closed = $derived(!!entry && isClosed(entry.note));
 
   // Let the main window know, so its float button shows this note as floating.
@@ -128,7 +129,8 @@
 
 <svelte:window {onkeydown} {onpointermove} {onblur} />
 
-<div class="floating">
+<!-- The window's one landmark, so a screen reader can find the note in it. -->
+<main class="floating">
   <header data-tauri-drag-region>
     <span class="spacer" data-tauri-drag-region></span>
   </header>
@@ -141,7 +143,7 @@
       <LockedNoteView {entry} compact />
     {/if}
   {/if}
-</div>
+</main>
 
 <style>
   .floating {

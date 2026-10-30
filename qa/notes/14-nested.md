@@ -130,7 +130,28 @@ flowchart LR
 :::
 :::
 
-#### 14. Table in a callout in a card
+#### 14. Diagram (240 px wide) in a callout in a card
+
+::: card
+:::!
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+:::
+:::
+
+#### 15. Math block in a callout in a card
+
+::: card
+:::!
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+:::
+:::
+
+#### 16. Table in a callout in a card
 
 ::: card
 :::!
@@ -141,7 +162,7 @@ flowchart LR
 :::
 :::
 
-#### 15. Divider in a callout in a card
+#### 17. Divider in a callout in a card
 
 ::: card
 :::!
@@ -149,7 +170,7 @@ flowchart LR
 :::
 :::
 
-#### 16. Key: Value line in a callout in a card
+#### 18. Key: Value line in a callout in a card
 
 ::: card
 :::!
@@ -157,7 +178,39 @@ flowchart LR
 :::
 :::
 
-#### 17. Image in a callout in a card
+#### 19. Mention in a callout in a card
+
+::: card
+:::!
+Ask @[QA · Ada] at @[QA · Ada].email.
+:::
+:::
+
+#### 20. Wiki link in a callout in a card
+
+::: card
+:::!
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+:::
+:::
+
+#### 21. Symbols in a callout in a card
+
+::: card
+:::!
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+:::
+:::
+
+#### 22. GitHub links in a callout in a card
+
+::: card
+:::!
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+:::
+:::
+
+#### 23. Image in a callout in a card
 
 ::: card
 :::!
@@ -165,7 +218,15 @@ flowchart LR
 :::
 :::
 
-#### 18. File in a callout in a card
+#### 24. Drawing in a callout in a card
+
+::: card
+:::!
+![A sample drawing](attachment:drawing.svg)
+:::
+:::
+
+#### 25. File in a callout in a card
 
 ::: card
 :::!
@@ -173,7 +234,7 @@ flowchart LR
 :::
 :::
 
-#### 19. Missing file in a callout in a card
+#### 26. Missing file in a callout in a card
 
 ::: card
 :::!
@@ -181,7 +242,7 @@ flowchart LR
 :::
 :::
 
-#### 20. Card in a callout in a card
+#### 27. Card in a callout in a card
 
 ::: card
 :::!
@@ -191,7 +252,7 @@ Text in a card.
 :::
 :::
 
-#### 21. Callout (info) in a callout in a card
+#### 28. Callout (info) in a callout in a card
 
 ::: card
 :::!
@@ -201,7 +262,7 @@ Text in an info callout.
 :::
 :::
 
-#### 22. Callout (warning, chosen icon) in a callout in a card
+#### 29. Callout (warning, chosen icon) in a callout in a card
 
 ::: card
 :::!
@@ -211,7 +272,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 23. Callout (decision, no icon) in a callout in a card
+#### 30. Callout (decision, no icon) in a callout in a card
 
 ::: card
 :::!

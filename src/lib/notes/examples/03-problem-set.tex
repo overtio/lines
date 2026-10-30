@@ -1,0 +1,44 @@
+\section{Probability · Problem Set 3}
+% #examples
+
+Due \textbf{Friday, 5 pm}. Show your work; a number without a reason gets no credit.
+
+\begin{description}
+  \item[Topics] Expectation, variance, the binomial distribution.
+  \item[Allowed] Notes and a calculator, not each other's answers.
+\end{description}
+
+\begin{enumerate}
+  \item A fair die is rolled once. Let $X$ be the number shown.
+  \begin{enumerate}
+    \item Find $\mathbb{E}[X]$.
+    \item Find $\operatorname{Var}(X) = \mathbb{E}[X^2] - \mathbb{E}[X]^2$.
+  \end{enumerate}
+
+  \item The table gives the distribution of the number of emails $N$ that arrive in an hour.
+  \begin{center}
+  \begin{tabular}{c|cccc}
+    $n$ & 0 & 1 & 2 & 3 \\
+    \hline
+    $P(N = n)$ & 0.1 & 0.4 & 0.3 & 0.2 \\
+  \end{tabular}
+  \end{center}
+  Find $\mathbb{E}[N]$ and $P(N \geq 2)$.
+
+  \item A coin lands heads with probability $p$. It is tossed $n$ times and $H$ counts the heads. Show that
+  \[ P(H = k) = \binom{n}{k} p^k (1 - p)^{n - k}, \qquad k = 0, 1, \ldots, n, \]
+  and that $\mathbb{E}[H] = np$.
+
+  \item \emph{(Bonus)} Simulate problem 3 with $n = 10$ and $p = 0.3$, for example with \verb|numpy.random.binomial(10, 0.3, size=100_000)|, and compare the average with $np$.
+\end{enumerate}
+
+\subsection*{Solution to problem 1}
+
+\begin{proof}[Solution]
+Each face has probability $\frac{1}{6}$, so
+\begin{align*}
+  \mathbb{E}[X] &= \frac{1 + 2 + \cdots + 6}{6} = \frac{7}{2}, \\
+  \mathbb{E}[X^2] &= \frac{1 + 4 + \cdots + 36}{6} = \frac{91}{6},
+\end{align*}
+and $\operatorname{Var}(X) = \frac{91}{6} - \frac{49}{4} = \frac{35}{12} \approx 2.92$.
+\end{proof}

@@ -1,3 +1,4 @@
+import { t } from "../i18n/index.svelte";
 import type { Remote, RemoteObject } from "./remote";
 import { SyncError } from "./remote";
 
@@ -14,7 +15,8 @@ export class FolderRemote implements Remote {
     try {
       return await invoke<T>(command, args);
     } catch (error) {
-      throw new SyncError(String(error));
+      // The app's native side says what went wrong in English; this says it's the folder.
+      throw new SyncError(t("sync.folder.failed", { error: String(error) }));
     }
   }
 
@@ -57,7 +59,7 @@ export class FolderRemote implements Remote {
         headers: { "x-dir": encodeURIComponent(dir), "x-name": name },
       });
     } catch (error) {
-      throw new SyncError(String(error));
+      throw new SyncError(t("sync.folder.failed", { error: String(error) }));
     }
   }
 }

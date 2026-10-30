@@ -47,8 +47,9 @@
   --card-bg: color-mix(in srgb, var(--ink) 2.5%, var(--bg-elevated));
   --card-border: color-mix(in srgb, var(--ink) 9%, transparent);
   --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.05);
-  --danger: #dc3e42;
-  --success: #2f9e63;
+  /* Dark enough for white text on them (4.5:1): Delete buttons, swipe actions. */
+  --danger: #d53c40;
+  --success: #278553;
   --pin: #f08c00;
   /* Callouts in notes (`:::info`, `:::warning`…), the same in every theme. */
   --callout-info: #2f6fdb;
@@ -59,6 +60,11 @@
   --callout-tint: 7%;
   /* Text on an accent-colored button: white on light themes, the background on dark ones. */
   --on-accent: #ffffff;
+  /* Text on the danger, success and pin colors (swipe actions, Delete buttons). The pin's orange is
+     too light for white, so it gets dark text. */
+  --on-danger: #ffffff;
+  --on-success: #ffffff;
+  --on-pin: #1d1c1a;
   --disabled-opacity: 0.45;
   --highlight-base: #ffd60a;
   --highlight: color-mix(in srgb, var(--highlight-base) 40%, transparent);
@@ -102,6 +108,11 @@
   --callout-decision: #3cc4a4;
   --callout-tint: 11%;
   --on-accent: var(--bg);
+  /* Dark themes' status colors are light, so dark text reads on them (white was below 3:1). Near
+     black rather than the background, which in some themes (Nord) is too grey for 4.5:1. */
+  --on-danger: #141414;
+  --on-success: #141414;
+  --on-pin: #141414;
   --highlight: color-mix(in srgb, var(--highlight-base) 25%, transparent);
   --syn-keyword: #ff7b72;
   --syn-string: #a5d6ff;
@@ -257,9 +268,23 @@ ul {
   list-style: none;
 }
 
+/* Keyboard focus, in the accent at full strength so it stands out (3:1) against any background. */
 :focus-visible {
-  outline: 2px solid var(--accent-soft);
+  outline: 2px solid var(--accent);
   outline-offset: -2px;
+}
+
+/* Read by screen readers, not shown: labels and announcements (lib/a11y.ts). */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 .icon-button {
@@ -304,6 +329,28 @@ ul {
   transition: background-color 120ms ease, color 120ms ease;
 }
 
+/*
+ * On touch screens a tap reaches 44px around a button (WCAG's size for touch) though it's drawn
+ * smaller, so toolbars keep their look.
+ */
+@media (pointer: coarse) {
+  .icon-button,
+  .text-button {
+    position: relative;
+  }
+
+  .icon-button::after,
+  .text-button::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+  }
+
+  .text-button::after {
+    inset: -7px -2px;
+  }
+}
+
 .text-button.danger {
   color: var(--danger);
 }
@@ -345,6 +392,55 @@ ul {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/*
+ * Placeholders are the browser's grey (about 4:1 on a field); the accessibility themes use their
+ * faint text, which they keep at 7:1 (High Contrast) or 4.5:1 on every surface.
+ */
+:root:is([data-theme="high-contrast"], [data-theme="red-green"], [data-theme="blue-yellow"]) ::placeholder {
+  color: var(--text-faint);
+  opacity: 1;
+}
+
+/*
+ * Forced colors (Windows' contrast themes, and Chrome's emulation of them): the system swaps every
+ * color for a few of its own and drops background colors and shadows. Borders take the text's
+ * color by themselves, but what's selected, chosen or focused is marked here with a background or
+ * a shadow, so mark it with the system's colors instead. `!important` because each component sets
+ * its own background for these, which would otherwise win and then be dropped.
+ */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: Highlight;
+  }
+
+  /* The open note's row, the current sidebar item, the chosen option (segmented controls, themes, icons, tabs, autocomplete). */
+  [aria-current="true"],
+  [aria-current="page"],
+  [aria-selected="true"],
+  [role="radio"][aria-checked="true"],
+  [aria-pressed="true"],
+  .icon-button.open,
+  [role="menuitem"]:is(:hover, :focus-visible) {
+    background: Highlight !important;
+    color: HighlightText !important;
+  }
+
+  /* Focus on something already marked: a ring in the marking's text color, inside it. */
+  :is([aria-current="true"], [aria-current="page"], [aria-selected="true"], [role="radio"][aria-checked="true"], [aria-pressed="true"]):focus-visible {
+    outline-color: HighlightText;
+  }
+
+  /* Text fields show focus with a border color, which forced colors makes the same as at rest. */
+  :root :is(input, textarea, select):focus {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  button:disabled {
+    color: GrayText;
   }
 }
 

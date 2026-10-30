@@ -94,3 +94,53 @@ Three cards, each inside the last. Check all three close here, and the next head
 #### 14. After the cards above
 
 This line is outside every card.
+
+#### 15. Photo from Unsplash, by the link to its page
+
+![Snow-covered mountain peak](https://unsplash.com/photos/snow-covered-mountain-peak-illuminated-by-sunset-light-mevyYnC5xCo)
+
+#### 16. Unsplash photo inside a line of text
+
+A mountain ![ice-capped mountain](https://unsplash.com/photos/xfngap_DToE) inside a line.
+
+#### 17. Dollars that aren't math
+
+- $5 and $10 stay text (a space before the second $, a digit after it).
+- An escaped \$x\$ stays text.
+- `$x$` in code stays code.
+
+#### 18. Math that isn't Markdown
+
+$a_1 * b_2 * c_3$ is math, with no italics.
+
+#### 19. Display math within a paragraph
+
+The Basel problem: $$\sum_{n=1}^\infty \frac{1}{n^2} = \frac{\pi^2}{6}$$ centered on a line of its own.
+
+#### 20. LaTeX that KaTeX can't read
+
+Shown red, as written, with the reason on hover: $\frac{1}{$
+
+$$
+\begin{matrix} a
+$$
+
+#### 21. Math code block
+
+```math
+\begin{aligned}
+a &= b + c \\
+d &= e
+\end{aligned}
+```
+
+#### 22. Empty math block
+
+$$
+$$
+
+#### 23. A line of only #
+
+#
+
+The # above is text, not an empty heading; a tag is typed this way.

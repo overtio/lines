@@ -1,7 +1,10 @@
-const time = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" });
-const day = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" });
-const full = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" });
-const relative = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" }).format(-1, "day");
+import { locale } from "./i18n/index.svelte";
+
+// In the app's language (which changing restarts the app), as the device writes it.
+const time = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" });
+const day = new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" });
+const full = new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", year: "numeric" });
+const relative = new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(-1, "day");
 const yesterdayLabel = relative[0].toLocaleUpperCase() + relative.slice(1);
 
 export function formatDate(ms: number, now = new Date()): string {

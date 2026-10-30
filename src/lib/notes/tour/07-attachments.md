@@ -4,7 +4,11 @@ Paste an image, drop one onto a note, or type `/image`. It's kept with your note
 
 ![A sunset over the lake](attachment:photo.png)
 
-Click a picture to select it, then Delete removes it.
+Click a picture to select it, then Delete removes it. Drag the round handle on its corner to make it smaller or larger; double-click the handle for its own size again.
+
+Pictures from the web show too. Paste the link to a photo on Unsplash on an empty line:
+
+![Snow covered mountain peak illuminated by sunset light](https://unsplash.com/photos/snow-covered-mountain-peak-illuminated-by-sunset-light-mevyYnC5xCo)
 
 ## Files
 

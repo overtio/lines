@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { ICONS, TAG_ICON_GROUPS, type IconName } from "../icons/icons";
   import { dismissable, placeAt, takeFocus } from "../popover";
@@ -23,12 +24,21 @@
     return [{ name: "", icons: matches }];
   });
 
+  /**
+   * The icon Tab lands on: the chosen one, else the first. The others are reached with the arrow
+   * keys, so the grid is one stop between the search field and the buttons.
+   */
+  const tabStop = $derived.by(() => {
+    const all = groups.flatMap((group) => group.icons);
+    return current && all.includes(current) ? current : all[0];
+  });
+
   $effect(() => {
     const p = ui.iconPicker;
     if (!p || !el) return;
     placeAt(el, p.x, p.y);
     // Focus the current icon rather than the search field, so phones don't pop up the keyboard.
-    const selected = el.querySelector<HTMLElement>('[aria-selected="true"]');
+    const selected = el.querySelector<HTMLElement>('[role="option"][tabindex="0"]');
     const restore = takeFocus(el, selected ?? el);
     selected?.scrollIntoView({ block: "center" });
     return restore;
@@ -67,11 +77,11 @@
     if (event.key === "Enter" && first) choose(first);
     else if (event.key === "ArrowDown") {
       event.preventDefault();
-      el?.querySelector<HTMLElement>('[role="option"]')?.focus();
+      el?.querySelector<HTMLElement>('[role="option"][tabindex="0"]')?.focus();
     }
   }
 
-  /** Arrow keys move by position, since groups end in partly filled rows. */
+  /** Arrow keys move by position, since groups end in partly filled rows; Home and End go to the ends. */
   function onIconKeydown(event: KeyboardEvent) {
     const icons = [...el!.querySelectorAll<HTMLElement>('[role="option"]')];
     const current = event.currentTarget as HTMLElement;
@@ -79,6 +89,8 @@
     let next: HTMLElement | undefined;
     if (event.key === "ArrowRight") next = icons[index + 1];
     else if (event.key === "ArrowLeft") next = icons[index - 1];
+    else if (event.key === "Home") next = icons[0];
+    else if (event.key === "End") next = icons.at(-1);
     else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       const down = event.key === "ArrowDown";
       const { offsetTop: top, offsetLeft: left } = current;
@@ -99,7 +111,7 @@
   <div
     class="picker popover"
     role="dialog"
-    aria-label="Icon for {picker.label}"
+    aria-label={t("picker.iconFor", { name: picker.label })}
     tabindex="-1"
     style:--columns={COLUMNS}
     bind:this={el}
@@ -111,40 +123,44 @@
       </span>
       <span class="actions">
         {#if picker.none}
-          <button class="text-button" onclick={chooseNone} disabled={none}>No Icon</button>
+          <button class="text-button" onclick={chooseNone} disabled={none}>{t("picker.noIcon")}</button>
         {/if}
-        <button class="text-button" onclick={() => choose(null)} disabled={!current && !none}>Reset</button>
+        <button class="text-button" onclick={() => choose(null)} disabled={!current && !none}>{t("picker.reset")}</button>
       </span>
     </header>
     <input
       type="search"
-      placeholder="Search icons"
-      aria-label="Search icons"
+      placeholder={t("picker.search")}
+      aria-label={t("picker.search")}
       autocomplete="off"
       spellcheck="false"
       bind:value={query}
       onkeydown={onSearchKeydown}
     />
-    <div class="scroll" role="listbox" aria-label="Icons">
-      {#each groups as group (group.name)}
-        {#if group.name}<h4>{group.name}</h4>{/if}
-        <div class="grid" role="group" aria-label={group.name || "Matches"}>
-          {#each group.icons as name (name)}
-            <button
-              role="option"
-              aria-selected={name === current}
-              aria-label={label(name)}
-              title={label(name)}
-              onclick={() => choose(name)}
-              onkeydown={onIconKeydown}
-            >
-              <Icon {name} size={18} strokeWidth={1.75} />
-            </button>
-          {/each}
-        </div>
-      {/each}
+    <div class="scroll">
+      <div role="listbox" aria-label={t("picker.icons")}>
+        {#each groups as group (group.name)}
+          <!-- Shown, but not said: the group around the icons is named after it. -->
+          {#if group.name}<div class="group-name" aria-hidden="true">{group.name}</div>{/if}
+          <div class="grid" role="group" aria-label={group.name || t("picker.matches")}>
+            {#each group.icons as name (name)}
+              <button
+                role="option"
+                tabindex={name === tabStop ? 0 : -1}
+                aria-selected={name === current}
+                aria-label={label(name)}
+                title={label(name)}
+                onclick={() => choose(name)}
+                onkeydown={onIconKeydown}
+              >
+                <Icon {name} size={18} strokeWidth={1.75} />
+              </button>
+            {/each}
+          </div>
+        {/each}
+      </div>
       {#if !groups[0]?.icons.length}
-        <p class="empty">No icons match “{query}”.</p>
+        <p class="empty" role="status">{t("picker.noMatches", { query })}</p>
       {/if}
     </div>
   </div>
@@ -237,7 +253,7 @@
     overscroll-behavior: contain;
   }
 
-  h4 {
+  .group-name {
     margin: 10px 2px 4px;
     font-size: 11px;
     font-weight: 600;
@@ -246,7 +262,7 @@
     color: var(--text-faint);
   }
 
-  h4:first-child {
+  .group-name:first-child {
     margin-top: 2px;
   }
 
@@ -277,6 +293,13 @@
     color: var(--bg);
   }
 
+  /* The chosen icon is already filled in; a ring shows when it has focus too. */
+  .grid button[aria-selected="true"]:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--bg-elevated),
+      0 0 0 4px var(--accent);
+  }
+
   .empty {
     margin: 24px 0;
     text-align: center;
@@ -284,9 +307,14 @@
     color: var(--text-faint);
   }
 
+  /* Fingers need bigger targets. */
   @media (pointer: coarse) {
     .picker {
-      --cell: 40px;
+      --cell: 44px;
+    }
+
+    header .text-button {
+      height: 44px;
     }
   }
 </style>

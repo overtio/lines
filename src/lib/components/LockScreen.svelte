@@ -1,5 +1,6 @@
 <script lang="ts">
   import { WrongPassphrase } from "../crypto";
+  import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { lock, touchIdAvailable } from "../lock/lock.svelte";
   import { eraseThisDevice } from "../lock/erase";
@@ -13,6 +14,7 @@
   let shakes = $state(0);
   let forgot = $state(false);
   let input = $state<HTMLInputElement>();
+  let card = $state<HTMLFormElement>();
   let touchId = $state(false);
 
   void touchIdAvailable.then((available) => {
@@ -29,7 +31,7 @@
     try {
       await lock.unlock(passphrase);
     } catch (e) {
-      error = e instanceof WrongPassphrase ? e.message : `Couldn't unlock: ${e instanceof Error ? e.message : e}`;
+      error = e instanceof WrongPassphrase ? e.message : t("lock.screen.unlockFailed", { error: e instanceof Error ? e.message : String(e) });
       shakes++;
       passphrase = "";
       busy = false;
@@ -45,25 +47,44 @@
     try {
       if (await lock.unlockWithTouchId()) return;
     } catch (e) {
-      error = String(e);
+      error = t("lock.touchId.failed", { error: String(e) });
     }
     busy = false;
     requestAnimationFrame(() => input?.focus());
   }
 
-  async function erase() {
-    const sure = confirm(
-      "Erase every note and attachment on this device, and its sync settings?\n\nNotes that were synced stay in your sync storage. This can't be undone.",
-    );
-    if (sure) await eraseThisDevice();
+  /** Asked in the page: the Mac app's web view has no confirm() (it returns false without asking). */
+  let erasing = $state(false);
+
+  /** Focus stays on the lock screen, as in a modal dialog: Tab goes round its controls. */
+  function onkeydown(event: KeyboardEvent) {
+    if (event.key === "Escape" && erasing) {
+      event.preventDefault();
+      erasing = false;
+      return;
+    }
+    if (event.key !== "Tab" || !card) return;
+    const controls = [...card.querySelectorAll<HTMLElement>("input, button")].filter((control) => !control.matches(":disabled"));
+    const [first, last] = [controls[0], controls.at(-1)];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+    }
   }
+
+  const focus = (node: HTMLElement) => node.focus();
 </script>
 
-<div class="lock" data-tauri-drag-region>
-  <form class="card" onsubmit={unlock}>
+<svelte:window {onkeydown} />
+
+<div class="lock" role="dialog" aria-modal="true" aria-labelledby="lock-title" aria-describedby="lock-hint" data-tauri-drag-region>
+  <form class="card" aria-busy={busy} bind:this={card} onsubmit={unlock}>
     <div class="badge" aria-hidden="true"><Icon name="lock" size={26} strokeWidth={1.75} /></div>
-    <h1>lines is locked</h1>
-    <p class="hint">Enter your passphrase to open your notes.</p>
+    <h1 id="lock-title">{t("lock.screen.title")}</h1>
+    <p class="hint" id="lock-hint">{t("lock.screen.hint")}</p>
 
     {#key shakes}
       <div class="field" class:shake={shakes > 0}>
@@ -71,42 +92,57 @@
           bind:this={input}
           bind:value={passphrase}
           type="password"
-          placeholder="Passphrase"
-          aria-label="Passphrase"
+          placeholder={t("lock.form.passphrase")}
+          aria-label={t("lock.form.passphrase")}
           aria-invalid={!!error}
+          aria-describedby={error ? "lock-error" : undefined}
           autocomplete="current-password"
           disabled={busy}
-          {@attach (node) => node.focus()}
+          {@attach focus}
         />
-        <button class="go" type="submit" disabled={!passphrase || busy} aria-label="Unlock">
+        <button class="go" type="submit" disabled={!passphrase || busy} aria-label={busy ? t("lock.screen.unlocking") : t("lock.screen.unlock")}>
           <Icon name={busy ? "loader" : "chevron-right"} size={18} class={busy ? "spin" : ""} />
         </button>
       </div>
     {/key}
 
-    <p class="error" role="alert">{error ?? ""}</p>
+    <p class="error" id="lock-error" role="alert">{error ?? ""}</p>
 
     {#if touchId}
       <button type="button" class="text-button" onclick={useTouchId} disabled={busy}>
-        <Icon name="fingerprint" size={16} /> Unlock with Touch ID
+        <Icon name="fingerprint" size={16} /> {t("lock.unlockWithTouchId")}
       </button>
     {/if}
 
     <div class="forgot">
       {#if forgot}
-        <p>
-          Without it, the notes on this device can't be opened, not even by lines. If you sync, your notes are still in
-          your sync storage: erase this device, then connect sync again.
-        </p>
-        <button type="button" class="text-button danger" onclick={erase}>Erase this device…</button>
+        <p id="lock-forgot">{t("lock.screen.forgotHint")}</p>
+        {#if erasing}
+          <p id="lock-erase">{t("lock.screen.eraseQuestion")}</p>
+          <div class="confirm" role="group" aria-labelledby="lock-erase">
+            <button type="button" class="text-button" onclick={() => (erasing = false)} {@attach focus}>{t("lock.cancel")}</button>
+            <button type="button" class="text-button danger" onclick={() => void eraseThisDevice()}>{t("lock.screen.erase")}</button>
+          </div>
+        {:else}
+          <!-- Focus comes here when the explanation shows, and back here from Cancel. -->
+          <button type="button" class="text-button danger" aria-describedby="lock-forgot" onclick={() => (erasing = true)} {@attach focus}>
+            {t("lock.screen.askErase")}
+          </button>
+        {/if}
       {:else}
-        <button type="button" class="text-button" onclick={() => (forgot = true)}>Forgot your passphrase?</button>
+        <button type="button" class="text-button" onclick={() => (forgot = true)}>{t("lock.screen.forgot")}</button>
       {/if}
     </div>
   </form>
 </div>
 
 <style>
+  .confirm {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+
   .lock {
     display: grid;
     place-items: center;
@@ -167,12 +203,15 @@
     transition: border-color 120ms ease, box-shadow 120ms ease;
   }
 
+  /* The accent at full strength, two pixels wide, so focus shows (3:1) in place of the outline. */
   input:focus {
-    border-color: var(--accent-soft);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: var(--accent);
+    box-shadow:
+      0 0 0 1px var(--accent),
+      0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
   }
 
-  input[aria-invalid="true"] {
+  input[aria-invalid="true"]:not(:focus) {
     border-color: color-mix(in srgb, var(--danger) 55%, transparent);
   }
 
@@ -193,6 +232,25 @@
   .go:disabled {
     opacity: 0;
     pointer-events: none;
+  }
+
+  /* Touch screens: a target a finger can hit (44 × 44). */
+  @media (pointer: coarse) {
+    input {
+      height: 50px;
+      padding-right: 56px;
+    }
+
+    .go {
+      top: 3px;
+      right: 3px;
+      width: 44px;
+      height: 44px;
+    }
+
+    .text-button {
+      min-height: 44px;
+    }
   }
 
   .error {

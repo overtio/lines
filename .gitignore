@@ -8,3 +8,6 @@ dist-site
 .idea
 src-tauri/target
 src-tauri/gen/schemas
+
+# The TeX engine (pnpm tex-assets): too big for git
+public/busytex

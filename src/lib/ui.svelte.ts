@@ -1,7 +1,7 @@
 import type { IconName } from "./icons/icons";
 
 export type Layout = "wide" | "medium" | "narrow";
-export type SettingsTab = "appearance" | "text" | "sync" | "privacy" | "about";
+export type SettingsTab = "appearance" | "text" | "sync" | "privacy" | "shortcuts" | "about";
 
 export type MenuItem = { label: string; icon?: IconName; danger?: boolean; run: () => void } | "separator";
 
@@ -13,6 +13,8 @@ export interface Menu {
   align?: "start" | "end";
   /** The button that opened it; pressing it again closes the menu rather than reopening it. */
   anchor?: Element;
+  /** What the menu is for, said by screen readers as it opens: "Share", a note's title. */
+  label?: string;
   items: MenuItem[];
   onclose?: () => void;
 }
@@ -49,6 +51,11 @@ class UIState {
   menu = $state.raw<Menu | null>(null);
   /** What an icon is being picked for, and where the picker opens. */
   iconPicker = $state.raw<IconTarget | null>(null);
+  /**
+   * The note whose PDF is being previewed, and whether to save (or print) it as soon as it's ready,
+   * or to offer its PNG images.
+   */
+  pdf = $state.raw<{ id: string; save: boolean; png?: boolean } | null>(null);
 
   constructor() {
     window.addEventListener("resize", () => {

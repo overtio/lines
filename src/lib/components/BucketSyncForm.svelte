@@ -18,6 +18,7 @@
 
 <!-- Connect to an S3-compatible bucket (R2, B2, S3, MinIO…). -->
 <script lang="ts">
+  import { t } from "../i18n/index.svelte";
   import { isTauri } from "../platform";
   import { sync } from "../sync/engine.svelte";
   import { inferRegion, isFolder, PROVIDERS, type ProviderId } from "../sync/providers";
@@ -30,6 +31,12 @@
   let testing = $state(false);
   let saving = $state(false);
   let message = $state<{ ok: boolean; text: string } | null>(null);
+  const id = $props.id();
+
+  /** A message's words before and after a placeholder that's shown as code. */
+  const around = (text: string) => text.split("\u0000");
+  const [corsBefore, corsAfter] = around(t("sync.bucket.corsTitle", { origin: "\u0000" }));
+  const [docsBefore, docsAfter] = around(t("sync.bucket.corsHelp", { file: "\u0000" }));
 
   const corsRule = JSON.stringify(
     [
@@ -64,7 +71,7 @@
     message = null;
     try {
       await sync.test($state.snapshot(form));
-      message = { ok: true, text: "Connected. lines can read and write this bucket." };
+      message = { ok: true, text: t("sync.bucket.works") };
     } catch (error) {
       message = { ok: false, text: describe(error) };
     } finally {
@@ -102,28 +109,35 @@
 </script>
 
 <form onsubmit={save}>
-  <Segmented label="Storage provider" options={providers} value={form.provider} onselect={choose} />
-  <p class="prose">{provider.help}</p>
+  <Segmented label={t("sync.bucket.provider")} options={providers} value={form.provider} onselect={choose} />
+  <p class="prose" id="{id}-help">{provider.help}</p>
 
   <label>
-    <span>Endpoint</span>
-    <input bind:value={form.endpoint} placeholder={provider.endpoint} required autocomplete="off" spellcheck="false" />
+    <span>{t("sync.bucket.endpoint")}</span>
+    <input
+      bind:value={form.endpoint}
+      placeholder={provider.endpoint}
+      required
+      autocomplete="off"
+      spellcheck="false"
+      aria-describedby="{id}-help"
+    />
   </label>
 
   <div class="row">
     <label>
-      <span>Bucket</span>
-      <input bind:value={form.bucket} placeholder="my-notes" required autocomplete="off" spellcheck="false" />
+      <span>{t("sync.bucket.bucket")}</span>
+      <input bind:value={form.bucket} placeholder={t("sync.bucket.bucketExample")} required autocomplete="off" spellcheck="false" />
     </label>
     <label>
-      <span>Folder</span>
+      <span>{t("sync.bucket.folder")}</span>
       <input bind:value={form.prefix} placeholder="lines/" autocomplete="off" spellcheck="false" />
     </label>
   </div>
 
   {#if form.provider === "other" || form.provider === "s3"}
     <label>
-      <span>Region</span>
+      <span>{t("sync.bucket.region")}</span>
       <input
         bind:value={form.region}
         placeholder={inferRegion(form.provider, form.endpoint)}
@@ -134,24 +148,21 @@
   {/if}
 
   <label>
-    <span>Access key ID</span>
+    <span>{t("sync.bucket.accessKeyId")}</span>
     <input bind:value={form.accessKeyId} required autocomplete="off" spellcheck="false" />
   </label>
   <label>
-    <span>Secret access key</span>
-    <input bind:value={form.secretAccessKey} type="password" required autocomplete="off" />
+    <span>{t("sync.bucket.secretAccessKey")}</span>
+    <input bind:value={form.secretAccessKey} type="password" required autocomplete="off" aria-describedby="{id}-keys" />
   </label>
 
-  <p class="note">
-    Your keys are stored only on this device{isTauri ? "" : ", in this browser's storage"}. Use a key that can access just
-    this bucket.
-  </p>
+  <p class="note" id="{id}-keys">{isTauri ? t("sync.bucket.keysApp") : t("sync.bucket.keysBrowser")}</p>
 
   {#if !isTauri}
     <details class="note">
-      <summary>In the browser, the bucket needs a CORS rule for <code>{location.origin}</code></summary>
+      <summary>{corsBefore}<code>{location.origin}</code>{corsAfter}</summary>
       <pre>{corsRule}</pre>
-      <p>Paste this into the bucket's CORS settings (S3, R2, MinIO). For Backblaze B2, see <code>docs/sync.md</code>.</p>
+      <p>{docsBefore}<code>docs/sync.md</code>{docsAfter}</p>
     </details>
   {/if}
 
@@ -161,13 +172,13 @@
 
   <footer class="form-footer">
     {#if connected}
-      <button type="button" class="text-button danger" onclick={disconnect} disabled={saving}>Disconnect</button>
+      <button type="button" class="text-button danger" onclick={disconnect} disabled={saving}>{t("sync.disconnect")}</button>
     {/if}
-    <button type="button" class="text-button push" onclick={test} disabled={!complete || testing || saving}>
-      {testing ? "Testing…" : "Test connection"}
+    <button type="button" class="text-button push" onclick={test} disabled={!complete || testing || saving} aria-busy={testing}>
+      {testing ? t("sync.bucket.testing") : t("sync.bucket.test")}
     </button>
-    <button type="submit" class="primary" disabled={!complete || saving}>
-      {saving ? "Connecting…" : connected ? "Save" : "Connect"}
+    <button type="submit" class="primary" disabled={!complete || saving} aria-busy={saving}>
+      {saving ? t("sync.connecting") : connected ? t("sync.save") : t("sync.connect")}
     </button>
   </footer>
 </form>
@@ -228,7 +239,16 @@
     outline: none;
   }
 
+  /* In the accent at full strength, two pixels wide, so focus shows (3:1) in place of the outline. */
   input:focus {
-    border-color: var(--accent-soft);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  /* Touch screens: a target a finger can hit (44 px high). */
+  @media (pointer: coarse) {
+    input {
+      height: 44px;
+    }
   }
 </style>

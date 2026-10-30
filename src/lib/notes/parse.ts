@@ -1,5 +1,7 @@
+import { latexContent, latexLines } from "./latex";
+import { frontMatter, nameOf, propertyOf, typeOf } from "./properties";
 import { plainLine } from "./stats";
-import type { NoteMeta } from "./types";
+import type { NoteFormat, NoteMeta } from "./types";
 
 /** Characters allowed inside a #tag. Nested tags use `/`, e.g. `#work/meetings`. */
 export const TAG_CHAR = /[\p{L}\p{N}_\-/]/u;
@@ -32,10 +34,7 @@ export function extractTags(body: string): string[] {
  * skipping code just like extractTags does.
  */
 export function renameTagIn(body: string, from: string, to: string): string {
-  const code: [number, number][] = [];
-  for (const re of [FENCE_RE, INLINE_CODE_RE]) {
-    for (const m of body.matchAll(re)) code.push([m.index, m.index + m[0].length]);
-  }
+  const code = codeRanges(body);
   let out = "";
   let last = 0;
   for (const match of body.matchAll(TAG_RE)) {
@@ -52,19 +51,56 @@ export function renameTagIn(body: string, from: string, to: string): string {
   return last ? out + body.slice(last) : body;
 }
 
+/** Where `body`'s code is, inline and in blocks, where tags and type references aren't read. */
+function codeRanges(body: string): [number, number][] {
+  const code: [number, number][] = [];
+  for (const re of [FENCE_RE, INLINE_CODE_RE]) {
+    for (const m of body.matchAll(re)) code.push([m.index, m.index + m[0].length]);
+  }
+  return code;
+}
+
+/** A reference to a type, `@type.recipe` (properties.ts); its columns, if any, follow the name. */
+const TYPE_REF_RE = /(?<![\p{L}\p{N}_.\/\\@`])@type\.([\p{L}\p{N}_][\p{L}\p{N}_-]*)/giu;
+
+/**
+ * Renames the type `from` to `to` in `body`: its `type` property, if it's of that type, as `to` is
+ * written, and every `@type.…` of it outside code, in lowercase, keeping their columns.
+ */
+export function renameTypeIn(body: string, from: string, to: string): string {
+  const target = nameOf(from);
+  const front = frontMatter(body);
+  const property = front && propertyOf(front.properties, "type");
+  if (property && nameOf(property.value) === target) {
+    const lines = body.split("\n");
+    const line = lines[property.line - 1];
+    lines[property.line - 1] = `${line.slice(0, line.indexOf(":") + 1)} ${to}`;
+    body = lines.join("\n");
+  }
+  const code = codeRanges(body);
+  return body.replace(TYPE_REF_RE, (written, name: string, offset: number) =>
+    nameOf(name) !== target || code.some(([a, b]) => offset >= a && offset < b) ? written : `@type.${to.toLowerCase().replace(/\s+/g, "_")}`,
+  );
+}
+
 /** A line as it reads in the note list: no Markdown, card fences dropped, table cells spaced. */
 function plain(line: string): string {
   return /^\s*:{3,}/.test(line) ? "" : plainLine(line).replace(/\s+/g, " ").trim();
 }
 
-export function computeMeta(body: string): NoteMeta {
+export function computeMeta(body: string, format: NoteFormat = "markdown"): NoteMeta {
+  if (format === "latex") return latexMeta(body);
   const lines = body.split("\n");
+  // The title is the first line after the note's properties, or failing that its `title` or `name`.
+  const front = frontMatter(body);
+  const properties = front?.properties ?? [];
   let title = "";
-  let i = 0;
+  let i = front?.lines ?? 0;
   for (; i < lines.length; i++) {
     title = plain(lines[i]);
     if (title) break;
   }
+  if (!title) title = plain(propertyOf(properties, "title")?.value ?? propertyOf(properties, "name")?.value ?? "");
   const rest: string[] = [];
   let inFence = false;
   for (i++; i < lines.length && rest.join(" ").length < 200; i++) {
@@ -80,5 +116,25 @@ export function computeMeta(body: string): NoteMeta {
     tags: extractTags(body),
     hasOpenTodos: OPEN_TODO_RE.test(body),
     searchText: body.toLowerCase(),
+    properties,
+    type: typeOf(properties),
+  };
+}
+
+/** A LaTeX note's title and excerpt come from its text as it reads; its tags can be in comments (`% #work`). */
+function latexMeta(body: string): NoteMeta {
+  const { text, title } = latexContent(body);
+  const lines = latexLines(text)
+    .map((line) => line.text.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+  if (title) lines.unshift(title);
+  return {
+    title: lines[0] ?? "",
+    excerpt: lines.slice(1).join(" ").slice(0, 200),
+    tags: extractTags(body),
+    hasOpenTodos: false,
+    searchText: body.toLowerCase(),
+    properties: [],
+    type: "",
   };
 }

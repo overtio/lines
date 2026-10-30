@@ -47,6 +47,22 @@ trashed: false
 Plain Markdown, readable by any editor.
 ```
 
+A note with an icon has an `icon` line, and a note written in LaTeX a `format: latex` line, followed by its LaTeX ([latex.md](latex.md)).
+
+A note's own [properties](linedown.md#properties) are part of its text, so they come after this block, in a second one:
+
+```markdown
+---
+id: 6f1c…
+…
+---
+---
+type: person
+fullname: Oleksandr Litus
+---
+# Oleks
+```
+
 On each sync, lines compares every note with what it last exchanged with the bucket (the object's ETag and a hash of its content):
 
 | Situation | What happens |

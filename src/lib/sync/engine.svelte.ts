@@ -1,4 +1,6 @@
+import { speak } from "../a11y";
 import { fromBase64, lockKey, randomBytes, toBase64, unlockKey } from "../crypto";
+import { t } from "../i18n/index.svelte";
 import { readSecret, writeSecret } from "../lock/vault";
 import { attachmentNames, getAttachment, putAttachment, usedAttachments } from "../notes/attachments";
 import { isBlank, notes } from "../notes/store.svelte";
@@ -79,7 +81,7 @@ const MIN_PASSPHRASE = 8;
 
 /** Long enough to be worth having; the forms say so before it gets here. */
 export function checkPassphrase(passphrase: string) {
-  if (passphrase.length < MIN_PASSPHRASE) throw new SyncError(`Use at least ${MIN_PASSPHRASE} characters.`);
+  if (passphrase.length < MIN_PASSPHRASE) throw new SyncError(t("sync.error.tooShort", { count: MIN_PASSPHRASE }));
 }
 
 /** Runs `run` over `items` a few at a time. After a failure the rest are skipped, and it only
@@ -106,14 +108,17 @@ function conflictCopy(note: Note): Note {
   const copy = { ...note, id: crypto.randomUUID(), createdAt: Date.now(), pinned: false };
   // A locked note that isn't open can't be changed; its title can.
   if (note.locked && !note.locked.open) {
-    return { ...copy, locked: { ...note.locked, title: `${note.locked.title || "Untitled"} (conflicted copy)` } };
+    return { ...copy, locked: { ...note.locked, title: t("sync.conflicted", { title: note.locked.title || t("sync.untitled") }) } };
   }
   const lines = note.body.split("\n");
   const first = lines.findIndex((line) => line.trim());
-  if (first === -1) lines.unshift("# Conflicted copy");
-  else lines[first] += " (conflicted copy)";
+  if (first === -1) lines.unshift(`# ${t("sync.conflictedCopy")}`);
+  else lines[first] = t("sync.conflicted", { title: lines[first] });
   return { ...copy, body: lines.join("\n"), ...(note.locked ? { locked: { ...note.locked, sealed: "" } } : {}) };
 }
+
+/** What the person calls where notes sync to: the drive or folder, or the bucket. */
+const placeName = (config: SyncConfig) => (isFolder(config) ? config.name : config.bucket);
 
 class SyncEngine {
   config = $state.raw<SyncConfig | null>(null);
@@ -128,6 +133,8 @@ class SyncEngine {
   #timer: ReturnType<typeof setTimeout> | undefined;
   /** While encryption is turned on or off, no other pass may run. */
   #paused = false;
+  /** Connected just now: screen readers hear once the first pass is done. */
+  #settingUp = false;
 
   /** Reads the saved connection. Once lines is unlocked, if the app lock is on. */
   async load() {
@@ -176,6 +183,7 @@ class SyncEngine {
     this.encryptionIssue = null;
     this.lastSynced = null;
     this.status = this.config ? "idle" : "off";
+    this.#settingUp = !!this.config;
     if (this.config) void this.syncNow();
   }
 
@@ -212,7 +220,7 @@ class SyncEngine {
     await this.#exclusive(async (config) => {
       const { store, root } = place(config);
       const file = await readKeyFile(store, root);
-      if (!file) throw new SyncError("The notes there aren't encrypted any more.");
+      if (!file) throw new SyncError(t("sync.error.notEncrypted"));
       const raw = await unlockKey(file, passphrase);
       // Starting over, like connecting again: nothing here is taken as deleted there.
       await this.#switch({ ...config, encryption: { id: file.id, key: toBase64(raw) } });
@@ -243,7 +251,7 @@ class SyncEngine {
       if (!config.encryption) return;
       const { store, root } = place(config);
       const file = await readKeyFile(store, root);
-      if (file?.id !== config.encryption.id) throw new SyncError("Encryption was changed on another device. Sync, then try again.");
+      if (file?.id !== config.encryption.id) throw new SyncError(t("sync.error.changedElsewhere"));
       await writeKeyFile(store, root, { ...file, ...(await lockKey(fromBase64(config.encryption.key), passphrase)) });
     });
   }
@@ -308,11 +316,18 @@ class SyncEngine {
       this.error = null;
       this.encryptionIssue = null;
       this.lastSynced = Date.now();
+      if (this.#settingUp) {
+        this.#settingUp = false;
+        speak(t("sync.spoken.ready", { place: placeName(config) }));
+      }
     } catch (error) {
       if (this.config !== config) return;
       console.error("lines: sync failed", error);
+      const message = error instanceof SyncError ? error.message : t("sync.error.failed", { error: String(error) });
+      // Out of sight, so said aloud; once, not again on every pass that fails the same way.
+      if (message !== this.error) speak(t("sync.spoken.problem", { error: message }));
       this.status = "error";
-      this.error = error instanceof SyncError ? error.message : `Sync failed: ${String(error)}`;
+      this.error = message;
     }
   }
 
@@ -322,16 +337,16 @@ class SyncEngine {
     const sealedThere = listed.some((object) => object.key.endsWith(SEALED));
     if (config.encryption) {
       if (!file && sealedThere) {
-        throw new SyncError(`The notes' key file (${KEY_FILE}) is missing. If the drive is still downloading it, this clears up by itself.`);
+        throw new SyncError(t("sync.error.keyFileMissing", { file: KEY_FILE }));
       }
       // Never silently back to plain: whoever can change the bucket could make that happen.
       if (!file) {
         this.encryptionIssue = "turned-off";
-        throw new SyncError("Encryption was turned off on another device. Turn it off here too to keep syncing.");
+        throw new SyncError(t("sync.error.turnedOff"));
       }
       if (file.id !== config.encryption.id) {
         this.encryptionIssue = "rekeyed";
-        throw new SyncError("Encryption was set up again on another device. Enter its new passphrase to keep syncing.");
+        throw new SyncError(t("sync.error.rekeyed"));
       }
     } else if (!file && sealedThere && localStorage.getItem(LEFTOVERS_KEY)) {
       // Encryption was turned off here; the encrypted copies are no longer needed.
@@ -341,7 +356,7 @@ class SyncEngine {
       localStorage.removeItem(LEFTOVERS_KEY);
     } else if (file || sealedThere) {
       this.encryptionIssue = "locked";
-      throw new SyncError("The notes there are encrypted. Enter the passphrase to sync them.");
+      throw new SyncError(t("sync.error.encrypted"));
     }
   }
 
@@ -362,9 +377,7 @@ class SyncEngine {
     // Notes were synced, yet the remote has none: far more likely a drive that's signed out or
     // a wrong folder than every note deleted elsewhere. Deleting them all here would be worse.
     if (remoteById.size === 0 && records.size > 0) {
-      throw new SyncError(
-        "The synced notes are missing from the remote, so nothing was changed here. If you cleared it on purpose, disconnect and connect again.",
-      );
+      throw new SyncError(t("sync.error.missing"));
     }
     // A locked note edited a moment ago is still being encrypted; it syncs on the next pass.
     const local = notes.entries.map((e) => e.note).filter((note) => (note.locked ? !!note.locked.sealed : !isBlank(note.body)));

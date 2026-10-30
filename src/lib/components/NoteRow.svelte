@@ -1,20 +1,24 @@
 <script lang="ts">
-  import { untrack } from "svelte";
+  import { tick, untrack } from "svelte";
+  import { speak } from "../a11y";
+  import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import type { IconName } from "../icons/icons";
   import { formatDate } from "../format";
   import { lockedNotes } from "../notes/locked.svelte";
   import { isClosed, notes, type Entry } from "../notes/store.svelte";
   import { longPress } from "../longPress";
-  import { copyText } from "../platform";
+  import { copyText, reducedMotion } from "../platform";
   import { menuPoint } from "../popover";
   import { prefs } from "../prefs.svelte";
+  import { typeIcons } from "../notes/tagIcons.svelte";
   import { ui } from "../ui.svelte";
   import { canFloat, floatingOpen, toggleFloating } from "../windows/floating";
 
   let {
     entry,
     selected,
+    tabbable,
     now,
     open,
     onswipe,
@@ -22,6 +26,8 @@
   }: {
     entry: Entry;
     selected: boolean;
+    /** Whether Tab lands on this row; the list's other rows are reached with the arrow keys. */
+    tabbable: boolean;
     now: Date;
     /** Whether this row may stay swiped open; turning it off closes the row. */
     open: boolean;
@@ -33,6 +39,8 @@
   interface Action {
     label: string;
     menuLabel: string;
+    /** What screen readers hear once it's done. */
+    done: string;
     icon: IconName;
     tone: "pin" | "danger" | "success";
     /** Whether swiping all the way across runs it; otherwise it has to be tapped. */
@@ -52,19 +60,70 @@
   const SLIDE_MS = 300;
 
   const id = $derived(entry.note.id);
+  /** The icon of its type (`type: person`), which a note of that type has unless it has its own. */
+  const typeIcon = $derived(entry.meta.type ? typeIcons.get(entry.meta.type) : undefined);
+  const icon = $derived(entry.note.icon ?? typeIcon);
+
+  // Screen readers call the row by its title, pinned or locked (hidden text by the icons) and date;
+  // the excerpt is its description, which they read after a pause, so moving through the list is quick.
 
   // Swipe right for the leading action and left for the trailing one, like Mail.
   const leading = $derived<Action>(
     entry.note.trashed
-      ? { label: "Restore", menuLabel: "Restore", icon: "restore", tone: "success", full: true, leaves: true, run: () => notes.restore(id) }
+      ? {
+          label: t("list.swipeRestore"),
+          menuLabel: t("list.restore"),
+          done: t("list.didRestore"),
+          icon: "restore",
+          tone: "success",
+          full: true,
+          leaves: true,
+          run: () => notes.restore(id),
+        }
       : entry.note.pinned
-        ? { label: "Unpin", menuLabel: "Unpin", icon: "pin-off", tone: "pin", full: true, leaves: false, run: () => notes.togglePin(id) }
-        : { label: "Pin", menuLabel: "Pin to Top", icon: "pin", tone: "pin", full: true, leaves: false, run: () => notes.togglePin(id) },
+        ? {
+            label: t("list.swipeUnpin"),
+            menuLabel: t("list.unpin"),
+            done: t("list.didUnpin"),
+            icon: "pin-off",
+            tone: "pin",
+            full: true,
+            leaves: false,
+            run: () => notes.togglePin(id),
+          }
+        : {
+            label: t("list.swipePin"),
+            menuLabel: t("list.pin"),
+            done: t("list.pinned"),
+            icon: "pin",
+            tone: "pin",
+            full: true,
+            leaves: false,
+            run: () => notes.togglePin(id),
+          },
   );
   const trailing = $derived<Action>(
     entry.note.trashed
-      ? { label: "Delete", menuLabel: "Delete Forever", icon: "trash", tone: "danger", full: false, leaves: true, run: () => notes.deleteForever(id) }
-      : { label: "Trash", menuLabel: "Move to Trash", icon: "trash", tone: "danger", full: true, leaves: true, run: () => notes.trash(id) },
+      ? {
+          label: t("list.swipeDelete"),
+          menuLabel: t("list.deleteForever"),
+          done: t("list.didDelete"),
+          icon: "trash",
+          tone: "danger",
+          full: false,
+          leaves: true,
+          run: () => notes.deleteForever(id),
+        }
+      : {
+          label: t("list.swipeTrash"),
+          menuLabel: t("list.trash"),
+          done: t("list.didTrash"),
+          icon: "trash",
+          tone: "danger",
+          full: true,
+          leaves: true,
+          run: () => notes.trash(id),
+        },
   );
 
   let li: HTMLLIElement;
@@ -150,11 +209,20 @@
 
   function perform(action: Action) {
     dragging = false;
+    // The row moves or goes away, perhaps with focus in it (given back by the menu as it closed):
+    // focus stays in the list, and screen readers hear what happened.
+    const run = () => {
+      const hadFocus = li.contains(document.activeElement);
+      action.run();
+      speak(action.done);
+      if (hadFocus) refocus();
+    };
+    const still = reducedMotion.matches;
     if (!action.leaves) {
       // Let the row slide shut before it jumps to its new place.
-      const delay = offset ? SLIDE_MS : 0;
+      const delay = offset && !still ? SLIDE_MS : 0;
       close();
-      setTimeout(action.run, delay);
+      setTimeout(run, delay);
       return;
     }
     const swiped = offset !== 0;
@@ -163,13 +231,22 @@
     if (swiped) offset = Math.sign(offset) * width;
     const { height, paddingTop } = getComputedStyle(li);
     li.animate([{ height, paddingTop, opacity: 1 }, { height: "0px", paddingTop: "0px", opacity: 0 }], {
-      duration: 220,
-      delay: swiped ? 160 : 0,
+      duration: still ? 0 : 220,
+      delay: swiped && !still ? 160 : 0,
       easing: getComputedStyle(li).getPropertyValue("--ease-sheet"),
       fill: "forwards",
     })
       .finished.catch(() => {})
-      .then(action.run);
+      .then(run);
+  }
+
+  /** Focus back on this note's row once the list has redrawn, or on the row Tab lands on if it left. */
+  function refocus() {
+    requestAnimationFrame(() => {
+      const list = document.querySelector(".note-list");
+      const row = list?.querySelector<HTMLElement>(`[data-id="${id}"]`) ?? list?.querySelector<HTMLElement>('.item[tabindex="0"]');
+      row?.focus({ preventScroll: true });
+    });
   }
 
   // Touch and pens drag the row. Mice right-click instead, and trackpads scroll sideways (below).
@@ -277,13 +354,17 @@
     };
   });
 
-  function onclick() {
+  function onclick(event: MouseEvent) {
     if (suppressClick) {
       suppressClick = false;
       return;
     }
     if (offset) return close();
     notes.select(id);
+    // Opened from the keyboard (Enter or Space, which click with no pointer: detail 0), the note's
+    // text takes focus, ready to read or write. A click leaves focus in the list, for ↑ and ↓.
+    // (On a phone, the open note's own focus handling applies.)
+    if (event.detail === 0 && ui.layout !== "narrow") void tick().then(() => document.querySelector<HTMLElement>("main .cm-content")?.focus());
   }
 
   function oncontextmenu(event: MouseEvent) {
@@ -299,10 +380,10 @@
   function lockItems() {
     const { locked, trashed } = entry.note;
     if (trashed || (locked && !locked.open)) return [];
-    if (!locked) return [{ label: "Lock Note", icon: "lock" as const, run: () => lockedNotes.lockNote(id) }];
+    if (!locked) return [{ label: t("list.lock"), icon: "lock" as const, run: () => lockedNotes.lockNote(id) }];
     return [
-      { label: "Lock Now", icon: "lock" as const, run: () => void lockedNotes.close() },
-      { label: "Remove Lock", icon: "lock-open" as const, run: () => void notes.removeLock(id) },
+      { label: t("list.lockNow"), icon: "lock" as const, run: () => void lockedNotes.close() },
+      { label: t("list.removeLock"), icon: "lock-open" as const, run: () => void notes.removeLock(id) },
     ];
   }
 
@@ -312,25 +393,26 @@
     ui.openMenu({
       x,
       y,
+      label: entry.meta.title || t("list.untitled"),
       items: [
         { label: leading.menuLabel, icon: leading.icon, run: () => perform(leading) },
         ...(canFloat && !entry.note.trashed
           ? [
               {
-                label: floatingOpen.has(id) ? "Close Floating Window" : "Open in Floating Window",
+                label: floatingOpen.has(id) ? t("list.unfloat") : t("list.float"),
                 icon: "picture-in-picture-2" as const,
                 run: () => toggleFloating(id),
               },
             ]
           : []),
         {
-          label: entry.note.icon ? "Change Icon…" : "Add Icon…",
+          label: entry.note.icon ? t("list.changeIcon") : t("list.addIcon"),
           icon: "smile",
           run: () =>
             (ui.iconPicker = {
               key: `note:${id}`,
-              label: entry.meta.title || "Untitled",
-              fallback: "file-text",
+              label: entry.meta.title || t("list.untitled"),
+              fallback: typeIcon ?? "file-text",
               icon: () => notes.get(id)?.note.icon ?? null,
               set: (icon) => notes.setIcon(id, icon),
               x,
@@ -338,7 +420,9 @@
             }),
         },
         ...lockItems(),
-        ...(isClosed(entry.note) ? [] : [{ label: "Copy Text", icon: "copy" as const, run: () => copyText(entry.note.body) }]),
+        ...(isClosed(entry.note)
+          ? []
+          : [{ label: t("list.copyText"), icon: "copy" as const, run: () => void copyText(entry.note.body).then(() => speak(t("list.copied"))) }]),
         "separator",
         { label: trailing.menuLabel, icon: trailing.icon, danger: true, run: () => perform(trailing) },
       ],
@@ -375,7 +459,9 @@
       class="item"
       class:selected
       data-id={id}
+      tabindex={tabbable ? 0 : -1}
       aria-current={selected}
+      aria-describedby={entry.meta.excerpt ? `excerpt-${id}` : undefined}
       style:transform={offset ? `translateX(${offset}px)` : undefined}
       {onclick}
       {onkeydown}
@@ -387,15 +473,17 @@
       {@attach longPress(onlongpress)}
     >
       <span class="item-title" class:untitled={!entry.meta.title}>
-        {#if entry.note.icon}<Icon name={entry.note.icon} size={15} strokeWidth={2} />{/if}
-        <span>{entry.meta.title || "Untitled"}</span>
+        {#if icon}<Icon name={icon} size={15} strokeWidth={2} />{/if}
+        <span>{entry.meta.title || t("list.untitled")}</span>
       </span>
-      {#if entry.meta.excerpt}<span class="excerpt">{entry.meta.excerpt}</span>{/if}
+      {#if entry.meta.excerpt}<span class="excerpt" id="excerpt-{id}" aria-hidden="true">{entry.meta.excerpt}</span>{/if}
+      <!-- Said after the title, by name: the icons alone would say nothing. -->
       <span class="meta">
-        {#if entry.note.pinned}<Icon name="pin" size={12} />{/if}
+        {#if entry.note.pinned}<Icon name="pin" size={12} /><span class="visually-hidden">{t("list.pinned")}</span>{/if}
         {#if entry.note.locked}
-          <span class="lock" title={entry.note.locked.open ? "Locked note, open" : "Locked note"}>
-            <Icon name={entry.note.locked.open ? "lock-open" : "lock"} size={12} />
+          {@const lockLabel = entry.note.locked.open ? t("list.lockedNoteOpen") : t("list.lockedNote")}
+          <span class="lock" title={lockLabel}>
+            <Icon name={entry.note.locked.open ? "lock-open" : "lock"} size={12} /><span class="visually-hidden">{lockLabel}</span>
           </span>
         {/if}
         <time datetime={new Date(entry.note.updatedAt).toISOString()}>{formatDate(entry.note.updatedAt, now)}</time>
@@ -510,17 +598,17 @@
 
   .pin {
     background: var(--pin);
-    color: #fff;
+    color: var(--on-pin);
   }
 
   .danger {
     background: var(--danger);
-    color: #fff;
+    color: var(--on-danger);
   }
 
   .success {
     background: var(--success);
-    color: #fff;
+    color: var(--on-success);
   }
 
   .item-title {
@@ -566,6 +654,11 @@
     margin-top: 2px;
     font-size: 11.5px;
     color: var(--text-faint);
+  }
+
+  /* With increased contrast, the date on the open note's row keeps 4.5:1 over its darker background. */
+  :global(:root[data-contrast="more"]) .item.selected .meta {
+    color: var(--text-muted);
   }
 
   .meta :global(.icon) {

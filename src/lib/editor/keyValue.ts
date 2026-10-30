@@ -1,6 +1,8 @@
 import { WidgetType } from "@codemirror/view";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
+import { speak } from "../a11y";
+import { t } from "../i18n/index.svelte";
 import { copyText } from "../platform";
 
 /*
@@ -29,7 +31,7 @@ export function copyButton(text: () => string, label: string, className = "cm-lp
   const button = document.createElement("button");
   button.type = "button";
   button.className = className;
-  button.title = "Copy";
+  button.title = t("editor.copy");
   button.setAttribute("aria-label", label);
   // Both icons stay mounted; a copy swaps which one shows for a moment.
   const icons = (["copy", "check"] as const).map((name) => {
@@ -43,6 +45,7 @@ export function copyButton(text: () => string, label: string, className = "cm-lp
   button.addEventListener("mousedown", (event) => event.preventDefault());
   button.addEventListener("click", () => {
     void copyText(text());
+    speak(t("editor.copied"));
     button.classList.add("is-copied");
     clearTimeout(done);
     done = setTimeout(() => button.classList.remove("is-copied"), 1200);

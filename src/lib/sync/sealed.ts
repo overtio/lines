@@ -13,6 +13,7 @@ import {
   type Bytes,
   type LockedKey,
 } from "../crypto";
+import { t } from "../i18n/index.svelte";
 import { SyncError, type Remote, type RemoteObject } from "./remote";
 
 /*
@@ -59,7 +60,7 @@ export async function readKeyFile(store: Remote, root: string): Promise<KeyFile 
   }
   const key = parsed as KeyFile | null;
   if (!isLockedKey(key) || key.format !== "lines-encryption" || typeof key.id !== "string") {
-    throw new SyncError(`${KEY_FILE} is damaged or from a newer version of lines, so nothing was synced.`);
+    throw new SyncError(t("sync.error.keyFileDamaged", { file: KEY_FILE }));
   }
   return key;
 }
@@ -104,7 +105,7 @@ export class SealedRemote implements Remote {
       return await open(this.content, data, this.#context(key));
     } catch (error) {
       if (error instanceof Unreadable) {
-        throw new SyncError(`${this.#context(key)} couldn't be decrypted: it was changed, or encrypted with another key.`);
+        throw new SyncError(t("sync.error.undecryptable", { file: this.#context(key) }));
       }
       throw error;
     }
@@ -122,7 +123,7 @@ export class SealedRemote implements Remote {
     try {
       data = fromBase64(object.text);
     } catch {
-      throw new SyncError(`${this.#context(key)} isn't an encrypted note.`);
+      throw new SyncError(t("sync.error.notSealed", { file: this.#context(key) }));
     }
     return { text: fromUtf8(await this.#open(data, key)), etag: object.etag };
   }

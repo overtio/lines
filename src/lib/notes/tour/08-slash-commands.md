@@ -1,6 +1,6 @@
 # Slash commands and shortcuts
 
-Type `/` at the start of a line for a menu of everything you can add. Keep typing to filter it: `/ta` finds Table, `/warn` finds Warning.
+Type `/` at the start of a line for a menu of everything you can add. Keep typing to filter it: `/ta` finds Table, `/warn` finds Warning. Tab completes like a shell: `/to` and Tab makes a todo, and `/he` and Tab fills in `/heading`.
 
 | Shortcut | What it does |
 | -------- | ------------ |

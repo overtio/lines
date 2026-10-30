@@ -13,6 +13,7 @@
   import { onMount } from "svelte";
   import Icon from "../icons/Icon.svelte";
   import type { IconName } from "../icons/icons";
+  import { t } from "../i18n/index.svelte";
   import { isApple, revealFile } from "../platform";
   import { sync } from "../sync/engine.svelte";
   import { findCloudFolders, pickFolder, type DriveId } from "../sync/folder";
@@ -58,13 +59,31 @@
 
   const describe = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
+  function choose(drive: CloudFolder) {
+    chosen = asConfig(drive);
+    message = null;
+  }
+
+  let driveList = $state<HTMLDivElement>();
+
+  /** Arrow keys move the choice, as in any group of radio buttons; Tab leaves the group. */
+  function onDrivesKeydown(event: KeyboardEvent) {
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+    if (!step || !drives?.length) return;
+    event.preventDefault();
+    const index = drives.findIndex(isChosen);
+    const next = index === -1 ? (step > 0 ? 0 : drives.length - 1) : (index + step + drives.length) % drives.length;
+    choose(drives[next]);
+    driveList?.querySelectorAll<HTMLElement>('[role="radio"]')[next]?.focus();
+  }
+
   async function chooseOther() {
     message = null;
     try {
       const path = await pickFolder();
       if (path) chosen = { kind: "folder", provider: "folder", name: path.split("/").pop() || path, path };
     } catch (error) {
-      message = describe(error);
+      message = t("sync.folder.failed", { error: describe(error) });
     }
   }
 
@@ -99,52 +118,46 @@
 </script>
 
 <div class="folder-sync">
-  <p class="prose">
-    Your notes go in a “{SUBFOLDER}” folder in the drive, and the drive's app syncs them to your other devices. Turn on the
-    same drive there, and connect lines to it.
-  </p>
+  <p class="prose">{t("sync.folder.intro", { folder: SUBFOLDER })}</p>
 
   {#if drives === null}
-    <p class="prose">Looking for cloud drives…</p>
+    <p class="prose" role="status">{t("sync.folder.looking")}</p>
   {:else}
-    <div class="drives" role="radiogroup" aria-label="Cloud drive">
-      {#each drives as drive (drive.path)}
+    <!-- One tab stop for the group: the chosen drive, else the first. -->
+    {@const anyChosen = !!custom || drives.some(isChosen)}
+    <div class="drives" role="radiogroup" tabindex="-1" aria-label={t("sync.folder.drives")} bind:this={driveList} onkeydown={onDrivesKeydown}>
+      {#each drives as drive, index (drive.path)}
         <button
           type="button"
           role="radio"
           aria-checked={isChosen(drive)}
+          tabindex={isChosen(drive) || (!anyChosen && index === 0) ? 0 : -1}
           class:active={isChosen(drive)}
-          onclick={() => ((chosen = asConfig(drive)), (message = null))}
+          onclick={() => choose(drive)}
         >
           <Icon name={ICONS[drive.provider]} size={17} />
           <span class="name">{drive.name}</span>
-          {#if current && current.path === `${drive.path}/${SUBFOLDER}`}<span class="badge">Connected</span>{/if}
+          {#if current && current.path === `${drive.path}/${SUBFOLDER}`}<span class="badge">{t("sync.connected")}</span>{/if}
         </button>
       {/each}
       {#if custom}
         <button type="button" role="radio" aria-checked="true" class="active">
           <Icon name="folder" size={17} />
           <span class="name" title={custom.path}>{custom.path}</span>
-          {#if current?.path === custom.path}<span class="badge">Connected</span>{/if}
+          {#if current?.path === custom.path}<span class="badge">{t("sync.connected")}</span>{/if}
         </button>
       {/if}
     </div>
     {#if !drives.length}
-      <p class="prose">
-        No cloud drives found on this Mac. Turn on iCloud Drive in System Settings → your name → iCloud, or install
-        Google Drive, Proton Drive, Dropbox or OneDrive. Or use any folder:
-      </p>
+      <p class="prose">{t("sync.folder.none")}</p>
     {/if}
     <button type="button" class="text-button flush other" onclick={chooseOther}>
-      <Icon name="folder" size={15} /> Choose another folder…
+      <Icon name="folder" size={15} /> {t("sync.folder.chooseOther")}
     </button>
   {/if}
 
   {#if chosen?.provider === "icloud"}
-    <p class="note">
-      iCloud Drive keeps your Macs in step. Syncing with the iPhone app and signing in with iCloud on the web are on
-      the way.
-    </p>
+    <p class="note">{t("sync.folder.icloud")}</p>
   {/if}
 
   {#if message}
@@ -153,13 +166,25 @@
 
   <footer class="form-footer">
     {#if current}
-      <button type="button" class="text-button danger" onclick={disconnect} disabled={busy}>Disconnect</button>
+      <button type="button" class="text-button danger" onclick={disconnect} disabled={busy}>{t("sync.disconnect")}</button>
       <button type="button" class="text-button" onclick={() => revealFile(`${current.path}/notes`)}>
-        {isApple ? "Show in Finder" : "Show folder"}
+        {isApple ? t("sync.folder.showInFinder") : t("sync.folder.show")}
       </button>
     {/if}
-    <button type="button" class="primary push" onclick={connect} disabled={!chosen || busy || chosen.path === current?.path}>
-      {busy ? "Connecting…" : current ? (chosen?.path === current.path ? "Connected" : "Switch") : "Connect"}
+    <button
+      type="button"
+      class="primary push"
+      onclick={connect}
+      disabled={!chosen || busy || chosen.path === current?.path}
+      aria-busy={busy}
+    >
+      {busy
+        ? t("sync.connecting")
+        : current
+          ? chosen?.path === current.path
+            ? t("sync.connected")
+            : t("sync.folder.switch")
+          : t("sync.connect")}
     </button>
   </footer>
 </div>
@@ -223,5 +248,12 @@
   .other {
     align-self: flex-start;
     margin-top: -4px;
+  }
+
+  /* Touch screens: a target a finger can hit (44 px high). */
+  @media (pointer: coarse) {
+    .drives button {
+      height: 44px;
+    }
   }
 </style>

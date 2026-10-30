@@ -4,24 +4,37 @@
   import { isApple } from "../platform";
   import Segmented from "./Segmented.svelte";
   import {
+    formatPercent,
     OPACITY,
     prefs,
     sfSymbolsAvailable,
     THEMES,
     windowLookAvailable,
     type Appearance,
+    type Contrast,
     type IconSet,
     type SwipeDirection,
+    type ThemeId,
     type WindowButtons,
   } from "../prefs.svelte";
   import { canFloat } from "../windows/floating";
+  import { LANGUAGES, languageChoice, setLanguage, type LanguageChoice, t } from "../i18n/index.svelte";
+  import { notes } from "../notes/store.svelte";
 
   const appearances: { id: Appearance; label: string }[] = [
-    { id: "system", label: "System" },
-    { id: "light", label: "Light" },
-    { id: "dark", label: "Dark" },
+    { id: "system", label: t("settings.appearanceSystem") },
+    { id: "light", label: t("settings.appearanceLight") },
+    { id: "dark", label: t("settings.appearanceDark") },
   ];
-  const floatingAppearances: { id: Appearance | "same"; label: string }[] = [{ id: "same", label: "Same" }, ...appearances];
+  const contrasts: { id: Contrast; label: string }[] = [
+    { id: "system", label: t("settings.appearanceSystem") },
+    { id: "standard", label: t("settings.contrastStandard") },
+    { id: "more", label: t("settings.contrastMore") },
+  ];
+  const floatingAppearances: { id: Appearance | "same"; label: string }[] = [
+    { id: "same", label: t("settings.floatingSame") },
+    ...appearances,
+  ];
 
   const iconSets: { id: IconSet; label: string; disabled?: boolean }[] = [
     { id: "lucide", label: "Lucide" },
@@ -30,55 +43,114 @@
   const previewIcons: IconName[] = ["notes", "tag", "pin", "trash"];
 
   const swipeDirections: { id: SwipeDirection; label: string }[] = [
-    { id: "fingers", label: "Follow fingers" },
-    { id: "reversed", label: "Reversed" },
+    { id: "fingers", label: t("settings.swipeFingers") },
+    { id: "reversed", label: t("settings.swipeReversed") },
   ];
   const windowButtons: { id: WindowButtons; label: string }[] = [
-    { id: "hover", label: "On hover" },
-    { id: "always", label: "Always" },
+    { id: "hover", label: t("settings.windowButtonsHover") },
+    { id: "always", label: t("settings.windowButtonsAlways") },
   ];
+
+  const themeIds = THEMES.map((theme) => theme.id);
+  // The accessibility themes come after the others, under their own heading, in the same group.
+  const themeGroups = [THEMES.filter((theme) => !theme.accessible), THEMES.filter((theme) => theme.accessible)];
+  const floatingThemeIds: (ThemeId | "same")[] = ["same", ...themeIds];
+
+  /**
+   * Arrow keys move the choice in a group of radio buttons, wrapping around, as native ones do; Tab
+   * reaches only the chosen one (Segmented does the same for its options).
+   */
+  function moveChoice<T extends string>(event: KeyboardEvent, ids: readonly T[], current: T, choose: (id: T) => void) {
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+    if (!step) return;
+    event.preventDefault();
+    const next = ids[(ids.indexOf(current) + step + ids.length) % ids.length];
+    choose(next);
+    (event.currentTarget as HTMLElement).querySelector<HTMLElement>(`[data-id="${next}"]`)?.focus();
+  }
 
   /** Only shown where there may be a trackpad. */
   const hasPointer = matchMedia("(any-pointer: fine)").matches;
+
+  const languages: { id: LanguageChoice; label: string }[] = [
+    { id: "system", label: t("settings.languageSystem") },
+    ...LANGUAGES.map(({ id, name }) => ({ id, label: name })),
+  ];
+
+  /** Starts lines again in the language chosen, once what's typed is saved. */
+  async function chooseLanguage(choice: LanguageChoice) {
+    if (choice === languageChoice) return;
+    await notes.flush();
+    setLanguage(choice);
+  }
 </script>
 
 <section>
-  <h3>Theme</h3>
-  <div class="themes" role="radiogroup" aria-label="Theme">
-    {#each THEMES as theme (theme.id)}
-      {@const [bg, sidebar, text, accent] = theme[prefs.dark ? "dark" : "light"]}
-      <button
-        role="radio"
-        aria-checked={prefs.theme === theme.id}
-        class="theme"
-        class:active={prefs.theme === theme.id}
-        onclick={() => (prefs.theme = theme.id)}
-      >
-        <span class="preview" style:background={bg} style:color={text}>
-          <span class="preview-sidebar" style:background={sidebar}>
-            <span class="dot" style:background={accent}></span>
-          </span>
-          <span class="preview-text">
-            <span class="line strong"></span>
-            <span class="line"></span>
-            <span class="line short" style:background={accent}></span>
-          </span>
-        </span>
-        <span class="name">{theme.name}</span>
-      </button>
-    {/each}
-  </div>
+  <h3>{t("settings.language")}</h3>
+  <Segmented label={t("settings.language")} options={languages} value={languageChoice} onselect={chooseLanguage} />
+  <p class="note">{t("settings.languageNote")}</p>
 </section>
 
 <section>
-  <h3>Appearance</h3>
-  <Segmented label="Appearance" options={appearances} value={prefs.appearance} onselect={(id) => (prefs.appearance = id)} />
+  <h3>{t("settings.theme")}</h3>
+  <!-- One group of radio buttons, so Tab stops once and the arrow keys go through every theme. -->
+  <div
+    class="themes"
+    role="radiogroup"
+    tabindex="-1"
+    aria-label={t("settings.theme")}
+    onkeydown={(event) => moveChoice(event, themeIds, prefs.theme, (id) => (prefs.theme = id))}
+  >
+    {#each themeGroups as group, index (index)}
+      {#if index > 0}
+        <h4 class="theme-group">{t("settings.themesAccessibility")}</h4>
+      {/if}
+      <div class="theme-grid">
+        {#each group as theme (theme.id)}
+          {@const [bg, sidebar, text, accent] = theme[prefs.dark ? "dark" : "light"]}
+          <button
+            role="radio"
+            data-id={theme.id}
+            aria-checked={prefs.theme === theme.id}
+            tabindex={prefs.theme === theme.id ? 0 : -1}
+            class="theme"
+            class:active={prefs.theme === theme.id}
+            onclick={() => (prefs.theme = theme.id)}
+          >
+            <span class="preview" style:background={bg} style:color={text} aria-hidden="true">
+              <span class="preview-sidebar" style:background={sidebar}>
+                <span class="dot" style:background={accent}></span>
+              </span>
+              <span class="preview-text">
+                <span class="line strong"></span>
+                <span class="line"></span>
+                <span class="line short" style:background={accent}></span>
+              </span>
+            </span>
+            <span class="name">{theme.name}</span>
+          </button>
+        {/each}
+      </div>
+    {/each}
+  </div>
+  <p class="note">{t("settings.themesAccessibilityNote")}</p>
+</section>
+
+<section>
+  <h3>{t("settings.appearance")}</h3>
+  <Segmented label={t("settings.appearance")} options={appearances} value={prefs.appearance} onselect={(id) => (prefs.appearance = id)} />
+</section>
+
+<section>
+  <h3>{t("settings.contrast")}</h3>
+  <Segmented label={t("settings.contrast")} options={contrasts} value={prefs.contrast} onselect={(id) => (prefs.contrast = id)} />
+  <p class="note">{t("settings.contrastNote")}</p>
 </section>
 
 {#if isApple}
   <section>
-    <h3>Icons</h3>
-    <Segmented label="Icons" options={iconSets} value={prefs.icons} onselect={(id) => (prefs.icons = id)}>
+    <h3>{t("settings.icons")}</h3>
+    <Segmented label={t("settings.icons")} options={iconSets} value={prefs.icons} onselect={(id) => (prefs.icons = id)}>
       {#snippet content(set)}
         <span class="icon-preview">
           {#if !set.disabled}
@@ -89,46 +161,64 @@
       {/snippet}
     </Segmented>
     {#if !sfSymbolsAvailable}
-      <p class="note">SF Symbols are available in the Mac and iPhone apps.</p>
+      <p class="note">{t("settings.sfSymbolsNote")}</p>
     {/if}
   </section>
 {/if}
 
 {#if windowLookAvailable}
   <section>
-    <h3>Main window</h3>
+    <h3>{t("settings.mainWindow")}</h3>
     <label class="slider">
-      <span class="label">Opacity</span>
-      <input type="range" min={OPACITY.min} max={OPACITY.max} step={OPACITY.step} bind:value={prefs.windowOpacity} />
-      <output>{Math.round(prefs.windowOpacity * 100)}%</output>
+      <span class="label">{t("settings.opacity")}</span>
+      <input
+        type="range"
+        min={OPACITY.min}
+        max={OPACITY.max}
+        step={OPACITY.step}
+        bind:value={prefs.windowOpacity}
+        aria-valuetext={formatPercent(prefs.windowOpacity)}
+      />
+      <!-- Hidden from screen readers, which hear the value from the slider (and would otherwise hear it twice). -->
+      <output aria-hidden="true">{formatPercent(prefs.windowOpacity)}</output>
     </label>
     <label class="check">
       <input type="checkbox" bind:checked={prefs.windowBlur} />
-      Blur what's behind
+      {t("settings.blur")}
     </label>
-    <p class="note">Below 100% opacity the desktop shows through the window.</p>
+    <p class="note">{t("settings.opacityNote")}</p>
   </section>
 {/if}
 
 {#if canFloat}
   <section>
-    <h3>Floating notes</h3>
+    <h3>{t("settings.floatingNotes")}</h3>
     <div class="row-setting">
-      <span class="label">Theme</span>
-      <div class="swatches" role="radiogroup" aria-label="Floating notes theme">
+      <span class="label">{t("settings.theme")}</span>
+      <div
+        class="swatches"
+        role="radiogroup"
+        tabindex="-1"
+        aria-label={t("settings.floatingTheme")}
+        onkeydown={(event) => moveChoice(event, floatingThemeIds, prefs.floatingTheme, (id) => (prefs.floatingTheme = id))}
+      >
         <button
           role="radio"
+          data-id="same"
           aria-checked={prefs.floatingTheme === "same"}
+          tabindex={prefs.floatingTheme === "same" ? 0 : -1}
           class="same"
           class:active={prefs.floatingTheme === "same"}
           onclick={() => (prefs.floatingTheme = "same")}
-          title="Same as the main window">Same</button
+          title={t("settings.floatingSameTitle")}>{t("settings.floatingSame")}</button
         >
         {#each THEMES as theme (theme.id)}
           {@const [bg, , , accent] = theme[prefs.floatingLook.dark ? "dark" : "light"]}
           <button
             role="radio"
+            data-id={theme.id}
             aria-checked={prefs.floatingTheme === theme.id}
+            tabindex={prefs.floatingTheme === theme.id ? 0 : -1}
             aria-label={theme.name}
             title={theme.name}
             class="swatch"
@@ -142,67 +232,80 @@
       </div>
     </div>
     <div class="row-setting">
-      <span class="label">Appearance</span>
+      <span class="label">{t("settings.appearance")}</span>
       <Segmented
-        label="Floating notes appearance"
+        label={t("settings.floatingAppearance")}
         options={floatingAppearances}
         value={prefs.floatingAppearance}
         onselect={(id) => (prefs.floatingAppearance = id)}
       />
     </div>
     <label class="slider">
-      <span class="label">Opacity</span>
-      <input type="range" min={OPACITY.min} max={OPACITY.max} step={OPACITY.step} bind:value={prefs.floatingOpacity} />
-      <output>{Math.round(prefs.floatingOpacity * 100)}%</output>
+      <span class="label">{t("settings.opacity")}</span>
+      <input
+        type="range"
+        min={OPACITY.min}
+        max={OPACITY.max}
+        step={OPACITY.step}
+        bind:value={prefs.floatingOpacity}
+        aria-valuetext={formatPercent(prefs.floatingOpacity)}
+      />
+      <output aria-hidden="true">{formatPercent(prefs.floatingOpacity)}</output>
     </label>
     {#if windowLookAvailable}
       <label class="check">
         <input type="checkbox" bind:checked={prefs.floatingBlur} />
-        Blur what's behind
+        {t("settings.blur")}
       </label>
       <label class="check">
         <input type="checkbox" bind:checked={prefs.floatingBorder} />
-        Border and shadow
+        {t("settings.floatingBorder")}
       </label>
     {/if}
     <div class="row-setting">
-      <span class="label">Window buttons</span>
+      <span class="label">{t("settings.windowButtons")}</span>
       <Segmented
-        label="Window buttons on floating notes"
+        label={t("settings.windowButtonsLabel")}
         options={windowButtons}
         value={prefs.floatingButtons}
         onselect={(id) => (prefs.floatingButtons = id)}
       />
     </div>
-    <p class="note">With “On hover”, close, minimize and zoom appear when the pointer nears the top-left corner.</p>
+    <p class="note">{t("settings.windowButtonsNote", { onHover: t("settings.windowButtonsHover") })}</p>
     <label class="check">
       <input type="checkbox" bind:checked={prefs.floatingOverFullscreen} />
-      Show over full-screen apps
+      {t("settings.overFullscreen")}
     </label>
-    <p class="note">Floating notes follow you to every desktop. With this on, they also stay visible over apps in full screen.</p>
+    <p class="note">{t("settings.overFullscreenNote")}</p>
   </section>
 {/if}
 
 {#if hasPointer}
   <section>
-    <h3>Trackpad</h3>
+    <h3>{t("settings.trackpad")}</h3>
     <Segmented
-      label="Trackpad swipe direction"
+      label={t("settings.swipeDirection")}
       options={swipeDirections}
       value={prefs.swipe}
       onselect={(id) => (prefs.swipe = id)}
     />
-    <p class="note">
-      Swipe a note with two fingers to pin or trash it. Choose which way the note moves when you swipe.
-    </p>
+    <p class="note">{t("settings.swipeNote")}</p>
   </section>
 {/if}
 
 <style>
-  .themes {
+  .theme-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
     gap: 10px;
+  }
+
+  /* Like the row labels below, so it reads as part of Theme rather than a section of its own. */
+  .theme-group {
+    margin: 16px 0 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
   }
 
   .theme {
@@ -333,5 +436,22 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
+  }
+
+  /* Forced colors (Windows' contrast themes): the previews show each theme's own colors, and the chosen one an outline for its ring. */
+  @media (forced-colors: active) {
+    .preview,
+    .swatch {
+      forced-color-adjust: none;
+    }
+
+    .theme.active .preview {
+      outline: 2px solid HighlightText;
+    }
+
+    .swatches button.active {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
   }
 </style>

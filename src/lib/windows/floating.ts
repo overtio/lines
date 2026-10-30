@@ -1,4 +1,5 @@
 import { SvelteSet } from "svelte/reactivity";
+import { t } from "../i18n/index.svelte";
 import { notes } from "../notes/store.svelte";
 import { isDesktopApp } from "../platform";
 
@@ -72,7 +73,7 @@ export async function openFloating(id: string) {
   const window = new WebviewWindow(label, {
     // The window reads which note to show from its label.
     url: "index.html",
-    title: notes.get(id)?.meta.title || "Untitled",
+    title: notes.get(id)?.meta.title || t("list.untitled"),
     width: state.width,
     height: state.height,
     ...(state.x !== undefined && state.y !== undefined ? { x: state.x, y: state.y } : { center: true }),

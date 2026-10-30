@@ -59,6 +59,21 @@ export const isAttachmentName = (name: string) => NAME.test(name);
 
 export const isImage = (file: Blob) => file.type in IMAGES;
 
+/**
+ * An image's description, and the width it's shown at when one follows a bar, as Obsidian writes
+ * it: `![Lake at dawn|400](…)`. A height (`|400x300`) is read and left out: images keep their shape.
+ */
+export function imageSize(label: string): { alt: string; width: number | null } {
+  const match = /^(.*?)\s*\|\s*(\d{1,5})(?:\s*x\s*\d{1,5})?\s*$/.exec(label);
+  return match && Number(match[2]) > 0 ? { alt: match[1], width: Number(match[2]) } : { alt: label, width: null };
+}
+
+/** An image's label with its width set, or without one (null) for the image's own size. */
+export function withWidth(label: string, width: number | null) {
+  const { alt } = imageSize(label);
+  return width ? `${alt}|${width}` : alt;
+}
+
 /** The attachment a link or image points at, if it's one of ours. */
 export function attachmentName(src: string): string | null {
   if (!src.startsWith(ATTACHMENT_PATH)) return null;
@@ -66,7 +81,8 @@ export function attachmentName(src: string): string | null {
   return NAME.test(name) ? name : null;
 }
 
-const REFERENCE = /\]\(\.\.\/attachments\/([0-9a-f]{32}\.[a-z0-9]+)\)/g;
+/** A link to an attachment: `](../attachments/…)` in Markdown, `{../attachments/…}` in LaTeX. */
+const REFERENCE = /(?:\]\(|\{)\.\.\/attachments\/([0-9a-f]{32}\.[a-z0-9]+)[)}]/g;
 
 /** Every attachment these notes show or link to. */
 export function referencedAttachments(bodies: Iterable<string>): Set<string> {

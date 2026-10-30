@@ -1,4 +1,5 @@
 import { fromBase64, fromUtf8, open, seal, toBase64, utf8, type Bytes } from "../crypto";
+import { t } from "../i18n/index.svelte";
 
 /*
  * What the app lock encrypts on this device: notes, attachments, and the sync settings (with
@@ -35,12 +36,12 @@ export interface Sealed {
 export const isSealed = (value: object): value is Sealed => "sealed" in value;
 
 export async function sealRecord(store: string, id: string, data: Bytes): Promise<Sealed> {
-  if (!key) throw new Error("lines is locked");
+  if (!key) throw new Error(t("lock.screen.title"));
   return { id, sealed: await seal(key, data, `${store}/${id}`) };
 }
 
 export async function openRecord(store: string, record: Sealed): Promise<Bytes> {
-  if (!key) throw new Error("lines is locked");
+  if (!key) throw new Error(t("lock.screen.title"));
   return open(key, record.sealed, `${store}/${record.id}`);
 }
 

@@ -1,42 +1,82 @@
 <script lang="ts">
   import Icon from "../icons/Icon.svelte";
   import type { IconName } from "../icons/icons";
+  import { t } from "../i18n/index.svelte";
   import { ui, type SettingsTab } from "../ui.svelte";
   import AboutPanel from "./AboutPanel.svelte";
   import AppearancePanel from "./AppearancePanel.svelte";
   import DataPanel from "./DataPanel.svelte";
   import PrivacyPanel from "./PrivacyPanel.svelte";
+  import ShortcutsPanel from "./ShortcutsPanel.svelte";
   import SyncPanel from "./SyncPanel.svelte";
   import TextPanel from "./TextPanel.svelte";
 
   let dialog: HTMLDialogElement;
+  /** What had focus before Settings opened, to give it back on closing. */
+  let opener: HTMLElement | null = null;
 
   const tabs: { id: SettingsTab; label: string; icon: IconName }[] = [
-    { id: "appearance", label: "Appearance", icon: "palette" },
-    { id: "text", label: "Text", icon: "type" },
-    { id: "sync", label: "Sync & Data", icon: "cloud" },
-    { id: "privacy", label: "Privacy", icon: "lock" },
-    { id: "about", label: "About", icon: "info" },
+    { id: "appearance", label: t("settings.tabAppearance"), icon: "palette" },
+    { id: "text", label: t("settings.tabText"), icon: "type" },
+    { id: "sync", label: t("settings.tabSync"), icon: "cloud" },
+    { id: "privacy", label: t("settings.tabPrivacy"), icon: "lock" },
+    { id: "shortcuts", label: t("shortcuts.tab"), icon: "keyboard" },
+    { id: "about", label: t("settings.tabAbout"), icon: "info" },
   ];
 
   $effect(() => {
-    if (ui.settings && !dialog.open) dialog.showModal();
-    else if (!ui.settings && dialog.open) dialog.close();
+    if (ui.settings && !dialog.open) {
+      opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      dialog.showModal();
+      // The tab it opened on, rather than whatever the browser picks first.
+      document.getElementById(`settings-tab-${ui.settings}`)?.focus();
+    } else if (!ui.settings && dialog.open) dialog.close();
   });
 
-  /** Arrow keys move between tabs, as in a native tab bar. */
+  function onclose() {
+    ui.settings = null;
+    // Not every browser gives focus back by itself; the opener may also have gone (a menu item).
+    if (opener?.isConnected) opener.focus();
+    opener = null;
+  }
+
+  /** Arrow keys move between tabs, as in a native tab bar; Home and End go to the first and last. */
   function onTabKeydown(event: KeyboardEvent) {
-    const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
-    if (!step) return;
-    event.preventDefault();
     const index = tabs.findIndex((tab) => tab.id === ui.settings);
-    const next = tabs[(index + step + tabs.length) % tabs.length];
+    const target = { ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: tabs.length - 1 }[event.key];
+    if (target === undefined) return;
+    event.preventDefault();
+    const next = tabs[(target + tabs.length) % tabs.length];
     ui.settings = next.id;
     document.getElementById(`settings-tab-${next.id}`)?.focus();
   }
+
+  const FOCUSABLE = "button, input, select, textarea, a[href], [tabindex]";
+
+  /**
+   * Tab wraps around inside Settings instead of leaving it: the page behind is out of reach while
+   * it's open, and the Mac app's web view would otherwise send focus nowhere.
+   */
+  function onDialogKeydown(event: KeyboardEvent) {
+    if (event.key !== "Tab") return;
+    const stops = [...dialog.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
+      (element) => element.tabIndex >= 0 && !(element as HTMLButtonElement).disabled && element.getClientRects().length > 0,
+    );
+    const first = stops[0];
+    const last = stops.at(-1);
+    if (!first || !last) return;
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
 </script>
 
-<dialog bind:this={dialog} onclose={() => (ui.settings = null)} aria-label="Settings">
+<dialog bind:this={dialog} {onclose} onkeydown={onDialogKeydown} aria-modal="true" aria-labelledby="settings-title">
+  <h2 id="settings-title" class="visually-hidden">{t("settings.title")}</h2>
   <header>
     <div class="tabs" role="tablist" tabindex="-1" onkeydown={onTabKeydown}>
       {#each tabs as tab (tab.id)}
@@ -54,7 +94,7 @@
         </button>
       {/each}
     </div>
-    <button class="icon-button" onclick={() => (ui.settings = null)} aria-label="Close">
+    <button class="icon-button close" onclick={() => (ui.settings = null)} aria-label={t("settings.close")} title={t("settings.close")}>
       <Icon name="x" size={18} />
     </button>
   </header>
@@ -66,12 +106,14 @@
       <TextPanel />
     {:else if ui.settings === "sync"}
       <section>
-        <h3>Sync</h3>
+        <h3>{t("settings.sync")}</h3>
         <SyncPanel />
       </section>
       <DataPanel />
     {:else if ui.settings === "privacy"}
       <PrivacyPanel />
+    {:else if ui.settings === "shortcuts"}
+      <ShortcutsPanel />
     {:else if ui.settings === "about"}
       <AboutPanel />
     {/if}
@@ -80,7 +122,7 @@
 
 <style>
   dialog {
-    width: min(580px, calc(100vw - 32px));
+    width: min(680px, calc(100vw - 32px));
     /* Pinned near the top instead of centered, so switching tabs doesn't make it jump. */
     margin: max(16px, 9dvh) auto auto;
     max-height: calc(100dvh - max(16px, 9dvh) - 16px);
@@ -111,8 +153,11 @@
     padding: 14px 12px 0 20px;
   }
 
+  /* Tabs that don't fit on one row (six of them, or longer names in other languages) wrap to a second rather than being cut off. */
   .tabs {
     display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
     gap: 2px;
     padding: 3px;
     border-radius: 10px;
@@ -268,6 +313,28 @@
 
   .body :global(.check input) {
     accent-color: var(--accent);
+  }
+
+  /* Touch screens: targets big enough for a finger. */
+  @media (pointer: coarse) {
+    .tabs button {
+      height: 44px;
+    }
+
+    .close {
+      width: 44px;
+      height: 44px;
+    }
+
+    .body :global(.text-button),
+    .body :global(.primary) {
+      min-height: 44px;
+    }
+
+    .body :global(.check) {
+      min-height: 44px;
+      margin-top: 4px;
+    }
   }
 
   /* Small screens: tabs show just their icons. */

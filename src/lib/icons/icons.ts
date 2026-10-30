@@ -3,6 +3,7 @@ import {
   AlarmClock,
   AppWindow,
   Archive,
+  AtSign,
   Banknote,
   Bed,
   Bell,
@@ -82,6 +83,7 @@ import {
   Info,
   Italic,
   Key,
+  Keyboard,
   Landmark,
   Languages,
   Laptop,
@@ -125,7 +127,9 @@ import {
   PinOff,
   Plane,
   Plus,
+  Printer,
   Puzzle,
+  Radical,
   RefreshCw,
   RotateCcw,
   Ruler,
@@ -134,6 +138,7 @@ import {
   Search,
   Server,
   Settings,
+  Shapes,
   Share,
   Shield,
   ShieldCheck,
@@ -151,6 +156,7 @@ import {
   Strikethrough,
   Sun,
   Table,
+  TableProperties,
   Tag,
   Target,
   Tent,
@@ -180,6 +186,7 @@ import {
   Zap,
 } from "@lucide/svelte";
 import type { Component } from "svelte";
+import { t } from "../i18n/index.svelte";
 
 /** Each icon as a Lucide component and its closest SF Symbol. */
 export const ICONS = {
@@ -187,6 +194,7 @@ export const ICONS = {
   "alarm-clock": [AlarmClock, "alarm"],
   "app-window": [AppWindow, "macwindow"],
   archive: [Archive, "archivebox"],
+  "at-sign": [AtSign, "at"],
   banknote: [Banknote, "banknote"],
   bed: [Bed, "bed.double"],
   bell: [Bell, "bell"],
@@ -266,6 +274,7 @@ export const ICONS = {
   info: [Info, "info.circle"],
   italic: [Italic, "italic"],
   key: [Key, "key"],
+  keyboard: [Keyboard, "keyboard"],
   landmark: [Landmark, "building.columns"],
   languages: [Languages, "character.bubble"],
   laptop: [Laptop, "laptopcomputer"],
@@ -309,7 +318,9 @@ export const ICONS = {
   "pin-off": [PinOff, "pin.slash"],
   plane: [Plane, "airplane"],
   plus: [Plus, "plus"],
+  printer: [Printer, "printer"],
   puzzle: [Puzzle, "puzzlepiece"],
+  radical: [Radical, "x.squareroot"],
   refresh: [RefreshCw, "arrow.clockwise"],
   restore: [RotateCcw, "arrow.uturn.backward"],
   ruler: [Ruler, "ruler"],
@@ -318,6 +329,7 @@ export const ICONS = {
   search: [Search, "magnifyingglass"],
   server: [Server, "server.rack"],
   settings: [Settings, "gearshape"],
+  shapes: [Shapes, "square.on.circle"],
   share: [Share, "square.and.arrow.up"],
   shield: [Shield, "shield"],
   "shield-check": [ShieldCheck, "checkmark.shield"],
@@ -334,6 +346,7 @@ export const ICONS = {
   stethoscope: [Stethoscope, "stethoscope"],
   strikethrough: [Strikethrough, "strikethrough"],
   sun: [Sun, "sun.max"],
+  "table-properties": [TableProperties, "list.bullet.rectangle"],
   table: [Table, "tablecells"],
   tag: [Tag, "tag"],
   target: [Target, "target"],
@@ -369,39 +382,39 @@ export type IconName = keyof typeof ICONS;
 /** Icons offered for tags, notes and callouts, grouped the way the picker shows them. */
 export const TAG_ICON_GROUPS: { name: string; icons: IconName[] }[] = [
   {
-    name: "Basics",
-    icons: ["hash", "tag", "folder", "archive", "inbox", "bookmark", "pin", "star", "heart", "flag", "lightbulb", "sparkles", "eye", "bell", "lock", "key", "shield", "link", "paperclip"],
+    name: t("picker.groupBasics"),
+    icons: ["hash", "tag", "shapes", "folder", "archive", "inbox", "bookmark", "pin", "star", "heart", "flag", "lightbulb", "sparkles", "eye", "bell", "lock", "key", "shield", "link", "paperclip"],
   },
   {
-    name: "Signs",
+    name: t("picker.groupSigns"),
     icons: ["info", "circle-question", "circle-alert", "triangle-alert", "octagon-x", "signpost", "check", "square-check", "x", "thumbs-up"],
   },
   {
-    name: "Work & study",
+    name: t("picker.groupWork"),
     icons: ["briefcase", "building-2", "landmark", "graduation-cap", "book", "book-open", "pencil", "file-text", "clipboard", "list-todo", "calendar", "clock", "alarm-clock", "timer", "hourglass", "chart-column", "calculator", "megaphone", "newspaper", "mail", "phone", "message-circle", "languages", "target", "trophy", "medal", "crown"],
   },
   {
-    name: "Tech",
+    name: t("picker.groupTech"),
     icons: ["code", "terminal", "cpu", "bug", "puzzle", "server", "laptop", "smartphone", "wifi", "tv", "gamepad-2"],
   },
   {
-    name: "Home & life",
+    name: t("picker.groupHome"),
     icons: ["house", "bed", "utensils", "coffee", "wine", "cake", "carrot", "shopping-cart", "package", "truck", "credit-card", "banknote", "gift", "party-popper", "shirt", "glasses", "gem", "scissors", "hammer", "wrench", "ruler"],
   },
   {
-    name: "People & health",
+    name: t("picker.groupPeople"),
     icons: ["user", "users", "smile", "thumbs-up", "brain", "activity", "dumbbell", "footprints", "stethoscope", "pill", "hospital"],
   },
   {
-    name: "Creative",
+    name: t("picker.groupCreative"),
     icons: ["palette", "paintbrush", "camera", "image", "film", "music", "headphones", "mic"],
   },
   {
-    name: "Travel & places",
+    name: t("picker.groupTravel"),
     icons: ["plane", "train-front", "bus", "car", "bike", "sailboat", "map-pin", "compass", "globe", "tent", "mountain", "tree-palm", "umbrella"],
   },
   {
-    name: "Nature",
+    name: t("picker.groupNature"),
     icons: ["leaf", "tree-pine", "flower-2", "sun", "moon", "cloud-rain", "snowflake", "flame", "zap", "paw-print", "dog", "cat", "bird", "fish"],
   },
 ];

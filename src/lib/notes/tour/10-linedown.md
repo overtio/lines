@@ -13,6 +13,11 @@ lines writes Markdown with a few additions of its own. We call it Linedown.
 | `:::! icon=flag`, `:::! icon=none` | a callout with another icon, or none |
 | ` ```mermaid ` | a diagram |
 | `Key: Value` | a value you can copy |
+| `---` `type: person` `---` at the top | properties, and a type in the sidebar |
+| `@Oleks`, `@[Two Words]` | a mention of another note |
+| `[[Two Words]]` | a wiki link, a mention too |
+| `@Oleks.email` | the value of its property |
+| `@type.person` on its own line | a table of every person |
 
 Everything else is standard Markdown, with GitHub's tables and task lists.
 

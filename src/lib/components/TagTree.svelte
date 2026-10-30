@@ -6,6 +6,7 @@
 </script>
 
 <script lang="ts">
+  import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { menuPoint } from "../popover";
   import { longPress } from "../longPress";
@@ -14,8 +15,21 @@
   import { ui } from "../ui.svelte";
   import TagTree from "./TagTree.svelte";
 
-  let { nodes, onchoose, depth = 0 }: { nodes: TagNode[]; onchoose: (tag: string) => void; depth?: number } =
-    $props();
+  let {
+    nodes,
+    onchoose,
+    depth = 0,
+    id,
+    labelledby,
+  }: {
+    nodes: TagNode[];
+    onchoose: (tag: string) => void;
+    depth?: number;
+    /** For a nested tree, so its parent's disclosure button can say what it shows. */
+    id?: string;
+    /** The id of the heading the tree sits under. */
+    labelledby?: string;
+  } = $props();
 
   /** The tag whose menu is open, outlined like a right-clicked note. */
   let menuFor = $state<string | null>(null);
@@ -65,10 +79,11 @@
     ui.openMenu({
       x,
       y,
+      label: `#${tag}`,
       items: [
-        { label: "Rename…", icon: "pencil", run: () => startRename(tag) },
+        { label: t("sidebar.rename"), icon: "pencil", run: () => startRename(tag) },
         {
-          label: "Change Icon…",
+          label: t("sidebar.changeIcon"),
           icon: "smile",
           run: () =>
             (ui.iconPicker = {
@@ -81,7 +96,7 @@
               y,
             }),
         },
-        ...(custom ? [{ label: "Reset Icon", icon: "hash" as const, run: () => tagIcons.set(tag, "hash") }] : []),
+        ...(custom ? [{ label: t("sidebar.resetIcon"), icon: "hash" as const, run: () => tagIcons.set(tag, "hash") }] : []),
       ],
       onclose: () => (menuFor = null),
     });
@@ -101,7 +116,7 @@
   }
 </script>
 
-<ul>
+<ul {id} aria-labelledby={labelledby}>
   {#each nodes as node (node.path)}
     {@const active = notes.filter.kind === "tag" && notes.filter.tag === node.path}
     {@const open = expanded.has(node.path)}
@@ -113,7 +128,7 @@
             <input
               class="label"
               value={draft}
-              aria-label="Tag name"
+              aria-label={t("list.tagName")}
               autocomplete="off"
               autocapitalize="off"
               spellcheck="false"
@@ -143,15 +158,17 @@
             class="disclosure"
             class:open
             onclick={() => toggle(node.path)}
-            aria-label={open ? `Collapse ${node.name}` : `Expand ${node.name}`}
+            aria-label={t("list.nestedTags", { tag: node.name })}
+            title={t("list.nestedTags", { tag: node.name })}
             aria-expanded={open}
+            aria-controls={open ? `tags-in-${node.path}` : undefined}
           >
             <Icon name="chevron-right" size={14} />
           </button>
         {/if}
       </div>
       {#if open}
-        <TagTree nodes={node.children} {onchoose} depth={depth + 1} />
+        <TagTree nodes={node.children} {onchoose} depth={depth + 1} id="tags-in-{node.path}" />
       {/if}
     </li>
   {/each}
@@ -196,9 +213,9 @@
     top: 50%;
     display: grid;
     place-items: center;
-    width: 22px;
-    height: 22px;
-    margin-top: -11px;
+    width: 24px;
+    height: 24px;
+    margin-top: -12px;
     border-radius: 6px;
     color: var(--text-faint);
     transition: transform 150ms ease, background-color 120ms ease;
@@ -213,5 +230,19 @@
 
   .disclosure.open {
     transform: rotate(90deg);
+  }
+
+  /* Fingers need bigger targets: the whole height of the row. */
+  @media (pointer: coarse) {
+    .tag-item :global(.row.row) {
+      padding-right: 48px;
+    }
+
+    .disclosure {
+      right: 0;
+      width: 44px;
+      height: 44px;
+      margin-top: -22px;
+    }
   }
 </style>

@@ -7,6 +7,8 @@
  * locks. Changing the passphrase only locks that key again; nothing else is re-encrypted.
  */
 
+import { t } from "./i18n/index.svelte";
+
 /** OWASP's recommendation for PBKDF2-HMAC-SHA256 (2023). */
 const ITERATIONS = 600_000;
 /** The first byte of everything sealed here, so the format can change later. */
@@ -40,7 +42,7 @@ export const toHex = (bytes: Uint8Array) => Array.from(bytes, (byte) => byte.toS
 /** The passphrase was wrong (or what it locks was changed). */
 export class WrongPassphrase extends Error {
   constructor() {
-    super("That passphrase isn't right.");
+    super(t("lock.error.wrongPassphrase"));
   }
 }
 
@@ -64,7 +66,7 @@ export async function seal(key: CryptoKey, data: Bytes, context: string): Promis
 }
 
 export async function open(key: CryptoKey, sealed: Bytes, context: string): Promise<Bytes> {
-  if (sealed[0] !== VERSION || sealed.length < 1 + 12 + 16) throw new Unreadable("Not something lines encrypted");
+  if (sealed[0] !== VERSION || sealed.length < 1 + 12 + 16) throw new Unreadable(t("lock.error.notEncrypted"));
   try {
     const data = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv: sealed.subarray(1, 13), additionalData: utf8(context) },
@@ -73,7 +75,7 @@ export async function open(key: CryptoKey, sealed: Bytes, context: string): Prom
     );
     return new Uint8Array(data);
   } catch {
-    throw new Unreadable("Couldn't decrypt: changed, damaged, or encrypted with another key");
+    throw new Unreadable(t("lock.error.unreadable"));
   }
 }
 
@@ -104,7 +106,7 @@ export async function lockKey(raw: Bytes, passphrase: string): Promise<LockedKey
 }
 
 export async function unlockKey(locked: LockedKey, passphrase: string): Promise<Bytes> {
-  if (locked.kdf !== "PBKDF2-SHA256" || !(locked.iterations >= 100_000)) throw new Unreadable("Unknown key format");
+  if (locked.kdf !== "PBKDF2-SHA256" || !(locked.iterations >= 100_000)) throw new Unreadable(t("lock.error.unknownFormat"));
   const key = await passphraseKey(passphrase, fromBase64(locked.salt), locked.iterations);
   try {
     return await open(key, fromBase64(locked.key), "key");

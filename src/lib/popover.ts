@@ -19,12 +19,14 @@ export function placeAt(el: HTMLElement, x: number, y: number, align: "start" | 
 /**
  * Closes a floating panel on a press outside it, scrolling elsewhere, resizing or switching
  * windows. A press on `anchor` (the button that opened it) is left to that button, which can
- * then toggle the panel. Returns a function that stops listening.
+ * then toggle the panel. With `onScroll` false, scrolling leaves it open. Returns a function that
+ * stops listening.
  */
-export function dismissable(el: () => HTMLElement | undefined, close: () => void, anchor?: Element | null) {
+export function dismissable(el: () => HTMLElement | undefined, close: () => void, anchor?: Element | null, onScroll = true) {
   const outside = (event: Event) => {
     const target = event.target as Node;
     if (el()?.contains(target) || (event.type === "pointerdown" && anchor?.contains(target))) return;
+    if (event.type === "scroll" && !onScroll) return;
     close();
   };
   addEventListener("pointerdown", outside, true);

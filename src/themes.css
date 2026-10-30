@@ -477,3 +477,449 @@
   --syn-function: #ffb454;
   --syn-type: #59c2ff;
 }
+
+/*
+ * Accessibility themes. Besides their base colors these set the ones other themes share from app.css
+ * (callouts, danger, success, pin, highlight, code), since those carry meaning here: High Contrast
+ * keeps every tier of text at 7:1 (AAA) on every surface it sits on (rows, chips, code, callouts,
+ * highlights), and the two color-blind themes keep all text, faint text included, at 4.5:1 (AA).
+ * Their callout, status and code colors stay apart under simulated color blindness. A color changed
+ * here needs checking again (docs/accessibility.md).
+ */
+
+/*
+ * High Contrast: pure white or black, text black or white, borders strong enough to see (3:1 and
+ * more), and a selected segment ringed rather than shaded. Like Windows' contrast themes and macOS'
+ * Increase Contrast.
+ */
+:root[data-theme="high-contrast"] {
+  /* This theme's pin color is dark, so white reads on it. */
+  --on-pin: #ffffff;
+  --bg: #ffffff;
+  --bg-list: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-elevated: #ffffff;
+  --text: #000000;
+  --text-sidebar: #000000;
+  --text-muted: #262626;
+  --text-faint: #383838;
+  --accent: #0033a8;
+  --tag-text: #0033a8;
+  --ink: #000000;
+  --border: color-mix(in srgb, var(--ink) 62%, transparent);
+  --card-border: color-mix(in srgb, var(--ink) 62%, transparent);
+  --hover: color-mix(in srgb, var(--ink) 7%, transparent);
+  --active: color-mix(in srgb, var(--accent) 16%, transparent);
+  --input: color-mix(in srgb, var(--ink) 7%, transparent);
+  --code-bg: color-mix(in srgb, var(--ink) 6%, transparent);
+  --tag-bg: color-mix(in srgb, var(--accent) 10%, transparent);
+  --selection: color-mix(in srgb, var(--accent) 22%, transparent);
+  --scrollbar: color-mix(in srgb, var(--ink) 55%, transparent);
+  --card-bg: var(--bg-elevated);
+  --card-shadow: none;
+  --shadow-segment: 0 0 0 1.5px var(--text);
+  --danger: #860f27;
+  --success: #1d7340;
+  --pin: #a14904;
+  --callout-info: #1a22f0;
+  --callout-question: #7a0aa8;
+  --callout-warning: #834c03;
+  --callout-error: var(--danger);
+  --callout-decision: #0e6549;
+  --callout-tint: 8%;
+  --highlight-base: #ffd400;
+  --highlight: color-mix(in srgb, var(--highlight-base) 55%, transparent);
+  --syn-keyword: #ad0b62;
+  --syn-string: #286037;
+  --syn-number: #1a22f0;
+  --syn-comment: #383838;
+  --syn-function: #7a0aa8;
+  --syn-type: #733301;
+}
+
+:root[data-theme="high-contrast"][data-scheme="dark"] {
+  --bg: #000000;
+  --bg-list: #000000;
+  --bg-sidebar: #000000;
+  --bg-elevated: #000000;
+  --text: #ffffff;
+  --text-sidebar: #ffffff;
+  --text-muted: #ebebeb;
+  --text-faint: #d9d9d9;
+  --accent: #5ce1ff;
+  --tag-text: #5ce1ff;
+  --ink: #ffffff;
+  --border: color-mix(in srgb, var(--ink) 65%, transparent);
+  --card-border: color-mix(in srgb, var(--ink) 65%, transparent);
+  --hover: color-mix(in srgb, var(--ink) 12%, transparent);
+  --active: color-mix(in srgb, var(--accent) 20%, transparent);
+  --input: color-mix(in srgb, var(--ink) 12%, transparent);
+  --code-bg: color-mix(in srgb, var(--ink) 10%, transparent);
+  --tag-bg: color-mix(in srgb, var(--accent) 14%, transparent);
+  --selection: color-mix(in srgb, var(--accent) 30%, transparent);
+  --scrollbar: color-mix(in srgb, var(--ink) 55%, transparent);
+  --card-bg: var(--bg-elevated);
+  --card-shadow: none;
+  --shadow-segment: 0 0 0 1.5px var(--text);
+  --danger: #ff6b6b;
+  --success: #4dfa9a;
+  --pin: #ffad1f;
+  --callout-info: #a6c0fc;
+  --callout-question: #ca5dfe;
+  --callout-warning: #fbb61b;
+  --callout-error: var(--danger);
+  --callout-decision: #2ff0b4;
+  --callout-tint: 10%;
+  --highlight-base: #ffd400;
+  --highlight: color-mix(in srgb, var(--highlight-base) 22%, transparent);
+  --syn-keyword: #e08ab8;
+  --syn-string: #8cf542;
+  --syn-number: #4fa3ff;
+  --syn-comment: #d9d9d9;
+  --syn-function: #ecc3fd;
+  --syn-type: #f08030;
+}
+
+/*
+ * Red-Green, for protanopia and deuteranopia (after GitHub's theme for them): built from the
+ * Okabe–Ito palette, with no meaning carried by red against green. The accent and success are
+ * blue, danger is vermillion, and callouts and code differ in lightness as well as hue.
+ */
+:root[data-theme="red-green"] {
+  /* This theme's pin color is dark, so white reads on it. */
+  --on-pin: #ffffff;
+  --bg: #ffffff;
+  --bg-list: #f9fafb;
+  --bg-sidebar: #f4f6f8;
+  --bg-elevated: #ffffff;
+  --text: #16191d;
+  --text-sidebar: #2a2f36;
+  --text-muted: #47515d;
+  --text-faint: #535d6a;
+  --accent: #0066a8;
+  --tag-text: #005f9e;
+  --ink: rgb(20, 30, 45);
+  --danger: #872800;
+  --success: #1063c2;
+  --pin: #b8156c;
+  --callout-info: #0c60b2;
+  --callout-question: #940075;
+  --callout-warning: #835800;
+  --callout-error: var(--danger);
+  --callout-decision: #0b7050;
+  --highlight-base: #f0e442;
+  --highlight: color-mix(in srgb, var(--highlight-base) 50%, transparent);
+  --syn-keyword: #872800;
+  --syn-string: #0b724d;
+  --syn-number: #1666b9;
+  --syn-comment: #535d6a;
+  --syn-function: #7e0471;
+  --syn-type: #835800;
+}
+
+:root[data-theme="red-green"][data-scheme="dark"] {
+  --bg: #0f1318;
+  --bg-list: #12161c;
+  --bg-sidebar: #171c23;
+  --bg-elevated: #1d232b;
+  --text: #e8ecf0;
+  --text-sidebar: #d3d9e0;
+  --text-muted: #b6c0ca;
+  --text-faint: #aeb9c4;
+  --accent: #6cc0f0;
+  --tag-text: #7cc4ee;
+  --ink: #ffffff;
+  --selection: color-mix(in srgb, var(--accent) 20%, transparent);
+  --danger: #f5925a;
+  --success: #2aa8f5;
+  --pin: #f45bb5;
+  --callout-info: #4cb3f5;
+  --callout-question: #f28cc4;
+  --callout-warning: #f5c02e;
+  --callout-error: var(--danger);
+  --callout-decision: #45e39a;
+  --callout-tint: 8%;
+  --highlight-base: #f0e442;
+  --highlight: color-mix(in srgb, var(--highlight-base) 13%, transparent);
+  --syn-keyword: #f5925a;
+  --syn-string: #45e39a;
+  --syn-number: #4cb3f5;
+  --syn-comment: #aeb9c4;
+  --syn-function: #f9bfe8;
+  --syn-type: #f5c02e;
+}
+
+/*
+ * Blue-Yellow, for tritanopia (after GitHub's theme for it): no meaning carried by blue against
+ * green or yellow against violet. The accent and danger are red, success is blue, and callouts
+ * and code differ in lightness as well as hue.
+ */
+:root[data-theme="blue-yellow"] {
+  /* This theme's pin color is dark, so white reads on it. */
+  --on-pin: #ffffff;
+  --bg: #ffffff;
+  --bg-list: #fbfafa;
+  --bg-sidebar: #f6f4f4;
+  --bg-elevated: #ffffff;
+  --text: #1f1a1b;
+  --text-sidebar: #342d2f;
+  --text-muted: #574d50;
+  --text-faint: #62575a;
+  --accent: #b3245e;
+  --tag-text: #a8205a;
+  --ink: rgb(45, 25, 30);
+  --danger: #b20016;
+  --success: #1f4fd6;
+  --pin: #a61fd6;
+  --callout-info: #1f4fd6;
+  --callout-question: #8318c4;
+  --callout-warning: #804900;
+  --callout-error: var(--danger);
+  --callout-decision: #1a6e1f;
+  --highlight-base: #ffd60a;
+  --highlight: color-mix(in srgb, var(--highlight-base) 45%, transparent);
+  --syn-keyword: #c50516;
+  --syn-string: #1f4fd6;
+  --syn-number: #8b3f03;
+  --syn-comment: #62575a;
+  --syn-function: #9b1fd9;
+  --syn-type: #046850;
+}
+
+:root[data-theme="blue-yellow"][data-scheme="dark"] {
+  --bg: #171415;
+  --bg-list: #1a1718;
+  --bg-sidebar: #201c1d;
+  --bg-elevated: #272223;
+  --text: #eee8e9;
+  --text-sidebar: #dcd4d6;
+  --text-muted: #c4b9bb;
+  --text-faint: #bfb4b7;
+  --accent: #ff8aad;
+  --tag-text: #ff8fb1;
+  --ink: #fff4f6;
+  --selection: color-mix(in srgb, var(--accent) 20%, transparent);
+  --danger: #fb8c8a;
+  --success: #2fa8f5;
+  --pin: #cb61f5;
+  --callout-info: #58b3fa;
+  --callout-question: #c598ff;
+  --callout-warning: #f5bd6e;
+  --callout-error: var(--danger);
+  --callout-decision: #5ee05a;
+  --callout-tint: 8%;
+  --highlight-base: #ffd60a;
+  --highlight: color-mix(in srgb, var(--highlight-base) 13%, transparent);
+  --syn-keyword: #fe876e;
+  --syn-string: #35b2fc;
+  --syn-number: #fcc447;
+  --syn-comment: #bfb4b7;
+  --syn-function: #dd89fd;
+  --syn-type: #4fe8c6;
+}
+
+/*
+ * Increased contrast (Settings → Appearance → Contrast, or the system's Increase Contrast):
+ * text at least 9:1 against the backgrounds it's on, muted text 7:1 (WCAG AAA), faint text and the
+ * accent (links, mentions, tags) 4.5:1 (AA, tinted chips' backgrounds included), and borders 3:1. Each theme's own colors, darkened
+ * (lightened in dark) only as far as that takes; worked out from each theme's colors, so a theme
+ * changed above needs these again (docs/accessibility.md).
+ */
+/* With the theme and scheme in the selector, so these outrank each theme's own colors. */
+:root[data-theme][data-scheme][data-contrast="more"] {
+  --text-sidebar: var(--text);
+  --border: color-mix(in srgb, var(--ink) 42%, transparent);
+  --card-border: color-mix(in srgb, var(--ink) 42%, transparent);
+}
+
+:root[data-theme][data-scheme="dark"][data-contrast="more"] {
+  --border: color-mix(in srgb, var(--ink) 36%, transparent);
+  --card-border: color-mix(in srgb, var(--ink) 36%, transparent);
+}
+
+:root[data-theme="lines"][data-scheme="light"][data-contrast="more"] {
+  --text-muted: #53514d;
+  --text-faint: #64615d;
+  --accent: #c03c41;
+  --tag-text: #c3393e;
+}
+
+:root[data-theme="lines"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #b2afab;
+  --text-faint: #8f8d89;
+}
+
+:root[data-theme="graphite"][data-scheme="light"][data-contrast="more"] {
+  --text-muted: #4f5257;
+  --text-faint: #5f6267;
+}
+
+:root[data-theme="graphite"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #aaacb2;
+  --text-faint: #888a90;
+}
+
+:root[data-theme="sepia"][data-scheme="light"][data-contrast="more"] {
+  --text-muted: #584a3a;
+  --text-faint: #685a49;
+  --accent: #a24e29;
+}
+
+:root[data-theme="sepia"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #bcaf9a;
+  --text-faint: #998d79;
+}
+
+:root[data-theme="forest"][data-scheme="light"][data-contrast="more"] {
+  --text-muted: #4a534d;
+  --text-faint: #5a635d;
+  --accent: #29784a;
+}
+
+:root[data-theme="forest"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #a5afa6;
+  --text-faint: #838d84;
+}
+
+:root[data-theme="ocean"][data-scheme="light"][data-contrast="more"] {
+  --text-muted: #455264;
+  --text-faint: #556274;
+  --accent: #2b66c9;
+}
+
+:root[data-theme="ocean"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #a3aebe;
+  --text-faint: #808c9e;
+}
+
+:root[data-theme="solarized"][data-scheme="light"][data-contrast="more"] {
+  --text: #313e42;
+  --text-muted: #404e52;
+  --text-faint: #505e62;
+  --accent: #b34213;
+}
+
+:root[data-theme="solarized"][data-scheme="dark"][data-contrast="more"] {
+  --text: #d2d8d8;
+  --text-muted: #b6c1c2;
+  --text-faint: #8e9da1;
+  --accent: #e18155;
+}
+
+:root[data-theme="nord"][data-scheme="light"][data-contrast="more"] {
+  --text-muted: #444c5e;
+  --text-faint: #555d6f;
+  --accent: #496586;
+  --tag-text: #496586;
+}
+
+:root[data-theme="nord"][data-scheme="dark"][data-contrast="more"] {
+  --text: #f0f3f7;
+  --text-muted: #d3d8df;
+  --text-faint: #a9b0bc;
+  --tag-text: #90bdbc;
+}
+
+:root[data-theme="dracula"][data-scheme="light"][data-contrast="more"] {
+  --text-muted: #534f3d;
+  --text-faint: #64604c;
+}
+
+:root[data-theme="dracula"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #afb6ce;
+  --text-faint: #8692b8;
+  --accent: #be94f9;
+}
+
+:root[data-theme="catppuccin"][data-scheme="light"][data-contrast="more"] {
+  --text: #393b4f;
+  --text-muted: #494b60;
+  --text-faint: #595b6f;
+  --accent: #7e35de;
+  --tag-text: #7e35de;
+}
+
+:root[data-theme="catppuccin"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #a6adc8;
+  --text-faint: #81879e;
+}
+
+:root[data-theme="tokyo-night"][data-scheme="light"][data-contrast="more"] {
+  --text: #2b3149;
+  --text-muted: #3c4158;
+  --text-faint: #4d5266;
+}
+
+:root[data-theme="tokyo-night"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #9da5cc;
+  --text-faint: #7a83ab;
+}
+
+:root[data-theme="gruvbox"][data-scheme="light"][data-contrast="more"] {
+  --text-muted: #504944;
+  --text-faint: #625951;
+}
+
+:root[data-theme="gruvbox"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #ccbc9c;
+  --text-faint: #a69781;
+}
+
+:root[data-theme="everforest"][data-scheme="light"][data-contrast="more"] {
+  --text: #384146;
+  --text-muted: #485252;
+  --text-faint: #58625f;
+  --accent: #257557;
+  --tag-text: #267657;
+}
+
+:root[data-theme="everforest"][data-scheme="dark"][data-contrast="more"] {
+  --text: #e3dbc9;
+  --text-muted: #c2c4b6;
+  --text-faint: #99a093;
+  --tag-text: #88c396;
+}
+
+:root[data-theme="ayu"][data-scheme="light"][data-contrast="more"] {
+  --text: #3f4346;
+  --text-muted: #4f5357;
+  --text-faint: #606367;
+  --accent: #a05a28;
+  --tag-text: #a15a09;
+}
+
+:root[data-theme="ayu"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #a09f9a;
+  --text-faint: #7d7f82;
+}
+
+/* High Contrast already meets these; it keeps its own borders, stronger than the ones above. */
+:root[data-theme="high-contrast"][data-scheme][data-contrast="more"] {
+  --border: color-mix(in srgb, var(--ink) 62%, transparent);
+  --card-border: color-mix(in srgb, var(--ink) 62%, transparent);
+}
+
+:root[data-theme="high-contrast"][data-scheme="dark"][data-contrast="more"] {
+  --border: color-mix(in srgb, var(--ink) 65%, transparent);
+  --card-border: color-mix(in srgb, var(--ink) 65%, transparent);
+}
+
+:root[data-theme="red-green"][data-scheme="light"][data-contrast="more"] {
+  --text-muted: #3d4651;
+  --border: color-mix(in srgb, var(--ink) 50%, transparent);
+  --card-border: color-mix(in srgb, var(--ink) 50%, transparent);
+}
+
+:root[data-theme="red-green"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #c2cbd4;
+}
+
+:root[data-theme="blue-yellow"][data-scheme="light"][data-contrast="more"] {
+  --text-muted: #4b4245;
+  --border: color-mix(in srgb, var(--ink) 50%, transparent);
+  --card-border: color-mix(in srgb, var(--ink) 50%, transparent);
+}
+
+:root[data-theme="blue-yellow"][data-scheme="dark"][data-contrast="more"] {
+  --text-muted: #cfc5c7;
+}

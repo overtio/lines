@@ -104,7 +104,24 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Quote, then Table
+#### 14. Quote, then Diagram (240 px wide)
+
+> A quote that runs over
+> two lines.
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+
+#### 15. Quote, then Math block
+
+> A quote that runs over
+> two lines.
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+
+#### 16. Quote, then Table
 
 > A quote that runs over
 > two lines.
@@ -113,37 +130,67 @@ flowchart LR
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 15. Quote, then Divider
+#### 17. Quote, then Divider
 
 > A quote that runs over
 > two lines.
 ---
 
-#### 16. Quote, then Key: Value line
+#### 18. Quote, then Key: Value line
 
 > A quote that runs over
 > two lines.
 **Wi-Fi password:** correct-horse-battery
 
-#### 17. Quote, then Image
+#### 19. Quote, then Mention
+
+> A quote that runs over
+> two lines.
+Ask @[QA · Ada] at @[QA · Ada].email.
+
+#### 20. Quote, then Wiki link
+
+> A quote that runs over
+> two lines.
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+
+#### 21. Quote, then Symbols
+
+> A quote that runs over
+> two lines.
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+
+#### 22. Quote, then GitHub links
+
+> A quote that runs over
+> two lines.
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+
+#### 23. Quote, then Image
 
 > A quote that runs over
 > two lines.
 ![A sample picture](attachment:photo.png)
 
-#### 18. Quote, then File
+#### 24. Quote, then Drawing
+
+> A quote that runs over
+> two lines.
+![A sample drawing](attachment:drawing.svg)
+
+#### 25. Quote, then File
 
 > A quote that runs over
 > two lines.
 [Budget.csv](attachment:budget.csv)
 
-#### 19. Quote, then Missing file
+#### 26. Quote, then Missing file
 
 > A quote that runs over
 > two lines.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 20. Quote, then Card
+#### 27. Quote, then Card
 
 > A quote that runs over
 > two lines.
@@ -151,7 +198,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 21. Quote, then Callout (info)
+#### 28. Quote, then Callout (info)
 
 > A quote that runs over
 > two lines.
@@ -159,7 +206,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 22. Quote, then Callout (warning, chosen icon)
+#### 29. Quote, then Callout (warning, chosen icon)
 
 > A quote that runs over
 > two lines.
@@ -167,7 +214,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 23. Quote, then Callout (decision, no icon)
+#### 30. Quote, then Callout (decision, no icon)
 
 > A quote that runs over
 > two lines.
