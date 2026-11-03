@@ -1,7 +1,7 @@
 import { aesKey, fromBase64, fromUtf8, isLockedKey, lockKey, open, randomBytes, seal, toBase64, unlockKey, utf8, WrongPassphrase, type Bytes } from "../crypto";
 import { t } from "../i18n/index.svelte";
+import { plugins } from "../plugins/registry.svelte";
 import { referencedAttachments } from "./attachments";
-import { computeMeta } from "./parse";
 import type { Note, NoteLock, WrappedKey } from "./types";
 
 /*
@@ -165,7 +165,7 @@ class NoteKeys {
     return {
       ...lock,
       key: this.newest(lock.key.id) ?? lock.key,
-      title: computeMeta(note.body, note.format).title,
+      title: plugins.language(note.format).meta(note.body).title,
       files: [...referencedAttachments([note.body])],
       sealed: toBase64(await seal(open.key, utf8(note.body), CONTEXT)),
     };

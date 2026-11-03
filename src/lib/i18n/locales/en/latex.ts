@@ -7,10 +7,6 @@
  * the document's language, not the app's.
  */
 export default {
-  // The "/" menu's sections.
-  "latex.slash.format": "Format",
-  "latex.slash.insert": "Insert",
-
   // The "/" menu's commands.
   "latex.slash.section": "Section",
   "latex.slash.section.keywords": "heading h1 title",

@@ -2,9 +2,6 @@ import type { Translation } from "../../format";
 import type en from "../en/latex";
 
 export default {
-  "latex.slash.format": "Format",
-  "latex.slash.insert": "Insérer",
-
   "latex.slash.section": "Section",
   "latex.slash.section.keywords": "titre en-tête",
   "latex.slash.subsection": "Sous-section",

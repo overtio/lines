@@ -1,4 +1,4 @@
-// Puts the TeX engine that typesets LaTeX notes as PDFs (src/lib/print/tex.ts) in public/busytex/:
+// Puts the TeX engine that typesets LaTeX notes as PDFs (src/plugins/tex/typeset.ts) in public/busytex/:
 // BusyTeX's pdfLaTeX built to WebAssembly, and TeX Live's basic packages. Run with `pnpm tex-assets`.
 //
 // The files come from texlyre-busytex's release for the installed version: a 520 MB archive, of

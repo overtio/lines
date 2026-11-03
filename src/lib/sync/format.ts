@@ -1,5 +1,6 @@
 import { ICONS, type IconName } from "../icons/icons";
 import { isWrappedKey } from "../notes/noteKeys.svelte";
+import { DEFAULT_LANGUAGE } from "../plugins/registry.svelte";
 import type { Note, NoteLock } from "../notes/types";
 
 /*
@@ -17,8 +18,9 @@ import type { Note, NoteLock } from "../notes/types";
  *   ---
  *   # My note
  *
- * `icon` is only there for a note that has one, and `format` for a note written in LaTeX, so
- * other notes stay byte for byte as they were.
+ * `icon` is only there for a note that has one, and `format` for a note not written in Markdown
+ * (the id of its language, which a plugin adds), so other notes stay byte for byte as they were.
+ * A language this device doesn't have is kept as it is.
  *
  * A locked note's Markdown is encrypted (see notes/noteKeys.svelte.ts). What it keeps readable,
  * its title and its key (itself locked with the password), is one line of JSON, and the
@@ -58,6 +60,7 @@ export function deserialize(text: string, fallbackId: string): Note {
     return Number.isNaN(ms) ? Date.now() : ms;
   };
   const icon = fields.get("icon");
+  const format = fields.get("format");
   const body = match ? text.slice(match[0].length) : text;
   const locked = readLock(fields.get("locked"), body);
   return {
@@ -68,10 +71,13 @@ export function deserialize(text: string, fallbackId: string): Note {
     pinned: fields.get("pinned") === "true",
     trashed: fields.get("trashed") === "true",
     ...(icon && icon in ICONS ? { icon: icon as IconName } : {}),
-    ...(fields.get("format") === "latex" ? { format: "latex" as const } : {}),
+    ...(isLanguage(format) ? { format } : {}),
     ...(locked ? { locked } : {}),
   };
 }
+
+/** A language's id, other than Markdown's, which is what a note without one is in. */
+const isLanguage = (id: string | undefined): id is string => !!id && id !== DEFAULT_LANGUAGE && /^[a-z0-9][a-z0-9-]*$/.test(id);
 
 function readLock(field: string | undefined, body: string): NoteLock | undefined {
   if (!field) return;

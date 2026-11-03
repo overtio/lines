@@ -18,8 +18,7 @@
   import { lock } from "./lib/lock/lock.svelte";
   import { lockedNotes } from "./lib/notes/locked.svelte";
   import { isClosed, notes } from "./lib/notes/store.svelte";
-  import { latexDocument } from "./lib/notes/latex";
-  import { plainText } from "./lib/notes/stats";
+  import { plugins } from "./lib/plugins/registry.svelte";
   import { copyText, downloadText, isApple, isNewNoteShortcut, isTauri, newNoteKey } from "./lib/platform";
   import { ui, type MenuItem } from "./lib/ui.svelte";
   import { openSettings } from "./lib/windows/settings.svelte";
@@ -117,29 +116,29 @@
   function openShare(event: MouseEvent) {
     if (shareOpen) return ui.closeMenu();
     if (!selected) return;
-    const { body, format } = selected.note;
-    const latex = format === "latex";
+    const { body } = selected.note;
+    // Copied and downloaded as what it's written in, even while that language's plugin is off.
+    const language = plugins.ownLanguage(selected.note.format);
     const title = selected.meta.title || t("list.untitled");
     const items: MenuItem[] = [];
     if (typeof navigator.share === "function") {
       items.push(
-        { label: t("app.shareSheet"), icon: "share", run: () => void navigator.share({ title, text: plainText(body, format) }).catch(() => {}) },
+        { label: t("app.shareSheet"), icon: "share", run: () => void navigator.share({ title, text: language.plainText(body) }).catch(() => {}) },
         "separator",
       );
     }
     items.push(
-      { label: latex ? t("app.copyLatex") : t("app.copyMarkdown"), icon: "copy", run: () => copy(body) },
-      { label: t("app.copyPlainText"), icon: "file-text", run: () => copy(plainText(body, format)) },
+      { label: t("app.copySource", { language: language.name }), icon: "copy", run: () => copy(body) },
+      { label: t("app.copyPlainText"), icon: "file-text", run: () => copy(language.plainText(body)) },
     );
     // Browsers save downloads; the native apps need their own save dialog for this, so it's web-only for now.
     if (!isTauri) {
       const filename = title.replace(/[\\/:*?"<>|]+/g, "-").trim().slice(0, 80) || t("list.untitled");
-      items.push(
-        "separator",
-        latex
-          ? { label: t("app.downloadLatex"), icon: "download", run: () => downloadText(`${filename}.tex`, latexDocument(body)) }
-          : { label: t("app.downloadMarkdown"), icon: "download", run: () => downloadText(`${filename}.md`, body) },
-      );
+      items.push("separator", {
+        label: t("app.downloadSource", { language: language.name }),
+        icon: "download",
+        run: () => downloadText(`${filename}.${language.extensions[0]}`, language.file(body), language.mimeType),
+      });
     }
     const id = selected.note.id;
     items.push(

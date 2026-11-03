@@ -21,6 +21,10 @@ export default {
   "picker.groupNature": "Nature",
   // Note info, under the toolbar's info button. "Written in" is followed by Markdown or LaTeX.
   "picker.writtenIn": "Written in",
+  // A note whose format's plugin is off, or isn't on this device, shows as plain text.
+  "picker.languageOff": "Written in {language}, whose plugin is off: it shows as plain text.",
+  "picker.languageMissing": "Written in {language}, which lines can’t show here: it shows as plain text.",
+  "picker.turnOn": "Turn On",
   "picker.words": "Words",
   "picker.characters": "Characters",
   "picker.sentences": "Sentences",

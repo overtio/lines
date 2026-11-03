@@ -1,6 +1,7 @@
 import type { BusyTexRunner } from "texlyre-busytex";
-import { ATTACHMENT_PATH, getAttachment, referencedAttachments } from "../notes/attachments";
-import { latexDocument } from "../notes/latex";
+import type { TypesetProgress, TypesetResult } from "../../lib/plugins/types";
+import { ATTACHMENT_PATH, getAttachment, referencedAttachments } from "../../lib/notes/attachments";
+import { latexDocument } from "../latex/text";
 
 /*
  * Typesets a LaTeX note as a PDF with a real TeX engine: BusyTeX's pdfLaTeX, built to
@@ -11,13 +12,6 @@ import { latexDocument } from "../notes/latex";
 
 /** Where the engine's files are. */
 export const texAssets = (import.meta.env.VITE_TEX_ASSETS || `${import.meta.env.BASE_URL}busytex`).replace(/\/+$/, "");
-
-export type TexProgress = { phase: "download" | "compile"; percent?: number };
-/**
- * A failure's first error, the whole log, and the note's line the error is on, when TeX says;
- * `starting` when it was the engine that couldn't start (its files didn't download).
- */
-export type TexResult = { ok: true; pdf: Uint8Array } | { ok: false; error: string; log: string; line: number | null; starting?: boolean };
 
 /** An absolute address, as the worker needs (it reads them relative to its own script). */
 const absolute = (path: string) => new URL(path, location.href).href;
@@ -111,8 +105,8 @@ let queue: Promise<unknown> = Promise.resolve();
  * The note as a PDF, made from the same document Export writes (latexDocument), with the images it
  * includes. Runs pdfLaTeX until references settle, and BibTeX when the note has a \bibliography.
  */
-export function typesetTex(body: string, onProgress?: (progress: TexProgress) => void): Promise<TexResult> {
-  const run = queue.then(async (): Promise<TexResult> => {
+export function typesetTex(body: string, onProgress?: (progress: TypesetProgress) => void): Promise<TypesetResult> {
+  const run = queue.then(async (): Promise<TypesetResult> => {
     const additionalFiles: { path: string; content: string | Uint8Array }[] = [];
     if (/\\usepackage(?:\[[^\]]*\])?\{[^}]*\bbooktabs\b/.test(body)) additionalFiles.push({ path: "booktabs.sty", content: BOOKTABS });
     for (const name of referencedAttachments([body])) {

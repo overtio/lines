@@ -1,20 +1,16 @@
 <script lang="ts">
   import Icon from "../icons/Icon.svelte";
   import type { IconName } from "../icons/icons";
-  import { isApple } from "../platform";
+  import { plugins } from "../plugins/registry.svelte";
   import Segmented from "./Segmented.svelte";
   import {
     formatPercent,
     OPACITY,
     prefs,
-    sfSymbolsAvailable,
-    THEMES,
     windowLookAvailable,
     type Appearance,
     type Contrast,
-    type IconSet,
     type SwipeDirection,
-    type ThemeId,
     type WindowButtons,
   } from "../prefs.svelte";
   import { canFloat } from "../windows/floating";
@@ -36,10 +32,20 @@
     ...appearances,
   ];
 
-  const iconSets: { id: IconSet; label: string; disabled?: boolean }[] = [
-    { id: "lucide", label: "Lucide" },
-    { id: "sf", label: "SF Symbols", disabled: !sfSymbolsAvailable },
-  ];
+  /** Icon sets from the plugins turned on; one that can't work here (SF Symbols on the web) shows why. */
+  const iconSets = $derived(
+    plugins.all
+      .filter((plugin) => plugins.isOn(plugin))
+      .flatMap((plugin) =>
+        (plugin.contributes.iconSets ?? []).map(({ id, name }) => ({
+          id,
+          label: name,
+          disabled: !plugins.isActive(plugin),
+          availability: plugin.available === false ? plugin.availability : undefined,
+        })),
+      ),
+  );
+  const iconsUnavailable = $derived(iconSets.flatMap((set) => set.availability ?? []));
   const previewIcons: IconName[] = ["notes", "tag", "pin", "trash"];
 
   const swipeDirections: { id: SwipeDirection; label: string }[] = [
@@ -51,10 +57,14 @@
     { id: "always", label: t("settings.windowButtonsAlways") },
   ];
 
-  const themeIds = THEMES.map((theme) => theme.id);
+  const themes = $derived(plugins.themes);
+  const themeIds = $derived(themes.map((theme) => theme.id));
   // The accessibility themes come after the others, under their own heading, in the same group.
-  const themeGroups = [THEMES.filter((theme) => !theme.accessible), THEMES.filter((theme) => theme.accessible)];
-  const floatingThemeIds: (ThemeId | "same")[] = ["same", ...themeIds];
+  const themeGroups = $derived([themes.filter((theme) => !theme.accessible), themes.filter((theme) => theme.accessible)]);
+  const floatingThemeIds = $derived(["same", ...themeIds]);
+  // What shows: the theme chosen, or Lines while the chosen one's plugin is off.
+  const theme = $derived(plugins.theme(prefs.theme).id);
+  const floatingTheme = $derived(prefs.floatingTheme === "same" ? "same" : plugins.theme(prefs.floatingTheme).id);
 
   /**
    * Arrow keys move the choice in a group of radio buttons, wrapping around, as native ones do; Tab
@@ -99,23 +109,23 @@
     role="radiogroup"
     tabindex="-1"
     aria-label={t("settings.theme")}
-    onkeydown={(event) => moveChoice(event, themeIds, prefs.theme, (id) => (prefs.theme = id))}
+    onkeydown={(event) => moveChoice(event, themeIds, theme, (id) => (prefs.theme = id))}
   >
     {#each themeGroups as group, index (index)}
-      {#if index > 0}
+      {#if index > 0 && group.length}
         <h4 class="theme-group">{t("settings.themesAccessibility")}</h4>
       {/if}
       <div class="theme-grid">
-        {#each group as theme (theme.id)}
-          {@const [bg, sidebar, text, accent] = theme[prefs.dark ? "dark" : "light"]}
+        {#each group as option (option.id)}
+          {@const { bg, "bg-sidebar": sidebar, text, accent } = option[prefs.dark ? "dark" : "light"]}
           <button
             role="radio"
-            data-id={theme.id}
-            aria-checked={prefs.theme === theme.id}
-            tabindex={prefs.theme === theme.id ? 0 : -1}
+            data-id={option.id}
+            aria-checked={theme === option.id}
+            tabindex={theme === option.id ? 0 : -1}
             class="theme"
-            class:active={prefs.theme === theme.id}
-            onclick={() => (prefs.theme = theme.id)}
+            class:active={theme === option.id}
+            onclick={() => (prefs.theme = option.id)}
           >
             <span class="preview" style:background={bg} style:color={text} aria-hidden="true">
               <span class="preview-sidebar" style:background={sidebar}>
@@ -127,7 +137,7 @@
                 <span class="line short" style:background={accent}></span>
               </span>
             </span>
-            <span class="name">{theme.name}</span>
+            <span class="name">{option.name}</span>
           </button>
         {/each}
       </div>
@@ -147,10 +157,10 @@
   <p class="note">{t("settings.contrastNote")}</p>
 </section>
 
-{#if isApple}
+{#if iconSets.length > 1}
   <section>
     <h3>{t("settings.icons")}</h3>
-    <Segmented label={t("settings.icons")} options={iconSets} value={prefs.icons} onselect={(id) => (prefs.icons = id)}>
+    <Segmented label={t("settings.icons")} options={iconSets} value={plugins.iconSet(prefs.icons).id} onselect={(id) => (prefs.icons = id)}>
       {#snippet content(set)}
         <span class="icon-preview">
           {#if !set.disabled}
@@ -160,9 +170,9 @@
         {set.label}
       {/snippet}
     </Segmented>
-    {#if !sfSymbolsAvailable}
-      <p class="note">{t("settings.sfSymbolsNote")}</p>
-    {/if}
+    {#each iconsUnavailable as availability (availability)}
+      <p class="note">{availability}</p>
+    {/each}
   </section>
 {/if}
 
@@ -200,31 +210,31 @@
         role="radiogroup"
         tabindex="-1"
         aria-label={t("settings.floatingTheme")}
-        onkeydown={(event) => moveChoice(event, floatingThemeIds, prefs.floatingTheme, (id) => (prefs.floatingTheme = id))}
+        onkeydown={(event) => moveChoice(event, floatingThemeIds, floatingTheme, (id) => (prefs.floatingTheme = id))}
       >
         <button
           role="radio"
           data-id="same"
-          aria-checked={prefs.floatingTheme === "same"}
-          tabindex={prefs.floatingTheme === "same" ? 0 : -1}
+          aria-checked={floatingTheme === "same"}
+          tabindex={floatingTheme === "same" ? 0 : -1}
           class="same"
-          class:active={prefs.floatingTheme === "same"}
+          class:active={floatingTheme === "same"}
           onclick={() => (prefs.floatingTheme = "same")}
           title={t("settings.floatingSameTitle")}>{t("settings.floatingSame")}</button
         >
-        {#each THEMES as theme (theme.id)}
-          {@const [bg, , , accent] = theme[prefs.floatingLook.dark ? "dark" : "light"]}
+        {#each themes as option (option.id)}
+          {@const { bg, accent } = option[prefs.floatingLook.dark ? "dark" : "light"]}
           <button
             role="radio"
-            data-id={theme.id}
-            aria-checked={prefs.floatingTheme === theme.id}
-            tabindex={prefs.floatingTheme === theme.id ? 0 : -1}
-            aria-label={theme.name}
-            title={theme.name}
+            data-id={option.id}
+            aria-checked={floatingTheme === option.id}
+            tabindex={floatingTheme === option.id ? 0 : -1}
+            aria-label={option.name}
+            title={option.name}
             class="swatch"
-            class:active={prefs.floatingTheme === theme.id}
+            class:active={floatingTheme === option.id}
             style:background={bg}
-            onclick={() => (prefs.floatingTheme = theme.id)}
+            onclick={() => (prefs.floatingTheme = option.id)}
           >
             <span style:background={accent}></span>
           </button>

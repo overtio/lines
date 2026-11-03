@@ -28,6 +28,8 @@ import { backslashSource, inOpenMath, MATH_COMMANDS, paragraphBefore, TEXT_COMMA
 import { ancestors } from "./util";
 
 export interface SlashCommand {
+  /** Names it to other commands, which can say to come after it (`after`). */
+  id: string;
   /** Its name, in the app's language. */
   name: string;
   /** The Markdown it produces, shown faintly on the right. */
@@ -38,6 +40,8 @@ export interface SlashCommand {
   keywords: string;
   /** Applies the command; `from`–`to` is the typed "/command". */
   apply: (view: EditorView, from: number, to: number) => void;
+  /** A plugin's command goes after this one in the menu (by id), or else at the end. */
+  after?: string;
 }
 
 /** Any block marker a line may already start with, so a command replaces it rather than stacking. */
@@ -99,18 +103,25 @@ export function insert(snippet: string | (() => string), ownLine = false) {
 }
 
 /** The menu's sections, in this order whatever they're called in the app's language. */
-const FORMAT: CompletionSection = { name: t("editor.section.format"), rank: 0 };
-const INSERT: CompletionSection = { name: t("editor.section.insert"), rank: 1 };
+export const SECTIONS = {
+  format: { name: t("editor.section.format"), rank: 0 } satisfies CompletionSection,
+  insert: { name: t("editor.section.insert"), rank: 1 } satisfies CompletionSection,
+};
+const { format: FORMAT, insert: INSERT } = SECTIONS;
 
 type Named = keyof typeof english & `editor.${"slash" | "callout"}.${string}`;
 
 /**
- * A command's name, from the message `key`, and the words that find it (`key.keywords`): the
+ * A command's id and name, from the message `key`, and the words that find it (`key.keywords`): the
  * language's own, and English's name and words too, so what English speakers type works in any language.
  */
-function named(key: Named) {
+export function named(key: Named) {
   const words = `${key}.keywords` as MessageKey;
-  return { name: t(key as MessageKey), keywords: [t(words), english[key], english[words as Named]].join(" ") };
+  return {
+    id: key.slice(key.lastIndexOf(".") + 1),
+    name: t(key as MessageKey),
+    keywords: [t(words), english[key], english[words as Named]].join(" "),
+  };
 }
 
 /** A callout of `kind` (see cards.ts), found by its name or by its keywords. */
@@ -135,13 +146,6 @@ const COMMANDS: SlashCommand[] = [
   { ...named("editor.slash.numberedList"), hint: "1.", icon: "list-ordered", section: FORMAT, apply: setPrefix("1. ") },
   { ...named("editor.slash.quote"), hint: ">", icon: "text-quote", section: FORMAT, apply: setPrefix("> ") },
   { ...named("editor.slash.codeBlock"), hint: "```", icon: "code", section: INSERT, apply: insert("```\n|\n```", true) },
-  {
-    ...named("editor.slash.diagram"),
-    hint: "mermaid",
-    icon: "workflow",
-    section: INSERT,
-    apply: insert("```mermaid\nflowchart LR\n  A[Idea] --> B[Note]|\n```", true),
-  },
   { ...named("editor.slash.math"), hint: "$$", icon: "radical", section: INSERT, apply: insert("$$\n|\n$$", true) },
   { ...named("editor.slash.card"), hint: ":::", icon: "panel-top", section: INSERT, apply: insertCard },
   callout("info"),
@@ -347,9 +351,22 @@ export const slashMenu = (
   ];
 };
 
+/** `commands` with `added` ones (plugins'), each after the command it names, or at the end. */
+function withAdded(commands: SlashCommand[], added: SlashCommand[]) {
+  const all = [...commands];
+  for (const command of added) {
+    const at = command.after ? all.findIndex((each) => each.id === command.after) : -1;
+    all.splice(at < 0 ? all.length : at + 1, 0, command);
+  }
+  return all;
+}
+
 /**
- * Type "/" at the start of a line (or after a space) to turn it into a todo, quote, heading…; "\" in
- * math for math commands; "@" to mention another note.
+ * Type "/" at the start of a line (or after a space) to turn it into a todo, quote, heading…, or
+ * whatever plugins add (`added`); "\" in math for math commands; "@" to mention another note.
  */
-// Before the menu, whose own keys are just as high in precedence.
-export const slashCommands = [mentionKeys, slashMenu(COMMANDS, markdownMath, [mentionSource])];
+export const slashCommands = (added: SlashCommand[]) => [
+  // Before the menu, whose own keys are just as high in precedence.
+  mentionKeys,
+  slashMenu(withAdded(COMMANDS, added), markdownMath, [mentionSource]),
+];

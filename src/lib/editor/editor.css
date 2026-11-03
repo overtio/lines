@@ -675,7 +675,7 @@
   user-select: none;
 }
 
-/* A Mermaid diagram (mermaid.ts), in place of its code block or below it while it's edited. */
+/* A code block drawn by a renderer plugin (rendered.ts), like a Mermaid diagram, in place of its code or below it while it's edited. */
 .cm-lp-diagram {
   position: relative;
   min-height: 3em;
@@ -690,7 +690,7 @@
   border-bottom: 1px dashed var(--border);
 }
 
-/* The diagram, with its resize handle (mermaid.ts) on its corner. */
+/* The drawing, with its resize handle (rendered.ts) on its corner. */
 .cm-lp-diagram-frame {
   position: relative;
   display: inline-block;
@@ -698,11 +698,18 @@
   vertical-align: top;
 }
 
-/* Its "Copy and Edit as Drawing" button, top right on hover, like a drawing's pencil. */
-.cm-lp-diagram-draw {
+/* Its renderer's buttons, like a diagram's "Copy and Edit as Drawing": top right on hover, like a drawing's pencil. */
+.cm-lp-diagram-actions {
   position: absolute;
   top: 6px;
   right: 6px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.cm-lp-diagram-action {
   display: grid;
   place-items: center;
   width: 30px;
@@ -713,27 +720,25 @@
   color: var(--text-muted);
   line-height: 1;
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.12s;
 }
 
-.cm-lp-diagram-draw:hover {
+.cm-lp-diagram-action:hover {
   color: var(--text);
 }
 
-.cm-lp-diagram:hover .cm-lp-diagram-draw,
-.cm-lp-diagram-draw:focus-visible {
+.cm-lp-diagram:hover .cm-lp-diagram-actions,
+.cm-lp-diagram-actions:focus-within {
   opacity: 1;
 }
 
-/* Not for a diagram that's empty or has an error, nor in the Trash. */
-.cm-lp-diagram:has(> .cm-lp-diagram-message) .cm-lp-diagram-draw,
-.cm-content[contenteditable="false"] .cm-lp-diagram-draw {
+/* Not for a block that's empty or has an error, nor in the Trash. */
+.cm-lp-diagram:has(> .cm-lp-diagram-message) .cm-lp-diagram-actions,
+.cm-content[contenteditable="false"] .cm-lp-diagram-actions {
   display: none;
 }
 
 @media (pointer: coarse) {
-  .cm-lp-diagram-draw {
+  .cm-lp-diagram-actions {
     opacity: 1;
   }
 }

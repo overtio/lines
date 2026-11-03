@@ -1,13 +1,16 @@
 import type { IconName } from "../icons/icons";
 import { isSite } from "../platform";
+import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
+import type { NoteLanguage } from "../plugins/types";
+import { untrack } from "svelte";
 import { announce } from "../windows/channel";
 import { noteKeys } from "./noteKeys.svelte";
 import type { SampleSet } from "./samples";
 import { SvelteSet } from "svelte/reactivity";
-import { addTagIn, computeMeta, normalizeTag, renameTagIn, renameTypeIn } from "./parse";
+import { normalizeTag, renameTagIn, renameTypeIn } from "./parse";
 import { nameOf } from "./properties";
 import { IndexedDBStorage, type NoteStorage } from "./storage";
-import type { Filter, Note, NoteFormat, NoteLock, NoteMeta, WrappedKey } from "./types";
+import type { Filter, Note, NoteLock, NoteMeta, WrappedKey } from "./types";
 import { WELCOME_NOTE } from "./welcome";
 
 export interface Entry {
@@ -55,8 +58,9 @@ export const isClosed = (note: Note) => !!note.locked && !note.locked.open;
  * to-dos and words stay out of the sidebar and search, so they don't come and go as it opens.
  */
 function metaOf(note: Note): NoteMeta {
-  if (!note.locked) return computeMeta(note.body, note.format);
-  const title = note.locked.open ? computeMeta(note.body, note.format).title : note.locked.title;
+  const language = plugins.language(note.format);
+  if (!note.locked) return language.meta(note.body);
+  const title = note.locked.open ? language.meta(note.body).title : note.locked.title;
   return { title, excerpt: "", tags: [], hasOpenTodos: false, searchText: title.toLowerCase(), properties: [], type: "" };
 }
 
@@ -78,8 +82,11 @@ class NotesStore {
   #pending = new Map<string, ReturnType<typeof setTimeout>>();
   #changeListeners = new Set<() => void>();
   #flushers = new Set<() => void>();
-  /** What new notes started as, so one left untouched can be discarded like a blank one. */
-  #templates = new Map<string, string>();
+  /**
+   * What new notes started as, so one left untouched can be discarded like a blank one, and the
+   * tag or type they were made in, to start them again in another language.
+   */
+  #templates = new Map<string, { body: string; made: { tag?: string; type?: string } }>();
   /** Notes moved to the trash since the last edit, most recent last, for undo; those trashed together share a batch. */
   #trashed: { id: string; pinned: boolean; selected: boolean; batch: number }[] = [];
   #batch = 0;
@@ -210,6 +217,17 @@ class NotesStore {
 
   constructor(storage: NoteStorage) {
     this.#storage = storage;
+    // A language's plugin turned on or off: its notes are read again, as their language or as plain
+    // text. Only the effect asks for plugins, as it runs once every module has loaded.
+    $effect.root(() => {
+      let languages: readonly NoteLanguage[] | undefined;
+      $effect(() => {
+        const now = plugins.languages;
+        const changed = languages && (now.length !== languages.length || now.some((language, i) => language !== languages![i]));
+        languages = now;
+        if (changed) untrack(() => (this.entries = this.entries.map((entry) => entryOf(entry.note))));
+      });
+    });
   }
 
   async load() {
@@ -270,15 +288,16 @@ class NotesStore {
     const now = Date.now();
     const f = this.filter;
     // Made under a tag it has the tag; made under a type, it's one of that type.
+    const made = f.kind === "tag" ? { tag: f.tag } : f.kind === "type" ? { type: f.type } : {};
     const note: Note = {
       id: crypto.randomUUID(),
-      body: body ?? (f.kind === "tag" ? `# \n\n#${f.tag}` : f.kind === "type" ? `---\ntype: ${f.type}\n---\n# ` : "# "),
+      body: body ?? plugins.language().newNote(made),
       createdAt: now,
       updatedAt: now,
       pinned: false,
       trashed: false,
     };
-    this.#templates.set(note.id, note.body);
+    this.#templates.set(note.id, { body: note.body, made });
     if (this.filter.kind === "trash") this.filter = { kind: "all" };
     this.query = "";
     this.entries = [entryOf(note), ...this.entries];
@@ -359,7 +378,7 @@ class NotesStore {
     const target = normalizeTag(tag.replace(/^#/, ""));
     if (!target) return 0;
     const only = new Set(ids);
-    return this.#rewrite((body, note) => (only.has(note.id) ? addTagIn(body, target, note.format === "latex") : body));
+    return this.#rewrite((body, note) => (only.has(note.id) ? plugins.language(note.format).addTag(body, target) : body));
   }
 
   /** Moves these notes to the trash together; ⌘Z brings them all back. */
@@ -442,22 +461,24 @@ class NotesStore {
   }
 
   /**
-   * Writes the note in LaTeX or Markdown. Its text stays as it is, except a new note's: its "# "
-   * goes, and a tag it was made under moves into a comment, where LaTeX ignores it.
+   * Writes the note in another language, by its id. Its text stays as it is, except a new note's,
+   * which starts again the way that language starts one (in LaTeX, without Markdown's "# ", and a
+   * tag it was made under in a comment, where LaTeX ignores it).
    */
-  setFormat(id: string, format: NoteFormat) {
+  setFormat(id: string, format: string) {
     const entry = this.get(id);
-    if (!entry || (entry.note.format ?? "markdown") === format) return;
+    if (!entry || (entry.note.format ?? DEFAULT_LANGUAGE) === format) return;
     this.flush();
+    const stored = format === DEFAULT_LANGUAGE ? undefined : format;
     const template = this.#templates.get(id);
-    if (format === "latex" && entry.note.body === template) {
-      const body = template.replace(/^# ?/, "").replace(/^#(?=\S)/m, "% #");
-      this.#templates.set(id, body);
-      this.#patch(id, { body, format: "latex" });
+    if (template && entry.note.body === template.body) {
+      const body = plugins.language(format).newNote(template.made);
+      this.#templates.set(id, { ...template, body });
+      this.#patch(id, { body, format: stored });
       if (this.selectedId === id) this.remoteRevision = { id, n: this.remoteRevision.n + 1 };
       return;
     }
-    this.#patch(id, { format: format === "latex" ? "latex" : undefined });
+    this.#patch(id, { format: stored });
   }
 
   trash(id: string, batch = ++this.#batch) {
@@ -740,7 +761,7 @@ class NotesStore {
   #discardIfBlank(id: string) {
     const entry = this.get(id);
     if (entry?.note.locked) return void this.#templates.delete(id);
-    const untouched = entry && (isBlank(entry.note.body) || entry.note.body === this.#templates.get(id));
+    const untouched = entry && (isBlank(entry.note.body) || entry.note.body === this.#templates.get(id)?.body);
     this.#templates.delete(id);
     if (entry && !entry.note.trashed && untouched) void this.deleteForever(id);
   }

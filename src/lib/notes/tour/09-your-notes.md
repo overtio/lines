@@ -22,4 +22,6 @@ The Mac app (and the iPhone app, coming) adds:
 
 Settings → Theme has sixteen themes, each light and dark (High Contrast and two for color blindness among them), four fonts, and spacing you can tune. Contrast → Increased darkens grey text in any of them. Right-click a note to pin it or give it an icon, and swipe a note in the list to pin or delete it. ⌘-click notes in the list (or ⇧-click, or ⌘A for all) to tag, pin or trash several at once.
 
+Most of lines is plugins, as in a code editor: LaTeX notes, the math and diagrams, TeX for PDFs, the themes and the icons. Settings → Plugins turns off the ones you don't use, and nothing in your notes changes: a LaTeX note waits as plain text until LaTeX is on again.
+
 #tour

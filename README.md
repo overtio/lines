@@ -78,6 +78,7 @@ Switch a note to LaTeX from its ⓘ panel and write `\section`, theorems, citati
 
 ### Make it yours
 
+- **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. See [docs/plugins.md](docs/plugins.md).
 - **Sixteen themes**, each light and dark, including High Contrast and two for color blindness.
 - **Fonts, text size and spacing**, with a live preview.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
@@ -113,6 +114,7 @@ Press <kbd>⌘/</kbd> to see them all. On Windows and Linux, use <kbd>Ctrl</kbd>
 | --- | --- |
 | [Linedown](docs/linedown.md) | The Markdown lines reads and writes, including its few additions (callouts, highlights, tags…) |
 | [LaTeX notes](docs/latex.md) | What's drawn in notes written in LaTeX |
+| [Plugins](docs/plugins.md) | How lines is made of plugins, turning them off, and writing one |
 | [Sync](docs/sync.md) | How sync and encryption work |
 | [Storage](docs/storage.md) | Where the web app keeps your notes, and for how long |
 | [Limitations](docs/limitations.md) | What doesn't work yet, and what hasn't been tried on real devices |
@@ -174,6 +176,7 @@ pnpm exec vite preview --outDir dist-site
 | --- | --- |
 | UI | [Svelte 5](https://svelte.dev): compiled, no virtual DOM, a very small runtime |
 | Editor | [CodeMirror 6](https://codemirror.net) with a custom live-preview layer |
+| Plugins | Formats, math and diagram engines, typesetters, themes and icons, on a small core ([docs/plugins.md](docs/plugins.md)) |
 | Apps | [Tauri 2](https://v2.tauri.app): macOS, Windows, Linux, iOS, Android |
 | Icons | [Lucide](https://lucide.dev), or SF Symbols on Apple platforms |
 | Build | [Vite](https://vite.dev) and TypeScript |
@@ -187,8 +190,21 @@ pnpm exec vite preview --outDir dist-site
 src/
   App.svelte                 App shell and responsive layout
   app.css                    Design tokens (colors, type), light and dark
-  themes.css                 Theme colors (light and dark for each)
+  plugins/                   lines' own plugins, one folder each (docs/plugins.md)
+    markdown/                Markdown, the format notes are written in by default (its editor is lib/editor)
+    latex/                   LaTeX notes: editor.ts draws them, syntax.ts reads them, text.ts for the list and
+                             exports, print.ts lays them out on paper
+    tex/                     Typesets a LaTeX note with TeX (BusyTeX's pdfLaTeX in WebAssembly)
+    katex/                   The math engine (KaTeX)
+    mermaid/                 Mermaid diagrams: the renderer, its colors, /diagram
+    themes/                  The sixteen themes, as their colors
+    lucide/  sf-symbols/     Icon sets
   lib/
+    plugins/
+      types.ts               What a plugin is and what it can add: formats, themes, icon sets, engines…
+      registry.svelte.ts     The plugins, which are on (kept and shared between windows), and what they add
+      plainText.ts           How a note shows while its format's plugin is off
+    themes.svelte.ts         The themes plugins add, as CSS; this window's theme
     editor/
       Editor.svelte          CodeMirror host; per-note undo history
       livePreview.ts         Hides Markdown and renders bullets, checkboxes, rules, images
@@ -199,11 +215,10 @@ src/
       formatting.ts          Bold, italic, code… toggles and the toolbar over selected text
       dragBlocks.ts          Grips for dragging lines and blocks to move them
       cursor.ts              Draws the text cursor (WebKit can leave a stray native caret behind)
-      mermaid.ts             Draws ```mermaid code blocks as diagrams
+      rendered.ts            Code blocks drawn by renderer plugins (```mermaid): live, resizable, with their buttons
       drawings.ts            Excalidraw drawings (SVGs holding their scene): spotting, opening, /drawing, from a diagram
-      math.ts                Draws $math$ and $$ blocks with KaTeX
-      latex.ts               Live preview, keys and slash commands for notes written in LaTeX
-      latexSyntax.ts         Reads a LaTeX note into what latex.ts draws
+      math.ts                Draws $math$ and $$ blocks with the math engine plugin
+      texCommands.ts         The "\" menu of LaTeX commands, in math and in LaTeX notes
       attachments.ts         Image and file blocks; pasting, dropping, /image and /file
       fences.ts              Closes ``` and ::: fences as you type them; ` or : wraps a selection
       lists.ts               Tab / Shift-Tab nesting for list items; Backspace after a marker
@@ -211,14 +226,12 @@ src/
       syntax.ts              #tag, ==highlight==, ::: card, $math$ and @mention / [[wiki link]] parser extensions
       objects.ts             Properties, @mentions and their menus; creating a mentioned note
       typeTables.ts          Tables of a type's notes (@type.recipe)
-      setup.ts               Extensions, keymaps, formatting commands; Markdown or LaTeX per note
+      setup.ts               Extensions, keymaps, formatting commands; the Markdown editor with plugins' additions
       editor.css             Styles for the rendered Markdown
     print/
       markdown.ts            A Markdown note as a printed document
-      latex.ts               A LaTeX note as a printed document: paragraphs, numbering, references, title
-      parts.ts               Math, code, diagrams and images on paper, and waiting for them to draw
+      parts.ts               Math, code, drawn code blocks and images on paper, and waiting for them to draw
       pages.ts               Cuts a document into pages between lines, as the preview shows and prints them
-      tex.ts                 Typesets a LaTeX note with TeX (BusyTeX's pdfLaTeX in WebAssembly)
       print.css              How a note looks on paper
     notes/
       store.svelte.ts        Reactive note state: filtering, search, tags, selection, saving
@@ -228,7 +241,6 @@ src/
       locked.svelte.ts       Locking and opening locked notes, their password, closing them when idle
       parse.ts               Title, excerpt and tag extraction; adding and renaming tags and types
       properties.ts          Properties (front matter), types and mentions as text
-      latex.ts               LaTeX notes as plain text, and as a whole document for export
       samples.ts             Adds the feature tour (tour/), the LaTeX examples (examples/) or the QA notes (qa/)
       tour/                  The feature tour: the demo website's first notes
       examples/              Notes written in LaTeX: a paper, lecture notes, a problem set
@@ -245,16 +257,16 @@ src/
       vault.ts               Encrypts what's stored on the device while the lock is on
     components/              Sidebar, tag tree, note list, settings
     windows/                 Floating notes, the Settings window, and messages between windows
-    icons/                   Icon component: Lucide or SF Symbols
+    icons/                   Icon component (drawn by the icon set plugin chosen) and the icons lines uses
     i18n/                    Translations: t(), the language, and each language's messages (locales/)
     a11y.ts                  Saying things to screen readers
-    prefs.svelte.ts          Theme, appearance, font, text size, spacing, icon set
+    prefs.svelte.ts          Theme, appearance, font, text size, spacing, icon set (themes and icon sets by plugin id)
     crypto.ts                AES-256-GCM and passphrase keys (WebCrypto), for sync and the app lock
     release.ts               The version and the source repository
 src-tauri/                   Native shell (Rust); sf_symbols.rs draws SF Symbols, lock.rs shares the
                              unlocked key with floating notes and does Touch ID
 src-tauri/icons/source/      App icon artwork (SVG): Mac layout and full-bleed for iOS/Android
-docs/                        Linedown, LaTeX, sync, storage, limitations, accessibility, translations
+docs/                        Linedown, LaTeX, plugins, sync, storage, limitations, accessibility, translations
 qa/                          Release checklist and QA notes (generated by scripts/qa-notes.mjs)
 ```
 
@@ -279,6 +291,16 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] Store sync credentials (the S3 secret key) in the OS keychain on native platforms instead of local storage
 - [ ] Conditional S3 writes (`If-Match`), so an upload fails instead of overwriting a note another device changed in between
 - [ ] Narrow the app's native permissions: limit network access to the configured endpoint and file access to the chosen sync folder
+
+**Plugins**
+- [ ] More formats as plugins, drawn as you type, printed and exported: Org mode, AsciiDoc, WikiText (MediaWiki) and reStructuredText
+- [ ] Plugins made by others: a plugin format, installing one from Settings → Plugins, and running its code safely (the apps only run lines' own scripts now)
+- [ ] Themes and icon sets from a file, which need no code
+- [ ] More renderers for code blocks: Graphviz, PlantUML, D2, Vega-Lite charts, music in ABC
+- [ ] Drawings (Excalidraw), code highlighting, GitHub links and symbols as plugins
+- [ ] Choose the format new notes start in
+- [ ] Plugins that add to LaTeX notes, as they can to Markdown ones
+- [ ] Sync which plugins are on
 
 **Notes**
 - [ ] Backlinks: the notes that mention this one
@@ -334,6 +356,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [x] Arrows and symbols (`->` as →, `!=` as ≠) shown without changing the note, in text and code, each switchable
 - [x] Resizable sidebar and note list
 - [x] Several notes at once: select, tag, pin and trash them together
+- [x] Plugins: formats, math and diagram engines, typesetters, themes and icon sets, each turned off or on in Settings → Plugins
 
 </details>
 

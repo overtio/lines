@@ -1,3 +1,4 @@
+import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
 import { ATTACHMENT_PATH, saveAttachment } from "./attachments";
 import type { Note } from "./types";
 
@@ -33,6 +34,13 @@ async function attach(name: string, saved: Map<string, string>) {
   return saved.get(name)!;
 }
 
+/** The language a sample file is written in, by its extension: a .tex file is LaTeX. None for Markdown. */
+function languageOfFile(path: string) {
+  const extension = path.slice(path.lastIndexOf(".") + 1);
+  const language = plugins.all.flatMap((plugin) => plugin.contributes.languages ?? []).find((each) => each.extensions.includes(extension));
+  return language && language.id !== DEFAULT_LANGUAGE ? language.id : undefined;
+}
+
 /** The notes of a set, newest first in the order of their files, ready to add. */
 export async function sampleNotes(set: SampleSet): Promise<Note[]> {
   const files = SETS[set];
@@ -49,7 +57,8 @@ export async function sampleNotes(set: SampleSet): Promise<Note[]> {
       // A second apart, so the list keeps the files' order.
       const time = now - i * 1000;
       const note: Note = { id: crypto.randomUUID(), body, createdAt: time, updatedAt: time, pinned: false, trashed: false };
-      return path.endsWith(".tex") ? { ...note, format: "latex" as const } : note;
+      const format = languageOfFile(path);
+      return format ? { ...note, format } : note;
     }),
   );
 }

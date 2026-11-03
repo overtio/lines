@@ -4,7 +4,7 @@ import type { Property } from "./properties";
 
 export interface Note {
   id: string;
-  /** The note's Markdown source. This is the only source of truth for content. */
+  /** The note's text, as written in its language. This is the only source of truth for content. */
   body: string;
   createdAt: number;
   updatedAt: number;
@@ -12,13 +12,14 @@ export interface Note {
   trashed: boolean;
   /** An icon chosen for the note, shown before its title in the list. */
   icon?: IconName;
-  /** Set for a note written in LaTeX rather than Markdown (docs/latex.md). */
-  format?: "latex";
+  /**
+   * The language it's written in, by the id of a language a plugin adds ("latex"), for a note not
+   * written in Markdown. Kept even while that plugin is off, or not on this device.
+   */
+  format?: string;
   /** Set for a note locked with the locked-notes password (see notes/noteKeys.svelte.ts). */
   locked?: NoteLock;
 }
-
-export type NoteFormat = "markdown" | "latex";
 
 /** The key a locked note is encrypted with, locked with the password. Notes locked with the same password share it. */
 export interface WrappedKey extends LockedKey {

@@ -6,6 +6,7 @@
   import AboutPanel from "./AboutPanel.svelte";
   import AppearancePanel from "./AppearancePanel.svelte";
   import DataPanel from "./DataPanel.svelte";
+  import PluginsPanel from "./PluginsPanel.svelte";
   import PrivacyPanel from "./PrivacyPanel.svelte";
   import ShortcutsPanel from "./ShortcutsPanel.svelte";
   import SyncPanel from "./SyncPanel.svelte";
@@ -22,6 +23,7 @@
   const tabs: { id: SettingsTab; label: string; icon: IconName }[] = [
     { id: "theme", label: t("settings.tabTheme"), icon: "palette" },
     { id: "text", label: t("settings.tabText"), icon: "type" },
+    { id: "plugins", label: t("settings.tabPlugins"), icon: "puzzle" },
     { id: "data", label: t("settings.tabData"), icon: "hard-drive" },
     { id: "shortcuts", label: t("shortcuts.tab"), icon: "keyboard" },
     { id: "about", label: t("settings.tabAbout"), icon: "info" },
@@ -152,6 +154,8 @@
       <AppearancePanel />
     {:else if ui.settings === "text"}
       <TextPanel />
+    {:else if ui.settings === "plugins"}
+      <PluginsPanel />
     {:else if ui.settings === "data"}
       <section aria-labelledby="settings-sync">
         <h3 id="settings-sync" tabindex="-1">{t("settings.sync")}</h3>

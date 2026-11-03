@@ -1,7 +1,7 @@
 import type { IconName } from "./icons/icons";
 
 export type Layout = "wide" | "medium" | "narrow";
-export type SettingsTab = "theme" | "text" | "data" | "shortcuts" | "about";
+export type SettingsTab = "theme" | "text" | "plugins" | "data" | "shortcuts" | "about";
 
 export type MenuItem = { label: string; icon?: IconName; danger?: boolean; run: () => void } | "separator";
 

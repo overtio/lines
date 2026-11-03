@@ -23,11 +23,9 @@ export default {
   "app.trash": "Move to Trash",
   // The share menu. "Share…" opens the system's share sheet.
   "app.shareSheet": "Share…",
-  "app.copyMarkdown": "Copy Markdown",
-  "app.copyLatex": "Copy LaTeX",
+  "app.copySource": "Copy {language}",
   "app.copyPlainText": "Copy Plain Text",
-  "app.downloadMarkdown": "Download Markdown",
-  "app.downloadLatex": "Download LaTeX",
+  "app.downloadSource": "Download {language}",
   "app.previewPdf": "Preview as PDF",
   "app.exportPdf": "Export as PDF…",
   "app.exportPng": "Export as PNG…",

@@ -1,7 +1,6 @@
-import { latexContent, latexLines } from "./latex";
 import { frontMatter, nameOf, propertyOf, typeOf } from "./properties";
 import { plainLine } from "./stats";
-import type { NoteFormat, NoteMeta } from "./types";
+import type { NoteMeta } from "./types";
 
 /** Characters allowed inside a #tag. Nested tags use `/`, e.g. `#work/meetings`. */
 export const TAG_CHAR = /[\p{L}\p{N}_\-/]/u;
@@ -29,21 +28,22 @@ export function extractTags(body: string): string[] {
   return [...tags].sort();
 }
 
-/** A line of nothing but tags, where another tag can go: `#work #ideas` (in LaTeX, `% #work`). */
-const TAG_LINE = /^(?:#[\p{L}\p{N}_\-/]+[ \t]*)+$/u;
-const LATEX_TAG_LINE = /^%[ \t]*(?:#[\p{L}\p{N}_\-/]+[ \t]*)+$/u;
+/** A line of nothing but tags, where another tag can go: `#work #ideas`, or after a `comment` mark (`% #work`). */
+const tagLine = (comment: string) =>
+  new RegExp(`^${comment ? `${comment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[ \\t]*` : ""}(?:#[\\p{L}\\p{N}_\\-/]+[ \\t]*)+$`, "u");
 
 /**
  * Adds `#tag` to a note's text, unless it has it: after the tags on its last line if that's a line
- * of tags, else on a line of its own at the end. A LaTeX note gets it in a comment, which LaTeX ignores.
+ * of tags, else on a line of its own at the end. In a language whose tags go in a comment, which it
+ * then ignores (`% #work` in LaTeX), `comment` is what starts one.
  */
-export function addTagIn(body: string, tag: string, latex = false): string {
+export function addTagIn(body: string, tag: string, comment = ""): string {
   if (extractTags(body).includes(tag)) return body;
   const text = body.replace(/\s+$/, "");
   const end = body.slice(text.length);
   const last = text.slice(text.lastIndexOf("\n") + 1);
-  if (text && (latex ? LATEX_TAG_LINE : TAG_LINE).test(last)) return `${text.replace(/[ \t]+$/, "")} #${tag}${end}`;
-  return `${text}${text ? "\n\n" : ""}${latex ? "% " : ""}#${tag}${end}`;
+  if (text && tagLine(comment).test(last)) return `${text.replace(/[ \t]+$/, "")} #${tag}${end}`;
+  return `${text}${text ? "\n\n" : ""}${comment ? `${comment} ` : ""}#${tag}${end}`;
 }
 
 /**
@@ -105,8 +105,8 @@ function plain(line: string): string {
   return /^\s*:{3,}/.test(line) ? "" : plainLine(line).replace(/\s+/g, " ").trim();
 }
 
-export function computeMeta(body: string, format: NoteFormat = "markdown"): NoteMeta {
-  if (format === "latex") return latexMeta(body);
+/** What the list, sidebar and search know of a Markdown note. */
+export function computeMeta(body: string): NoteMeta {
   const lines = body.split("\n");
   // The title is the first line after the note's properties, or failing that its `title` or `name`.
   const front = frontMatter(body);
@@ -135,23 +135,5 @@ export function computeMeta(body: string, format: NoteFormat = "markdown"): Note
     searchText: body.toLowerCase(),
     properties,
     type: typeOf(properties),
-  };
-}
-
-/** A LaTeX note's title and excerpt come from its text as it reads; its tags can be in comments (`% #work`). */
-function latexMeta(body: string): NoteMeta {
-  const { text, title } = latexContent(body);
-  const lines = latexLines(text)
-    .map((line) => line.text.replace(/\s+/g, " ").trim())
-    .filter(Boolean);
-  if (title) lines.unshift(title);
-  return {
-    title: lines[0] ?? "",
-    excerpt: lines.slice(1).join(" ").slice(0, 200),
-    tags: extractTags(body),
-    hasOpenTodos: false,
-    searchText: body.toLowerCase(),
-    properties: [],
-    type: "",
   };
 }

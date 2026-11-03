@@ -5,6 +5,7 @@
   import { frontMatter } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
   import { tagIcons, typeIcons } from "../notes/tagIcons.svelte";
+  import { plugins } from "../plugins/registry.svelte";
   import { prefs } from "../prefs.svelte";
   import { objectsChanged } from "./objects";
   import { createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment } from "./setup";
@@ -44,7 +45,7 @@
     if (notes.get(currentId)?.note.body !== body) notes.update(currentId, body);
   }
 
-  /** Sets the editor up for the open note's format, Markdown or LaTeX, unless it is already. */
+  /** Sets the editor up for the open note's language (its plugin's editing), unless it is already. */
   function applyFormat() {
     if (!view || !currentId) return;
     const editing = formatEditing(notes.get(currentId)?.note.format);
@@ -158,6 +159,19 @@
   $effect(() => {
     void notes.get(noteId)?.note.format;
     untrack(applyFormat);
+  });
+
+  // A plugin turned on or off: the note's language is set up again from scratch, so all it draws
+  // (math, diagrams, its own syntax) follows. Its text, selection and undo history stay.
+  let pluginsSeen = plugins.active;
+  $effect(() => {
+    const active = plugins.active;
+    if (active === pluginsSeen) return;
+    pluginsSeen = active;
+    untrack(() => {
+      view?.dispatch({ effects: formatCompartment.reconfigure([]) });
+      applyFormat();
+    });
   });
 
   $effect(() => {

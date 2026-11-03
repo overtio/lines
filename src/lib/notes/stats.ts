@@ -1,6 +1,4 @@
-import { latexContent, latexLines, latexPlainText } from "./latex";
 import { frontMatter } from "./properties";
-import type { NoteFormat } from "./types";
 
 export interface NoteStats {
   words: number;
@@ -46,9 +44,8 @@ function textLines(body: string): string[] {
   return body.split("\n").slice(frontMatter(body)?.lines ?? 0);
 }
 
-/** The note as plain text: Markdown and properties removed, code kept, fences, dividers and card fences dropped, table cells tab-separated. */
-export function plainText(body: string, format: NoteFormat = "markdown"): string {
-  if (format === "latex") return latexPlainText(body);
+/** A Markdown note as plain text: Markdown and properties removed, code kept, fences, dividers and card fences dropped, table cells tab-separated. */
+export function plainText(body: string): string {
   return textLines(body)
     .filter((line) => !FENCE_RE.test(line) && !RULE_RE.test(line) && !TABLE_DELIM_RE.test(line) && !CARD_FENCE_RE.test(line))
     .map(plainLine)
@@ -65,15 +62,11 @@ function countSentences(text: string): number {
 }
 
 /**
- * Counts what a reader sees. Every line with words is a paragraph (that's how the editor shows
- * them), except headings, which also don't count as sentences.
+ * Counts what a reader sees in a Markdown note. Every line with words is a paragraph (that's how
+ * the editor shows them), except headings, which also don't count as sentences.
  */
-export function noteStats(body: string, format: NoteFormat = "markdown"): NoteStats {
-  const stats: NoteStats = { words: 0, characters: 0, sentences: 0, paragraphs: 0 };
-  if (format === "latex") {
-    for (const { text, heading } of latexLines(latexContent(body).text)) count(stats, text, heading);
-    return stats;
-  }
+export function noteStats(body: string): NoteStats {
+  const lines: CountedLine[] = [];
   let inFence = false;
   for (const line of textLines(body)) {
     if (FENCE_RE.test(line)) {
@@ -81,17 +74,27 @@ export function noteStats(body: string, format: NoteFormat = "markdown"): NoteSt
       continue;
     }
     if (!inFence && (RULE_RE.test(line) || TABLE_DELIM_RE.test(line) || CARD_FENCE_RE.test(line))) continue;
-    count(stats, inFence ? line : plainLine(line), inFence || HEADING_RE.test(line));
+    lines.push({ text: inFence ? line : plainLine(line), heading: inFence || HEADING_RE.test(line) });
   }
-  return stats;
+  return countLines(lines);
 }
 
-/** Adds a line's words and characters, and unless it's a heading (or code), a paragraph and its sentences. */
-function count(stats: NoteStats, text: string, heading: boolean) {
-  const words = text.match(WORD_RE)?.length ?? 0;
-  stats.words += words;
-  stats.characters += [...text.trim()].length;
-  if (!words || heading) return;
-  stats.paragraphs++;
-  stats.sentences += countSentences(text);
+/** A line as it reads, and whether it's a heading (or code), which counts words but not as a paragraph. */
+export interface CountedLine {
+  text: string;
+  heading: boolean;
+}
+
+/** Counts a note's lines, as any language reads them: words and characters, and paragraphs and sentences outside headings. */
+export function countLines(lines: Iterable<CountedLine>): NoteStats {
+  const stats: NoteStats = { words: 0, characters: 0, sentences: 0, paragraphs: 0 };
+  for (const { text, heading } of lines) {
+    const words = text.match(WORD_RE)?.length ?? 0;
+    stats.words += words;
+    stats.characters += [...text.trim()].length;
+    if (!words || heading) continue;
+    stats.paragraphs++;
+    stats.sentences += countSentences(text);
+  }
+  return stats;
 }

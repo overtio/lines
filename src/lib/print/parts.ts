@@ -6,15 +6,16 @@ import Icon from "../icons/Icon.svelte";
 import type { IconName } from "../icons/icons";
 import { t } from "../i18n/index.svelte";
 import { loadMath, type Macros, NO_MACROS } from "../editor/math";
-import { loadMermaid } from "../editor/mermaid";
 import { unsplashImage } from "../editor/unsplash";
 import { attachmentName, attachmentURL, imageSize } from "../notes/attachments";
 import { symbolPieces } from "../notes/symbols";
+import type { MathEngine, Renderer } from "../plugins/types";
 
 /*
- * The pieces a printed note is made of that take a moment to draw: math (KaTeX), diagrams
- * (Mermaid), highlighted code and images. Each is drawn into an element now and finished
- * later; `ready()` waits for all of them, so pages are measured only once everything has its size.
+ * The pieces a printed note is made of that take a moment to draw: math and code blocks drawn by
+ * plugins (KaTeX, Mermaid), highlighted code and images. Each is drawn into an element now and
+ * finished later; `ready()` waits for all of them, so pages are measured only once everything has
+ * its size.
  */
 
 /** Code's colors on paper, by kind, as the editor groups them (setup.ts). See print.css. */
@@ -27,42 +28,6 @@ const highlighter = tagHighlighter([
   { tag: [tags.typeName, tags.className, tags.namespace, tags.standard(tags.variableName), tags.propertyName], class: "doc-t" },
 ]);
 
-/** Mermaid's colors on paper: black lines and text, light fills. */
-const DIAGRAM_THEME = {
-  look: "classic" as const,
-  themeVariables: {
-    darkMode: false,
-    fontSize: "14px",
-    background: "#ffffff",
-    edgeLabelBackground: "#ffffff",
-    labelBackgroundColor: "#ffffff",
-    dropShadow: "none",
-    primaryColor: "#eef1f6",
-    primaryBorderColor: "#7d8796",
-    primaryTextColor: "#1a1a1a",
-    secondaryColor: "#f3f3f3",
-    tertiaryColor: "#f8f8f8",
-    lineColor: "#555555",
-    textColor: "#1a1a1a",
-    noteBkgColor: "#fff5c4",
-    noteBorderColor: "#d8c25a",
-    noteTextColor: "#1a1a1a",
-    // Pie slices, apart from each other in print and in grey.
-    pie1: "#9dbbe6",
-    pie2: "#f0c48a",
-    pie3: "#a8d5ac",
-    pie4: "#e3a3a8",
-    pie5: "#c5b3e3",
-    pie6: "#96d0cf",
-    pie7: "#e8d58f",
-    pie8: "#c9c9c9",
-    pieStrokeColor: "#ffffff",
-    pieOuterStrokeColor: "#ffffff",
-  },
-};
-
-let diagrams = 0;
-
 export function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = "", ...children: (Node | string)[]): HTMLElementTagNameMap[K] {
   const element = document.createElement(tag);
   if (className) element.className = className;
@@ -73,8 +38,8 @@ export function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = ""
 export class Parts {
   #pending: Promise<unknown>[] = [];
   #icons: Record<string, unknown>[] = [];
-  #katex: Awaited<ReturnType<typeof loadMath>> | undefined;
-  #katexLoading: Promise<void> | undefined;
+  #math: MathEngine | null | undefined;
+  #mathLoading: Promise<void> | undefined;
 
   /** Waits for everything still being drawn. */
   async ready() {
@@ -102,17 +67,18 @@ export class Parts {
     const dom = el(display ? "div" : "span", display ? "doc-math is-display" : "doc-math");
     const draw = () => {
       try {
-        this.#katex!.render(tex, dom, { displayMode: display, output: "htmlAndMathml", throwOnError: true, strict: "ignore", macros: { ...macros.map } });
+        if (!this.#math) throw new Error();
+        this.#math.render(dom, tex, { display, macros: macros.map });
       } catch {
-        // As written, the way the editor shows math KaTeX can't read.
+        // As written, the way the editor shows math the engine can't read (or with no engine on).
         dom.textContent = tex;
         dom.classList.add("is-error");
       }
     };
-    if (this.#katex) draw();
+    if (this.#math !== undefined) draw();
     else {
-      this.#katexLoading ??= loadMath().then((katex) => void (this.#katex = katex));
-      this.#later(this.#katexLoading.then(draw));
+      this.#mathLoading ??= loadMath().then((engine) => void (this.#math = engine));
+      this.#later(this.#mathLoading.then(draw));
     }
     return dom;
   }
@@ -148,25 +114,23 @@ export class Parts {
     return pre;
   }
 
-  /** A Mermaid diagram, in black and white, at the width its code block gives (```mermaid |400) if it does. */
-  diagram(source: string, width: number | null = null): HTMLElement {
+  /**
+   * A code block drawn by a renderer plugin (a Mermaid diagram), in black and white, at the width
+   * its code block gives (```mermaid |400) if it does. Code it can't draw prints as code.
+   */
+  rendered(renderer: Renderer, source: string, width: number | null = null): HTMLElement {
     const dom = el("div", "doc-diagram");
-    const id = `lines-print-diagram-${++diagrams}`;
     this.#later(
-      loadMermaid()
-        .then(async (mermaid) => {
-          mermaid.initialize({ startOnLoad: false, securityLevel: "strict", suppressErrorRendering: true, theme: "base", ...DIAGRAM_THEME });
-          const { svg } = await mermaid.render(id, source);
-          dom.innerHTML = svg;
+      renderer
+        .render(source, { paper: true })
+        .then((drawn) => {
+          if (typeof drawn === "string") dom.innerHTML = drawn;
+          else dom.replaceChildren(drawn);
           // No wider than the page (print.css).
-          const drawn = dom.querySelector("svg");
-          if (width && drawn) Object.assign(drawn.style, { width: `${width}px`, maxWidth: "" });
+          const svg = dom.querySelector("svg");
+          if (width && svg) Object.assign(svg.style, { width: `${width}px`, maxWidth: "" });
         })
-        .catch(() => {
-          document.getElementById(id)?.remove();
-          document.getElementById(`d${id}`)?.remove();
-          dom.replaceChildren(this.code(source, ""));
-        }),
+        .catch(() => dom.replaceChildren(this.code(source, ""))),
     );
     return dom;
   }

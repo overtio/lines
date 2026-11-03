@@ -1,5 +1,3 @@
-@import "./themes.css";
-
 :root {
   --font-system: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-serif: ui-serif, "New York", "Iowan Old Style", Charter, "Bitstream Charter", Georgia, Cambria, serif;
@@ -34,7 +32,7 @@
   --surface-list: color-mix(in srgb, var(--bg-list) var(--window-alpha), transparent);
   --surface-sidebar: color-mix(in srgb, var(--bg-sidebar) var(--window-alpha), transparent);
 
-  /* Derived from each theme's base colors (themes.css). */
+  /* Derived from each theme's base colors (themes.svelte.ts writes those, from theme plugins). */
   --border: color-mix(in srgb, var(--ink) 8%, transparent);
   --hover: color-mix(in srgb, var(--ink) 4.5%, transparent);
   --active: color-mix(in srgb, var(--ink) 7.5%, transparent);
@@ -68,7 +66,7 @@
   --disabled-opacity: 0.45;
   --highlight-base: #ffd60a;
   --highlight: color-mix(in srgb, var(--highlight-base) 40%, transparent);
-  /* Code block colors; themes with their own syntax palettes override these (themes.css). */
+  /* Code block colors; themes with their own syntax palettes override these. */
   --syn-keyword: #cf222e;
   --syn-string: #0a3069;
   --syn-number: #0550ae;
@@ -399,7 +397,7 @@ ul {
  * Placeholders are the browser's grey (about 4:1 on a field); the accessibility themes use their
  * faint text, which they keep at 7:1 (High Contrast) or 4.5:1 on every surface.
  */
-:root:is([data-theme="high-contrast"], [data-theme="red-green"], [data-theme="blue-yellow"]) ::placeholder {
+:root[data-accessible] ::placeholder {
   color: var(--text-faint);
   opacity: 1;
 }

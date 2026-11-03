@@ -2,22 +2,30 @@ import { syntaxTree } from "@codemirror/language";
 import { type EditorState, type Extension, type Range, Prec, StateField } from "@codemirror/state";
 import { Decoration, type DecorationSet, EditorView, keymap, WidgetType } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";
-import type Katex from "katex";
 import { t } from "../i18n/index.svelte";
+import { plugins } from "../plugins/registry.svelte";
+import type { MathEngine } from "../plugins/types";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { focusChanged, focused, isEditing } from "./util";
 
 /*
- * LaTeX math, drawn with KaTeX: `$x^2$` within text (livePreview.ts and tables.ts draw it), and
- * blocks between `$$` lines or in a ```math code block, drawn here like diagrams. With the cursor
- * in a block, its LaTeX shows with the math below it. KaTeX loads the first time a note has math.
+ * Math, drawn by a math engine plugin (KaTeX): `$x^2$` within text (livePreview.ts and tables.ts
+ * draw it), and blocks between `$$` lines or in a ```math code block, drawn here like diagrams.
+ * With the cursor in a block, its LaTeX shows with the math below it. The engine loads the first
+ * time a note has math; with none on, math stays as it's written.
  */
 
-let katex: typeof Katex | undefined;
-let loading: Promise<typeof Katex> | undefined;
-/** Loads KaTeX (and its fonts' CSS), once. */
-export const loadMath = () =>
-  (loading ??= Promise.all([import("katex"), import("katex/dist/katex.min.css")]).then(([module]) => (katex = module.default)));
+/** Engines that have loaded, and so draw at once. */
+const loaded = new WeakSet<MathEngine>();
+
+/** The math engine, once it's ready to draw; null with none on. */
+export async function loadMath(): Promise<MathEngine | null> {
+  const engine = plugins.math;
+  if (!engine) return null;
+  await engine.load();
+  loaded.add(engine);
+  return engine;
+}
 
 /** A note's own math commands (\newcommand…), and a key that's the same for the same ones. */
 export interface Macros {
@@ -29,32 +37,33 @@ export const NO_MACROS: Macros = { map: {}, key: "" };
 
 export const macrosOf = (map: Record<string, string>): Macros => ({ map, key: JSON.stringify(map) });
 
-/** Draws `tex` into `dom`; LaTeX KaTeX can't read shows as it is, marked, with the reason on hover. */
-function draw(dom: HTMLElement, tex: string, display: boolean, macros: Macros) {
+/** Draws `tex` into `dom`; LaTeX the engine can't read shows as it is, marked, with the reason on hover. */
+function draw(engine: MathEngine, dom: HTMLElement, tex: string, display: boolean, macros: Macros) {
   try {
-    // A copy: KaTeX adds to it what the math itself defines (\gdef). Screen readers read the
-    // MathML KaTeX writes alongside the drawing, which it hides from them.
-    katex!.render(tex, dom, { displayMode: display, output: "htmlAndMathml", throwOnError: true, strict: "ignore", macros: { ...macros.map } });
+    engine.render(dom, tex, { display, macros: macros.map });
     dom.classList.remove("is-error");
     dom.removeAttribute("title");
   } catch (error) {
     dom.textContent = tex;
     dom.classList.add("is-error");
-    dom.title = error instanceof Error ? error.message.replace(/^KaTeX parse error: /, "") : String(error);
+    dom.title = error instanceof Error ? error.message : String(error);
   }
 }
 
-/** `tex` drawn as math, now or once KaTeX has loaded (`onLoad` then runs, to measure again). */
+/** `tex` drawn as math, now or once the engine has loaded (`onLoad` then runs, to measure again). */
 export function mathElement(tex: string, display: boolean, onLoad?: () => void, macros = NO_MACROS): HTMLElement {
   const dom = document.createElement("span");
   dom.className = display ? "cm-lp-math is-display" : "cm-lp-math";
-  if (katex) draw(dom, tex, display, macros);
+  const engine = plugins.math;
+  if (engine && loaded.has(engine)) draw(engine, dom, tex, display, macros);
   else {
+    // As written until it's drawn, or for good with no engine on.
     dom.textContent = tex;
     dom.classList.add("is-pending");
-    void loadMath().then(() => {
+    void loadMath().then((ready) => {
+      if (!ready) return;
       dom.classList.remove("is-pending");
-      draw(dom, tex, display, macros);
+      draw(ready, dom, tex, display, macros);
       onLoad?.();
     });
   }

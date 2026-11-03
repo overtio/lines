@@ -196,7 +196,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 13. Settings
 
-- [ ] The tabs are Theme, Text, Data, Shortcuts and About; Data has Sync, App lock, Locked notes, Synced notes (its Go to Sync button scrolls up to Sync and focuses it), Export and Sample notes
+- [ ] The tabs are Theme, Text, Plugins, Data, Shortcuts and About; Data has Sync, App lock, Locked notes, Synced notes (its Go to Sync button scrolls up to Sync and focuses it), Export and Sample notes
 - [ ] ← and → move between tabs; Esc closes; every change applies at once, in every window
 - [ ] Only the panel scrolls, with one scrollbar, in every tab (Shortcuts too, all the way to the end); the tabs stay put
 - [ ] [Web] A click outside Settings closes it; a click inside, or selecting text and letting go outside, doesn't
@@ -216,6 +216,18 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Text: the preview follows font, size, spacing presets and every slider; Reset to default
 - [ ] Text → Symbols: turning off "in text" or "in code" shows the characters there at once (tables too), in every window, and is remembered; the other keeps its symbols
 - [ ] About: version, Source on GitHub, Report an issue, license, credits, third-party licenses load
+
+## 13a. Plugins
+
+- [ ] Settings → Plugins lists Formats (Markdown, LaTeX), Drawing and Typesetting (Math, Diagrams, TeX Typesetting) and Look (Themes, Lucide, SF Symbols [Apple]), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no checkbox, and says it's in the Mac and iPhone apps
+- [ ] Clicking a plugin's row (not just its checkbox) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
+- [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On (no format switch, with Markdown the only format left); Turn On draws it as LaTeX again at once
+- [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
+- [ ] Turning TeX Typesetting on while LaTeX is off turns LaTeX on too
+- [ ] Diagrams off: ```mermaid blocks show as code, `/diagram` is gone from the "/" menu, and the PDF prints them as code; on again, they're drawn again, and Diagram is right after Code block in the menu
+- [ ] Math off: `$…$`, `$$` blocks and LaTeX notes' math show as written, on screen and in the PDF; on again, drawn
+- [ ] TeX Typesetting off: a LaTeX note's PDF preview has no "Typeset with" switch
+- [ ] Choices are remembered after reloading, and turning a plugin on or off in one window changes every window at once (the Settings window, floating notes [Desktop], other browser tabs [Web])
 
 ## 14. Sync
 

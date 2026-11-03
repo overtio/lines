@@ -1,16 +1,16 @@
-import { locale, t } from "../i18n/index.svelte";
-import { enumerated, THEOREMS } from "../editor/latex";
-import { type Definitions, type Env, LIST_ENVS, scanLatex, type Span } from "../editor/latexSyntax";
-import { type Macros, macrosOf } from "../editor/math";
-import { DOCUMENT_BEGIN, latexText } from "../notes/latex";
-import { el, type Parts } from "./parts";
+import { locale, t } from "../../lib/i18n/index.svelte";
+import { enumerated, THEOREMS } from "./editor";
+import { type Definitions, type Env, LIST_ENVS, scanLatex, type Span } from "./syntax";
+import { type Macros, macrosOf } from "../../lib/editor/math";
+import { DOCUMENT_BEGIN, latexText } from "./text";
+import { el, type Parts } from "../../lib/print/parts";
 
 /*
- * A LaTeX note as a printed document, read the way the editor reads it (latexSyntax.ts) but laid
+ * A LaTeX note as a printed document, read the way the editor reads it (syntax.ts) but laid
  * out as LaTeX lays out a page: lines join into paragraphs, a blank line starts a new one, sections,
  * theorems and equations are numbered and \ref shows their numbers, and \maketitle prints the
  * title. Footnotes are gathered at the end. Commands it doesn't know print their last argument's
- * text, or nothing (layout like \vspace). For TeX's own typesetting, see tex.ts.
+ * text, or nothing (layout like \vspace). For TeX's own typesetting, see the TeX plugin (plugins/tex).
  */
 
 interface Node {
@@ -105,7 +105,7 @@ class Flow {
   }
 }
 
-export function latexDocument(body: string, parts: Parts): HTMLElement {
+export function printDocument(body: string, parts: Parts): HTMLElement {
   const doc = el("div", "doc doc-latex");
   // Its text is set in KaTeX's Computer Modern, so its fonts are wanted even with no math in it.
   parts.math("", false).remove();

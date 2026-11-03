@@ -1,6 +1,6 @@
 # LaTeX notes
 
-A note can be written in LaTeX instead of Markdown. Switch it in the note's info panel (the ⓘ button in its toolbar): **Markdown** or **LaTeX**. The note's text stays as it is; lines reads it the other way.
+A note can be written in LaTeX instead of Markdown. Switch it in the note's info panel (the ⓘ button in its toolbar): **Markdown** or **LaTeX**. The note's text stays as it is; lines reads it the other way. LaTeX notes are a [plugin](plugins.md), on unless it's turned off in Settings → Plugins; while it's off, LaTeX notes show as plain text.
 
 A LaTeX note is drawn the way a Markdown note is: the text is plain LaTeX, and commands are hidden unless the cursor is on them. `\section{Plan}` reads as a heading, `\textbf{Friday}` as bold, an `itemize` as a list, math as math. What lines doesn't draw stays as written, faint.
 
@@ -21,7 +21,7 @@ We fly on \textbf{Friday} and come back \emph{Monday}.
 \[ \int_0^1 x^2\,dx = \frac{1}{3} \]
 ```
 
-The editor's reading of LaTeX is in `src/lib/editor/latexSyntax.ts`, and what it draws in `src/lib/editor/latex.ts`. The note list's title, excerpt and counts come from `src/lib/notes/latex.ts`.
+The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.ts`, what it draws in `editor.ts`, and the note list's title, excerpt and counts in `text.ts` and `index.ts`.
 
 ## What's drawn
 
@@ -114,8 +114,8 @@ Download (in the note's share menu, on the web) and Export (Settings → Data) w
 
 ⌘P (or Share → Preview as PDF) shows a LaTeX note on pages, in either of two ways, chosen with **Typeset with** at the top:
 
-- **lines** lays it out itself, as LaTeX lays out an article: lines join into paragraphs and a blank line starts the next; text is set in Computer Modern and justified. A whole document's `\maketitle` prints its title, authors and date. Sections, theorems (on their own counters, or shared as `\newtheorem` says), `equation`s, and figures' and tables' captions are numbered, and `\ref`, `\eqref` and `\autoref` show those numbers. Footnotes are gathered at the end. Commands it doesn't know print their last argument's text (`\textcolor{red}{word}` prints "word"), or nothing (`\vspace`, `\noindent`). Print… prints the pages, or saves them as a PDF from the print dialog. The code is in `src/lib/print/latex.ts`.
-- **TeX** typesets it with pdfLaTeX, compiled to WebAssembly (BusyTeX), from the same document Export writes (with Latin Modern as its font). It runs LaTeX until references settle, and BibTeX when the note has a `\bibliography`. It has TeX Live's basic packages, `amsmath`, `amsthm`, `graphicx`, `hyperref` and `listings` among them; `booktabs` stands in with plain rules. The first time, it downloads TeX (about 125 MB); the browser keeps it. If TeX stops at an error, the preview says where, with TeX's log. Save PDF saves the PDF. The code is in `src/lib/print/tex.ts`.
+- **lines** lays it out itself, as LaTeX lays out an article: lines join into paragraphs and a blank line starts the next; text is set in Computer Modern and justified. A whole document's `\maketitle` prints its title, authors and date. Sections, theorems (on their own counters, or shared as `\newtheorem` says), `equation`s, and figures' and tables' captions are numbered, and `\ref`, `\eqref` and `\autoref` show those numbers. Footnotes are gathered at the end. Commands it doesn't know print their last argument's text (`\textcolor{red}{word}` prints "word"), or nothing (`\vspace`, `\noindent`). Print… prints the pages, or saves them as a PDF from the print dialog. The code is in `src/plugins/latex/print.ts`.
+- **TeX** typesets it with pdfLaTeX, compiled to WebAssembly (BusyTeX), from the same document Export writes (with Latin Modern as its font). It runs LaTeX until references settle, and BibTeX when the note has a `\bibliography`. It has TeX Live's basic packages, `amsmath`, `amsthm`, `graphicx`, `hyperref` and `listings` among them; `booktabs` stands in with plain rules. The first time, it downloads TeX (about 125 MB); the browser keeps it. If TeX stops at an error, the preview says where, with TeX's log. Save PDF saves the PDF. TeX is a plugin of its own, TeX Typesetting (Settings → Plugins), in `src/plugins/tex/`.
 
 ## On disk
 

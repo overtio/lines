@@ -15,7 +15,7 @@ export const SETTINGS_LABEL = "settings";
 /** This window is the Settings window. */
 export const isSettingsWindow = windowLabel() === SETTINGS_LABEL;
 
-const TABS: SettingsTab[] = ["theme", "text", "data", "shortcuts", "about"];
+const TABS: SettingsTab[] = ["theme", "text", "plugins", "data", "shortcuts", "about"];
 
 /** The tab the Settings window opens on, from its address. */
 export function initialTab(): SettingsTab {

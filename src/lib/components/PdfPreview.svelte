@@ -5,23 +5,23 @@
   import { t } from "../i18n/index.svelte";
   import type { Entry } from "../notes/store.svelte";
   import { isApple, isDesktopApp, isTauri, revealFile, saveFile } from "../platform";
-  import { prefs, type Paper, type Typesetter } from "../prefs.svelte";
-  import { latexDocument } from "../print/latex";
-  import { markdownDocument } from "../print/markdown";
+  import { plugins } from "../plugins/registry.svelte";
+  import type { TypesetResult } from "../plugins/types";
+  import { prefs, type Paper } from "../prefs.svelte";
   import { pagesToPng } from "../print/images";
   import { paginate, PAPERS } from "../print/pages";
   import { Parts } from "../print/parts";
-  import { texAvailable, type TexResult, typesetTex } from "../print/tex";
   import { placeAt } from "../popover";
   import { zip } from "../zip";
   import "../print/print.css";
   import Segmented from "./Segmented.svelte";
 
   /*
-   * A note as a PDF: laid out on pages by lines (print/), or for a LaTeX note typeset by TeX
-   * (print/tex.ts). lines' pages print as they show, through the system's print dialog, which
-   * saves PDFs too; TeX's PDF is saved as it is. lines' pages also save as PNG images
-   * (print/images.ts): the whole note as one, or one per page.
+   * A note as a PDF: laid out on pages by lines, as its language's plugin prints it (print/), or
+   * typeset by a typesetter plugin for its language (TeX, for a LaTeX note). lines' pages print as
+   * they show, through the system's print dialog, which saves PDFs too; a typesetter's PDF is
+   * saved as it is. lines' pages also save as PNG images (print/images.ts): the whole note as one,
+   * or one per page.
    */
 
   let {
@@ -40,14 +40,18 @@
   // A snapshot of the note when the preview opened.
   const { note } = untrack(() => entry);
   const title = untrack(() => entry.meta.title) || t("list.untitled");
-  const latex = note.format === "latex";
+  const language = plugins.language(note.format);
+  /** Typesetters for its language, besides lines' own pages. */
+  const typesetters = untrack(() => plugins.typesettersFor(language.id));
   const filename = title.replace(/[\\/:*?"<>|]+/g, "-").trim().slice(0, 80) || t("list.untitled");
   /** The system print dialog: in browsers, and in the desktop apps (not on iPhone or iPad). */
   const canPrint = !isTauri || isDesktopApp;
 
   // Images are lines' pages, so asking for them starts there.
-  let typesetter = $state<Typesetter>(untrack(() => (png ? "lines" : prefs.typesetter)));
-  const using = $derived<Typesetter>(latex ? typesetter : "lines");
+  let typesetter = $state(untrack(() => (png ? "lines" : prefs.typesetter)));
+  /** The typesetter making the PDF, if it isn't lines. */
+  const external = $derived(typesetters.find((each) => each.id === typesetter));
+  const using = $derived(external?.id ?? "lines");
 
   // lines' own pages.
   let parts: Parts | null = null;
@@ -56,12 +60,12 @@
   let count = $state(0);
   let zoom = $state(1);
 
-  // TeX's PDF.
-  let tex = $state<
+  // A typesetter's PDF.
+  let typesetting = $state<
     | { state: "idle" | "missing" | "compiling" }
     | { state: "downloading"; percent: number }
     | { state: "done"; pdf: Uint8Array<ArrayBuffer>; url: string }
-    | { state: "failed"; result: Extract<TexResult, { ok: false }> }
+    | { state: "failed"; result: Extract<TypesetResult, { ok: false }> }
   >({ state: "idle" });
   let saved = $state<{ path: string | null; filename: string } | null>(null);
 
@@ -93,7 +97,7 @@
     dialog?.remove();
     removeEventListener("beforeprint", beforePrint);
     removeEventListener("afterprint", afterPrint);
-    if (tex.state === "done") URL.revokeObjectURL(tex.url);
+    if (typesetting.state === "done") URL.revokeObjectURL(typesetting.url);
     if (opener?.isConnected) opener.focus();
   });
 
@@ -104,11 +108,11 @@
     untrack(() => void layOut(paper));
   });
 
-  // Typesets with TeX when that's chosen, once.
+  // Typesets with the typesetter when it's chosen, once.
   $effect(() => {
-    if (using !== "tex") return;
+    if (using === "lines") return;
     untrack(() => {
-      if (tex.state === "idle") void typeset();
+      if (typesetting.state === "idle") void typeset();
     });
   });
 
@@ -122,7 +126,7 @@
   async function layOut(paper: Paper) {
     if (!doc) {
       parts = new Parts();
-      doc = latex ? latexDocument(note.body, parts) : markdownDocument(note.body, parts);
+      doc = language.print(note.body, parts);
       measure.replaceChildren(doc);
       // Laid out once in the page before waiting, so the fonts it uses start loading.
       void doc.offsetHeight;
@@ -147,19 +151,22 @@
   }
 
   async function typeset() {
-    if (!(await texAvailable())) return void (tex = { state: "missing" });
-    tex = { state: "compiling" };
-    const result = await typesetTex(note.body, (progress) => {
-      tex = progress.phase === "download" ? { state: "downloading", percent: Math.round(progress.percent ?? 0) } : { state: "compiling" };
+    const by = external;
+    if (!by) return;
+    const name = by.name;
+    if (!(await by.available())) return void (typesetting = { state: "missing" });
+    typesetting = { state: "compiling" };
+    const result = await by.typeset(note.body, (progress) => {
+      typesetting = progress.phase === "download" ? { state: "downloading", percent: Math.round(progress.percent ?? 0) } : { state: "compiling" };
     });
     if (!result.ok) {
-      tex = { state: "failed", result };
-      speak(result.line ? t("print.texErrorAt", { line: result.line }) : t("print.texError"));
+      typesetting = { state: "failed", result };
+      speak(result.line ? t("print.typesetErrorAt", { name, line: result.line }) : t("print.typesetError", { name }));
       return;
     }
     const pdf = new Uint8Array(result.pdf);
-    tex = { state: "done", pdf, url: URL.createObjectURL(new Blob([pdf], { type: "application/pdf" })) };
-    speak(t("print.texReady"));
+    typesetting = { state: "done", pdf, url: URL.createObjectURL(new Blob([pdf], { type: "application/pdf" })) };
+    speak(t("print.typesetReady", { name }));
     if (saveWhenReady) {
       saveWhenReady = false;
       exportPdf();
@@ -167,7 +174,7 @@
   }
 
   function retry() {
-    tex = { state: "idle" };
+    typesetting = { state: "idle" };
     void typeset();
   }
 
@@ -178,11 +185,11 @@
     zoom = Math.min(1, (scroller.clientWidth - 32) / pageWidth);
   }
 
-  /** Prints lines' pages, or saves TeX's PDF. */
+  /** Prints lines' pages, or saves the typesetter's PDF. */
   function exportPdf() {
-    if (using === "tex") {
-      if (tex.state !== "done") return;
-      void saveFile(`${filename}.pdf`, tex.pdf, "application/pdf").then((path) => {
+    if (using !== "lines") {
+      if (typesetting.state !== "done") return;
+      void saveFile(`${filename}.pdf`, typesetting.pdf, "application/pdf").then((path) => {
         saved = { path, filename: `${filename}.pdf` };
         speak(path ? t("print.savedTo", { path }) : t("print.downloaded", { filename: `${filename}.pdf` }));
       });
@@ -266,12 +273,9 @@
     { id: "a4" as const, label: t("print.a4") },
     { id: "letter" as const, label: t("print.letter") },
   ];
-  const typesetters = [
-    { id: "lines" as const, label: t("print.lines") },
-    { id: "tex" as const, label: t("print.tex") },
-  ];
+  const typesetterOptions = [{ id: "lines", label: t("print.lines") }, ...typesetters.map(({ id, name }) => ({ id, label: name }))];
 
-  const ready = $derived(using === "tex" ? tex.state === "done" : laidOut && canPrint);
+  const ready = $derived(using !== "lines" ? typesetting.state === "done" : laidOut && canPrint);
 </script>
 
 {#snippet savedMessage(file: { path: string | null; filename: string })}
@@ -294,10 +298,10 @@
       <span class="note-title">{title}</span>
     </div>
     <div class="controls">
-      {#if latex}
+      {#if typesetters.length}
         <div class="control">
           <span class="label" aria-hidden="true">{t("print.typesetter")}</span>
-          <Segmented label={t("print.typesetter")} options={typesetters} value={typesetter} onselect={(id) => (typesetter = prefs.typesetter = id)} />
+          <Segmented label={t("print.typesetter")} options={typesetterOptions} value={using} onselect={(id) => (typesetter = prefs.typesetter = id)} />
         </div>
       {/if}
       {#if using === "lines"}
@@ -347,15 +351,16 @@
       {:else}
         {t("print.pages", { count })}{#if canPrint}<span class="hint"> · {t("print.printHint")}</span>{/if}
       {/if}
-    {:else if tex.state === "downloading"}
-      {t("print.downloading", { percent: tex.percent })} <span class="hint">{t("print.downloadingSize")}</span>
-    {:else if tex.state === "compiling"}
-      {t("print.compiling")}
-    {:else if tex.state === "done"}
+    {:else if typesetting.state === "downloading"}
+      {t("print.downloading", { name: external!.name, percent: typesetting.percent })}
+      {#if external?.download}<span class="hint">{external.download}</span>{/if}
+    {:else if typesetting.state === "compiling"}
+      {t("print.compiling", { name: external!.name })}
+    {:else if typesetting.state === "done"}
       {#if saved}
         {@render savedMessage(saved)}
       {:else}
-        {t("print.texReady")}
+        {t("print.typesetReady", { name: external!.name })}
       {/if}
     {/if}
   </div>
@@ -364,25 +369,26 @@
     <!-- lines' pages, laid out by print/pages.ts. -->
     <div class="pages" bind:this={pagesEl} hidden={using !== "lines"} style:zoom></div>
 
-    {#if using === "tex"}
-      {#if tex.state === "done"}
-        <iframe class="pdf" src={tex.url} title={t("print.pdfFrame", { title })}></iframe>
-      {:else if tex.state === "downloading"}
+    {#if external}
+      {@const name = external.name}
+      {#if typesetting.state === "done"}
+        <iframe class="pdf" src={typesetting.url} title={t("print.pdfFrame", { title, name })}></iframe>
+      {:else if typesetting.state === "downloading"}
         <div class="message">
-          <progress max="100" value={tex.percent} aria-label={t("print.downloading", { percent: tex.percent })}></progress>
+          <progress max="100" value={typesetting.percent} aria-label={t("print.downloading", { name, percent: typesetting.percent })}></progress>
         </div>
-      {:else if tex.state === "missing"}
-        <p class="message">{t("print.texMissing")}</p>
-      {:else if tex.state === "failed"}
+      {:else if typesetting.state === "missing"}
+        <p class="message">{t("print.typesetterMissing", { name })}</p>
+      {:else if typesetting.state === "failed"}
         <div class="message failed">
-          {#if tex.result.starting}
-            <p>{t("print.texOffline")}</p>
+          {#if typesetting.result.starting}
+            <p>{t("print.typesetterOffline", { name })}</p>
           {:else}
-            <p><strong>{tex.result.line ? t("print.texErrorAt", { line: tex.result.line }) : t("print.texError")}</strong></p>
-            <pre class="error">{tex.result.error}</pre>
+            <p><strong>{typesetting.result.line ? t("print.typesetErrorAt", { name, line: typesetting.result.line }) : t("print.typesetError", { name })}</strong></p>
+            <pre class="error">{typesetting.result.error}</pre>
             <details>
-              <summary>{t("print.log")}</summary>
-              <pre class="log">{tex.result.log}</pre>
+              <summary>{t("print.log", { name })}</summary>
+              <pre class="log">{typesetting.result.log}</pre>
             </details>
           {/if}
           <button class="text-button" onclick={retry}>{t("print.retry")}</button>

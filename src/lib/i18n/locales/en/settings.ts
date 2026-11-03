@@ -4,6 +4,7 @@ export default {
   "settings.title": "Settings",
   "settings.tabTheme": "Theme",
   "settings.tabText": "Text",
+  "settings.tabPlugins": "Plugins",
   "settings.tabData": "Data",
   "settings.tabAbout": "About",
   "settings.close": "Close",

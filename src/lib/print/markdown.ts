@@ -7,11 +7,13 @@ import { githubText } from "../editor/github";
 import { valueText } from "../editor/objects";
 import { Card, Highlight, Mention, Tag, TexMath } from "../editor/syntax";
 import { tableData } from "../editor/typeTables";
-import { diagramInfo } from "../editor/mermaid";
+import { fenceLanguage, renderedInfo } from "../editor/rendered";
 import { isUnsplashPhoto } from "../editor/unsplash";
 import { attachmentName } from "../notes/attachments";
 import { frontMatter, readTypeRef, typeLabel } from "../notes/properties";
 import { withSymbols } from "../notes/symbols";
+import { plugins } from "../plugins/registry.svelte";
+import type { MarkdownAddition, MarkdownPrint, MarkdownPrinter } from "../plugins/types";
 import { prefs } from "../prefs.svelte";
 import { el, type Parts } from "./parts";
 
@@ -19,10 +21,25 @@ import { el, type Parts } from "./parts";
  * A Markdown note as a printed document: the same Linedown the editor reads (docs/linedown.md),
  * drawn as it reads with nothing to edit. Each line of a paragraph stays a line, as on screen.
  * Tags and mentions read as text; type tables are drawn as their tables; front matter becomes a
- * short list of properties at the top.
+ * short list of properties at the top. What plugins add to Markdown prints as they say.
  */
 
-const parser = (markdownLanguage.parser as MarkdownParser).configure([Tag, Highlight, Card, TexMath, Mention]);
+const linedown = (markdownLanguage.parser as MarkdownParser).configure([Tag, Highlight, Card, TexMath, Mention]);
+
+let withPlugins: { additions: MarkdownAddition[]; parser: MarkdownParser; printers: Map<string, MarkdownPrinter> } | undefined;
+
+/** The parser and printers with what plugins add to Markdown, made again when that changes. */
+function additions() {
+  const added = plugins.markdown;
+  if (withPlugins?.additions !== added) {
+    withPlugins = {
+      additions: added,
+      parser: linedown.configure(added.flatMap((addition) => addition.syntax ?? [])),
+      printers: new Map(added.flatMap((addition) => Object.entries(addition.print ?? {}))),
+    };
+  }
+  return withPlugins;
+}
 
 /** Marks that are only syntax: `**`, `` ` ``, `#`, `>`… */
 const MARKS = new Set([
@@ -52,8 +69,27 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
       doc.append(list);
     }
   }
+  const { parser, printers } = additions();
   const tree = parser.parse(text);
   const slice = (from: number, to: number) => text.slice(from, to);
+
+  const print: MarkdownPrint = {
+    slice,
+    inline: (node, into) => inline(node, into),
+    blocks: (node, into) => {
+      for (let child = node.firstChild; child; child = child.nextSibling) block(child, into);
+    },
+    parts,
+  };
+
+  /** Prints a node a plugin added, if it's one. */
+  function printed(node: SyntaxNode, into: Node) {
+    const printer = printers.get(node.name);
+    if (!printer) return false;
+    const out = printer(node, print);
+    if (out) into.appendChild(out);
+    return true;
+  }
 
   /**
    * Text, each line of it a line; the indentation that continues a paragraph is left out. Its
@@ -92,7 +128,7 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
 
   function inlineNode(node: SyntaxNode, into: Node) {
     const { name } = node;
-    if (MARKS.has(name)) return;
+    if (printed(node, into) || MARKS.has(name)) return;
     if (INLINE_TAGS[name]) {
       const element = el(INLINE_TAGS[name]);
       inline(node, element);
@@ -223,6 +259,7 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
 
   function block(node: SyntaxNode, into: HTMLElement) {
     const { name } = node;
+    if (printed(node, into)) return;
     const heading = /^(?:ATXHeading(\d)|SetextHeading(\d))$/.exec(name);
     if (heading) {
       const h = el(`h${Number(heading[1] ?? heading[2])}` as "h1");
@@ -257,11 +294,12 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
       }
       case "FencedCode": {
         const info = node.getChild("CodeInfo");
-        const language = info ? (/\S*/.exec(slice(info.from, info.to))![0] ?? "").toLowerCase() : "";
+        const written = info ? slice(info.from, info.to) : "";
+        const language = fenceLanguage(written);
         const code = node.getChild("CodeText");
         const source = code ? slice(code.from, code.to) : "";
-        const diagram = info && diagramInfo(slice(info.from, info.to));
-        if (diagram) return void into.append(parts.diagram(source, diagram.width));
+        const rendered = renderedInfo(written);
+        if (rendered) return void into.append(parts.rendered(rendered.renderer, source, rendered.width));
         if (language === "math") return void into.append(parts.math(source, true));
         return void into.append(parts.code(source, language, prefs.symbolsInCode));
       }

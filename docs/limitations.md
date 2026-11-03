@@ -98,6 +98,17 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - A locked note can be mentioned by its title, but its properties can't be read, even while it's open.
 - A synced note's file has two front matter blocks: lines' own (id, dates…) and then the note's properties, as part of its text. Apps that read front matter see the first.
 
+## Plugins
+
+How plugins work is in [plugins.md](plugins.md).
+
+- Plugins come with lines; one made by someone else can't be installed yet.
+- A note in a format whose plugin is off shows as plain text: no live preview, and its title is its first line as written. Exports and downloads still write it in its format.
+- Turning a plugin on or off isn't synced: each device keeps its own.
+- Drawings (Excalidraw), highlighting code blocks, GitHub links, symbols, and objects and mentions are still part of the core and Markdown, not plugins.
+- Only Markdown notes take additions from plugins; a renderer plugin draws code blocks in Markdown notes, not in LaTeX ones.
+- Turning a plugin off or on in the Mac app's Settings window hasn't been tried there yet, nor in floating notes (each window should follow at once).
+
 ## Accessibility and languages
 
 - With Contrast on Standard, faint text (dates, counts, the sidebar's headings, hints) is below WCAG AA's 4.5:1 in every theme but the three accessibility ones, and secondary text is too in a few light themes (Solarized, Everforest, Ayu). Contrast → Increased, or the system's Increase Contrast, meets AA (docs/accessibility.md).
@@ -142,6 +153,8 @@ Where the web app keeps everything is in [storage.md](storage.md).
 ## Future work
 
 - [ ] Convert a note between Markdown and LaTeX when switching
+- [ ] Formats as plugins: Org mode, AsciiDoc, WikiText and reStructuredText
+- [ ] Install plugins made by others, safely; themes and icon sets from a file
 - [ ] Drawings in LaTeX notes, saved as a PDF beside the SVG for TeX
 - [ ] Save lines' PDF straight to a file in the apps (the web view's own PDF output), and print on iPhone and iPad
 - [ ] More of TeX Live for TeX's PDFs, fetched as a note needs it; XeLaTeX for other scripts and fonts

@@ -5,14 +5,14 @@ import type { SyntaxNode } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import { t } from "../i18n/index.svelte";
 import { ATTACHMENT_PATH, attachmentName, getAttachment, saveAttachment } from "../notes/attachments";
-import { diagramInfo } from "./mermaid";
+import { fenceLanguage } from "./rendered";
 
 /*
  * Drawings: Excalidraw sketches kept as SVG attachments with their scene inside, as excalidraw.com
  * saves them with "Embed scene". A note shows one as the image it is, here and in any Markdown app;
  * lines also opens it in Excalidraw (DrawingEditor.svelte) to change, and Save puts the result in as
- * a new attachment in its place. /drawing starts one, and a Mermaid diagram's button starts one
- * from a copy of the diagram.
+ * a new attachment in its place. /drawing starts one, and a Mermaid diagram's button
+ * (plugins/mermaid) starts one from a copy of the diagram.
  */
 
 /** What an SVG that holds its Excalidraw scene says. */
@@ -122,7 +122,7 @@ function diagramAt(state: EditorState, pos: number) {
     for (let node: SyntaxNode | null = syntaxTree(state).resolveInner(pos, side); node; node = node.parent) {
       if (node.name !== "FencedCode") continue;
       const info = node.getChild("CodeInfo");
-      if (!info || !diagramInfo(state.sliceDoc(info.from, info.to))) return null;
+      if (!info || fenceLanguage(state.sliceDoc(info.from, info.to)) !== "mermaid") return null;
       const code = node.getChild("CodeText");
       return { from: node.from, to: node.to, source: code ? state.sliceDoc(code.from, code.to) : "" };
     }

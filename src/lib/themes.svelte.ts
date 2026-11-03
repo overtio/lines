@@ -1,0 +1,79 @@
+import { plugins } from "./plugins/registry.svelte";
+import type { Theme, ThemeColors } from "./plugins/types";
+import { prefs } from "./prefs.svelte";
+
+/*
+ * Themes come from plugins (lines' own are in plugins/themes). This writes the colors of the ones
+ * on as CSS custom properties, which app.css builds on, and shows this window's theme: the one
+ * chosen, or Lines while the plugin it's from is off.
+ */
+
+/** What Increased contrast changes in every theme, before each theme's own changes. */
+const MORE_CONTRAST = `:root[data-theme][data-scheme][data-contrast="more"] {
+  --text-sidebar: var(--text);
+  --border: color-mix(in srgb, var(--ink) 42%, transparent);
+  --card-border: color-mix(in srgb, var(--ink) 42%, transparent);
+}
+
+:root[data-theme][data-scheme="dark"][data-contrast="more"] {
+  --border: color-mix(in srgb, var(--ink) 36%, transparent);
+  --card-border: color-mix(in srgb, var(--ink) 36%, transparent);
+}`;
+
+/** A custom property's name, and a value that can't end the rule it's in. */
+const PROPERTY = /^[a-z][a-z0-9-]*$/;
+const VALUE = /^[^;{}<>]*$/;
+
+function rule(selector: string, colors: Partial<ThemeColors> = {}) {
+  const lines = Object.entries(colors)
+    .filter(([name, value]) => PROPERTY.test(name) && typeof value === "string" && VALUE.test(value))
+    .map(([name, value]) => `  --${name}: ${value};`);
+  return lines.length ? `${selector} {\n${lines.join("\n")}\n}` : "";
+}
+
+/**
+ * The themes' colors as CSS. With the theme and scheme in their selectors, Increased contrast's
+ * colors outrank the theme's own, and each theme's outrank those every theme shares.
+ */
+export function themeCss(themes: readonly Theme[]): string {
+  const root = (theme: Theme) => `:root[data-theme="${CSS.escape(theme.id)}"]`;
+  return [
+    ...themes.flatMap((theme) => [rule(root(theme), theme.light), rule(`${root(theme)}[data-scheme="dark"]`, theme.dark)]),
+    MORE_CONTRAST,
+    ...themes.flatMap(({ moreContrast }, i) => [
+      rule(`${root(themes[i])}[data-scheme="light"][data-contrast="more"]`, moreContrast?.light),
+      rule(`${root(themes[i])}[data-scheme="dark"][data-contrast="more"]`, moreContrast?.dark),
+    ]),
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+const style = document.createElement("style");
+style.id = "lines-themes";
+// First in the page, so app.css's rules come after the themes' and build on them.
+document.head.prepend(style);
+
+function showThemes() {
+  const css = themeCss(plugins.themes);
+  if (style.textContent !== css) style.textContent = css;
+}
+
+function showTheme() {
+  const { theme: id, dark } = prefs.windowLook;
+  const theme = plugins.theme(id);
+  const root = document.documentElement;
+  root.dataset.theme = theme.id;
+  if (theme.accessible) root.dataset.accessible = "";
+  else delete root.dataset.accessible;
+  // Tint the browser's and phone's status bar to match.
+  document.querySelector('meta[name="theme-color"]:not([media])')?.setAttribute("content", theme[dark ? "dark" : "light"].bg);
+}
+
+// Before the first paint, so there's no flash of another theme; then whenever they change.
+showThemes();
+showTheme();
+$effect.root(() => {
+  $effect(showThemes);
+  $effect(showTheme);
+});

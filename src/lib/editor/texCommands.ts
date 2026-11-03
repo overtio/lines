@@ -45,6 +45,7 @@ function tex(
   let place = 0;
   const write = snippet(template.replace(/\$\{([^{}]*)\}/g, (_, name: string) => `\${${++place}${name ? `:${name}` : ""}}`) + "${0}");
   return {
+    id: name,
     name: `\\${name}`,
     hint,
     icon,

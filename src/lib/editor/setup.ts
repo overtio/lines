@@ -16,10 +16,8 @@ import { attachmentBlocks } from "./attachments";
 import { formatToolbar, toggleFormat } from "./formatting";
 import { listKeymap } from "./lists";
 import { livePreview, openAtCursor } from "./livePreview";
-import type { NoteFormat } from "../notes/types";
-import { latexEditing } from "./latex";
 import { mathBlocks } from "./math";
-import { mermaidDiagrams } from "./mermaid";
+import { renderedBlocks } from "./rendered";
 import { slashCommands } from "./slashCommands";
 import { symbols } from "./symbols";
 import { tables } from "./tables";
@@ -27,6 +25,8 @@ import { typeTables } from "./typeTables";
 import { frontMatterField, missingNotes } from "./objects";
 import { Card, Highlight, Mention, Tag, TexMath } from "./syntax";
 import { t as message } from "../i18n/index.svelte";
+import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
+import type { MarkdownAddition } from "../plugins/types";
 
 /**
  * The parser for a code block's language (```sql, ```ts…). Each language is loaded the first time
@@ -41,16 +41,26 @@ function codeParser(info: string): Parser | null {
 }
 
 /**
- * GFM plus our #tags, ==highlights==, cards, $math$, @mentions and highlighted code blocks. Built directly rather
- * than through `markdown()`, which would also bundle HTML, CSS and JavaScript parsers up front.
- * Sharing `markdownLanguage.data` keeps list continuation on Enter working.
+ * GFM plus our #tags, ==highlights==, cards, $math$, @mentions, highlighted code blocks and what
+ * plugins add. Built directly rather than through `markdown()`, which would also bundle HTML, CSS
+ * and JavaScript parsers up front. Sharing `markdownLanguage.data` keeps list continuation on
+ * Enter working.
  */
-const language = new Language(
-  markdownLanguage.data,
-  (markdownLanguage.parser as MarkdownParser).configure([Tag, Highlight, Card, TexMath, Mention, parseCode({ codeParser })]),
-  [],
-  "markdown",
-);
+const linedown = (additions: MarkdownAddition[]) =>
+  new Language(
+    markdownLanguage.data,
+    (markdownLanguage.parser as MarkdownParser).configure([
+      Tag,
+      Highlight,
+      Card,
+      TexMath,
+      Mention,
+      parseCode({ codeParser }),
+      ...additions.flatMap((addition) => addition.syntax ?? []),
+    ]),
+    [],
+    "markdown",
+  );
 
 /** Turn the selected lines into todos, or tick/untick them if they already are. */
 const toggleTodo: StateCommand = ({ state, dispatch }) => {
@@ -92,7 +102,7 @@ const highlightStyle = HighlightStyle.define([
   { tag: t.url, color: "var(--text-faint)" },
   { tag: t.contentSeparator, color: "var(--text-faint)" },
   { tag: t.monospace, fontFamily: "var(--font-mono)" },
-  // Code blocks; each theme has its own colors for these (app.css, themes.css).
+  // Code blocks; each theme has its own colors for these (app.css, and theme plugins).
   { tag: [t.keyword, t.modifier, t.self, t.operatorKeyword, t.tagName], color: "var(--syn-keyword)" },
   { tag: [t.string, t.special(t.string), t.regexp, t.character], color: "var(--syn-string)" },
   { tag: [t.number, t.bool, t.null, t.atom, t.unit, t.constant(t.variableName)], color: "var(--syn-number)" },
@@ -218,14 +228,14 @@ const phrases = EditorState.phrases.of({
   "Selection deleted": message("editor.cm.selectionDeleted"),
 });
 
-/** What only a Markdown note's editor has: the parser, live preview, blocks, menus and keys. */
-const markdownEditing: Extension = [
-  language,
+/** What only a Markdown note's editor has: the parser, live preview, blocks, menus and keys, and plugins' additions. */
+const linedownEditing = (additions: MarkdownAddition[]): Extension => [
+  linedown(additions),
   frontMatterField,
   missingNotes,
   pasteURLAsLink,
   tables,
-  mermaidDiagrams,
+  renderedBlocks,
   mathBlocks,
   typeTables,
   attachmentBlocks,
@@ -236,15 +246,25 @@ const markdownEditing: Extension = [
   // Before live preview, so its marks (a code span, a link) wrap the symbols inside them.
   symbols,
   livePreview,
-  slashCommands,
+  slashCommands(additions.flatMap((addition) => addition.commands ?? [])),
   formatToolbar,
   fenceInput,
   formattingKeymap,
+  additions.flatMap((addition) => addition.editor ?? []),
 ];
 
-/** The editing for a note's format: Markdown, or LaTeX (latex.ts). */
+let built: { additions: MarkdownAddition[]; editing: Extension } | undefined;
+
+/** A Markdown note's editor (the Markdown plugin's), made again when plugins add something else to Markdown. */
+export function markdownEditing(): Extension {
+  const additions = plugins.markdown;
+  if (built?.additions !== additions) built = { additions, editing: linedownEditing(additions) };
+  return built.editing;
+}
+
+/** The editing for a note's language: Markdown, LaTeX… (each its plugin's), or none for plain text. */
 export const formatCompartment = new Compartment();
-export const formatEditing = (format: NoteFormat = "markdown") => (format === "latex" ? latexEditing : markdownEditing);
+export const formatEditing = (format = DEFAULT_LANGUAGE) => plugins.language(format).editor();
 
 export const readOnlyCompartment = new Compartment();
 
@@ -265,7 +285,7 @@ export function createExtensions(onChange: () => void): Extension[] {
       // and the spellchecker use the device's own languages rather than reading it as French, say.
       lang: "",
     }),
-    formatCompartment.of(markdownEditing),
+    formatCompartment.of(formatEditing()),
     cursor,
     syntaxHighlighting(highlightStyle),
     search({ top: true }),

@@ -13,6 +13,8 @@ export type WindowMessage =
   | { type: "show"; id: string }
   /** Preferences changed (theme, text, window look); reload them. */
   | { type: "prefs" }
+  /** A plugin was turned on or off (plugins/registry.svelte.ts). */
+  | { type: "plugins" }
   /** A floating note's window opened or closed. */
   | { type: "floating"; id: string; open: boolean }
   /** The app lock locked lines, or was turned on or off: save, and start over. */

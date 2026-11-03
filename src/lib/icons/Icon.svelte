@@ -1,33 +1,18 @@
 <script lang="ts">
-  import { prefs, type IconSet } from "../prefs.svelte";
-  import { ICONS, type IconName } from "./icons";
+  import { plugins } from "../plugins/registry.svelte";
+  import { prefs } from "../prefs.svelte";
+  import type { IconName } from "./icons";
 
+  /** One of lines' icons, drawn by the icon set chosen in Settings (or `set`), which comes from a plugin. */
   let {
     name,
     size = 18,
     strokeWidth = 2,
     class: className = "",
     set,
-  }: { name: IconName; size?: number; strokeWidth?: number; class?: string; set?: IconSet } = $props();
+  }: { name: IconName; size?: number; strokeWidth?: number; class?: string; set?: string } = $props();
 
-  const [Lucide, symbol] = $derived(ICONS[name]);
-  // Drawn by macOS / iOS on request; see src-tauri/src/sf_symbols.rs.
-  const src = $derived(`url("sfsymbol://localhost/${symbol}?size=${size}&scale=${Math.ceil(devicePixelRatio)}")`);
+  const Drawn = $derived(plugins.iconSet(set ?? prefs.icons).component);
 </script>
 
-{#if (set ?? prefs.icons) === "sf"}
-  <span class="icon sf-symbol {className}" style:width="{size}px" style:height="{size}px" style:--src={src} aria-hidden="true"
-  ></span>
-{:else}
-  <Lucide {size} {strokeWidth} class="icon {className}" aria-hidden="true" />
-{/if}
-
-<style>
-  .sf-symbol {
-    display: inline-block;
-    flex-shrink: 0;
-    background-color: currentColor;
-    -webkit-mask: var(--src) center / contain no-repeat;
-    mask: var(--src) center / contain no-repeat;
-  }
-</style>
+<Drawn {name} {size} {strokeWidth} class="icon {className}" />

@@ -2,6 +2,7 @@ import { mount, unmount } from "svelte";
 import App from "./App.svelte";
 import "./app.css";
 import { prefs } from "./lib/prefs.svelte";
+import "./lib/themes.svelte";
 import "./lib/editor/editor.css";
 import FloatingNote from "./lib/components/FloatingNote.svelte";
 import Settings from "./lib/components/Settings.svelte";
@@ -13,6 +14,7 @@ import { lockedNotes } from "./lib/notes/locked.svelte";
 import { noteKeys } from "./lib/notes/noteKeys.svelte";
 import { notes } from "./lib/notes/store.svelte";
 import { isMacApp, isTauri } from "./lib/platform";
+import { plugins } from "./lib/plugins/registry.svelte";
 import { sync } from "./lib/sync/engine.svelte";
 import { announce, onAnnounce, windowLabel } from "./lib/windows/channel";
 import { canFloat, floatingOpen, restoreFloating } from "./lib/windows/floating";
@@ -37,7 +39,7 @@ if (isTauri) {
   });
 }
 
-if (import.meta.env.DEV) Object.assign(window, { lines: { notes, sync, lock, lockedNotes, noteKeys } });
+if (import.meta.env.DEV) Object.assign(window, { lines: { notes, sync, lock, lockedNotes, noteKeys, plugins } });
 
 /** A floating note's window is labelled "note-<id>", Settings' "settings"; the main window "main". */
 const label = windowLabel();

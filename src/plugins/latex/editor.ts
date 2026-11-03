@@ -1,18 +1,18 @@
 import type { CompletionSection } from "@codemirror/autocomplete";
 import { EditorSelection, type EditorState, type Extension, Prec, type Range, type StateCommand, StateField } from "@codemirror/state";
 import { Decoration, type DecorationSet, EditorView, keymap, WidgetType } from "@codemirror/view";
-import { t } from "../i18n/index.svelte";
-import { attachmentName, openAttachment } from "../notes/attachments";
-import { DOCUMENT_BEGIN, latexEscape, latexLines, latexText, preambleField } from "../notes/latex";
-import { openExternal } from "../platform";
-import { type AttachmentWriter, attachmentPasting, choose, imageElement } from "./attachments";
-import { type Definitions, type Env, LIST_ENVS, scanLatex, type Span, type Table } from "./latexSyntax";
-import { BulletWidget, NumberWidget, opensLink } from "./livePreview";
-import { numericColumn, tablePasting } from "./tables";
-import { InlineMathWidget, type Macros, macrosOf, MathBlockWidget, mathElement } from "./math";
-import { insert, type SlashCommand, slashMenu } from "./slashCommands";
-import { inOpenMath, MATH_COMMANDS, paragraphBefore, searchWords, TEXT_COMMANDS } from "./texCommands";
-import { focusChanged, focused, isEditing } from "./util";
+import { t } from "../../lib/i18n/index.svelte";
+import { attachmentName, openAttachment } from "../../lib/notes/attachments";
+import { DOCUMENT_BEGIN, latexEscape, latexLines, latexText, preambleField } from "./text";
+import { openExternal } from "../../lib/platform";
+import { type AttachmentWriter, attachmentPasting, choose, imageElement } from "../../lib/editor/attachments";
+import { type Definitions, type Env, LIST_ENVS, scanLatex, type Span, type Table } from "./syntax";
+import { BulletWidget, NumberWidget, opensLink } from "../../lib/editor/livePreview";
+import { numericColumn, tablePasting } from "../../lib/editor/tables";
+import { InlineMathWidget, type Macros, macrosOf, MathBlockWidget, mathElement } from "../../lib/editor/math";
+import { insert, SECTIONS, type SlashCommand, slashMenu } from "../../lib/editor/slashCommands";
+import { inOpenMath, MATH_COMMANDS, paragraphBefore, searchWords, TEXT_COMMANDS } from "../../lib/editor/texCommands";
+import { focusChanged, focused, isEditing } from "../../lib/editor/util";
 
 /*
  * Live preview for notes written in LaTeX (docs/latex.md), the way livePreview.ts draws Markdown:
@@ -800,13 +800,13 @@ const latexKeymap = Prec.high(
   ]),
 );
 
-const FORMAT: CompletionSection = { name: t("latex.slash.format"), rank: 0 };
-const INSERT: CompletionSection = { name: t("latex.slash.insert"), rank: 1 };
+const { format: FORMAT, insert: INSERT } = SECTIONS;
 
 type SlashName = "section" | "subsection" | "subsubsection" | "bullets" | "numbers" | "quote" | "math" | "equations" | "code" | "table" | "image" | "file" | "footnote" | "link" | "date";
 
 /** A "/" command, named and found by its messages (`latex.slash.<name>` and its keywords). */
 const command = (name: SlashName, hint: string, icon: SlashCommand["icon"], section: CompletionSection, apply: SlashCommand["apply"]): SlashCommand => ({
+  id: name,
   name: t(`latex.slash.${name}`),
   hint,
   icon,
