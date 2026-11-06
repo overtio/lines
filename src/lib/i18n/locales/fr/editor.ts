@@ -40,6 +40,7 @@ export default {
   "editor.slash.file.keywords": "joindre pièce jointe importer document pdf",
   "editor.slash.drawing": "Dessin",
   "editor.slash.drawing.keywords": "excalidraw croquis dessiner tableau blanc",
+  "editor.slash.pictures.keywords": "gif anime réaction image photo",
   "editor.slash.divider": "Séparateur",
   "editor.slash.divider.keywords": "ligne trait règle",
   "editor.slash.link": "Lien",

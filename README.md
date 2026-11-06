@@ -78,7 +78,7 @@ Switch a note to LaTeX from its ⓘ panel and write `\section`, theorems, citati
 
 ### Make it yours
 
-- **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. See [docs/plugins.md](docs/plugins.md).
+- **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. Others are off until you want them: anime reaction GIFs from nekos.best, Gifukai, OtakuGIFs and Purr Bot, picked from the "/" menu. See [docs/plugins.md](docs/plugins.md).
 - **Sixteen themes**, each light and dark, including High Contrast and two for color blindness.
 - **Fonts, text size and spacing**, with a live preview.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
@@ -197,6 +197,8 @@ src/
     tex/                     Typesets a LaTeX note with TeX (BusyTeX's pdfLaTeX in WebAssembly)
     katex/                   The math engine (KaTeX)
     mermaid/                 Mermaid diagrams: the renderer, its colors, /diagram
+    nekos-best/  gifukai/    Picture sources: anime reaction GIFs and pictures, each with its "/" command
+    otakugifs/  purrbot/
     themes/                  The sixteen themes, as their colors
     lucide/  sf-symbols/     Icon sets
   lib/
@@ -220,6 +222,7 @@ src/
       math.ts                Draws $math$ and $$ blocks with the math engine plugin
       texCommands.ts         The "\" menu of LaTeX commands, in math and in LaTeX notes
       attachments.ts         Image and file blocks; pasting, dropping, /image and /file
+      pictures.ts            Picture sources' "/" commands, which open the picture picker
       fences.ts              Closes ``` and ::: fences as you type them; ` or : wraps a selection
       lists.ts               Tab / Shift-Tab nesting for list items; Backspace after a marker
       keyValue.ts            Copy buttons for Key: Value lines
@@ -255,11 +258,12 @@ src/
     lock/
       lock.svelte.ts         The app lock: unlocking, turning it on and off, locking when idle
       vault.ts               Encrypts what's stored on the device while the lock is on
-    components/              Sidebar, tag tree, note list, settings
+    components/              Sidebar, tag tree, note list, settings, the icon and picture pickers
     windows/                 Floating notes, the Settings window, and messages between windows
     icons/                   Icon component (drawn by the icon set plugin chosen) and the icons lines uses
     i18n/                    Translations: t(), the language, and each language's messages (locales/)
     a11y.ts                  Saying things to screen readers
+    net.ts                   Requests through the apps' native networking; web images that try again
     prefs.svelte.ts          Theme, appearance, font, text size, spacing, icon set (themes and icon sets by plugin id)
     crypto.ts                AES-256-GCM and passphrase keys (WebCrypto), for sync and the app lock
     release.ts               The version and the source repository

@@ -5,6 +5,7 @@ import latex from "./latex";
 import list from "./list";
 import lock from "./lock";
 import picker from "./picker";
+import pictures from "./pictures";
 import plugins from "./plugins";
 import print from "./print";
 import settings from "./settings";
@@ -19,6 +20,7 @@ export default {
   ...list,
   ...lock,
   ...picker,
+  ...pictures,
   ...plugins,
   ...print,
   ...settings,

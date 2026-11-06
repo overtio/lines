@@ -16,6 +16,10 @@ Settings → Plugins lists them. A plugin that isn't needed can be turned off, a
 | Themes | The sixteen themes. Always on. | Yes | `src/plugins/themes/` |
 | Lucide | lines' icons. Always on. | Yes | `src/plugins/lucide/` |
 | SF Symbols | Apple's icons, in the Mac and iPhone apps | Yes | `src/plugins/sf-symbols/` |
+| nekos.best | Anime reaction GIFs and pictures from [nekos.best](https://nekos.best), searchable by anime | No | `src/plugins/nekos-best/` |
+| Gifukai | Anime reaction GIFs from [Gifukai](https://gifukai.com), in the apps only | No | `src/plugins/gifukai/` |
+| OtakuGIFs | Anime reaction GIFs from [OtakuGIFs](https://otakugifs.xyz) | No | `src/plugins/otakugifs/` |
+| Purr Bot | Anime GIFs and pictures from [Purr Bot](https://purrbot.site)'s safe-for-work set, in the apps only | No | `src/plugins/purrbot/` |
 
 ## Turning a plugin off
 
@@ -24,6 +28,7 @@ Nothing is lost. A plugin turned off stops adding what it adds, at once, in ever
 - **A format.** Its notes keep their format and show as plain text, which can still be read and changed. Their ⓘ panel says so, with a button that turns the plugin back on. Export, Copy and Download still write them as what they are (a LaTeX note as a `.tex` file that compiles).
 - **An engine.** With Math off, math shows as it's written. With Diagrams off, a ` ```mermaid ` block is a code block and `/diagram` is gone from the "/" menu. Without TeX, a LaTeX note's PDF is laid out by lines.
 - **A theme or an icon set.** What was chosen is kept, and lines shows its own (Lines, Lucide) until the plugin is on again.
+- **A picture source.** Its "/" command leaves the menu. Pictures already put in notes stay: they're links to the pictures themselves.
 - **A plugin others need** (TeX needs LaTeX): those wait, and say what they need. Turning one on turns on what it needs too.
 
 Which plugins are on is kept on each device, like the rest of Settings. A note in a format this device doesn't have, synced from another, shows as plain text and keeps its format when it syncs back.
@@ -83,6 +88,8 @@ Every part of `contributes` is optional, and a plugin can add several kinds of t
 **`renderers`**: engines that draw a code block of their languages, on screen in the theme's colors or for paper in black on white, as SVG markup or an element. `actions` are buttons on what they draw.
 
 **`typesetters`**: ways to make a PDF for notes in some languages, offered beside lines' own pages in the PDF preview.
+
+**`pictures`**: places to find pictures and GIFs online (`PictureSource`). Each gets a "/" command in Markdown notes, named after it, which opens the picture picker: the source's categories (`categories()`), a few pictures from the one chosen (`pictures(category, count)`), and, if it can, a search by anime or artist (`search(query, count)`). The picture picked goes in the note as a link to it, `![hug (Anime)](https://…)`, its alt text the category and the credit the source gives. The picker, the command and how the picture goes in are lines' own (`src/lib/components/PicturePicker.svelte`, `src/lib/editor/pictures.ts`), so a source is only where its pictures come from. Ask for them with `getJSON` (`src/lib/net.ts`), which goes through the apps' native networking, where a server needs no CORS for lines; on the web the server has to allow it, or the plugin says it's only in the apps (`available`, as Gifukai and Purr Bot do). `oneByOne` asks a source that gives one picture per request for several at once.
 
 **`markdown`**: new syntax for Markdown notes. A `syntax` extension for the parser ([`@lezer/markdown`](https://github.com/lezer-parser/markdown)), `editor` extensions that draw it, `commands` for the "/" menu (each can go `after` another, by id), and `print`, a printer for each node the syntax adds.
 

@@ -2,7 +2,7 @@
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { ICONS, TAG_ICON_GROUPS, type IconName } from "../icons/icons";
-  import { dismissable, placeAt, takeFocus } from "../popover";
+  import { dismissable, gridStep, placeAt, takeFocus } from "../popover";
   import { ui } from "../ui.svelte";
 
   const COLUMNS = 8;
@@ -81,27 +81,13 @@
     }
   }
 
-  /** Arrow keys move by position, since groups end in partly filled rows; Home and End go to the ends. */
+  /** Arrow keys move by position, since groups end in partly filled rows; up from the top row goes to the search field. */
   function onIconKeydown(event: KeyboardEvent) {
     const icons = [...el!.querySelectorAll<HTMLElement>('[role="option"]')];
-    const current = event.currentTarget as HTMLElement;
-    const index = icons.indexOf(current);
-    let next: HTMLElement | undefined;
-    if (event.key === "ArrowRight") next = icons[index + 1];
-    else if (event.key === "ArrowLeft") next = icons[index - 1];
-    else if (event.key === "Home") next = icons[0];
-    else if (event.key === "End") next = icons.at(-1);
-    else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      const down = event.key === "ArrowDown";
-      const { offsetTop: top, offsetLeft: left } = current;
-      const rows = icons.filter((icon) => (down ? icon.offsetTop > top : icon.offsetTop < top));
-      const rowTop = down ? Math.min(...rows.map((i) => i.offsetTop)) : Math.max(...rows.map((i) => i.offsetTop));
-      next = rows
-        .filter((icon) => icon.offsetTop === rowTop)
-        .sort((a, b) => Math.abs(a.offsetLeft - left) - Math.abs(b.offsetLeft - left))[0];
-      if (!next && !down) return el!.querySelector("input")?.focus();
-    } else return;
+    const next = gridStep(event.key, icons, event.currentTarget as HTMLElement);
+    if (next === undefined) return;
     event.preventDefault();
+    if (next === null && event.key === "ArrowUp") el!.querySelector("input")?.focus();
     next?.focus();
     next?.scrollIntoView({ block: "nearest" });
   }

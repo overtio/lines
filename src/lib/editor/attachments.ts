@@ -18,6 +18,7 @@ import {
   saveAttachment,
   whenArrived,
 } from "../notes/attachments";
+import { loadImage } from "../net";
 import { coarsePointer } from "../platform";
 import { locale, type MessageKey, t } from "../i18n/index.svelte";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
@@ -60,16 +61,17 @@ export function imageElement(src: string, label: string, onChange: () => void): 
     heights.set(`${src}\n${label}`, img.offsetHeight);
     onChange();
   };
-  img.onerror = () => {
+  const failed = () => {
     dom.replaceChildren(placeholder(t("editor.imageFailed")));
     onChange();
   };
   let cancel = () => {};
   const name = attachmentName(src);
   if (!name) {
-    img.src = unsplashImage(src) ?? src;
+    loadImage(img, unsplashImage(src) ?? src, failed);
     dom.append(img);
   } else {
+    img.onerror = failed;
     const show = () =>
       void attachmentURL(name).then((url) => {
         if (url) {
@@ -604,8 +606,13 @@ async function insertFiles(view: EditorView, writer: AttachmentWriter, files: Fi
     view.focus();
     return;
   }
-  const line = doc.lineAt(from);
-  const before = doc.sliceString(line.from, from).trim() ? "\n" : "";
+  place(view, markdown, from, to);
+}
+
+/** Puts `markdown` at `from`–`to` on lines of its own, with the cursor on the line after it. */
+function place(view: EditorView, markdown: string, from: number, to = from) {
+  const line = view.state.doc.lineAt(from);
+  const before = view.state.doc.sliceString(line.from, from).trim() ? "\n" : "";
   const insert = before + markdown + "\n";
   view.dispatch({
     changes: { from, to, insert },
@@ -614,6 +621,13 @@ async function insertFiles(view: EditorView, writer: AttachmentWriter, files: Fi
     userEvent: "input.paste",
   });
   view.focus();
+}
+
+/** Puts a picture from the web at `pos` in a Markdown note, on a line of its own, where one can go. */
+export function insertPicture(view: EditorView, pos: number, src: string, alt: string) {
+  pos = Math.min(pos, view.state.doc.length);
+  if (!allowed(markdownWriter, view.state, pos)) return;
+  place(view, markdownWriter.image(src, alt), pos);
 }
 
 /** Text copied along with a file that's only its name or address, as Finder and browsers add. */

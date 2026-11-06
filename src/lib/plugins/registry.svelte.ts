@@ -57,6 +57,7 @@ class Plugins {
   readonly renderers = $derived(this.#from("renderers"));
   readonly typesetters = $derived(this.#from("typesetters"));
   readonly markdown = $derived(this.#from("markdown"));
+  readonly pictures = $derived(this.#from("pictures"));
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).

@@ -1,5 +1,6 @@
 import { AwsClient } from "aws4fetch";
 import { t } from "../i18n/index.svelte";
+import { request } from "../net";
 import { isTauri } from "../platform";
 import { SyncError, type Remote, type RemoteObject } from "./remote";
 
@@ -12,21 +13,6 @@ export interface S3Config {
   prefix: string;
   accessKeyId: string;
   secretAccessKey: string;
-}
-
-type Fetch = typeof fetch;
-
-let nativeFetch: Promise<Fetch> | undefined;
-
-/**
- * In the native apps requests go through Rust, so the bucket needs no CORS
- * setup. In the browser they're plain fetches and the bucket must allow
- * this app's origin.
- */
-function getFetch(): Promise<Fetch> {
-  if (!isTauri) return Promise.resolve(fetch.bind(window));
-  nativeFetch ??= import("@tauri-apps/plugin-http").then((m) => m.fetch as Fetch);
-  return nativeFetch;
 }
 
 const unquote = (etag: string | null) => etag?.replace(/^(W\/)?"|"$/g, "") ?? null;
@@ -51,11 +37,10 @@ export class S3Remote implements Remote {
   }
 
   async #request(path: string, init: RequestInit = {}) {
-    const doFetch = await getFetch();
     const signed = await this.#client.sign(this.#base + path, init);
     let response: Response;
     try {
-      response = await doFetch(signed);
+      response = await request(signed);
     } catch (error) {
       console.error("lines: storage request failed", error);
       throw new SyncError(

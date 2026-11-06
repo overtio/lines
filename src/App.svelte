@@ -6,6 +6,7 @@
   import NoteInfo from "./lib/components/NoteInfo.svelte";
   import Settings from "./lib/components/Settings.svelte";
   import IconPicker from "./lib/components/IconPicker.svelte";
+  import PicturePicker from "./lib/components/PicturePicker.svelte";
   import TagPrompt from "./lib/components/TagPrompt.svelte";
   import LockedNoteView from "./lib/components/LockedNoteView.svelte";
   import NotesPasswordDialog from "./lib/components/NotesPasswordDialog.svelte";
@@ -505,6 +506,7 @@
 {/if}
 <ContextMenu />
 <IconPicker />
+<PicturePicker />
 <TagPrompt />
 
 <style>

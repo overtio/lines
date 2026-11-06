@@ -45,6 +45,8 @@ export default {
   "editor.slash.file.keywords": "attach attachment upload document pdf",
   "editor.slash.drawing": "Drawing",
   "editor.slash.drawing.keywords": "excalidraw sketch draw whiteboard",
+  // Words that find a picture source's "/" command (nekos.best, OtakuGIFs…), whose name is its own.
+  "editor.slash.pictures.keywords": "gif anime reaction picture image",
   // A horizontal line (`---`).
   "editor.slash.divider": "Divider",
   "editor.slash.divider.keywords": "rule line separator hr break",

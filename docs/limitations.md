@@ -32,6 +32,16 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - lines loads the photo through Unsplash's download link, which counts as a download each time it's shown.
 - Unsplash+ photos don't show: Unsplash only hands them to subscribers. They say the image couldn't be shown.
 
+## Pictures and GIFs from plugins
+
+- A picture from a picture source (nekos.best, Gifukai, OtakuGIFs, Purr Bot) is kept as a link, not a file, so it needs the internet to show, isn't in exports or sync as a picture, and goes if the source takes it down.
+- Gifukai's and Purr Bot's APIs don't answer web pages, so those plugins are only in the apps.
+- OtakuGIFs' server sends one GIF at a time and turns away the rest, so lines tries again for each, one after another: a note with several of them fills in slowly.
+- Categories are the sources' own words, in English ("hug", "pat"), in every language.
+- Each source says its pictures are safe for work. lines asks Gifukai for safe ones only and Purr Bot for its safe-for-work set only, but can't check what they send. The Nekos API isn't offered: of 100 pictures it rated safe, 39 were tagged as showing nudity.
+- Only nekos.best can be searched (by anime or artist); the others have categories only.
+- Only Markdown notes have the commands: a LaTeX note would need the picture as a file of its own.
+
 ## Math
 
 - Math is drawn by KaTeX, which covers most of LaTeX's math mode but not all of it (no `\newcommand` shared between blocks, no TikZ or other packages), and not whole LaTeX documents.

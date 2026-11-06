@@ -4,6 +4,7 @@
   import { t } from "../i18n/index.svelte";
   import { isClosed, notes } from "../notes/store.svelte";
   import LockedNoteView from "./LockedNoteView.svelte";
+  import PicturePicker from "./PicturePicker.svelte";
   import { prefs } from "../prefs.svelte";
   import { announce } from "../windows/channel";
   import { saveFloatingState } from "../windows/floating";
@@ -144,6 +145,8 @@
     {/if}
   {/if}
 </main>
+
+<PicturePicker />
 
 <style>
   .floating {

@@ -114,6 +114,13 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Pasting text that also carries a file (a document paragraph) pastes the text
 - [ ] TIFF and BMP images become PNG; unreadable images become files
 - [ ] `/image` and `/file` open the file picker
+- [ ] A picture source's command (`/otakugifs`…, turned on in Settings → Plugins) opens its picker under the cursor, the command gone from the line: its categories, the one shown last time (or the first) chosen, and six of its pictures, which fade in as they load; ↻ shows six others
+- [ ] Typing in the picker's search narrows the categories; Enter shows the first; with nekos.best, a word that isn't a category offers Search for "…" (by anime), and shows what it finds
+- [ ] Clicking a picture, or Enter on it, puts it on a line of its own as `![hug (Anime)](https://…)` and closes the picker, the cursor on the line after it; ⌘Z takes it out
+- [ ] ↓ goes from the search to the categories and on to the pictures; ↑ comes back; arrows move within each; Esc or a click outside closes the picker and focus goes back to the note
+- [ ] Offline, or with the source down, the picker says it couldn't reach it, with Try Again; a picture that won't load shows an image icon
+- [ ] A note with several OtakuGIFs GIFs shows all of them (its server answers one at a time, so they come in one after another)
+- [ ] The source's name in the picker opens its website
 - [ ] Nothing can be attached in code, tables or trashed notes
 - [ ] Files show as a card with an icon, name and kind · size
 - [ ] An image or file that hasn't synced yet says so, and appears when it arrives
@@ -191,6 +198,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 - [ ] Menus open at the pointer, stay inside the window, move with ↑ ↓, and close on Esc, a click outside, scroll or resize
 - [ ] The icon picker searches by name, Enter picks the first match, arrow keys move around the grid, and focus starts on the current icon
+- [ ] The picture picker: VoiceOver reads it as "Pictures from …", each category and picture by name (the category, and the anime or artist), how many pictures loaded, and the error when a source can't be reached
 - [ ] Share: Share… where the system has it, Copy Markdown, Copy Plain Text, Download Markdown [Web]
 - [ ] Note info shows words, characters, sentences, paragraphs, reading time and dates
 
@@ -219,7 +227,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 13a. Plugins
 
-- [ ] Settings → Plugins lists Formats (Markdown, LaTeX), Drawing and Typesetting (Math, Diagrams, TeX Typesetting) and Look (Themes, Lucide, SF Symbols [Apple]), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no checkbox, and says it's in the Mac and iPhone apps
+- [ ] Settings → Plugins lists Formats (Markdown, LaTeX), Drawing and Typesetting (Math, Diagrams, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and Pictures and GIFs (nekos.best, Gifukai, OtakuGIFs, Purr Bot, all off), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no checkbox, and says it's in the Mac and iPhone apps, and Gifukai and Purr Bot have none either and say they're only in the apps
 - [ ] Clicking a plugin's row (not just its checkbox) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
 - [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On (no format switch, with Markdown the only format left); Turn On draws it as LaTeX again at once
 - [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
@@ -227,6 +235,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Diagrams off: ```mermaid blocks show as code, `/diagram` is gone from the "/" menu, and the PDF prints them as code; on again, they're drawn again, and Diagram is right after Code block in the menu
 - [ ] Math off: `$…$`, `$$` blocks and LaTeX notes' math show as written, on screen and in the PDF; on again, drawn
 - [ ] TeX Typesetting off: a LaTeX note's PDF preview has no "Typeset with" switch
+- [ ] A picture source on: its "/" command is in the menu after Image (`/nekos`, `/gifukai`, `/otakugifs`, `/purr`; `/gif` and `/anime` find them all); off, it's gone
 - [ ] Choices are remembered after reloading, and turning a plugin on or off in one window changes every window at once (the Settings window, floating notes [Desktop], other browser tabs [Web])
 
 ## 14. Sync

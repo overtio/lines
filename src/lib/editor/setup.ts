@@ -17,6 +17,7 @@ import { formatToolbar, toggleFormat } from "./formatting";
 import { listKeymap } from "./lists";
 import { livePreview, openAtCursor } from "./livePreview";
 import { mathBlocks } from "./math";
+import { pictureCommands } from "./pictures";
 import { renderedBlocks } from "./rendered";
 import { slashCommands } from "./slashCommands";
 import { symbols } from "./symbols";
@@ -26,7 +27,7 @@ import { frontMatterField, missingNotes } from "./objects";
 import { Card, Highlight, Mention, Tag, TexMath } from "./syntax";
 import { t as message } from "../i18n/index.svelte";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
-import type { MarkdownAddition } from "../plugins/types";
+import type { MarkdownAddition, PictureSource } from "../plugins/types";
 
 /**
  * The parser for a code block's language (```sql, ```ts…). Each language is loaded the first time
@@ -229,7 +230,7 @@ const phrases = EditorState.phrases.of({
 });
 
 /** What only a Markdown note's editor has: the parser, live preview, blocks, menus and keys, and plugins' additions. */
-const linedownEditing = (additions: MarkdownAddition[]): Extension => [
+const linedownEditing = (additions: MarkdownAddition[], pictures: PictureSource[]): Extension => [
   linedown(additions),
   frontMatterField,
   missingNotes,
@@ -246,19 +247,21 @@ const linedownEditing = (additions: MarkdownAddition[]): Extension => [
   // Before live preview, so its marks (a code span, a link) wrap the symbols inside them.
   symbols,
   livePreview,
-  slashCommands(additions.flatMap((addition) => addition.commands ?? [])),
+  slashCommands([...additions.flatMap((addition) => addition.commands ?? []), ...pictureCommands(pictures)]),
   formatToolbar,
   fenceInput,
   formattingKeymap,
   additions.flatMap((addition) => addition.editor ?? []),
 ];
 
-let built: { additions: MarkdownAddition[]; editing: Extension } | undefined;
+let built: { additions: MarkdownAddition[]; pictures: PictureSource[]; editing: Extension } | undefined;
 
-/** A Markdown note's editor (the Markdown plugin's), made again when plugins add something else to Markdown. */
+/** A Markdown note's editor (the Markdown plugin's), made again when plugins add something else to it. */
 export function markdownEditing(): Extension {
-  const additions = plugins.markdown;
-  if (built?.additions !== additions) built = { additions, editing: linedownEditing(additions) };
+  const { markdown: additions, pictures } = plugins;
+  if (built?.additions !== additions || built.pictures !== pictures) {
+    built = { additions, pictures, editing: linedownEditing(additions, pictures) };
+  }
   return built.editing;
 }
 

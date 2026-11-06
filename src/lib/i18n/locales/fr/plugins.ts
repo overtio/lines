@@ -23,4 +23,10 @@ export default {
   "plugins.themes.description": "Lines et quinze autres, dont Contraste élevé et deux pour le daltonisme.",
   "plugins.lucide.description": "Les icônes de lines, de Lucide.",
   "plugins.sfSymbols.description": "Les icônes d’Apple, dessinées par votre Mac, iPhone ou iPad.",
+  "plugins.groupPictures": "Images et GIF",
+  "plugins.nekosBest.description": "Des GIF de réactions d’anime, et des images de nekos, kitsunes, waifus et husbandos, tous adaptés au travail. Cherchez-les par anime ou par artiste. Tapez /nekos pour en choisir un.",
+  "plugins.gifukai.description": "Des GIF de réactions d’anime, des câlins aux tapes dans la main, chacun avec l’anime d’où il vient. Tapez /gifukai pour en choisir un.",
+  "plugins.otakugifs.description": "Des GIF de réactions d’anime, de soixante-dix sortes. Tapez /otakugifs pour en choisir un.",
+  "plugins.purrbot.description": "Des GIF et des images d’anime de la collection de Purr Bot adaptée au travail. Tapez /purr pour en choisir un.",
+  "plugins.appsOnly": "Seulement dans les apps lines : {name} ne laisse pas les sites web demander ses images.",
 } satisfies Translation<typeof en>;

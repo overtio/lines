@@ -4,7 +4,7 @@
   import { plugins } from "../plugins/registry.svelte";
   import type { Plugin } from "../plugins/types";
 
-  /** The plugins, grouped by what they add most: formats, then engines that draw and typeset, then looks. */
+  /** The plugins, grouped by what they add most: formats, then engines that draw and typeset, looks, and pictures. */
   const GROUPS: { label: string; has: (plugin: Plugin) => unknown }[] = [
     { label: t("plugins.groupFormats"), has: ({ contributes }) => contributes.languages?.length },
     {
@@ -12,6 +12,7 @@
       has: ({ contributes }) => contributes.math?.length || contributes.renderers?.length || contributes.typesetters?.length,
     },
     { label: t("plugins.groupLook"), has: ({ contributes }) => contributes.themes?.length || contributes.iconSets?.length },
+    { label: t("plugins.groupPictures"), has: ({ contributes }) => contributes.pictures?.length },
     { label: t("plugins.groupMore"), has: () => true },
   ];
 

@@ -1,4 +1,6 @@
+import type { EditorView } from "@codemirror/view";
 import type { IconName } from "./icons/icons";
+import type { PictureSource } from "./plugins/types";
 
 export type Layout = "wide" | "medium" | "narrow";
 export type SettingsTab = "theme" | "text" | "plugins" | "data" | "shortcuts" | "about";
@@ -36,6 +38,17 @@ export interface IconTarget {
   y: number;
 }
 
+/** A picture source's picker, opened by its "/" command in a note. */
+export interface PicturePick {
+  source: PictureSource;
+  view: EditorView;
+  /** Where in the note the picture goes. */
+  pos: number;
+  /** Where to open, in viewport coordinates. */
+  x: number;
+  y: number;
+}
+
 /** Notes a tag is being added to (the ones picked in the list), and where its box opens. */
 export interface TagPrompt {
   ids: string[];
@@ -60,6 +73,8 @@ class UIState {
   menu = $state.raw<Menu | null>(null);
   /** What an icon is being picked for, and where the picker opens. */
   iconPicker = $state.raw<IconTarget | null>(null);
+  /** The picture picker, while it's open. */
+  picturePicker = $state.raw<PicturePick | null>(null);
   /** Notes a tag is being added to, and where its box opens. */
   tagPrompt = $state.raw<TagPrompt | null>(null);
   /**

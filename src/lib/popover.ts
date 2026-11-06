@@ -64,3 +64,25 @@ export function takeFocus(el: HTMLElement, target: HTMLElement = el) {
     if (lost && previous instanceof HTMLElement && previous.isConnected) previous.focus({ preventScroll: true });
   };
 }
+
+/**
+ * Where an arrow key, Home or End moves focus from `current` among `items` laid out in rows, by
+ * position, so rows needn't be full: null past the first or last, undefined for any other key.
+ */
+export function gridStep(key: string, items: HTMLElement[], current: HTMLElement): HTMLElement | null | undefined {
+  const index = items.indexOf(current);
+  if (key === "ArrowRight") return items[index + 1] ?? null;
+  if (key === "ArrowLeft") return items[index - 1] ?? null;
+  if (key === "Home") return items[0] ?? null;
+  if (key === "End") return items.at(-1) ?? null;
+  if (key !== "ArrowDown" && key !== "ArrowUp") return undefined;
+  const down = key === "ArrowDown";
+  const { offsetTop: top, offsetLeft: left } = current;
+  const rows = items.filter((item) => (down ? item.offsetTop > top : item.offsetTop < top));
+  if (!rows.length) return null;
+  const tops = rows.map((item) => item.offsetTop);
+  const rowTop = down ? Math.min(...tops) : Math.max(...tops);
+  return rows
+    .filter((item) => item.offsetTop === rowTop)
+    .sort((a, b) => Math.abs(a.offsetLeft - left) - Math.abs(b.offsetLeft - left))[0];
+}

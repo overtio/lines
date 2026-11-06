@@ -24,4 +24,12 @@ export default {
   "plugins.themes.description": "Lines and fifteen more, including High Contrast and two for color blindness.",
   "plugins.lucide.description": "lines’ icons, from Lucide.",
   "plugins.sfSymbols.description": "Apple’s icons, drawn by your Mac, iPhone or iPad.",
+  // Picture sources, in Settings → Plugins. nekos.best, Gifukai, OtakuGIFs and Purr Bot are names, not translated.
+  "plugins.groupPictures": "Pictures and GIFs",
+  "plugins.nekosBest.description": "Anime reaction GIFs, and pictures of nekos, kitsune, waifus and husbandos, all safe for work. Search them by anime or artist. Type /nekos to pick one.",
+  "plugins.gifukai.description": "Anime reaction GIFs, from hugs to high fives, each with the anime it’s from. Type /gifukai to pick one.",
+  "plugins.otakugifs.description": "Anime reaction GIFs, in seventy kinds. Type /otakugifs to pick one.",
+  "plugins.purrbot.description": "Anime GIFs and pictures from Purr Bot’s safe-for-work collection. Type /purr to pick one.",
+  // {name} is a picture source that answers only the apps, not web pages.
+  "plugins.appsOnly": "Only in the lines apps: {name} doesn’t let websites ask for its pictures.",
 };

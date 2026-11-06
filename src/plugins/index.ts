@@ -1,10 +1,14 @@
 import { isApple } from "../lib/platform";
 import type { Plugin } from "../lib/plugins/types";
+import { gifukai } from "./gifukai";
 import { katex } from "./katex";
 import { latex } from "./latex";
 import { lucide } from "./lucide";
 import { markdown } from "./markdown";
 import { mermaid } from "./mermaid";
+import { nekosBest } from "./nekos-best";
+import { otakuGifs } from "./otakugifs";
+import { purrBot } from "./purrbot";
 import { sfSymbols } from "./sf-symbols";
 import { tex } from "./tex";
 import { themes } from "./themes";
@@ -24,4 +28,9 @@ export const builtIn = (): Plugin[] => [
   lucide(),
   // Its symbols may only be used on Apple's platforms.
   ...(isApple ? [sfSymbols()] : []),
+  // Pictures and GIFs from the web, off until turned on.
+  nekosBest(),
+  gifukai(),
+  otakuGifs(),
+  purrBot(),
 ];

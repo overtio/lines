@@ -23,4 +23,10 @@ export default {
   "plugins.themes.description": "Lines y quince más, entre ellos Alto contraste y dos para el daltonismo.",
   "plugins.lucide.description": "Los iconos de lines, de Lucide.",
   "plugins.sfSymbols.description": "Los iconos de Apple, dibujados por tu Mac, iPhone o iPad.",
+  "plugins.groupPictures": "Imágenes y GIF",
+  "plugins.nekosBest.description": "GIF de reacciones de anime e imágenes de nekos, kitsunes, waifus y husbandos, todo apto para el trabajo. Búscalos por anime o artista. Escribe /nekos para elegir uno.",
+  "plugins.gifukai.description": "GIF de reacciones de anime, de abrazos a choques de manos, cada uno con el anime del que viene. Escribe /gifukai para elegir uno.",
+  "plugins.otakugifs.description": "GIF de reacciones de anime, de setenta tipos. Escribe /otakugifs para elegir uno.",
+  "plugins.purrbot.description": "GIF e imágenes de anime de la colección apta para el trabajo de Purr Bot. Escribe /purr para elegir uno.",
+  "plugins.appsOnly": "Solo en las apps de lines: {name} no deja que los sitios web pidan sus imágenes.",
 } satisfies Translation<typeof en>;

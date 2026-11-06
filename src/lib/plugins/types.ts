@@ -50,6 +50,8 @@ export interface Contributions {
   typesetters?: Typesetter[];
   /** New syntax for Markdown notes: block types and marks within text, and their "/" commands. */
   markdown?: MarkdownAddition[];
+  /** Places to find pictures and GIFs, each with a "/" command in Markdown notes. */
+  pictures?: PictureSource[];
 }
 
 /** A markup language notes can be written in. Nothing in lines outside its plugin knows how it reads. */
@@ -213,4 +215,31 @@ export interface MarkdownPrint {
   blocks(node: SyntaxNode, into: HTMLElement): void;
   /** Math, code, pictures and icons, which take a moment to draw. */
   parts: Parts;
+}
+
+/**
+ * Somewhere to find pictures and GIFs online. Its "/" command opens the picture picker, which shows
+ * its categories and a few pictures from the one chosen; the note links to the picture picked.
+ */
+export interface PictureSource {
+  /** Also its "/" command's id. */
+  id: string;
+  /** As its makers write it, which is also its "/" command's name: "nekos.best". */
+  name: string;
+  icon: IconName;
+  /** Its website, which the picker links to. */
+  site: string;
+  /** What it calls its pictures (reactions like "hug", kinds like "neko"), in the order to show them. */
+  categories(): Promise<string[]>;
+  /** About `count` pictures from `category`, different ones each time. */
+  pictures(category: string, count: number): Promise<Picture[]>;
+  /** About `count` pictures whose anime or artist matches `query`, if it can search. */
+  search?(query: string, count: number): Promise<Picture[]>;
+}
+
+export interface Picture {
+  /** The picture itself, which the note links to. */
+  url: string;
+  /** Who or what it's from, as the source credits it: an anime, an artist. */
+  credit?: string;
 }

@@ -40,6 +40,7 @@ export default {
   "editor.slash.file.keywords": "adjuntar adjunto subir documento pdf",
   "editor.slash.drawing": "Dibujo",
   "editor.slash.drawing.keywords": "excalidraw boceto dibujar pizarra",
+  "editor.slash.pictures.keywords": "gif anime reacción imagen foto",
   "editor.slash.divider": "Separador",
   "editor.slash.divider.keywords": "línea regla división",
   "editor.slash.link": "Enlace",
