@@ -594,7 +594,14 @@ class NotesStore {
     return () => this.#flushers.delete(flusher);
   }
 
-  /** Add a note created outside the editor (e.g. a sync conflict copy). Counts as a local change. */
+  /** Adds notes made from files (import.ts); returns how many, and the files that weren't of a kind lines reads. */
+  async importFiles(files: File[]) {
+    const { notesFromFiles } = await import("./import");
+    const { notes, skipped } = await notesFromFiles(files);
+    for (const note of notes) await this.insert(note);
+    return { count: notes.length, skipped };
+  }
+
   /** Adds a set of sample notes (see samples.ts); returns how many. */
   async addSamples(set: SampleSet) {
     const { sampleNotes } = await import("./samples");

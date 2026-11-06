@@ -31,6 +31,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:site
+        # Unsplash's and GIPHY's keys for /unsplash and /giphy; without them those plugins are off.
+        env:
+          VITE_UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          VITE_GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist-site

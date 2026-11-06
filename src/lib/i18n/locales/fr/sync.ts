@@ -76,9 +76,9 @@ export default {
   "sync.browser.choose": "Choisir un dossier…",
   "sync.browser.chooseAnother": "Choisir un autre dossier…",
   "sync.browser.cantPick": "Ce navigateur ne peut pas enregistrer dans un dossier. Essayez Chrome ou Edge.",
-  "sync.browser.gone": "Le dossier n’est plus disponible. Choisissez-le de nouveau dans Réglages → Données.",
+  "sync.browser.gone": "Le dossier n’est plus disponible. Choisissez-le de nouveau dans Réglages → Synchronisation.",
   "sync.browser.permission":
-    "lines a besoin de votre autorisation pour utiliser de nouveau « {name} ». Ouvrez Réglages → Données et autorisez-le.",
+    "lines a besoin de votre autorisation pour utiliser de nouveau « {name} ». Ouvrez Réglages → Synchronisation et autorisez-le.",
 
   "sync.e2e.title": "Chiffrement de bout en bout",
   "sync.e2e.intro":

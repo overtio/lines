@@ -29,7 +29,7 @@ export function plainLine(line: string): string {
     // Link text may have escaped brackets, as attached files' names do: `[a \[draft\].txt](…)`.
     .replace(/!\[(?:\\.|[^\]\\])*\]\([^)]*\)/g, "")
     .replace(/\[((?:\\.|[^\]\\])*)\]\([^)]*\)/g, (_, text: string) => text.replace(/\\([[\]\\])/g, "$1"))
-    .replace(/\*\*|__|~~|==|`|\*/g, "")
+    .replace(/\*\*|__|~~|==|`|\*|<\/?u>/gi, "")
     // A wiki link reads as what it shows: `[[Ada Lovelace]]` as `Ada Lovelace`, `[[Ada Lovelace|Ada]]` as `Ada`.
     .replace(/(?<![!\\])\[\[([^[\]\n|#]+)(?:#[^[\]\n|]*)?(?:\|([^[\]\n]+))?\]\]/gu, (_, name: string, shown?: string) => (shown ?? name).trim())
     // A mention of a note with spaces in its title: `@[Ada Lovelace]` reads `@Ada Lovelace`.

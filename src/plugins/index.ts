@@ -1,13 +1,17 @@
 import { isApple } from "../lib/platform";
 import type { Plugin } from "../lib/plugins/types";
+import { giphy } from "./giphy";
+import { ironcalc } from "./ironcalc";
 import { katex } from "./katex";
 import { latex } from "./latex";
 import { lucide } from "./lucide";
 import { markdown } from "./markdown";
 import { mermaid } from "./mermaid";
 import { sfSymbols } from "./sf-symbols";
+import { spreadsheet } from "./spreadsheet";
 import { tex } from "./tex";
 import { themes } from "./themes";
+import { unsplash } from "./unsplash";
 
 /*
  * The plugins lines comes with, in the order Settings → Plugins lists them. The core finds them
@@ -17,9 +21,13 @@ import { themes } from "./themes";
 export const builtIn = (): Plugin[] => [
   markdown(),
   latex(),
+  spreadsheet(),
   katex(),
   mermaid(),
+  ironcalc(),
   tex(),
+  unsplash(),
+  giphy(),
   themes(),
   lucide(),
   // Its symbols may only be used on Apple's platforms.

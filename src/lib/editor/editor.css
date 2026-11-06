@@ -65,6 +65,11 @@
   color: var(--text-faint);
 }
 
+.cm-lp-underline {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 .cm-lp-highlight {
   background: var(--highlight);
   border-radius: 3px;
@@ -468,6 +473,15 @@
   border-bottom: 1px solid var(--table-line);
 }
 
+/* A formula (tables.ts): as written until the formula engine has loaded, then what it works out to. */
+.cm-lp-formula-pending {
+  color: var(--text-faint);
+}
+
+.cm-lp-formula-error {
+  color: var(--danger);
+}
+
 /*
  * A table of the notes of a type (`@type.recipe`, typeTables.ts): a drawn table whose header sorts
  * by a column when clicked, and shows a × to remove it on hover, with a + to add one at its end.
@@ -684,6 +698,11 @@
   line-height: normal;
   cursor: text;
   transition: opacity 150ms ease;
+}
+
+/* A code block drawn to work in (rendered.ts), like a ```csv block's grid, in place of its code. */
+.cm-lp-editable {
+  padding: 0.5em 0;
 }
 
 .cm-lp-diagram.is-preview {
@@ -1063,6 +1082,7 @@
 .cm-line.cm-lp-card,
 .cm-lp-table-wrap.cm-lp-card,
 .cm-lp-diagram.cm-lp-card,
+.cm-lp-editable.cm-lp-card,
 .cm-lp-math-block.cm-lp-card,
 .cm-lp-block.cm-lp-card {
   --card-pad: calc(1.4 * var(--editor-size));
@@ -1480,11 +1500,6 @@
   text-align: right;
 }
 
-.cm-lt-underline {
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-}
-
 .cm-lt-smallcaps {
   font-variant: small-caps;
 }
@@ -1654,4 +1669,34 @@
   .cm-focused .cm-lp-file-block.is-selected .cm-lp-file {
     outline: 2px solid Highlight;
   }
+}
+
+/*
+ * A spreadsheet note (plugins/spreadsheet): its grid takes the editor's whole width and fills it
+ * to the bottom, below the title. The grid (Grid.svelte) is styled where it's made; here, only what
+ * it inherits from the editor's text is set back, for it and for a ```csv block's in a Markdown note.
+ */
+.cm-editor.cm-sheet-note .cm-content {
+  max-width: none;
+  padding-bottom: var(--editor-pad-top);
+}
+
+/* Scrolling stops at the grid's edges, without the bounce past them, and doesn't move the note around it. */
+.cm-editor.cm-sheet-note .cm-scroller {
+  overscroll-behavior: none;
+}
+
+.cm-sheet {
+  white-space: normal;
+  overflow-wrap: normal;
+  cursor: default;
+  /* The editor hides the browser's caret and draws its own (cursor.ts); a cell's is the browser's, in the same color. */
+  caret-color: var(--accent);
+  /* As wide as the note's text, however many columns: the grid scrolls sideways instead. */
+  contain: inline-size;
+}
+
+.cm-sheet-placeholder {
+  color: var(--text-faint);
+  pointer-events: none;
 }

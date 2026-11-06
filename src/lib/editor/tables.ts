@@ -6,8 +6,11 @@ import type { SyntaxNode } from "@lezer/common";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { githubLink, githubText } from "./github";
 import { copyButton, destroyCopyButton } from "./keyValue";
-import { opensLink } from "./livePreview";
+import { followsLink } from "./links";
 import { mathElement } from "./math";
+import { isFormula } from "../sheets/cells";
+import { showFormulas } from "../sheets/formulas";
+import { plugins } from "../plugins/registry.svelte";
 import { symbolsChanged } from "./symbols";
 import { withSymbols } from "../notes/symbols";
 import { prefs } from "../prefs.svelte";
@@ -16,7 +19,8 @@ import { ancestors, focusChanged, focused, hasText, isEditing } from "./util";
 
 /*
  * GFM tables. Away from the cursor a table shows as a real table; click a cell (or move into the
- * table) and it turns back into its Markdown, kept neatly aligned as you Tab between cells.
+ * table) and it turns back into its Markdown, kept neatly aligned as you Tab between cells. A cell
+ * written as a formula (`=SUM(B2:B4)`, the header being row 1) shows what it works out to.
  */
 
 type Align = "" | "left" | "center" | "right";
@@ -214,7 +218,7 @@ export function insertTable(view: EditorView, from: number, to: number) {
 
 /** Splits tab-separated text (spreadsheets, pgAdmin, database tools) into rows of cells. A cell in
  * double quotes may hold tabs, line breaks and `""` for a quote, as Excel and pgAdmin write them. */
-function parseTabbed(text: string): string[][] {
+export function parseTabbed(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = "";
@@ -249,7 +253,7 @@ function parseTabbed(text: string): string[][] {
 }
 
 /** Rows of a lone `<table>` in copied HTML, as from a web page; null if there's more than a table. */
-function htmlTable(html: string): string[][] | null {
+export function htmlTable(html: string): string[][] | null {
   const doc = new DOMParser().parseFromString(html, "text/html");
   const tables = doc.querySelectorAll("table");
   if (tables.length !== 1) return null;
@@ -271,10 +275,10 @@ function looksTabular(rows: string[][]) {
 
 const NUMBER = /^[-+]?[\d.,]*\d%?$/;
 
-/** Whether the column `col` of `body` is all numbers, and so right-aligned. */
+/** Whether the column `col` of `body` is all numbers (formulas, too, like a total's), and so right-aligned. */
 export const numericColumn = (body: string[][], col: number) => {
   const values = body.map((row) => row[col]).filter(Boolean);
-  return values.length > 0 && values.every((v) => NUMBER.test(v));
+  return values.some((v) => NUMBER.test(v)) && values.every((v) => NUMBER.test(v) || isFormula(v));
 };
 
 /** The pasted rows as an aligned Markdown table; numeric columns are right-aligned. */
@@ -359,11 +363,12 @@ const STYLES: Record<string, string> = {
   StrongEmphasis: "cm-lp-strong",
   Strikethrough: "cm-lp-strike",
   Highlight: "cm-lp-highlight",
+  Underline: "cm-lp-underline",
   InlineCode: "cm-lp-code",
   Tag: "cm-lp-tag",
 };
 
-const MARKS = new Set(["EmphasisMark", "StrikethroughMark", "HighlightMark", "CodeMark", "LinkMark", "LinkTitle", "LinkLabel"]);
+const MARKS = new Set(["EmphasisMark", "StrikethroughMark", "HighlightMark", "UnderlineMark", "CodeMark", "LinkMark", "LinkTitle", "LinkLabel"]);
 
 function inlines(doc: Text, parent: SyntaxNode, from: number, to: number): Inline[] {
   const out: Inline[] = [];
@@ -400,7 +405,7 @@ function plainInline(content: Inline[]): string {
   return content.map((item) => (typeof item === "string" ? item : "tex" in item ? item.tex : plainInline(item.children))).join("");
 }
 
-/** `code`: inside a code span, which shows symbols (notes/symbols.ts) as Settings → Text has it for code. */
+/** `code`: inside a code span, which shows symbols (notes/symbols.ts) as Settings → Editing has it for code. */
 function renderInline(parent: HTMLElement, content: Inline[], view: EditorView, code = false) {
   for (const item of content) {
     if (typeof item === "string") {
@@ -428,8 +433,8 @@ function renderInline(parent: HTMLElement, content: Inline[], view: EditorView, 
 }
 
 interface TableModel {
-  /** Cells by line of the source, without the delimiter row. */
-  rows: { line: number; cells: Inline[][] }[];
+  /** Cells by line of the source, without the delimiter row: as they read, and as written. */
+  rows: { line: number; cells: Inline[][]; written: string[] }[];
   aligns: Align[];
   columns: number;
 }
@@ -443,13 +448,17 @@ class TableWidget extends WidgetType {
     readonly parse: () => TableModel,
     /** How far in it sits, in cards. */
     readonly inset: CardInset,
-    /** Which symbols it shows (Settings → Text), so changing them draws it again. */
+    /** Which symbols it shows (Settings → Editing), so changing them draws it again. */
     readonly symbols = `${prefs.symbolsInText} ${prefs.symbolsInCode}`,
+    /** What works out its formulas, so turning that on or off draws it again. */
+    readonly formulas = plugins.formulas?.id,
   ) {
     super();
   }
   eq(other: TableWidget) {
-    return other.source === this.source && sameInset(other.inset, this.inset) && other.symbols === this.symbols;
+    return (
+      other.source === this.source && sameInset(other.inset, this.inset) && other.symbols === this.symbols && other.formulas === this.formulas
+    );
   }
   toDOM(view: EditorView) {
     const wrap = document.createElement("div");
@@ -459,10 +468,12 @@ class TableWidget extends WidgetType {
     table.className = "cm-lp-table-grid";
     const model = this.parse();
     const [head, ...body] = model.rows;
+    const elements: HTMLElement[][] = [];
     const section = (tag: "thead" | "tbody", rows: TableModel["rows"]) => {
       const el = document.createElement(tag);
       for (const row of rows) {
         const tr = document.createElement("tr");
+        elements.push([]);
         for (let col = 0; col < model.columns; col++) {
           const cell = document.createElement(tag === "thead" ? "th" : "td");
           if (tag === "thead") cell.setAttribute("scope", "col");
@@ -472,6 +483,7 @@ class TableWidget extends WidgetType {
           if (model.aligns[col] === "right") cell.classList.add("is-right");
           cell.dataset.text = plainInline(row.cells[col] ?? []).trim();
           renderInline(cell, row.cells[col] ?? [], view);
+          elements[elements.length - 1].push(cell);
           tr.append(cell);
         }
         el.append(tr);
@@ -481,6 +493,13 @@ class TableWidget extends WidgetType {
     section("thead", [head]);
     if (body.length) section("tbody", body);
     wrap.append(table);
+    const cells = model.rows.map((row) =>
+      Array.from({ length: model.columns }, (_, col) => {
+        const written = row.written[col] ?? "";
+        return isFormula(written) ? written.replaceAll("\\|", "|") : plainInline(row.cells[col] ?? []).trim();
+      }),
+    );
+    void showFormulas(cells, elements, { pending: "cm-lp-formula-pending", error: "cm-lp-formula-error" }).then(() => view.requestMeasure());
     // One copy button for the whole table, moved into whichever cell the pointer is over.
     let text = "";
     const copy = copyButton(() => text, t("editor.copyCell"), "cm-lp-copy cm-lp-cell-copy");
@@ -519,11 +538,12 @@ function modelOf(state: EditorState, table: SyntaxNode): TableModel {
     if (row.name !== "TableHeader" && row.name !== "TableRow") continue;
     const line = doc.lineAt(row.from);
     const cellNodes = row.getChildren("TableCell");
-    const cells = splitRow(line.text).map(({ from, to }) => {
+    const spans = splitRow(line.text);
+    const cells = spans.map(({ from, to }) => {
       const node = cellNodes.find((n) => n.from >= line.from + from && n.to <= line.from + to);
       return node ? inlines(doc, node, node.from, node.to) : [];
     });
-    rows.push({ line: line.number - first, cells });
+    rows.push({ line: line.number - first, cells, written: spans.map(({ from, to }) => line.text.slice(from, to).trim()) });
   }
   return { rows, aligns: grid.aligns, columns: grid.columns };
 }
@@ -569,7 +589,7 @@ const clickToEdit = EditorView.domEventHandlers({
   mousedown(event, view) {
     const target = event.target as HTMLElement;
     const wrap = target.closest(".cm-lp-table-wrap");
-    if (!wrap || opensLink(event, view)) return false;
+    if (!wrap || followsLink(event, view)) return false;
     if (target.closest(".cm-lp-copy")) return true;
     const cell = target.closest<HTMLElement>("td, th");
     if (event.button !== 0 || view.state.readOnly || !cell) return true;

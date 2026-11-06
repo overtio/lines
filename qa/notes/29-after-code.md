@@ -10,7 +10,7 @@ Code block followed straight away, with no blank line, by each element. Check: n
 plain code
   indented line
 ```
-A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 
 #### 2. Code block, then Long paragraph
 
@@ -162,7 +162,33 @@ plain code
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Code block, then Divider
+#### 17. Code block, then Table with formulas
+
+```
+plain code
+  indented line
+```
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+
+#### 18. Code block, then Spreadsheet (csv block)
+
+```
+plain code
+  indented line
+```
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+
+#### 19. Code block, then Divider
 
 ```
 plain code
@@ -170,7 +196,7 @@ plain code
 ```
 ---
 
-#### 18. Code block, then Key: Value line
+#### 20. Code block, then Key: Value line
 
 ```
 plain code
@@ -178,7 +204,7 @@ plain code
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 19. Code block, then Mention
+#### 21. Code block, then Mention
 
 ```
 plain code
@@ -186,7 +212,7 @@ plain code
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 20. Code block, then Wiki link
+#### 22. Code block, then Wiki link
 
 ```
 plain code
@@ -194,7 +220,7 @@ plain code
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 21. Code block, then Symbols
+#### 23. Code block, then Symbols
 
 ```
 plain code
@@ -202,7 +228,7 @@ plain code
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 22. Code block, then GitHub links
+#### 24. Code block, then GitHub links
 
 ```
 plain code
@@ -210,7 +236,7 @@ plain code
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 23. Code block, then Image
+#### 25. Code block, then Image
 
 ```
 plain code
@@ -218,7 +244,7 @@ plain code
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 24. Code block, then Drawing
+#### 26. Code block, then Drawing
 
 ```
 plain code
@@ -226,7 +252,7 @@ plain code
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 25. Code block, then File
+#### 27. Code block, then File
 
 ```
 plain code
@@ -234,7 +260,7 @@ plain code
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 26. Code block, then Missing file
+#### 28. Code block, then Missing file
 
 ```
 plain code
@@ -242,7 +268,7 @@ plain code
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 27. Code block, then Card
+#### 29. Code block, then Card
 
 ```
 plain code
@@ -252,7 +278,7 @@ plain code
 Text in a card.
 :::
 
-#### 28. Code block, then Callout (info)
+#### 30. Code block, then Callout (info)
 
 ```
 plain code
@@ -262,7 +288,7 @@ plain code
 Text in an info callout.
 :::
 
-#### 29. Code block, then Callout (warning, chosen icon)
+#### 31. Code block, then Callout (warning, chosen icon)
 
 ```
 plain code
@@ -272,7 +298,7 @@ plain code
 Text in a warning callout with the flag icon.
 :::
 
-#### 30. Code block, then Callout (decision, no icon)
+#### 32. Code block, then Callout (decision, no icon)
 
 ```
 plain code

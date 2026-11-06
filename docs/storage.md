@@ -23,7 +23,7 @@ With the app lock on, the notes and attachments in `lines` are encrypted (see [s
 
 | Key | What's in it |
 |---|---|
-| `lines.prefs` | Theme, appearance, font, text size, spacing, icon set |
+| `lines.prefs` | Theme, appearance, font, text size, note width, spacing, icon set, layout, links |
 | `lines.tagIcons` | Icons given to tags |
 | `lines.sync` | Where notes sync to: the folder (its name and an id for its handle) or the bucket and its keys. Encrypted while the app lock is on |
 | `lines.sync.leftovers` | Set only while encrypted copies are being removed after turning end-to-end encryption off |

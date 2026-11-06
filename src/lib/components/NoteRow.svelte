@@ -154,6 +154,12 @@
     return dragging && action.full && Math.abs(offset) > width * FULL;
   });
 
+  /** The actions, each keeping its label next to the row's edge, and growing its icon when letting go would run it. */
+  const actions = $derived([
+    { action: leading, transform: `translateX(calc(${leadingX}px - 100%))`, edge: "justify-end", gap: "mr-5", armed: armed && offset > 0 },
+    { action: trailing, transform: `translateX(calc(${trailingX}px + 100%))`, edge: "justify-start", gap: "ml-5", armed: armed && offset < 0 },
+  ]);
+
   $effect(() => {
     if (armed) navigator.vibrate?.(8);
   });
@@ -164,6 +170,13 @@
 
   // While open, a press anywhere else closes the row.
   const swiped = $derived(offset !== 0);
+  /** Lit as the open note, or among the picked ones while some are. */
+  const lit = $derived(notes.picked.size ? picked : selected);
+  const menuTarget = $derived(menuOpen || ui.iconPicker?.key === `note:${id}`);
+
+  const tones = { pin: "bg-pin text-on-pin", danger: "bg-danger text-on-danger", success: "bg-success text-on-success" };
+  /** The row and its actions slide into place, but follow the finger (or trackpad) exactly while it's dragged. */
+  const slides = $derived(dragging ? "transition-none will-change-transform" : "transition-transform duration-300 ease-sheet");
 
   $effect(() => {
     if (!swiped || dragging) return;
@@ -471,33 +484,38 @@
   }
 </script>
 
-<li bind:this={li} class:menu-target={menuOpen || ui.iconPicker?.key === `note:${id}`}>
-  <div class="row" class:swiped class:dragging>
-    <button
-      class="action leading {leading.tone}"
-      class:armed={armed && offset > 0}
-      style:transform="translateX(calc({leadingX}px - 100%))"
-      tabindex="-1"
-      aria-hidden="true"
-      onclick={() => perform(leading)}
-    >
-      <span class="action-content"><Icon name={leading.icon} size={20} />{leading.label}</span>
-    </button>
-    <button
-      class="action trailing {trailing.tone}"
-      class:armed={armed && offset < 0}
-      style:transform="translateX(calc({trailingX}px + 100%))"
-      tabindex="-1"
-      aria-hidden="true"
-      onclick={() => perform(trailing)}
-    >
-      <span class="action-content"><Icon name={trailing.icon} size={20} />{trailing.label}</span>
-    </button>
+<!-- Lets the browser skip layout and paint for off-screen rows. (`menu-target`, `selected` and `swiped` hide the dividers beside it: NoteList.svelte.) -->
+<li bind:this={li} class={["relative [contain-intrinsic-size:auto_94px] [content-visibility:auto]", menuTarget && "menu-target"]}>
+  <div class={["relative overflow-hidden rounded-lg", swiped && "swiped"]}>
+    {#each actions as { action, transform, edge, gap, armed } (edge)}
+      <button
+        class={["absolute inset-0 flex items-center", edge, tones[action.tone], slides]}
+        style:transform
+        tabindex="-1"
+        aria-hidden="true"
+        onclick={() => perform(action)}
+      >
+        <span class={["flex w-[76px] shrink-0 flex-col items-center gap-1 text-[11.5px] font-semibold", gap]}>
+          <Icon
+            name={action.icon}
+            size={20}
+            class="transition-[scale] duration-220 ease-[cubic-bezier(0.3,1.6,0.6,1)] {armed ? 'scale-120' : ''}"
+          />{action.label}
+        </span>
+      </button>
+    {/each}
 
+    <!-- Vertical scrolling stays native; sideways drags are ours. The background is a layer over the
+         list's color, which shows only while swiped, so the action underneath doesn't show through. -->
     <button
       bind:this={item}
-      class="item"
-      class:selected={notes.picked.size ? picked : selected}
+      class={[
+        "item relative z-1 flex w-full touch-pan-y flex-col gap-[3px] rounded-lg bg-[image:linear-gradient(var(--layer),var(--layer))] px-3 pt-3 pb-[11px] text-left text-fg [-webkit-touch-callout:none]",
+        lit ? "selected [--layer:var(--active)]" : "[--layer:transparent] hover:[--layer:var(--hover)]",
+        swiped && "bg-list",
+        menuTarget && "inset-ring-2 inset-ring-accent",
+        slides,
+      ]}
       data-id={id}
       tabindex={tabbable ? 0 : -1}
       aria-current={selected}
@@ -512,19 +530,22 @@
       onpointercancel={onpointerup}
       {@attach longPress(onlongpress)}
     >
-      <span class="item-title" class:untitled={!entry.meta.title}>
-        {#if icon}<Icon name={icon} size={15} strokeWidth={2} />{/if}
-        <span>{entry.meta.title || t("list.untitled")}</span>
-        {#if picked && notes.picked.size}<span class="visually-hidden">, {t("list.picked")}</span>{/if}
+      <span class={["flex min-w-0 items-center gap-1.5 text-md leading-[1.35] font-semibold whitespace-nowrap", !entry.meta.title && "text-faint"]}>
+        {#if icon}<Icon name={icon} size={15} strokeWidth={2} class="flex-none text-accent" />{/if}
+        <span class="truncate">{entry.meta.title || t("list.untitled")}</span>
+        {#if picked && notes.picked.size}<span class="sr-only">, {t("list.picked")}</span>{/if}
       </span>
-      {#if entry.meta.excerpt}<span class="excerpt" id="excerpt-{id}" aria-hidden="true">{entry.meta.excerpt}</span>{/if}
-      <!-- Said after the title, by name: the icons alone would say nothing. -->
-      <span class="meta">
-        {#if entry.note.pinned}<Icon name="pin" size={12} /><span class="visually-hidden">{t("list.pinned")}</span>{/if}
+      {#if entry.meta.excerpt}
+        <span class="line-clamp-2 text-sm leading-[1.45] text-muted" id="excerpt-{id}" aria-hidden="true">{entry.meta.excerpt}</span>
+      {/if}
+      <!-- Said after the title, by name: the icons alone would say nothing. With increased contrast,
+           the date on the open note's row keeps 4.5:1 over its darker background. -->
+      <span class={["mt-0.5 flex items-center gap-[5px] text-[11.5px] text-faint", lit && "in-data-[contrast=more]:text-muted"]}>
+        {#if entry.note.pinned}<Icon name="pin" size={12} class="text-accent" /><span class="sr-only">{t("list.pinned")}</span>{/if}
         {#if entry.note.locked}
           {@const lockLabel = entry.note.locked.open ? t("list.lockedNoteOpen") : t("list.lockedNote")}
-          <span class="lock" title={lockLabel}>
-            <Icon name={entry.note.locked.open ? "lock-open" : "lock"} size={12} /><span class="visually-hidden">{lockLabel}</span>
+          <span class="flex" title={lockLabel}>
+            <Icon name={entry.note.locked.open ? "lock-open" : "lock"} size={12} /><span class="sr-only">{lockLabel}</span>
           </span>
         {/if}
         <time datetime={new Date(entry.note.updatedAt).toISOString()}>{formatDate(entry.note.updatedAt, now)}</time>
@@ -532,185 +553,3 @@
     </button>
   </div>
 </li>
-
-<style>
-  li {
-    /* Lets the browser skip layout and paint for off-screen rows. */
-    content-visibility: auto;
-    contain-intrinsic-size: auto 94px;
-    position: relative;
-  }
-
-  .row {
-    position: relative;
-    overflow: hidden;
-    border-radius: 10px;
-  }
-
-  .item {
-    --layer: transparent;
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    width: 100%;
-    padding: 12px 12px 11px;
-    border-radius: 10px;
-    background: linear-gradient(var(--layer), var(--layer));
-    text-align: left;
-    color: var(--text);
-    /* Vertical scrolling stays native; sideways drags are ours. */
-    touch-action: pan-y;
-    -webkit-touch-callout: none;
-    transition: transform 300ms var(--ease-sheet);
-  }
-
-  /* Touch screens would keep a tapped row looking hovered. */
-  @media (hover: hover) {
-    .item:hover {
-      --layer: var(--hover);
-    }
-  }
-
-  .item.selected {
-    --layer: var(--active);
-  }
-
-  /* Opaque while swiped, so the action underneath doesn't show through. */
-  .swiped .item {
-    background-color: var(--bg-list);
-  }
-
-  .menu-target .item {
-    box-shadow: inset 0 0 0 2px var(--accent);
-  }
-
-  .action {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    transition: transform 300ms var(--ease-sheet);
-  }
-
-  /* The row follows the finger (or trackpad) exactly while it's dragged. */
-  .dragging .item,
-  .dragging .action {
-    transition: none;
-    will-change: transform;
-  }
-
-  /* Each action keeps its label next to the row's edge. */
-  .leading {
-    justify-content: flex-end;
-  }
-
-  .trailing {
-    justify-content: flex-start;
-  }
-
-  .action-content {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    width: 76px;
-    font-size: 11.5px;
-    font-weight: 600;
-  }
-
-  .leading .action-content {
-    margin-right: 20px;
-  }
-
-  .trailing .action-content {
-    margin-left: 20px;
-  }
-
-  .action :global(.icon) {
-    transition: transform 220ms cubic-bezier(0.3, 1.6, 0.6, 1);
-  }
-
-  .action.armed :global(.icon) {
-    transform: scale(1.2);
-  }
-
-  .pin {
-    background: var(--pin);
-    color: var(--on-pin);
-  }
-
-  .danger {
-    background: var(--danger);
-    color: var(--on-danger);
-  }
-
-  .success {
-    background: var(--success);
-    color: var(--on-success);
-  }
-
-  .item-title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.35;
-    white-space: nowrap;
-  }
-
-  .item-title > span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .item-title > :global(.icon) {
-    flex: none;
-    color: var(--accent);
-  }
-
-  .untitled {
-    color: var(--text-faint);
-  }
-
-  .excerpt {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    font-size: 13px;
-    line-height: 1.45;
-    color: var(--text-muted);
-  }
-
-  .meta {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 2px;
-    font-size: 11.5px;
-    color: var(--text-faint);
-  }
-
-  /* With increased contrast, the date on the open note's row keeps 4.5:1 over its darker background. */
-  :global(:root[data-contrast="more"]) .item.selected .meta {
-    color: var(--text-muted);
-  }
-
-  .meta :global(.icon) {
-    color: var(--accent);
-  }
-
-  .meta .lock {
-    display: flex;
-  }
-
-  .meta .lock :global(.icon) {
-    color: var(--text-faint);
-  }
-</style>

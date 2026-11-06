@@ -3,6 +3,7 @@
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { prefs } from "../prefs.svelte";
+  import Button from "./ui/Button.svelte";
 
   /** A floating note while lines is locked: nothing of the note shows until the main window is unlocked. */
 
@@ -20,27 +21,8 @@
   }
 </script>
 
-<div class="locked" data-tauri-drag-region>
+<div class="flex h-full flex-col items-center justify-center gap-2 bg-surface text-faint" data-tauri-drag-region>
   <Icon name="lock" size={22} strokeWidth={1.75} />
-  <p>{t("lock.screen.title")}</p>
-  <button type="button" class="text-button" onclick={showMain}>{t("lock.floating.unlock")}</button>
+  <p class="m-0 text-sm text-muted">{t("lock.screen.title")}</p>
+  <Button variant="quiet" onclick={showMain}>{t("lock.floating.unlock")}</Button>
 </div>
-
-<style>
-  .locked {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    height: 100%;
-    background: var(--surface);
-    color: var(--text-faint);
-  }
-
-  p {
-    margin: 0;
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-</style>

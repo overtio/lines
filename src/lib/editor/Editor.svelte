@@ -8,6 +8,7 @@
   import { plugins } from "../plugins/registry.svelte";
   import { prefs } from "../prefs.svelte";
   import { objectsChanged } from "./objects";
+  import { outline, outlineCompartment } from "./outline.svelte";
   import { createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment } from "./setup";
   import { symbolsChanged } from "./symbols";
 
@@ -180,6 +181,13 @@
     view?.dispatch({ effects: readOnlyCompartment.reconfigure(readOnly(value)) });
   });
 
+  // Settings → General → Layout: the outline beside the note.
+  $effect(() => {
+    const on = prefs.outline;
+    noteId;
+    untrack(() => view?.dispatch({ effects: outlineCompartment.reconfigure(on ? outline : []) }));
+  });
+
   // Mentions show other notes' titles, icons and properties, and tags their icons; draw them again when those change.
   $effect(() => {
     void notes.objectsSignature;
@@ -188,7 +196,7 @@
     untrack(() => view?.dispatch({ effects: objectsChanged.of(null) }));
   });
 
-  // Settings → Text: `->` shown as →, or as typed.
+  // Settings → Editing: `->` shown as →, or as typed.
   $effect(() => {
     void prefs.symbolsInText;
     void prefs.symbolsInCode;
@@ -201,11 +209,4 @@
   });
 </script>
 
-<div class="editor" bind:this={host}></div>
-
-<style>
-  .editor {
-    height: 100%;
-    min-height: 0;
-  }
-</style>
+<div class="h-full min-h-0" bind:this={host}></div>

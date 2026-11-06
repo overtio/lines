@@ -9,7 +9,7 @@ JSON block (no language) followed straight away, with no blank line, by each ele
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
-A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 
 #### 2. JSON block (no language), then Long paragraph
 
@@ -146,77 +146,101 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. JSON block (no language), then Divider
+#### 17. JSON block (no language), then Table with formulas
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+
+#### 18. JSON block (no language), then Spreadsheet (csv block)
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+
+#### 19. JSON block (no language), then Divider
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ---
 
-#### 18. JSON block (no language), then Key: Value line
+#### 20. JSON block (no language), then Key: Value line
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 19. JSON block (no language), then Mention
+#### 21. JSON block (no language), then Mention
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 20. JSON block (no language), then Wiki link
+#### 22. JSON block (no language), then Wiki link
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 21. JSON block (no language), then Symbols
+#### 23. JSON block (no language), then Symbols
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 22. JSON block (no language), then GitHub links
+#### 24. JSON block (no language), then GitHub links
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 23. JSON block (no language), then Image
+#### 25. JSON block (no language), then Image
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 24. JSON block (no language), then Drawing
+#### 26. JSON block (no language), then Drawing
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 25. JSON block (no language), then File
+#### 27. JSON block (no language), then File
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 26. JSON block (no language), then Missing file
+#### 28. JSON block (no language), then Missing file
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 27. JSON block (no language), then Card
+#### 29. JSON block (no language), then Card
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -225,7 +249,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 28. JSON block (no language), then Callout (info)
+#### 30. JSON block (no language), then Callout (info)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -234,7 +258,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 29. JSON block (no language), then Callout (warning, chosen icon)
+#### 31. JSON block (no language), then Callout (warning, chosen icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -243,7 +267,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 30. JSON block (no language), then Callout (decision, no icon)
+#### 32. JSON block (no language), then Callout (decision, no icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}

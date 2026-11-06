@@ -1,16 +1,30 @@
-/** Settings: its tabs and panels (appearance, text, privacy, sync and data, about). */
+/** Settings: its sections (general, appearance, windows, text, editing, privacy, data, about). */
 export default {
-  // The window and its tabs.
+  // The window and its sections, each with what it's for.
   "settings.title": "Settings",
-  "settings.tabTheme": "Theme",
-  "settings.tabText": "Text",
-  "settings.tabPlugins": "Plugins",
-  "settings.tabData": "Data",
-  "settings.tabAbout": "About",
+  "settings.sections": "Settings sections",
+  "settings.back": "All settings",
   "settings.close": "Close",
-  "settings.sync": "Sync",
+  "settings.section.general": "General",
+  "settings.section.generalAbout": "The language lines speaks, where its panes go, and how swiping moves.",
+  "settings.section.appearance": "Appearance",
+  "settings.section.appearanceAbout": "The theme, light or dark, contrast and icons.",
+  "settings.section.windows": "Windows",
+  "settings.section.windowsAbout": "How see-through the main window is, and how floating notes look.",
+  "settings.section.text": "Text",
+  "settings.section.textAbout": "The font notes are in, its size, and how wide and spaced out notes are.",
+  "settings.section.editing": "Editing",
+  "settings.section.editingAbout": "Symbols that replace what you type, and what clicking a link does.",
+  "settings.section.plugins": "Plugins",
+  "settings.section.sync": "Sync",
+  "settings.section.privacy": "Privacy",
+  "settings.section.privacyAbout": "Lock lines, or single notes, with a password or Touch ID.",
+  "settings.section.data": "Data",
+  "settings.section.dataAbout": "Export your notes, import files, add example notes, or start again.",
+  "settings.section.shortcuts": "Shortcuts",
+  "settings.section.about": "About",
 
-  // Theme.
+  // General, Appearance and Windows.
   "settings.language": "Language",
   "settings.languageSystem": "System",
   "settings.languageNote": "lines starts again in the language chosen. System follows your device's language when lines speaks it, and English when it doesn't.",
@@ -25,17 +39,29 @@ export default {
   // Names the three themes above as they are written there.
   "settings.themesAccessibilityNote":
     "High Contrast is black on white, or white on black, with strong borders, for low vision. Red-Green Friendly is for protanopia and deuteranopia, and Blue-Yellow Friendly for tritanopia: their colors stay apart with those kinds of color blindness.",
-  "settings.appearance": "Appearance",
   // Light or dark: follow the device's.
   "settings.appearanceSystem": "System",
   "settings.appearanceLight": "Light",
   "settings.appearanceDark": "Dark",
+  // The row with the choices above, under Theme.
+  "settings.mode": "Light or dark",
   "settings.contrast": "Contrast",
   "settings.contrastStandard": "Standard",
   "settings.contrastMore": "Increased",
   "settings.contrastNote": "Increased darkens grey text and borders, in every theme, so they’re easier to read. System follows Increase Contrast in your device’s accessibility settings.",
   "settings.icons": "Icons",
   "settings.sfSymbolsNote": "SF Symbols are available in the Mac and iPhone apps.",
+  // Settings → General → Layout: which side the sidebar and the note list are on, tabs and the outline.
+  "settings.layout": "Layout",
+  "settings.sidebarSide": "Sidebar",
+  "settings.listSide": "Note list",
+  "settings.sideLeft": "Left",
+  "settings.sideRight": "Right",
+  "settings.tabs": "Open notes in tabs",
+  "settings.tabsNote": "The notes you open show as tabs above the note. A tab in italics is a preview: the next note you open takes its place, unless you edit it or double-click the tab. Not at phone width.",
+  "settings.outline": "Show an outline beside the note",
+  "settings.outlineNote": "A short line beside the note for each of its headings, darker for the part you’re reading. Point at them to see the headings, and choose one to go there. Shown when a note has two or more headings and there’s room beside it.",
+  "settings.outlineSide": "Outline side",
   "settings.mainWindow": "Main window",
   // How see-through a window is.
   "settings.opacity": "Opacity",
@@ -80,6 +106,16 @@ export default {
   "settings.pixels": "{value}px",
   // A size in pixels, as a screen reader says it.
   "settings.pixelsSpoken": "{count, plural, one {# pixel} other {# pixels}}",
+
+  // Settings → Text → Note width: how far a note's text runs before it wraps.
+  "settings.noteWidth": "Note width",
+  "settings.widthNarrow": "Narrow",
+  "settings.widthMedium": "Medium",
+  "settings.widthWide": "Wide",
+  "settings.widthFull": "Full",
+  "settings.width": "Width",
+  "settings.noteWidthNote": "How far a note’s text runs before it wraps. Full uses all the room beside the sidebar and list, keeping the side margins. Floating notes and phones always use their whole width.",
+
   "settings.spacing": "Spacing",
   "settings.spacingPreset": "Spacing preset",
   "settings.spacingCompact": "Compact",
@@ -89,7 +125,6 @@ export default {
   "settings.paragraphSpacing": "Paragraph spacing",
   "settings.headingSpacing": "Heading spacing",
   "settings.titleSpacing": "Space below title",
-  "settings.textWidth": "Text width",
   "settings.sideMargins": "Side margins",
   "settings.topMargin": "Top margin",
   "settings.customSpacing": "Custom spacing, saved on this device.",
@@ -100,6 +135,22 @@ export default {
   // The arrows and signs are shown as they appear in notes; keep them as they are.
   "settings.symbolsNote":
     "Also <- as ←, <-> as ↔, => as ⇒, <=> as ⇔, <= as ≤, >= as ≥ and != as ≠. Your notes keep what you typed: put the cursor on one to see it, or type \\-> to keep it as typed.",
+
+  // Settings → Editing → Links: what a click, ⌘-click and ⌘⇧-click on each kind of link in a note does.
+  "settings.links": "Links",
+  "settings.linksWeb": "Web links",
+  "settings.linksTag": "Tags",
+  "settings.linksMention": "Mentions",
+  "settings.linkClick": "Click",
+  "settings.linkEdit": "Edit",
+  "settings.linkOpen": "Open",
+  "settings.linkShowNotes": "Show its notes",
+  "settings.linkCopy": "Copy address",
+  "settings.linkNewTab": "Open in new tab",
+  "settings.linkBackgroundTab": "Open in background tab",
+  "settings.linkWindow": "Open in floating window",
+  "settings.linksNote":
+    "Edit puts the cursor there, as a click on text does. Web links include attached files, which open in their app, and mentions are of notes (@Ada, [[Ada]]). The tab choices need tabs on (General → Layout); until then they open the note. On a touch screen, a tap while you’re not typing opens, and {openKey} opens what the cursor is on.",
 
   // About.
   "settings.version": "Version {version}",
@@ -128,7 +179,7 @@ export default {
   "settings.export": "Export",
   // "attachments" is the folder's name in the .zip, so it stays as it is.
   "settings.exportText":
-    "Save every note as a Markdown file, bundled in a .zip. Each file is named after its note’s title and holds exactly what you wrote, so it opens in any text editor or other Markdown app. Images and attached files go in an attachments folder beside them.",
+    "Save every note as a file of its own, bundled in a .zip: Markdown notes as Markdown files, LaTeX notes as documents that compile, and spreadsheets as CSV files. Each is named after its note’s title and opens in other apps. Images and attached files go in an attachments folder beside them.",
   // "Trash" is the folder's name in the .zip, so it stays as it is.
   "settings.includeTrash": "Include the trash ({count, plural, one {# note} other {# notes}}, in a Trash folder)",
   "settings.lockedNotIncluded":
@@ -141,6 +192,13 @@ export default {
   "settings.showInFinder": "Show in Finder",
   "settings.showInFolder": "Show in folder",
 
+  // Data: importing files.
+  "settings.import": "Import",
+  "settings.importText": "Markdown and LaTeX files become notes. A CSV file becomes a spreadsheet, and so does each sheet of an Excel workbook.",
+  "settings.importFiles": "Import Files…",
+  "settings.importing": "Importing…",
+  "settings.imported": "{count, plural, =0 {No notes imported} one {Imported # note} other {Imported # notes}}",
+  "settings.importSkipped": "Not imported, as lines doesn’t read files like them: {names}",
   // Data: sample notes.
   "settings.samples": "Sample notes",
   "settings.samplesText":

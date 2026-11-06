@@ -5,7 +5,7 @@ import { prefs } from "./lib/prefs.svelte";
 import "./lib/themes.svelte";
 import "./lib/editor/editor.css";
 import FloatingNote from "./lib/components/FloatingNote.svelte";
-import Settings from "./lib/components/Settings.svelte";
+import Settings from "./lib/components/settings/Settings.svelte";
 import LockedNote from "./lib/components/LockedNote.svelte";
 import LockScreen from "./lib/components/LockScreen.svelte";
 import { lock } from "./lib/lock/lock.svelte";
@@ -18,7 +18,7 @@ import { plugins } from "./lib/plugins/registry.svelte";
 import { sync } from "./lib/sync/engine.svelte";
 import { announce, onAnnounce, windowLabel } from "./lib/windows/channel";
 import { canFloat, floatingOpen, restoreFloating } from "./lib/windows/floating";
-import { closeSettings, forwardToMain, initialTab, isSettingsWindow, serveSettings } from "./lib/windows/settings.svelte";
+import { closeSettings, forwardToMain, initialSection, isSettingsWindow, serveSettings } from "./lib/windows/settings.svelte";
 import { ui } from "./lib/ui.svelte";
 
 if (isMacApp) document.documentElement.dataset.platform = "mac-app";
@@ -102,7 +102,7 @@ async function start() {
     mount(FloatingNote, { target, props: { id: floatingId } });
     if (lock.enabled) watchActivity();
   } else if (isSettingsWindow) {
-    ui.settings = initialTab();
+    ui.settings = initialSection();
     forwardToMain({ sync, lock, lockedNotes, notes }, sync, () => {
       lock.refresh();
       noteKeys.refresh();

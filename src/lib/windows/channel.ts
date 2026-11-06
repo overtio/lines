@@ -30,7 +30,7 @@ export type WindowMessage =
   /** A window that just opened asks whether locked notes are open. */
   | { type: "notes-ask" }
   /** The Settings window should show this tab (see settings.svelte.ts). */
-  | { type: "settings-tab"; tab: string }
+  | { type: "settings-section"; section: string }
   /** The Settings window asks the main window to do something, and hears how it went. */
   | { type: "call"; id: string; target: string; method: string; args: unknown[] }
   | { type: "reply"; id: string; result?: unknown; error?: string }

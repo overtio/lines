@@ -21,6 +21,6 @@ To keep your notes, click **Save to a folder** at the bottom of the sidebar and 
 - [ ] Write something in this note
 - [ ] Type `/` at the start of a line
 - [ ] Open the next note, **Writing in Markdown**
-- [ ] Try a theme in Settings → Theme
+- [ ] Try a theme in Settings → Appearance
 
 #tour

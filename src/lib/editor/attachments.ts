@@ -22,6 +22,7 @@ import { coarsePointer } from "../platform";
 import { locale, type MessageKey, t } from "../i18n/index.svelte";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { editDrawing, isDrawing, knownDrawing } from "./drawings";
+import { giphyStill } from "./giphy";
 import { isUnsplashPhoto, unsplashImage, unsplashPhoto } from "./unsplash";
 import { ancestors, focusChanged, focused, isEditing } from "./util";
 
@@ -67,7 +68,7 @@ export function imageElement(src: string, label: string, onChange: () => void): 
   let cancel = () => {};
   const name = attachmentName(src);
   if (!name) {
-    img.src = unsplashImage(src) ?? src;
+    img.src = unsplashImage(src) ?? giphyStill(src) ?? src;
     dom.append(img);
   } else {
     const show = () =>
@@ -604,16 +605,23 @@ async function insertFiles(view: EditorView, writer: AttachmentWriter, files: Fi
     view.focus();
     return;
   }
-  const line = doc.lineAt(from);
-  const before = doc.sliceString(line.from, from).trim() ? "\n" : "";
+  insertLines(view, markdown, from, to, "input.paste");
+}
+
+/** Puts `markdown` at `from`–`to` on a line of its own, with the cursor on the line after it so it shows at once. */
+function insertLines(view: EditorView, markdown: string, from: number, to: number, userEvent: string) {
+  const line = view.state.doc.lineAt(from);
+  const before = view.state.doc.sliceString(line.from, from).trim() ? "\n" : "";
   const insert = before + markdown + "\n";
-  view.dispatch({
-    changes: { from, to, insert },
-    selection: { anchor: from + insert.length },
-    scrollIntoView: true,
-    userEvent: "input.paste",
-  });
+  view.dispatch({ changes: { from, to, insert }, selection: { anchor: from + insert.length }, scrollIntoView: true, userEvent });
   view.focus();
+}
+
+/** Puts an image from the web (/unsplash, /giphy) where the cursor is in a Markdown note, unless it can't go there. */
+export function insertWebImage(view: EditorView, src: string, alt: string) {
+  const { from, to } = view.state.selection.main;
+  if (!view.dom.isConnected || !allowed(markdownWriter, view.state, from)) return;
+  insertLines(view, markdownWriter.image(src, alt), from, to, "input");
 }
 
 /** Text copied along with a file that's only its name or address, as Finder and browsers add. */

@@ -38,9 +38,16 @@ export default {
   "editor.slash.card": "Card",
   "editor.slash.card.keywords": "box panel section block callout container",
   "editor.slash.table": "Table",
-  "editor.slash.table.keywords": "grid columns rows spreadsheet",
+  "editor.slash.table.keywords": "grid columns rows",
+  // A ```csv block, drawn as a spreadsheet's grid.
+  "editor.slash.spreadsheet": "Spreadsheet",
+  "editor.slash.spreadsheet.keywords": "csv cells formulas sheet excel calculate",
   "editor.slash.image": "Image",
   "editor.slash.image.keywords": "picture photo screenshot upload",
+  "editor.slash.unsplash": "Photo",
+  "editor.slash.unsplash.keywords": "unsplash picture image stock search web",
+  "editor.slash.giphy": "GIF",
+  "editor.slash.giphy.keywords": "giphy animated meme reaction funny",
   "editor.slash.file": "File",
   "editor.slash.file.keywords": "attach attachment upload document pdf",
   "editor.slash.drawing": "Drawing",
@@ -86,10 +93,15 @@ export default {
   "editor.callout.changeIcon": "Change icon…",
   "editor.callout.addIcon": "Add icon…",
 
+  // The outline beside a note (Settings → General → Layout): its headings, by name when pointed at.
+  "editor.outline": "Outline",
+  "editor.outline.headings": "Headings",
+
   // The toolbar over selected text.
   "editor.format": "Format",
   "editor.format.bold": "Bold",
   "editor.format.italic": "Italic",
+  "editor.format.underline": "Underline",
   "editor.format.strike": "Strikethrough",
   "editor.format.code": "Code",
   "editor.format.highlight": "Highlight",
@@ -177,19 +189,35 @@ export default {
   "editor.typeTable.new": "New {type}",
   "editor.typeTable.open": "Open {title}",
 
-  // CodeMirror's own words: the find and replace bar, and what it says to screen readers. `$` is a
-  // number CodeMirror fills in; keep it.
-  "editor.cm.find": "Find",
-  "editor.cm.replace": "Replace",
-  "editor.cm.next": "next",
-  "editor.cm.previous": "previous",
-  // Selects every match.
-  "editor.cm.all": "all",
-  "editor.cm.matchCase": "match case",
-  "editor.cm.regexp": "regexp",
-  "editor.cm.byWord": "by word",
-  "editor.cm.replaceOne": "replace",
-  "editor.cm.replaceAll": "replace all",
+  // The find bar over a note (⌘F). {current} and {count}: "3 of 12".
+  "editor.find.label": "Find in note",
+  "editor.find.find": "Find",
+  "editor.find.replaceWith": "Replace with",
+  "editor.find.count": "{current} of {count}",
+  "editor.find.matches": "{count, plural, =0 {No results} one {# result} other {# results}}",
+  "editor.find.many": "{count}+ results",
+  "editor.find.invalid": "Not a valid pattern",
+  "editor.find.matchCase": "Match case",
+  "editor.find.regexp": "Regular expression",
+  "editor.find.wholeWord": "Whole words only",
+  "editor.find.previous": "Previous match",
+  "editor.find.next": "Next match",
+  "editor.find.close": "Close",
+  "editor.find.showReplace": "Replace",
+  "editor.find.replace": "Replace",
+  "editor.find.replaceAll": "Replace All",
+  // The picker /unsplash and /giphy open, where {name} is Unsplash or GIPHY.
+  "editor.images.search": "Search {name}",
+  // A picture in the picker, and who made it.
+  "editor.images.by": "{image}, by {name}",
+  "editor.images.searching": "Searching…",
+  "editor.images.found": "{count, plural, one {# result} other {# results}}",
+  "editor.images.none": "Nothing found for “{query}”.",
+  "editor.images.failed": "Couldn’t reach {name}.",
+  "editor.images.retry": "Try Again",
+
+  // CodeMirror's own words: what it says to screen readers, and its go-to-line box. `$` is a number
+  // CodeMirror fills in; keep it.
   "editor.cm.close": "close",
   "editor.cm.currentMatch": "current match",
   // "current match. … on line 12."

@@ -48,6 +48,8 @@ export interface Contributions {
   renderers?: Renderer[];
   /** Ways to make a note's PDF other than lines' own pages, like TeX for LaTeX notes. */
   typesetters?: Typesetter[];
+  /** Engines that work out formulas (`=SUM(B2:B4)`) in tables and spreadsheets. */
+  formulas?: FormulaEngine[];
   /** New syntax for Markdown notes: block types and marks within text, and their "/" commands. */
   markdown?: MarkdownAddition[];
 }
@@ -81,6 +83,26 @@ export interface NoteLanguage {
   file(body: string, attachments?: string): string;
   /** The note laid out as a document, for its PDF, printing and images (print/). */
   print(body: string, parts: Parts): HTMLElement;
+  /**
+   * For a language whose notes copy and download as something other than their text as written:
+   * what that's called, and the note as it ("CSV", a spreadsheet's cells without its title).
+   */
+  copyAs?: { name: string; text(body: string): string };
+  /** Other files its notes can be downloaded as, besides their own: a spreadsheet as an Excel workbook. */
+  exports?: NoteExport[];
+  /** Other extensions it can make notes from (an Excel workbook's), besides its own. */
+  opens?: string[];
+  /** The notes a file of its extensions makes, if not one with the file's text as it is. */
+  read?(file: { name: string; data: Uint8Array }): Promise<string[]>;
+}
+
+export interface NoteExport {
+  /** What the share menu says: "Download Excel Workbook". */
+  label: string;
+  icon: IconName;
+  extension: string;
+  mimeType: string;
+  write(body: string): Promise<Uint8Array<ArrayBuffer>>;
 }
 
 /**
@@ -113,7 +135,7 @@ export interface Theme {
   accessible?: boolean;
   light: ThemeColors;
   dark: ThemeColors;
-  /** What changes with Settings → Theme → Contrast → Increased, or the device's Increase Contrast. */
+  /** What changes with Settings → Appearance → Contrast → Increased, or the device's Increase Contrast. */
   moreContrast?: { light?: Partial<ThemeColors>; dark?: Partial<ThemeColors> };
 }
 
@@ -158,6 +180,37 @@ export interface Renderer {
   render(source: string, options: { paper: boolean }): Promise<string | Element>;
   /** Buttons on what it draws, like a diagram's "Copy and Edit as Drawing". */
   actions?: BlockAction[];
+  /**
+   * Draws its blocks in the editor as something to work in, instead of `render`'s picture, which
+   * still prints: a ```csv block as a spreadsheet's grid. It's put into `dom`, in place of the
+   * block's code, and writes what's changed back through `block`.
+   */
+  editor?(dom: HTMLElement, block: EditableBlock): BlockEditor;
+}
+
+/** A code block drawn in the editor as something to work in (`Renderer.editor`). */
+export interface EditableBlock {
+  readonly view: EditorView;
+  /** Its code as written, kept up to date. */
+  readonly source: string;
+  readonly readOnly: boolean;
+  /** Writes its code, as one step to undo. */
+  write(source: string): void;
+  /** Out of it, into the note's text above it or below (a line is added below one that ends the note). */
+  leave(up: boolean): void;
+  /** Shows its code in place of what's drawn, the cursor at its start. */
+  showCode(): void;
+}
+
+/** What a renderer's editor gives back for a block it's put into. */
+export interface BlockEditor {
+  /** Its code, or whether the note is read-only, changed. */
+  update(): void;
+  /** Takes the keyboard, from the line above it (↓) or below (↑). */
+  focus(from: "above" | "below"): void;
+  /** The editor's size or text size changed. */
+  layout?(): void;
+  destroy(): void;
 }
 
 export interface BlockAction {
@@ -186,6 +239,75 @@ export interface Typesetter {
   available(): Promise<boolean>;
   /** Makes a note's PDF from its text, saying how it's going. */
   typeset(body: string, progress: (progress: TypesetProgress) => void): Promise<TypesetResult>;
+}
+
+/** A cell as a formula engine works it out. */
+export interface CellValue {
+  /** As it shows: "1,650.50", "TRUE", "#DIV/0!". */
+  text: string;
+  kind: "empty" | "number" | "text" | "boolean" | "error";
+}
+
+/** A sheet kept by a formula engine, worked out again as its cells change. */
+export interface FormulaSheet {
+  /** Its cells as written ("12", "=SUM(B2:B4)"), by row; only what changed since last time is worked out again. */
+  update(cells: string[][]): void;
+  /** What a cell shows, by row and column from 0, including ones a formula spills into. */
+  value(row: number, column: number): CellValue;
+  free(): void;
+}
+
+/** Cells by row, as written: a sheet's, or a table's. */
+export type Cells = string[][];
+
+/** What can go at a place in a formula being written. Places count UTF-16 units, as strings do. */
+export interface FormulaCompletion {
+  /** A function's name is being typed: what's typed of it so far, starting at `from`. */
+  name?: { typed: string; from: number };
+  /** Inside a function's parentheses: which function, and which of its arguments (from 0). */
+  argument?: { name: string; index: number };
+  /** Whether a cell or a range of them can go here (after `=`, `(`, a comma, an operator). */
+  reference: boolean;
+}
+
+/** A function an engine knows, for suggesting it. */
+export interface FormulaFunction {
+  name: string;
+  /** What it does, in a sentence. */
+  about: string;
+  args: { name: string; about: string; optional: boolean; /** "…": as many more as wanted. */ more: boolean }[];
+}
+
+/** A reference in a formula: where it's written (from–to), and the cells it points at, from 0. */
+export interface FormulaReference {
+  from: number;
+  to: number;
+  top: number;
+  left: number;
+  bottom: number;
+  right: number;
+}
+
+export interface FormulaEngine {
+  id: string;
+  name: string;
+  /** Gets ready, loading what it needs the first time. Everything else waits for it. */
+  load(): Promise<void>;
+  sheet(): FormulaSheet;
+  /** `cells` with `count` rows or columns put in at `at` (taken out, if negative), formulas still pointing at the same cells. */
+  shift(cells: Cells, axis: "row" | "column", at: number, count: number): Cells;
+  /** A formula as it reads copied `rows` down and `columns` across: its relative references move with it. */
+  move(formula: string, rows: number, columns: number): string;
+  /** What can go at `cursor` in a formula being written. */
+  complete(formula: string, cursor: number): FormulaCompletion;
+  /** The references in a formula to cells of its own sheet. */
+  references(formula: string): FormulaReference[];
+  /** Every function it knows, by name. */
+  functions(): FormulaFunction[];
+  /** The sheets of an Excel workbook, each cell as written (its formula, or its value as it shows). */
+  readWorkbook?(data: Uint8Array): { name: string; cells: Cells }[];
+  /** A sheet as an Excel workbook, with its formulas and their values. */
+  writeWorkbook?(name: string, cells: Cells): Uint8Array<ArrayBuffer>;
 }
 
 /** New syntax for Markdown notes (Linedown): a block type, or a mark within text. */

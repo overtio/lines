@@ -8,6 +8,19 @@ export function* ancestors(state: EditorState, pos: number, side: -1 | 0 | 1 = 0
   for (let node: SyntaxNode | null = syntaxTree(state).resolveInner(pos, side); node; node = node.parent) yield node;
 }
 
+/**
+ * Text at `from` changed from `before` to `after`, as a change of only the part that differs, so
+ * what's around it stays put (and the cursors in it); null if nothing does.
+ */
+export function changeBetween(from: number, before: string, after: string) {
+  if (before === after) return null;
+  let start = 0;
+  while (start < before.length && start < after.length && before[start] === after[start]) start++;
+  let end = 0;
+  while (end < before.length - start && end < after.length - start && before[before.length - 1 - end] === after[after.length - 1 - end]) end++;
+  return { from: from + start, to: from + before.length - end, insert: after.slice(start, after.length - end) };
+}
+
 /** Whether line `n` exists and has text on it. */
 export const hasText = (doc: Text, n: number) => n >= 1 && n <= doc.lines && !!doc.line(n).text.trim();
 

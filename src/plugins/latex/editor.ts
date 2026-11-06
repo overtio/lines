@@ -2,17 +2,17 @@ import type { CompletionSection } from "@codemirror/autocomplete";
 import { EditorSelection, type EditorState, type Extension, Prec, type Range, type StateCommand, StateField } from "@codemirror/state";
 import { Decoration, type DecorationSet, EditorView, keymap, WidgetType } from "@codemirror/view";
 import { t } from "../../lib/i18n/index.svelte";
-import { attachmentName, openAttachment } from "../../lib/notes/attachments";
 import { DOCUMENT_BEGIN, latexEscape, latexLines, latexText, preambleField } from "./text";
-import { openExternal } from "../../lib/platform";
 import { type AttachmentWriter, attachmentPasting, choose, imageElement } from "../../lib/editor/attachments";
 import { type Definitions, type Env, LIST_ENVS, scanLatex, type Span, type Table } from "./syntax";
-import { BulletWidget, NumberWidget, opensLink } from "../../lib/editor/livePreview";
+import { BulletWidget, NumberWidget } from "../../lib/editor/livePreview";
+import { followClick } from "../../lib/editor/links";
 import { numericColumn, tablePasting } from "../../lib/editor/tables";
 import { InlineMathWidget, type Macros, macrosOf, MathBlockWidget, mathElement } from "../../lib/editor/math";
 import { insert, SECTIONS, type SlashCommand, slashMenu } from "../../lib/editor/slashCommands";
 import { inOpenMath, MATH_COMMANDS, paragraphBefore, searchWords, TEXT_COMMANDS } from "../../lib/editor/texCommands";
 import { focusChanged, focused, isEditing } from "../../lib/editor/util";
+import { outlineHeadings } from "../../lib/editor/outline.svelte";
 
 /*
  * Live preview for notes written in LaTeX (docs/latex.md), the way livePreview.ts draws Markdown:
@@ -150,7 +150,7 @@ function spoken(shown: string, said: string): DocumentFragment {
   visible.textContent = shown;
   visible.setAttribute("aria-hidden", "true");
   const hidden = document.createElement("span");
-  hidden.className = "visually-hidden";
+  hidden.className = "sr-only";
   hidden.textContent = said;
   fragment.append(visible, hidden);
   return fragment;
@@ -657,14 +657,7 @@ const events = EditorView.domEventHandlers({
       view.focus();
       return true;
     }
-    if (opensLink(event, view)) {
-      const href = target.closest<HTMLElement>(".cm-lp-link")!.dataset.href!;
-      const name = attachmentName(href);
-      void (name ? openAttachment(name, name) : openExternal(href));
-      event.preventDefault();
-      return true;
-    }
-    return false;
+    return followClick(event, view);
   },
 });
 
@@ -796,6 +789,7 @@ const latexKeymap = Prec.high(
     { key: "Enter", run: enter },
     { key: "Mod-b", run: wrap("textbf") },
     { key: "Mod-i", run: wrap("emph") },
+    { key: "Mod-u", run: wrap("underline") },
     { key: "Mod-e", run: wrap("texttt") },
   ]),
 );
@@ -843,6 +837,13 @@ function backslashCommands(state: EditorState, pos: number) {
   return inOpenMath(paragraphBefore(state, pos)) ? MATH_COMMANDS : TEXT_COMMANDS;
 }
 
+/** Its \section, \subsection and \subsubsection headings, for the outline beside the note. */
+const outline = outlineHeadings.of((state) =>
+  state.field(parsed).spans.flatMap((span) =>
+    span.type === "heading" ? [{ level: span.level, title: latexText(state.sliceDoc(span.open, span.close)).trim(), from: span.from }] : [],
+  ),
+);
+
 /** What a LaTeX note's editor adds to the shared ones (setup.ts), in place of the Markdown ones. */
 export const latexEditing: Extension = [
   focused,
@@ -854,4 +855,5 @@ export const latexEditing: Extension = [
   Prec.high(tablePasting(tabular, literalAt)),
   attachmentPasting(latexWriter),
   pasteLink,
+  outline,
 ];

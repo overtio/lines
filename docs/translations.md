@@ -1,6 +1,6 @@
 # Translations
 
-lines speaks English, Spanish and French. Settings → Theme → Language chooses one, or **System** follows the device's language (English when lines doesn't speak it). Changing it starts lines again, in every window, after saving what's being typed.
+lines speaks English, Spanish and French. Settings → General → Language chooses one, or **System** follows the device's language (English when lines doesn't speak it). Changing it starts lines again, in every window, after saving what's being typed.
 
 Notes themselves aren't translated: the welcome note, the feature tour and the examples are in English.
 

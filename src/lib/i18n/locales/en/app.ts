@@ -17,6 +17,8 @@ export default {
   // The lock button of a locked note that's open; it opens a menu to lock it again or take the lock off.
   "app.lockedOpen": "Locked note, open until you lock it",
   "app.info": "Note info",
+  // Said by screen readers after ⌘+ or ⌘− changes it; {size} is like "18 pixels".
+  "app.textSize": "Text size: {size}",
   "app.share": "Share",
   "app.pin": "Pin to top",
   "app.unpin": "Unpin",
@@ -26,9 +28,17 @@ export default {
   "app.copySource": "Copy {language}",
   "app.copyPlainText": "Copy Plain Text",
   "app.downloadSource": "Download {language}",
+  "app.saveFailed": "Couldn’t save {filename}.",
   "app.previewPdf": "Preview as PDF",
   "app.exportPdf": "Export as PDF…",
   "app.exportPng": "Export as PNG…",
+  // Tabs (Settings → General → Layout): their list, their menu, and a preview tab, which the next note opened replaces.
+  "app.tabs": "Open notes",
+  "app.keepTab": "Keep Open",
+  "app.closeTab": "Close Tab",
+  "app.closeOtherTabs": "Close Other Tabs",
+  "app.tabPreview": "{title}, preview",
+  "app.tabPreviewHint": "{title} · A preview: double-click to keep it open",
   "app.sidebarWidth": "Sidebar width",
   "app.listWidth": "Note list width",
   "app.resizeHint": "Drag to resize, double-click for the usual width",

@@ -10,7 +10,7 @@ Code block (TypeScript) followed straight away, with no blank line, by each elem
 const greeting: string = "hello";
 console.log(greeting);
 ```
-A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 
 #### 2. Code block (TypeScript), then Long paragraph
 
@@ -162,7 +162,33 @@ console.log(greeting);
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Code block (TypeScript), then Divider
+#### 17. Code block (TypeScript), then Table with formulas
+
+```ts
+const greeting: string = "hello";
+console.log(greeting);
+```
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+
+#### 18. Code block (TypeScript), then Spreadsheet (csv block)
+
+```ts
+const greeting: string = "hello";
+console.log(greeting);
+```
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+
+#### 19. Code block (TypeScript), then Divider
 
 ```ts
 const greeting: string = "hello";
@@ -170,7 +196,7 @@ console.log(greeting);
 ```
 ---
 
-#### 18. Code block (TypeScript), then Key: Value line
+#### 20. Code block (TypeScript), then Key: Value line
 
 ```ts
 const greeting: string = "hello";
@@ -178,7 +204,7 @@ console.log(greeting);
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 19. Code block (TypeScript), then Mention
+#### 21. Code block (TypeScript), then Mention
 
 ```ts
 const greeting: string = "hello";
@@ -186,7 +212,7 @@ console.log(greeting);
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 20. Code block (TypeScript), then Wiki link
+#### 22. Code block (TypeScript), then Wiki link
 
 ```ts
 const greeting: string = "hello";
@@ -194,7 +220,7 @@ console.log(greeting);
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 21. Code block (TypeScript), then Symbols
+#### 23. Code block (TypeScript), then Symbols
 
 ```ts
 const greeting: string = "hello";
@@ -202,7 +228,7 @@ console.log(greeting);
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 22. Code block (TypeScript), then GitHub links
+#### 24. Code block (TypeScript), then GitHub links
 
 ```ts
 const greeting: string = "hello";
@@ -210,7 +236,7 @@ console.log(greeting);
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 23. Code block (TypeScript), then Image
+#### 25. Code block (TypeScript), then Image
 
 ```ts
 const greeting: string = "hello";
@@ -218,7 +244,7 @@ console.log(greeting);
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 24. Code block (TypeScript), then Drawing
+#### 26. Code block (TypeScript), then Drawing
 
 ```ts
 const greeting: string = "hello";
@@ -226,7 +252,7 @@ console.log(greeting);
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 25. Code block (TypeScript), then File
+#### 27. Code block (TypeScript), then File
 
 ```ts
 const greeting: string = "hello";
@@ -234,7 +260,7 @@ console.log(greeting);
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 26. Code block (TypeScript), then Missing file
+#### 28. Code block (TypeScript), then Missing file
 
 ```ts
 const greeting: string = "hello";
@@ -242,7 +268,7 @@ console.log(greeting);
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 27. Code block (TypeScript), then Card
+#### 29. Code block (TypeScript), then Card
 
 ```ts
 const greeting: string = "hello";
@@ -252,7 +278,7 @@ console.log(greeting);
 Text in a card.
 :::
 
-#### 28. Code block (TypeScript), then Callout (info)
+#### 30. Code block (TypeScript), then Callout (info)
 
 ```ts
 const greeting: string = "hello";
@@ -262,7 +288,7 @@ console.log(greeting);
 Text in an info callout.
 :::
 
-#### 29. Code block (TypeScript), then Callout (warning, chosen icon)
+#### 31. Code block (TypeScript), then Callout (warning, chosen icon)
 
 ```ts
 const greeting: string = "hello";
@@ -272,7 +298,7 @@ console.log(greeting);
 Text in a warning callout with the flag icon.
 :::
 
-#### 30. Code block (TypeScript), then Callout (decision, no icon)
+#### 32. Code block (TypeScript), then Callout (decision, no icon)
 
 ```ts
 const greeting: string = "hello";

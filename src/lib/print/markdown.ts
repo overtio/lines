@@ -5,12 +5,13 @@ import { t } from "../i18n/index.svelte";
 import { CALLOUTS, calloutOf } from "../editor/cards";
 import { githubText } from "../editor/github";
 import { valueText } from "../editor/objects";
-import { Card, Highlight, Mention, Tag, TexMath } from "../editor/syntax";
+import { Card, Highlight, Mention, Tag, TexMath, Underline } from "../editor/syntax";
 import { tableData } from "../editor/typeTables";
 import { fenceLanguage, renderedInfo } from "../editor/rendered";
 import { isUnsplashPhoto } from "../editor/unsplash";
 import { attachmentName } from "../notes/attachments";
 import { frontMatter, readTypeRef, typeLabel } from "../notes/properties";
+import { isFormula } from "../sheets/cells";
 import { withSymbols } from "../notes/symbols";
 import { plugins } from "../plugins/registry.svelte";
 import type { MarkdownAddition, MarkdownPrint, MarkdownPrinter } from "../plugins/types";
@@ -24,7 +25,7 @@ import { el, type Parts } from "./parts";
  * short list of properties at the top. What plugins add to Markdown prints as they say.
  */
 
-const linedown = (markdownLanguage.parser as MarkdownParser).configure([Tag, Highlight, Card, TexMath, Mention]);
+const linedown = (markdownLanguage.parser as MarkdownParser).configure([Tag, Highlight, Underline, Card, TexMath, Mention]);
 
 let withPlugins: { additions: MarkdownAddition[]; parser: MarkdownParser; printers: Map<string, MarkdownPrinter> } | undefined;
 
@@ -44,8 +45,8 @@ function additions() {
 /** Marks that are only syntax: `**`, `` ` ``, `#`, `>`… */
 const MARKS = new Set([
   "EmphasisMark", "CodeMark", "LinkMark", "HeaderMark", "QuoteMark", "ListMark", "HighlightMark", "StrikethroughMark",
-  "MathMark", "TaskMarker", "CardMark", "SubscriptMark", "SuperscriptMark", "TagMark", "LinkTitle", "LinkLabel", "Comment",
-  "ProcessingInstruction",
+  "UnderlineMark", "MathMark", "TaskMarker", "CardMark", "SubscriptMark", "SuperscriptMark", "TagMark", "LinkTitle", "LinkLabel",
+  "Comment", "ProcessingInstruction",
 ]);
 
 const INLINE_TAGS: Record<string, keyof HTMLElementTagNameMap> = {
@@ -53,6 +54,7 @@ const INLINE_TAGS: Record<string, keyof HTMLElementTagNameMap> = {
   StrongEmphasis: "strong",
   Strikethrough: "s",
   Highlight: "mark",
+  Underline: "u",
   Subscript: "sub",
   Superscript: "sup",
 };
@@ -221,19 +223,29 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
             return spec.startsWith(":") && spec.endsWith(":") ? "center" : spec.endsWith(":") ? "right" : spec.startsWith(":") ? "left" : "";
           })
       : [];
+    // Each cell as written, for its formulas: a formula as it is, other cells as they read.
+    const cells: string[][] = [];
+    const elements: HTMLElement[][] = [];
     const row = (rowNode: SyntaxNode, cellTag: "th" | "td") => {
       const tr = el("tr");
+      cells.push([]);
+      elements.push([]);
       rowNode.getChildren("TableCell").forEach((cell, i) => {
         const td = el(cellTag);
         if (aligns[i]) td.style.textAlign = aligns[i];
         inline(cell, td);
+        const written = slice(cell.from, cell.to).trim();
+        cells[cells.length - 1].push(isFormula(written) ? written.replaceAll("\\|", "|") : (td.textContent ?? "").trim());
+        elements[elements.length - 1].push(td);
         tr.append(td);
       });
       return tr;
     };
     const header = node.getChild("TableHeader");
+    const head = header ? [row(header, "th")] : [];
     const body = node.getChildren("TableRow").map((r) => row(r, "td"));
-    return el("div", "doc-table", el("table", "", el("thead", "", ...(header ? [row(header, "th")] : [])), el("tbody", "", ...body)));
+    parts.formulas(cells, elements);
+    return el("div", "doc-table", el("table", "", el("thead", "", ...head), el("tbody", "", ...body)));
   }
 
   function listItem(node: SyntaxNode) {

@@ -10,7 +10,7 @@ let region: HTMLElement | undefined;
 export function speak(message: string) {
   if (!region) {
     region = document.createElement("div");
-    region.className = "visually-hidden";
+    region.className = "sr-only";
     region.setAttribute("aria-live", "polite");
     region.setAttribute("role", "status");
     document.body.append(region);

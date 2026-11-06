@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { Popover } from "bits-ui";
   import { locale, t } from "../i18n/index.svelte";
   import { type Entry, notes } from "../notes/store.svelte";
   import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
-  import { dismissable, placeAt, takeFocus } from "../popover";
-  import Segmented from "./Segmented.svelte";
+  import { takeFocus } from "../popover";
+  import Button from "./ui/Button.svelte";
+  import Segmented from "./ui/Segmented.svelte";
+  import { floating } from "./ui/styles";
 
   /**
    * Counts and dates for a note, in a small panel under the toolbar's info button (`anchor`), and
@@ -11,7 +14,9 @@
    */
   let { entry, anchor, onclose }: { entry: Entry; anchor: HTMLElement; onclose: () => void } = $props();
 
-  let el = $state<HTMLDivElement>();
+  let el = $state<HTMLElement | null>(null);
+  /** Gives focus back to the info button when it closes. */
+  let restore: (() => void) | undefined;
 
   const format = $derived(entry.note.format ?? DEFAULT_LANGUAGE);
   const stats = $derived(plugins.language(format).stats(entry.note.body));
@@ -36,98 +41,61 @@
     [t("picker.readingTime"), reading ? t("picker.minutes", { count: reading }) : "—"],
   ]);
 
-  $effect(() => {
-    if (!el) return;
-    const rect = anchor.getBoundingClientRect();
-    placeAt(el, rect.right, rect.bottom + 6, "end");
-    // Focus moves in, so screen readers read it, and goes back to the info button when it closes.
-    const restore = takeFocus(el);
-    // It hangs from the toolbar, which doesn't scroll; and switching the format moves the note under it.
-    const stop = dismissable(() => el, onclose, anchor, false);
-    return () => {
-      stop();
-      restore();
-    };
-  });
+  // Closed by taking it away, so focus goes back then.
+  $effect(() => () => restore?.());
 </script>
 
-<svelte:window onkeydown={(event) => event.key === "Escape" && onclose()} />
-
-<div class="info popover" role="dialog" aria-label={t("app.info")} tabindex="-1" bind:this={el}>
-  {#if formats.length > 1 || unshown}
-    <div class="format">
-      {#if formats.length > 1}
-        <Segmented label={t("picker.writtenIn")} options={formats} value={format} onselect={(id) => notes.setFormat(entry.note.id, id)} />
-      {/if}
-      {#if unshown}
-        <p class="unshown">
-          {unshown.plugin ? t("picker.languageOff", { language: unshown.name }) : t("picker.languageMissing", { language: unshown.name })}
-          {#if unshown.plugin}
-            <button class="text-button" onclick={() => plugins.setOn(unshown.plugin!, true)}>{t("picker.turnOn")}</button>
-          {/if}
-        </p>
-      {/if}
-    </div>
-  {/if}
-  <dl>
+{#snippet facts(rows: string[][], className = "")}
+  <dl class="m-0 grid grid-cols-[1fr_auto] gap-x-5 gap-y-1.5 {className}">
     {#each rows as [label, value] (label)}
-      <dt>{label}</dt>
-      <dd>{value}</dd>
+      <dt class="text-muted">{label}</dt>
+      <dd class="tabular m-0 text-right text-fg">{value}</dd>
     {/each}
   </dl>
-  <dl class="dates">
-    <dt>{t("picker.created")}</dt>
-    <dd>{date.format(entry.note.createdAt)}</dd>
-    <dt>{t("picker.edited")}</dt>
-    <dd>{date.format(entry.note.updatedAt)}</dd>
-  </dl>
-</div>
+{/snippet}
 
-<style>
-  .info {
-    min-width: 230px;
-    padding: 12px 14px;
-    font-size: 13px;
-  }
-
-  .format {
-    margin-bottom: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .unshown {
-    max-width: 260px;
-    margin: 0;
-    line-height: 1.45;
-    color: var(--text-muted);
-  }
-
-  .unshown:not(:first-child) {
-    margin-top: 10px;
-  }
-
-  dl {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 6px 20px;
-    margin: 0;
-  }
-
-  dt {
-    color: var(--text-muted);
-  }
-
-  dd {
-    margin: 0;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    color: var(--text);
-  }
-
-  .dates {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-  }
-</style>
+<!-- It hangs from the toolbar, which doesn't scroll; and switching the format moves the note under it, so neither closes it. -->
+<Popover.Root open onOpenChange={(open) => !open && onclose()}>
+  <Popover.Portal>
+    <Popover.Content
+      bind:ref={el}
+      customAnchor={anchor}
+      align="end"
+      sideOffset={6}
+      collisionPadding={8}
+      role="dialog"
+      aria-label={t("app.info")}
+      onOpenAutoFocus={(event) => {
+        event.preventDefault();
+        // Focus moves in, so screen readers read it.
+        restore = takeFocus(el!);
+      }}
+      onCloseAutoFocus={(event) => event.preventDefault()}
+      class="{floating} min-w-[230px] px-3.5 py-3 text-sm"
+    >
+      {#if formats.length > 1 || unshown}
+        <div class="mb-3 border-b border-line pb-3">
+          {#if formats.length > 1}
+            <Segmented label={t("picker.writtenIn")} options={formats} value={format} onselect={(id) => notes.setFormat(entry.note.id, id)} />
+          {/if}
+          {#if unshown}
+            <p class="m-0 max-w-[260px] leading-normal text-muted not-first:mt-2.5">
+              {unshown.plugin ? t("picker.languageOff", { language: unshown.name }) : t("picker.languageMissing", { language: unshown.name })}
+              {#if unshown.plugin}
+                <Button variant="quiet" onclick={() => plugins.setOn(unshown.plugin!, true)}>{t("picker.turnOn")}</Button>
+              {/if}
+            </p>
+          {/if}
+        </div>
+      {/if}
+      {@render facts(rows)}
+      {@render facts(
+        [
+          [t("picker.created"), date.format(entry.note.createdAt)],
+          [t("picker.edited"), date.format(entry.note.updatedAt)],
+        ],
+        "mt-2.5 border-t border-line pt-2.5",
+      )}
+    </Popover.Content>
+  </Popover.Portal>
+</Popover.Root>

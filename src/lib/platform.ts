@@ -38,6 +38,17 @@ export function isNewNoteShortcut(event: KeyboardEvent) {
 
 const SAFE_URL = /^(https?:|mailto:|tel:)/i;
 
+let nativeFetch: Promise<typeof fetch> | undefined;
+
+/**
+ * `fetch` for other sites (a sync bucket, Unsplash). In the native apps requests go through Rust,
+ * so the site needs no CORS setup for lines; in the browser they're plain fetches.
+ */
+export function webFetch(): Promise<typeof fetch> {
+  if (!isTauri) return Promise.resolve(fetch.bind(window));
+  return (nativeFetch ??= import("@tauri-apps/plugin-http").then((module) => module.fetch as typeof fetch));
+}
+
 export async function openExternal(url: string) {
   if (!SAFE_URL.test(url)) return;
   if (isTauri) {

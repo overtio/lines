@@ -11,10 +11,12 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, cards, m
 | Headings, emphasis, lists, quotes, code, links, images, rules | As in CommonMark | Yes |
 | Tables, ~~strikethrough~~, `- [ ]` task lists, autolinks | As in GFM | GFM |
 | Highlight | `==text==` | No (also in Obsidian, Bear, Pandoc's `mark`) |
+| Underline | `<u>text</u>` | Yes (inline HTML, as GitHub, Obsidian and Typora show it) |
 | Tag | `#tag`, `#nested/tag` | No (as in Bear) |
 | Card | `::: card` … `:::` | Pandoc fenced div |
 | Callout | `:::!` … `:::`, `:::info icon=flag` … `:::` | Pandoc fenced div |
 | Diagram | ` ```mermaid ` code block | GitHub, GitLab, Obsidian |
+| Spreadsheet | ` ```csv ` code block | Yes (a code block of CSV) |
 | Math | `$x^2$`, `$$` … `$$`, ` ```math ` code block | GitHub, GitLab, Obsidian, Pandoc |
 | Attachment | `![](../attachments/<hash>.png)`, `[Name.pdf](../attachments/<hash>.pdf)` | Yes (relative links) |
 | Copyable value | `Key: Value` lines | Yes (plain text, read specially) |
@@ -22,6 +24,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, cards, m
 | Properties | `key: value` lines between `---` lines at the top | YAML front matter (Obsidian, Jekyll, Pandoc) |
 | Mention | `@Oleks`, `@[Two Words]`, `@Oleks.fullname`, `[[Two Words]]` | Wiki links: Obsidian, Logseq, Foam |
 | Type table | `@type.recipe`, `@type.recipe(time, servings)` on a line of its own | No |
+| Formula | A table cell starting with `=`: `=SUM(B2:B4)` | No (a formula as text elsewhere) |
 
 ## Title
 
@@ -34,6 +37,15 @@ A note has no separate title field: its title is its **first line with text on i
 - Exactly two `=` on each side. `===` doesn't start one.
 - Like emphasis: the opening `==` can't be followed by a space and the closing one can't follow a space, so `a == b` stays text.
 - It nests with the other inline styles: `==**bold** and highlighted==`.
+
+## Underline
+
+`<u>underlined text</u>` underlines text. It's HTML's underline tag, which Markdown allows inline, so other apps underline it too; ⌘U writes it.
+
+- The tags are lowercase or uppercase, with nothing inside them: `<u>`, not `<u class="x">`, which stays HTML.
+- The two tags go around text in one paragraph, list item or table cell, as other styles do. A `<u>` without its `</u>` stays as typed.
+- It nests with the other inline styles: `<u>**bold** and underlined</u>`, `**<u>underlined</u> and bold**`.
+- In a LaTeX note, ⌘U writes `\underline{…}`.
 
 ## Tags
 
@@ -100,7 +112,11 @@ Fenced code blocks (` ``` ` or `~~~`) are as in CommonMark. lines reads the info
 
 - The first word names the language, for syntax highlighting: ` ```sql `, ` ```ts `, ` ```python `. Any language in CodeMirror's language data works, by name or alias.
 - A block with no language whose text starts with `{` or `[` is treated as JSON, so it can be tidied.
-- ` ```mermaid ` is a diagram (below).
+- ` ```mermaid ` is a diagram, and ` ```csv ` a spreadsheet (below).
+
+## Spreadsheets
+
+A code block with the language `csv` is drawn as a spreadsheet's grid of cells, by the Spreadsheets [plugin](plugins.md) (with it off, it's a code block). Its text is CSV, row 1 on the block's first line, and a cell starting with `=` is a formula, worked out by the Formulas plugin (IronCalc). Changing a cell writes the block again as CSV. The text shows in place of the grid only while the cursor is in it, from the cells' Edit as CSV; spaces after commas are left out, as in `Rent, 1200`. Like diagrams, spreadsheets are drawn at the top level and in cards. Other apps show the CSV as a code block. More in [spreadsheets.md](spreadsheets.md#spreadsheets-in-markdown-notes).
 
 ## Diagrams
 
@@ -148,7 +164,8 @@ Images and other files added to a note are stored by lines and linked with ordin
 - A width after a bar in the alt text sets the size an image is shown at, in pixels, as in Obsidian: `![Lake at dawn|400](../attachments/….jpg)`. The image keeps its shape (a height, `|400x300`, is read but not used) and is never wider than the note. Dragging the handle on the corner of an image on a line of its own writes this width; double-clicking the handle takes it out. Printed notes and PNGs use it too. Other Markdown apps that don't know it show the image at its own size, with the bar in its description.
 - An SVG image that holds its [Excalidraw](https://excalidraw.com) scene is a **drawing**: `/drawing` makes one, and excalidraw.com's exports with *Embed scene* are too. It's drawn like any image (clear behind it, and light on dark in dark themes), with a button that opens it in Excalidraw; so do double-clicking it and Enter while it's selected. Save puts the drawing in as a new SVG attachment and changes the link to it, so undo brings back the one before. Other Markdown apps show it as the picture it is.
 - Images from the web (`![](https://…)`) show too. Links to anything else are ordinary links.
-- An image whose address is a photo's page on [Unsplash](https://unsplash.com) shows that photo: `![Snow-covered mountain peak illuminated by sunset light](https://unsplash.com/photos/snow-covered-mountain-peak-illuminated-by-sunset-light-mevyYnC5xCo)`. Pasting such a link (or the picture's own address) on an empty line adds it this way, described by the words in the link. Other Markdown apps don't know these links and show a broken image.
+- An image whose address is a photo's page on [Unsplash](https://unsplash.com) shows that photo: `![Snow-covered mountain peak illuminated by sunset light](https://unsplash.com/photos/snow-covered-mountain-peak-illuminated-by-sunset-light-mevyYnC5xCo)`. Pasting such a link (or the picture's own address) on an empty line adds it this way, described by the words in the link, and so does choosing a photo with `/unsplash`. Other Markdown apps don't know these links and show a broken image.
+- `/giphy` adds a GIF from [GIPHY](https://giphy.com) as an image from the web: `![Happy dance](https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif)`, which any Markdown app shows. With reduced motion, lines shows GIPHY's GIFs still.
 
 ## GitHub links
 
@@ -208,7 +225,7 @@ company: @Overtio
 
 ## Mentions
 
-`@Name` mentions another note: it's drawn as that note's title, with its icon, and ⌘-click opens it, as it does a link. So does ⌥↵ with the cursor on it, and on a link or an attached file. `@Name.key` is the value of one of its properties.
+`@Name` mentions another note: it's drawn as that note's title, with its icon, and ⌘-click opens it, as it does a link. So does ⌥↵ with the cursor on it, and on a link or an attached file. Settings → Editing → Links sets what a click, ⌘-click and ⇧⌘-click do on links, tags and mentions: edit, open, copy a link's address, or open a mentioned note in a new tab, a background tab or a floating window. `@Name.key` is the value of one of its properties.
 
 ```markdown
 Call @Oleks about the contract; @Oleks.fullname signs for @Overtio.
@@ -242,6 +259,16 @@ Ask @[Ada Lovelace] for her @[Ada Lovelace].email.
 - The type is matched as the sidebar matches it, without case, `_` standing for a space: `@type.book_club` is the type `book club`. A table for a type with no notes says so.
 - `/type table` writes `@type.` on a line of its own and opens the menu of types.
 
+## Formulas in tables
+
+A table cell starting with `=` is a formula, as in a spreadsheet: drawn, the table shows what it works out to (`src/lib/editor/tables.ts`, worked out by the Formulas plugin, IronCalc). More in [spreadsheets.md](spreadsheets.md#formulas-in-tables).
+
+- Cells are named A1 style, columns from the left and rows from the header, which is row 1: in a table of items and costs, `=SUM(B2:B4)` adds the costs of the first three items.
+- The cursor in the table shows the formulas, as the table's Markdown always does.
+- `\=` at the start of a cell is a plain `=`.
+- Formulas are worked out where tables are drawn: at the top level and in cards. In quotes and lists, a table stays Markdown.
+- Another Markdown app shows the formula as written.
+
 ## Lists and todos
 
 As in GFM. Some details:
@@ -260,7 +287,7 @@ lines shows some pairs of characters as the symbol they stand for, without chang
 | `<->` | ↔ | `>=` | ≥ |
 | `=>` | ⇒ | `!=` | ≠ |
 
-- Code blocks and code spans show them too. In code, each symbol takes the width of the characters it replaces, so columns still line up. Settings → Text turns them off in text and in code separately.
+- Code blocks and code spans show them too. In code, each symbol takes the width of the characters it replaces, so columns still line up. Settings → Editing turns them off in text and in code separately.
 - A pair inside a longer run of these characters stays as typed: `-->`, `<!--`, `!==`, `>>=`, `==>`. So does a pair after a backslash: `\->`.
 - Links' addresses, HTML, math, tags, mentions, Markdown's own marks (a quote's `>`, say) and properties keep their characters.
 - With the cursor touching one, the characters show, ready to edit.

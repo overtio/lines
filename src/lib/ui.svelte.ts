@@ -1,7 +1,8 @@
+import type { SettingsSection } from "./components/settings/sections";
 import type { IconName } from "./icons/icons";
+import { prefs } from "./prefs.svelte";
 
 export type Layout = "wide" | "medium" | "narrow";
-export type SettingsTab = "theme" | "text" | "plugins" | "data" | "shortcuts" | "about";
 
 export type MenuItem = { label: string; icon?: IconName; danger?: boolean; run: () => void } | "separator";
 
@@ -56,7 +57,7 @@ class UIState {
   /** Focus mode: just the note, with the sidebar and note list tucked away. */
   focus = $state(false);
   /** The open Settings tab, or null when Settings is closed. */
-  settings = $state<SettingsTab | null>(null);
+  settings = $state<SettingsSection | null>(null);
   menu = $state.raw<Menu | null>(null);
   /** What an icon is being picked for, and where the picker opens. */
   iconPicker = $state.raw<IconTarget | null>(null);
@@ -75,6 +76,16 @@ class UIState {
       this.layout = next;
       this.sidebarOpen = next === "wide";
     });
+  }
+
+  /**
+   * Where the button that shows the sidebar goes, while there's one: in the note list's title bar
+   * when the list is on the sidebar's side (and always on a phone), or else at the note's edge on
+   * that side. On a wide screen it's there while the sidebar is hidden; elsewhere, always.
+   */
+  get sidebarToggle(): "list" | "editor" | null {
+    if ((this.layout === "wide" && this.sidebarOpen) || (this.focus && this.layout !== "narrow")) return null;
+    return this.layout === "narrow" || prefs.listSide === prefs.sidebarSide ? "list" : "editor";
   }
 
   toggleSidebar() {

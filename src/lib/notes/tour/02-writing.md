@@ -3,6 +3,7 @@
 Type Markdown and it's formatted as you go. The text stays exactly what you typed, so your notes open in any other app too.
 
 - **Bold** with `**`, *italic* with `*`, ~~strikethrough~~ with `~~`
+- <u>Underline</u> with ⌘U, which writes `<u>` and `</u>` around the text
 - ==Highlight== with `==`, and `code` with backticks
 - A [link](https://example.com): ⌘-click (Ctrl-click) to open it
 - GitHub links read short, like https://github.com/overtio/lines/issues/1
@@ -10,7 +11,7 @@ Type Markdown and it's formatted as you go. The text stays exactly what you type
 
 ## Arrows and symbols
 
-Type `-` and then `>` and it shows as an arrow: Home -> cabin. The same goes for <-, <->, =>, <=>, <=, >= and !=, in code too. The note keeps the characters you typed: move the cursor onto one to see them. Settings → Text turns symbols off.
+Type `-` and then `>` and it shows as an arrow: Home -> cabin. The same goes for <-, <->, =>, <=>, <=, >= and !=, in code too. The note keeps the characters you typed: move the cursor onto one to see them. Settings → Editing turns symbols off.
 
 ## Headings
 

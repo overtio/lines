@@ -8,7 +8,7 @@ Type \`/\` at the start of a line for headings, lists, tables, callouts, code, i
 
 ## The basics
 
-- Make text **bold**, *italic*, ~~struck through~~, ==highlighted==, or \`code\`, or select it for a toolbar
+- Make text **bold**, *italic*, <u>underlined</u>, ~~struck through~~, ==highlighted==, or \`code\`, or select it for a toolbar
 - Start a line with \`#\`, \`##\` or \`###\` for headings
 - Use \`-\` for lists and \`- [ ]\` for todos
   - Tab nests an item, Shift-Tab moves it back out
@@ -54,6 +54,8 @@ A card groups anything: text, lists, tables, even other cards.
 | ⌘I | Italic |
 | ⌘↵ | Todo |
 
+A cell like \`=SUM(B2:B4)\` shows what it works out to. For a spreadsheet in a note, type \`/spreadsheet\`; for a whole one, switch a note to Spreadsheet in its ⓘ panel.
+
 ## Code, diagrams and math
 
 \`\`\`sql
@@ -75,11 +77,11 @@ Hover the value in a "Key: Value" line to copy it:
 
 ## Images and files
 
-Paste or drop an image or any other file into a note, or type \`/image\` or \`/file\`. Paste the link to a photo on Unsplash on an empty line and the photo shows. Type \`/drawing\` to sketch in Excalidraw; double-click a drawing to change it.
+Paste or drop an image or any other file into a note, or type \`/image\` or \`/file\`. Type \`/unsplash\` for a photo from Unsplash, or \`/giphy\` for a GIF. Type \`/drawing\` to sketch in Excalidraw; double-click a drawing to change it.
 
 ## Private by design
 
-Your notes are stored on this device. Sync them through your own cloud drive or S3 bucket, encrypted end to end if you like, from Settings. Lock a note with a password from its toolbar, or lock all of lines from Settings → Data.
+Your notes are stored on this device. Sync them through your own cloud drive or S3 bucket, encrypted end to end if you like, from Settings. Lock a note with a password from its toolbar, or lock all of lines from Settings → Privacy.
 
 ---
 

@@ -1,0 +1,32 @@
+import type { Translation } from "../../format";
+import type en from "../en/sheet";
+
+export default {
+  "sheet.format": "Hoja de cálculo",
+  "sheet.label": "Hoja de cálculo",
+  "sheet.title": "Título",
+  "sheet.cell": "Celda {cell}",
+  "sheet.editCell": "Editar {cell}",
+  "sheet.at": "{cell}: {value}",
+  "sheet.empty": "vacía",
+  "sheet.functions": "Funciones",
+  "sheet.selectAll": "Seleccionar todo",
+  "sheet.menu": "Celda {cell}",
+  "sheet.cut": "Cortar",
+  "sheet.copy": "Copiar",
+  "sheet.insertRowsAbove": "{count, plural, one {Insertar fila arriba} other {Insertar # filas arriba}}",
+  "sheet.insertRowsBelow": "{count, plural, one {Insertar fila abajo} other {Insertar # filas abajo}}",
+  "sheet.deleteRows": "{count, plural, one {Eliminar fila} other {Eliminar # filas}}",
+  "sheet.insertColumnsLeft": "{count, plural, one {Insertar columna a la izquierda} other {Insertar # columnas a la izquierda}}",
+  "sheet.insertColumnsRight": "{count, plural, one {Insertar columna a la derecha} other {Insertar # columnas a la derecha}}",
+  "sheet.deleteColumns": "{count, plural, one {Eliminar columna} other {Eliminar # columnas}}",
+  "sheet.clear": "Borrar",
+  "sheet.editText": "Editar como CSV",
+  "sheet.rowsInserted": "{count, plural, one {Fila insertada} other {# filas insertadas}}",
+  "sheet.rowsDeleted": "{count, plural, one {Fila eliminada} other {# filas eliminadas}}",
+  "sheet.columnsInserted": "{count, plural, one {Columna insertada} other {# columnas insertadas}}",
+  "sheet.columnsDeleted": "{count, plural, one {Columna eliminada} other {# columnas eliminadas}}",
+  "sheet.downloadValues": "Descargar valores como CSV",
+  "sheet.downloadWorkbook": "Descargar libro de Excel",
+  "sheet.noEngine": "Los libros de Excel necesitan el complemento Cálculo (IronCalc). Actívalo en Ajustes → Complementos.",
+} satisfies Translation<typeof en>;

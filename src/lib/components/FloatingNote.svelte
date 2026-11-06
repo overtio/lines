@@ -7,6 +7,7 @@
   import { prefs } from "../prefs.svelte";
   import { announce } from "../windows/channel";
   import { saveFloatingState } from "../windows/floating";
+  import { textSizeKey } from "../textSize";
 
   /** One note in its own small window, kept above everything else. */
   let { id }: { id: string } = $props();
@@ -94,8 +95,9 @@
     if (prefs.floatingButtons === "hover") showButtons(false);
   }
 
-  // ⌘W closes the floating note (Ctrl+W elsewhere).
+  // ⌘W closes the floating note (Ctrl+W elsewhere); ⌘+ and ⌘− size the text, as in the main window.
   function onkeydown(event: KeyboardEvent) {
+    if (textSizeKey(event)) return;
     if ((event.metaKey || event.ctrlKey) && !event.shiftKey && !event.altKey && event.key.toLowerCase() === "w") {
       event.preventDefault();
       void win.close();
@@ -129,14 +131,15 @@
 
 <svelte:window {onkeydown} {onpointermove} {onblur} />
 
-<!-- The window's one landmark, so a screen reader can find the note in it. -->
-<main class="floating">
-  <header data-tauri-drag-region>
-    <span class="spacer" data-tauri-drag-region></span>
+<!-- The window's one landmark, so a screen reader can find the note in it. A compact editor: the window is the margin. -->
+<main class="flex h-full flex-col bg-surface [--editor-pad-top:4px] [--editor-pad-x:20px] [--editor-width:none]">
+  <!-- Room for the traffic lights. -->
+  <header class="flex h-9 shrink-0 items-center gap-0.5 pr-1.5 pl-20" data-tauri-drag-region>
+    <span class="flex-1 self-stretch" data-tauri-drag-region></span>
   </header>
 
   {#if entry && !entry.note.trashed}
-    <div class="editor-host" hidden={closed}>
+    <div class="min-h-0 flex-1" hidden={closed}>
       <Editor noteId={id} trashed={closed} />
     </div>
     {#if closed}
@@ -144,36 +147,3 @@
     {/if}
   {/if}
 </main>
-
-<style>
-  .floating {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background: var(--surface);
-    /* A compact editor: the window is the margin. */
-    --editor-width: none;
-    --editor-pad-x: 20px;
-    --editor-pad-top: 4px;
-  }
-
-  header {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    height: 36px;
-    flex-shrink: 0;
-    /* Room for the traffic lights. */
-    padding: 0 6px 0 80px;
-  }
-
-  .spacer {
-    flex: 1;
-    align-self: stretch;
-  }
-
-  .editor-host {
-    flex: 1;
-    min-height: 0;
-  }
-</style>

@@ -20,7 +20,7 @@ const ELEMENTS = [
   {
     id: "paragraph",
     name: "Paragraph",
-    md: "A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.",
+    md: "A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.",
   },
   {
     id: "long-paragraph",
@@ -49,6 +49,12 @@ const ELEMENTS = [
     name: "Table",
     md: "| Left | Center | Right |\n| :--- | :----: | ----: |\n| a | **b** | 1 |\n| longer cell text | `code` | 22 |",
   },
+  {
+    id: "table-formulas",
+    name: "Table with formulas",
+    md: "| Item | Cost |\n| --- | ---: |\n| Rent | 1200 |\n| Food | 450.50 |\n| Total | =SUM(B2:B3) |\n| Broken | =B2/0 |",
+  },
+  { id: "spreadsheet", name: "Spreadsheet (csv block)", md: "```csv\nItem, Cost\nRent, 1200\nFood, 450.50\nTotal, =SUM(B2:B3)\n```" },
   { id: "divider", name: "Divider", md: "---" },
   { id: "key-value", name: "Key: Value line", md: "**Wi-Fi password:** correct-horse-battery" },
   { id: "mention", name: "Mention", md: "Ask @[QA · Ada] at @[QA · Ada].email." },
@@ -85,7 +91,7 @@ const CONTAINERS = [
 ];
 
 /** Some things are only drawn at the top level and in cards; elsewhere they stay Markdown. */
-const DRAWN = new Set(["diagram", "diagram-sized", "math", "table", "image", "drawing", "file", "missing-file"]);
+const DRAWN = new Set(["diagram", "diagram-sized", "math", "table", "table-formulas", "image", "drawing", "file", "missing-file"]);
 const DRAWN_ONLY_IN = new Set(["top-level", "card", "callout", "callout-none", "nested"]);
 
 const notes = [];
@@ -105,6 +111,7 @@ const INLINE = [
   "***bold italic***",
   "~~struck~~",
   "==highlighted==",
+  "<u>underlined</u>",
   "`code`",
   "[link](https://example.com)",
   "#qa/inline-tag",
@@ -114,11 +121,12 @@ const INLINE = [
   "==highlight with **bold** and `code`==",
   "**[bold link](https://example.com)**",
   "~~struck **bold**~~",
+  "<u>underlined with **bold**</u>",
 ];
 const inlineLine = INLINE.join(", ");
 const INLINE_PLACES = [
   ["a paragraph", inlineLine],
-  ["a heading", `## Heading with ${INLINE.slice(0, 6).join(", ")}`],
+  ["a heading", `## Heading with ${INLINE.slice(0, 7).join(", ")}`],
   ["a bullet", `- ${inlineLine}`],
   ["a todo", `- [ ] ${inlineLine}`],
   ["a done todo", `- [x] ${inlineLine}`],
@@ -126,12 +134,12 @@ const INLINE_PLACES = [
   ["a table cell", `| Styles |\n| --- |\n| ${INLINE.filter((s) => !s.includes("|")).join(", ")} |`],
   ["a card", `::: card\n${inlineLine}\n:::`],
   ["a callout", `:::?\n${inlineLine}\n:::`],
-  ["a Key: Value line", `**Styles:** ${INLINE.slice(0, 6).join(" ")}`],
+  ["a Key: Value line", `**Styles:** ${INLINE.slice(0, 7).join(" ")}`],
 ];
 note(
   "01-inline-styles.md",
   "Inline styles",
-  "Each style alone and mixed, in each place text can be. Check: every style shows (bold, italic, strikethrough, highlight, code, link, tag), its Markdown is hidden until the cursor is on the line, and nested styles combine.",
+  "Each style alone and mixed, in each place text can be. Check: every style shows (bold, italic, strikethrough, highlight, underline, code, link, tag), its Markdown is hidden until the cursor is on the line, and nested styles combine.",
   INLINE_PLACES.map(([place, md], i) => `${label(i + 1, `In ${place}`)}\n\n${md}`),
   "inline",
 );
@@ -141,11 +149,12 @@ note(
 note(
   "02-tags-and-highlights.md",
   "Tags and highlights",
-  "Edge cases for tags and highlights. Check each line against what it says should happen, and the tags in the sidebar under qa.",
+  "Edge cases for tags, highlights and underlines. Check each line against what it says should happen, and the tags in the sidebar under qa.",
   [
     `${label(1, "Tags")}\n\n- #qa/plain is a tag\n- #qa/nested/deeper is a nested tag\n- (#qa/in-brackets) is a tag\n- #qa/trailing-slash/ is a tag without the slash\n- #QA/Upper is the same tag as #qa/upper\n- #qa/café and #qa/日本 are tags\n- C# is not a tag\n- #123 is not a tag\n- [a link](#anchor) is not a tag\n- \`#qa/in-code\` is not a tag`,
     `${label(2, "Tags in code blocks")}\n\n\`\`\`\n#qa/not-a-tag in a code block\n\`\`\``,
     `${label(3, "Highlights")}\n\n- ==highlighted==\n- a == b is not a highlight\n- ===three equals=== is not a highlight\n- ==highlight across **bold** text==\n- == spaced == is not a highlight`,
+    `${label(4, "Underlines")}\n\n- <u>underlined</u>\n- <U>underlined in capitals</U>\n- <u>underline across **bold** and ==highlighted== text</u>\n- **bold with <u>underlined</u> inside**\n- a lone <u> stays as typed\n- <u class="x">a tag with an attribute</u> is not an underline\n- \`<u>in code</u>\` is not an underline`,
   ],
   "tags",
 );

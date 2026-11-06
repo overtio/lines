@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig, type EnvironmentModuleNode, type Plugin } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import tailwindcss from "@tailwindcss/vite";
 import pkg from "./package.json" with { type: "json" };
 
 const host = process.env.TAURI_DEV_HOST;
@@ -70,7 +71,7 @@ function excalidrawFonts(): Plugin {
 
 // https://v2.tauri.app/start/frontend/vite/
 export default defineConfig({
-  plugins: [svelte(), reloadOnStateChange(), excalidrawFonts()],
+  plugins: [svelte(), tailwindcss(), reloadOnStateChange(), excalidrawFonts()],
   define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   clearScreen: false,
   server: {
@@ -81,6 +82,8 @@ export default defineConfig({
     watch: { ignored: ["**/src-tauri/**"] },
   },
   envPrefix: ["VITE_", "TAURI_ENV_"],
+  // IronCalc's WebAssembly loads from its own package (plugins/ironcalc/calc.ts), not pre-bundled.
+  optimizeDeps: { exclude: ["@ironcalc/wasm-xlsx"] },
   build: {
     target: "es2022",
     sourcemap: !!process.env.TAURI_ENV_DEBUG,

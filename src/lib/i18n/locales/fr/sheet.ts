@@ -1,0 +1,32 @@
+import type { Translation } from "../../format";
+import type en from "../en/sheet";
+
+export default {
+  "sheet.format": "Tableur",
+  "sheet.label": "Feuille de calcul",
+  "sheet.title": "Titre",
+  "sheet.cell": "Cellule {cell}",
+  "sheet.editCell": "Modifier {cell}",
+  "sheet.at": "{cell} : {value}",
+  "sheet.empty": "vide",
+  "sheet.functions": "Fonctions",
+  "sheet.selectAll": "Tout sélectionner",
+  "sheet.menu": "Cellule {cell}",
+  "sheet.cut": "Couper",
+  "sheet.copy": "Copier",
+  "sheet.insertRowsAbove": "{count, plural, one {Insérer une ligne au-dessus} other {Insérer # lignes au-dessus}}",
+  "sheet.insertRowsBelow": "{count, plural, one {Insérer une ligne en dessous} other {Insérer # lignes en dessous}}",
+  "sheet.deleteRows": "{count, plural, one {Supprimer la ligne} other {Supprimer # lignes}}",
+  "sheet.insertColumnsLeft": "{count, plural, one {Insérer une colonne à gauche} other {Insérer # colonnes à gauche}}",
+  "sheet.insertColumnsRight": "{count, plural, one {Insérer une colonne à droite} other {Insérer # colonnes à droite}}",
+  "sheet.deleteColumns": "{count, plural, one {Supprimer la colonne} other {Supprimer # colonnes}}",
+  "sheet.clear": "Effacer",
+  "sheet.editText": "Modifier en CSV",
+  "sheet.rowsInserted": "{count, plural, one {Ligne insérée} other {# lignes insérées}}",
+  "sheet.rowsDeleted": "{count, plural, one {Ligne supprimée} other {# lignes supprimées}}",
+  "sheet.columnsInserted": "{count, plural, one {Colonne insérée} other {# colonnes insérées}}",
+  "sheet.columnsDeleted": "{count, plural, one {Colonne supprimée} other {# colonnes supprimées}}",
+  "sheet.downloadValues": "Télécharger les valeurs en CSV",
+  "sheet.downloadWorkbook": "Télécharger en classeur Excel",
+  "sheet.noEngine": "Les classeurs Excel ont besoin de l’extension Calcul (IronCalc). Activez-la dans Réglages → Extensions.",
+} satisfies Translation<typeof en>;

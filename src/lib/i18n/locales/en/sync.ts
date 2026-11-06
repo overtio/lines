@@ -1,6 +1,6 @@
 /** Sync: cloud drives, folders, buckets, end-to-end encryption, and sync's messages. */
 export default {
-  /* Settings → Data. */
+  /* Settings → Sync. */
   "sync.intro":
     "Sync your notes across devices. Each note is saved as a Markdown file (or encrypted, if you turn that on below), and your notes stay on this device too, so lines works offline.",
   // {place} is the drive or bucket, as in “iCloud Drive” or “my-notes”.
@@ -89,9 +89,9 @@ export default {
   "sync.browser.choose": "Choose a Folder…",
   "sync.browser.chooseAnother": "Choose Another Folder…",
   "sync.browser.cantPick": "This browser can’t save to a folder. Try Chrome or Edge.",
-  "sync.browser.gone": "The folder isn’t available any more. Choose it again in Settings → Data.",
+  "sync.browser.gone": "The folder isn’t available any more. Choose it again in Settings → Sync.",
   // {name} is the folder's name.
-  "sync.browser.permission": "lines needs your permission to use “{name}” again. Open Settings → Data and allow it.",
+  "sync.browser.permission": "lines needs your permission to use “{name}” again. Open Settings → Sync and allow it.",
 
   /* End-to-end encryption. */
   "sync.e2e.title": "End-to-end encryption",
@@ -120,7 +120,7 @@ export default {
   "sync.e2e.turnedOff": "Encryption was turned off on another device, so the notes there are plain Markdown files again.",
   "sync.e2e.turnOffToo": "Turn off here too",
 
-  /* Problems, shown in Settings → Data and spoken. */
+  /* Problems, shown in Settings → Sync and spoken. */
   // {error} is what went wrong, often in English.
   "sync.error.failed": "Sync failed: {error}",
   "sync.error.tooShort": "Use at least {count} characters.",

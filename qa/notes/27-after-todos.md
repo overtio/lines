@@ -9,7 +9,7 @@ Todo list followed straight away, with no blank line, by each element. Check: no
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
-A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 
 #### 2. Todo list, then Long paragraph
 
@@ -146,77 +146,101 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Todo list, then Divider
+#### 17. Todo list, then Table with formulas
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+
+#### 18. Todo list, then Spreadsheet (csv block)
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+
+#### 19. Todo list, then Divider
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ---
 
-#### 18. Todo list, then Key: Value line
+#### 20. Todo list, then Key: Value line
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 **Wi-Fi password:** correct-horse-battery
 
-#### 19. Todo list, then Mention
+#### 21. Todo list, then Mention
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 20. Todo list, then Wiki link
+#### 22. Todo list, then Wiki link
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 21. Todo list, then Symbols
+#### 23. Todo list, then Symbols
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 22. Todo list, then GitHub links
+#### 24. Todo list, then GitHub links
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 23. Todo list, then Image
+#### 25. Todo list, then Image
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample picture](attachment:photo.png)
 
-#### 24. Todo list, then Drawing
+#### 26. Todo list, then Drawing
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample drawing](attachment:drawing.svg)
 
-#### 25. Todo list, then File
+#### 27. Todo list, then File
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Budget.csv](attachment:budget.csv)
 
-#### 26. Todo list, then Missing file
+#### 28. Todo list, then Missing file
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 27. Todo list, then Card
+#### 29. Todo list, then Card
 
 - [x] Done todo
 - [ ] Open todo
@@ -225,7 +249,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 28. Todo list, then Callout (info)
+#### 30. Todo list, then Callout (info)
 
 - [x] Done todo
 - [ ] Open todo
@@ -234,7 +258,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 29. Todo list, then Callout (warning, chosen icon)
+#### 31. Todo list, then Callout (warning, chosen icon)
 
 - [x] Done todo
 - [ ] Open todo
@@ -243,7 +267,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 30. Todo list, then Callout (decision, no icon)
+#### 32. Todo list, then Callout (decision, no icon)
 
 - [x] Done todo
 - [ ] Open todo

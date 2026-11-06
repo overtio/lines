@@ -9,11 +9,12 @@ import { loadMath, type Macros, NO_MACROS } from "../editor/math";
 import { unsplashImage } from "../editor/unsplash";
 import { attachmentName, attachmentURL, imageSize } from "../notes/attachments";
 import { symbolPieces } from "../notes/symbols";
-import type { MathEngine, Renderer } from "../plugins/types";
+import type { Cells, MathEngine, Renderer } from "../plugins/types";
+import { showFormulas } from "../sheets/formulas";
 
 /*
  * The pieces a printed note is made of that take a moment to draw: math and code blocks drawn by
- * plugins (KaTeX, Mermaid), highlighted code and images. Each is drawn into an element now and
+ * plugins (KaTeX, Mermaid), tables' formulas (IronCalc), highlighted code and images. Each is drawn into an element now and
  * finished later; `ready()` waits for all of them, so pages are measured only once everything has
  * its size.
  */
@@ -60,6 +61,11 @@ export class Parts {
 
   #later(work: Promise<unknown>) {
     this.#pending.push(work);
+  }
+
+  /** What a table's formulas work out to, in their cells' elements (by row, as `cells`); numbers to the right with `numbers`, as in a spreadsheet. */
+  formulas(cells: Cells, elements: HTMLElement[][], numbers = false) {
+    this.#later(showFormulas(cells, elements, { pending: "doc-formula-pending", error: "doc-formula-error", number: numbers ? "doc-number" : undefined }));
   }
 
   /** Math: within text, or displayed on its own. */

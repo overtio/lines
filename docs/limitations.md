@@ -15,7 +15,7 @@ Each of these has only run in Chrome, through the end-to-end tests (two browser 
 ## Saving to a folder on the web
 
 - Only Chrome, Edge and other Chromium browsers have the File System Access API. Safari and Firefox keep notes in the browser, and can export them.
-- After the browser restarts, it asks again before lines may use the folder; until someone clicks Allow access in Settings → Data, sync shows an error.
+- After the browser restarts, it asks again before lines may use the folder; until someone clicks Allow access in Settings → Sync, sync shows an error.
 - The browser blocks some folders (the home folder itself, system folders, Downloads on some systems).
 
 ## The web app's own storage
@@ -30,7 +30,15 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - An Unsplash photo is kept as the link to its page, not as a file, so it needs the internet to show, and isn't in exports or sync as a picture.
 - Other Markdown apps show these links as broken images, as the page isn't a picture.
 - lines loads the photo through Unsplash's download link, which counts as a download each time it's shown.
-- Unsplash+ photos don't show: Unsplash only hands them to subscribers. They say the image couldn't be shown.
+- Unsplash+ photos don't show: Unsplash only hands them to subscribers. They say the image couldn't be shown. `/unsplash` leaves them out.
+
+## /unsplash and /giphy
+
+- They need the internet, and an API key from each service built into lines (see the README). A build without one doesn't have the command, and Settings → Plugins says so.
+- What you search for goes to Unsplash or GIPHY. Nothing else does: lines doesn't send them your notes.
+- The keys are shared by everyone using that build, and each service limits how many searches a key can make an hour (until it approves the app for more). Past that, the picker says it couldn't reach them for a while.
+- A GIF is kept as its address on GIPHY, like an Unsplash photo: it needs the internet to show, and isn't in exports or sync as a picture. With reduced motion, GIFs from GIPHY show still, but other animated images in notes still play.
+- They're in Markdown notes only. A LaTeX note can't compile a picture from the web anyway.
 
 ## Math
 
@@ -48,6 +56,24 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - A photo pasted from Unsplash, or any other `\includegraphics{https://…}`, shows in lines but doesn't compile: LaTeX can only include files.
 - A synced LaTeX note's file still ends in `.md`, with `format: latex` in its front matter. Export writes `.tex` files.
 - Switching a note's format doesn't convert its text.
+- Formulas in a `tabular` aren't worked out, as they are in Markdown tables.
+
+## Spreadsheets
+
+How they work is in [spreadsheets.md](spreadsheets.md).
+
+- Not tried in the Mac app yet (WebKit), on an iPhone or with a touch screen; only in Chrome. Typing in a cell, IMEs, copying and pasting, and the cells' menu are the parts most likely to differ there.
+- One sheet per note. A workbook's sheets come in as notes of their own, and formulas that reach into another sheet come in as their values.
+- No formatting is kept: bold, colors, borders, number formats (a sum of money shows as a plain number), merged cells, column widths and frozen rows. Charts, pivot tables, comments and conditional formatting in a workbook are left out.
+- Columns can't be resized, sorted, filtered or hidden, and rows and columns can't be moved by dragging. There's no fill handle to drag; ⌘D and ⌘R fill instead.
+- Function suggestions and their descriptions are in English in every language, as the functions' names are. They're IronCalc's, from its own spreadsheet app.
+- A reference to another sheet can't be pointed at (there's one sheet per note), and while pointing, ⌘ and an arrow doesn't jump to the edge of what's written.
+- Formulas are in English with commas, and numbers and dates are read as in US English, whatever the app's language: `1.200,50` is text, not a number.
+- Find in a note (⌘F) doesn't search a spreadsheet's cells. The note list's search does. In a Markdown note, it finds text in a ` ```csv ` block but can't show it in the grid; the cells' Edit as CSV shows the block's text.
+- A ` ```csv ` block in a Markdown note is one sheet on its own: its formulas can't reach another block, a table or a spreadsheet note. Comma-separated only; a ` ```tsv ` block is code.
+- A screen reader hears each cell as it's reached, but can't browse the grid's rows and columns as a table: the grid is inside the editor's text box (docs/accessibility.md).
+- Every row is kept in memory and worked out again on each change, so very large sheets (tens of thousands of rows) are slow to change, though only the rows in view are drawn.
+- A formula engine other than IronCalc can't be chosen yet ([HyperFormula](https://github.com/overtio/lines/issues/1)).
 
 ## PDF
 
@@ -97,6 +123,15 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - The icon chosen for a type is kept on the device, like a tag's, so other devices show the default.
 - A locked note can be mentioned by its title, but its properties can't be read, even while it's open.
 - A synced note's file has two front matter blocks: lines' own (id, dates…) and then the note's properties, as part of its text. Apps that read front matter see the first.
+
+## Layout, tabs and the outline
+
+- Tabs have no keyboard shortcuts of their own beyond their tablist (← →, Delete): browsers keep ⌘W, Ctrl+Tab and ⌘1–9 for their own tabs.
+- There are no tabs at phone width, nor in floating notes, and a tab can't be dragged to another place or into its own window.
+- Open tabs are kept on each device, in the window's own storage; they don't sync.
+- Panes on the right, and tabs, haven't been tried in the Mac app yet: the window buttons' room in each arrangement, and dragging the window by the space around the tabs.
+- Links (Settings → Editing → Links): a web link can't open in a background tab of the browser, as browsers decide that; tab choices for mentions need tabs on, and in a floating note they open the note in the main window.
+- The outline shows only with room for it beside the text (none at phone width, nor with Compact spacing in a narrow window), and in Markdown and LaTeX notes; plain-text notes have no headings. In a very long note, headings far down join it a moment after the note opens, as the note is read in the background.
 
 ## Plugins
 

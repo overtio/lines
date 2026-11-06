@@ -13,8 +13,6 @@ import type { SyntaxNode } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
 import type { IconName } from "../icons/icons";
-import { attachmentName, openAttachment } from "../notes/attachments";
-import { coarsePointer, openExternal } from "../platform";
 import {
   CALLOUTS,
   CalloutIcon,
@@ -31,7 +29,8 @@ import { drawnAsBlock, imageElement } from "./attachments";
 import { GitHubWidget, githubText } from "./github";
 import { CopyWidget, keyValue } from "./keyValue";
 import { InlineMathWidget } from "./math";
-import { drawMention, frontMatterField, objectsChanged, openMention, openNote, openTag, openType, valueText } from "./objects";
+import { followClick, openHref } from "./links";
+import { drawMention, frontMatterField, objectsChanged, openMention, openTag, valueText } from "./objects";
 import { normalizeTag } from "../notes/parse";
 import { keyOf } from "../notes/properties";
 import { plainLine } from "../notes/stats";
@@ -77,7 +76,7 @@ class SpokenWidget extends WidgetType {
   }
   toDOM() {
     const el = document.createElement("span");
-    el.className = "visually-hidden";
+    el.className = "sr-only";
     el.textContent = this.text;
     return el;
   }
@@ -202,7 +201,7 @@ class TagIconWidget extends WidgetType {
     el.className = "cm-lp-tag-icon";
     tagIconCleanups.set(el, mount(Icon, { target: el, props: { name: this.icon, size: 13, strokeWidth: 2.25 } }));
     const spoken = document.createElement("span");
-    spoken.className = "visually-hidden";
+    spoken.className = "sr-only";
     spoken.textContent = "#";
     el.append(spoken);
     return el;
@@ -246,13 +245,14 @@ const formatWidget = new FormatWidget();
 const hidden = Decoration.replace({});
 
 /** What's drawn in a note's properties (its front matter): only what's within a line. */
-const IN_PROPERTIES = new Set(["Emphasis", "StrongEmphasis", "Strikethrough", "Highlight", "InlineCode", "Link", "Autolink", "URL", "Tag", "Mention", "InlineMath"]);
+const IN_PROPERTIES = new Set(["Emphasis", "StrongEmphasis", "Strikethrough", "Highlight", "Underline", "InlineCode", "Link", "Autolink", "URL", "Tag", "Mention", "InlineMath"]);
 
 const INLINE_STYLES: Record<string, [cls: string, mark: string]> = {
   Emphasis: ["cm-lp-em", "EmphasisMark"],
   StrongEmphasis: ["cm-lp-strong", "EmphasisMark"],
   Strikethrough: ["cm-lp-strike", "StrikethroughMark"],
   Highlight: ["cm-lp-highlight", "HighlightMark"],
+  Underline: ["cm-lp-underline", "UnderlineMark"],
   InlineCode: ["cm-lp-code", "CodeMark"],
 };
 
@@ -704,15 +704,9 @@ function toggleCheckbox(view: EditorView, el: Element) {
   });
 }
 
-/** Opens a link's address: an attached file in its app, anything else in the browser. */
-function openHref(href: string, text: string) {
-  const name = attachmentName(href);
-  void (name ? openAttachment(name, text || name) : openExternal(href));
-}
-
 /**
- * ⌥↵ opens what the cursor is on, as ⌘-click does: a mention's note (made, if it isn't there yet),
- * a type's or a tag's notes, a link, or an attached file. The keyboard's way to everything a click opens.
+ * ⌥↵ opens what the cursor is on: a mention's note (made, if it isn't there yet), a type's or a
+ * tag's notes, a link, or an attached file. The keyboard's way to everything a click opens (links.ts).
  */
 export const openAtCursor: Command = (view) => {
   const { state } = view;
@@ -739,12 +733,6 @@ export const openAtCursor: Command = (view) => {
   }
   return false;
 };
-
-/** Whether this click opens the link under it: with ⌘ (Ctrl), or a tap while not editing. */
-export function opensLink(event: MouseEvent, view: EditorView) {
-  const link = (event.target as HTMLElement).closest<HTMLElement>(".cm-lp-link");
-  return !!link?.dataset.href && (event.metaKey || event.ctrlKey || (coarsePointer.matches && !view.hasFocus));
-}
 
 export const livePreview = ViewPlugin.fromClass(
   class {
@@ -779,26 +767,7 @@ export const livePreview = ViewPlugin.fromClass(
           event.preventDefault();
           return true;
         }
-        const mention = target.closest<HTMLElement>(".cm-lp-mention");
-        if (mention && (event.metaKey || event.ctrlKey || (coarsePointer.matches && !view.hasFocus))) {
-          if (mention.dataset.note) openNote(mention.dataset.note);
-          else if (mention.dataset.type) openType(mention.dataset.type);
-          event.preventDefault();
-          return true;
-        }
-        const tag = target.closest<HTMLElement>(".cm-lp-tag");
-        if (tag?.dataset.tag && (event.metaKey || event.ctrlKey || (coarsePointer.matches && !view.hasFocus))) {
-          openTag(tag.dataset.tag);
-          event.preventDefault();
-          return true;
-        }
-        if (opensLink(event, view)) {
-          const link = target.closest<HTMLElement>(".cm-lp-link")!;
-          openHref(link.dataset.href!, link.textContent ?? "");
-          event.preventDefault();
-          return true;
-        }
-        return false;
+        return followClick(event, view);
       },
     },
   },

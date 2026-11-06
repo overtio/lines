@@ -13,7 +13,8 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const run = (cmd, args, cwd = root) => execFileSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
 
-const LICENSE_FILE = /^(licen[cs]e|copying|notice)([-._].*)?(\.(md|txt))?$/i;
+// Third-party notices too: what a package bundles from others (IronCalc's WebAssembly, its Rust crates).
+const LICENSE_FILE = /^(licen[cs]e|copying|notice|third[-_]party[-_]notices)([-._].*)?(\.(md|txt))?$/i;
 
 function licenseTexts(dir) {
   if (!dir || !existsSync(dir)) return [];
@@ -49,8 +50,9 @@ const listed = JSON.parse(run("pnpm", ["licenses", "list", "--prod", "--json"]))
 const js = Object.values(listed)
   .flat()
   .map((p) => ({ name: p.name, version: p.versions[0], license: p.license, dir: p.paths[0] }));
-// Svelte's runtime is compiled into the app even though Svelte is a dev dependency.
-for (const name of ["svelte", "esm-env", "clsx"]) {
+// Svelte's runtime is compiled into the app, and Tailwind's CSS into its stylesheet, though they're
+// dev dependencies.
+for (const name of ["svelte", "esm-env", "clsx", "tailwindcss"]) {
   const store = join(root, "node_modules/.pnpm");
   const entry = readdirSync(store).find((d) => d.startsWith(`${name}@`));
   if (!entry) continue;

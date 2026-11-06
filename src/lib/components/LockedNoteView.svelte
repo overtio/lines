@@ -6,6 +6,8 @@
   import { noteKeys } from "../notes/noteKeys.svelte";
   import type { Entry } from "../notes/store.svelte";
   import { openSettings } from "../windows/settings.svelte";
+  import Button from "./ui/Button.svelte";
+  import UnlockField from "./UnlockField.svelte";
 
   /** Shown instead of the editor for a locked note that isn't open: the password (or Touch ID) opens it. */
   let { entry, compact = false }: { entry: Entry; compact?: boolean } = $props();
@@ -13,7 +15,6 @@
   let password = $state("");
   let busy = $state(false);
   let error = $state<string | null>(null);
-  /** Bumped on a wrong password, to shake the field again. */
   let shakes = $state(0);
   let forgot = $state(false);
   let input = $state<HTMLInputElement>();
@@ -56,240 +57,58 @@
   }
 </script>
 
-<div class="locked" class:compact>
-  <form class="card" onsubmit={unlock} aria-labelledby="{id}-title" aria-describedby="{id}-hint" aria-busy={busy}>
-    <div class="badge" aria-hidden="true"><Icon name="lock" size={compact ? 20 : 24} strokeWidth={1.75} /></div>
-    <h2 id="{id}-title" class:untitled={!entry.meta.title}>{entry.meta.title || t("lock.note.untitled")}</h2>
-    <p class="hint" id="{id}-hint">{t("lock.note.hint")}</p>
+<div
+  class={[
+    "grid min-h-0 flex-1 place-items-center overflow-auto px-4 transition-opacity duration-150 starting:opacity-0",
+    compact ? "pt-3 pb-6" : "pt-6 pb-[calc(var(--titlebar-h,0px)+24px)]",
+  ]}
+>
+  <form class="flex w-[min(300px,100%)] flex-col items-center text-center" onsubmit={unlock} aria-labelledby="{id}-title" aria-describedby="{id}-hint" aria-busy={busy}>
+    <div
+      class={["grid place-items-center bg-tag text-accent", compact ? "mb-2.5 size-10 rounded-xl" : "mb-4 size-[52px] rounded-[16px]"]}
+      aria-hidden="true"
+    >
+      <Icon name="lock" size={compact ? 20 : 24} strokeWidth={1.75} />
+    </div>
+    <h2 id="{id}-title" class={["m-0 max-w-full truncate text-lg font-semibold tracking-tight", !entry.meta.title && "text-faint"]}>
+      {entry.meta.title || t("lock.note.untitled")}
+    </h2>
+    <p class={["m-0 mt-1.5 text-sm leading-normal text-muted", compact ? "mb-3" : "mb-[18px]"]} id="{id}-hint">{t("lock.note.hint")}</p>
 
-    {#key shakes}
-      <div class="field" class:shake={shakes > 0}>
-        <input
-          bind:this={input}
-          bind:value={password}
-          type="password"
-          placeholder={t("lock.form.password")}
-          aria-label={t("lock.note.passwordLabel")}
-          aria-invalid={!!error}
-          aria-describedby={error ? `${id}-error` : undefined}
-          autocomplete="current-password"
-          disabled={busy}
-          {@attach (node) => void (shakes > 0 && node.focus())}
-        />
-        <button class="go" type="submit" disabled={!password || busy} aria-label={busy ? t("lock.note.opening") : t("lock.note.view")}>
-          <Icon name={busy ? "loader" : "chevron-right"} size={18} class={busy ? "spin" : ""} />
-        </button>
-      </div>
-    {/key}
-
-    <p class="error" id="{id}-error" role="alert">{error ?? ""}</p>
+    <UnlockField
+      bind:value={password}
+      bind:input
+      label={t("lock.note.passwordLabel")}
+      placeholder={t("lock.form.password")}
+      go={t("lock.note.view")}
+      going={t("lock.note.opening")}
+      {error}
+      errorId="{id}-error"
+      {busy}
+      {shakes}
+    />
 
     {#if touchId}
-      <button type="button" class="text-button" onclick={useTouchId} disabled={busy}>
-        <Icon name="fingerprint" size={16} /> {t("lock.useTouchId")}
-      </button>
+      <Button variant="quiet" icon="fingerprint" onclick={useTouchId} disabled={busy}>{t("lock.useTouchId")}</Button>
     {/if}
 
     {#if !compact}
-      <div class="forgot">
+      <div class="mt-[22px] text-xs leading-normal text-faint">
         {#if forgot}
-          <p id="{id}-forgot">{t("lock.note.forgotHint")}</p>
+          <p class="m-0 mb-2" id="{id}-forgot">{t("lock.note.forgotHint")}</p>
           <!-- Focus comes here when the explanation shows. -->
-          <button
-            type="button"
-            class="text-button"
+          <Button
+            variant="quiet"
             aria-describedby="{id}-forgot"
-            onclick={() => void openSettings("data")}
+            onclick={() => void openSettings("privacy")}
             {@attach (node) => node.focus()}
           >
             {t("lock.note.openPrivacy")}
-          </button>
+          </Button>
         {:else}
-          <button type="button" class="text-button" onclick={() => (forgot = true)}>{t("lock.note.forgot")}</button>
+          <Button variant="quiet" onclick={() => (forgot = true)}>{t("lock.note.forgot")}</Button>
         {/if}
       </div>
     {/if}
   </form>
 </div>
-
-<style>
-  .locked {
-    flex: 1;
-    min-height: 0;
-    display: grid;
-    place-items: center;
-    overflow: auto;
-    padding: 24px 16px calc(var(--titlebar-h, 0px) + 24px);
-    animation: fade-in 160ms ease;
-  }
-
-  .compact {
-    padding: 12px 16px 24px;
-  }
-
-  .card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: min(300px, 100%);
-    text-align: center;
-  }
-
-  .badge {
-    display: grid;
-    place-items: center;
-    width: 52px;
-    height: 52px;
-    margin-bottom: 16px;
-    border-radius: 16px;
-    background: var(--tag-bg);
-    color: var(--accent);
-  }
-
-  .compact .badge {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 10px;
-    border-radius: 12px;
-  }
-
-  h2 {
-    max-width: 100%;
-    margin: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 17px;
-    font-weight: 650;
-    letter-spacing: -0.01em;
-  }
-
-  .untitled {
-    color: var(--text-faint);
-  }
-
-  .hint {
-    margin: 6px 0 18px;
-    font-size: 13px;
-    line-height: 1.45;
-    color: var(--text-muted);
-  }
-
-  .compact .hint {
-    margin-bottom: 12px;
-  }
-
-  .field {
-    position: relative;
-    width: 100%;
-  }
-
-  input {
-    width: 100%;
-    height: 38px;
-    padding: 0 42px 0 13px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--bg-elevated);
-    color: var(--text);
-    font: inherit;
-    font-size: 14.5px;
-    outline: none;
-    transition: border-color 120ms ease, box-shadow 120ms ease;
-  }
-
-  /* The accent at full strength, two pixels wide, so focus shows (3:1) in place of the outline. */
-  input:focus {
-    border-color: var(--accent);
-    box-shadow:
-      0 0 0 1px var(--accent),
-      0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
-  }
-
-  input[aria-invalid="true"]:not(:focus) {
-    border-color: color-mix(in srgb, var(--danger) 55%, transparent);
-  }
-
-  .go {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    display: grid;
-    place-items: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 7px;
-    background: var(--accent);
-    color: var(--on-accent);
-    transition: opacity 120ms ease;
-  }
-
-  .go:disabled {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  /* Touch screens: a target a finger can hit (44 × 44). */
-  @media (pointer: coarse) {
-    input {
-      height: 50px;
-      padding-right: 56px;
-    }
-
-    .go {
-      top: 3px;
-      right: 3px;
-      width: 44px;
-      height: 44px;
-    }
-
-    .text-button {
-      min-height: 44px;
-    }
-  }
-
-  .error {
-    min-height: 1.45em;
-    margin: 8px 0 2px;
-    font-size: 12.5px;
-    line-height: 1.45;
-    color: var(--danger);
-  }
-
-  .forgot {
-    margin-top: 22px;
-    font-size: 12.5px;
-    line-height: 1.5;
-    color: var(--text-faint);
-  }
-
-  .forgot p {
-    margin: 0 0 8px;
-  }
-
-  .forgot .text-button {
-    font-size: 12.5px;
-    color: var(--text-faint);
-  }
-
-  .shake {
-    animation: shake 360ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
-  }
-
-  @keyframes shake {
-    20%,
-    60% {
-      transform: translateX(-7px);
-    }
-    40%,
-    80% {
-      transform: translateX(7px);
-    }
-  }
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-  }
-</style>

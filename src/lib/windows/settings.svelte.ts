@@ -1,6 +1,7 @@
 import { t } from "../i18n/index.svelte";
 import { isDesktopApp } from "../platform";
-import { ui, type SettingsTab } from "../ui.svelte";
+import { sectionOf, type SettingsSection } from "../components/settings/sections";
+import { ui } from "../ui.svelte";
 import { announce, onAnnounce, windowLabel } from "./channel";
 
 /*
@@ -15,43 +16,39 @@ export const SETTINGS_LABEL = "settings";
 /** This window is the Settings window. */
 export const isSettingsWindow = windowLabel() === SETTINGS_LABEL;
 
-const TABS: SettingsTab[] = ["theme", "text", "plugins", "data", "shortcuts", "about"];
+/** The section the Settings window opens on, from its address. */
+export const initialSection = () => sectionOf(new URLSearchParams(location.search).get("section"));
 
-/** The tab the Settings window opens on, from its address. */
-export function initialTab(): SettingsTab {
-  const tab = new URLSearchParams(location.search).get("tab") as SettingsTab | null;
-  return tab && TABS.includes(tab) ? tab : "theme";
-}
-
-/** Opens Settings on a tab: its own window in the desktop apps (brought forward if open), a dialog elsewhere. */
-export async function openSettings(tab: SettingsTab) {
+/** Opens Settings on a section: its own window in the desktop apps (brought forward if open), a dialog elsewhere. */
+export async function openSettings(section: SettingsSection = "general") {
   if (!isDesktopApp) {
-    ui.settings = tab;
+    ui.settings = section;
     return;
   }
   const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
   const existing = await WebviewWindow.getByLabel(SETTINGS_LABEL);
   if (existing) {
-    void announce({ type: "settings-tab", tab });
+    void announce({ type: "settings-section", section });
     await existing.unminimize();
     await existing.setFocus();
     return;
   }
   const { LogicalPosition } = await import("@tauri-apps/api/dpi");
   const window = new WebviewWindow(SETTINGS_LABEL, {
-    url: `index.html?tab=${tab}`,
+    url: `index.html?section=${section}`,
     title: t("settings.title"),
-    width: 680,
+    width: 860,
     height: 640,
-    minWidth: 420,
+    // Room for the list of sections beside a section, which a narrower window would stack.
+    minWidth: 700,
     minHeight: 360,
     center: true,
     // Hidden until it has drawn (it shows itself), so it never flashes white.
     visible: false,
     titleBarStyle: "overlay",
     hiddenTitle: true,
-    // Centered on the tabs' row.
-    trafficLightPosition: new LogicalPosition(16, 31),
+    // As in the main window: centered on the title row, over the list of sections.
+    trafficLightPosition: new LogicalPosition(20, 28),
   });
   void window.once("tauri://error", (event) => console.error("lines: couldn't open the Settings window", event.payload));
 }
@@ -103,8 +100,8 @@ export function forwardToMain(targets: Record<string, Target>, sync: SyncState, 
       else call.reject(new Error(message.error));
     } else if (message.type === "sync-state") {
       Object.assign(sync, message.state);
-    } else if (message.type === "settings-tab") {
-      ui.settings = message.tab as SettingsTab;
+    } else if (message.type === "settings-section") {
+      ui.settings = sectionOf(message.section);
     }
   });
   for (const [name, names] of Object.entries(FORWARDED)) {

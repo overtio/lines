@@ -11,6 +11,7 @@ import picker from "./picker";
 import plugins from "./plugins";
 import print from "./print";
 import settings from "./settings";
+import sheet from "./sheet";
 import shortcuts from "./shortcuts";
 import sidebar from "./sidebar";
 import sync from "./sync";
@@ -25,6 +26,7 @@ export default {
   ...plugins,
   ...print,
   ...settings,
+  ...sheet,
   ...shortcuts,
   ...sidebar,
   ...sync,

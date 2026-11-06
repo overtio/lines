@@ -6,7 +6,7 @@ Each element at the top level. Check: it draws as it does on its own, sits insid
 
 #### 1. Paragraph at the top level
 
-A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 
 #### 2. Long paragraph at the top level
 
@@ -98,65 +98,83 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Divider at the top level
+#### 17. Table with formulas at the top level
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+
+#### 18. Spreadsheet (csv block) at the top level
+
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+
+#### 19. Divider at the top level
 
 ---
 
-#### 18. Key: Value line at the top level
+#### 20. Key: Value line at the top level
 
 **Wi-Fi password:** correct-horse-battery
 
-#### 19. Mention at the top level
+#### 21. Mention at the top level
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 20. Wiki link at the top level
+#### 22. Wiki link at the top level
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 21. Symbols at the top level
+#### 23. Symbols at the top level
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 22. GitHub links at the top level
+#### 24. GitHub links at the top level
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 23. Image at the top level
+#### 25. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 24. Drawing at the top level
+#### 26. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 25. File at the top level
+#### 27. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 26. Missing file at the top level
+#### 28. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 27. Card at the top level
+#### 29. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 28. Callout (info) at the top level
+#### 30. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 29. Callout (warning, chosen icon) at the top level
+#### 31. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 30. Callout (decision, no icon) at the top level
+#### 32. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

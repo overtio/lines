@@ -6,6 +6,7 @@ lines writes Markdown with a few additions of its own. We call it Linedown.
 | ----- | --- |
 | `**bold**`, `*italic*` | **bold**, *italic* |
 | `~~struck~~`, `==highlight==` | ~~struck~~, ==highlight== |
+| `<u>underlined</u>` | <u>underlined</u> |
 | `#tag`, `#nested/tag` | a tag in the sidebar |
 | `- [ ] todo` | a todo |
 | `::: card` … `:::` | a card |

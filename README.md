@@ -29,7 +29,7 @@ The [demo website](https://overtio.github.io/lines/) opens with a tour: one shor
 
 - **Live Markdown.** Type `**bold**`, `# Heading` or `- [ ] todo` and see it formatted. Put the cursor on a line to see its Markdown again.
 - **Slash commands.** Type `/` at the start of a line for headings, todos, tables, callouts, code, diagrams, math, images, drawings, today's date and more. <kbd>Tab</kbd> completes, like a shell.
-- **Format toolbar.** Select text to make it bold, italic, struck through, code or highlighted.
+- **Format toolbar.** Select text to make it bold, italic, underlined, struck through, code or highlighted.
 - **Lists and todos.** <kbd>Tab</kbd> and <kbd>⇧Tab</kbd> nest list items. Click a checkbox to tick it; the Todo view gathers every note with open tasks.
 - **Drag to move.** Grab the grip beside any line, list item, heading, table or card to move it, or use <kbd>⌥↑</kbd> / <kbd>⌥↓</kbd>.
 - **Arrows and symbols.** `->` shows as →, `!=` as ≠, and so on, on screen only. The note keeps what you typed.
@@ -37,18 +37,23 @@ The [demo website](https://overtio.github.io/lines/) opens with a tour: one shor
 
 ### More than text
 
-- **Tables** that look like tables. <kbd>Tab</kbd> moves between cells, and rows pasted from a spreadsheet become one.
+- **Tables** that look like tables. <kbd>Tab</kbd> moves between cells, and rows pasted from a spreadsheet become one. A cell like `=SUM(B2:B4)` shows what it works out to.
 - **Cards and callouts.** Group a section into a card, or make it an info, question, warning, error or decision callout: `:::info` … `:::`.
 - **Code blocks** with syntax highlighting in your theme's colors, a copy button, and a wand that tidies JSON, SQL, JavaScript, CSS and more.
 - **Diagrams** from [Mermaid](https://mermaid.js.org) code: flowcharts, sequence diagrams, Gantt charts and more, drawn as you type.
 - **Math** with [KaTeX](https://katex.org): `$…$` in a line, `$$` for a block.
 - **Drawings** with [Excalidraw](https://excalidraw.com), saved in the note as an SVG any Markdown app can show.
 - **Images and files.** Paste or drop them in. Drag an image's corner to resize it.
+- **Photos and GIFs from the web.** `/unsplash` searches Unsplash's free photos and `/giphy` GIPHY's GIFs, and puts the one you pick in the note.
 - **GitHub links** read short, like `overtio/lines#12`, with GitHub's mark.
 
 ### LaTeX notes
 
 Switch a note to LaTeX from its ⓘ panel and write `\section`, theorems, citations and math as you would in a paper, drawn as you type. Paste a whole paper and it just works. Export gives you a `.tex` file that compiles, or have TeX itself typeset the PDF, right in the app. See [docs/latex.md](docs/latex.md).
+
+### Spreadsheets
+
+Switch a note to a spreadsheet from its ⓘ panel and work in a grid of cells, with formulas worked out by [IronCalc](https://www.ironcalc.com): the keys you know from Excel, functions suggested as you type, cells pointed at with the mouse or the arrow keys, copy and paste with other apps, fill down, and rows and columns inserted with formulas that follow. It's kept as CSV, so it syncs and searches like any note. A ` ```csv ` code block (`/spreadsheet`) is a spreadsheet inside a Markdown note, worked in the same way. Import CSV files and Excel workbooks from Settings → Data, and download a spreadsheet as CSV (formulas or values) or as an Excel workbook. See [docs/spreadsheets.md](docs/spreadsheets.md).
 
 ### Organizing
 
@@ -64,7 +69,8 @@ Switch a note to LaTeX from its ⓘ panel and write `\section`, theorems, citati
 
 - **PDF and print.** <kbd>⌘P</kbd> lays a note out on A4 or Letter pages, black on white. Save it as a PDF, or as PNG images.
 - **Share** a note through the system share sheet, copy it as Markdown or plain text, or download it as a file.
-- **Export everything** as Markdown files in a .zip, with images and files (Settings → Data).
+- **Export everything** as files in a .zip, each in its note's format (Markdown, LaTeX or CSV), with images and files (Settings → Data).
+- **Import** Markdown, LaTeX, CSV and Excel files as notes (Settings → Data).
 - **Sample notes.** Add the feature tour, LaTeX examples or the QA notes from Settings → Data.
 
 ### Sync and privacy
@@ -80,9 +86,11 @@ Switch a note to LaTeX from its ⓘ panel and write `\section`, theorems, citati
 
 - **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. See [docs/plugins.md](docs/plugins.md).
 - **Sixteen themes**, each light and dark, including High Contrast and two for color blindness.
-- **Fonts, text size and spacing**, with a live preview.
+- **Fonts, text size, note width and spacing**, with a live preview; <kbd>⌘+</kbd> and <kbd>⌘−</kbd> size the text as you read. Notes can be narrow, medium, wide, any width between, or fill the window.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
 - **Fits any screen**: three columns on a desktop, a drawer on a tablet, a stack on a phone. Drag the columns to resize them.
+- **Your layout.** Put the sidebar and the note list on the left or the right, each its own way, and turn on tabs for the notes you open, as in a code editor (Settings → General → Layout).
+- **Outline.** Turn on short lines beside the note, on its right or left, one for each heading, darker for the part you're reading. Point at them to see the headings by name, and click one to glide there. Markdown and LaTeX notes both have it.
 - **Native touches**: SF Symbols on Apple devices, see-through windows on the Mac, and Settings in its own window.
 - **English, Spanish and French**, following your system or chosen in Settings. See [docs/translations.md](docs/translations.md) to add a language.
 - **Accessible.** Everything works from the keyboard and with a screen reader, at large text sizes, with reduced motion and with increased contrast. See [docs/accessibility.md](docs/accessibility.md).
@@ -95,17 +103,18 @@ Press <kbd>⌘/</kbd> to see them all. On Windows and Linux, use <kbd>Ctrl</kbd>
 | --- | --- |
 | <kbd>⌘N</kbd> | New note (<kbd>⌥N</kbd> on the web, where the browser keeps <kbd>⌘N</kbd>) |
 | <kbd>⌘⇧F</kbd> | Search notes |
-| <kbd>⌘F</kbd> | Find in the note |
-| <kbd>⌘B</kbd> <kbd>⌘I</kbd> <kbd>⌘E</kbd> | Bold, italic, inline code |
+| <kbd>⌘F</kbd> | Find and replace in the open note |
+| <kbd>⌘B</kbd> <kbd>⌘I</kbd> <kbd>⌘U</kbd> <kbd>⌘E</kbd> | Bold, italic, underline, inline code |
 | <kbd>⌘⇧X</kbd> <kbd>⌘⇧H</kbd> | Strikethrough, highlight |
 | <kbd>⌘↵</kbd> | Make a todo, or tick it |
 | <kbd>Tab</kbd> <kbd>⇧Tab</kbd> | Nest or un-nest a list item; next or previous table cell |
-| <kbd>⌘-click</kbd> or <kbd>⌥↵</kbd> | Open a link, mention, tag or file |
+| <kbd>⌘-click</kbd> or <kbd>⌥↵</kbd> | Open a link, mention, tag or file (Settings → Editing → Links sets what click, ⌘-click and ⇧⌘-click do) |
 | <kbd>⌘-click</kbd> <kbd>⇧-click</kbd> <kbd>⌘A</kbd> | Select several notes in the list (<kbd>⌫</kbd> moves them to the Trash) |
 | <kbd>⌘\\</kbd> | Show or hide the sidebar |
 | <kbd>⇧⌘\\</kbd> | Focus mode |
 | <kbd>F6</kbd> <kbd>⇧F6</kbd> | Move between the sidebar, the note list and the note |
 | <kbd>⌘P</kbd> | Preview as PDF, then print or save |
+| <kbd>⌘+</kbd> / <kbd>⌘−</kbd> / <kbd>⌘0</kbd> | Make notes' text bigger, smaller, or its usual size |
 | <kbd>⌃⌘L</kbd> | Lock lines, when the app lock is on |
 
 ## Documentation
@@ -114,6 +123,7 @@ Press <kbd>⌘/</kbd> to see them all. On Windows and Linux, use <kbd>Ctrl</kbd>
 | --- | --- |
 | [Linedown](docs/linedown.md) | The Markdown lines reads and writes, including its few additions (callouts, highlights, tags…) |
 | [LaTeX notes](docs/latex.md) | What's drawn in notes written in LaTeX |
+| [Spreadsheets](docs/spreadsheets.md) | Formulas in tables, spreadsheet notes, and opening and saving CSV and Excel files |
 | [Plugins](docs/plugins.md) | How lines is made of plugins, turning them off, and writing one |
 | [Sync](docs/sync.md) | How sync and encryption work |
 | [Storage](docs/storage.md) | Where the web app keeps your notes, and for how long |
@@ -159,6 +169,20 @@ TeX itself (BusyTeX's engine and TeX Live's basic packages, about 125 MB) isn't 
 </details>
 
 <details>
+<summary><b>Unsplash and GIPHY keys</b></summary>
+
+`/unsplash` and `/giphy` search through Unsplash's and GIPHY's APIs, which need a key each: an access key from [unsplash.com/developers](https://unsplash.com/developers) and an API key from [developers.giphy.com](https://developers.giphy.com). Put them in `.env.local` (git ignores it) before building:
+
+```sh
+VITE_UNSPLASH_ACCESS_KEY=…
+VITE_GIPHY_API_KEY=…
+```
+
+The website workflow reads them from the repository's secrets `UNSPLASH_ACCESS_KEY` and `GIPHY_API_KEY`. A build without a key leaves its plugin off, and Settings → Plugins says why. The keys end up in the app, as both services expect of apps that call them from the device.
+
+</details>
+
+<details>
 <summary><b>Demo website</b></summary>
 
 The web app with the feature tour instead of the welcome note, saving to a folder on the visitor's computer or in the browser ([docs/storage.md](docs/storage.md)). `.github/workflows/website.yml` publishes it to GitHub Pages on every push to main.
@@ -175,6 +199,7 @@ pnpm exec vite preview --outDir dist-site
 | | |
 | --- | --- |
 | UI | [Svelte 5](https://svelte.dev): compiled, no virtual DOM, a very small runtime |
+| Components | [Bits UI](https://bits-ui.com) for menus, dialogs, selects, switches and the like (accessible, unstyled), styled with [Tailwind CSS 4](https://tailwindcss.com) on the theme's colors |
 | Editor | [CodeMirror 6](https://codemirror.net) with a custom live-preview layer |
 | Plugins | Formats, math and diagram engines, typesetters, themes and icons, on a small core ([docs/plugins.md](docs/plugins.md)) |
 | Apps | [Tauri 2](https://v2.tauri.app): macOS, Windows, Linux, iOS, Android |
@@ -189,11 +214,15 @@ pnpm exec vite preview --outDir dist-site
 ```
 src/
   App.svelte                 App shell and responsive layout
-  app.css                    Design tokens (colors, type), light and dark
+  app.css                    Design tokens (the theme's colors, one scale of sizes) as Tailwind's, light and dark
   plugins/                   lines' own plugins, one folder each (docs/plugins.md)
     markdown/                Markdown, the format notes are written in by default (its editor is lib/editor)
     latex/                   LaTeX notes: editor.ts draws them, syntax.ts reads them, text.ts for the list and
                              exports, print.ts lays them out on paper
+    spreadsheet/             Spreadsheet notes: sheet.ts reads their title and CSV, editor.ts and Grid.svelte
+                             draw the grid to work in, index.ts lists, prints, imports and exports them;
+                             block.svelte.ts draws ```csv blocks in Markdown notes as the same grid
+    ironcalc/                The formula engine (IronCalc in WebAssembly), and reading and writing Excel workbooks
     tex/                     Typesets a LaTeX note with TeX (BusyTeX's pdfLaTeX in WebAssembly)
     katex/                   The math engine (KaTeX)
     mermaid/                 Mermaid diagrams: the renderer, its colors, /diagram
@@ -209,25 +238,33 @@ src/
       Editor.svelte          CodeMirror host; per-note undo history
       livePreview.ts         Hides Markdown and renders bullets, checkboxes, rules, images
       symbols.ts             Shows -> as →, != as ≠ and the like (the table is notes/symbols.ts)
-      tables.ts              Rendered tables, cell navigation, column alignment, pasting tables
+      tables.ts              Rendered tables (formulas worked out), cell navigation, column alignment, pasting tables
       cards.ts               Draws ::: card blocks and callouts behind their text; /card, leaving a card
       formatCode.ts          Tidies code blocks (JSON, SQL, Prettier languages)
-      formatting.ts          Bold, italic, code… toggles and the toolbar over selected text
+      formatting.ts          Bold, italic, underline, code… toggles and the toolbar over selected text
+      links.ts               Following links, tags and mentions as Settings → Editing → Links says for each click
+      outline.svelte.ts      The outline beside a note: its languages' headings, the part being read, gliding to one
+      OutlineRail.svelte     The outline's lines and its card of headings
       dragBlocks.ts          Grips for dragging lines and blocks to move them
       cursor.ts              Draws the text cursor (WebKit can leave a stray native caret behind)
-      rendered.ts            Code blocks drawn by renderer plugins (```mermaid): live, resizable, with their buttons
+      rendered.ts            Code blocks drawn by renderer plugins (```mermaid): live, resizable, with their buttons; or to work in (```csv)
       drawings.ts            Excalidraw drawings (SVGs holding their scene): spotting, opening, /drawing, from a diagram
       math.ts                Draws $math$ and $$ blocks with the math engine plugin
       texCommands.ts         The "\" menu of LaTeX commands, in math and in LaTeX notes
       attachments.ts         Image and file blocks; pasting, dropping, /image and /file
+      webImages.ts           Picking a picture from a library on the web (/unsplash, /giphy)
       fences.ts              Closes ``` and ::: fences as you type them; ` or : wraps a selection
       lists.ts               Tab / Shift-Tab nesting for list items; Backspace after a marker
       keyValue.ts            Copy buttons for Key: Value lines
-      syntax.ts              #tag, ==highlight==, ::: card, $math$ and @mention / [[wiki link]] parser extensions
+      syntax.ts              #tag, ==highlight==, <u>underline</u>, ::: card, $math$ and @mention / [[wiki link]] parser extensions
       objects.ts             Properties, @mentions and their menus; creating a mentioned note
       typeTables.ts          Tables of a type's notes (@type.recipe)
       setup.ts               Extensions, keymaps, formatting commands; the Markdown editor with plugins' additions
       editor.css             Styles for the rendered Markdown
+    sheets/
+      csv.ts                 Reading and writing CSV, as spreadsheet apps write it
+      cells.ts               Cell names (B4), formulas, and putting in and taking out rows and columns
+      formulas.ts            The formula engine that's on, loading it, and tables' formulas worked out
     print/
       markdown.ts            A Markdown note as a printed document
       parts.ts               Math, code, drawn code blocks and images on paper, and waiting for them to draw
@@ -242,6 +279,8 @@ src/
       parse.ts               Title, excerpt and tag extraction; adding and renaming tags and types
       properties.ts          Properties (front matter), types and mentions as text
       samples.ts             Adds the feature tour (tour/), the LaTeX examples (examples/) or the QA notes (qa/)
+      import.ts              Makes notes from files, each by its format's plugin (Settings → Data → Import)
+      export.ts              Every note as a file in its format, in a .zip
       tour/                  The feature tour: the demo website's first notes
       examples/              Notes written in LaTeX: a paper, lecture notes, a problem set
     sync/
@@ -255,12 +294,15 @@ src/
     lock/
       lock.svelte.ts         The app lock: unlocking, turning it on and off, locking when idle
       vault.ts               Encrypts what's stored on the device while the lock is on
-    components/              Sidebar, tag tree, note list, settings
+    components/              Sidebar, tag tree, note list, dialogs
+      ui/                    Shared parts: buttons, switches, selects, sliders, setting rows and groups
+      settings/              Settings: its list of sections, and one component per section
     windows/                 Floating notes, the Settings window, and messages between windows
     icons/                   Icon component (drawn by the icon set plugin chosen) and the icons lines uses
     i18n/                    Translations: t(), the language, and each language's messages (locales/)
     a11y.ts                  Saying things to screen readers
-    prefs.svelte.ts          Theme, appearance, font, text size, spacing, icon set (themes and icon sets by plugin id)
+    prefs.svelte.ts          Theme, appearance, font, text size, note width, spacing, icon set (themes and icon sets by plugin id), layout, links
+    tabs.svelte.ts           Tabs for open notes: preview tabs, closing, following the selection
     crypto.ts                AES-256-GCM and passphrase keys (WebCrypto), for sync and the app lock
     release.ts               The version and the source repository
 src-tauri/                   Native shell (Rust); sf_symbols.rs draws SF Symbols, lock.rs shares the
@@ -301,6 +343,14 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] Choose the format new notes start in
 - [ ] Plugins that add to LaTeX notes, as they can to Markdown ones
 - [ ] Sync which plugins are on
+- [ ] [HyperFormula](https://github.com/overtio/lines/issues/1) as a formula engine to choose instead of IronCalc
+- [ ] [SQLite files](https://github.com/overtio/lines/issues/2): their tables, and SQL query blocks, read-only
+
+**Spreadsheets**
+- [ ] Several sheets in one spreadsheet note, with formulas between them
+- [ ] Column widths, number formats and bold kept in the note
+- [ ] Sort and filter, and a fill handle to drag
+- [ ] Formulas in a ```csv block that reach another block, a table or a spreadsheet note
 
 **Notes**
 - [ ] Backlinks: the notes that mention this one
@@ -354,7 +404,10 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [x] A note as a PDF: preview, print and save
 - [x] A note as PNG images: one tall image, or one per page
 - [x] Arrows and symbols (`->` as →, `!=` as ≠) shown without changing the note, in text and code, each switchable
-- [x] Resizable sidebar and note list
+- [x] Resizable sidebar and note list, each on the left or the right
+- [x] Tabs for open notes, with preview tabs (off by default)
+- [x] An outline of a note's headings beside it (off by default)
+- [x] Choose what a click, ⌘-click and ⇧⌘-click do on links, tags and mentions
 - [x] Several notes at once: select, tag, pin and trash them together
 - [x] Plugins: formats, math and diagram engines, typesetters, themes and icon sets, each turned off or on in Settings → Plugins
 

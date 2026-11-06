@@ -6,7 +6,7 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 
 #### 1. Paragraph in a quote
 
-> A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+> A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 
 #### 2. Long paragraph in a quote
 
@@ -98,65 +98,83 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > | a | **b** | 1 |
 > | longer cell text | `code` | 22 |
 
-#### 17. Divider in a quote
+#### 17. Table with formulas in a quote (stays Markdown here)
+
+> | Item | Cost |
+> | --- | ---: |
+> | Rent | 1200 |
+> | Food | 450.50 |
+> | Total | =SUM(B2:B3) |
+> | Broken | =B2/0 |
+
+#### 18. Spreadsheet (csv block) in a quote
+
+> ```csv
+> Item, Cost
+> Rent, 1200
+> Food, 450.50
+> Total, =SUM(B2:B3)
+> ```
+
+#### 19. Divider in a quote
 
 > ---
 
-#### 18. Key: Value line in a quote
+#### 20. Key: Value line in a quote
 
 > **Wi-Fi password:** correct-horse-battery
 
-#### 19. Mention in a quote
+#### 21. Mention in a quote
 
 > Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 20. Wiki link in a quote
+#### 22. Wiki link in a quote
 
 > Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 21. Symbols in a quote
+#### 23. Symbols in a quote
 
 > Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 22. GitHub links in a quote
+#### 24. GitHub links in a quote
 
 > Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 23. Image in a quote (stays Markdown here)
+#### 25. Image in a quote (stays Markdown here)
 
 > ![A sample picture](attachment:photo.png)
 
-#### 24. Drawing in a quote (stays Markdown here)
+#### 26. Drawing in a quote (stays Markdown here)
 
 > ![A sample drawing](attachment:drawing.svg)
 
-#### 25. File in a quote (stays Markdown here)
+#### 27. File in a quote (stays Markdown here)
 
 > [Budget.csv](attachment:budget.csv)
 
-#### 26. Missing file in a quote (stays Markdown here)
+#### 28. Missing file in a quote (stays Markdown here)
 
 > [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 27. Card in a quote
+#### 29. Card in a quote
 
 > ::: card
 > Text in a card.
 > :::
 
-#### 28. Callout (info) in a quote
+#### 30. Callout (info) in a quote
 
 > :::i
 > Text in an info callout.
 > :::
 
-#### 29. Callout (warning, chosen icon) in a quote
+#### 31. Callout (warning, chosen icon) in a quote
 
 > :::! icon=flag
 > Text in a warning callout with the flag icon.
 > :::
 
-#### 30. Callout (decision, no icon) in a quote
+#### 32. Callout (decision, no icon) in a quote
 
 > :::^ icon=none
 > Text in a decision callout with no icon.

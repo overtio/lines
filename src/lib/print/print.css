@@ -206,6 +206,16 @@
   overflow: hidden;
 }
 
+/* A spreadsheet note's numbers, lined up on the right as in the grid. */
+.doc .doc-number {
+  text-align: right;
+}
+
+/* A formula in a table that can't be worked out (#DIV/0!). */
+.doc .doc-formula-error {
+  color: #b42318;
+}
+
 .doc table {
   border-collapse: collapse;
   font-size: 0.95em;

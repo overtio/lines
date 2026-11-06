@@ -56,6 +56,7 @@ class Plugins {
   readonly mathEngines = $derived(this.#from("math"));
   readonly renderers = $derived(this.#from("renderers"));
   readonly typesetters = $derived(this.#from("typesetters"));
+  readonly formulaEngines = $derived(this.#from("formulas"));
   readonly markdown = $derived(this.#from("markdown"));
 
   constructor() {
@@ -143,6 +144,11 @@ class Plugins {
   /** What draws math, if anything does. */
   get math() {
     return this.mathEngines[0];
+  }
+
+  /** What works out formulas in tables and spreadsheets, if anything does. */
+  get formulas() {
+    return this.formulaEngines[0];
   }
 
   /** Typesetters for notes in `language`, besides lines' own pages. */

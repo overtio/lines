@@ -1,13 +1,17 @@
 <script lang="ts">
+  import { Popover } from "bits-ui";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { ICONS, TAG_ICON_GROUPS, type IconName } from "../icons/icons";
-  import { dismissable, placeAt, takeFocus } from "../popover";
+  import { pointAt, takeFocus } from "../popover";
   import { ui } from "../ui.svelte";
+  import Button from "./ui/Button.svelte";
+  import { floating } from "./ui/styles";
+  import TextField from "./ui/TextField.svelte";
 
-  const COLUMNS = 8;
-
-  let el = $state<HTMLDivElement>();
+  let el = $state<HTMLElement | null>(null);
+  /** Gives focus back where it was when the picker closes. */
+  let restore: (() => void) | undefined;
   let query = $state("");
 
   const picker = $derived(ui.iconPicker);
@@ -33,20 +37,16 @@
     return current && all.includes(current) ? current : all[0];
   });
 
-  $effect(() => {
-    const p = ui.iconPicker;
-    if (!p || !el) return;
-    placeAt(el, p.x, p.y);
-    // Focus the current icon rather than the search field, so phones don't pop up the keyboard.
-    const selected = el.querySelector<HTMLElement>('[role="option"][tabindex="0"]');
-    const restore = takeFocus(el, selected ?? el);
-    selected?.scrollIntoView({ block: "center" });
-    return restore;
-  });
+  /** It opens at a point: the pointer, or under a row's icon. */
+  const anchor = $derived(picker && pointAt(picker.x, picker.y));
 
-  $effect(() => {
-    if (ui.iconPicker) return dismissable(() => el, close);
-  });
+  /** Focus goes to the current icon rather than the search field, so phones don't pop up the keyboard. */
+  function onOpenAutoFocus(event: Event) {
+    event.preventDefault();
+    const selected = el!.querySelector<HTMLElement>('[role="option"][tabindex="0"]');
+    restore = takeFocus(el!, selected ?? el!);
+    selected?.scrollIntoView({ block: "center" });
+  }
 
   function close() {
     ui.iconPicker = null;
@@ -64,13 +64,6 @@
   }
 
   const label = (name: IconName) => name.replace(/-/g, " ");
-
-  function onkeydown(event: KeyboardEvent) {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      close();
-    }
-  }
 
   function onSearchKeydown(event: KeyboardEvent) {
     const first = groups[0]?.icons[0];
@@ -107,214 +100,86 @@
   }
 </script>
 
-{#if picker}
-  <div
-    class="picker popover"
-    role="dialog"
-    aria-label={t("picker.iconFor", { name: picker.label })}
-    tabindex="-1"
-    style:--columns={COLUMNS}
-    bind:this={el}
-    {onkeydown}
-  >
-    <header>
-      <span class="target" class:none>
-        <Icon name={current ?? picker.fallback} size={15} strokeWidth={1.75} /><span>{picker.label}</span>
-      </span>
-      <span class="actions">
-        {#if picker.none}
-          <button class="text-button" onclick={chooseNone} disabled={none}>{t("picker.noIcon")}</button>
-        {/if}
-        <button class="text-button" onclick={() => choose(null)} disabled={!current && !none}>{t("picker.reset")}</button>
-      </span>
-    </header>
-    <input
-      type="search"
-      placeholder={t("picker.search")}
-      aria-label={t("picker.search")}
-      autocomplete="off"
-      spellcheck="false"
-      bind:value={query}
-      onkeydown={onSearchKeydown}
-    />
-    <div class="scroll">
-      <div role="listbox" aria-label={t("picker.icons")}>
-        {#each groups as group (group.name)}
-          <!-- Shown, but not said: the group around the icons is named after it. -->
-          {#if group.name}<div class="group-name" aria-hidden="true">{group.name}</div>{/if}
-          <div class="grid" role="group" aria-label={group.name || t("picker.matches")}>
-            {#each group.icons as name (name)}
-              <button
-                role="option"
-                tabindex={name === tabStop ? 0 : -1}
-                aria-selected={name === current}
-                aria-label={label(name)}
-                title={label(name)}
-                onclick={() => choose(name)}
-                onkeydown={onIconKeydown}
-              >
-                <Icon {name} size={18} strokeWidth={1.75} />
-              </button>
+<Popover.Root open={!!picker} onOpenChange={(open) => !open && close()}>
+  <Popover.Portal>
+    <!-- Narrower than its grid of 8 on a small phone; the columns then share what room there is. -->
+    <Popover.Content
+      bind:ref={el}
+      customAnchor={anchor}
+      align="start"
+      sideOffset={0}
+      collisionPadding={8}
+      role="dialog"
+      aria-label={picker ? t("picker.iconFor", { name: picker.label }) : undefined}
+      {onOpenAutoFocus}
+      onCloseAutoFocus={(event) => {
+        event.preventDefault();
+        restore?.();
+      }}
+      class="{floating} w-[min(calc(var(--cell)*8+2px*7+20px),calc(100vw-16px))] p-2.5 [--cell:34px] coarse:[--cell:44px]"
+    >
+      {#if picker}
+        <header class="-mt-0.5 mb-2 ml-1 flex items-center justify-between gap-2">
+          <span class="flex min-w-0 items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+            <Icon name={current ?? picker.fallback} size={15} strokeWidth={1.75} class="shrink-0 text-accent {none ? 'opacity-35' : ''}" />
+            <span class="truncate">{picker.label}</span>
+          </span>
+          <span class="flex shrink-0 gap-0.5">
+            {#if picker.none}
+              <Button variant="quiet" onclick={chooseNone} disabled={none}>{t("picker.noIcon")}</Button>
+            {/if}
+            <Button variant="quiet" onclick={() => choose(null)} disabled={!current && !none}>{t("picker.reset")}</Button>
+          </span>
+        </header>
+        <TextField
+          type="search"
+          icon="search"
+          placeholder={t("picker.search")}
+          aria-label={t("picker.search")}
+          autocomplete="off"
+          spellcheck="false"
+          bind:value={query}
+          onkeydown={onSearchKeydown}
+          class="mb-2 [&_input::-webkit-search-cancel-button]:hidden"
+        />
+        <!-- A fixed height, so the picker doesn't jump around while searching. -->
+        <div class="-mx-1 h-[min(calc(var(--cell)*7+40px),calc(100dvh-120px))] overflow-x-hidden overflow-y-auto overscroll-contain px-1">
+          <div role="listbox" aria-label={t("picker.icons")}>
+            {#each groups as group (group.name)}
+              <!-- Shown, but not said: the group around the icons is named after it. -->
+              {#if group.name}
+                <div class="mx-0.5 mt-2.5 mb-1 text-2xs font-semibold tracking-wide text-faint uppercase first:mt-0.5" aria-hidden="true">{group.name}</div>
+              {/if}
+              <!-- Columns share whatever width is left, so a classic scrollbar never forces sideways scrolling. -->
+              <div class="grid auto-rows-(--cell) grid-cols-[repeat(8,minmax(0,1fr))] gap-0.5" role="group" aria-label={group.name || t("picker.matches")}>
+                {#each group.icons as name (name)}
+                  <!-- The chosen icon is already filled in; a ring shows when it has focus too. -->
+                  <button
+                    role="option"
+                    tabindex={name === tabStop ? 0 : -1}
+                    aria-selected={name === current}
+                    aria-label={label(name)}
+                    title={label(name)}
+                    onclick={() => choose(name)}
+                    onkeydown={onIconKeydown}
+                    class={[
+                      "grid place-items-center rounded-md outline-none",
+                      name === current
+                        ? "bg-accent text-on-accent focus-visible:shadow-[0_0_0_2px_var(--bg-elevated),0_0_0_4px_var(--accent)]"
+                        : "text-muted hover:bg-hover hover:text-fg focus-visible:bg-hover focus-visible:text-fg",
+                    ]}
+                  >
+                    <Icon {name} size={18} strokeWidth={1.75} />
+                  </button>
+                {/each}
+              </div>
             {/each}
           </div>
-        {/each}
-      </div>
-      {#if !groups[0]?.icons.length}
-        <p class="empty" role="status">{t("picker.noMatches", { query })}</p>
+          {#if !groups[0]?.icons.length}
+            <p class="m-0 my-6 text-center text-sm text-faint" role="status">{t("picker.noMatches", { query })}</p>
+          {/if}
+        </div>
       {/if}
-    </div>
-  </div>
-{/if}
-
-<style>
-  .picker {
-    /* Narrower than its grid on a small phone; the columns then share what room there is. */
-    width: min(calc(var(--cell) * var(--columns) + 2px * (var(--columns) - 1) + 20px), calc(100vw - 16px));
-    padding: 10px;
-    --cell: 34px;
-  }
-
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin: -2px 0 8px 4px;
-  }
-
-  .target {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-    overflow: hidden;
-    font-size: 13px;
-    font-weight: 600;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  .target > span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .target :global(.icon) {
-    color: var(--accent);
-  }
-
-  .target.none :global(.icon) {
-    opacity: 0.35;
-  }
-
-  .actions {
-    display: flex;
-    flex-shrink: 0;
-    gap: 2px;
-  }
-
-  header .text-button {
-    height: 26px;
-    font-size: 12px;
-  }
-
-  header .text-button:disabled {
-    opacity: 0.4;
-  }
-
-  input {
-    width: 100%;
-    height: 30px;
-    margin-bottom: 8px;
-    padding: 0 10px;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    background: var(--input);
-    color: var(--text);
-    font: inherit;
-    font-size: 13px;
-    outline: none;
-  }
-
-  input:focus {
-    border-color: var(--accent-soft);
-  }
-
-  input::-webkit-search-cancel-button {
-    display: none;
-  }
-
-  /* A fixed height, so the picker doesn't jump around while searching. */
-  .scroll {
-    height: min(calc(var(--cell) * 7 + 40px), calc(100dvh - 120px));
-    margin: 0 -4px;
-    padding: 0 4px;
-    overflow: hidden auto;
-    overscroll-behavior: contain;
-  }
-
-  .group-name {
-    margin: 10px 2px 4px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--text-faint);
-  }
-
-  .group-name:first-child {
-    margin-top: 2px;
-  }
-
-  /* Columns share whatever width is left, so a classic scrollbar never forces sideways scrolling. */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
-    grid-auto-rows: var(--cell);
-    gap: 2px;
-  }
-
-  .grid button {
-    display: grid;
-    place-items: center;
-    border-radius: 8px;
-    color: var(--text-muted);
-  }
-
-  .grid button:hover,
-  .grid button:focus-visible {
-    background: var(--hover);
-    color: var(--text);
-    outline: none;
-  }
-
-  .grid button[aria-selected="true"] {
-    background: var(--accent);
-    color: var(--bg);
-  }
-
-  /* The chosen icon is already filled in; a ring shows when it has focus too. */
-  .grid button[aria-selected="true"]:focus-visible {
-    box-shadow:
-      0 0 0 2px var(--bg-elevated),
-      0 0 0 4px var(--accent);
-  }
-
-  .empty {
-    margin: 24px 0;
-    text-align: center;
-    font-size: 13px;
-    color: var(--text-faint);
-  }
-
-  /* Fingers need bigger targets. */
-  @media (pointer: coarse) {
-    .picker {
-      --cell: 44px;
-    }
-
-    header .text-button {
-      height: 44px;
-    }
-  }
-</style>
+    </Popover.Content>
+  </Popover.Portal>
+</Popover.Root>

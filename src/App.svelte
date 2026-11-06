@@ -4,13 +4,17 @@
   import NoteList from "./lib/components/NoteList.svelte";
   import Sidebar from "./lib/components/Sidebar.svelte";
   import NoteInfo from "./lib/components/NoteInfo.svelte";
-  import Settings from "./lib/components/Settings.svelte";
+  import Settings from "./lib/components/settings/Settings.svelte";
   import IconPicker from "./lib/components/IconPicker.svelte";
   import TagPrompt from "./lib/components/TagPrompt.svelte";
   import LockedNoteView from "./lib/components/LockedNoteView.svelte";
   import NotesPasswordDialog from "./lib/components/NotesPasswordDialog.svelte";
   import PdfPreview from "./lib/components/PdfPreview.svelte";
   import PaneResizer from "./lib/components/PaneResizer.svelte";
+  import SidebarToggle from "./lib/components/SidebarToggle.svelte";
+  import TabBar from "./lib/components/TabBar.svelte";
+  import Button from "./lib/components/ui/Button.svelte";
+  import IconButton from "./lib/components/ui/IconButton.svelte";
   import Editor from "./lib/editor/Editor.svelte";
   import { untrack } from "svelte";
   import { speak } from "./lib/a11y";
@@ -19,31 +23,124 @@
   import { lockedNotes } from "./lib/notes/locked.svelte";
   import { isClosed, notes } from "./lib/notes/store.svelte";
   import { plugins } from "./lib/plugins/registry.svelte";
-  import { copyText, downloadText, isApple, isNewNoteShortcut, isTauri, newNoteKey } from "./lib/platform";
+  import { copyText, isApple, isDesktopApp, isNewNoteShortcut, newNoteKey, revealFile, saveFile } from "./lib/platform";
   import { ui, type MenuItem } from "./lib/ui.svelte";
   import { openSettings } from "./lib/windows/settings.svelte";
   import { PANE_WIDTHS, prefs } from "./lib/prefs.svelte";
   import { canFloat, floatingOpen, toggleFloating } from "./lib/windows/floating";
+  import { tabs } from "./lib/tabs.svelte";
+  import { textSizeKey } from "./lib/textSize";
+  import { findInPane } from "./lib/editor/find.svelte";
 
   let searchInput = $state<HTMLInputElement>();
 
-  // The sidebar and note list are dragged wider or narrower at their right edges, where they're
+  type Pane = "sidebar" | "list" | "editor";
+
+  /**
+   * The panes from left to right, as Settings → General → Layout puts them: the sidebar outermost on
+   * its side, the note list beside the note.
+   */
+  const order = $derived.by(() => {
+    const left: Pane[] = [];
+    const right: Pane[] = [];
+    (prefs.sidebarSide === "left" ? left : right).push("sidebar");
+    (prefs.listSide === "left" ? left : right).push("list");
+    return [...left, "editor", ...right.reverse()] as Pane[];
+  });
+
+  /**
+   * The grid's columns in that order, but for phones (one pane at a time; see the styles). The
+   * sidebar is a column only on a wide screen, elsewhere a drawer; a hidden sidebar's column, and
+   * in focus mode the side panes', shrink to nothing, so they slide away.
+   */
+  const grid = $derived.by(() => {
+    if (ui.layout === "narrow") return null;
+    const panes = order.filter((pane) => pane !== "sidebar" || ui.layout === "wide");
+    const width = (pane: Pane) =>
+      pane === "editor" ? "minmax(0, 1fr)" : ui.focus || (pane === "sidebar" && !ui.sidebarOpen) ? "0px" : `var(--${pane}-w)`;
+    return { areas: `"${panes.join(" ")}"`, columns: panes.map(width).join(" ") };
+  });
+
+  /** The pane at the window's left edge, which leaves room for the Mac app's window buttons (app.css). */
+  const first = $derived.by((): Pane => {
+    if (ui.layout === "narrow") return selected ? "editor" : "list";
+    if (ui.layout === "wide" && prefs.sidebarSide === "left" && ui.sidebarOpen && !ui.focus) return "sidebar";
+    return prefs.listSide === "left" && !ui.focus ? "list" : "editor";
+  });
+
+  // The sidebar and note list are dragged wider or narrower at their inner edges, where they're
   // columns; the note keeps at least NOTE_MIN.
   const NOTE_MIN = 360;
   let windowWidth = $state(innerWidth);
   let resizing = $state(false);
   const sidebarColumn = $derived(ui.layout === "wide" && ui.sidebarOpen && !ui.focus);
   const listColumn = $derived(ui.layout !== "narrow" && !ui.focus);
+  /** How far the note list's inner edge is from its side of the window: past the sidebar, when that's on the same side. */
+  const listOffset = $derived(prefs.listWidth + (sidebarColumn && prefs.sidebarSide === prefs.listSide ? prefs.sidebarWidth : 0));
   const sidebarMax = $derived(Math.max(PANE_WIDTHS.sidebar.min, Math.min(PANE_WIDTHS.sidebar.max, windowWidth - prefs.listWidth - NOTE_MIN)));
   const listMax = $derived(
     Math.max(PANE_WIDTHS.list.min, Math.min(PANE_WIDTHS.list.max, windowWidth - (sidebarColumn ? prefs.sidebarWidth : 0) - NOTE_MIN)),
   );
+
+  const wide = $derived(ui.layout === "wide");
+  const narrow = $derived(ui.layout === "narrow");
+  const focusMode = $derived(ui.focus && !narrow);
+
+  /*
+   * How the panes are laid out (the panes slide in 320ms). Wide and medium: columns in the order
+   * `grid` gives. On a wide screen the sidebar column animates closed; the sidebar keeps its width
+   * and hugs the column's inner edge, so it slides out to its side instead of squashing, and focus
+   * mode slides the note list away the same way. Medium and narrow: the sidebar slides in as a
+   * drawer from its side. Narrow: one pane at a time, like a phone's navigation stack. Panes paint
+   * their own backgrounds, so their dividers (on a side pane's inner edge) sit on them; a side pane
+   * that slides away hides, divider and all, once it's gone.
+   */
+  const divider = (side: "left" | "right", hidden = false) => [
+    side === "left" ? "border-r" : "border-l",
+    hidden ? "invisible border-transparent transition-[visibility,border-color] delay-320 duration-0" : "border-line",
+  ];
+  const sidebarPaneClass = $derived([
+    "min-h-0 min-w-0 bg-surface-sidebar",
+    wide
+      ? [
+          "flex overflow-hidden [grid-area:sidebar] *:w-[calc(var(--sidebar-w)_-_1px)] *:shrink-0",
+          prefs.sidebarSide === "left" ? "justify-end" : "justify-start",
+          divider(prefs.sidebarSide, !ui.sidebarOpen || focusMode),
+        ]
+      : [
+          "absolute inset-y-0 z-20 w-[min(var(--sidebar-w),82vw)]",
+          prefs.sidebarSide === "left" ? "left-0" : "right-0",
+          divider(prefs.sidebarSide),
+          // The shadow fades with the slide; otherwise its blur lingers at the edge and pops off at the end.
+          ui.sidebarOpen
+            ? "visible translate-x-0 [box-shadow:var(--shadow-drawer)] [transition:translate_320ms_var(--ease-sheet),box-shadow_320ms_var(--ease-sheet)]"
+            : [
+                "invisible [box-shadow:0_0_40px_transparent] [transition:translate_320ms_var(--ease-sheet),box-shadow_320ms_var(--ease-sheet),visibility_0s_320ms]",
+                prefs.sidebarSide === "left" ? "-translate-x-full" : "translate-x-full",
+              ],
+        ],
+  ]);
+  /** On a phone, the note list and the note side by side, slid along to the one showing. */
+  const stacked = $derived(["row-start-1 transition-[translate] duration-320 ease-sheet", notes.selected && "-translate-x-full"]);
+  const listPaneClass = $derived([
+    "min-h-0 min-w-0 bg-surface-list",
+    narrow
+      ? ["col-start-1", stacked]
+      : [
+          "flex overflow-hidden [grid-area:list] *:w-[calc(var(--list-w)_-_1px)] *:shrink-0",
+          prefs.listSide === "left" ? "justify-end" : "justify-start",
+          divider(prefs.listSide, focusMode),
+        ],
+  ]);
 
   const selected = $derived(notes.selected);
   /** A locked note that isn't open shows the password prompt instead of its text. */
   const closed = $derived(!!selected && isClosed(selected.note));
 
   const focusKey = isApple ? "⇧⌘\\" : "Ctrl+Shift+\\";
+
+  /** Where there's no note: what to do, or what went wrong. */
+  const placeholder = "flex flex-1 flex-col items-center justify-center gap-3 pb-(--titlebar-h) text-faint";
 
   let shareOpen = $state(false);
   let lockMenuOpen = $state(false);
@@ -55,8 +152,8 @@
 
   /*
    * Focus follows the sidebar. As a drawer it takes focus when it slides in and gives it back when
-   * it goes. As a column, focus moves between its hide button and the list's show button, since
-   * each goes away when pressed.
+   * it goes. As a column, focus moves between its hide button and the show button (in the note
+   * list's title bar or the note's toolbar), since each goes away when pressed.
    */
   let beforeDrawer: Element | null = null;
   let firstRun = true;
@@ -68,12 +165,14 @@
       const active = document.activeElement;
       if (open) {
         if (drawer) beforeDrawer = active;
-        if (drawer || listPane.querySelector(".titlebar")?.contains(active)) {
+        if (drawer || active?.classList.contains("sidebar-toggle")) {
           sidebarPane.querySelector<HTMLElement>("button")?.focus({ preventScroll: true });
         }
       } else if (sidebarPane.contains(active) || (beforeDrawer && active === document.body)) {
         const back = beforeDrawer instanceof HTMLElement && beforeDrawer.isConnected ? beforeDrawer : null;
-        (back ?? listPane.querySelector<HTMLElement>(".titlebar button"))?.focus({ preventScroll: true });
+        (back ?? document.querySelector<HTMLElement>(".sidebar-toggle") ?? listPane.querySelector<HTMLElement>(".titlebar button"))?.focus({
+          preventScroll: true,
+        });
         beforeDrawer = null;
       }
     });
@@ -104,6 +203,11 @@
     });
   });
 
+  // Tabs turned off: they go with them.
+  $effect(() => {
+    if (!prefs.tabs) untrack(() => tabs.clear());
+  });
+
   function toggleInfo(event: MouseEvent) {
     infoAnchor = infoAnchor ? null : (event.currentTarget as HTMLElement);
   }
@@ -112,13 +216,14 @@
     infoAnchor = null;
   }
 
-  /** Share menu under the toolbar button: the system share sheet where there is one, copying, and download. */
+  /** Share menu under the toolbar button: the system share sheet where there is one, copying, and downloads. */
   function openShare(event: MouseEvent) {
     if (shareOpen) return ui.closeMenu();
     if (!selected) return;
     const { body } = selected.note;
     // Copied and downloaded as what it's written in, even while that language's plugin is off.
     const language = plugins.ownLanguage(selected.note.format);
+    const source = language.copyAs?.name ?? language.name;
     const title = selected.meta.title || t("list.untitled");
     const items: MenuItem[] = [];
     if (typeof navigator.share === "function") {
@@ -128,18 +233,24 @@
       );
     }
     items.push(
-      { label: t("app.copySource", { language: language.name }), icon: "copy", run: () => copy(body) },
+      { label: t("app.copySource", { language: source }), icon: "copy", run: () => copy(language.copyAs?.text(body) ?? body) },
       { label: t("app.copyPlainText"), icon: "file-text", run: () => copy(language.plainText(body)) },
     );
-    // Browsers save downloads; the native apps need their own save dialog for this, so it's web-only for now.
-    if (!isTauri) {
-      const filename = title.replace(/[\\/:*?"<>|]+/g, "-").trim().slice(0, 80) || t("list.untitled");
-      items.push("separator", {
-        label: t("app.downloadSource", { language: language.name }),
+    const filename = title.replace(/[\\/:*?"<>|]+/g, "-").trim().slice(0, 80) || t("list.untitled");
+    items.push(
+      "separator",
+      {
+        label: t("app.downloadSource", { language: source }),
         icon: "download",
-        run: () => downloadText(`${filename}.${language.extensions[0]}`, language.file(body), language.mimeType),
-      });
-    }
+        run: () => void save(`${filename}.${language.extensions[0]}`, async () => new TextEncoder().encode(language.file(body)), `${language.mimeType};charset=utf-8`),
+      },
+      // Other files it can be, like a spreadsheet's Excel workbook.
+      ...(language.exports ?? []).map((download) => ({
+        label: download.label,
+        icon: download.icon,
+        run: () => void save(`${filename}.${download.extension}`, () => download.write(body), download.mimeType),
+      })),
+    );
     const id = selected.note.id;
     items.push(
       "separator",
@@ -151,6 +262,21 @@
     const rect = anchor.getBoundingClientRect();
     shareOpen = true;
     ui.openMenu({ x: rect.right, y: rect.bottom + 6, align: "end", anchor, label: t("app.share"), items, onclose: () => (shareOpen = false) });
+  }
+
+  /**
+   * Saves a note as a file: downloaded on the web, into Downloads in the apps, and shown in Finder
+   * (or the file manager) on a computer, since nothing else shows it happened.
+   */
+  async function save(filename: string, write: () => Promise<Uint8Array<ArrayBuffer>>, type: string) {
+    try {
+      const path = await saveFile(filename, await write(), type);
+      speak(path ? t("print.savedTo", { path }) : t("print.downloaded", { filename }));
+      if (path && isDesktopApp) await revealFile(path);
+    } catch (error) {
+      console.error("lines: couldn't save the note as a file", error);
+      speak(t("app.saveFailed", { filename }));
+    }
   }
 
   /** Copying shows nothing, so screen readers are told it happened. */
@@ -181,10 +307,14 @@
     });
   }
 
-  /** ⌘Z right after moving a note to the trash brings it back, even from inside the editor. */
+  /** ⌘Z right after moving a note to the trash brings it back, even from inside the editor; ⌘+ and ⌘− size the text. */
   function onKeydownCapture(event: KeyboardEvent) {
     // A drawing's keys are Excalidraw's (⌘Z undoes a stroke there, not a trashing).
     if ((event.target as HTMLElement).closest?.(".drawing-editor")) return;
+    if (textSizeKey(event)) {
+      event.stopPropagation();
+      return;
+    }
     // ⌘/ (Ctrl+/) lists the keyboard shortcuts, before a note's editor takes it (for comments,
     // which Markdown notes don't use).
     if ((event.metaKey || event.ctrlKey) && !event.shiftKey && !event.altKey && event.key === "/") {
@@ -247,12 +377,14 @@
   }
 
   /**
-   * F6 (⇧F6 back) moves between the sidebar, the note list and the open note, as in other desktop
-   * apps, so the keyboard and screen readers don't have to Tab through every button on the way.
-   * Each pane takes focus where it was left: the chosen list, the open note's row, the note's text.
+   * F6 (⇧F6 back) moves between the sidebar, the note list and the open note, left to right, as
+   * in other desktop apps, so the keyboard and screen readers don't have to Tab through every button
+   * on the way. Each pane takes focus where it was left: the chosen list, the open note's row, the
+   * note's text.
    */
   function cyclePane(back: boolean) {
-    const panes = [sidebarPane, listPane, editorPane].filter((pane) => pane && !pane.inert && pane.offsetParent !== null);
+    const elements = { sidebar: sidebarPane, list: listPane, editor: editorPane };
+    const panes = order.map((pane) => elements[pane]).filter((pane) => pane && !pane.inert && pane.offsetParent !== null);
     if (!panes.length) return;
     const current = panes.findIndex((pane) => pane.contains(document.activeElement));
     const next = panes[(current + (back ? -1 : 1) + panes.length) % panes.length];
@@ -298,6 +430,9 @@
       ui.focus = false;
       if (ui.layout === "narrow") notes.select(null);
       searchInput?.focus();
+    } else if (key === "f" && !event.altKey && !event.defaultPrevented && selected && !closed && !ui.settings && !ui.pdf) {
+      // ⌘F finds in the open note from anywhere in the window, not only with the cursor in it.
+      if (findInPane(editorPane)) event.preventDefault();
     } else if (event.code === "Backslash" && event.shiftKey) {
       event.preventDefault();
       if (ui.layout !== "narrow") ui.focus = !ui.focus;
@@ -310,26 +445,36 @@
 
 <svelte:window onkeydown={onKeydown} onkeydowncapture={onKeydownCapture} bind:innerWidth={windowWidth} />
 
+<!-- `data-sidebar` and `data-first` say which pane leaves room for the Mac app's window buttons (app.css). -->
 <div
-  class="app"
-  data-layout={ui.layout}
-  class:sidebar-open={ui.sidebarOpen}
-  class:has-selection={!!selected}
-  class:focus={ui.focus && ui.layout !== "narrow"}
-  class:resizing
+  class={[
+    "app relative grid h-full overflow-hidden",
+    narrow ? "grid-cols-[100%_100%]" : "transition-[grid-template-columns] duration-320 ease-sheet",
+    // Dragging a pane's edge: the columns follow the pointer at once, and text isn't selected.
+    resizing && "cursor-col-resize transition-none! select-none",
+  ]}
+  data-sidebar={prefs.sidebarSide}
+  data-first={first}
   style:--sidebar-w="{prefs.sidebarWidth}px"
   style:--list-w="{prefs.listWidth}px"
+  style:grid-template-areas={grid?.areas}
+  style:grid-template-columns={grid?.columns}
 >
-  <aside class="pane sidebar-pane" inert={ui.layout !== "wide" && !ui.sidebarOpen} bind:this={sidebarPane}>
+  <aside class={sidebarPaneClass} inert={!wide && !ui.sidebarOpen} bind:this={sidebarPane}>
     <Sidebar />
   </aside>
 
-  {#if ui.layout !== "wide"}
-    <button class="scrim" aria-label={t("app.closeSidebar")} tabindex="-1" onclick={() => (ui.sidebarOpen = false)}></button>
+  {#if !wide}
+    <button
+      class={["absolute inset-0 z-10 bg-scrim transition-opacity duration-320 ease-sheet", ui.sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"]}
+      aria-label={t("app.closeSidebar")}
+      tabindex="-1"
+      onclick={() => (ui.sidebarOpen = false)}
+    ></button>
   {/if}
 
   <!-- On a phone one pane shows at a time; the other is off-screen and out of reach. -->
-  <div class="pane list-pane" inert={ui.layout === "narrow" && !!selected} bind:this={listPane}>
+  <div class={listPaneClass} inert={narrow && !!selected} bind:this={listPane}>
     <NoteList bind:searchInput />
   </div>
 
@@ -340,7 +485,8 @@
       min={PANE_WIDTHS.sidebar.min}
       max={sidebarMax}
       initial={PANE_WIDTHS.sidebar.initial}
-      left={prefs.sidebarWidth}
+      side={prefs.sidebarSide}
+      offset={prefs.sidebarWidth}
       onresize={(width) => (prefs.sidebarWidth = width)}
       ondrag={(dragging) => (resizing = dragging)}
     />
@@ -352,122 +498,97 @@
       min={PANE_WIDTHS.list.min}
       max={listMax}
       initial={PANE_WIDTHS.list.initial}
-      left={(sidebarColumn ? prefs.sidebarWidth : 0) + prefs.listWidth}
+      side={prefs.listSide}
+      offset={listOffset}
       onresize={(width) => (prefs.listWidth = width)}
       ondrag={(dragging) => (resizing = dragging)}
     />
   {/if}
 
-  <main class="pane editor-pane" inert={ui.layout === "narrow" && !selected} bind:this={editorPane}>
-    <header class="toolbar" data-tauri-drag-region>
-      {#if ui.layout === "narrow"}
-        <button class="icon-button" onclick={() => notes.select(null)} aria-label={t("app.backToNotes")} title={t("app.backToNotes")}>
-          <Icon name="chevron-left" size={22} />
-        </button>
-      {:else}
-        {#if selected || ui.focus}
-          <button
-            class="icon-button"
-            class:on={ui.focus}
-            onclick={() => (ui.focus = !ui.focus)}
-            aria-label={ui.focus ? t("app.unfocus") : t("app.focus")}
-            title={ui.focus ? t("app.unfocusWithKey", { key: focusKey }) : t("app.focusWithKey", { key: focusKey })}
-          >
-            <Icon name={ui.focus ? "minimize-2" : "maximize-2"} size={16} />
-          </button>
-        {/if}
+  <main
+    class={["editor-pane flex min-h-0 min-w-0 flex-col bg-surface", narrow ? ["col-start-2", stacked] : "[grid-area:editor]"]}
+    inert={narrow && !selected}
+    bind:this={editorPane}
+  >
+    <header class="toolbar flex h-(--titlebar-h) shrink-0 items-center gap-1 px-3 pt-(--titlebar-pad-top)" data-tauri-drag-region>
+      {#if ui.sidebarToggle === "editor" && prefs.sidebarSide === "left"}
+        <SidebarToggle />
       {/if}
-      <div class="spacer" data-tauri-drag-region></div>
+      {#if narrow}
+        <IconButton icon="chevron-left" iconSize={22} label={t("app.backToNotes")} onclick={() => notes.select(null)} />
+      {:else if selected || ui.focus}
+        <IconButton
+          icon={ui.focus ? "minimize-2" : "maximize-2"}
+          iconSize={16}
+          on={ui.focus}
+          label={ui.focus ? t("app.unfocus") : t("app.focus")}
+          tooltip={ui.focus ? t("app.unfocusWithKey", { key: focusKey }) : t("app.focusWithKey", { key: focusKey })}
+          onclick={() => (ui.focus = !ui.focus)}
+        />
+      {/if}
+      {#if tabs.shown}
+        <TabBar />
+      {:else}
+        <div class="flex-1 self-stretch" data-tauri-drag-region></div>
+      {/if}
       {#if selected}
         {#if selected.note.trashed}
-          <button class="text-button" onclick={() => restore(selected.note.id)}>
-            <Icon name="restore" size={15} /> {t("app.restore")}
-          </button>
-          <button class="text-button danger" onclick={() => deleteForever(selected.note.id)}>
-            {t("app.deleteForever")}
-          </button>
+          <Button variant="quiet" icon="restore" onclick={() => restore(selected.note.id)}>{t("app.restore")}</Button>
+          <Button variant="danger" onclick={() => deleteForever(selected.note.id)}>{t("app.deleteForever")}</Button>
         {:else}
           {#if canFloat}
             {@const floating = floatingOpen.has(selected.note.id)}
-            <button
-              class="icon-button"
-              class:on={floating}
+            <IconButton
+              icon="picture-in-picture-2"
+              iconSize={17}
+              on={floating}
+              label={floating ? t("app.unfloat") : t("app.float")}
               onclick={() => toggleFloating(selected.note.id)}
-              aria-label={floating ? t("app.unfloat") : t("app.float")}
-              title={floating ? t("app.unfloat") : t("app.float")}
-            >
-              <Icon name="picture-in-picture-2" size={17} />
-            </button>
+            />
           {/if}
           {#if !selected.note.locked}
-            <button
-              class="icon-button"
-              onclick={() => lockedNotes.lockNote(selected.note.id)}
-              aria-label={t("app.lockNote")}
-              title={t("app.lockNote")}
-            >
-              <Icon name="lock" size={17} />
-            </button>
+            <IconButton icon="lock" iconSize={17} label={t("app.lockNote")} onclick={() => lockedNotes.lockNote(selected.note.id)} />
           {:else if !closed}
-            <button
-              class="icon-button"
-              class:open={lockMenuOpen}
-              onclick={openLockMenu}
-              aria-label={t("app.lockedOpen")}
+            <IconButton
+              icon="lock-open"
+              iconSize={17}
+              open={lockMenuOpen}
+              label={t("app.lockedOpen")}
               aria-haspopup="menu"
               aria-expanded={lockMenuOpen}
-              title={t("app.lockedOpen")}
-            >
-              <Icon name="lock-open" size={17} />
-            </button>
+              onclick={openLockMenu}
+            />
           {/if}
           {#if !closed}
-            <button
-              class="icon-button"
-              class:open={!!infoAnchor}
-              onclick={toggleInfo}
-              aria-label={t("app.info")}
-              aria-expanded={!!infoAnchor}
-              title={t("app.info")}
-            >
-              <Icon name="info" size={17} />
-            </button>
-            <button
-              class="icon-button"
-              class:open={shareOpen}
-              onclick={openShare}
-              aria-label={t("app.share")}
+            <IconButton icon="info" iconSize={17} open={!!infoAnchor} label={t("app.info")} aria-expanded={!!infoAnchor} onclick={toggleInfo} />
+            <IconButton
+              icon="share"
+              iconSize={17}
+              open={shareOpen}
+              label={t("app.share")}
               aria-haspopup="menu"
               aria-expanded={shareOpen}
-              title={t("app.share")}
-            >
-              <Icon name="share" size={17} />
-            </button>
+              onclick={openShare}
+            />
           {/if}
-          <button
-            class="icon-button"
-            class:on={selected.note.pinned}
+          <IconButton
+            icon={selected.note.pinned ? "pin-off" : "pin"}
+            iconSize={17}
+            on={selected.note.pinned}
+            label={selected.note.pinned ? t("app.unpin") : t("app.pin")}
             onclick={() => togglePin(selected.note.id, selected.note.pinned)}
-            aria-label={selected.note.pinned ? t("app.unpin") : t("app.pin")}
-            title={selected.note.pinned ? t("app.unpin") : t("app.pin")}
-          >
-            {#if selected.note.pinned}<Icon name="pin-off" size={17} />{:else}<Icon name="pin" size={17} />{/if}
-          </button>
-          <button
-            class="icon-button"
-            onclick={() => trash(selected.note.id)}
-            aria-label={t("app.trash")}
-            title={t("app.trash")}
-          >
-            <Icon name="trash" size={17} />
-          </button>
+          />
+          <IconButton icon="trash" iconSize={17} label={t("app.trash")} onclick={() => trash(selected.note.id)} />
         {/if}
+      {/if}
+      {#if ui.sidebarToggle === "editor" && prefs.sidebarSide === "right"}
+        <SidebarToggle />
       {/if}
     </header>
 
     {#if selected}
       <!-- The editor stays, out of sight, so other notes keep their undo history and place. -->
-      <div class="editor-host" hidden={closed}>
+      <div class="min-h-0 flex-1" hidden={closed}>
         <Editor noteId={selected.note.id} trashed={selected.note.trashed || closed} />
       </div>
       {#if closed}
@@ -476,17 +597,17 @@
         {/key}
       {/if}
     {:else if notes.loadError}
-      <div class="placeholder">
+      <div class={placeholder}>
         <Icon name="circle-alert" size={36} strokeWidth={1.25} />
-        <p role="alert">{t("app.loadError", { error: notes.loadError })}</p>
+        <p class="m-0 text-md" role="alert">{t("app.loadError", { error: notes.loadError })}</p>
       </div>
     {:else if notes.ready}
-      <div class="placeholder">
+      <div class={placeholder}>
         <Icon name="feather" size={36} strokeWidth={1.25} />
-        <p>{t("app.noSelection")}</p>
-        <button class="text-button" onclick={() => notes.create()}>
-          {t("list.newNote")} <kbd>{newNoteKey}</kbd>
-        </button>
+        <p class="m-0 text-md">{t("app.noSelection")}</p>
+        <Button variant="quiet" onclick={() => notes.create()}>
+          {t("list.newNote")} <kbd class="ml-1.5 font-[inherit] text-xs text-faint">{newNoteKey}</kbd>
+        </Button>
       </div>
     {/if}
   </main>
@@ -506,217 +627,3 @@
 <ContextMenu />
 <IconPicker />
 <TagPrompt />
-
-<style>
-  .app {
-    --sidebar-ms: 320ms;
-    --sidebar-slide: var(--sidebar-ms) var(--ease-sheet);
-    --sidebar-w: 230px;
-    --list-w: 320px;
-    position: relative;
-    display: grid;
-    grid-template-columns: var(--sidebar-w) var(--list-w) minmax(0, 1fr);
-    height: 100%;
-    overflow: hidden;
-  }
-
-  .pane {
-    min-width: 0;
-    min-height: 0;
-  }
-
-  /* Dragging a pane's edge: the columns follow the pointer at once, and text isn't selected. */
-  .app.resizing {
-    transition: none !important;
-    user-select: none;
-    cursor: col-resize;
-  }
-
-  /* Panes paint their own backgrounds, so their dividers sit on them rather than on nothing. */
-  .list-pane {
-    border-right: 1px solid var(--border);
-    background: var(--surface-list);
-  }
-
-  .sidebar-pane {
-    border-right: 1px solid var(--border);
-    background: var(--surface-sidebar);
-  }
-
-  /*
-   * Wide: three columns; the sidebar column animates closed. The sidebar keeps its width and
-   * hugs the column's right edge, so it slides out to the left instead of squashing.
-   */
-  .app[data-layout="wide"] {
-    transition: grid-template-columns var(--sidebar-slide);
-  }
-
-  .app[data-layout="wide"]:not(.sidebar-open) {
-    grid-template-columns: 0 var(--list-w) minmax(0, 1fr);
-  }
-
-  .app[data-layout="wide"] .sidebar-pane {
-    display: flex;
-    justify-content: flex-end;
-    overflow: hidden;
-  }
-
-  .app[data-layout="wide"] .sidebar-pane > :global(.sidebar) {
-    flex-shrink: 0;
-    width: calc(var(--sidebar-w) - 1px);
-  }
-
-  .app[data-layout="wide"]:not(.sidebar-open) .sidebar-pane {
-    visibility: hidden;
-    border-right-color: transparent;
-    transition: visibility 0s var(--sidebar-ms), border-color 0s var(--sidebar-ms);
-  }
-
-  /* Focus mode: just the note. The list slides away like the sidebar, and so does the sidebar. */
-  .app[data-layout="wide"].focus {
-    grid-template-columns: 0 0 minmax(0, 1fr);
-  }
-
-  .app[data-layout="medium"] {
-    transition: grid-template-columns var(--sidebar-slide);
-  }
-
-  .app[data-layout="medium"].focus {
-    grid-template-columns: 0 minmax(0, 1fr);
-  }
-
-  .app:not([data-layout="narrow"]) .list-pane {
-    display: flex;
-    justify-content: flex-end;
-    overflow: hidden;
-  }
-
-  .app:not([data-layout="narrow"]) .list-pane > :global(.note-list) {
-    flex-shrink: 0;
-    width: calc(var(--list-w) - 1px);
-  }
-
-  .app.focus .list-pane,
-  .app[data-layout="wide"].focus .sidebar-pane {
-    visibility: hidden;
-    border-right-color: transparent;
-    transition: visibility 0s var(--sidebar-ms), border-color 0s var(--sidebar-ms);
-  }
-
-  /* Medium & narrow: the sidebar slides in as a drawer. */
-  .app:not([data-layout="wide"]) {
-    grid-template-columns: var(--list-w) minmax(0, 1fr);
-  }
-
-  .app:not([data-layout="wide"]) .sidebar-pane {
-    position: absolute;
-    inset: 0 auto 0 0;
-    z-index: 20;
-    width: min(var(--sidebar-w), 82vw);
-    /* The shadow fades with the slide; otherwise its blur lingers at the edge and pops off at the end. */
-    box-shadow: 0 0 40px transparent;
-    transform: translateX(-100%);
-    transition:
-      transform var(--sidebar-slide),
-      box-shadow var(--sidebar-slide),
-      visibility 0s var(--sidebar-ms);
-    visibility: hidden;
-  }
-
-  .app:not([data-layout="wide"]).sidebar-open .sidebar-pane {
-    box-shadow: var(--shadow-drawer);
-    transform: none;
-    visibility: visible;
-    transition:
-      transform var(--sidebar-slide),
-      box-shadow var(--sidebar-slide);
-  }
-
-  .scrim {
-    position: absolute;
-    inset: 0;
-    z-index: 10;
-    background: var(--scrim);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--sidebar-slide);
-  }
-
-  .sidebar-open .scrim {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* Narrow: one pane at a time, like a phone navigation stack. */
-  .app[data-layout="narrow"] {
-    grid-template-columns: 100% 100%;
-  }
-
-  .app[data-layout="narrow"] .list-pane,
-  .app[data-layout="narrow"] .editor-pane {
-    grid-row: 1;
-    transition: transform 320ms var(--ease-sheet);
-  }
-
-  .app[data-layout="narrow"] .list-pane {
-    grid-column: 1;
-    border-right: 0;
-  }
-
-  .app[data-layout="narrow"] .editor-pane {
-    grid-column: 2;
-  }
-
-  .app[data-layout="narrow"].has-selection .list-pane,
-  .app[data-layout="narrow"].has-selection .editor-pane {
-    transform: translateX(-100%);
-  }
-
-  .editor-pane {
-    display: flex;
-    flex-direction: column;
-    background: var(--surface);
-  }
-
-  .toolbar {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    height: var(--titlebar-h);
-    padding: var(--titlebar-pad-top) 12px 0;
-    flex-shrink: 0;
-  }
-
-  .spacer {
-    flex: 1;
-    align-self: stretch;
-  }
-
-  .editor-host {
-    flex: 1;
-    min-height: 0;
-  }
-
-  .placeholder {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding-bottom: var(--titlebar-h);
-    color: var(--text-faint);
-  }
-
-  .placeholder p {
-    margin: 0;
-    font-size: 15px;
-  }
-
-  kbd {
-    margin-left: 6px;
-    font-family: inherit;
-    font-size: 12px;
-    color: var(--text-faint);
-  }
-</style>

@@ -45,7 +45,7 @@ const STYLES: Record<string, string> = {
   textsl: "cm-lp-em",
   emph: "cm-lp-em",
   texttt: "cm-lp-code",
-  underline: "cm-lt-underline",
+  underline: "cm-lp-underline",
   textsc: "cm-lt-smallcaps",
   sout: "cm-lp-strike",
   paragraph: "cm-lp-strong",

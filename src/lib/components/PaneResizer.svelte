@@ -2,9 +2,10 @@
   import { t } from "../i18n/index.svelte";
 
   /*
-   * The edge between two panes, dragged to resize the one on its left (a window splitter). From
-   * the keyboard it's a Tab stop: ← and → resize by 10 px (⇧ by 50), Home and End go to the
-   * narrowest and widest, and Enter or a double-click puts the pane back to its usual width.
+   * A side pane's inner edge, dragged to resize it (a window splitter); the pane is on the window's
+   * left or right (`side`). From the keyboard it's a Tab stop: ← and → move the edge by 10 px (⇧ by
+   * 50), Home and End go to the narrowest and widest, and Enter or a double-click puts the pane back
+   * to its usual width.
    */
 
   let {
@@ -13,7 +14,8 @@
     min,
     max,
     initial,
-    left,
+    side,
+    offset,
     onresize,
     ondrag,
   }: {
@@ -23,8 +25,9 @@
     min: number;
     max: number;
     initial: number;
-    /** Where it sits, from the window's left edge. */
-    left: number;
+    /** The side of the window the pane is on, and how far from that side its inner edge is. */
+    side: "left" | "right";
+    offset: number;
     onresize: (width: number) => void;
     /** A drag starts or ends (the panes don't animate while it's on). */
     ondrag: (dragging: boolean) => void;
@@ -47,8 +50,11 @@
     ondrag(true);
   }
 
+  /** Moving the edge right makes a pane on the left wider, and one on the right narrower. */
+  const grows = $derived(side === "left" ? 1 : -1);
+
   function onpointermove(event: PointerEvent) {
-    if (start) set(start.width + event.clientX - start.x);
+    if (start) set(start.width + grows * (event.clientX - start.x));
   }
 
   function end() {
@@ -59,17 +65,23 @@
 
   function onkeydown(event: KeyboardEvent) {
     const step = event.shiftKey ? 50 : 10;
-    const next: Record<string, number> = { ArrowLeft: width - step, ArrowRight: width + step, Home: min, End: max, Enter: initial };
+    const next: Record<string, number> = { ArrowLeft: width - grows * step, ArrowRight: width + grows * step, Home: min, End: max, Enter: initial };
     if (!(event.key in next)) return;
     event.preventDefault();
     set(next[event.key]);
   }
 </script>
 
-<!-- A focusable separator with a value is ARIA's window splitter, which is interactive. -->
+<!-- A focusable separator with a value is ARIA's window splitter, which is interactive. Centered on
+     the edge, it shows a line in the accent color while it's pointed at, dragged or focused. -->
 <!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
 <div
-  class="resizer"
+  class={[
+    "absolute inset-y-0 z-5 w-[9px] cursor-col-resize touch-none outline-none",
+    side === "right" ? "-mr-1" : "-ml-[5px]",
+    "after:absolute after:inset-y-0 after:left-[3px] after:w-[3px] after:bg-accent after:opacity-0 after:transition-opacity after:delay-100 forced-colors:after:bg-[Highlight]",
+    "hover:after:opacity-100 focus-visible:after:opacity-100 active:after:opacity-100",
+  ]}
   role="separator"
   tabindex="0"
   aria-orientation="vertical"
@@ -78,7 +90,8 @@
   aria-valuemin={min}
   aria-valuemax={max}
   title={t("app.resizeHint")}
-  style:left="{left}px"
+  style:left={side === "left" ? `${offset}px` : undefined}
+  style:right={side === "right" ? `${offset}px` : undefined}
   {onpointerdown}
   {onpointermove}
   onpointerup={end}
@@ -87,45 +100,3 @@
   ondblclick={() => set(initial)}
   {onkeydown}
 ></div>
-
-<style>
-  .resizer {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: 5;
-    width: 9px;
-    margin-left: -5px;
-    cursor: col-resize;
-    touch-action: none;
-  }
-
-  /* A line in the accent color while it's pointed at, dragged or focused. */
-  .resizer::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 3px;
-    width: 3px;
-    background: var(--accent);
-    opacity: 0;
-    transition: opacity 0.15s 0.1s;
-  }
-
-  .resizer:hover::after,
-  .resizer:active::after,
-  .resizer:focus-visible::after {
-    opacity: 1;
-  }
-
-  .resizer:focus-visible {
-    outline: none;
-  }
-
-  @media (forced-colors: active) {
-    .resizer::after {
-      background: Highlight;
-    }
-  }
-</style>

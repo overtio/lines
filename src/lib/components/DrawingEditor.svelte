@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+  import { Dialog } from "bits-ui";
   import { onDestroy, onMount, tick } from "svelte";
   import { on } from "svelte/events";
   import { MediaQuery } from "svelte/reactivity";
@@ -7,6 +8,7 @@
   import { speak } from "../a11y";
   import { locale, t } from "../i18n/index.svelte";
   import { formatKeys, speakKeys, system } from "../shortcuts";
+  import Button from "./ui/Button.svelte";
 
   /*
    * Excalidraw, full-window, on a drawing (editor/drawings.ts), or on a copy of a Mermaid diagram.
@@ -30,10 +32,10 @@
 
   type Excalidraw = typeof import("@excalidraw/excalidraw");
 
-  let dialog: HTMLDialogElement;
+  let content = $state<HTMLElement | null>(null);
   let host: HTMLElement;
   /** Save and Cancel: over the canvas, then in Excalidraw's top right once it's shown. */
-  let actions: HTMLElement;
+  let actions = $state<HTMLElement>()!;
   /** The place Excalidraw keeps at its top right, while it's shown. */
   let slot = $state.raw<HTMLElement | null>(null);
   /** Excalidraw's phone layout, whose top row is its tools. */
@@ -44,10 +46,11 @@
   const compact = $derived(phone || narrow.current);
 
   $effect(() => {
+    if (!actions || !content) return;
     if (slot && !compact) slot.append(actions);
-    else if (actions.parentElement !== dialog) dialog.prepend(actions);
+    else if (actions.parentElement !== content) content.prepend(actions);
   });
-  let opener: HTMLElement | null = null;
+  const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   let status = $state<"loading" | "ready" | "failed" | "saving">("loading");
   let error = $state("");
   let confirming = $state(false);
@@ -57,8 +60,6 @@
   /** The scene's version when it opened, and whether it has changed since. */
   let start: number | null = null;
   let changed = false;
-  /** Leaving on purpose (Save, or Discard), rather than the dialog being closed. */
-  let leaving = false;
 
   /** ⌘S (Ctrl+S): Excalidraw keeps ⌘↩ for editing a line's points. */
   const SAVE_KEYS = "Mod-s";
@@ -95,16 +96,22 @@
     return `rgb(${before.join(", ")})`;
   }
 
+  /*
+   * Excalidraw puts its own dialogs (Clear canvas, say) straight in the page, outside this one, so
+   * this one doesn't hold focus in or close on a press outside it; the app behind is made inert
+   * instead, as it is behind any dialog.
+   */
+  const app = document.getElementById("app");
+
   onMount(() => {
-    opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    dialog.showModal();
+    if (app) app.inert = true;
     void load();
   });
 
   onDestroy(() => {
     unmountReact?.();
     actions?.remove();
-    dialog?.remove();
+    if (app) app.inert = false;
     if (opener?.isConnected) opener.focus();
   });
 
@@ -242,10 +249,7 @@
     }
   }
 
-  function leave() {
-    leaving = true;
-    dialog.close();
-  }
+  const leave = () => onclose();
 
   /** Cancel, or Escape outside the canvas: closes, after asking if anything changed. */
   function cancel() {
@@ -260,21 +264,6 @@
     host.querySelector<HTMLElement>(".excalidraw-container, canvas")?.focus();
   }
 
-  function onclosed() {
-    // Closed by the browser after all (Escape pressed twice, say): it stays open while there's anything to lose.
-    if (!leaving && changed) {
-      dialog.showModal();
-      confirming = true;
-      return;
-    }
-    onclose();
-  }
-
-  function oncancel(event: Event) {
-    event.preventDefault();
-    cancel();
-  }
-
   function onkeydowncapture(event: KeyboardEvent) {
     // ⌘S (Ctrl+S) is Save, wherever the focus is.
     if ((event.metaKey || event.ctrlKey) && !event.shiftKey && !event.altKey && event.key.toLowerCase() === "s") {
@@ -283,236 +272,101 @@
       void save();
       return;
     }
+    if (event.key !== "Escape") return;
     // Escape in the canvas is Excalidraw's (to stop editing text, or deselect), not a way out.
     const target = event.target as Node;
-    if (event.key === "Escape" && host.contains(target) && !actions.contains(target)) event.preventDefault();
+    if (host.contains(target) && !actions.contains(target)) return;
+    event.preventDefault();
+    cancel();
   }
 
-  function onkeydown(event: KeyboardEvent) {
-    // Excalidraw's single-key tools aren't the app's shortcuts too.
-    event.stopPropagation();
-    if (event.key !== "Tab") return;
-    // Tab stays inside, as in Settings and the PDF preview.
-    const stops = [...dialog.querySelectorAll<HTMLElement>("button, input, a[href], [tabindex]")].filter(
-      (element) => element.tabIndex >= 0 && !(element as HTMLButtonElement).disabled && element.getClientRects().length > 0,
-    );
-    const first = stops[0];
-    const last = stops.at(-1);
-    if (!first || !last) return;
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  }
+  /** Excalidraw's single-key tools aren't the app's shortcuts too. */
+  const onkeydown = (event: KeyboardEvent) => event.stopPropagation();
+
+  /** An island like Excalidraw's undo and redo: flat, with its ring in the canvas's color. */
+  const island = "pointer-events-auto flex items-center rounded-md bg-panel [box-shadow:0_0_0_1px_var(--color-surface-lowest,var(--bg))]";
+  const tool = "grid size-9 place-items-center rounded-md transition-colors enabled:hover:bg-hover disabled:opacity-45";
 </script>
 
-<dialog
-  bind:this={dialog}
-  class="drawing-editor"
-  aria-labelledby="drawing-editor-title"
-  aria-describedby="drawing-editor-hint"
-  onclose={onclosed}
-  {oncancel}
-  {onkeydowncapture}
-  {onkeydown}
->
-  <h2 class="visually-hidden" id="drawing-editor-title">{t("editor.drawing.title")}</h2>
-  <p class="visually-hidden" id="drawing-editor-hint">{t("editor.drawing.hint", { keys: formatKeys(SAVE_KEYS, system) })}</p>
-  <!-- Its keys are its own, not Excalidraw's, though it's shown inside Excalidraw: heard on the
-       element itself, as Excalidraw's are, rather than delegated to the app's root. -->
-  <div class="actions" class:compact bind:this={actions} {@attach (node) => on(node, "keydown", onkeydown)}>
-    <div class="controls tools">
-      <button class="tool" onclick={cancel} title={t("editor.drawing.cancel")} aria-label={t("editor.drawing.cancel")}>
-        <Icon name="x" size={18} />
-      </button>
-      <button
-        class="tool save"
-        onclick={save}
-        disabled={status === "loading" || status === "saving"}
-        title={`${t("editor.drawing.save")} (${formatKeys(SAVE_KEYS, system)})`}
-        aria-label={t("editor.drawing.save")}
-        aria-keyshortcuts={speakKeys(SAVE_KEYS, system)}
+<Dialog.Root open>
+  <Dialog.Portal>
+    <Dialog.Content
+      bind:ref={content}
+      trapFocus={false}
+      preventScroll={false}
+      interactOutsideBehavior="ignore"
+      escapeKeydownBehavior="ignore"
+      onCloseAutoFocus={(event) => event.preventDefault()}
+      {onkeydowncapture}
+      class="drawing-editor fixed inset-0 z-50 flex flex-col bg-bg text-fg outline-none"
+    >
+      <Dialog.Title class="sr-only">{t("editor.drawing.title")}</Dialog.Title>
+      <Dialog.Description class="sr-only">{t("editor.drawing.hint", { keys: formatKeys(SAVE_KEYS, system) })}</Dialog.Description>
+      <!-- Its keys are its own, not Excalidraw's, though it's shown inside Excalidraw: heard on the
+           element itself, as Excalidraw's are, rather than delegated to the app's root. Over the
+           canvas until Excalidraw is shown, then in its top right; on a phone, a row above it. -->
+      <div
+        class={compact
+          ? "relative border-b border-line bg-panel px-2.5 pt-[max(6px,env(safe-area-inset-top))] pb-1.5"
+          : slot
+            ? "relative"
+            : "absolute top-[max(16px,env(safe-area-inset-top))] right-4 z-1"}
+        bind:this={actions}
+        {@attach (node) => on(node, "keydown", onkeydown)}
       >
-        <Icon name="check" size={18} />
-      </button>
-    </div>
-    {#if confirming}
-      <div class="controls confirm" role="group" aria-labelledby="drawing-editor-question">
-        <span class="question" id="drawing-editor-question">{t("editor.drawing.discardQuestion")}</span>
-        <button class="text-button danger" onclick={leave}>{t("editor.drawing.discard")}</button>
-        <button class="primary" onclick={keepEditing} {@attach (button) => button.focus()}>{t("editor.drawing.keepEditing")}</button>
+        <div class={compact ? "pointer-events-auto flex items-center justify-between" : island}>
+          <button class={[tool, "text-muted enabled:hover:text-fg"]} onclick={cancel} title={t("editor.drawing.cancel")} aria-label={t("editor.drawing.cancel")}>
+            <Icon name="x" size={18} />
+          </button>
+          <button
+            class={[tool, "text-accent"]}
+            onclick={save}
+            disabled={status === "loading" || status === "saving"}
+            title={`${t("editor.drawing.save")} (${formatKeys(SAVE_KEYS, system)})`}
+            aria-label={t("editor.drawing.save")}
+            aria-keyshortcuts={speakKeys(SAVE_KEYS, system)}
+          >
+            <Icon name="check" size={18} />
+          </button>
+        </div>
+        {#if confirming}
+          <!-- Below Save and Cancel, so Excalidraw's top bar keeps its size; set off from the drawing it's over. -->
+          <div
+            class={[
+              island,
+              "absolute top-[calc(100%+8px)] w-max max-w-[min(340px,calc(100vw-32px))] flex-wrap justify-end gap-1 rounded-xl p-2.5 [box-shadow:var(--card-shadow),0_0_0_1px_var(--card-border)]",
+              compact ? "right-2.5" : "right-0",
+            ]}
+            role="group"
+            aria-labelledby="drawing-editor-question"
+          >
+            <span class="basis-full px-1 pb-1.5 text-sm font-[550]" id="drawing-editor-question">{t("editor.drawing.discardQuestion")}</span>
+            <Button variant="danger" onclick={leave}>{t("editor.drawing.discard")}</Button>
+            <Button variant="primary" onclick={keepEditing} {@attach (button) => button.focus()}>{t("editor.drawing.keepEditing")}</Button>
+          </div>
+        {/if}
       </div>
-    {/if}
-  </div>
 
-  {#if status === "loading" || error}
-    <div class="status" role="status">
-      {status === "loading" ? t("editor.drawing.loading") : error}
-    </div>
-  {/if}
-  <div class="canvas" bind:this={host}></div>
-</dialog>
+      {#if status === "loading" || error}
+        <div class="px-5 py-2.5 text-sm text-muted" role="status">
+          {status === "loading" ? t("editor.drawing.loading") : error}
+        </div>
+      {/if}
+      <div class="canvas relative min-h-0 flex-1" bind:this={host}></div>
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>
 
 <style>
-  dialog {
-    width: 100vw;
-    max-width: none;
-    height: 100dvh;
-    max-height: none;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: var(--bg);
-    color: var(--text);
-  }
-
-  dialog[open] {
-    display: flex;
-    flex-direction: column;
-  }
-
-  dialog::backdrop {
-    background: var(--scrim);
-  }
-
-  /* Over the canvas until Excalidraw is shown, and if it can't be. */
-  dialog > .actions {
-    position: absolute;
-    top: max(16px, env(safe-area-inset-top));
-    right: 16px;
-    z-index: 1;
-  }
-
-  /* A row above the canvas on a phone, Cancel at one end and Save at the other. */
-  dialog > .actions.compact {
-    position: relative;
-    inset: auto;
-    padding: 6px 10px;
-    padding-top: max(6px, env(safe-area-inset-top));
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-elevated);
-  }
-
-  .compact > .tools {
-    justify-content: space-between;
-    background: none;
-    box-shadow: none;
-  }
-
-  .compact > .confirm {
-    right: 10px;
-  }
-
-  /* An island like Excalidraw's menu and zoom buttons: flat, with their ring in the canvas's color. */
-  .controls {
-    display: flex;
-    align-items: center;
-    border-radius: 8px;
-    background: var(--bg-elevated);
-    box-shadow: 0 0 0 1px var(--color-surface-lowest, var(--bg));
-    pointer-events: auto;
-  }
-
-  /* Icons, like its undo and redo, filling the island; Save's check in the accent. */
-  .tool {
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    color: var(--text-muted);
-  }
-
-  .tool:hover:not(:disabled) {
-    background: var(--hover);
-    color: var(--text);
-  }
-
-  .tool.save,
-  .tool.save:hover:not(:disabled) {
-    color: var(--accent);
-  }
-
-  .tool:disabled {
-    opacity: var(--disabled-opacity);
-  }
-
-  .confirm button {
-    height: 30px;
-    padding: 0 12px;
-    border-radius: 6px;
-    white-space: nowrap;
-  }
-
-  .actions {
-    position: relative;
-  }
-
-  /* Below Save and Cancel, so Excalidraw's top bar keeps its size. */
-  .confirm {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    width: max-content;
-    max-width: min(340px, calc(100vw - 32px));
-    gap: 4px;
-    padding: 10px;
-    border-radius: 12px;
-    /* Over the drawing, so set off from it. */
-    box-shadow: var(--card-shadow), 0 0 0 1px var(--card-border);
-  }
-
-  .confirm .question {
-    flex-basis: 100%;
-    padding: 0 4px 6px;
-    white-space: normal;
-  }
-
-  .question {
-    padding: 0 6px 0 8px;
-    font-size: 13px;
-    font-weight: 550;
-    white-space: nowrap;
-  }
-
-  .primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background: var(--accent);
-    color: var(--on-accent);
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .primary:disabled {
-    opacity: var(--disabled-opacity);
-  }
-
-  .status {
-    padding: 10px 20px;
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-
-  .canvas {
-    position: relative;
-    flex: 1;
-    min-height: 0;
-  }
-
   /*
    * Excalidraw in the app's theme rather than its own purple and greys: its toolbars, menus and
    * dialogs take the theme's surfaces, text, borders, accent and font. Its own dark colors are on
    * .excalidraw.theme--dark, which this outranks, and the theme's tokens already change with it.
-   * What's drawn keeps its colors, as the note shows them.
+   * What's drawn keeps its colors, as the note shows them. Its dialogs are outside the canvas, in
+   * the page.
    */
-  .canvas :global(.excalidraw) {
+  .canvas :global(.excalidraw),
+  :global(body > .excalidraw.excalidraw-modal-container) {
     --ui-font: var(--font-ui);
     --color-primary: var(--accent);
     --color-primary-darker: color-mix(in srgb, var(--accent) 88%, var(--ink));

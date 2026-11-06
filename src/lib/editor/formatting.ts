@@ -18,7 +18,7 @@ import { selectedBlock } from "./attachments";
 import { ancestors } from "./util";
 
 /*
- * Inline formatting: bold, italic, strikethrough, code and highlight. The shortcuts and the
+ * Inline formatting: bold, italic, underline, strikethrough, code and highlight. The shortcuts and the
  * toolbar that appears over selected text both toggle it, using the parse tree to tell whether
  * the selection is already formatted (so italic on bold text adds italic instead of eating one
  * of the bold's asterisks).
@@ -30,7 +30,9 @@ interface Format {
   shortcut: string;
   /** The shortcut as `aria-keyshortcuts` writes it. */
   keys: string;
-  marker: string;
+  /** What goes before and after the text. */
+  open: string;
+  close: string;
   /** The syntax node for text formatted this way, and the node for its markers. */
   node: string;
   mark: string;
@@ -41,12 +43,16 @@ const key = (k: string, shift = false) => ({
   keys: `${isApple ? "Meta" : "Control"}+${shift ? "Shift+" : ""}${k}`,
 });
 
+/** The same marker on both sides: `**bold**`. */
+const around = (marker: string) => ({ open: marker, close: marker });
+
 export const FORMATS = {
-  bold: { name: t("editor.format.bold"), icon: "bold", ...key("B"), marker: "**", node: "StrongEmphasis", mark: "EmphasisMark" },
-  italic: { name: t("editor.format.italic"), icon: "italic", ...key("I"), marker: "*", node: "Emphasis", mark: "EmphasisMark" },
-  strike: { name: t("editor.format.strike"), icon: "strikethrough", ...key("X", true), marker: "~~", node: "Strikethrough", mark: "StrikethroughMark" },
-  code: { name: t("editor.format.code"), icon: "code", ...key("E"), marker: "`", node: "InlineCode", mark: "CodeMark" },
-  highlight: { name: t("editor.format.highlight"), icon: "highlighter", ...key("H", true), marker: "==", node: "Highlight", mark: "HighlightMark" },
+  bold: { name: t("editor.format.bold"), icon: "bold", ...key("B"), ...around("**"), node: "StrongEmphasis", mark: "EmphasisMark" },
+  italic: { name: t("editor.format.italic"), icon: "italic", ...key("I"), ...around("*"), node: "Emphasis", mark: "EmphasisMark" },
+  underline: { name: t("editor.format.underline"), icon: "underline", ...key("U"), open: "<u>", close: "</u>", node: "Underline", mark: "UnderlineMark" },
+  strike: { name: t("editor.format.strike"), icon: "strikethrough", ...key("X", true), ...around("~~"), node: "Strikethrough", mark: "StrikethroughMark" },
+  code: { name: t("editor.format.code"), icon: "code", ...key("E"), ...around("`"), node: "InlineCode", mark: "CodeMark" },
+  highlight: { name: t("editor.format.highlight"), icon: "highlighter", ...key("H", true), ...around("=="), node: "Highlight", mark: "HighlightMark" },
 } satisfies Record<string, Format>;
 
 export type FormatId = keyof typeof FORMATS;
@@ -102,8 +108,8 @@ export function toggleFormat(id: FormatId): StateCommand {
       if (range.empty) {
         // Nothing selected: put the cursor between a new pair of markers.
         return {
-          changes: { from: range.from, insert: format.marker + format.marker },
-          range: EditorSelection.cursor(range.from + format.marker.length),
+          changes: { from: range.from, insert: format.open + format.close },
+          range: EditorSelection.cursor(range.from + format.open.length),
         };
       }
       const changes: { from: number; to?: number; insert?: string }[] = [];
@@ -117,7 +123,7 @@ export function toggleFormat(id: FormatId): StateCommand {
           const close = marks[marks.length - 1];
           if (open && close && open !== close) changes.push({ from: open.from, to: open.to }, { from: close.from, to: close.to });
         } else if (!remove && !node) {
-          changes.push({ from: part.from, insert: format.marker }, { from: part.to, insert: format.marker });
+          changes.push({ from: part.from, insert: format.open }, { from: part.to, insert: format.close });
         }
       }
       const set = state.changes(changes);

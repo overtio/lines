@@ -4,7 +4,7 @@ import { HighlightStyle, Language, LanguageDescription, ParseContext, syntaxHigh
 import { languages } from "@codemirror/language-data";
 import type { Parser } from "@lezer/common";
 import { type MarkdownParser, parseCode } from "@lezer/markdown";
-import { highlightSelectionMatches, search, searchKeymap } from "@codemirror/search";
+import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { Compartment, EditorState, Prec, type Extension, type StateCommand } from "@codemirror/state";
 import { EditorView, keymap, placeholder } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
@@ -12,6 +12,7 @@ import { cards } from "./cards";
 import { cursor } from "./cursor";
 import { dragBlocks } from "./dragBlocks";
 import { fenceInput } from "./fences";
+import { find } from "./find.svelte";
 import { attachmentBlocks } from "./attachments";
 import { formatToolbar, toggleFormat } from "./formatting";
 import { listKeymap } from "./lists";
@@ -23,7 +24,8 @@ import { symbols } from "./symbols";
 import { tables } from "./tables";
 import { typeTables } from "./typeTables";
 import { frontMatterField, missingNotes } from "./objects";
-import { Card, Highlight, Mention, Tag, TexMath } from "./syntax";
+import { markdownOutline, outlineCompartment } from "./outline.svelte";
+import { Card, Highlight, Mention, Tag, TexMath, Underline } from "./syntax";
 import { t as message } from "../i18n/index.svelte";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
 import type { MarkdownAddition } from "../plugins/types";
@@ -41,7 +43,7 @@ function codeParser(info: string): Parser | null {
 }
 
 /**
- * GFM plus our #tags, ==highlights==, cards, $math$, @mentions, highlighted code blocks and what
+ * GFM plus our #tags, ==highlights==, <u>underlines</u>, cards, $math$, @mentions, highlighted code blocks and what
  * plugins add. Built directly rather than through `markdown()`, which would also bundle HTML, CSS
  * and JavaScript parsers up front. Sharing `markdownLanguage.data` keeps list continuation on
  * Enter working.
@@ -52,6 +54,7 @@ const linedown = (additions: MarkdownAddition[]) =>
     (markdownLanguage.parser as MarkdownParser).configure([
       Tag,
       Highlight,
+      Underline,
       Card,
       TexMath,
       Mention,
@@ -89,6 +92,7 @@ const toggleTodo: StateCommand = ({ state, dispatch }) => {
 const formattingKeymap = keymap.of([
   { key: "Mod-b", run: toggleFormat("bold") },
   { key: "Mod-i", run: toggleFormat("italic") },
+  { key: "Mod-u", run: toggleFormat("underline") },
   { key: "Mod-e", run: toggleFormat("code") },
   { key: "Mod-Shift-x", run: toggleFormat("strike") },
   { key: "Mod-Shift-h", run: toggleFormat("highlight") },
@@ -137,6 +141,12 @@ const theme = EditorView.theme({
   ".cm-content ::selection": { backgroundColor: "var(--selection)" },
   // Other places the selected text appears; neutral, so they don't read as ==highlights==.
   ".cm-selectionMatch": { backgroundColor: "var(--active)" },
+  // The find bar's matches (find.svelte.ts), and the one it's on.
+  ".cm-searchMatch": { backgroundColor: "var(--accent-soft)", borderRadius: "2px" },
+  ".cm-searchMatch-selected, .cm-searchMatch-selected .cm-selectionMatch": {
+    backgroundColor: "var(--accent)",
+    color: "var(--on-accent)",
+  },
   // The slash command menu, styled like the app's other menus.
   ".cm-tooltip.cm-tooltip-autocomplete": {
     padding: "5px",
@@ -204,18 +214,8 @@ const theme = EditorView.theme({
   },
 });
 
-/** CodeMirror's own words (its find bar, and what it says to screen readers), in the app's language. */
+/** CodeMirror's own words (what it says to screen readers, its go-to-line box), in the app's language. */
 const phrases = EditorState.phrases.of({
-  Find: message("editor.cm.find"),
-  Replace: message("editor.cm.replace"),
-  next: message("editor.cm.next"),
-  previous: message("editor.cm.previous"),
-  all: message("editor.cm.all"),
-  "match case": message("editor.cm.matchCase"),
-  regexp: message("editor.cm.regexp"),
-  "by word": message("editor.cm.byWord"),
-  replace: message("editor.cm.replaceOne"),
-  "replace all": message("editor.cm.replaceAll"),
   close: message("editor.cm.close"),
   "current match": message("editor.cm.currentMatch"),
   "on line": message("editor.cm.onLine"),
@@ -250,6 +250,7 @@ const linedownEditing = (additions: MarkdownAddition[]): Extension => [
   formatToolbar,
   fenceInput,
   formattingKeymap,
+  markdownOutline,
   additions.flatMap((addition) => addition.editor ?? []),
 ];
 
@@ -288,12 +289,13 @@ export function createExtensions(onChange: () => void): Extension[] {
     formatCompartment.of(formatEditing()),
     cursor,
     syntaxHighlighting(highlightStyle),
-    search({ top: true }),
+    find,
     highlightSelectionMatches(),
     placeholder(message("editor.placeholder")),
     phrases,
     keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, indentWithTab]),
     readOnlyCompartment.of(readOnly(false)),
+    outlineCompartment.of([]),
     theme,
     EditorView.updateListener.of((update) => {
       if (update.docChanged) onChange();

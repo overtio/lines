@@ -10,19 +10,23 @@ Settings → Plugins lists them. A plugin that isn't needed can be turned off, a
 |---|---|---|---|
 | Markdown | The Markdown notes are written in ([Linedown](linedown.md)). Always on. | Yes | `src/plugins/markdown/`, with the editor in `src/lib/editor/` and printing in `src/lib/print/markdown.ts` |
 | LaTeX | Notes written in LaTeX ([latex.md](latex.md)) | Yes | `src/plugins/latex/` |
+| Spreadsheets | Notes that are spreadsheets, kept as CSV, and opening CSV and Excel files; draws ` ```csv ` code blocks in Markdown notes as spreadsheets, and adds `/spreadsheet` ([spreadsheets.md](spreadsheets.md)) | Yes | `src/plugins/spreadsheet/` |
 | Math (KaTeX) | The math engine, for math in notes of any format | Yes | `src/plugins/katex/` |
 | Diagrams (Mermaid) | Draws ` ```mermaid ` code blocks, and adds `/diagram` | Yes | `src/plugins/mermaid/` |
+| Formulas (IronCalc) | The formula engine, for formulas in tables and spreadsheets, and Excel workbooks | Yes | `src/plugins/ironcalc/` |
 | TeX Typesetting | Makes a LaTeX note's PDF with TeX. Needs LaTeX. | Yes | `src/plugins/tex/` |
 | Themes | The sixteen themes. Always on. | Yes | `src/plugins/themes/` |
 | Lucide | lines' icons. Always on. | Yes | `src/plugins/lucide/` |
 | SF Symbols | Apple's icons, in the Mac and iPhone apps | Yes | `src/plugins/sf-symbols/` |
+| Unsplash | `/unsplash`: search Unsplash's free photos and put one in a note. Needs an API key when lines is built (README) | Yes | `src/plugins/unsplash/` |
+| GIPHY | `/giphy`: search GIPHY's GIFs and put one in a note. Needs an API key when lines is built | Yes | `src/plugins/giphy/` |
 
 ## Turning a plugin off
 
 Nothing is lost. A plugin turned off stops adding what it adds, at once, in every window:
 
-- **A format.** Its notes keep their format and show as plain text, which can still be read and changed. Their ⓘ panel says so, with a button that turns the plugin back on. Export, Copy and Download still write them as what they are (a LaTeX note as a `.tex` file that compiles).
-- **An engine.** With Math off, math shows as it's written. With Diagrams off, a ` ```mermaid ` block is a code block and `/diagram` is gone from the "/" menu. Without TeX, a LaTeX note's PDF is laid out by lines.
+- **A format.** Its notes keep their format and show as plain text, which can still be read and changed. Their ⓘ panel says so, with a button that turns the plugin back on. Export, Copy and Download still write them as what they are (a LaTeX note as a `.tex` file that compiles). With Spreadsheets off, a ` ```csv ` block in a Markdown note is a code block too, and `/spreadsheet` is gone from the "/" menu.
+- **An engine.** With Math off, math shows as it's written. With Diagrams off, a ` ```mermaid ` block is a code block and `/diagram` is gone from the "/" menu. With Formulas off, formulas show as written, and spreadsheets don't download as values or Excel workbooks. Without TeX, a LaTeX note's PDF is laid out by lines.
 - **A theme or an icon set.** What was chosen is kept, and lines shows its own (Lines, Lucide) until the plugin is on again.
 - **A plugin others need** (TeX needs LaTeX): those wait, and say what they need. Turning one on turns on what it needs too.
 
@@ -67,24 +71,27 @@ Every part of `contributes` is optional, and a plugin can add several kinds of t
 **`languages`**: formats notes can be written in (`NoteLanguage`). A language says everything lines needs to know about notes written in it, so nothing outside its plugin knows how it reads:
 
 - `id`, kept with every note in it (`format: latex` in synced files), so it must never change; `name`, `extensions` (the usual one first) and `mimeType`
-- `editor()`: CodeMirror extensions for how it's read, drawn as you type, its keys and its "/" menu. The editor in `src/lib/editor/` has pieces to build on: the menu (`slashMenu`), math (`mathElement`, `MathBlockWidget`), bullets and numbers (`livePreview.ts`), pasting tables and attachments, and the backslash commands (`texCommands.ts`).
+- `editor()`: CodeMirror extensions for how it's read, drawn as you type, its keys and its "/" menu. The editor in `src/lib/editor/` has pieces to build on: the menu (`slashMenu`), math (`mathElement`, `MathBlockWidget`), bullets and numbers (`livePreview.ts`), pasting tables and attachments, and the backslash commands (`texCommands.ts`). To show its headings in the outline beside the note, the editor adds `outlineHeadings.of((state) => headings)` (`outline.svelte.ts`), each with its `level` (1 the largest), `title` as it reads and where it starts (`from`); a language without one has no outline.
 - `meta(body)`: what the note list, sidebar and search know of a note: title, excerpt, tags, open todos, properties and type
 - `plainText(body)` and `stats(body)`, for copying and the ⓘ panel's counts (`countLines` in `notes/stats.ts` counts as every format does)
 - `addTag(body, tag)`, and `newNote({ tag, type })`, how a new note starts
 - `file(body, attachments?)`: the note as a file of its own, for exports and downloads
-- `print(body, parts)`: the note laid out for paper, for its PDF, printing and PNG images. `parts` draws math, code, renderers' code blocks and images.
+- `print(body, parts)`: the note laid out for paper, for its PDF, printing and PNG images. `parts` draws math, code, renderers' code blocks, tables' formulas and images.
+- Optionally, for a language whose notes aren't simply files of their text (a spreadsheet's are a title and CSV): `copyAs`, what Copy and Download call its text and give (`CSV`); `exports`, more files the share menu downloads (values as CSV, an Excel workbook); `opens`, more extensions it makes notes from (`xlsx`); and `read(file)`, the notes a file makes, for Settings → Data → Import. A language without `read` makes a note of a file's text as it is.
 
-**`themes`**: each with `light` and `dark` colors for app.css's custom properties, by name without `--`. `bg`, `bg-list`, `bg-sidebar`, `bg-elevated`, `text`, `text-sidebar`, `text-muted`, `text-faint`, `accent`, `tag-text` and `ink` (what faint overlays are mixed from) are needed; any other property app.css has (`danger`, `callout-info`, `syn-keyword`…) can be set too. `moreContrast` holds the colors for Contrast → Increased. A theme is data, nothing more.
+**`themes`**: each with `light` and `dark` colors for app.css's custom properties, by name without `--`. `bg`, `bg-list`, `bg-sidebar`, `bg-elevated`, `text`, `text-sidebar`, `text-muted`, `text-faint`, `accent`, `tag-text` and `ink` (what faint overlays are mixed from) are needed; any other property app.css has (`danger`, `callout-info`, `syn-keyword`…) can be set too. `moreContrast` holds the colors for Contrast → Increased. A theme is data, nothing more: app.css builds the rest of the palette from these and hands it to Tailwind (`bg-panel`, `text-muted`, `border-line`…), so every component follows the theme.
 
 **`iconSets`**: a Svelte component that draws any of lines' icons (`src/lib/icons/icons.ts`) at a size.
 
 **`math`**: an engine that draws LaTeX math into an element, after loading itself the first time.
 
-**`renderers`**: engines that draw a code block of their languages, on screen in the theme's colors or for paper in black on white, as SVG markup or an element. `actions` are buttons on what they draw.
+**`formulas`**: an engine that works out formulas (`FormulaEngine`), for tables in Markdown notes and for spreadsheets. It keeps a sheet that works its cells out again as they change (`sheet()`), moves a formula's relative references as copying does (`move`), puts in and takes out rows and columns with formulas still pointing at the same cells (`shift`), says what can go at the cursor in a formula being written (`complete`), where its references are (`references`) and which functions it knows (`functions`, for suggesting them), and can read and write Excel workbooks. Formulas are in Excel's English, with commas, so they work the same everywhere. Only the first engine on is used; IronCalc's is lines' own, and [HyperFormula is being considered](https://github.com/overtio/lines/issues/1) as another.
+
+**`renderers`**: engines that draw a code block of their languages, on screen in the theme's colors or for paper in black on white, as SVG markup or an element. `actions` are buttons on what they draw. A renderer with an `editor` draws its blocks on screen as something to work in instead, which `render` still prints: the Spreadsheets plugin's draws a ` ```csv ` block as a grid. `editor(dom, block)` puts what it draws into `dom` and gives back what the editor calls as things change (`BlockEditor`: `update` when the block's code or the note's read-only state changes, `focus` when ↓ or ↑ moves into it from the text around it, `layout`, `destroy`). Through `block` (`EditableBlock`) it reads the block's code (`source`) and writes it back as one step to undo (`write`), and moves the cursor out into the text (`leave`) or into its code (`showCode`), which shows in its place while the cursor's in it (`src/lib/editor/rendered.ts`).
 
 **`typesetters`**: ways to make a PDF for notes in some languages, offered beside lines' own pages in the PDF preview.
 
-**`markdown`**: new syntax for Markdown notes. A `syntax` extension for the parser ([`@lezer/markdown`](https://github.com/lezer-parser/markdown)), `editor` extensions that draw it, `commands` for the "/" menu (each can go `after` another, by id), and `print`, a printer for each node the syntax adds.
+**`markdown`**: new syntax for Markdown notes. A `syntax` extension for the parser ([`@lezer/markdown`](https://github.com/lezer-parser/markdown)), `editor` extensions that draw it, `commands` for the "/" menu (each can go `after` another, by id; several after the same one keep their plugins' order), and `print`, a printer for each node the syntax adds. A command can open a picker of pictures from a library on the web with `pickWebImage` (`src/lib/editor/webImages.ts`): the library searches, and the picker is the same for each, as Unsplash's and GIPHY's are.
 
 ### Plugins built on plugins
 

@@ -13,6 +13,7 @@
   import { notes, type TagNode } from "../notes/store.svelte";
   import { tagIcons } from "../notes/tagIcons.svelte";
   import { ui } from "../ui.svelte";
+  import SidebarRow from "./SidebarRow.svelte";
   import TagTree from "./TagTree.svelte";
 
   let {
@@ -68,11 +69,6 @@
     }
   }
 
-  const focusAndSelect = (input: HTMLInputElement) => {
-    input.focus();
-    input.select();
-  };
-
   function showMenu(tag: string, x: number, y: number) {
     menuFor = tag;
     ui.openMenu({
@@ -114,47 +110,33 @@
   }
 </script>
 
-<ul {id} aria-labelledby={labelledby}>
+<!-- A small gap so neighboring highlights never touch, including nested tags. -->
+<ul {id} aria-labelledby={labelledby} class={["flex flex-col gap-0.5", depth > 0 && "mt-0.5"]}>
   {#each nodes as node (node.path)}
-    {@const active = notes.filter.kind === "tag" && notes.filter.tag === node.path}
     {@const open = expanded.has(node.path)}
     <li>
-      <div class="tag-item" style:--depth={depth}>
-        {#if renaming === node.path}
-          <div class="row renaming">
-            <Icon name={tagIcons.get(node.path)} size={16} strokeWidth={1.75} />
-            <input
-              class="label"
-              value={draft}
-              aria-label={t("list.tagName")}
-              autocomplete="off"
-              autocapitalize="off"
-              spellcheck="false"
-              {oninput}
-              onkeydown={onRenameKeydown}
-              onblur={finishRename}
-              {@attach focusAndSelect}
-            />
-          </div>
-        {:else}
-          <button
-            class="row"
-            class:active
-            class:menu-target={menuFor === node.path || ui.iconPicker?.key === `tag:${node.path}`}
-            onclick={() => onchoose(node.path)}
-            oncontextmenu={(event) => oncontextmenu(event, node.path)}
-            {@attach longPress((x, y) => showMenu(node.path, x, y))}
-            aria-current={active}
-          >
-            <Icon name={tagIcons.get(node.path)} size={16} strokeWidth={1.75} />
-            <span class="label">{node.name}</span>
-            <span class="count">{node.count}</span>
-          </button>
-        {/if}
+      <div class="relative" style:padding-left="{depth * 14}px">
+        <!-- Room at the end for the disclosure button, as tall as the row on a touch screen. -->
+        <SidebarRow
+          class="pr-[30px] coarse:pr-12"
+          icon={tagIcons.get(node.path)}
+          label={node.name}
+          count={node.count}
+          active={notes.filter.kind === "tag" && notes.filter.tag === node.path}
+          marked={menuFor === node.path || ui.iconPicker?.key === `tag:${node.path}`}
+          rename={renaming === node.path
+            ? { value: draft, "aria-label": t("list.tagName"), oninput, onkeydown: onRenameKeydown, onblur: finishRename }
+            : undefined}
+          onclick={() => onchoose(node.path)}
+          oncontextmenu={(event) => oncontextmenu(event, node.path)}
+          {@attach longPress((x, y) => showMenu(node.path, x, y))}
+        />
         {#if node.children.length}
           <button
-            class="disclosure"
-            class:open
+            class={[
+              "absolute top-1/2 right-1 -mt-3 grid size-6 place-items-center rounded-sm text-faint transition-[rotate,background-color] hover:bg-hover hover:text-muted coarse:right-0 coarse:-mt-[22px] coarse:size-11",
+              open && "rotate-90",
+            ]}
             onclick={() => toggle(node.path)}
             aria-label={t("list.nestedTags", { tag: node.name })}
             title={t("list.nestedTags", { tag: node.name })}
@@ -171,76 +153,3 @@
     </li>
   {/each}
 </ul>
-
-<style>
-  .tag-item {
-    position: relative;
-    padding-left: calc(var(--depth) * 14px);
-  }
-
-  .tag-item :global(.row.row) {
-    padding-right: 30px;
-  }
-
-  .row.menu-target {
-    box-shadow: inset 0 0 0 2px var(--accent);
-  }
-
-  .row {
-    -webkit-touch-callout: none;
-  }
-
-  .renaming {
-    box-shadow: inset 0 0 0 2px var(--accent-soft);
-    background: var(--bg);
-  }
-
-  .renaming input {
-    height: 100%;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: var(--text);
-    font: inherit;
-    outline: none;
-  }
-
-  .disclosure {
-    position: absolute;
-    right: 4px;
-    top: 50%;
-    display: grid;
-    place-items: center;
-    width: 24px;
-    height: 24px;
-    margin-top: -12px;
-    border-radius: 6px;
-    color: var(--text-faint);
-    transition: transform 150ms ease, background-color 120ms ease;
-  }
-
-  @media (hover: hover) {
-    .disclosure:hover {
-      background: var(--hover);
-      color: var(--text-muted);
-    }
-  }
-
-  .disclosure.open {
-    transform: rotate(90deg);
-  }
-
-  /* Fingers need bigger targets: the whole height of the row. */
-  @media (pointer: coarse) {
-    .tag-item :global(.row.row) {
-      padding-right: 48px;
-    }
-
-    .disclosure {
-      right: 0;
-      width: 44px;
-      height: 44px;
-      margin-top: -22px;
-    }
-  }
-</style>

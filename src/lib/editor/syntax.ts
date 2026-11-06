@@ -121,6 +121,30 @@ export const Highlight: MarkdownConfig = {
   ],
 };
 
+const LESS_THAN = 60;
+const UnderlineDelim = { resolve: "Underline", mark: "UnderlineMark" };
+
+/**
+ * `<u>underlined</u>` text: HTML's underline, which other Markdown apps show too. The two tags
+ * pair up as a highlight's `==` do, around text that can have other styles inside.
+ */
+export const Underline: MarkdownConfig = {
+  defineNodes: ["Underline", { name: "UnderlineMark", style: t.processingInstruction }],
+  parseInline: [
+    {
+      name: "Underline",
+      before: "HTMLTag",
+      parse(cx, next, pos) {
+        if (next !== LESS_THAN) return -1;
+        const tag = cx.slice(pos, Math.min(cx.end, pos + 4)).toLowerCase();
+        if (tag.startsWith("<u>")) return cx.addDelimiter(UnderlineDelim, pos, pos + 3, true, false);
+        if (tag === "</u>") return cx.addDelimiter(UnderlineDelim, pos, pos + 4, false, true);
+        return -1;
+      },
+    },
+  ],
+};
+
 const COLON = 58;
 
 /** A `:::` fence: three or more colons, then (on an opening fence) an optional name like `card`. */

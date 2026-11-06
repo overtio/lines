@@ -351,12 +351,17 @@ export const slashMenu = (
   ];
 };
 
-/** `commands` with `added` ones (plugins'), each after the command it names, or at the end. */
+/**
+ * `commands` with `added` ones (plugins'), each after the command it names, or at the end. Several
+ * after the same one keep their plugins' order.
+ */
 function withAdded(commands: SlashCommand[], added: SlashCommand[]) {
   const all = [...commands];
   for (const command of added) {
-    const at = command.after ? all.findIndex((each) => each.id === command.after) : -1;
-    all.splice(at < 0 ? all.length : at + 1, 0, command);
+    let at = command.after ? all.findIndex((each) => each.id === command.after) : -1;
+    if (at < 0) at = all.length - 1;
+    else while (all[at + 1]?.after === command.after) at++;
+    all.splice(at + 1, 0, command);
   }
   return all;
 }

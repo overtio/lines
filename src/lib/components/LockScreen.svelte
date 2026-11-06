@@ -4,13 +4,14 @@
   import Icon from "../icons/Icon.svelte";
   import { lock, touchIdAvailable } from "../lock/lock.svelte";
   import { eraseThisDevice } from "../lock/erase";
+  import Button from "./ui/Button.svelte";
+  import UnlockField from "./UnlockField.svelte";
 
   /** Shown instead of the app while it's locked, until the passphrase (or Touch ID) opens it. */
 
   let passphrase = $state("");
   let busy = $state(false);
   let error = $state<string | null>(null);
-  /** Bumped on a wrong passphrase, to shake the field again. */
   let shakes = $state(0);
   let forgot = $state(false);
   let input = $state<HTMLInputElement>();
@@ -80,223 +81,57 @@
 
 <svelte:window {onkeydown} />
 
-<div class="lock" role="dialog" aria-modal="true" aria-labelledby="lock-title" aria-describedby="lock-hint" data-tauri-drag-region>
-  <form class="card" aria-busy={busy} bind:this={card} onsubmit={unlock}>
-    <div class="badge" aria-hidden="true"><Icon name="lock" size={26} strokeWidth={1.75} /></div>
-    <h1 id="lock-title">{t("lock.screen.title")}</h1>
-    <p class="hint" id="lock-hint">{t("lock.screen.hint")}</p>
+<div
+  class="grid h-full place-items-center bg-surface px-4 py-6 transition-opacity duration-200 starting:opacity-0"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="lock-title"
+  aria-describedby="lock-hint"
+  data-tauri-drag-region
+>
+  <form class="flex w-[min(320px,100%)] flex-col items-center text-center" aria-busy={busy} bind:this={card} onsubmit={unlock}>
+    <div class="mb-[18px] grid size-[60px] place-items-center rounded-[18px] bg-tag text-accent" aria-hidden="true">
+      <Icon name="lock" size={26} strokeWidth={1.75} />
+    </div>
+    <h1 id="lock-title" class="m-0 text-xl font-semibold tracking-tight">{t("lock.screen.title")}</h1>
+    <p class="m-0 mt-1.5 mb-[22px] text-sm text-muted" id="lock-hint">{t("lock.screen.hint")}</p>
 
-    {#key shakes}
-      <div class="field" class:shake={shakes > 0}>
-        <input
-          bind:this={input}
-          bind:value={passphrase}
-          type="password"
-          placeholder={t("lock.form.passphrase")}
-          aria-label={t("lock.form.passphrase")}
-          aria-invalid={!!error}
-          aria-describedby={error ? "lock-error" : undefined}
-          autocomplete="current-password"
-          disabled={busy}
-          {@attach focus}
-        />
-        <button class="go" type="submit" disabled={!passphrase || busy} aria-label={busy ? t("lock.screen.unlocking") : t("lock.screen.unlock")}>
-          <Icon name={busy ? "loader" : "chevron-right"} size={18} class={busy ? "spin" : ""} />
-        </button>
-      </div>
-    {/key}
-
-    <p class="error" id="lock-error" role="alert">{error ?? ""}</p>
+    <UnlockField
+      bind:value={passphrase}
+      bind:input
+      label={t("lock.form.passphrase")}
+      placeholder={t("lock.form.passphrase")}
+      go={t("lock.screen.unlock")}
+      going={t("lock.screen.unlocking")}
+      {error}
+      errorId="lock-error"
+      {busy}
+      {shakes}
+      autofocus
+    />
 
     {#if touchId}
-      <button type="button" class="text-button" onclick={useTouchId} disabled={busy}>
-        <Icon name="fingerprint" size={16} /> {t("lock.unlockWithTouchId")}
-      </button>
+      <Button variant="quiet" icon="fingerprint" onclick={useTouchId} disabled={busy}>{t("lock.unlockWithTouchId")}</Button>
     {/if}
 
-    <div class="forgot">
+    <div class="mt-7 text-xs leading-normal text-faint">
       {#if forgot}
-        <p id="lock-forgot">{t("lock.screen.forgotHint")}</p>
+        <p class="m-0 mb-2" id="lock-forgot">{t("lock.screen.forgotHint")}</p>
         {#if erasing}
-          <p id="lock-erase">{t("lock.screen.eraseQuestion")}</p>
-          <div class="confirm" role="group" aria-labelledby="lock-erase">
-            <button type="button" class="text-button" onclick={() => (erasing = false)} {@attach focus}>{t("lock.cancel")}</button>
-            <button type="button" class="text-button danger" onclick={() => void eraseThisDevice()}>{t("lock.screen.erase")}</button>
+          <p class="m-0 mb-2" id="lock-erase">{t("lock.screen.eraseQuestion")}</p>
+          <div class="flex justify-center gap-2" role="group" aria-labelledby="lock-erase">
+            <Button variant="quiet" onclick={() => (erasing = false)} {@attach focus}>{t("lock.cancel")}</Button>
+            <Button variant="danger" onclick={() => void eraseThisDevice()}>{t("lock.screen.erase")}</Button>
           </div>
         {:else}
           <!-- Focus comes here when the explanation shows, and back here from Cancel. -->
-          <button type="button" class="text-button danger" aria-describedby="lock-forgot" onclick={() => (erasing = true)} {@attach focus}>
+          <Button variant="danger" aria-describedby="lock-forgot" onclick={() => (erasing = true)} {@attach focus}>
             {t("lock.screen.askErase")}
-          </button>
+          </Button>
         {/if}
       {:else}
-        <button type="button" class="text-button" onclick={() => (forgot = true)}>{t("lock.screen.forgot")}</button>
+        <Button variant="quiet" onclick={() => (forgot = true)}>{t("lock.screen.forgot")}</Button>
       {/if}
     </div>
   </form>
 </div>
-
-<style>
-  .confirm {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .lock {
-    display: grid;
-    place-items: center;
-    height: 100%;
-    padding: 24px 16px;
-    background: var(--surface);
-    animation: fade-in 200ms ease;
-  }
-
-  .card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: min(320px, 100%);
-    text-align: center;
-  }
-
-  .badge {
-    display: grid;
-    place-items: center;
-    width: 60px;
-    height: 60px;
-    margin-bottom: 18px;
-    border-radius: 18px;
-    background: var(--tag-bg);
-    color: var(--accent);
-  }
-
-  h1 {
-    margin: 0;
-    font-size: 19px;
-    font-weight: 650;
-    letter-spacing: -0.01em;
-  }
-
-  .hint {
-    margin: 6px 0 22px;
-    font-size: 13.5px;
-    color: var(--text-muted);
-  }
-
-  .field {
-    position: relative;
-    width: 100%;
-  }
-
-  input {
-    width: 100%;
-    height: 40px;
-    padding: 0 44px 0 14px;
-    border: 1px solid var(--border);
-    border-radius: 11px;
-    background: var(--bg-elevated);
-    color: var(--text);
-    font: inherit;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 120ms ease, box-shadow 120ms ease;
-  }
-
-  /* The accent at full strength, two pixels wide, so focus shows (3:1) in place of the outline. */
-  input:focus {
-    border-color: var(--accent);
-    box-shadow:
-      0 0 0 1px var(--accent),
-      0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
-  }
-
-  input[aria-invalid="true"]:not(:focus) {
-    border-color: color-mix(in srgb, var(--danger) 55%, transparent);
-  }
-
-  .go {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    display: grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    background: var(--accent);
-    color: var(--on-accent);
-    transition: opacity 120ms ease;
-  }
-
-  .go:disabled {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  /* Touch screens: a target a finger can hit (44 × 44). */
-  @media (pointer: coarse) {
-    input {
-      height: 50px;
-      padding-right: 56px;
-    }
-
-    .go {
-      top: 3px;
-      right: 3px;
-      width: 44px;
-      height: 44px;
-    }
-
-    .text-button {
-      min-height: 44px;
-    }
-  }
-
-  .error {
-    min-height: 1.5em;
-    margin: 8px 0 4px;
-    font-size: 13px;
-    color: var(--danger);
-  }
-
-  .forgot {
-    margin-top: 28px;
-    font-size: 12.5px;
-    line-height: 1.5;
-    color: var(--text-faint);
-  }
-
-  .forgot p {
-    margin: 0 0 8px;
-  }
-
-  .forgot .text-button {
-    font-size: 12.5px;
-  }
-
-  .forgot .text-button:not(.danger) {
-    color: var(--text-faint);
-  }
-
-  .shake {
-    animation: shake 360ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
-  }
-
-  @keyframes shake {
-    20%,
-    60% {
-      transform: translateX(-7px);
-    }
-    40%,
-    80% {
-      transform: translateX(7px);
-    }
-  }
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-  }
-</style>

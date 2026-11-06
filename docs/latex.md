@@ -57,6 +57,7 @@ The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.
 - `\begin{…}` and `\end{…}` on lines of their own shrink to a small gap until the cursor is on them.
 - Numbered environments (`equation`, `align`…) are drawn without numbers, and `\label` is left out of the math. References show the label's name, not a number.
 - `\multicolumn{2}{c}{…}` in a `tabular` spans its columns; `\multirow` shows its text; booktabs rules (`\toprule`…) and `\hline` are left out.
+- A cell starting with `=` stays as written: formulas are worked out in Markdown tables and spreadsheets only ([spreadsheets.md](spreadsheets.md)). Nor is there a spreadsheet block to put in a LaTeX note, as a ` ```csv ` block is in a Markdown one.
 - Math can use the note's own commands: `\newcommand{\R}{\mathbb{R}}`, `\newcommand{\abs}[1]{\lvert #1 \rvert}`, `\renewcommand`, `\def\x{…}` and `\DeclareMathOperator{\sinc}{sinc}`, anywhere in the note, preamble included.
 - Each line of the LaTeX is a line on screen: a paragraph hard-wrapped in the source shows wrapped there too. LaTeX joins them; lines doesn't.
 - Something that isn't closed (`\textbf{` with no `}`, an environment with no `\end`) is left as written rather than drawn, so a note never breaks while you type. A verbatim block that isn't closed runs to the end of the note.
@@ -65,7 +66,8 @@ The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.
 
 - Enter after an `\item` starts the next item; Enter on an empty item ends the list.
 - Enter after a `\begin{…}` (or `\[`) that isn't closed yet adds the `\end{…}` (or `\]`), with the cursor between. A list starts with an `\item`.
-- ⌘B, ⌘I and ⌘E put the selection in `\textbf{…}`, `\emph{…}` and `\texttt{…}`, or take it out.
+- ⌘B, ⌘I, ⌘U and ⌘E put the selection in `\textbf{…}`, `\emph{…}`, `\underline{…}` and `\texttt{…}`, or take it out.
+- With the outline on (Settings → General → Layout), `\section`, `\subsection` and `\subsubsection` (starred too) are its headings.
 - Pasting and dropping work as in Markdown notes, written as LaTeX:
   - Rows copied from a spreadsheet, pgAdmin or a web page become a `tabular`, lined up in the LaTeX, with the first row over a `\hline` and number columns right-aligned. Special characters in cells are escaped (`well_id` → `well\_id`). Undo once for the text as copied.
   - An image becomes `\includegraphics[width=\linewidth]{../attachments/…}`; any other file `\href{../attachments/…}{Name.pdf}`. `/image` and `/file` choose them from the device.

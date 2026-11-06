@@ -12,6 +12,22 @@ export type WindowButtons = "hover" | "always";
 export type SwipeDirection = "fingers" | "reversed";
 /** The paper a note's PDF is laid out on. */
 export type Paper = "a4" | "letter";
+/** Which side of the window a pane goes on. */
+export type Side = "left" | "right";
+
+/** What a click on a link in a note does (editor/links.ts): web links (and attached files), tags, and mentions of notes. */
+export type LinkKind = "web" | "tag" | "mention";
+export type LinkClick = "click" | "modClick" | "modShiftClick";
+export type LinkAction = "edit" | "open" | "newTab" | "backgroundTab" | "window" | "copy";
+export type LinkClicks = Record<LinkKind, Record<LinkClick, LinkAction>>;
+
+/** What each kind of link can do; "edit" puts the cursor there, as a click on text does. */
+export const LINK_ACTIONS: Record<LinkKind, readonly LinkAction[]> = {
+  web: ["edit", "open", "copy"],
+  tag: ["edit", "open"],
+  mention: ["edit", "open", "newTab", "backgroundTab", "window"],
+};
+export const LINK_CLICKS: readonly LinkClick[] = ["click", "modClick", "modShiftClick"];
 
 export const FONTS: { id: FontId; name: string; family: string }[] = [
   { id: "system", name: t("settings.fontSystem"), family: "var(--font-system)" },
@@ -29,8 +45,6 @@ export interface Spacing {
   headings: number;
   /** Extra space under the note's first line, in px. */
   title: number;
-  /** Maximum width of the text column, in px. */
-  width: number;
   /** Space on either side of the text, in px. Phones use half. */
   margin: number;
   /** Space above the first line, in px. */
@@ -60,7 +74,6 @@ export const SPACING_FIELDS: {
   { key: "paragraph", label: t("settings.paragraphSpacing"), min: 0.2, max: 1.6, step: 0.05, format: formatPercent },
   { key: "headings", label: t("settings.headingSpacing"), min: 0, max: 2.5, step: 0.1, format: formatPercent },
   { key: "title", label: t("settings.titleSpacing"), min: 0, max: 48, step: 2, format: formatPixels, spoken: spokenPixels },
-  { key: "width", label: t("settings.textWidth"), min: 480, max: 1200, step: 20, format: formatPixels, spoken: spokenPixels },
   { key: "margin", label: t("settings.sideMargins"), min: 12, max: 120, step: 4, format: formatPixels, spoken: spokenPixels },
   { key: "top", label: t("settings.topMargin"), min: 0, max: 120, step: 4, format: formatPixels, spoken: spokenPixels },
 ];
@@ -69,21 +82,32 @@ export const SPACING_PRESETS: { id: string; name: string; spacing: Spacing }[] =
   {
     id: "compact",
     name: t("settings.spacingCompact"),
-    spacing: { lineHeight: 1.45, paragraph: 0.5, headings: 0.6, title: 0, width: 680, margin: 24, top: 8 },
+    spacing: { lineHeight: 1.45, paragraph: 0.5, headings: 0.6, title: 0, margin: 24, top: 8 },
   },
   {
     id: "default",
     name: t("settings.spacingDefault"),
-    spacing: { lineHeight: 1.65, paragraph: 1, headings: 1, title: 4, width: 720, margin: 40, top: 24 },
+    spacing: { lineHeight: 1.65, paragraph: 1, headings: 1, title: 4, margin: 40, top: 24 },
   },
   {
     id: "relaxed",
     name: t("settings.spacingRelaxed"),
-    spacing: { lineHeight: 1.85, paragraph: 1.2, headings: 1.4, title: 12, width: 680, margin: 64, top: 48 },
+    spacing: { lineHeight: 1.85, paragraph: 1.2, headings: 1.4, title: 12, margin: 64, top: 48 },
   },
 ];
 
 export const DEFAULT_SPACING = SPACING_PRESETS[1].spacing;
+
+/** The size of a note's text, in px (Settings → Text → Text size, and ⌘+ and ⌘−). */
+export const TEXT_SIZE = { min: 12, max: 28, step: 1 };
+
+/** How wide a note's text can run, in px (Settings → Text → Note width), and its choices besides Full. */
+export const NOTE_WIDTH = { min: 480, max: 1400, step: 20 };
+export const NOTE_WIDTHS = [
+  { id: "narrow", name: t("settings.widthNarrow"), width: 600 },
+  { id: "medium", name: t("settings.widthMedium"), width: 720 },
+  { id: "wide", name: t("settings.widthWide"), width: 960 },
+] as const;
 
 export function sameSpacing(a: Spacing, b: Spacing) {
   return SPACING_FIELDS.every(({ key }) => Math.abs(a[key] - b[key]) < 1e-6);
@@ -102,6 +126,9 @@ interface Stored {
   icons: string;
   swipe: SwipeDirection;
   spacing: Spacing;
+  /** How wide a note's text runs before wrapping, in px; or all the room there is, with the side margins kept. */
+  noteWidth: number;
+  fullWidth: boolean;
   /** See-through-ness and background blur of the main window and of floating notes (Mac app). */
   windowOpacity: number;
   windowBlur: boolean;
@@ -118,12 +145,20 @@ interface Stored {
   paper: Paper;
   /** How a LaTeX note's PDF is made: by lines (as it draws the note), or a typesetter plugin's id ("tex"). */
   typesetter: string;
-  /** The sidebar's and note list's widths, in pixels, as dragged (App.svelte). */
+  /** The sidebar's and note list's widths, in pixels, as dragged (App.svelte), and their sides of the window. */
   sidebarWidth: number;
   listWidth: number;
+  sidebarSide: Side;
+  listSide: Side;
+  /** Open notes show as tabs above the note (tabs.svelte.ts). */
+  tabs: boolean;
+  /** A line beside the note for each of its headings (editor/outline.svelte.ts), on its right or left. */
+  outline: boolean;
+  outlineSide: Side;
   /** Notes show `->` as →, `!=` as ≠ and so on (notes/symbols.ts): in their text, and in code. */
   symbolsInText: boolean;
   symbolsInCode: boolean;
+  links: LinkClicks;
 }
 
 export const OPACITY = { min: 0.3, max: 1, step: 0.01 };
@@ -156,6 +191,8 @@ const DEFAULTS: Stored = {
   icons: "lucide",
   swipe: "fingers",
   spacing: DEFAULT_SPACING,
+  noteWidth: 720,
+  fullWidth: false,
   windowOpacity: 1,
   windowBlur: true,
   floatingOpacity: 1,
@@ -169,8 +206,18 @@ const DEFAULTS: Stored = {
   typesetter: "lines",
   sidebarWidth: 230,
   listWidth: 320,
+  sidebarSide: "left",
+  listSide: "left",
+  tabs: false,
+  outline: false,
+  outlineSide: "right",
   symbolsInText: true,
   symbolsInCode: true,
+  links: {
+    web: { click: "edit", modClick: "open", modShiftClick: "copy" },
+    tag: { click: "edit", modClick: "open", modShiftClick: "open" },
+    mention: { click: "edit", modClick: "open", modShiftClick: "newTab" },
+  },
 };
 
 /** How narrow and wide the sidebar and note list can be dragged, and where double-clicking puts them back. */
@@ -190,6 +237,18 @@ const flag = (value: unknown, fallback: boolean) =>
   typeof value === "boolean" ? value : typeof value === "number" ? value > 0 : fallback;
 
 const APPEARANCES: Appearance[] = ["system", "light", "dark"];
+const SIDES: Side[] = ["left", "right"];
+
+/** Each kind of link's action for each click, where it's one that kind can do. */
+function readLinks(raw: unknown): LinkClicks {
+  const stored = (raw ?? {}) as Record<string, Record<string, unknown> | undefined>;
+  return Object.fromEntries(
+    (Object.keys(LINK_ACTIONS) as LinkKind[]).map((kind) => [
+      kind,
+      Object.fromEntries(LINK_CLICKS.map((click) => [click, oneOf(stored[kind]?.[click], LINK_ACTIONS[kind], DEFAULTS.links[kind][click])])),
+    ]),
+  ) as LinkClicks;
+}
 
 /** A plugin's theme, icon set or typesetter, by id. */
 const id = (value: unknown, fallback: string) => (typeof value === "string" && /^[a-z0-9][a-z0-9-]*$/.test(value) ? value : fallback);
@@ -208,12 +267,15 @@ function read(): Stored {
     appearance: oneOf(raw.appearance, APPEARANCES, DEFAULTS.appearance),
     contrast: oneOf(raw.contrast, ["system", "standard", "more"] as const, DEFAULTS.contrast),
     font: oneOf(raw.font, FONTS.map((f) => f.id), DEFAULTS.font),
-    textSize: clamp(raw.textSize, 14, 22, DEFAULTS.textSize),
+    textSize: clamp(raw.textSize, TEXT_SIZE.min, TEXT_SIZE.max, DEFAULTS.textSize),
     icons: id(raw.icons, DEFAULTS.icons),
     swipe: oneOf(raw.swipe, ["fingers", "reversed"] as const, DEFAULTS.swipe),
     spacing: Object.fromEntries(
       SPACING_FIELDS.map(({ key, min, max }) => [key, clamp(spacing[key], min, max, DEFAULT_SPACING[key])]),
     ) as unknown as Spacing,
+    // Kept with the spacing until Note width had a section of its own.
+    noteWidth: clamp(raw.noteWidth ?? spacing.width, NOTE_WIDTH.min, NOTE_WIDTH.max, DEFAULTS.noteWidth),
+    fullWidth: flag(raw.fullWidth, DEFAULTS.fullWidth),
     windowOpacity: clamp(raw.windowOpacity, OPACITY.min, OPACITY.max, 1),
     windowBlur: flag(raw.windowBlur, true),
     floatingOpacity: clamp(raw.floatingOpacity, OPACITY.min, OPACITY.max, 1),
@@ -227,8 +289,14 @@ function read(): Stored {
     typesetter: id(raw.typesetter, DEFAULTS.typesetter),
     sidebarWidth: clamp(raw.sidebarWidth, PANE_WIDTHS.sidebar.min, PANE_WIDTHS.sidebar.max, DEFAULTS.sidebarWidth),
     listWidth: clamp(raw.listWidth, PANE_WIDTHS.list.min, PANE_WIDTHS.list.max, DEFAULTS.listWidth),
+    sidebarSide: oneOf(raw.sidebarSide, SIDES, DEFAULTS.sidebarSide),
+    listSide: oneOf(raw.listSide, SIDES, DEFAULTS.listSide),
+    tabs: flag(raw.tabs, DEFAULTS.tabs),
+    outline: flag(raw.outline, DEFAULTS.outline),
+    outlineSide: oneOf(raw.outlineSide, SIDES, DEFAULTS.outlineSide),
     symbolsInText: flag(raw.symbolsInText, DEFAULTS.symbolsInText),
     symbolsInCode: flag(raw.symbolsInCode, DEFAULTS.symbolsInCode),
+    links: readLinks(raw.links),
   };
 }
 
@@ -260,8 +328,15 @@ class Prefs {
   typesetter = $state(this.#initial.typesetter);
   sidebarWidth = $state(this.#initial.sidebarWidth);
   listWidth = $state(this.#initial.listWidth);
+  sidebarSide = $state(this.#initial.sidebarSide);
+  listSide = $state(this.#initial.listSide);
+  tabs = $state(this.#initial.tabs);
+  outline = $state(this.#initial.outline);
+  outlineSide = $state(this.#initial.outlineSide);
   symbolsInText = $state(this.#initial.symbolsInText);
   symbolsInCode = $state(this.#initial.symbolsInCode);
+  /** Settings → Editing → Links: what a click, ⌘-click and ⌘⇧-click on each kind of link does. */
+  links = $state(this.#initial.links);
   #markWindowReady!: () => void;
   /** Resolves once this window's native look (opaque or see-through) has first been applied. */
   readonly windowReady = new Promise<void>((resolve) => (this.#markWindowReady = resolve));
@@ -270,6 +345,8 @@ class Prefs {
   #saved = JSON.stringify(this.#initial);
   #saveTimer: ReturnType<typeof setTimeout> | undefined;
   spacing = $state<Spacing>(this.#initial.spacing);
+  noteWidth = $state(this.#initial.noteWidth);
+  fullWidth = $state(this.#initial.fullWidth);
 
   #systemDark = $state(darkQuery.matches);
   #systemMoreContrast = $state(contrastQuery.matches);
@@ -331,6 +408,13 @@ class Prefs {
    * Reads every preference that changes line heights, so an effect calling it
    * re-runs when they change and can tell CodeMirror to measure again.
    */
+  /** Makes notes' text a step bigger (1) or smaller (-1), or its usual size (0), within its range; returns the new size. */
+  stepTextSize(by: -1 | 0 | 1) {
+    const next = by === 0 ? DEFAULTS.textSize : this.textSize + by * TEXT_SIZE.step;
+    this.textSize = Math.min(TEXT_SIZE.max, Math.max(TEXT_SIZE.min, next));
+    return this.textSize;
+  }
+
   watchLayout() {
     return [this.font, this.textSize, $state.snapshot(this.spacing)];
   }
@@ -349,7 +433,7 @@ class Prefs {
     style.setProperty("--paragraph-gap", String(s.paragraph));
     style.setProperty("--heading-space", String(s.headings));
     style.setProperty("--title-gap", `${s.title}px`);
-    style.setProperty("--editor-width", `${s.width}px`);
+    style.setProperty("--editor-width", this.fullWidth ? "none" : `${this.noteWidth}px`);
     style.setProperty("--editor-margin", `${s.margin}px`);
     style.setProperty("--editor-pad-top", `${s.top}px`);
     root.style.colorScheme = dark ? "dark" : "light";
@@ -372,6 +456,8 @@ class Prefs {
       icons: this.icons,
       swipe: this.swipe,
       spacing: $state.snapshot(this.spacing),
+      noteWidth: this.noteWidth,
+      fullWidth: this.fullWidth,
       windowOpacity: this.windowOpacity,
       windowBlur: this.windowBlur,
       floatingOpacity: this.floatingOpacity,
@@ -385,8 +471,14 @@ class Prefs {
       typesetter: this.typesetter,
       sidebarWidth: this.sidebarWidth,
       listWidth: this.listWidth,
+      sidebarSide: this.sidebarSide,
+      listSide: this.listSide,
+      tabs: this.tabs,
+      outline: this.outline,
+      outlineSide: this.outlineSide,
       symbolsInText: this.symbolsInText,
       symbolsInCode: this.symbolsInCode,
+      links: $state.snapshot(this.links),
     };
     return JSON.stringify(stored);
   }
@@ -414,6 +506,8 @@ class Prefs {
     this.icons = next.icons;
     this.swipe = next.swipe;
     if (!sameSpacing(this.spacing, next.spacing)) this.spacing = next.spacing;
+    this.noteWidth = next.noteWidth;
+    this.fullWidth = next.fullWidth;
     this.windowOpacity = next.windowOpacity;
     this.windowBlur = next.windowBlur;
     this.floatingOpacity = next.floatingOpacity;
@@ -427,8 +521,14 @@ class Prefs {
     this.typesetter = next.typesetter;
     this.sidebarWidth = next.sidebarWidth;
     this.listWidth = next.listWidth;
+    this.sidebarSide = next.sidebarSide;
+    this.listSide = next.listSide;
+    this.tabs = next.tabs;
+    this.outline = next.outline;
+    this.outlineSide = next.outlineSide;
     this.symbolsInText = next.symbolsInText;
     this.symbolsInCode = next.symbolsInCode;
+    if (JSON.stringify(this.links) !== JSON.stringify(next.links)) this.links = next.links;
   }
 }
 

@@ -7,7 +7,7 @@ Each element in a callout. Check: it draws as it does on its own, sits inside th
 #### 1. Paragraph in a callout
 
 :::i
-A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::
 
 #### 2. Long paragraph in a callout
@@ -130,67 +130,89 @@ $$
 | longer cell text | `code` | 22 |
 :::
 
-#### 17. Divider in a callout
+#### 17. Table with formulas in a callout
+
+:::i
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+:::
+
+#### 18. Spreadsheet (csv block) in a callout
+
+:::i
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+:::
+
+#### 19. Divider in a callout
 
 :::i
 ---
 :::
 
-#### 18. Key: Value line in a callout
+#### 20. Key: Value line in a callout
 
 :::i
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 19. Mention in a callout
+#### 21. Mention in a callout
 
 :::i
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 20. Wiki link in a callout
+#### 22. Wiki link in a callout
 
 :::i
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 21. Symbols in a callout
+#### 23. Symbols in a callout
 
 :::i
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 22. GitHub links in a callout
+#### 24. GitHub links in a callout
 
 :::i
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 23. Image in a callout
+#### 25. Image in a callout
 
 :::i
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 24. Drawing in a callout
+#### 26. Drawing in a callout
 
 :::i
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 25. File in a callout
+#### 27. File in a callout
 
 :::i
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 26. Missing file in a callout
+#### 28. Missing file in a callout
 
 :::i
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 27. Card in a callout
+#### 29. Card in a callout
 
 :::i
 ::: card
@@ -198,7 +220,7 @@ Text in a card.
 :::
 :::
 
-#### 28. Callout (info) in a callout
+#### 30. Callout (info) in a callout
 
 :::i
 :::i
@@ -206,7 +228,7 @@ Text in an info callout.
 :::
 :::
 
-#### 29. Callout (warning, chosen icon) in a callout
+#### 31. Callout (warning, chosen icon) in a callout
 
 :::i
 :::! icon=flag
@@ -214,7 +236,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 30. Callout (decision, no icon) in a callout
+#### 32. Callout (decision, no icon) in a callout
 
 :::i
 :::^ icon=none

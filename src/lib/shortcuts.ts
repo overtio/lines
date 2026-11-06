@@ -39,6 +39,9 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.focus", keys: ["Mod-Shift-\\"] },
       { action: "shortcuts.list", keys: ["Mod-/"] },
       { action: "shortcuts.pdf", keys: ["Mod-p"] },
+      { action: "shortcuts.textBigger", keys: ["Mod-+"] },
+      { action: "shortcuts.textSmaller", keys: ["Mod--"] },
+      { action: "shortcuts.textUsual", keys: ["Mod-0"] },
       { action: "shortcuts.lock", keys: [{ mac: "Ctrl-Mod-l", other: "Ctrl-Alt-l" }], note: "shortcuts.lockNote" },
       { action: "shortcuts.closeFloating", keys: ["Mod-w"], only: "desktop" },
       { action: "shortcuts.undoTrash", keys: ["Mod-z"], note: "shortcuts.undoTrashNote" },
@@ -57,7 +60,7 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.trashPicked", keys: ["Backspace"], note: "shortcuts.inList" },
       { action: "shortcuts.menu", keys: ["Shift-F10"] },
       { action: "shortcuts.openAtCursor", keys: ["Alt-Enter"], note: "shortcuts.inNote" },
-      { action: "shortcuts.openLink", keys: ["Mod-click"] },
+      { action: "shortcuts.openLink", keys: ["Mod-click"], note: "shortcuts.linksSetting" },
       { action: "shortcuts.close", keys: ["Escape"] },
     ],
   },
@@ -83,6 +86,7 @@ export const SHORTCUTS: ShortcutGroup[] = [
     shortcuts: [
       { action: "shortcuts.bold", keys: ["Mod-b"] },
       { action: "shortcuts.italic", keys: ["Mod-i"] },
+      { action: "shortcuts.underline", keys: ["Mod-u"] },
       { action: "shortcuts.code", keys: ["Mod-e"] },
       { action: "shortcuts.strike", keys: ["Mod-Shift-x"], note: "shortcuts.markdownOnly" },
       { action: "shortcuts.highlight", keys: ["Mod-Shift-h"], note: "shortcuts.markdownOnly" },
@@ -93,6 +97,26 @@ export const SHORTCUTS: ShortcutGroup[] = [
     shortcuts: [
       { action: "shortcuts.nextCell", keys: ["Tab", "Shift-Tab"] },
       { action: "shortcuts.newRow", keys: ["Enter"] },
+    ],
+  },
+  {
+    name: "shortcuts.group.sheets",
+    shortcuts: [
+      { action: "shortcuts.sheetMove", keys: ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Tab", "Shift-Tab"] },
+      { action: "shortcuts.sheetSelect", keys: ["Shift-ArrowDown", "Shift-click"] },
+      { action: "shortcuts.sheetEdge", keys: ["Mod-ArrowDown", "Mod-ArrowRight", "Home", "End"] },
+      { action: "shortcuts.sheetAll", keys: ["Mod-a"] },
+      { action: "shortcuts.sheetEdit", keys: ["Enter", "F2"], note: "shortcuts.sheetTyping" },
+      { action: "shortcuts.sheetKeep", keys: ["Enter", "Shift-Enter", "Tab"], note: "shortcuts.inCell" },
+      { action: "shortcuts.sheetCancel", keys: ["Escape"], note: "shortcuts.inCell" },
+      { action: "shortcuts.sheetBreak", keys: ["Alt-Enter"], note: "shortcuts.inCell" },
+      { action: "shortcuts.sheetPoint", keys: ["ArrowUp", "Shift-ArrowUp", "click"], note: "shortcuts.inFormula" },
+      { action: "shortcuts.sheetSuggestion", keys: ["Enter", "Tab"], note: "shortcuts.inSuggestions" },
+      { action: "shortcuts.sheetClear", keys: ["Backspace"] },
+      { action: "shortcuts.sheetFillDown", keys: ["Mod-d"] },
+      { action: "shortcuts.sheetFillRight", keys: ["Mod-r"] },
+      { action: "shortcuts.sheetMenu", keys: ["Shift-F10"] },
+      { action: "shortcuts.sheetInOut", keys: ["ArrowDown", "ArrowUp"], note: "shortcuts.besideSheet" },
     ],
   },
   {
@@ -146,7 +170,7 @@ function keyName(key: string, on: System): string {
 /** How `keys` are written on `on`: "⌘⇧F" on a Mac, "Ctrl+Shift+F" elsewhere. */
 export function formatKeys(keys: Keys, on: System): string {
   const spec = typeof keys === "string" ? keys : keys[on];
-  // The last part is the key ("-" itself never is one here); the rest are modifiers.
+  // The last part is the key (a "-" at the end is the key itself); the rest are modifiers.
   const parts = spec.split(/-(?=.)/);
   const key = parts.pop()!;
   const modifiers = new Set(parts);
@@ -188,6 +212,8 @@ export function speakKeys(keys: Keys, on: System): string {
     "/": "shortcuts.key.slash",
     "\\": "shortcuts.key.backslash",
     "@": "shortcuts.key.at",
+    "+": "shortcuts.key.plus",
+    "-": "shortcuts.key.minus",
   };
   const spokenKey = spokenKeys[key] ? t(spokenKeys[key]) : key.length === 1 ? key.toUpperCase() : key;
   return [...order.filter((m) => modifiers.has(m)).map((m) => t(words[m])), spokenKey].join(" ");

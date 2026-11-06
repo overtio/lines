@@ -7,7 +7,7 @@ Heading 1 followed straight away, with no blank line, by each element. Check: no
 #### 1. Heading 1, then Paragraph
 
 # Heading one
-A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 
 #### 2. Heading 1, then Long paragraph
 
@@ -114,78 +114,98 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Heading 1, then Divider
+#### 17. Heading 1, then Table with formulas
+
+# Heading one
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+
+#### 18. Heading 1, then Spreadsheet (csv block)
+
+# Heading one
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+
+#### 19. Heading 1, then Divider
 
 # Heading one
 ---
 
-#### 18. Heading 1, then Key: Value line
+#### 20. Heading 1, then Key: Value line
 
 # Heading one
 **Wi-Fi password:** correct-horse-battery
 
-#### 19. Heading 1, then Mention
+#### 21. Heading 1, then Mention
 
 # Heading one
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 20. Heading 1, then Wiki link
+#### 22. Heading 1, then Wiki link
 
 # Heading one
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 21. Heading 1, then Symbols
+#### 23. Heading 1, then Symbols
 
 # Heading one
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 22. Heading 1, then GitHub links
+#### 24. Heading 1, then GitHub links
 
 # Heading one
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 23. Heading 1, then Image
+#### 25. Heading 1, then Image
 
 # Heading one
 ![A sample picture](attachment:photo.png)
 
-#### 24. Heading 1, then Drawing
+#### 26. Heading 1, then Drawing
 
 # Heading one
 ![A sample drawing](attachment:drawing.svg)
 
-#### 25. Heading 1, then File
+#### 27. Heading 1, then File
 
 # Heading one
 [Budget.csv](attachment:budget.csv)
 
-#### 26. Heading 1, then Missing file
+#### 28. Heading 1, then Missing file
 
 # Heading one
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 27. Heading 1, then Card
+#### 29. Heading 1, then Card
 
 # Heading one
 ::: card
 Text in a card.
 :::
 
-#### 28. Heading 1, then Callout (info)
+#### 30. Heading 1, then Callout (info)
 
 # Heading one
 :::i
 Text in an info callout.
 :::
 
-#### 29. Heading 1, then Callout (warning, chosen icon)
+#### 31. Heading 1, then Callout (warning, chosen icon)
 
 # Heading one
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 30. Heading 1, then Callout (decision, no icon)
+#### 32. Heading 1, then Callout (decision, no icon)
 
 # Heading one
 :::^ icon=none

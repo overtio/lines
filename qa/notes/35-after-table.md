@@ -10,7 +10,7 @@ Table followed straight away, with no blank line, by each element. Check: nothin
 | :--- | :----: | ----: |
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
-A paragraph with **bold**, *italic*, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 
 #### 2. Table, then Long paragraph
 
@@ -162,7 +162,33 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Table, then Divider
+#### 17. Table, then Table with formulas
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+
+#### 18. Table, then Spreadsheet (csv block)
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+
+#### 19. Table, then Divider
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -170,7 +196,7 @@ $$
 | longer cell text | `code` | 22 |
 ---
 
-#### 18. Table, then Key: Value line
+#### 20. Table, then Key: Value line
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -178,7 +204,7 @@ $$
 | longer cell text | `code` | 22 |
 **Wi-Fi password:** correct-horse-battery
 
-#### 19. Table, then Mention
+#### 21. Table, then Mention
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -186,7 +212,7 @@ $$
 | longer cell text | `code` | 22 |
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 20. Table, then Wiki link
+#### 22. Table, then Wiki link
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -194,7 +220,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 | longer cell text | `code` | 22 |
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 21. Table, then Symbols
+#### 23. Table, then Symbols
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -202,7 +228,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | longer cell text | `code` | 22 |
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 22. Table, then GitHub links
+#### 24. Table, then GitHub links
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -210,7 +236,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | longer cell text | `code` | 22 |
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 23. Table, then Image
+#### 25. Table, then Image
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -218,7 +244,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 ![A sample picture](attachment:photo.png)
 
-#### 24. Table, then Drawing
+#### 26. Table, then Drawing
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -226,7 +252,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 25. Table, then File
+#### 27. Table, then File
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -234,7 +260,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [Budget.csv](attachment:budget.csv)
 
-#### 26. Table, then Missing file
+#### 28. Table, then Missing file
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -242,7 +268,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 27. Table, then Card
+#### 29. Table, then Card
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -252,7 +278,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 28. Table, then Callout (info)
+#### 30. Table, then Callout (info)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -262,7 +288,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 29. Table, then Callout (warning, chosen icon)
+#### 31. Table, then Callout (warning, chosen icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -272,7 +298,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 30. Table, then Callout (decision, no icon)
+#### 32. Table, then Callout (decision, no icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |

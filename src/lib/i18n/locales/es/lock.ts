@@ -75,7 +75,7 @@ export default {
 
   "lock.synced.title": "Notas sincronizadas",
   "lock.synced.intro":
-    "Para cifrar las notas antes de que salgan de este dispositivo, de modo que tu proveedor de almacenamiento no pueda leerlas, activa el cifrado de extremo a extremo en Sincronización, más arriba.",
+    "Para cifrar las notas antes de que salgan de este dispositivo, de modo que tu proveedor de almacenamiento no pueda leerlas, activa el cifrado de extremo a extremo en Ajustes → Sincronización.",
   "lock.synced.open": "Ir a Sincronización",
 
   "lock.screen.title": "lines está bloqueado",

@@ -205,7 +205,7 @@ export function printDocument(body: string, parts: Parts): HTMLElement {
           }
           return flow.block(caption);
         }
-        const tag = { "cm-lp-strong": "strong", "cm-lp-em": "em", "cm-lp-code": "code", "cm-lt-underline": "u", "cm-lp-strike": "s" }[span.cls] ?? "span";
+        const tag = { "cm-lp-strong": "strong", "cm-lp-em": "em", "cm-lp-code": "code", "cm-lp-underline": "u", "cm-lp-strike": "s" }[span.cls] ?? "span";
         const element = el(tag as "span", span.cls === "cm-lt-smallcaps" ? "doc-smallcaps" : "");
         flow.inline().append(inline(span.open, span.close, node.children, element));
         // \paragraph{Title} runs into the text after it.

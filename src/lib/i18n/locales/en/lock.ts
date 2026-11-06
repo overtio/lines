@@ -14,7 +14,7 @@ export default {
   "lock.form.passwordsDiffer": "The two passwords don’t match.",
   "lock.cancel": "Cancel",
 
-  /* Settings → Data: the app lock. */
+  /* Settings → Privacy: the app lock. */
   "lock.app.title": "App lock",
   "lock.app.intro":
     "Lock lines with a passphrase. Your notes, attachments and sync settings on this device are encrypted, and lines asks for the passphrase when it opens.",
@@ -52,7 +52,7 @@ export default {
   "lock.touchId.turnOffFailed": "Couldn’t turn off Touch ID: {error}",
   "lock.touchId.failed": "Touch ID didn’t work: {error}",
 
-  /* Settings → Data: locked notes. */
+  /* Settings → Privacy: locked notes. */
   "lock.notes.title": "Locked notes",
   // “Lock Note” is the note menu's item.
   "lock.notes.intro":
@@ -78,10 +78,10 @@ export default {
   "lock.notes.turningOn": "Turning on…",
   "lock.notes.notOpen": "Open your locked notes first.",
 
-  /* Settings → Data: synced notes. */
+  /* Settings → Privacy: synced notes. */
   "lock.synced.title": "Synced notes",
   "lock.synced.intro":
-    "To encrypt notes before they leave this device, so your storage provider can’t read them, turn on end-to-end encryption under Sync, above.",
+    "To encrypt notes before they leave this device, so your storage provider can’t read them, turn on end-to-end encryption in Settings → Sync.",
   "lock.synced.open": "Go to Sync",
 
   /* The lock screen, while lines is locked. */

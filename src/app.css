@@ -1,3 +1,96 @@
+/*
+ * lines' look. Themes (plugins) set the base colors as custom properties, which :root below builds
+ * on; the @theme blocks make them, and one scale of sizes, Tailwind's tokens. Components use
+ * Tailwind's utilities and the shared parts in components/ui; what CodeMirror draws in a note is
+ * styled by editor/editor.css.
+ *
+ * Tailwind's Preflight reset isn't used: notes, KaTeX, Mermaid and Excalidraw keep the browser's
+ * defaults, and the reset in @layer base is all the app needs.
+ */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* Only these: theme colors, so everything follows the theme, and one scale of each. */
+@theme {
+  --color-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+
+  --text-2xs: 11px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 21px;
+
+  /* One height for buttons, fields and selects (h-control), and one for rows in menus and lists (h-row). */
+  --spacing-control: var(--control);
+  --spacing-row: var(--row);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-list: var(--bg-list);
+  --color-sidebar: var(--bg-sidebar);
+  /* Raised over the window: cards, dialogs, menus. */
+  --color-panel: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-list: var(--surface-list);
+  --color-surface-sidebar: var(--surface-sidebar);
+  --color-fg: var(--text);
+  --color-fg-sidebar: var(--text-sidebar);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-ink: var(--ink);
+  --color-line: var(--border);
+  --color-hover: var(--hover);
+  --color-active: var(--active);
+  --color-input: var(--input);
+  --color-code: var(--code-bg);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-selection: var(--selection);
+  --color-tag: var(--tag-bg);
+  --color-tag-fg: var(--tag-text);
+  --color-card: var(--card-bg);
+  --color-card-line: var(--card-border);
+  --color-danger: var(--danger);
+  --color-on-danger: var(--on-danger);
+  --color-success: var(--success);
+  --color-on-success: var(--on-success);
+  --color-pin: var(--pin);
+  --color-on-pin: var(--on-pin);
+  --color-highlight: var(--highlight);
+  --color-scrim: var(--scrim);
+
+  --font-ui: var(--font-ui);
+  --font-text: var(--font-text);
+  --font-mono: var(--font-mono);
+
+  --shadow-card: var(--card-shadow);
+  --shadow-menu: var(--shadow-menu);
+  --shadow-dialog: var(--shadow-dialog);
+  --shadow-segment: var(--shadow-segment);
+  --shadow-drawer: var(--shadow-drawer);
+
+  --ease-sheet: var(--ease-sheet);
+  --ease-pop: var(--ease-pop);
+}
+
+/* Fingers, and devices that can hover. */
+@custom-variant coarse (@media (pointer: coarse));
+@custom-variant fine (@media (pointer: fine));
+
 :root {
   --font-system: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-serif: ui-serif, "New York", "Iowan Old Style", Charter, "Bitstream Charter", Georgia, Cambria, serif;
@@ -18,9 +111,11 @@
   --editor-pad-top: 24px;
   --titlebar-pad-top: 0px;
   --titlebar-h: calc(52px + var(--titlebar-pad-top));
+  --control: 32px;
+  --row: 28px;
 
   /*
-   * Window surfaces. In the Mac app, window opacity (Settings → Theme) makes them
+   * Window surfaces. In the Mac app, window opacity (Settings → Windows) makes them
    * see-through, with the desktop blurred behind; elsewhere they're always solid.
    */
   --window-alpha: 100%;
@@ -172,10 +267,10 @@
   pointer-events: none;
 }
 
-:root[data-platform="mac-app"] .sidebar .titlebar,
-:root[data-platform="mac-app"] .app:not(.sidebar-open) .note-list .titlebar,
-:root[data-platform="mac-app"] .app[data-layout="narrow"].has-selection .editor-pane .toolbar,
-:root[data-platform="mac-app"] .app.focus .editor-pane .toolbar {
+/* The window buttons' room, in the leftmost pane: a sidebar on the left, or the pane App.svelte marks as first. */
+:root[data-platform="mac-app"] .app[data-sidebar="left"] .sidebar .titlebar,
+:root[data-platform="mac-app"] .app[data-first="list"] .note-list .titlebar,
+:root[data-platform="mac-app"] .app[data-first="editor"] .editor-pane .toolbar {
   padding-left: 92px;
 }
 
@@ -187,12 +282,6 @@
   transition: padding-left 320ms var(--ease-sheet);
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
 /*
  * Where scroll bars are always shown (Windows, Linux, or macOS set to "Always"), keep them slim
  * with a transparent track so they sit on each theme instead of a gray strip. Overlay scroll
@@ -202,160 +291,12 @@
   scrollbar-color: var(--scrollbar) transparent;
 }
 
-* {
-  scrollbar-width: thin;
-}
-
-html,
-body,
-#app {
-  height: 100%;
-  margin: 0;
-}
-
-/* The app never scrolls as a whole: no rubber-banding, and no swipe-to-go-back in browsers. */
-html,
-body {
-  overflow: hidden;
-  overscroll-behavior: none;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 14px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  -webkit-tap-highlight-color: transparent;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-input,
-.cm-content {
-  user-select: text;
-  -webkit-user-select: text;
-}
-
-button {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-}
-
-button:disabled {
-  cursor: default;
-}
-
-input[type="range"],
-input[type="checkbox"],
-summary {
-  cursor: pointer;
-}
-
-ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* Keyboard focus, in the accent at full strength so it stands out (3:1) against any background. */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-}
-
-/* Read by screen readers, not shown: labels and announcements (lib/a11y.ts). */
-.visually-hidden {
-  position: absolute !important;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-}
-
-.icon-button {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  color: var(--text-muted);
-  flex-shrink: 0;
-  transition: background-color 120ms ease, color 120ms ease;
-}
-
-@media (hover: hover) {
-  .icon-button:hover,
-  .text-button:hover {
-    background: var(--hover);
-    color: var(--text);
-  }
-}
-
-/* While the button's menu is open. */
-.icon-button.open {
-  background: var(--active);
-  color: var(--text);
-}
-
-.icon-button.on {
-  color: var(--accent);
-}
-
-.text-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 30px;
-  padding: 0 10px;
-  border-radius: 8px;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 500;
-  transition: background-color 120ms ease, color 120ms ease;
-}
-
-/*
- * On touch screens a tap reaches 44px around a button (WCAG's size for touch) though it's drawn
- * smaller, so toolbars keep their look.
- */
+/* Fingers need bigger targets. */
 @media (pointer: coarse) {
-  .icon-button,
-  .text-button {
-    position: relative;
+  :root {
+    --control: 44px;
+    --row: 44px;
   }
-
-  .icon-button::after,
-  .text-button::after {
-    content: "";
-    position: absolute;
-    inset: -6px;
-  }
-
-  .text-button::after {
-    inset: -7px -2px;
-  }
-}
-
-.text-button.danger {
-  color: var(--danger);
-}
-
-/* Lines a text button's label up with the text above it. */
-.text-button.flush {
-  margin-left: -10px;
 }
 
 @media (max-width: 699px) {
@@ -364,90 +305,185 @@ ul {
   }
 }
 
-/* Menus, the icon picker and other panels that float over the app. */
-.popover {
-  position: fixed;
-  z-index: 100;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg-elevated);
-  box-shadow: var(--shadow-menu);
-  outline: none;
-  animation: popover-in 140ms var(--ease-pop);
-}
-
-@keyframes popover-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-}
-
-.spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/*
- * Placeholders are the browser's grey (about 4:1 on a field); the accessibility themes use their
- * faint text, which they keep at 7:1 (High Contrast) or 4.5:1 on every surface.
- */
-:root[data-accessible] ::placeholder {
-  color: var(--text-faint);
-  opacity: 1;
-}
-
-/*
- * Forced colors (Windows' contrast themes, and Chrome's emulation of them): the system swaps every
- * color for a few of its own and drops background colors and shadows. Borders take the text's
- * color by themselves, but what's selected, chosen or focused is marked here with a background or
- * a shadow, so mark it with the system's colors instead. `!important` because each component sets
- * its own background for these, which would otherwise win and then be dropped.
- */
-@media (forced-colors: active) {
-  :focus-visible {
-    outline-color: Highlight;
-  }
-
-  /* The open note's row, the current sidebar item, the chosen option (segmented controls, themes, icons, tabs, autocomplete). */
-  [aria-current="true"],
-  [aria-current="page"],
-  [aria-selected="true"],
-  [role="radio"][aria-checked="true"],
-  [aria-pressed="true"],
-  .icon-button.open,
-  [role="menuitem"]:is(:hover, :focus-visible) {
-    background: Highlight !important;
-    color: HighlightText !important;
-  }
-
-  /* Focus on something already marked: a ring in the marking's text color, inside it. */
-  :is([aria-current="true"], [aria-current="page"], [aria-selected="true"], [role="radio"][aria-checked="true"], [aria-pressed="true"]):focus-visible {
-    outline-color: HighlightText;
-  }
-
-  /* Text fields show focus with a border color, which forced colors makes the same as at rest. */
-  :root :is(input, textarea, select):focus {
-    outline: 2px solid Highlight;
-    outline-offset: -2px;
-  }
-
-  button:disabled {
-    color: GrayText;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
+@layer base {
   *,
   *::before,
   *::after {
-    transition-duration: 0s !important;
-    animation-duration: 0s !important;
-    animation-iteration-count: 1 !important;
+    box-sizing: border-box;
   }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  html,
+  body,
+  #app {
+    height: 100%;
+    margin: 0;
+  }
+
+  /* The app never scrolls as a whole: no rubber-banding, and no swipe-to-go-back in browsers. */
+  html,
+  body {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  input,
+  textarea,
+  .cm-content {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: default;
+  }
+
+  input[type="range"],
+  input[type="checkbox"],
+  summary {
+    cursor: pointer;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Keyboard focus, in the accent at full strength so it stands out (3:1) against any background. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  /*
+   * Placeholders are the browser's grey (about 4:1 on a field); the accessibility themes use their
+   * faint text, which they keep at 7:1 (High Contrast) or 4.5:1 on every surface.
+   */
+  :root[data-accessible] ::placeholder {
+    color: var(--text-faint);
+    opacity: 1;
+  }
+
+  /*
+   * Forced colors (Windows' contrast themes, and Chrome's emulation of them): the system swaps every
+   * color for a few of its own and drops background colors and shadows. Borders take the text's
+   * color by themselves, but what's selected, chosen or focused is marked here with a background or
+   * a shadow, so mark it with the system's colors instead. `!important` because each component sets
+   * its own background for these, which would otherwise win and then be dropped.
+   */
+  @media (forced-colors: active) {
+    :focus-visible {
+      outline-color: Highlight;
+    }
+
+    /*
+     * The open note's row, the current sidebar item, the chosen option (segmented controls, themes,
+     * icons, sections, menus, autocomplete), a switch that's on. Out of forced colors' hands, as it
+     * would draw a backplate in the background's color behind their text and hide it; everything in
+     * them takes the marking's text color.
+     */
+    [aria-current="true"],
+    [aria-current="page"],
+    [aria-selected="true"],
+    [role="radio"][aria-checked="true"],
+    [role="switch"][aria-checked="true"],
+    [aria-pressed="true"],
+    [aria-expanded="true"][aria-haspopup],
+    [role="menuitem"][data-highlighted],
+    [role="option"][data-highlighted] {
+      forced-color-adjust: none;
+      background: Highlight !important;
+      color: HighlightText !important;
+
+      & * {
+        color: inherit !important;
+      }
+    }
+
+    /* Focus on something already marked: a ring in the marking's text color, inside it. */
+    :is([aria-current="true"], [aria-current="page"], [aria-selected="true"], [role="radio"][aria-checked="true"], [aria-pressed="true"]):focus-visible {
+      outline-color: HighlightText;
+    }
+
+    /* Text fields show focus with a border color, which forced colors makes the same as at rest. */
+    :root :is(input, textarea, select):focus {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    button:disabled {
+      color: GrayText;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0s !important;
+      animation-duration: 0s !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * On touch screens a tap reaches 44px around a small button (WCAG's size for touch) though it's
+ * drawn smaller, so toolbars keep their look.
+ */
+@utility touch-target {
+  @media (pointer: coarse) {
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: -6px;
+    }
+  }
+}
+
+/* Floating panels (menus, popovers, selects) open from where they're anchored. */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+@utility animate-pop-in {
+  animation: pop-in 140ms var(--ease-pop);
+  transform-origin: var(--bits-floating-transform-origin, center);
 }

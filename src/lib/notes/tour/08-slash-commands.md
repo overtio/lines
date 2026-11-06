@@ -6,6 +6,7 @@ Type `/` at the start of a line for a menu of everything you can add. Keep typin
 | -------- | ------------ |
 | ⌘B | Bold |
 | ⌘I | Italic |
+| ⌘U | Underline |
 | ⌘E | Inline code |
 | ⌘⇧X | Strikethrough |
 | ⌘⇧H | Highlight |
@@ -13,6 +14,7 @@ Type `/` at the start of a line for a menu of everything you can add. Keep typin
 | ⌥↑ ⌥↓ | Move lines |
 | ⌘F | Find in the note |
 | ⇧⌘\ | Focus on the note |
+| ⌘+ ⌘− | Bigger or smaller text |
 
 On Windows and Linux, use Ctrl for ⌘ and Alt for ⌥.
 

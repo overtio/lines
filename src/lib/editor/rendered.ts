@@ -1,21 +1,26 @@
+import { isolateHistory } from "@codemirror/commands";
 import { syntaxTree } from "@codemirror/language";
-import { type EditorState, type Extension, type Range, StateField } from "@codemirror/state";
-import { Decoration, type DecorationSet, EditorView, WidgetType } from "@codemirror/view";
+import { type EditorState, type Extension, Prec, type Range, StateField } from "@codemirror/state";
+import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, WidgetType } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
 import { t } from "../i18n/index.svelte";
 import { plugins } from "../plugins/registry.svelte";
-import type { Renderer } from "../plugins/types";
+import type { BlockEditor, EditableBlock, Renderer } from "../plugins/types";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { coarsePointer } from "../platform";
-import { focusChanged, focused, isEditing } from "./util";
+import { ancestors, changeBetween, focusChanged, focused, isEditing } from "./util";
 
 /*
  * Code blocks drawn by a renderer plugin: ```mermaid as its diagram, say, in the theme's colors.
  * With the cursor in one, the code shows with the drawing below it, redrawn as you type. Buttons
  * the renderer gives sit on the drawing, and a handle on its corner resizes it, written after the
  * language as an image's width is in its label (```mermaid |400).
+ *
+ * A renderer can draw its blocks as something to work in instead (`Renderer.editor`): a ```csv
+ * block as a spreadsheet's grid, which writes its changes back into the code. The code shows only
+ * while the cursor is in it, from the find bar, say, or the block's own "Edit as CSV".
  */
 
 /** A code block's language as its info string gives it: its first word, in lowercase. */
@@ -29,6 +34,14 @@ export function renderedInfo(info: string): { renderer: Renderer; width: number 
   const match = /^(\S+)(?:\s+\|\s*(\d{1,5})(?:\s*x\s*\d{1,5})?)?$/.exec(info.trim());
   const renderer = match && plugins.renderer(match[1]);
   return renderer ? { renderer, width: Number(match[2]) || null } : null;
+}
+
+/** The code block at `pos`, or the one ending just before it. */
+function fenceAt(state: EditorState, pos: number): SyntaxNode | null {
+  for (const side of [1, -1] as const) {
+    for (const node of ancestors(state, pos, side)) if (node.name === "FencedCode") return node;
+  }
+  return null;
 }
 
 /** What drawings' colors depend on: one made in one look is drawn again in another. */
@@ -129,18 +142,11 @@ function setWidth(svg: SVGSVGElement, width: number | null) {
 function writeWidth(view: EditorView, dom: HTMLElement, width: number | null) {
   const pos = view.posAtDOM(dom);
   // A preview sits after the block's last line; the block is just before it.
-  const at = dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos;
-  for (const side of [1, -1] as const) {
-    for (let node: SyntaxNode | null = syntaxTree(view.state).resolveInner(at, side); node; node = node.parent) {
-      if (node.name !== "FencedCode") continue;
-      const info = node.getChild("CodeInfo");
-      const text = info ? view.state.sliceDoc(info.from, info.to) : "";
-      if (!info || !renderedInfo(text)) return;
-      const insert = text.trim().split(/\s/)[0] + (width ? ` |${width}` : "");
-      if (insert !== text) view.dispatch({ changes: { from: info.from, to: info.to, insert }, userEvent: "input.resize" });
-      return;
-    }
-  }
+  const info = fenceAt(view.state, dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos)?.getChild("CodeInfo");
+  const text = info ? view.state.sliceDoc(info.from, info.to) : "";
+  if (!info || !renderedInfo(text)) return;
+  const insert = text.trim().split(/\s/)[0] + (width ? ` |${width}` : "");
+  if (insert !== text) view.dispatch({ changes: { from: info.from, to: info.to, insert }, userEvent: "input.resize" });
 }
 
 /**
@@ -279,6 +285,170 @@ class RenderedWidget extends WidgetType {
   }
 }
 
+/* Blocks to work in. */
+
+/** A block drawn by its renderer's editor, as the editor sees it. */
+class Block implements EditableBlock {
+  constructor(
+    readonly view: EditorView,
+    readonly dom: HTMLElement,
+    public source: string,
+  ) {}
+
+  get readOnly() {
+    return this.view.state.readOnly;
+  }
+
+  /** Where it is in the note now. */
+  #node() {
+    return fenceAt(this.view.state, this.view.posAtDOM(this.dom));
+  }
+
+  write(source: string) {
+    const node = this.#node();
+    if (!node || this.readOnly) return;
+    const { state } = this.view;
+    // Its code goes between the fence lines: none, or a line break and the code.
+    const marks = node.getChildren("CodeMark");
+    const from = state.doc.lineAt(node.from).to;
+    const to = marks.length > 1 ? state.doc.lineAt(marks[marks.length - 1].from).from - 1 : node.to;
+    const changes = changeBetween(from, state.sliceDoc(from, to), source ? `\n${source}` : "");
+    if (changes) this.view.dispatch({ changes, userEvent: "input", annotations: isolateHistory.of("full") });
+  }
+
+  leave(up: boolean) {
+    const node = this.#node();
+    if (!node) return;
+    const { doc } = this.view.state;
+    const first = doc.lineAt(node.from);
+    const last = doc.lineAt(node.to);
+    if (up && first.number === 1) return;
+    const spec =
+      up ? { selection: { anchor: doc.line(first.number - 1).to } }
+      : last.number < doc.lines ? { selection: { anchor: doc.line(last.number + 1).from } }
+      : { changes: { from: doc.length, insert: "\n" }, selection: { anchor: doc.length + 1 } };
+    // Moved first, so it doesn't show its code as the editor takes focus with the cursor still in it.
+    this.view.dispatch({ ...spec, scrollIntoView: true, userEvent: "select" });
+    this.view.focus();
+  }
+
+  showCode() {
+    const node = this.#node();
+    if (!node) return;
+    const { doc } = this.view.state;
+    const fence = doc.lineAt(node.from);
+    this.view.dispatch({ selection: { anchor: fence.number < doc.lines ? doc.line(fence.number + 1).from : fence.to }, scrollIntoView: true });
+    this.view.focus();
+  }
+}
+
+/** Blocks on screen drawn to work in: what draws them, and the editor it made for each. */
+const editables = new Map<HTMLElement, { renderer: Renderer; block: Block; editor: BlockEditor }>();
+
+class EditableWidget extends WidgetType {
+  constructor(
+    readonly renderer: Renderer,
+    readonly source: string,
+    readonly inset: CardInset,
+  ) {
+    super();
+  }
+  eq(other: EditableWidget) {
+    return other.renderer === this.renderer && other.source === this.source && sameInset(other.inset, this.inset);
+  }
+  toDOM(view: EditorView) {
+    const dom = document.createElement("div");
+    dom.className = "cm-lp-editable";
+    setInset(dom, this.inset);
+    const block = new Block(view, dom, this.source);
+    editables.set(dom, { renderer: this.renderer, block, editor: this.renderer.editor!(dom, block) });
+    measure(view, dom, this.source);
+    return dom;
+  }
+  // Its code changed, often from what's drawn: it keeps what's drawn (and the keyboard) and shows the change.
+  updateDOM(dom: HTMLElement, view: EditorView) {
+    const live = editables.get(dom);
+    if (!live || live.renderer !== this.renderer) return false;
+    setInset(dom, this.inset);
+    if (live.block.source !== this.source) {
+      live.block.source = this.source;
+      live.editor.update();
+      measure(view, dom, this.source);
+    }
+    return true;
+  }
+  destroy(dom: HTMLElement) {
+    editables.get(dom)?.editor.destroy();
+    editables.delete(dom);
+  }
+  get estimatedHeight() {
+    return heights.get(`editable\n${this.source}`) ?? 160;
+  }
+  ignoreEvent() {
+    return true;
+  }
+}
+
+/** Keeps what's drawn up to date with whether the note is read-only, and with the editor's size. */
+const editableUpdates = ViewPlugin.define((view) => ({
+  update(update) {
+    const readOnly = update.startState.readOnly !== update.state.readOnly;
+    if (!readOnly && !update.geometryChanged) return;
+    for (const { block, editor } of editables.values()) {
+      if (block.view !== view) continue;
+      if (readOnly) editor.update();
+      if (update.geometryChanged) editor.layout?.();
+    }
+  },
+}));
+
+/** Remembers how tall a block is drawn, for the next time it's off screen. */
+function measure(view: EditorView, dom: HTMLElement, source: string) {
+  view.requestMeasure({ read: () => dom.offsetHeight, write: (height) => void (height && remember(heights, `editable\n${source}`, height)) });
+}
+
+/**
+ * ↓ on the line above a block drawn to work in, or ↑ on the line below it, goes into it, rather
+ * than into its code.
+ */
+function intoEditable(forward: boolean) {
+  return (view: EditorView) => {
+    const { state } = view;
+    const range = state.selection.main;
+    if (state.selection.ranges.length > 1 || !range.empty) return false;
+    const line = state.doc.lineAt(range.head);
+    // Within a wrapped line, ↑ and ↓ move along it.
+    if (state.doc.lineAt(view.moveVertically(range, forward).head).number === line.number) return false;
+    const n = line.number + (forward ? 1 : -1);
+    if (n < 1 || n > state.doc.lines) return false;
+    const next = state.doc.line(n);
+    const at = forward ? next.from : next.to;
+    let start = -1;
+    state.field(blocks).between(at, at, (from, to, deco) => {
+      if (deco.spec.widget instanceof EditableWidget && (forward ? from : to) === at) start = from;
+    });
+    return start >= 0 && focusEditable(view, start, forward ? "above" : "below");
+  };
+}
+
+/** Gives the keyboard to the block drawn to work in whose fence starts at `start`, as if moving into it from above or below. */
+export function focusEditable(view: EditorView, start: number, from: "above" | "below") {
+  for (const [dom, { block, editor }] of editables) {
+    if (block.view === view && view.posAtDOM(dom) === start) {
+      editor.focus(from);
+      return true;
+    }
+  }
+  return false;
+}
+
+const editableKeymap = Prec.high(
+  keymap.of([
+    { key: "ArrowDown", run: intoEditable(true) },
+    { key: "ArrowUp", run: intoEditable(false) },
+  ]),
+);
+
 function buildBlocks(state: EditorState): DecorationSet {
   const decos: Range<Decoration>[] = [];
   syntaxTree(state).iterate({
@@ -295,7 +465,13 @@ function buildBlocks(state: EditorState): DecorationSet {
       const code = node.node.getChild("CodeText");
       const source = code ? state.sliceDoc(code.from, code.to) : "";
       const inset = cardInset(state, node.node);
-      if (isEditing(state, node.from, node.to)) {
+      if (rendered.renderer.editor) {
+        // In place of its code, which shows as it is while the cursor's in it.
+        if (!isEditing(state, node.from, node.to)) {
+          const widget = new EditableWidget(rendered.renderer, source, inset);
+          decos.push(Decoration.replace({ widget, block: true }).range(first.from, state.doc.lineAt(node.to).to));
+        }
+      } else if (isEditing(state, node.from, node.to)) {
         const widget = new RenderedWidget(rendered.renderer, source, rendered.width, inset, true);
         decos.push(Decoration.widget({ widget, block: true, side: 1 }).range(state.doc.lineAt(node.to).to));
       } else {
@@ -337,4 +513,4 @@ const clickToEdit = EditorView.domEventHandlers({
   },
 });
 
-export const renderedBlocks: Extension = [focused, blocks, clickToEdit];
+export const renderedBlocks: Extension = [focused, blocks, clickToEdit, editableUpdates, editableKeymap];

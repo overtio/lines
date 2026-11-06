@@ -1,17 +1,21 @@
 <script lang="ts">
+  import { Popover } from "bits-ui";
   import { speak } from "../a11y";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { normalizeTag } from "../notes/parse";
   import { notes, type TagNode } from "../notes/store.svelte";
-  import { dismissable, placeAt, takeFocus } from "../popover";
+  import { pointAt, takeFocus } from "../popover";
   import { ui } from "../ui.svelte";
+  import { floating } from "./ui/styles";
 
   /** How many tags it suggests at most. */
   const SUGGESTIONS = 6;
 
-  let el = $state<HTMLDivElement>();
+  let el = $state<HTMLElement | null>(null);
   let input = $state<HTMLInputElement>();
+  /** Gives focus back where it was when the box closes. */
+  let restore: (() => void) | undefined;
   let value = $state("");
   /** The suggestion ↑ and ↓ are on, if any. */
   let active = $state(-1);
@@ -41,16 +45,8 @@
 
   const typed = $derived(normalizeTag(value.trim().replace(/^#/, "")));
 
-  $effect(() => {
-    const p = ui.tagPrompt;
-    if (!p || !el || !input) return;
-    placeAt(el, p.x, p.y, p.align);
-    return takeFocus(el, input);
-  });
-
-  $effect(() => {
-    if (ui.tagPrompt) return dismissable(() => el, close);
-  });
+  /** It opens at a point: the pointer, or a button's corner. */
+  const anchor = $derived(prompt && pointAt(prompt.x, prompt.y));
 
   // A new search starts with nothing chosen.
   $effect(() => {
@@ -78,10 +74,7 @@
   }
 
   function onkeydown(event: KeyboardEvent) {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      close();
-    } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       if (!suggestions.length) return;
       event.preventDefault();
       // Past either end, back to what's typed.
@@ -96,122 +89,71 @@
   }
 </script>
 
-{#if prompt}
-  <div class="tag-prompt popover" role="dialog" tabindex="-1" aria-label={t("list.tagFor", { count: prompt.ids.length })} bind:this={el} {onkeydown}>
-    <form {onsubmit}>
-    <p class="title" aria-hidden="true">{t("list.tagFor", { count: prompt.ids.length })}</p>
-    <div class="field">
-      <Icon name="hash" size={14} />
-      <input
-        bind:this={input}
-        bind:value
-        placeholder={t("list.tagName")}
-        aria-label={t("list.tagName")}
-        autocomplete="off"
-        autocapitalize="off"
-        spellcheck="false"
-        role="combobox"
-        aria-expanded={suggestions.length > 0}
-        aria-controls="tag-prompt-suggestions"
-        aria-autocomplete="list"
-        aria-activedescendant={active >= 0 ? `tag-suggestion-${active}` : undefined}
-      />
-      <button class="add" type="submit" disabled={!typed && active < 0}>{t("list.tagAdd")}</button>
-    </div>
-    {#if suggestions.length}
-      <ul id="tag-prompt-suggestions" role="listbox" aria-label={t("list.tagName")}>
-        {#each suggestions as tag, i (tag)}
-          <li id="tag-suggestion-{i}" role="option" aria-selected={i === active} class:active={i === active}>
-            <!-- For a pointer; the keyboard uses ↑ ↓ and Enter in the field. -->
-            <button type="button" tabindex="-1" onclick={() => add(tag)}>#{tag}</button>
-          </li>
-        {/each}
-      </ul>
-    {/if}
-    </form>
-  </div>
-{/if}
-
-<style>
-  .tag-prompt {
-    width: min(300px, calc(100vw - 16px));
-    padding: 10px;
-  }
-
-  .title {
-    margin: 0 2px 8px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted);
-  }
-
-  .field {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding-left: 8px;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    background: var(--input);
-    color: var(--text-faint);
-  }
-
-  .field:focus-within {
-    border-color: var(--accent-soft);
-  }
-
-  input {
-    flex: 1;
-    min-width: 0;
-    height: 30px;
-    border: none;
-    background: none;
-    color: var(--text);
-    font: inherit;
-    font-size: 13px;
-    outline: none;
-  }
-
-  .add {
-    height: 26px;
-    margin: 2px;
-    padding: 0 10px;
-    border-radius: 6px;
-    background: var(--accent);
-    color: var(--on-accent);
-    font-size: 12px;
-    font-weight: 600;
-  }
-
-  .add:disabled {
-    opacity: var(--disabled-opacity);
-  }
-
-  ul {
-    margin: 6px 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  li button {
-    width: 100%;
-    padding: 5px 8px;
-    border-radius: 6px;
-    text-align: left;
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-
-  li button:hover,
-  li.active button {
-    background: var(--hover);
-    color: var(--text);
-  }
-
-  @media (pointer: coarse) {
-    input,
-    li button {
-      min-height: 44px;
-    }
-  }
-</style>
+<Popover.Root open={!!prompt} onOpenChange={(open) => !open && close()}>
+  <Popover.Portal>
+    <Popover.Content
+      bind:ref={el}
+      customAnchor={anchor}
+      align={prompt?.align ?? "start"}
+      sideOffset={0}
+      collisionPadding={8}
+      role="dialog"
+      aria-label={t("list.tagFor", { count: prompt?.ids.length ?? 0 })}
+      onOpenAutoFocus={(event) => {
+        event.preventDefault();
+        restore = takeFocus(el!, input);
+      }}
+      onCloseAutoFocus={(event) => {
+        event.preventDefault();
+        restore?.();
+      }}
+      {onkeydown}
+      class="{floating} w-[min(300px,calc(100vw-16px))] p-2.5"
+    >
+      <form {onsubmit}>
+        <p class="m-0 mx-0.5 mb-2 text-xs font-semibold text-muted" aria-hidden="true">{t("list.tagFor", { count: prompt?.ids.length ?? 0 })}</p>
+        <div class="flex items-center gap-1.5 rounded-md border border-transparent bg-input pl-2 text-faint focus-within:border-accent">
+          <Icon name="hash" size={14} />
+          <input
+            bind:this={input}
+            bind:value
+            placeholder={t("list.tagName")}
+            aria-label={t("list.tagName")}
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            role="combobox"
+            aria-expanded={suggestions.length > 0}
+            aria-controls="tag-prompt-suggestions"
+            aria-autocomplete="list"
+            aria-activedescendant={active >= 0 ? `tag-suggestion-${active}` : undefined}
+            class="h-[30px] min-w-0 flex-1 border-0 bg-transparent p-0 font-[inherit] text-sm text-fg outline-none placeholder:text-faint coarse:h-11"
+          />
+          <button
+            class="m-0.5 h-[26px] rounded-sm bg-accent px-2.5 text-xs font-semibold text-on-accent disabled:opacity-45 coarse:h-10"
+            type="submit"
+            disabled={!typed && active < 0}>{t("list.tagAdd")}</button
+          >
+        </div>
+        {#if suggestions.length}
+          <ul id="tag-prompt-suggestions" role="listbox" aria-label={t("list.tagName")} class="mt-1.5">
+            {#each suggestions as tag, i (tag)}
+              <li id="tag-suggestion-{i}" role="option" aria-selected={i === active}>
+                <!-- For a pointer; the keyboard uses ↑ ↓ and Enter in the field. -->
+                <button
+                  type="button"
+                  tabindex="-1"
+                  onclick={() => add(tag)}
+                  class={[
+                    "w-full rounded-sm px-2 py-[5px] text-left text-sm hover:bg-hover hover:text-fg coarse:min-h-11",
+                    i === active ? "bg-hover text-fg" : "text-muted",
+                  ]}>#{tag}</button
+                >
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </form>
+    </Popover.Content>
+  </Popover.Portal>
+</Popover.Root>
