@@ -53,7 +53,7 @@ Switch a note to LaTeX from its ⓘ panel and write `\section`, theorems, citati
 
 ### Spreadsheets
 
-Switch a note to a spreadsheet from its ⓘ panel and work in a grid of cells, with formulas worked out by [IronCalc](https://www.ironcalc.com): the keys you know from Excel, functions suggested as you type, cells pointed at with the mouse or the arrow keys, copy and paste with other apps, fill down, and rows and columns inserted with formulas that follow. It's kept as CSV, so it syncs and searches like any note. A ` ```csv ` code block (`/spreadsheet`) is a spreadsheet inside a Markdown note, worked in the same way. Import CSV files and Excel workbooks from Settings → Data, and download a spreadsheet as CSV (formulas or values) or as an Excel workbook. See [docs/spreadsheets.md](docs/spreadsheets.md).
+Switch a note to a spreadsheet from its ⓘ panel and work in a grid of cells, with formulas worked out by [IronCalc](https://www.ironcalc.com): the keys you know from Excel, functions suggested as you type, cells pointed at with the mouse or the arrow keys, copy and paste with other apps, series filled by dragging the selection's corner (1, 2 → 3, 4; Monday → Tuesday), cells moved by holding and dragging them, sorting, money, dates and negative numbers shown your way (accounting style too), the sum and average of what's selected, and rows and columns inserted with formulas that follow. Formulas can use other notes' spreadsheets (`=Budget!B4`), and follow them when they're renamed. It's kept as CSV, so it syncs and searches like any note. A ` ```csv ` code block (`/spreadsheet`) is a spreadsheet inside a Markdown note, worked in the same way, sized by dragging its corner, and turned into a Markdown table (or back) with a button. Import CSV files and Excel workbooks from Settings → Data, and download a spreadsheet as CSV (formulas or values) or as an Excel workbook. See [docs/spreadsheets.md](docs/spreadsheets.md).
 
 ### Organizing
 
@@ -63,6 +63,7 @@ Switch a note to a spreadsheet from its ⓘ panel and work in a grid of cells, w
 - **Fast search** across every note.
 - **Pin, trash, restore.** Right-click, long-press or swipe a note.
 - **Several notes at once.** <kbd>⌘</kbd>-click, <kbd>⇧</kbd>-click or <kbd>⌘A</kbd> in the list, then tag, pin or trash them together.
+- **Two notes side by side.** Open to the Side (or <kbd>⌥</kbd>-click in the list) opens a note beside the one you're in, to read one while writing the other; swap them, or drag the line between them.
 - **Floating notes** (desktop apps). Pop a note into its own small window that can stay on top.
 
 ### Export and share
@@ -264,6 +265,8 @@ src/
     sheets/
       csv.ts                 Reading and writing CSV, as spreadsheet apps write it
       cells.ts               Cell names (B4), formulas, and putting in and taking out rows and columns
+      fill.ts                Filling cells from those before them: series that go on, the rest repeated
+      display.ts             Dates and money: read however they're typed, shown as Settings says
       formulas.ts            The formula engine that's on, loading it, and tables' formulas worked out
     print/
       markdown.ts            A Markdown note as a printed document
@@ -349,8 +352,8 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 **Spreadsheets**
 - [ ] Several sheets in one spreadsheet note, with formulas between them
 - [ ] Column widths, number formats and bold kept in the note
-- [ ] Sort and filter, and a fill handle to drag
-- [ ] Formulas in a ```csv block that reach another block, a table or a spreadsheet note
+- [ ] Sort and filter
+- [ ] Moving cells and resizing blocks with a finger
 
 **Notes**
 - [ ] Backlinks: the notes that mention this one

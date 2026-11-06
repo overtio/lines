@@ -1,4 +1,4 @@
-import type { Cells } from "../plugins/types";
+import type { CellArea, Cells } from "../plugins/types";
 
 /*
  * Cells as tables and spreadsheets keep them: rows of what's written in each, formulas included
@@ -36,4 +36,22 @@ export function shifted(row: number, column: number, axis: "row" | "column", at:
   if (index < at) return [row, column];
   if (count < 0 && index < at - count) return null;
   return axis === "row" ? [row + count, column] : [row, column + count];
+}
+
+/** The cells with those in `area` moved `rows` down and `columns` across, over what's there, leaving where they were empty. */
+export function movedCells(cells: Cells, area: CellArea, rows: number, columns: number): Cells {
+  const out = cells.map((row) => [...row]);
+  const taken: { row: number; column: number; input: string }[] = [];
+  for (let row = area.top; row <= area.bottom; row++) {
+    for (let column = area.left; column <= area.right; column++) {
+      taken.push({ row: row + rows, column: column + columns, input: cells[row]?.[column] ?? "" });
+      if (column < (out[row]?.length ?? 0)) out[row][column] = "";
+    }
+  }
+  for (const { row, column, input } of taken) {
+    while (out.length <= row) out.push([]);
+    while (out[row].length < column) out[row].push("");
+    out[row][column] = input;
+  }
+  return out;
 }

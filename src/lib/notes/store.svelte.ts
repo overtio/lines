@@ -108,8 +108,8 @@ class NotesStore {
   query = $state("");
   /** A freshly created note that the editor should focus once it opens. */
   pendingFocus = $state<string | null>(null);
-  /** Bumped when a note changes from outside the editor (e.g. sync), so an open editor can refresh. */
-  remoteRevision = $state({ id: "", n: 0 });
+  /** Bumped when notes change from outside the editor (e.g. sync), so editors with them open can refresh. */
+  remoteRevision = $state<{ ids: string[]; n: number }>({ ids: [], n: 0 });
   /** Bumped when locked notes open or close, so editors take up (or let go of) their text. */
   lockRevision = $state(0);
 
@@ -378,7 +378,7 @@ class NotesStore {
     const target = normalizeTag(tag.replace(/^#/, ""));
     if (!target) return 0;
     const only = new Set(ids);
-    return this.#rewrite((body, note) => (only.has(note.id) ? plugins.language(note.format).addTag(body, target) : body));
+    return this.rewrite((body, note) => (only.has(note.id) ? plugins.language(note.format).addTag(body, target) : body));
   }
 
   /** Moves these notes to the trash together; ⌘Z brings them all back. */
@@ -475,7 +475,7 @@ class NotesStore {
       const body = plugins.language(format).newNote(template.made);
       this.#templates.set(id, { ...template, body });
       this.#patch(id, { body, format: stored });
-      if (this.selectedId === id) this.remoteRevision = { id, n: this.remoteRevision.n + 1 };
+      this.#changedOutside([id]);
       return;
     }
     this.#patch(id, { format: stored });
@@ -540,7 +540,7 @@ class NotesStore {
   renameTag(from: string, to: string) {
     const target = normalizeTag(to);
     if (!target || target === from) return;
-    this.#rewrite((body) => renameTagIn(body, from, to));
+    this.rewrite((body) => renameTagIn(body, from, to));
     // Keep showing the same notes under their new name.
     const f = this.filter;
     if (f.kind === "tag" && (f.tag === from || f.tag.startsWith(from + "/"))) {
@@ -555,16 +555,16 @@ class NotesStore {
   renameType(from: string, to: string) {
     const target = to.trim().toLowerCase();
     if (!target || nameOf(target) === nameOf(from)) return;
-    this.#rewrite((body) => renameTypeIn(body, from, to.trim()));
+    this.rewrite((body) => renameTypeIn(body, from, to.trim()));
     // Keep showing the same notes under their new name.
     if (this.filter.kind === "type" && this.filter.type === from) this.filter = { kind: "type", type: target };
   }
 
   /**
    * Rewrites every note's text with `rewrite` (but locked notes', which aren't listed), saving the
-   * ones it changes. Returns how many it changed.
+   * ones it changes, open ones included. Returns how many it changed.
    */
-  #rewrite(rewrite: (body: string, note: Note) => string) {
+  rewrite(rewrite: (body: string, note: Note) => string) {
     this.flush();
     const changed: string[] = [];
     this.entries = this.entries.map((entry) => {
@@ -575,10 +575,10 @@ class NotesStore {
       return entryOf({ ...entry.note, body });
     });
     for (const id of changed) void this.#save(id);
-    if (this.selectedId && changed.includes(this.selectedId)) {
-      this.remoteRevision = { id: this.selectedId, n: this.remoteRevision.n + 1 };
+    if (changed.length) {
+      this.#changedOutside(changed);
+      this.#notify();
     }
-    if (changed.length) this.#notify();
     return changed.length;
   }
 
@@ -660,7 +660,7 @@ class NotesStore {
       : [entry, ...this.entries];
     clearTimeout(this.#pending.get(note.id));
     this.#pending.delete(note.id);
-    this.remoteRevision = { id: note.id, n: this.remoteRevision.n + 1 };
+    this.#changedOutside([note.id]);
     await this.#storage.put(stored(note));
     void announce({ type: "note", id: note.id, local: false });
   }
@@ -695,7 +695,7 @@ class NotesStore {
       if (current && JSON.stringify(stored(current.note)) === JSON.stringify(found)) return;
       const entry = entryOf(note);
       this.entries = current ? this.entries.map((e) => (e.note.id === id ? entry : e)) : [entry, ...this.entries];
-      if (current?.note.body !== note.body) this.remoteRevision = { id, n: this.remoteRevision.n + 1 };
+      if (current?.note.body !== note.body) this.#changedOutside([id]);
     }
     if (local) this.#notify();
   }
@@ -728,6 +728,11 @@ class NotesStore {
     clearTimeout(this.#pending.get(id));
     this.#pending.set(id, setTimeout(() => this.#save(id), SAVE_DELAY));
     this.#notify();
+  }
+
+  /** Tells the editors with these notes open that their text changed. */
+  #changedOutside(ids: string[]) {
+    this.remoteRevision = { ids, n: this.remoteRevision.n + 1 };
   }
 
   #notify() {

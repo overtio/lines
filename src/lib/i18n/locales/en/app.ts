@@ -46,4 +46,9 @@ export default {
   "app.loadError": "Your notes couldn’t be loaded: {error}",
   // Where the note goes when none is open.
   "app.noSelection": "Select a note, or start a new one.",
+  // A note open beside the selected one (Open to the Side), and its buttons.
+  "app.side": "Beside: {title}",
+  "app.sideSwap": "Swap the two notes",
+  "app.sideClose": "Close this note",
+  "app.sideWidth": "Width of the note beside",
 };

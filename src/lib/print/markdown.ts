@@ -311,7 +311,7 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
         const code = node.getChild("CodeText");
         const source = code ? slice(code.from, code.to) : "";
         const rendered = renderedInfo(written);
-        if (rendered) return void into.append(parts.rendered(rendered.renderer, source, rendered.width));
+        if (rendered) return void into.append(parts.rendered(rendered.renderer, source, rendered.width, body));
         if (language === "math") return void into.append(parts.math(source, true));
         return void into.append(parts.code(source, language, prefs.symbolsInCode));
       }

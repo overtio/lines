@@ -71,21 +71,29 @@ export function t(key: MessageKey, params?: Params): string {
   return format(messages[key] ?? en[key], params, locale);
 }
 
+/** Keeps the language chosen; whether it could. */
+function keep(choice: LanguageChoice) {
+  try {
+    if (choice === "system") localStorage.removeItem(KEY);
+    else localStorage.setItem(KEY, choice);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Switches the app's language. Everything on screen is redrawn by starting again, in every window;
  * the caller saves what's being typed first.
  */
 export function setLanguage(choice: LanguageChoice) {
-  try {
-    if (choice === "system") localStorage.removeItem(KEY);
-    else localStorage.setItem(KEY, choice);
-  } catch {
-    return;
-  }
-  void announce({ type: "prefs" }).finally(() => location.reload());
+  if (keep(choice)) void announce({ type: "language", choice }).finally(() => location.reload());
 }
 
-// Another window switched the language: start again in it too.
+// Another window switched the language: start again in it too, with that language kept here first
+// (this window's storage may not have it yet).
 void onAnnounce((message) => {
-  if (message.type === "prefs" && stored() !== languageChoice) location.reload();
+  if (message.type !== "language" || message.choice === languageChoice) return;
+  keep(message.choice as LanguageChoice);
+  location.reload();
 });

@@ -170,77 +170,91 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Callout (info), then Divider
+#### 19. Callout (info), then Named spreadsheet (csv name=), and a formula in another block using it
+
+:::i
+Text in an info callout.
+:::
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Callout (info), then Divider
 
 :::i
 Text in an info callout.
 :::
 ---
 
-#### 20. Callout (info), then Key: Value line
+#### 21. Callout (info), then Key: Value line
 
 :::i
 Text in an info callout.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Callout (info), then Mention
+#### 22. Callout (info), then Mention
 
 :::i
 Text in an info callout.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Callout (info), then Wiki link
+#### 23. Callout (info), then Wiki link
 
 :::i
 Text in an info callout.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Callout (info), then Symbols
+#### 24. Callout (info), then Symbols
 
 :::i
 Text in an info callout.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Callout (info), then GitHub links
+#### 25. Callout (info), then GitHub links
 
 :::i
 Text in an info callout.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Callout (info), then Image
+#### 26. Callout (info), then Image
 
 :::i
 Text in an info callout.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 26. Callout (info), then Drawing
+#### 27. Callout (info), then Drawing
 
 :::i
 Text in an info callout.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Callout (info), then File
+#### 28. Callout (info), then File
 
 :::i
 Text in an info callout.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Callout (info), then Missing file
+#### 29. Callout (info), then Missing file
 
 :::i
 Text in an info callout.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Callout (info), then Card
+#### 30. Callout (info), then Card
 
 :::i
 Text in an info callout.
@@ -249,7 +263,7 @@ Text in an info callout.
 Text in a card.
 :::
 
-#### 30. Callout (info), then Callout (info)
+#### 31. Callout (info), then Callout (info)
 
 :::i
 Text in an info callout.
@@ -258,7 +272,7 @@ Text in an info callout.
 Text in an info callout.
 :::
 
-#### 31. Callout (info), then Callout (warning, chosen icon)
+#### 32. Callout (info), then Callout (warning, chosen icon)
 
 :::i
 Text in an info callout.
@@ -267,7 +281,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Callout (info), then Callout (decision, no icon)
+#### 33. Callout (info), then Callout (decision, no icon)
 
 :::i
 Text in an info callout.

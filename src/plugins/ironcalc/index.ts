@@ -26,14 +26,16 @@ const engine: FormulaEngine = {
         loading = undefined;
         throw error;
       })),
-  sheet: () => loaded().sheet(),
+  sheet: (find) => loaded().sheet(find),
   shift: (cells, axis, at, count) => loaded().shift(cells, axis, at, count),
+  moveCells: (cells, area, rows, columns) => loaded().moveCells(cells, area, rows, columns),
   move: (formula, rows, columns) => loaded().move(formula, rows, columns),
+  renameSheets: (formula, rename) => loaded().renameSheets(formula, rename),
   complete: (formula, cursor) => loaded().complete(formula, cursor),
   references: (formula) => loaded().references(formula),
   functions: () => loaded().functions(),
   readWorkbook: (data) => loaded().readWorkbook(data),
-  writeWorkbook: (name, cells) => loaded().writeWorkbook(name, cells),
+  writeWorkbook: (name, cells, find) => loaded().writeWorkbook(name, cells, find),
 };
 
 export const ironcalc = (): Plugin => ({

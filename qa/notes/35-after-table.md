@@ -188,7 +188,22 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Table, then Divider
+#### 19. Table, then Named spreadsheet (csv name=), and a formula in another block using it
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Table, then Divider
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -196,7 +211,7 @@ Total, =SUM(B2:B3)
 | longer cell text | `code` | 22 |
 ---
 
-#### 20. Table, then Key: Value line
+#### 21. Table, then Key: Value line
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -204,7 +219,7 @@ Total, =SUM(B2:B3)
 | longer cell text | `code` | 22 |
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Table, then Mention
+#### 22. Table, then Mention
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -212,7 +227,7 @@ Total, =SUM(B2:B3)
 | longer cell text | `code` | 22 |
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Table, then Wiki link
+#### 23. Table, then Wiki link
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -220,7 +235,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 | longer cell text | `code` | 22 |
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Table, then Symbols
+#### 24. Table, then Symbols
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -228,7 +243,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | longer cell text | `code` | 22 |
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Table, then GitHub links
+#### 25. Table, then GitHub links
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -236,7 +251,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | longer cell text | `code` | 22 |
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Table, then Image
+#### 26. Table, then Image
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -244,7 +259,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 ![A sample picture](attachment:photo.png)
 
-#### 26. Table, then Drawing
+#### 27. Table, then Drawing
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -252,7 +267,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Table, then File
+#### 28. Table, then File
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -260,7 +275,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Table, then Missing file
+#### 29. Table, then Missing file
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -268,7 +283,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Table, then Card
+#### 30. Table, then Card
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -278,7 +293,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 30. Table, then Callout (info)
+#### 31. Table, then Callout (info)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -288,7 +303,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 31. Table, then Callout (warning, chosen icon)
+#### 32. Table, then Callout (warning, chosen icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -298,7 +313,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Table, then Callout (decision, no icon)
+#### 33. Table, then Callout (decision, no icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |

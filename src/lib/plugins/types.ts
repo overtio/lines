@@ -176,8 +176,9 @@ export interface Renderer {
   /**
    * Draws a code block's `source`: on screen in the theme's colors, or for paper in black on white.
    * Resolves to SVG markup or an element; rejects, with what's wrong, on code it can't draw.
+   * `note` is the whole note's text, when it's known, for what depends on the rest of the note.
    */
-  render(source: string, options: { paper: boolean }): Promise<string | Element>;
+  render(source: string, options: { paper: boolean; note?: string }): Promise<string | Element>;
   /** Buttons on what it draws, like a diagram's "Copy and Edit as Drawing". */
   actions?: BlockAction[];
   /**
@@ -193,9 +194,15 @@ export interface EditableBlock {
   readonly view: EditorView;
   /** Its code as written, kept up to date. */
   readonly source: string;
+  /** Where it starts in the note now. */
+  readonly from: number;
+  /** Its name, written after its language (```csv name=costs), by which other blocks and notes can find it. */
+  readonly name: string | null;
   readonly readOnly: boolean;
   /** Writes its code, as one step to undo. */
   write(source: string): void;
+  /** Writes its name after its language, or takes it out (null). */
+  rename(name: string | null): void;
   /** Out of it, into the note's text above it or below (a line is added below one that ends the note). */
   leave(up: boolean): void;
   /** Shows its code in place of what's drawn, the cursor at its start. */
@@ -204,7 +211,7 @@ export interface EditableBlock {
 
 /** What a renderer's editor gives back for a block it's put into. */
 export interface BlockEditor {
-  /** Its code, or whether the note is read-only, changed. */
+  /** Its code or name, the note around it, or whether the note is read-only, changed. */
   update(): void;
   /** Takes the keyboard, from the line above it (↓) or below (↑). */
   focus(from: "above" | "below"): void;
@@ -278,26 +285,48 @@ export interface FormulaFunction {
   args: { name: string; about: string; optional: boolean; /** "…": as many more as wanted. */ more: boolean }[];
 }
 
-/** A reference in a formula: where it's written (from–to), and the cells it points at, from 0. */
-export interface FormulaReference {
-  from: number;
-  to: number;
+/** Cells from one corner to the other, by row and column from 0. */
+export interface CellArea {
   top: number;
   left: number;
   bottom: number;
   right: number;
 }
 
+/** A reference in a formula: where it's written (from–to), and the cells it points at. */
+export interface FormulaReference extends CellArea {
+  from: number;
+  to: number;
+}
+
+/**
+ * Another sheet a formula reaches into by name (`Budget!B4`), as found from the sheet it's in: the
+ * same `id` however it's named, its cells, and how the names in its own formulas are found.
+ */
+export interface LinkedSheet {
+  id: string;
+  cells: Cells;
+  find: FindSheet;
+}
+
+/** The sheet a name in a formula stands for, from where it's written; null if there's none. */
+export type FindSheet = (name: string) => LinkedSheet | null;
+
 export interface FormulaEngine {
   id: string;
   name: string;
   /** Gets ready, loading what it needs the first time. Everything else waits for it. */
   load(): Promise<void>;
-  sheet(): FormulaSheet;
+  /** A sheet to work cells out in; `find` finds the other sheets its formulas name. */
+  sheet(find?: FindSheet): FormulaSheet;
   /** `cells` with `count` rows or columns put in at `at` (taken out, if negative), formulas still pointing at the same cells. */
   shift(cells: Cells, axis: "row" | "column", at: number, count: number): Cells;
+  /** `cells` with those in `area` moved `rows` down and `columns` across, as cutting and pasting them does: formulas pointing at them follow. */
+  moveCells(cells: Cells, area: CellArea, rows: number, columns: number): Cells;
   /** A formula as it reads copied `rows` down and `columns` across: its relative references move with it. */
   move(formula: string, rows: number, columns: number): string;
+  /** A formula with the other sheets it names (`Budget!B4`) called what `rename` returns for each name; those it returns nothing for stay as written. */
+  renameSheets(formula: string, rename: (name: string) => string | undefined): string;
   /** What can go at `cursor` in a formula being written. */
   complete(formula: string, cursor: number): FormulaCompletion;
   /** The references in a formula to cells of its own sheet. */
@@ -306,8 +335,8 @@ export interface FormulaEngine {
   functions(): FormulaFunction[];
   /** The sheets of an Excel workbook, each cell as written (its formula, or its value as it shows). */
   readWorkbook?(data: Uint8Array): { name: string; cells: Cells }[];
-  /** A sheet as an Excel workbook, with its formulas and their values. */
-  writeWorkbook?(name: string, cells: Cells): Uint8Array<ArrayBuffer>;
+  /** A sheet as an Excel workbook, with its formulas and their values, and the sheets they name (`find`) as more sheets. */
+  writeWorkbook?(name: string, cells: Cells, find?: FindSheet): Uint8Array<ArrayBuffer>;
 }
 
 /** New syntax for Markdown notes (Linedown): a block type, or a mark within text. */

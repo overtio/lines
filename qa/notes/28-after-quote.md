@@ -152,67 +152,80 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Quote, then Divider
+#### 19. Quote, then Named spreadsheet (csv name=), and a formula in another block using it
+
+> A quote that runs over
+> two lines.
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Quote, then Divider
 
 > A quote that runs over
 > two lines.
 ---
 
-#### 20. Quote, then Key: Value line
+#### 21. Quote, then Key: Value line
 
 > A quote that runs over
 > two lines.
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Quote, then Mention
+#### 22. Quote, then Mention
 
 > A quote that runs over
 > two lines.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Quote, then Wiki link
+#### 23. Quote, then Wiki link
 
 > A quote that runs over
 > two lines.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Quote, then Symbols
+#### 24. Quote, then Symbols
 
 > A quote that runs over
 > two lines.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Quote, then GitHub links
+#### 25. Quote, then GitHub links
 
 > A quote that runs over
 > two lines.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Quote, then Image
+#### 26. Quote, then Image
 
 > A quote that runs over
 > two lines.
 ![A sample picture](attachment:photo.png)
 
-#### 26. Quote, then Drawing
+#### 27. Quote, then Drawing
 
 > A quote that runs over
 > two lines.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Quote, then File
+#### 28. Quote, then File
 
 > A quote that runs over
 > two lines.
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Quote, then Missing file
+#### 29. Quote, then Missing file
 
 > A quote that runs over
 > two lines.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Quote, then Card
+#### 30. Quote, then Card
 
 > A quote that runs over
 > two lines.
@@ -220,7 +233,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 30. Quote, then Callout (info)
+#### 31. Quote, then Callout (info)
 
 > A quote that runs over
 > two lines.
@@ -228,7 +241,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 31. Quote, then Callout (warning, chosen icon)
+#### 32. Quote, then Callout (warning, chosen icon)
 
 > A quote that runs over
 > two lines.
@@ -236,7 +249,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Quote, then Callout (decision, no icon)
+#### 33. Quote, then Callout (decision, no icon)
 
 > A quote that runs over
 > two lines.

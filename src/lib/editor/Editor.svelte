@@ -11,6 +11,7 @@
   import { outline, outlineCompartment } from "./outline.svelte";
   import { createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment } from "./setup";
   import { symbolsChanged } from "./symbols";
+  import { changesBetween } from "./util";
 
   let { noteId, trashed }: { noteId: string; trashed: boolean } = $props();
 
@@ -85,25 +86,12 @@
     }
   }
 
-  /** Apply a change that arrived from elsewhere (sync), touching only the part that differs. */
+  /** Apply a change that arrived from elsewhere (sync), touching only the parts that differ. */
   function replaceDoc(body: string) {
     if (!view) return;
-    const current = view.state.doc.toString();
-    if (current === body) return;
-    let start = 0;
-    while (start < current.length && start < body.length && current[start] === body[start]) start++;
-    let end = 0;
-    while (
-      end < current.length - start &&
-      end < body.length - start &&
-      current[current.length - 1 - end] === body[body.length - 1 - end]
-    )
-      end++;
-    view.dispatch({
-      changes: { from: start, to: current.length - end, insert: body.slice(start, body.length - end) },
-      userEvent: "sync",
-      annotations: Transaction.addToHistory.of(false),
-    });
+    const changes = changesBetween(view.state.doc.toString(), body);
+    if (!changes.length) return;
+    view.dispatch({ changes, userEvent: "sync", annotations: Transaction.addToHistory.of(false) });
     // The store already has this text; don't echo it back.
     dirty = false;
     clearTimeout(syncTimer);
@@ -133,10 +121,10 @@
   });
 
   $effect(() => {
-    const { id } = notes.remoteRevision;
+    const { ids } = notes.remoteRevision;
     untrack(() => {
-      if (id !== currentId) return;
-      const body = notes.get(id)?.note.body;
+      if (!currentId || !ids.includes(currentId)) return;
+      const body = notes.get(currentId)?.note.body;
       if (body !== undefined) replaceDoc(body);
     });
   });

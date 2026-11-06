@@ -1,10 +1,11 @@
 import { isolateHistory } from "@codemirror/commands";
 import { type EditorState, StateField } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
-import type { Cells } from "../../lib/plugins/types";
+import type { Cells, FindSheet } from "../../lib/plugins/types";
 import { changeBetween } from "../../lib/editor/util";
 import { t } from "../../lib/i18n/index.svelte";
 import { writeCsv } from "../../lib/sheets/csv";
+import { type SheetChoice, sheetChoices, sheetFinder } from "./links";
 import { readSheet, type SheetText, titleOf } from "./sheet";
 
 /*
@@ -22,6 +23,21 @@ export interface Sheet {
   readonly label: string;
   /** Whether it fills the editor, as a spreadsheet note's does, rather than being as tall as its rows, as a block in a note is. */
   readonly fills: boolean;
+  /** Finds the other sheets its formulas name (links.ts). */
+  readonly find: FindSheet;
+  /** The other sheets its formulas can name, suggested while one's written. */
+  sheets?(): SheetChoice[];
+  /** A block's name, which others find it by; renamed, or named, from the grid. */
+  readonly name?: string | null;
+  rename?(name: string | null): void;
+  /** A block's name for a formula elsewhere in its note, given one (Sheet1, Sheet2…) if it has none, as that formula points at it. */
+  nameHere?(): string | null;
+  /** The title of the note it's in. */
+  noteTitle(): string;
+  /** Its name for a formula in another note: the note's title, and a block's name (or none for a note's first block without one). */
+  nameElsewhere(): string | null;
+  /** Turns a block into a Markdown table. */
+  toTable?(): void;
   /** Writes its cells, changed, as one step to undo. */
   write(cells: Cells): void;
   /** Out of the grid, into the note's text above it or below. */
@@ -57,6 +73,10 @@ export class NoteSheet implements Sheet {
   readOnly = $state(false);
   label = $derived(titleOf(this.head) || t("sheet.label"));
   readonly fills = true;
+  readonly find = sheetFinder(null);
+  sheets = () => sheetChoices(null);
+  noteTitle = () => titleOf(this.head);
+  nameElsewhere = () => this.noteTitle() || null;
   focus: Sheet["focus"];
   layout: Sheet["layout"];
 

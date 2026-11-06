@@ -134,78 +134,90 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Mention, then Divider
+#### 19. Mention, then Named spreadsheet (csv name=), and a formula in another block using it
+
+Ask @[QA · Ada] at @[QA · Ada].email.
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Mention, then Divider
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ---
 
-#### 20. Mention, then Key: Value line
+#### 21. Mention, then Key: Value line
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Mention, then Mention
+#### 22. Mention, then Mention
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Mention, then Wiki link
+#### 23. Mention, then Wiki link
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Mention, then Symbols
+#### 24. Mention, then Symbols
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Mention, then GitHub links
+#### 25. Mention, then GitHub links
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Mention, then Image
+#### 26. Mention, then Image
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ![A sample picture](attachment:photo.png)
 
-#### 26. Mention, then Drawing
+#### 27. Mention, then Drawing
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Mention, then File
+#### 28. Mention, then File
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Mention, then Missing file
+#### 29. Mention, then Missing file
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Mention, then Card
+#### 30. Mention, then Card
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ::: card
 Text in a card.
 :::
 
-#### 30. Mention, then Callout (info)
+#### 31. Mention, then Callout (info)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::i
 Text in an info callout.
 :::
 
-#### 31. Mention, then Callout (warning, chosen icon)
+#### 32. Mention, then Callout (warning, chosen icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Mention, then Callout (decision, no icon)
+#### 33. Mention, then Callout (decision, no icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::^ icon=none

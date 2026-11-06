@@ -240,4 +240,6 @@ export default {
   "editor.a11y.propertiesEnd": "End of properties",
   "editor.a11y.codeStart": "Code",
   "editor.a11y.codeEnd": "End of code",
+  // A rendered table's button: turns it into a ```csv block, drawn as a spreadsheet.
+  "editor.toSpreadsheet": "Convert to Spreadsheet",
 };

@@ -56,6 +56,8 @@ class UIState {
   sidebarOpen = $state(this.layout === "wide");
   /** Focus mode: just the note, with the sidebar and note list tucked away. */
   focus = $state(false);
+  /** The note open beside the selected one (Open to the Side), on wide and medium screens. */
+  side = $state<string | null>(null);
   /** The open Settings tab, or null when Settings is closed. */
   settings = $state<SettingsSection | null>(null);
   menu = $state.raw<Menu | null>(null);

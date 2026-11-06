@@ -170,77 +170,91 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Todo list, then Divider
+#### 19. Todo list, then Named spreadsheet (csv name=), and a formula in another block using it
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Todo list, then Divider
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ---
 
-#### 20. Todo list, then Key: Value line
+#### 21. Todo list, then Key: Value line
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Todo list, then Mention
+#### 22. Todo list, then Mention
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Todo list, then Wiki link
+#### 23. Todo list, then Wiki link
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Todo list, then Symbols
+#### 24. Todo list, then Symbols
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Todo list, then GitHub links
+#### 25. Todo list, then GitHub links
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Todo list, then Image
+#### 26. Todo list, then Image
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample picture](attachment:photo.png)
 
-#### 26. Todo list, then Drawing
+#### 27. Todo list, then Drawing
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Todo list, then File
+#### 28. Todo list, then File
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Todo list, then Missing file
+#### 29. Todo list, then Missing file
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Todo list, then Card
+#### 30. Todo list, then Card
 
 - [x] Done todo
 - [ ] Open todo
@@ -249,7 +263,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 30. Todo list, then Callout (info)
+#### 31. Todo list, then Callout (info)
 
 - [x] Done todo
 - [ ] Open todo
@@ -258,7 +272,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 31. Todo list, then Callout (warning, chosen icon)
+#### 32. Todo list, then Callout (warning, chosen icon)
 
 - [x] Done todo
 - [ ] Open todo
@@ -267,7 +281,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Todo list, then Callout (decision, no icon)
+#### 33. Todo list, then Callout (decision, no icon)
 
 - [x] Done todo
 - [ ] Open todo

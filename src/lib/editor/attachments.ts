@@ -20,6 +20,7 @@ import {
 } from "../notes/attachments";
 import { coarsePointer } from "../platform";
 import { locale, type MessageKey, t } from "../i18n/index.svelte";
+import { actionBar, dropBar } from "./actions";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { editDrawing, isDrawing, knownDrawing } from "./drawings";
 import { giphyStill } from "./giphy";
@@ -189,7 +190,7 @@ class BlockWidget extends WidgetType {
     const onChange = () => view.requestMeasure();
     const content = kind === "image" ? imageElement(src, label, onChange) : fileElement(attachmentName(src)!, label, onChange);
     let destroy = content.destroy;
-    // An image sits in a frame with its resize handle (and a drawing's edit button) on its corners.
+    // An image sits in a frame with its resize handle on its corner (and a drawing's edit button beside it).
     const frame = document.createElement("span");
     frame.className = "cm-lp-image-frame";
     frame.append(content.dom);
@@ -201,17 +202,20 @@ class BlockWidget extends WidgetType {
         if (!drawing || dom.dataset.src !== src) return;
         dom.dataset.drawing = "";
         const edit = document.createElement("button");
-        edit.className = "cm-lp-drawing-edit";
+        edit.className = "cm-lp-action cm-lp-drawing-edit";
         edit.type = "button";
         // Not a Tab stop in the text: Enter on the selected drawing does the same.
         edit.tabIndex = -1;
         edit.title = t("editor.drawing.editHint");
         edit.setAttribute("aria-label", t("editor.drawing.edit"));
         const icon = mount(Icon, { target: edit, props: { name: "pencil", size: 15 } });
-        frame.append(edit);
+        const bar = actionBar(dom, frame);
+        bar.append(edit);
+        frame.append(bar);
         onChange();
         destroy = () => {
           content.destroy();
+          dropBar(bar);
           void unmount(icon);
         };
         cleanups.set(dom, destroy);
@@ -274,7 +278,7 @@ function writeWidth(view: EditorView, dom: HTMLElement, width: number | null) {
  */
 function resizeHandle(view: EditorView, dom: HTMLElement) {
   const handle = document.createElement("span");
-  handle.className = "cm-lp-image-resize";
+  handle.className = "cm-lp-resize cm-lp-image-resize";
   handle.title = coarsePointer.matches ? "" : t("editor.image.resizeHint");
   handle.setAttribute("aria-hidden", "true");
   handle.addEventListener("pointerdown", (event) => {

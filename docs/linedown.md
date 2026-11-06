@@ -116,7 +116,7 @@ Fenced code blocks (` ``` ` or `~~~`) are as in CommonMark. lines reads the info
 
 ## Spreadsheets
 
-A code block with the language `csv` is drawn as a spreadsheet's grid of cells, by the Spreadsheets [plugin](plugins.md) (with it off, it's a code block). Its text is CSV, row 1 on the block's first line, and a cell starting with `=` is a formula, worked out by the Formulas plugin (IronCalc). Changing a cell writes the block again as CSV. The text shows in place of the grid only while the cursor is in it, from the cells' Edit as CSV; spaces after commas are left out, as in `Rent, 1200`. Like diagrams, spreadsheets are drawn at the top level and in cards. Other apps show the CSV as a code block. More in [spreadsheets.md](spreadsheets.md#spreadsheets-in-markdown-notes).
+A code block with the language `csv` is drawn as a spreadsheet's grid of cells, by the Spreadsheets [plugin](plugins.md) (with it off, it's a code block). Its text is CSV, row 1 on the block's first line, and a cell starting with `=` is a formula, worked out by the Formulas plugin (IronCalc). Changing a cell writes the block again as CSV. The text shows in place of the grid only while the cursor is in it, from the cells' Edit as CSV; spaces after commas are left out, as in `Rent, 1200`. Like diagrams, spreadsheets are drawn at the top level and in cards. A name after the language (` ```csv name=costs `, or `name="Q1 costs"`) lets formulas in other blocks and notes use its cells (`=costs!B2`, `='Trip/costs'!B2`); a width after a bar (`|400`) can follow it, as for diagrams. Empty rows and columns at the end of its CSV are kept: they're its size. Other apps show the CSV as a code block. More in [spreadsheets.md](spreadsheets.md#spreadsheets-in-markdown-notes).
 
 ## Diagrams
 

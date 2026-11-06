@@ -40,7 +40,8 @@
   }
 </script>
 
-<DropdownMenu.Root open={!!ui.menu} onOpenChange={(open) => !open && ui.closeMenu()}>
+<!-- Bound both ways: a menu that closes itself (an item chosen) is closed in `ui` too, or the next one wouldn't open. -->
+<DropdownMenu.Root bind:open={() => !!ui.menu, (open) => !open && ui.closeMenu()}>
   <DropdownMenu.Portal>
     <DropdownMenu.Content
       bind:ref={content}

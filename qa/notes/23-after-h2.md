@@ -134,78 +134,90 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Heading 2, then Divider
+#### 19. Heading 2, then Named spreadsheet (csv name=), and a formula in another block using it
+
+## Heading two
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Heading 2, then Divider
 
 ## Heading two
 ---
 
-#### 20. Heading 2, then Key: Value line
+#### 21. Heading 2, then Key: Value line
 
 ## Heading two
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Heading 2, then Mention
+#### 22. Heading 2, then Mention
 
 ## Heading two
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Heading 2, then Wiki link
+#### 23. Heading 2, then Wiki link
 
 ## Heading two
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Heading 2, then Symbols
+#### 24. Heading 2, then Symbols
 
 ## Heading two
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Heading 2, then GitHub links
+#### 25. Heading 2, then GitHub links
 
 ## Heading two
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Heading 2, then Image
+#### 26. Heading 2, then Image
 
 ## Heading two
 ![A sample picture](attachment:photo.png)
 
-#### 26. Heading 2, then Drawing
+#### 27. Heading 2, then Drawing
 
 ## Heading two
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Heading 2, then File
+#### 28. Heading 2, then File
 
 ## Heading two
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Heading 2, then Missing file
+#### 29. Heading 2, then Missing file
 
 ## Heading two
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Heading 2, then Card
+#### 30. Heading 2, then Card
 
 ## Heading two
 ::: card
 Text in a card.
 :::
 
-#### 30. Heading 2, then Callout (info)
+#### 31. Heading 2, then Callout (info)
 
 ## Heading two
 :::i
 Text in an info callout.
 :::
 
-#### 31. Heading 2, then Callout (warning, chosen icon)
+#### 32. Heading 2, then Callout (warning, chosen icon)
 
 ## Heading two
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Heading 2, then Callout (decision, no icon)
+#### 33. Heading 2, then Callout (decision, no icon)
 
 ## Heading two
 :::^ icon=none

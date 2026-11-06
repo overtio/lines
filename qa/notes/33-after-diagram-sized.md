@@ -188,7 +188,22 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Diagram (240 px wide), then Divider
+#### 19. Diagram (240 px wide), then Named spreadsheet (csv name=), and a formula in another block using it
+
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Diagram (240 px wide), then Divider
 
 ```mermaid |240
 flowchart LR
@@ -196,7 +211,7 @@ flowchart LR
 ```
 ---
 
-#### 20. Diagram (240 px wide), then Key: Value line
+#### 21. Diagram (240 px wide), then Key: Value line
 
 ```mermaid |240
 flowchart LR
@@ -204,7 +219,7 @@ flowchart LR
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Diagram (240 px wide), then Mention
+#### 22. Diagram (240 px wide), then Mention
 
 ```mermaid |240
 flowchart LR
@@ -212,7 +227,7 @@ flowchart LR
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Diagram (240 px wide), then Wiki link
+#### 23. Diagram (240 px wide), then Wiki link
 
 ```mermaid |240
 flowchart LR
@@ -220,7 +235,7 @@ flowchart LR
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Diagram (240 px wide), then Symbols
+#### 24. Diagram (240 px wide), then Symbols
 
 ```mermaid |240
 flowchart LR
@@ -228,7 +243,7 @@ flowchart LR
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Diagram (240 px wide), then GitHub links
+#### 25. Diagram (240 px wide), then GitHub links
 
 ```mermaid |240
 flowchart LR
@@ -236,7 +251,7 @@ flowchart LR
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Diagram (240 px wide), then Image
+#### 26. Diagram (240 px wide), then Image
 
 ```mermaid |240
 flowchart LR
@@ -244,7 +259,7 @@ flowchart LR
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 26. Diagram (240 px wide), then Drawing
+#### 27. Diagram (240 px wide), then Drawing
 
 ```mermaid |240
 flowchart LR
@@ -252,7 +267,7 @@ flowchart LR
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Diagram (240 px wide), then File
+#### 28. Diagram (240 px wide), then File
 
 ```mermaid |240
 flowchart LR
@@ -260,7 +275,7 @@ flowchart LR
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Diagram (240 px wide), then Missing file
+#### 29. Diagram (240 px wide), then Missing file
 
 ```mermaid |240
 flowchart LR
@@ -268,7 +283,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Diagram (240 px wide), then Card
+#### 30. Diagram (240 px wide), then Card
 
 ```mermaid |240
 flowchart LR
@@ -278,7 +293,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 30. Diagram (240 px wide), then Callout (info)
+#### 31. Diagram (240 px wide), then Callout (info)
 
 ```mermaid |240
 flowchart LR
@@ -288,7 +303,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 31. Diagram (240 px wide), then Callout (warning, chosen icon)
+#### 32. Diagram (240 px wide), then Callout (warning, chosen icon)
 
 ```mermaid |240
 flowchart LR
@@ -298,7 +313,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Diagram (240 px wide), then Callout (decision, no icon)
+#### 33. Diagram (240 px wide), then Callout (decision, no icon)
 
 ```mermaid |240
 flowchart LR

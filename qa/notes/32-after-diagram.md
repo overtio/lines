@@ -206,7 +206,23 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Diagram, then Divider
+#### 19. Diagram, then Named spreadsheet (csv name=), and a formula in another block using it
+
+```mermaid
+flowchart LR
+  A[Start] --> B{Choice}
+  B --> C[Done]
+```
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Diagram, then Divider
 
 ```mermaid
 flowchart LR
@@ -215,7 +231,7 @@ flowchart LR
 ```
 ---
 
-#### 20. Diagram, then Key: Value line
+#### 21. Diagram, then Key: Value line
 
 ```mermaid
 flowchart LR
@@ -224,7 +240,7 @@ flowchart LR
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Diagram, then Mention
+#### 22. Diagram, then Mention
 
 ```mermaid
 flowchart LR
@@ -233,7 +249,7 @@ flowchart LR
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Diagram, then Wiki link
+#### 23. Diagram, then Wiki link
 
 ```mermaid
 flowchart LR
@@ -242,7 +258,7 @@ flowchart LR
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Diagram, then Symbols
+#### 24. Diagram, then Symbols
 
 ```mermaid
 flowchart LR
@@ -251,7 +267,7 @@ flowchart LR
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Diagram, then GitHub links
+#### 25. Diagram, then GitHub links
 
 ```mermaid
 flowchart LR
@@ -260,7 +276,7 @@ flowchart LR
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Diagram, then Image
+#### 26. Diagram, then Image
 
 ```mermaid
 flowchart LR
@@ -269,7 +285,7 @@ flowchart LR
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 26. Diagram, then Drawing
+#### 27. Diagram, then Drawing
 
 ```mermaid
 flowchart LR
@@ -278,7 +294,7 @@ flowchart LR
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Diagram, then File
+#### 28. Diagram, then File
 
 ```mermaid
 flowchart LR
@@ -287,7 +303,7 @@ flowchart LR
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Diagram, then Missing file
+#### 29. Diagram, then Missing file
 
 ```mermaid
 flowchart LR
@@ -296,7 +312,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Diagram, then Card
+#### 30. Diagram, then Card
 
 ```mermaid
 flowchart LR
@@ -307,7 +323,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 30. Diagram, then Callout (info)
+#### 31. Diagram, then Callout (info)
 
 ```mermaid
 flowchart LR
@@ -318,7 +334,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 31. Diagram, then Callout (warning, chosen icon)
+#### 32. Diagram, then Callout (warning, chosen icon)
 
 ```mermaid
 flowchart LR
@@ -329,7 +345,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Diagram, then Callout (decision, no icon)
+#### 33. Diagram, then Callout (decision, no icon)
 
 ```mermaid
 flowchart LR

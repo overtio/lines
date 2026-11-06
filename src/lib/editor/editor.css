@@ -417,8 +417,21 @@
 
 /* A table away from the cursor, drawn as one. */
 .cm-lp-table-wrap {
+  position: relative;
   --table-line: color-mix(in srgb, var(--ink) 12%, transparent);
   padding: 0.5em 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  /* A wide table scrolls; it doesn't widen the note past its window. */
+  contain: inline-size;
+}
+
+/* A Markdown table scrolls in a box of its own (tables.ts), so its button can sit beside it. */
+.cm-lp-table-wrap:has(> .cm-lp-table-scroll) {
+  overflow: visible;
+}
+
+.cm-lp-table-scroll {
   overflow-x: auto;
   overscroll-behavior-x: contain;
 }
@@ -702,6 +715,7 @@
 
 /* A code block drawn to work in (rendered.ts), like a ```csv block's grid, in place of its code. */
 .cm-lp-editable {
+  position: relative;
   padding: 0.5em 0;
 }
 
@@ -717,18 +731,40 @@
   vertical-align: top;
 }
 
-/* Its renderer's buttons, like a diagram's "Copy and Edit as Drawing": top right on hover, like a drawing's pencil. */
-.cm-lp-diagram-actions {
+/*
+ * A block's buttons (actions.ts), like a diagram's "Copy and Edit as Drawing" or a drawing's pencil:
+ * on hover, down the right side of what it draws from its top, or inside its top right corner where
+ * there's no room beside it. What's drawn can start below the block's top (--actions-top) and be
+ * narrower than it (--actions-left).
+ */
+.cm-lp-actions {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: var(--actions-top, 0px);
+  left: calc(var(--actions-left, 100%) + 6px);
+  z-index: 10;
   display: flex;
+  flex-direction: column;
   gap: 6px;
   opacity: 0;
   transition: opacity 0.12s;
 }
 
-.cm-lp-diagram-action {
+.cm-lp-actions.is-inside {
+  top: calc(var(--actions-top, 0px) + 6px);
+  left: calc(var(--actions-left, 100%) - 36px);
+}
+
+/* Inside, over a grid's column letters, which stay put above its cells. */
+.cm-lp-editable > .cm-lp-actions {
+  z-index: 30;
+}
+
+/* A table's start below the space above it. */
+.cm-lp-table-wrap {
+  --actions-top: 0.5em;
+}
+
+.cm-lp-action {
   display: grid;
   place-items: center;
   width: 30px;
@@ -741,23 +777,24 @@
   cursor: pointer;
 }
 
-.cm-lp-diagram-action:hover {
+.cm-lp-action:hover {
   color: var(--text);
 }
 
-.cm-lp-diagram:hover .cm-lp-diagram-actions,
-.cm-lp-diagram-actions:focus-within {
+:is(.cm-lp-diagram, .cm-lp-editable, .cm-lp-table-wrap, .cm-lp-image-block):hover .cm-lp-actions,
+.cm-lp-image-block:is(.is-preview, .is-selected) .cm-lp-actions,
+.cm-lp-actions:focus-within {
   opacity: 1;
 }
 
 /* Not for a block that's empty or has an error, nor in the Trash. */
-.cm-lp-diagram:has(> .cm-lp-diagram-message) .cm-lp-diagram-actions,
-.cm-content[contenteditable="false"] .cm-lp-diagram-actions {
+.cm-lp-diagram:has(> .cm-lp-diagram-message) .cm-lp-actions,
+.cm-content[contenteditable="false"] .cm-lp-actions {
   display: none;
 }
 
 @media (pointer: coarse) {
-  .cm-lp-diagram-actions {
+  .cm-lp-actions {
     opacity: 1;
   }
 }
@@ -864,7 +901,7 @@
   box-shadow: 0 0 0 2px var(--accent);
 }
 
-/* The image with its resize handle (bottom right) and, for a drawing, its edit button (top right). */
+/* The image with its resize handle (bottom right) and, for a drawing, its edit button beside it. */
 .cm-lp-image-frame {
   position: relative;
   display: inline-block;
@@ -872,29 +909,50 @@
   vertical-align: bottom;
 }
 
-.cm-lp-image-resize,
-.cm-lp-diagram-resize {
+/*
+ * A resize handle, the same for an image, a diagram and a spreadsheet's grid: a small round button
+ * just past the bottom right corner, with a corner mark in the accent color. Bigger to a finger.
+ */
+.cm-lp-resize {
   position: absolute;
-  right: -8px;
-  bottom: -8px;
-  z-index: 1;
-  width: 24px;
-  height: 24px;
+  right: -18px;
+  bottom: -18px;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  color: var(--accent);
   cursor: nwse-resize;
   touch-action: none;
-  opacity: 0;
   transition: opacity 0.12s;
 }
 
-/* A round grip, small inside its larger target. */
-.cm-lp-image-resize::after,
-.cm-lp-diagram-resize::after {
+.cm-lp-resize::after {
   content: "";
-  position: absolute;
-  inset: 6px;
-  border: 2px solid var(--bg);
-  border-radius: 50%;
-  background: var(--accent);
+  width: 9px;
+  height: 9px;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7.5 1.5v6h-6'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+@media (pointer: coarse) {
+  .cm-lp-resize {
+    right: -24px;
+    bottom: -24px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* An image's and a diagram's show on hover, while it's selected or being resized. */
+.cm-lp-image-resize,
+.cm-lp-diagram-resize {
+  opacity: 0;
 }
 
 .cm-lp-image-block:hover .cm-lp-image-resize,
@@ -950,37 +1008,7 @@
   filter: invert(93%) hue-rotate(180deg);
 }
 
-.cm-lp-drawing-edit {
-  /* Above the drawing, which its dark-theme filter would otherwise paint over. */
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg-elevated);
-  color: var(--text-muted);
-  line-height: 1;
-  opacity: 0;
-  transition: opacity 0.12s;
-}
-
-.cm-lp-drawing-edit:hover {
-  color: var(--text);
-}
-
-.cm-lp-image-block[data-drawing]:hover .cm-lp-drawing-edit,
-.cm-lp-image-block[data-drawing].is-preview .cm-lp-drawing-edit,
-.cm-lp-image-block[data-drawing].is-selected .cm-lp-drawing-edit {
-  opacity: 1;
-}
-
 @media (pointer: coarse) {
-  .cm-lp-drawing-edit,
   .cm-lp-image-resize,
   .cm-lp-diagram-resize {
     opacity: 1;

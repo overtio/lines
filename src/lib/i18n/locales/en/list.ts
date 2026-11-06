@@ -75,4 +75,5 @@ export default {
   "list.exportName": "lines-notes-{date}",
   // The folder trashed notes go in, in an export.
   "list.trashFolder": "Trash",
+  "list.openBeside": "Open to the Side",
 };

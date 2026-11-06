@@ -7,7 +7,8 @@ import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
 import { t } from "../i18n/index.svelte";
 import { plugins } from "../plugins/registry.svelte";
-import type { BlockEditor, EditableBlock, Renderer } from "../plugins/types";
+import type { BlockAction, BlockEditor, EditableBlock, Renderer } from "../plugins/types";
+import { actionBar, dropBar, keepBeside } from "./actions";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { coarsePointer } from "../platform";
 import { ancestors, changeBetween, focusChanged, focused, isEditing } from "./util";
@@ -16,7 +17,8 @@ import { ancestors, changeBetween, focusChanged, focused, isEditing } from "./ut
  * Code blocks drawn by a renderer plugin: ```mermaid as its diagram, say, in the theme's colors.
  * With the cursor in one, the code shows with the drawing below it, redrawn as you type. Buttons
  * the renderer gives sit on the drawing, and a handle on its corner resizes it, written after the
- * language as an image's width is in its label (```mermaid |400).
+ * language as an image's width is in its label (```mermaid |400). A block can have a name there too
+ * (```csv name=costs), which others find it by.
  *
  * A renderer can draw its blocks as something to work in instead (`Renderer.editor`): a ```csv
  * block as a spreadsheet's grid, which writes its changes back into the code. The code shows only
@@ -26,18 +28,41 @@ import { ancestors, changeBetween, focusChanged, focused, isEditing } from "./ut
 /** A code block's language as its info string gives it: its first word, in lowercase. */
 export const fenceLanguage = (info: string) => (/\S*/.exec(info.trim())![0] ?? "").toLowerCase();
 
+/** An info string: its language, then a name (name=costs, or name="Q1 costs"), then a width (|400). */
+const INFO = /^(\S+)(?:\s+name=(?:"([^"]*)"|(\S+)))?(?:\s+\|\s*(\d{1,5})(?:\s*x\s*\d{1,5})?)?$/;
+
+/** A code block's name, from its info string, if it has one. */
+export function blockName(info: string): string | null {
+  const match = INFO.exec(info.trim());
+  return (match?.[2] ?? match?.[3])?.trim() || null;
+}
+
+/** An info string with a name and width. */
+const infoText = (language: string, name: string | null, width: number | null) =>
+  language + (name ? ` name=${/[\s"]/.test(name) ? `"${name.replaceAll('"', "")}"` : name}` : "") + (width ? ` |${width}` : "");
+
 /**
  * The renderer for a code block's info string, and the width it's shown at, if it gives one. The
  * language stays a word of its own, so other apps still see what it is.
  */
-export function renderedInfo(info: string): { renderer: Renderer; width: number | null } | null {
-  const match = /^(\S+)(?:\s+\|\s*(\d{1,5})(?:\s*x\s*\d{1,5})?)?$/.exec(info.trim());
+export function renderedInfo(info: string): { renderer: Renderer; width: number | null; name: string | null } | null {
+  const match = INFO.exec(info.trim());
   const renderer = match && plugins.renderer(match[1]);
-  return renderer ? { renderer, width: Number(match[2]) || null } : null;
+  return renderer ? { renderer, width: Number(match[4]) || null, name: blockName(info) } : null;
+}
+
+/** Writes a block's info string again with its name or width changed, keeping the rest. */
+function writeInfo(view: EditorView, node: SyntaxNode, change: { name?: string | null; width?: number | null }, userEvent: string) {
+  const info = node.getChild("CodeInfo");
+  const text = info ? view.state.sliceDoc(info.from, info.to) : "";
+  const rendered = info && renderedInfo(text);
+  if (!info || !rendered) return;
+  const insert = infoText(fenceLanguage(text), change.name !== undefined ? change.name : rendered.name, change.width !== undefined ? change.width : rendered.width);
+  if (insert !== text) view.dispatch({ changes: { from: info.from, to: info.to, insert }, userEvent });
 }
 
 /** The code block at `pos`, or the one ending just before it. */
-function fenceAt(state: EditorState, pos: number): SyntaxNode | null {
+export function fenceAt(state: EditorState, pos: number): SyntaxNode | null {
   for (const side of [1, -1] as const) {
     for (const node of ancestors(state, pos, side)) if (node.name === "FencedCode") return node;
   }
@@ -76,8 +101,13 @@ async function draw(dom: HTMLElement, view: EditorView, delay = 0) {
     else dom.replaceChildren(content);
     const svg = dom.querySelector<SVGSVGElement>(":scope > svg");
     if (svg) frame(dom, svg, view);
+    // Its buttons beside the drawing.
     const actions = actionBars.get(dom);
-    if (actions) dom.append(actions.bar);
+    if (actions) {
+      const holder = dom.querySelector<HTMLElement>(":scope > .cm-lp-diagram-frame") ?? dom;
+      holder.append(actions.bar);
+      keepBeside(actions.bar, dom, holder);
+    }
     dom.classList.remove("is-pending");
     view.requestMeasure();
   };
@@ -142,11 +172,8 @@ function setWidth(svg: SVGSVGElement, width: number | null) {
 function writeWidth(view: EditorView, dom: HTMLElement, width: number | null) {
   const pos = view.posAtDOM(dom);
   // A preview sits after the block's last line; the block is just before it.
-  const info = fenceAt(view.state, dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos)?.getChild("CodeInfo");
-  const text = info ? view.state.sliceDoc(info.from, info.to) : "";
-  if (!info || !renderedInfo(text)) return;
-  const insert = text.trim().split(/\s/)[0] + (width ? ` |${width}` : "");
-  if (insert !== text) view.dispatch({ changes: { from: info.from, to: info.to, insert }, userEvent: "input.resize" });
+  const node = fenceAt(view.state, dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos);
+  if (node) writeInfo(view, node, { width }, "input.resize");
 }
 
 /**
@@ -156,7 +183,7 @@ function writeWidth(view: EditorView, dom: HTMLElement, width: number | null) {
  */
 function resizeHandle(view: EditorView, dom: HTMLElement) {
   const handle = document.createElement("span");
-  handle.className = "cm-lp-diagram-resize";
+  handle.className = "cm-lp-resize cm-lp-diagram-resize";
   handle.title = coarsePointer.matches ? "" : t("editor.image.resizeHint");
   handle.setAttribute("aria-hidden", "true");
   handle.addEventListener("pointerdown", (event) => {
@@ -199,6 +226,40 @@ function resizeHandle(view: EditorView, dom: HTMLElement) {
   return handle;
 }
 
+/**
+ * A block's buttons, from its renderer's actions, beside `target` (actions.ts). Each is given where
+ * the block is in the note when it's clicked.
+ */
+export function addActions(view: EditorView, dom: HTMLElement, actions: BlockAction[] = [], target: Element = dom) {
+  if (!actions.length) return;
+  const bar = actionBar(dom, target);
+  const icons = actions.map((action) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "cm-lp-action";
+    button.title = action.label;
+    button.setAttribute("aria-label", action.label);
+    button.addEventListener("click", () => {
+      const pos = view.posAtDOM(dom);
+      // A preview sits after the block's last line; the block is just before it.
+      action.run(view, dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos);
+    });
+    bar.append(button);
+    return mount(Icon, { target: button, props: { name: action.icon, size: 15 } });
+  });
+  actionBars.set(dom, { bar, icons });
+  dom.append(bar);
+}
+
+/** Takes down a block's buttons. */
+export function removeActions(dom: HTMLElement) {
+  const actions = actionBars.get(dom);
+  if (!actions) return;
+  dropBar(actions.bar);
+  for (const icon of actions.icons) void unmount(icon);
+  actionBars.delete(dom);
+}
+
 new MutationObserver(() => {
   for (const [dom, { view }] of live) void draw(dom, view);
 }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-scheme", "data-font", "data-contrast"] });
@@ -232,27 +293,7 @@ class RenderedWidget extends WidgetType {
     dom.setAttribute("role", "figure");
     dom.setAttribute("aria-label", this.renderer.label);
     setInset(dom, this.inset);
-    const actions = this.renderer.actions ?? [];
-    if (actions.length) {
-      const bar = document.createElement("span");
-      bar.className = "cm-lp-diagram-actions";
-      const icons = actions.map((action) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "cm-lp-diagram-action";
-        button.title = action.label;
-        button.setAttribute("aria-label", action.label);
-        button.addEventListener("click", () => {
-          const pos = view.posAtDOM(dom);
-          // A preview sits after the block's last line; the block is just before it.
-          action.run(view, dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos);
-        });
-        bar.append(button);
-        return mount(Icon, { target: button, props: { name: action.icon, size: 15 } });
-      });
-      actionBars.set(dom, { bar, icons });
-      dom.append(bar);
-    }
+    addActions(view, dom, this.renderer.actions);
     live.set(dom, { renderer: this.renderer, source: this.source, width: this.width, view });
     void draw(dom, view);
     return dom;
@@ -275,7 +316,7 @@ class RenderedWidget extends WidgetType {
   destroy(dom: HTMLElement) {
     live.delete(dom);
     latest.delete(dom);
-    for (const icon of actionBars.get(dom)?.icons ?? []) void unmount(icon);
+    removeActions(dom);
   }
   get estimatedHeight() {
     return heights.get(`${this.width}\n${this.source}`) ?? 160;
@@ -293,10 +334,15 @@ class Block implements EditableBlock {
     readonly view: EditorView,
     readonly dom: HTMLElement,
     public source: string,
+    public name: string | null,
   ) {}
 
   get readOnly() {
     return this.view.state.readOnly;
+  }
+
+  get from() {
+    return this.view.posAtDOM(this.dom);
   }
 
   /** Where it is in the note now. */
@@ -314,6 +360,11 @@ class Block implements EditableBlock {
     const to = marks.length > 1 ? state.doc.lineAt(marks[marks.length - 1].from).from - 1 : node.to;
     const changes = changeBetween(from, state.sliceDoc(from, to), source ? `\n${source}` : "");
     if (changes) this.view.dispatch({ changes, userEvent: "input", annotations: isolateHistory.of("full") });
+  }
+
+  rename(name: string | null) {
+    const node = this.#node();
+    if (node && !this.readOnly) writeInfo(this.view, node, { name: name?.trim() || null }, "input");
   }
 
   leave(up: boolean) {
@@ -349,19 +400,22 @@ class EditableWidget extends WidgetType {
   constructor(
     readonly renderer: Renderer,
     readonly source: string,
+    readonly name: string | null,
     readonly inset: CardInset,
   ) {
     super();
   }
   eq(other: EditableWidget) {
-    return other.renderer === this.renderer && other.source === this.source && sameInset(other.inset, this.inset);
+    return other.renderer === this.renderer && other.source === this.source && other.name === this.name && sameInset(other.inset, this.inset);
   }
   toDOM(view: EditorView) {
     const dom = document.createElement("div");
     dom.className = "cm-lp-editable";
     setInset(dom, this.inset);
-    const block = new Block(view, dom, this.source);
+    const block = new Block(view, dom, this.source, this.name);
     editables.set(dom, { renderer: this.renderer, block, editor: this.renderer.editor!(dom, block) });
+    // Beside what its editor drew, which sets where that starts and how wide it is (--actions-top, --actions-left).
+    addActions(view, dom, this.renderer.actions, dom.firstElementChild ?? dom);
     measure(view, dom, this.source);
     return dom;
   }
@@ -370,8 +424,9 @@ class EditableWidget extends WidgetType {
     const live = editables.get(dom);
     if (!live || live.renderer !== this.renderer) return false;
     setInset(dom, this.inset);
-    if (live.block.source !== this.source) {
+    if (live.block.source !== this.source || live.block.name !== this.name) {
       live.block.source = this.source;
+      live.block.name = this.name;
       live.editor.update();
       measure(view, dom, this.source);
     }
@@ -380,6 +435,7 @@ class EditableWidget extends WidgetType {
   destroy(dom: HTMLElement) {
     editables.get(dom)?.editor.destroy();
     editables.delete(dom);
+    removeActions(dom);
   }
   get estimatedHeight() {
     return heights.get(`editable\n${this.source}`) ?? 160;
@@ -389,14 +445,14 @@ class EditableWidget extends WidgetType {
   }
 }
 
-/** Keeps what's drawn up to date with whether the note is read-only, and with the editor's size. */
+/** Keeps what's drawn up to date with the note around it and whether it's read-only, and with the editor's size. */
 const editableUpdates = ViewPlugin.define((view) => ({
   update(update) {
-    const readOnly = update.startState.readOnly !== update.state.readOnly;
-    if (!readOnly && !update.geometryChanged) return;
+    const changed = update.docChanged || update.startState.readOnly !== update.state.readOnly;
+    if (!changed && !update.geometryChanged) return;
     for (const { block, editor } of editables.values()) {
       if (block.view !== view) continue;
-      if (readOnly) editor.update();
+      if (changed) editor.update();
       if (update.geometryChanged) editor.layout?.();
     }
   },
@@ -468,7 +524,7 @@ function buildBlocks(state: EditorState): DecorationSet {
       if (rendered.renderer.editor) {
         // In place of its code, which shows as it is while the cursor's in it.
         if (!isEditing(state, node.from, node.to)) {
-          const widget = new EditableWidget(rendered.renderer, source, inset);
+          const widget = new EditableWidget(rendered.renderer, source, rendered.name, inset);
           decos.push(Decoration.replace({ widget, block: true }).range(first.from, state.doc.lineAt(node.to).to));
         }
       } else if (isEditing(state, node.from, node.to)) {
@@ -502,7 +558,7 @@ const clickToEdit = EditorView.domEventHandlers({
     if (!dom) return false;
     event.preventDefault();
     // Its buttons' own, on click, and its resize handle's.
-    if ((event.target as HTMLElement).closest(".cm-lp-diagram-actions, .cm-lp-diagram-resize")) return true;
+    if ((event.target as HTMLElement).closest(".cm-lp-actions, .cm-lp-diagram-resize")) return true;
     if (event.button !== 0 || view.state.readOnly || dom.classList.contains("is-preview")) return true;
     const { doc } = view.state;
     const fence = doc.lineAt(view.posAtDOM(dom));

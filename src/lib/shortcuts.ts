@@ -56,6 +56,7 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.open", keys: ["Enter"], note: "shortcuts.inList" },
       { action: "shortcuts.pickOne", keys: ["Mod-click"], note: "shortcuts.inList" },
       { action: "shortcuts.pickRange", keys: ["Shift-click", "Shift-ArrowUp", "Shift-ArrowDown"], note: "shortcuts.inList" },
+      { action: "shortcuts.openBeside", keys: ["Alt-click"], note: "shortcuts.inList" },
       { action: "shortcuts.pickAll", keys: ["Mod-a"], note: "shortcuts.inList" },
       { action: "shortcuts.trashPicked", keys: ["Backspace"], note: "shortcuts.inList" },
       { action: "shortcuts.menu", keys: ["Shift-F10"] },
@@ -115,6 +116,9 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.sheetClear", keys: ["Backspace"] },
       { action: "shortcuts.sheetFillDown", keys: ["Mod-d"] },
       { action: "shortcuts.sheetFillRight", keys: ["Mod-r"] },
+      { action: "shortcuts.sheetAutofill", keys: ["drag"], note: "shortcuts.onCorner" },
+      { action: "shortcuts.sheetAutofillOther", keys: [{ mac: "Alt-drag", other: "Ctrl-drag" }], note: "shortcuts.onCorner" },
+      { action: "shortcuts.sheetMoveCells", keys: ["drag"], note: "shortcuts.afterHolding" },
       { action: "shortcuts.sheetMenu", keys: ["Shift-F10"] },
       { action: "shortcuts.sheetInOut", keys: ["ArrowDown", "ArrowUp"], note: "shortcuts.besideSheet" },
     ],
@@ -153,6 +157,7 @@ const ARROWS: Record<string, string> = { ArrowUp: "↑", ArrowDown: "↓", Arrow
 /** A key as printed on keyboards in the app's language ("Intro", "Entrée"), or as itself. */
 function keyName(key: string, on: System): string {
   if (key === "click") return t("shortcuts.key.click");
+  if (key === "drag") return t("shortcuts.key.drag");
   if (on === "mac" && MAC_KEYS[key]) return MAC_KEYS[key];
   if (ARROWS[key]) return ARROWS[key];
   const named: Record<string, MessageKey> = {
@@ -176,8 +181,8 @@ export function formatKeys(keys: Keys, on: System): string {
   const modifiers = new Set(parts);
   if (on === "mac") {
     const symbols = MAC_ORDER.filter((m) => modifiers.has(m)).map((m) => MAC_SYMBOLS[m]).join("");
-    // A click reads as words after the symbols: ⌘-click.
-    return key === "click" ? `${symbols}-${keyName(key, on)}` : symbols + keyName(key, on);
+    // A click or drag reads as words after the symbols: ⌘-click.
+    return (key === "click" || key === "drag") && symbols ? `${symbols}-${keyName(key, on)}` : symbols + keyName(key, on);
   }
   const names: Record<string, string> = { Mod: t("shortcuts.key.ctrl"), Ctrl: t("shortcuts.key.ctrl"), Alt: t("shortcuts.key.alt"), Shift: t("shortcuts.key.shift") };
   return [...OTHER_ORDER.filter((m) => modifiers.has(m)).map((m) => names[m]), keyName(key, on)].join("+");
@@ -209,6 +214,7 @@ export function speakKeys(keys: Keys, on: System): string {
     End: "shortcuts.key.end",
     Backspace: "shortcuts.key.backspace",
     click: "shortcuts.key.click",
+    drag: "shortcuts.key.drag",
     "/": "shortcuts.key.slash",
     "\\": "shortcuts.key.backslash",
     "@": "shortcuts.key.at",

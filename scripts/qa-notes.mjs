@@ -55,6 +55,11 @@ const ELEMENTS = [
     md: "| Item | Cost |\n| --- | ---: |\n| Rent | 1200 |\n| Food | 450.50 |\n| Total | =SUM(B2:B3) |\n| Broken | =B2/0 |",
   },
   { id: "spreadsheet", name: "Spreadsheet (csv block)", md: "```csv\nItem, Cost\nRent, 1200\nFood, 450.50\nTotal, =SUM(B2:B3)\n```" },
+  {
+    id: "spreadsheet-named",
+    name: "Named spreadsheet (csv name=), and a formula in another block using it",
+    md: "```csv name=costs\nItem, Cost, Day\nRent, $1200, 2026-01-05\n```\n\n```csv\nTotal, =costs!B2*2\n```",
+  },
   { id: "divider", name: "Divider", md: "---" },
   { id: "key-value", name: "Key: Value line", md: "**Wi-Fi password:** correct-horse-battery" },
   { id: "mention", name: "Mention", md: "Ask @[QA · Ada] at @[QA · Ada].email." },

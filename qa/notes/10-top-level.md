@@ -116,65 +116,76 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Divider at the top level
+#### 19. Named spreadsheet (csv name=), and a formula in another block using it at the top level
+
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Divider at the top level
 
 ---
 
-#### 20. Key: Value line at the top level
+#### 21. Key: Value line at the top level
 
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Mention at the top level
+#### 22. Mention at the top level
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Wiki link at the top level
+#### 23. Wiki link at the top level
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Symbols at the top level
+#### 24. Symbols at the top level
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. GitHub links at the top level
+#### 25. GitHub links at the top level
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Image at the top level
+#### 26. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 26. Drawing at the top level
+#### 27. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. File at the top level
+#### 28. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Missing file at the top level
+#### 29. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Card at the top level
+#### 30. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 30. Callout (info) at the top level
+#### 31. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 31. Callout (warning, chosen icon) at the top level
+#### 32. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Callout (decision, no icon) at the top level
+#### 33. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

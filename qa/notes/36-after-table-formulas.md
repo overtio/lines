@@ -224,7 +224,24 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Table with formulas, then Divider
+#### 19. Table with formulas, then Named spreadsheet (csv name=), and a formula in another block using it
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Table with formulas, then Divider
 
 | Item | Cost |
 | --- | ---: |
@@ -234,7 +251,7 @@ Total, =SUM(B2:B3)
 | Broken | =B2/0 |
 ---
 
-#### 20. Table with formulas, then Key: Value line
+#### 21. Table with formulas, then Key: Value line
 
 | Item | Cost |
 | --- | ---: |
@@ -244,7 +261,7 @@ Total, =SUM(B2:B3)
 | Broken | =B2/0 |
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Table with formulas, then Mention
+#### 22. Table with formulas, then Mention
 
 | Item | Cost |
 | --- | ---: |
@@ -254,7 +271,7 @@ Total, =SUM(B2:B3)
 | Broken | =B2/0 |
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Table with formulas, then Wiki link
+#### 23. Table with formulas, then Wiki link
 
 | Item | Cost |
 | --- | ---: |
@@ -264,7 +281,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 | Broken | =B2/0 |
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Table with formulas, then Symbols
+#### 24. Table with formulas, then Symbols
 
 | Item | Cost |
 | --- | ---: |
@@ -274,7 +291,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | Broken | =B2/0 |
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Table with formulas, then GitHub links
+#### 25. Table with formulas, then GitHub links
 
 | Item | Cost |
 | --- | ---: |
@@ -284,7 +301,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | Broken | =B2/0 |
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Table with formulas, then Image
+#### 26. Table with formulas, then Image
 
 | Item | Cost |
 | --- | ---: |
@@ -294,7 +311,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 ![A sample picture](attachment:photo.png)
 
-#### 26. Table with formulas, then Drawing
+#### 27. Table with formulas, then Drawing
 
 | Item | Cost |
 | --- | ---: |
@@ -304,7 +321,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Table with formulas, then File
+#### 28. Table with formulas, then File
 
 | Item | Cost |
 | --- | ---: |
@@ -314,7 +331,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Table with formulas, then Missing file
+#### 29. Table with formulas, then Missing file
 
 | Item | Cost |
 | --- | ---: |
@@ -324,7 +341,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Table with formulas, then Card
+#### 30. Table with formulas, then Card
 
 | Item | Cost |
 | --- | ---: |
@@ -336,7 +353,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 30. Table with formulas, then Callout (info)
+#### 31. Table with formulas, then Callout (info)
 
 | Item | Cost |
 | --- | ---: |
@@ -348,7 +365,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 31. Table with formulas, then Callout (warning, chosen icon)
+#### 32. Table with formulas, then Callout (warning, chosen icon)
 
 | Item | Cost |
 | --- | ---: |
@@ -360,7 +377,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Table with formulas, then Callout (decision, no icon)
+#### 33. Table with formulas, then Callout (decision, no icon)
 
 | Item | Cost |
 | --- | ---: |

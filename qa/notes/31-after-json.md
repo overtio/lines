@@ -170,77 +170,91 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. JSON block (no language), then Divider
+#### 19. JSON block (no language), then Named spreadsheet (csv name=), and a formula in another block using it
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. JSON block (no language), then Divider
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ---
 
-#### 20. JSON block (no language), then Key: Value line
+#### 21. JSON block (no language), then Key: Value line
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. JSON block (no language), then Mention
+#### 22. JSON block (no language), then Mention
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. JSON block (no language), then Wiki link
+#### 23. JSON block (no language), then Wiki link
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. JSON block (no language), then Symbols
+#### 24. JSON block (no language), then Symbols
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. JSON block (no language), then GitHub links
+#### 25. JSON block (no language), then GitHub links
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. JSON block (no language), then Image
+#### 26. JSON block (no language), then Image
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 26. JSON block (no language), then Drawing
+#### 27. JSON block (no language), then Drawing
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. JSON block (no language), then File
+#### 28. JSON block (no language), then File
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 28. JSON block (no language), then Missing file
+#### 29. JSON block (no language), then Missing file
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. JSON block (no language), then Card
+#### 30. JSON block (no language), then Card
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -249,7 +263,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 30. JSON block (no language), then Callout (info)
+#### 31. JSON block (no language), then Callout (info)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -258,7 +272,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 31. JSON block (no language), then Callout (warning, chosen icon)
+#### 32. JSON block (no language), then Callout (warning, chosen icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -267,7 +281,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. JSON block (no language), then Callout (decision, no icon)
+#### 33. JSON block (no language), then Callout (decision, no icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}

@@ -2,7 +2,9 @@ import { isTauri } from "../platform";
 
 /**
  * Messages between the app's windows: the main window, Settings and any floating notes. They share one
- * on-device database, so a message only says what changed; each window reloads it from storage.
+ * on-device database, so a note's message only says which changed, and each window reloads it from
+ * there. Settings, plugins and the language, kept in local storage, which WebKit brings up to date
+ * in other windows only a moment later, come in the message, so they apply at once.
  */
 export type WindowMessage =
   /** A note was saved or deleted. `local` means by the person (so it should sync), not by sync itself. */
@@ -11,10 +13,12 @@ export type WindowMessage =
   | { type: "attachment"; id: string }
   /** Show this note in the main window. */
   | { type: "show"; id: string }
-  /** Preferences changed (theme, text, window look); reload them. */
-  | { type: "prefs" }
-  /** A plugin was turned on or off (plugins/registry.svelte.ts). */
-  | { type: "plugins" }
+  /** Preferences changed (theme, text, window look): all of them, as saved. */
+  | { type: "prefs"; prefs: string }
+  /** The app's language was chosen (i18n/index.svelte.ts). */
+  | { type: "language"; choice: string }
+  /** A plugin was turned on or off (plugins/registry.svelte.ts): which are, by choice. */
+  | { type: "plugins"; choices: Record<string, boolean> }
   /** A floating note's window opened or closed. */
   | { type: "floating"; id: string; open: boolean }
   /** The app lock locked lines, or was turned on or off: save, and start over. */
@@ -36,7 +40,13 @@ export type WindowMessage =
   | { type: "reply"; id: string; result?: unknown; error?: string }
   /** How sync is doing in the main window, and the Settings window asking for it. */
   | { type: "sync-state"; state: import("./settings.svelte").SyncState }
-  | { type: "sync-ask" };
+  | { type: "sync-ask" }
+  /** A spreadsheet's grid started or stopped writing a formula where a reference can go (plugins/spreadsheet/pointing.svelte.ts). */
+  | { type: "sheet-writer"; writing: boolean; note: string }
+  /** Cells pointed at in another window for it, in the sheet called `sheet`. */
+  | { type: "sheet-point"; sheet: string; anchor: { row: number; column: number }; corner: { row: number; column: number } }
+  /** That formula finished from the window cells were pointed at in: kept (Return, a click elsewhere) or not (Esc). */
+  | { type: "sheet-done"; keep: boolean };
 
 const EVENT = "lines:window";
 const self = crypto.randomUUID();

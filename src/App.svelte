@@ -11,6 +11,7 @@
   import NotesPasswordDialog from "./lib/components/NotesPasswordDialog.svelte";
   import PdfPreview from "./lib/components/PdfPreview.svelte";
   import PaneResizer from "./lib/components/PaneResizer.svelte";
+  import SideNote from "./lib/components/SideNote.svelte";
   import SidebarToggle from "./lib/components/SidebarToggle.svelte";
   import TabBar from "./lib/components/TabBar.svelte";
   import Button from "./lib/components/ui/Button.svelte";
@@ -202,6 +203,23 @@
       });
     });
   });
+
+  /*
+   * A note open beside the selected one (SideNote.svelte), on wide and medium screens. Never the
+   * same note in both (neither editor would see the other's typing): selecting the one beside
+   * closes it. Trashed or deleted, it goes.
+   */
+  let editorWidth = $state(0);
+  const beside = $derived.by(() => {
+    const entry = ui.side && !narrow && ui.side !== notes.selectedId ? notes.get(ui.side) : undefined;
+    return entry && !entry.note.trashed ? entry : null;
+  });
+  $effect(() => {
+    if (ui.side && notes.ready && (ui.side === notes.selectedId || !notes.get(ui.side) || notes.get(ui.side)!.note.trashed)) untrack(() => (ui.side = null));
+  });
+  /** As wide as dragged, leaving the main note at least NOTE_MIN. */
+  const sideMax = $derived(Math.max(PANE_WIDTHS.side.min, Math.min(PANE_WIDTHS.side.max, editorWidth - NOTE_MIN)));
+  const sideWidth = $derived(Math.min(prefs.sideWidth, sideMax));
 
   // Tabs turned off: they go with them.
   $effect(() => {
@@ -506,10 +524,13 @@
   {/if}
 
   <main
-    class={["editor-pane flex min-h-0 min-w-0 flex-col bg-surface", narrow ? ["col-start-2", stacked] : "[grid-area:editor]"]}
+    class={["editor-pane relative flex min-h-0 min-w-0 bg-surface", narrow ? ["col-start-2", stacked] : "[grid-area:editor]"]}
     inert={narrow && !selected}
     bind:this={editorPane}
+    bind:clientWidth={editorWidth}
   >
+    <!-- The selected note, and beside it the one opened to the side. -->
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col">
     <header class="toolbar flex h-(--titlebar-h) shrink-0 items-center gap-1 px-3 pt-(--titlebar-pad-top)" data-tauri-drag-region>
       {#if ui.sidebarToggle === "editor" && prefs.sidebarSide === "left"}
         <SidebarToggle />
@@ -608,6 +629,23 @@
         <Button variant="quiet" onclick={() => notes.create()}>
           {t("list.newNote")} <kbd class="ml-1.5 font-[inherit] text-xs text-faint">{newNoteKey}</kbd>
         </Button>
+      </div>
+    {/if}
+    </div>
+    {#if beside}
+      <PaneResizer
+        label={t("app.sideWidth")}
+        width={sideWidth}
+        min={PANE_WIDTHS.side.min}
+        max={sideMax}
+        initial={PANE_WIDTHS.side.initial}
+        side="right"
+        offset={sideWidth}
+        onresize={(width) => (prefs.sideWidth = width)}
+        ondrag={(dragging) => (resizing = dragging)}
+      />
+      <div class="flex min-h-0 shrink-0" style:width="{sideWidth}px">
+        <SideNote id={beside.note.id} />
       </div>
     {/if}
   </main>

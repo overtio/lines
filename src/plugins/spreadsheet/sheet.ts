@@ -1,7 +1,10 @@
+import { locale } from "../../lib/i18n/index.svelte";
 import { extractTags } from "../../lib/notes/parse";
+import { prefs } from "../../lib/prefs.svelte";
 import type { Cells } from "../../lib/plugins/types";
 import { el } from "../../lib/print/parts";
 import { parseCsv, trimCells, writeCsv } from "../../lib/sheets/csv";
+import { type CellLook, cellShown, displayed } from "../../lib/sheets/display";
 
 /*
  * A spreadsheet note's text: its title on the first line, with its tags (`Budget 2026 #home`), a
@@ -44,11 +47,50 @@ export const sheetCsv = (body: string) => {
 /** Its cells without the empty rows and columns at the end. */
 export const sheetCells = (body: string) => trimCells(readSheet(body).cells);
 
-const NUMBER = /^[-+]?[$€£¥]?\s*[\d.,]+%?$/;
+/** Numbers, money and dates, which line up on the right. */
+const NUMBER = /^(?:[-+]?[$€£¥]?\s*[\d.,]+%?|\d{4}-\d{2}-\d{2})$/;
 
-/** Cells as a printed table, numbers on the right as in the grid; with each cell's element, for what its formula works out to. */
-export function printedCells(cells: Cells) {
-  const elements = cells.map((row) => row.map((cell) => el("td", NUMBER.test(cell.trim()) ? "doc-number" : "", cell)));
+/** How cells show what's in them, as Settings → Editing → Spreadsheets says. */
+const look = (): CellLook => ({
+  dates: prefs.sheetDates,
+  money: prefs.sheetMoney,
+  negative: prefs.sheetNegative,
+  edge: prefs.sheetMoneyEdge,
+  currency: prefs.sheetCurrency,
+  locale,
+});
+
+/** What a cell shows, as the grid draws it: dates, money and numbers below zero as Settings says. */
+export const cellLook = (text: string) => cellShown(text, look());
+
+/** What a cell shows, as text: to copy, or list. */
+export const showCell = (text: string) => displayed(text, look());
+
+/** What a cell shows, read out: with a minus rather than in parentheses, which screen readers may leave unsaid. */
+export const spokenCell = (text: string) => displayed(text, { ...look(), negative: "minus" });
+
+/** What a cell shows, printed as the grid draws it: money's symbol at its left edge, red, and room for a `)` if Settings says so. */
+export function printedCell(text: string): Node | string {
+  const shown = cellLook(text);
+  if (!shown.symbol && !shown.red && !shown.room) return shown.text;
+  const symbol = shown.symbol ? [el("span", "doc-symbol", shown.symbol)] : [];
+  const room = shown.room ? [el("span", "doc-room", ")")] : [];
+  return el("span", shown.red ? "doc-negative" : "", ...symbol, shown.text, ...room);
+}
+
+/**
+ * Cells as a printed table, numbers on the right as in the grid, shown as `show` says, and its first
+ * row or column a header if Settings has them stand out; with each cell's element, for what its
+ * formula works out to.
+ */
+export function printedCells(cells: Cells, show: (text: string) => Node | string = (text) => text) {
+  const elements = cells.map((row, r) =>
+    row.map((cell, c) => {
+      const header = prefs.sheetHeaderRow && r === 0;
+      const classes = [NUMBER.test(cell.trim()) && "doc-number", !header && prefs.sheetHeaderColumn && c === 0 && "doc-head"];
+      return el(header ? "th" : "td", classes.filter(Boolean).join(" "), show(cell));
+    }),
+  );
   const table = el("div", "doc-table", el("table", "", el("tbody", "", ...elements.map((row) => el("tr", "", ...row)))));
   return { table, elements };
 }

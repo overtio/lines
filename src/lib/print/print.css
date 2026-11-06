@@ -211,6 +211,25 @@
   text-align: right;
 }
 
+/* Money's symbol at a spreadsheet cell's left edge, amounts below zero in red, and room for their `)` after others, when Settings says so. */
+.doc .doc-symbol {
+  float: left;
+  padding-right: 0.5em;
+}
+
+.doc .doc-negative {
+  color: #b42318;
+}
+
+.doc .doc-room {
+  visibility: hidden;
+}
+
+/* A spreadsheet's first column, when Settings has it stand out as a header. */
+.doc .doc-head {
+  font-weight: 650;
+}
+
 /* A formula in a table that can't be worked out (#DIV/0!). */
 .doc .doc-formula-error {
   color: #b42318;

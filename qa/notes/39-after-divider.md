@@ -134,78 +134,90 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Divider, then Divider
+#### 19. Divider, then Named spreadsheet (csv name=), and a formula in another block using it
+
+---
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Divider, then Divider
 
 ---
 ---
 
-#### 20. Divider, then Key: Value line
+#### 21. Divider, then Key: Value line
 
 ---
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Divider, then Mention
+#### 22. Divider, then Mention
 
 ---
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Divider, then Wiki link
+#### 23. Divider, then Wiki link
 
 ---
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Divider, then Symbols
+#### 24. Divider, then Symbols
 
 ---
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Divider, then GitHub links
+#### 25. Divider, then GitHub links
 
 ---
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Divider, then Image
+#### 26. Divider, then Image
 
 ---
 ![A sample picture](attachment:photo.png)
 
-#### 26. Divider, then Drawing
+#### 27. Divider, then Drawing
 
 ---
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Divider, then File
+#### 28. Divider, then File
 
 ---
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Divider, then Missing file
+#### 29. Divider, then Missing file
 
 ---
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Divider, then Card
+#### 30. Divider, then Card
 
 ---
 ::: card
 Text in a card.
 :::
 
-#### 30. Divider, then Callout (info)
+#### 31. Divider, then Callout (info)
 
 ---
 :::i
 Text in an info callout.
 :::
 
-#### 31. Divider, then Callout (warning, chosen icon)
+#### 32. Divider, then Callout (warning, chosen icon)
 
 ---
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Divider, then Callout (decision, no icon)
+#### 33. Divider, then Callout (decision, no icon)
 
 ---
 :::^ icon=none

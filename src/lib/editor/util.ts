@@ -21,6 +21,23 @@ export function changeBetween(from: number, before: string, after: string) {
   return { from: from + start, to: from + before.length - end, insert: after.slice(start, after.length - end) };
 }
 
+/**
+ * The changes that make `before` into `after`, touching only the parts that differ: line by line
+ * if they have as many lines (as a word renamed in several places does), so what's between those
+ * stays as it is; else as one change.
+ */
+export function changesBetween(before: string, after: string) {
+  const lines = before.split("\n");
+  const others = after.split("\n");
+  if (lines.length !== others.length) return [changeBetween(0, before, after)].filter((change) => change !== null);
+  let at = 0;
+  return lines.flatMap((line, i) => {
+    const change = changeBetween(at, line, others[i]);
+    at += line.length + 1;
+    return change ? [change] : [];
+  });
+}
+
 /** Whether line `n` exists and has text on it. */
 export const hasText = (doc: Text, n: number) => n >= 1 && n <= doc.lines && !!doc.line(n).text.trim();
 

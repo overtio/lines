@@ -194,4 +194,5 @@ export default {
   "editor.a11y.propertiesEnd": "Fin de las propiedades",
   "editor.a11y.codeStart": "Código",
   "editor.a11y.codeEnd": "Fin del código",
+  "editor.toSpreadsheet": "Convertir en hoja de cálculo",
 } satisfies Translation<typeof en>;

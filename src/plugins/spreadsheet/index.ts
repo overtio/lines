@@ -9,7 +9,8 @@ import { parseCsv, sniffDelimiter, writeCsv } from "../../lib/sheets/csv";
 import { calculate, loadFormulas, loadedFormulas } from "../../lib/sheets/formulas";
 import { sheetBlock, sheetCommand } from "./block.svelte";
 import { sheetEditing } from "./editor";
-import { printedCells, readSheet, sheetBody, sheetCells, sheetCsv, tagsOf, titleOf } from "./sheet";
+import { sheetFinder } from "./links";
+import { printedCell, printedCells, readSheet, sheetBody, sheetCells, sheetCsv, tagsOf, titleOf } from "./sheet";
 
 /*
  * Spreadsheet notes: cells and formulas, kept as CSV under the note's title (sheet.ts), and drawn
@@ -22,7 +23,7 @@ import { printedCells, readSheet, sheetBody, sheetCells, sheetCsv, tagsOf, title
 /** Its cells as they show: formulas worked out, if the engine has loaded. */
 function values(cells: Cells): Cells {
   const engine = loadedFormulas();
-  return engine ? calculate(engine, cells).map((row) => row.map((value) => value.text)) : cells;
+  return engine ? calculate(engine, cells, sheetFinder(null)).map((row) => row.map((value) => value.text)) : cells;
 }
 
 function meta(body: string): NoteMeta {
@@ -45,8 +46,8 @@ function meta(body: string): NoteMeta {
 /** Its title, then its cells as a table, formulas worked out. */
 function print(body: string, parts: Parts): HTMLElement {
   const cells = sheetCells(body);
-  const { table, elements } = printedCells(cells);
-  parts.formulas(cells, elements, true);
+  const { table, elements } = printedCells(cells, printedCell);
+  parts.formulas(cells, elements, { numbers: true, find: sheetFinder(null), show: printedCell });
   const title = titleOf(readSheet(body).head);
   return el("div", "doc doc-sheet", ...(title ? [el("h1", "", title)] : []), table);
 }
@@ -81,7 +82,7 @@ const downloads = (): NoteExport[] => [
     write: async (body) => {
       const engine = await loadFormulas();
       if (!engine?.writeWorkbook) throw new Error(t("sheet.noEngine"));
-      return engine.writeWorkbook(titleOf(readSheet(body).head) || t("sheet.label"), sheetCells(body));
+      return engine.writeWorkbook(titleOf(readSheet(body).head) || t("sheet.label"), sheetCells(body), sheetFinder(null));
     },
   },
 ];

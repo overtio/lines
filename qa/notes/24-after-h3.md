@@ -134,78 +134,90 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Heading 3, then Divider
+#### 19. Heading 3, then Named spreadsheet (csv name=), and a formula in another block using it
+
+### Heading three
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Heading 3, then Divider
 
 ### Heading three
 ---
 
-#### 20. Heading 3, then Key: Value line
+#### 21. Heading 3, then Key: Value line
 
 ### Heading three
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Heading 3, then Mention
+#### 22. Heading 3, then Mention
 
 ### Heading three
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Heading 3, then Wiki link
+#### 23. Heading 3, then Wiki link
 
 ### Heading three
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Heading 3, then Symbols
+#### 24. Heading 3, then Symbols
 
 ### Heading three
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Heading 3, then GitHub links
+#### 25. Heading 3, then GitHub links
 
 ### Heading three
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Heading 3, then Image
+#### 26. Heading 3, then Image
 
 ### Heading three
 ![A sample picture](attachment:photo.png)
 
-#### 26. Heading 3, then Drawing
+#### 27. Heading 3, then Drawing
 
 ### Heading three
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Heading 3, then File
+#### 28. Heading 3, then File
 
 ### Heading three
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Heading 3, then Missing file
+#### 29. Heading 3, then Missing file
 
 ### Heading three
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Heading 3, then Card
+#### 30. Heading 3, then Card
 
 ### Heading three
 ::: card
 Text in a card.
 :::
 
-#### 30. Heading 3, then Callout (info)
+#### 31. Heading 3, then Callout (info)
 
 ### Heading three
 :::i
 Text in an info callout.
 :::
 
-#### 31. Heading 3, then Callout (warning, chosen icon)
+#### 32. Heading 3, then Callout (warning, chosen icon)
 
 ### Heading three
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Heading 3, then Callout (decision, no icon)
+#### 33. Heading 3, then Callout (decision, no icon)
 
 ### Heading three
 :::^ icon=none

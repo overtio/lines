@@ -9,7 +9,7 @@ import { loadMath, type Macros, NO_MACROS } from "../editor/math";
 import { unsplashImage } from "../editor/unsplash";
 import { attachmentName, attachmentURL, imageSize } from "../notes/attachments";
 import { symbolPieces } from "../notes/symbols";
-import type { Cells, MathEngine, Renderer } from "../plugins/types";
+import type { Cells, FindSheet, MathEngine, Renderer } from "../plugins/types";
 import { showFormulas } from "../sheets/formulas";
 
 /*
@@ -63,9 +63,14 @@ export class Parts {
     this.#pending.push(work);
   }
 
-  /** What a table's formulas work out to, in their cells' elements (by row, as `cells`); numbers to the right with `numbers`, as in a spreadsheet. */
-  formulas(cells: Cells, elements: HTMLElement[][], numbers = false) {
-    this.#later(showFormulas(cells, elements, { pending: "doc-formula-pending", error: "doc-formula-error", number: numbers ? "doc-number" : undefined }));
+  /**
+   * What a table's formulas work out to, in their cells' elements (by row, as `cells`); numbers to
+   * the right with `numbers`, as in a spreadsheet. `find` finds the other sheets they name, and
+   * `show` turns what they work out to into what's printed.
+   */
+  formulas(cells: Cells, elements: HTMLElement[][], { numbers = false, find, show }: { numbers?: boolean; find?: FindSheet; show?: (text: string) => Node | string } = {}) {
+    const classes = { pending: "doc-formula-pending", error: "doc-formula-error", number: numbers ? "doc-number" : undefined };
+    this.#later(showFormulas(cells, elements, classes, { find, show }));
   }
 
   /** Math: within text, or displayed on its own. */
@@ -124,11 +129,11 @@ export class Parts {
    * A code block drawn by a renderer plugin (a Mermaid diagram), in black and white, at the width
    * its code block gives (```mermaid |400) if it does. Code it can't draw prints as code.
    */
-  rendered(renderer: Renderer, source: string, width: number | null = null): HTMLElement {
+  rendered(renderer: Renderer, source: string, width: number | null = null, note?: string): HTMLElement {
     const dom = el("div", "doc-diagram");
     this.#later(
       renderer
-        .render(source, { paper: true })
+        .render(source, { paper: true, note })
         .then((drawn) => {
           if (typeof drawn === "string") dom.innerHTML = drawn;
           else dom.replaceChildren(drawn);

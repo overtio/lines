@@ -11,7 +11,7 @@ export default {
   "settings.section.appearanceAbout": "The theme, light or dark, contrast and icons.",
   "settings.section.windows": "Windows",
   "settings.section.windowsAbout": "How see-through the main window is, and how floating notes look.",
-  "settings.section.text": "Text",
+  "settings.section.text": "Typography",
   "settings.section.textAbout": "The font notes are in, its size, and how wide and spaced out notes are.",
   "settings.section.editing": "Editing",
   "settings.section.editingAbout": "Symbols that replace what you type, and what clicking a link does.",
@@ -107,7 +107,7 @@ export default {
   // A size in pixels, as a screen reader says it.
   "settings.pixelsSpoken": "{count, plural, one {# pixel} other {# pixels}}",
 
-  // Settings → Text → Note width: how far a note's text runs before it wraps.
+  // Settings → Typography → Note width: how far a note's text runs before it wraps.
   "settings.noteWidth": "Note width",
   "settings.widthNarrow": "Narrow",
   "settings.widthMedium": "Medium",
@@ -137,6 +137,22 @@ export default {
     "Also <- as ←, <-> as ↔, => as ⇒, <=> as ⇔, <= as ≤, >= as ≥ and != as ≠. Your notes keep what you typed: put the cursor on one to see it, or type \\-> to keep it as typed.",
 
   // Settings → Editing → Links: what a click, ⌘-click and ⌘⇧-click on each kind of link in a note does.
+  "settings.spreadsheets": "Spreadsheets",
+  "settings.spreadsheetsNote": "How spreadsheets look, and how their cells show dates and money. Dates are kept as 2026-11-05 however they’re typed; money as written, its symbol first ($1200).",
+  "settings.sheetHeadings": "Column letters and row numbers",
+  "settings.sheetHeaderRow": "Highlight top row",
+  "settings.sheetHeaderColumn": "Highlight left column",
+  "settings.sheetDates": "Dates",
+  "settings.sheetCurrency": "Currency",
+  "settings.sheetCurrencyNote": "What Format as Currency writes, and what $ stands for if it’s a dollar",
+  "settings.sheetMoney": "Money",
+  "settings.sheetMoneyEdge": "Symbol at the cell’s left edge",
+  "settings.sheetMoneyEdgeNote": "As accounting formats show money: the symbol on the left, the amount on the right",
+  "settings.sheetNegative": "Negative numbers",
+  "settings.sheetNegativeNote": "Money and other numbers below zero",
+  "settings.sheetNegativeRed": "{amount} in red",
+  "settings.sheetStats": "Selected cells",
+  "settings.sheetStatsNote": "What selecting several cells shows of their numbers; with none on, nothing shows",
   "settings.links": "Links",
   "settings.linksWeb": "Web links",
   "settings.linksTag": "Tags",

@@ -8,19 +8,23 @@ import { githubLink, githubText } from "./github";
 import { copyButton, destroyCopyButton } from "./keyValue";
 import { followsLink } from "./links";
 import { mathElement } from "./math";
+import type { Cells } from "../plugins/types";
 import { isFormula } from "../sheets/cells";
+import { writeCsv } from "../sheets/csv";
 import { showFormulas } from "../sheets/formulas";
 import { plugins } from "../plugins/registry.svelte";
 import { symbolsChanged } from "./symbols";
 import { withSymbols } from "../notes/symbols";
 import { prefs } from "../prefs.svelte";
 import { t } from "../i18n/index.svelte";
+import { addActions, removeActions } from "./rendered";
 import { ancestors, focusChanged, focused, hasText, isEditing } from "./util";
 
 /*
  * GFM tables. Away from the cursor a table shows as a real table; click a cell (or move into the
  * table) and it turns back into its Markdown, kept neatly aligned as you Tab between cells. A cell
- * written as a formula (`=SUM(B2:B4)`, the header being row 1) shows what it works out to.
+ * written as a formula (`=SUM(B2:B4)`, the header being row 1) shows what it works out to. With a
+ * renderer for ```csv blocks (the Spreadsheets plugin's), a button turns a table into one.
  */
 
 type Align = "" | "left" | "center" | "right";
@@ -281,8 +285,8 @@ export const numericColumn = (body: string[][], col: number) => {
   return values.some((v) => NUMBER.test(v)) && values.every((v) => NUMBER.test(v) || isFormula(v));
 };
 
-/** The pasted rows as an aligned Markdown table; numeric columns are right-aligned. */
-function tableMarkdown(cells: string[][]) {
+/** Rows of cells as an aligned Markdown table, the first its header; numeric columns are right-aligned. */
+export function tableMarkdown(cells: string[][]) {
   const columns = Math.max(...cells.map((row) => row.length));
   const clean = cells.map((row) =>
     Array.from({ length: columns }, (_, col) => (row[col] ?? "").replace(/\s+/g, " ").trim().replace(/\|/g, "\\|")),
@@ -441,6 +445,23 @@ interface TableModel {
 
 const copies = new WeakMap<HTMLElement, HTMLElement>();
 
+/** A table's cells as a spreadsheet has them: formulas as written, the rest as plain text. */
+const cellsOf = (model: TableModel): Cells =>
+  model.rows.map((row) =>
+    Array.from({ length: model.columns }, (_, col) => {
+      const written = row.written[col] ?? "";
+      return isFormula(written) ? written.replaceAll("\\|", "|") : plainInline(row.cells[col] ?? []).trim();
+    }),
+  );
+
+/** The table at `pos` as a ```csv block, which the Spreadsheets plugin draws as a grid. Its cells' formatting doesn't go with it. */
+function toSpreadsheet(view: EditorView, pos: number) {
+  const table = tableAt(view.state, pos);
+  if (!table || view.state.readOnly) return;
+  const insert = `\`\`\`csv\n${writeCsv(cellsOf(modelOf(view.state, table)))}\n\`\`\``;
+  view.dispatch({ changes: { from: table.from, to: table.to, insert }, userEvent: "input", annotations: isolateHistory.of("full") });
+}
+
 class TableWidget extends WidgetType {
   constructor(
     readonly source: string,
@@ -452,12 +473,18 @@ class TableWidget extends WidgetType {
     readonly symbols = `${prefs.symbolsInText} ${prefs.symbolsInCode}`,
     /** What works out its formulas, so turning that on or off draws it again. */
     readonly formulas = plugins.formulas?.id,
+    /** Whether it can be turned into a spreadsheet, so turning that plugin on or off draws it again. */
+    readonly sheets = !!plugins.renderer("csv"),
   ) {
     super();
   }
   eq(other: TableWidget) {
     return (
-      other.source === this.source && sameInset(other.inset, this.inset) && other.symbols === this.symbols && other.formulas === this.formulas
+      other.source === this.source &&
+      sameInset(other.inset, this.inset) &&
+      other.symbols === this.symbols &&
+      other.formulas === this.formulas &&
+      other.sheets === this.sheets
     );
   }
   toDOM(view: EditorView) {
@@ -492,13 +519,13 @@ class TableWidget extends WidgetType {
     };
     section("thead", [head]);
     if (body.length) section("tbody", body);
-    wrap.append(table);
-    const cells = model.rows.map((row) =>
-      Array.from({ length: model.columns }, (_, col) => {
-        const written = row.written[col] ?? "";
-        return isFormula(written) ? written.replaceAll("\\|", "|") : plainInline(row.cells[col] ?? []).trim();
-      }),
-    );
+    // It scrolls sideways in a box of its own, so its button can sit beside it.
+    const scroll = document.createElement("div");
+    scroll.className = "cm-lp-table-scroll";
+    scroll.append(table);
+    wrap.append(scroll);
+    if (this.sheets) addActions(view, wrap, [{ label: t("editor.toSpreadsheet"), icon: "sheet", run: toSpreadsheet }]);
+    const cells = cellsOf(model);
     void showFormulas(cells, elements, { pending: "cm-lp-formula-pending", error: "cm-lp-formula-error" }).then(() => view.requestMeasure());
     // One copy button for the whole table, moved into whichever cell the pointer is over.
     let text = "";
@@ -518,6 +545,7 @@ class TableWidget extends WidgetType {
   destroy(dom: HTMLElement) {
     const copy = copies.get(dom);
     if (copy) destroyCopyButton(copy);
+    removeActions(dom);
   }
   get estimatedHeight() {
     // Every line but the |---| one is a row.
@@ -590,7 +618,7 @@ const clickToEdit = EditorView.domEventHandlers({
     const target = event.target as HTMLElement;
     const wrap = target.closest(".cm-lp-table-wrap");
     if (!wrap || followsLink(event, view)) return false;
-    if (target.closest(".cm-lp-copy")) return true;
+    if (target.closest(".cm-lp-copy, .cm-lp-actions")) return true;
     const cell = target.closest<HTMLElement>("td, th");
     if (event.button !== 0 || view.state.readOnly || !cell) return true;
     const { doc } = view.state;

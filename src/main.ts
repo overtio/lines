@@ -25,10 +25,13 @@ if (isMacApp) document.documentElement.dataset.platform = "mac-app";
 
 if (isTauri) {
   // The webview's own right-click menu (Reload, Inspect Element) isn't part of the app. Keep it
-  // only where it helps: in text you can edit (spelling, Cut, Copy, Paste) or have selected.
+  // only where it helps: in text you can edit (spelling, Cut, Copy, Paste) or have selected. What a
+  // note draws in its text (a spreadsheet's grid, a table, a diagram) is in the editor's editable
+  // text but not editable itself, so the nearest contenteditable decides.
   addEventListener("contextmenu", (event) => {
     const target = event.target as Element | null;
-    if (target?.closest('input, textarea, [contenteditable="true"]') || getSelection()?.isCollapsed === false) return;
+    const editable = target?.closest("[contenteditable]")?.getAttribute("contenteditable");
+    if (target?.closest("input, textarea") || editable === "true" || editable === "" || getSelection()?.isCollapsed === false) return;
     event.preventDefault();
   });
   // F12 opens the inspector in debug builds (View → Developer Tools in the Mac app).

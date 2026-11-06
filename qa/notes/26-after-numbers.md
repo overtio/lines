@@ -188,7 +188,22 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Numbered list, then Divider
+#### 19. Numbered list, then Named spreadsheet (csv name=), and a formula in another block using it
+
+1. First
+2. Second
+   1. Nested
+3. Third
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 20. Numbered list, then Divider
 
 1. First
 2. Second
@@ -196,7 +211,7 @@ Total, =SUM(B2:B3)
 3. Third
 ---
 
-#### 20. Numbered list, then Key: Value line
+#### 21. Numbered list, then Key: Value line
 
 1. First
 2. Second
@@ -204,7 +219,7 @@ Total, =SUM(B2:B3)
 3. Third
 **Wi-Fi password:** correct-horse-battery
 
-#### 21. Numbered list, then Mention
+#### 22. Numbered list, then Mention
 
 1. First
 2. Second
@@ -212,7 +227,7 @@ Total, =SUM(B2:B3)
 3. Third
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 22. Numbered list, then Wiki link
+#### 23. Numbered list, then Wiki link
 
 1. First
 2. Second
@@ -220,7 +235,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 3. Third
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 23. Numbered list, then Symbols
+#### 24. Numbered list, then Symbols
 
 1. First
 2. Second
@@ -228,7 +243,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 3. Third
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 24. Numbered list, then GitHub links
+#### 25. Numbered list, then GitHub links
 
 1. First
 2. Second
@@ -236,7 +251,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 3. Third
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 25. Numbered list, then Image
+#### 26. Numbered list, then Image
 
 1. First
 2. Second
@@ -244,7 +259,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 ![A sample picture](attachment:photo.png)
 
-#### 26. Numbered list, then Drawing
+#### 27. Numbered list, then Drawing
 
 1. First
 2. Second
@@ -252,7 +267,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 ![A sample drawing](attachment:drawing.svg)
 
-#### 27. Numbered list, then File
+#### 28. Numbered list, then File
 
 1. First
 2. Second
@@ -260,7 +275,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [Budget.csv](attachment:budget.csv)
 
-#### 28. Numbered list, then Missing file
+#### 29. Numbered list, then Missing file
 
 1. First
 2. Second
@@ -268,7 +283,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 29. Numbered list, then Card
+#### 30. Numbered list, then Card
 
 1. First
 2. Second
@@ -278,7 +293,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 30. Numbered list, then Callout (info)
+#### 31. Numbered list, then Callout (info)
 
 1. First
 2. Second
@@ -288,7 +303,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 31. Numbered list, then Callout (warning, chosen icon)
+#### 32. Numbered list, then Callout (warning, chosen icon)
 
 1. First
 2. Second
@@ -298,7 +313,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 32. Numbered list, then Callout (decision, no icon)
+#### 33. Numbered list, then Callout (decision, no icon)
 
 1. First
 2. Second

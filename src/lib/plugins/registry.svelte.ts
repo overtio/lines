@@ -61,7 +61,7 @@ class Plugins {
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).
-    void onAnnounce((message) => message.type === "plugins" && (this.#choices = read()));
+    void onAnnounce((message) => message.type === "plugins" && (this.#choices = message.choices));
   }
 
   /** What the running plugins add of one kind, in their order. */
@@ -104,7 +104,7 @@ class Plugins {
     } catch {
       // Storage that can't be written: the choice lasts until lines restarts.
     }
-    void announce({ type: "plugins" });
+    void announce({ type: "plugins", choices });
   }
 
   /** The language a note shows in: its own while its plugin runs, plain text otherwise. */

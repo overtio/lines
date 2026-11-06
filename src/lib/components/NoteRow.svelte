@@ -382,6 +382,8 @@
     // ⇧-click every note from the last one clicked. A click on its own picks just this one.
     if (isApple ? event.metaKey : event.ctrlKey) return notes.togglePick(id);
     if (event.shiftKey) return notes.pickRange(id);
+    // ⌥-click (Alt-click elsewhere) opens it beside the one that's open.
+    if (event.altKey && canOpenBeside) return openBeside();
     notes.clearPicks();
     notes.select(id);
     // Opened from the keyboard (Enter or Space, which click with no pointer: detail 0), the note's
@@ -437,6 +439,15 @@
     });
   }
 
+  /** Whether it can open beside the selected note: on wide and medium screens, not in the Trash, and not the selected note itself. */
+  const canOpenBeside = $derived(ui.layout !== "narrow" && !entry.note.trashed && notes.selectedId !== id);
+
+  function openBeside() {
+    notes.clearPicks();
+    if (notes.selectedId) ui.side = id;
+    else notes.select(id);
+  }
+
   function showMenu(x: number, y: number) {
     if (offset) close();
     if (picked && notes.pickedEntries.length > 1) return showPickedMenu(x, y);
@@ -449,6 +460,7 @@
       label: entry.meta.title || t("list.untitled"),
       items: [
         { label: leading.menuLabel, icon: leading.icon, run: () => perform(leading) },
+        ...(canOpenBeside ? [{ label: t("list.openBeside"), icon: "columns-2" as const, run: openBeside }] : []),
         ...(canFloat && !entry.note.trashed
           ? [
               {

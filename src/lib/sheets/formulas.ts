@@ -1,5 +1,5 @@
 import { plugins } from "../plugins/registry.svelte";
-import type { CellValue, Cells, FormulaEngine } from "../plugins/types";
+import type { CellValue, Cells, FindSheet, FormulaEngine } from "../plugins/types";
 import { isFormula } from "./cells";
 
 /*
@@ -8,6 +8,9 @@ import { isFormula } from "./cells";
  */
 
 const ready = new WeakSet<FormulaEngine>();
+
+/** A sheet's name as a formula writes it: in quotes unless it's one word that can't be read as a cell (Q1). */
+export const sheetName = (name: string) => (/^[A-Za-z_][\w.]*$/.test(name) && !/^[A-Za-z]{1,3}\d+$/.test(name) ? name : `'${name.replaceAll("'", "''")}'`);
 
 /** The engine that's on, once it has loaded; null if none is on. */
 export async function loadFormulas(): Promise<FormulaEngine | null> {
@@ -24,9 +27,9 @@ export function loadedFormulas(): FormulaEngine | null {
   return engine && ready.has(engine) ? engine : null;
 }
 
-/** Every cell of a table worked out, as it shows. */
-export function calculate(engine: FormulaEngine, cells: Cells): CellValue[][] {
-  const sheet = engine.sheet();
+/** Every cell of a table worked out, as it shows; `find` finds the other sheets its formulas name. */
+export function calculate(engine: FormulaEngine, cells: Cells, find?: FindSheet): CellValue[][] {
+  const sheet = engine.sheet(find);
   try {
     sheet.update(cells);
     return cells.map((row, r) => row.map((_, c) => sheet.value(r, c)));
@@ -40,11 +43,13 @@ export function calculate(engine: FormulaEngine, cells: Cells): CellValue[][] {
  * once the engine has loaded. Until then, and with no engine on, they show as written, in
  * `classes.pending`; an error (`#DIV/0!`) shows in `classes.error`, and a number in `classes.number`
  * if given. The formula stays in the cell's tooltip. Resolves once they show, for what's printed.
+ * `find` finds the other sheets they name, and `show` turns what they work out to into what shows.
  */
 export async function showFormulas(
   cells: Cells,
   elements: (HTMLElement | undefined)[][],
   classes: { pending: string; error: string; number?: string },
+  { find, show = (text) => text }: { find?: FindSheet; show?: (text: string) => Node | string } = {},
 ) {
   const formulas = cells.flatMap((row, r) => row.flatMap((input, c) => (isFormula(input) && elements[r]?.[c] ? [{ input, el: elements[r][c]!, r, c }] : [])));
   if (!formulas.length) return;
@@ -60,11 +65,11 @@ export async function showFormulas(
     console.error("lines: couldn't load the formula engine", error);
   }
   if (!engine) return;
-  const values = calculate(engine, cells);
+  const values = calculate(engine, cells, find);
   for (const { el, r, c } of formulas) {
-    const { text, kind } = values[r][c];
-    el.textContent = text;
-    el.dataset.text = text;
+    const { kind } = values[r][c];
+    el.replaceChildren(show(values[r][c].text));
+    el.dataset.text = el.textContent ?? "";
     el.classList.remove(classes.pending);
     el.classList.toggle(classes.error, kind === "error");
     if (classes.number) el.classList.toggle(classes.number, kind === "number");

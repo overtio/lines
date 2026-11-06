@@ -82,9 +82,13 @@ function quote(cell: string, delimiter: string) {
   return cell.includes(delimiter) || /["\r\n]|^\s|\s$/.test(cell) ? `"${cell.replaceAll('"', '""')}"` : cell;
 }
 
-/** Writes cells as CSV (or with another delimiter), every row as wide as the widest, without empty rows or columns at the end. */
-export function writeCsv(cells: Cells, delimiter = ","): string {
-  return trimCells(cells)
+/**
+ * Writes cells as CSV (or with another delimiter), every row as wide as the widest, without empty
+ * rows or columns at the end, or with `keep` with them: a block in a note is as big as its CSV.
+ */
+export function writeCsv(cells: Cells, delimiter = ",", keep = false): string {
+  const width = cells.reduce((most, row) => Math.max(most, row.length), 0);
+  return (keep ? cells.map((row) => Array.from({ length: width }, (_, c) => row[c] ?? "")) : trimCells(cells))
     .map((row) => row.map((cell) => quote(cell, delimiter)).join(delimiter))
     .join("\n");
 }

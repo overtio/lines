@@ -61,4 +61,5 @@ export default {
   "list.tagAdd": "Ajouter",
   "list.tagged": "{count, plural, =0 {Elles ont toutes déjà #{tag}} one {#{tag} ajoutée à # note} other {#{tag} ajoutée à # notes}}",
   "list.taggedLocked": "Les notes verrouillées gardent leurs étiquettes.",
+  "list.openBeside": "Ouvrir à côté",
 } satisfies Translation<typeof en>;

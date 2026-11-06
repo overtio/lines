@@ -1,5 +1,6 @@
 import { locale, t } from "./i18n/index.svelte";
 import { isMacApp } from "./platform";
+import { CURRENCIES, DATE_STYLES, type DateStyle, localCurrency, MONEY_STYLES, type MoneyStyle, NEGATIVE_STYLES, type NegativeStyle } from "./sheets/display";
 import { announce, onAnnounce, windowLabel } from "./windows/channel";
 
 export type Appearance = "system" | "light" | "dark";
@@ -98,10 +99,10 @@ export const SPACING_PRESETS: { id: string; name: string; spacing: Spacing }[] =
 
 export const DEFAULT_SPACING = SPACING_PRESETS[1].spacing;
 
-/** The size of a note's text, in px (Settings → Text → Text size, and ⌘+ and ⌘−). */
+/** The size of a note's text, in px (Settings → Typography → Text size, and ⌘+ and ⌘−). */
 export const TEXT_SIZE = { min: 12, max: 28, step: 1 };
 
-/** How wide a note's text can run, in px (Settings → Text → Note width), and its choices besides Full. */
+/** How wide a note's text can run, in px (Settings → Typography → Note width), and its choices besides Full. */
 export const NOTE_WIDTH = { min: 480, max: 1400, step: 20 };
 export const NOTE_WIDTHS = [
   { id: "narrow", name: t("settings.widthNarrow"), width: 600 },
@@ -148,6 +149,8 @@ interface Stored {
   /** The sidebar's and note list's widths, in pixels, as dragged (App.svelte), and their sides of the window. */
   sidebarWidth: number;
   listWidth: number;
+  /** The note open beside another's width, as dragged. */
+  sideWidth: number;
   sidebarSide: Side;
   listSide: Side;
   /** Open notes show as tabs above the note (tabs.svelte.ts). */
@@ -159,7 +162,24 @@ interface Stored {
   symbolsInText: boolean;
   symbolsInCode: boolean;
   links: LinkClicks;
+  /** What selecting several cells of a spreadsheet shows of them (none: nothing). */
+  sheetStats: SheetStat[];
+  /** How spreadsheets show dates and money (sheets/display.ts), and the currency "Format as Currency" writes. */
+  sheetDates: DateStyle;
+  sheetMoney: MoneyStyle;
+  sheetCurrency: string;
+  /** How amounts and numbers below zero show (-$5, ($5), either in red), and whether money's symbol goes at the cell's left edge. */
+  sheetNegative: NegativeStyle;
+  sheetMoneyEdge: boolean;
+  /** Spreadsheets show their column letters and row numbers. */
+  sheetHeadings: boolean;
+  /** Spreadsheets' first row, and first column, stand out as headers. */
+  sheetHeaderRow: boolean;
+  sheetHeaderColumn: boolean;
 }
+
+export const SHEET_STATS = ["sum", "average", "min", "max", "count"] as const;
+export type SheetStat = (typeof SHEET_STATS)[number];
 
 export const OPACITY = { min: 0.3, max: 1, step: 0.01 };
 
@@ -206,6 +226,7 @@ const DEFAULTS: Stored = {
   typesetter: "lines",
   sidebarWidth: 230,
   listWidth: 320,
+  sideWidth: 520,
   sidebarSide: "left",
   listSide: "left",
   tabs: false,
@@ -213,6 +234,15 @@ const DEFAULTS: Stored = {
   outlineSide: "right",
   symbolsInText: true,
   symbolsInCode: true,
+  sheetStats: ["sum", "average", "count"],
+  sheetDates: "medium",
+  sheetMoney: "symbol",
+  sheetCurrency: localCurrency(locale),
+  sheetNegative: "minus",
+  sheetMoneyEdge: false,
+  sheetHeadings: true,
+  sheetHeaderRow: false,
+  sheetHeaderColumn: false,
   links: {
     web: { click: "edit", modClick: "open", modShiftClick: "copy" },
     tag: { click: "edit", modClick: "open", modShiftClick: "open" },
@@ -224,6 +254,7 @@ const DEFAULTS: Stored = {
 export const PANE_WIDTHS = {
   sidebar: { min: 180, max: 420, initial: DEFAULTS.sidebarWidth },
   list: { min: 240, max: 560, initial: DEFAULTS.listWidth },
+  side: { min: 300, max: 1400, initial: DEFAULTS.sideWidth },
 };
 
 const clamp = (value: unknown, min: number, max: number, fallback: number) =>
@@ -253,11 +284,11 @@ function readLinks(raw: unknown): LinkClicks {
 /** A plugin's theme, icon set or typesetter, by id. */
 const id = (value: unknown, fallback: string) => (typeof value === "string" && /^[a-z0-9][a-z0-9-]*$/.test(value) ? value : fallback);
 
-/** The saved preferences, each checked and falling back to its default; unknown keys are dropped. */
-function read(): Stored {
+/** The saved preferences (or those `json` gives), each checked and falling back to its default; unknown keys are dropped. */
+function read(json?: string): Stored {
   let raw: Record<string, unknown> = {};
   try {
-    raw = JSON.parse(localStorage.getItem(KEY) ?? "{}") ?? {};
+    raw = JSON.parse(json ?? localStorage.getItem(KEY) ?? "{}") ?? {};
   } catch {
     // Unreadable: start from the defaults.
   }
@@ -289,6 +320,7 @@ function read(): Stored {
     typesetter: id(raw.typesetter, DEFAULTS.typesetter),
     sidebarWidth: clamp(raw.sidebarWidth, PANE_WIDTHS.sidebar.min, PANE_WIDTHS.sidebar.max, DEFAULTS.sidebarWidth),
     listWidth: clamp(raw.listWidth, PANE_WIDTHS.list.min, PANE_WIDTHS.list.max, DEFAULTS.listWidth),
+    sideWidth: clamp(raw.sideWidth, PANE_WIDTHS.side.min, PANE_WIDTHS.side.max, DEFAULTS.sideWidth),
     sidebarSide: oneOf(raw.sidebarSide, SIDES, DEFAULTS.sidebarSide),
     listSide: oneOf(raw.listSide, SIDES, DEFAULTS.listSide),
     tabs: flag(raw.tabs, DEFAULTS.tabs),
@@ -297,11 +329,17 @@ function read(): Stored {
     symbolsInText: flag(raw.symbolsInText, DEFAULTS.symbolsInText),
     symbolsInCode: flag(raw.symbolsInCode, DEFAULTS.symbolsInCode),
     links: readLinks(raw.links),
+    sheetStats: Array.isArray(raw.sheetStats) ? SHEET_STATS.filter((stat) => (raw.sheetStats as unknown[]).includes(stat)) : DEFAULTS.sheetStats,
+    sheetDates: oneOf(raw.sheetDates, DATE_STYLES, DEFAULTS.sheetDates),
+    sheetMoney: oneOf(raw.sheetMoney, MONEY_STYLES, DEFAULTS.sheetMoney),
+    sheetCurrency: oneOf(raw.sheetCurrency, CURRENCIES, DEFAULTS.sheetCurrency),
+    sheetNegative: oneOf(raw.sheetNegative, NEGATIVE_STYLES, DEFAULTS.sheetNegative),
+    sheetMoneyEdge: flag(raw.sheetMoneyEdge, DEFAULTS.sheetMoneyEdge),
+    sheetHeadings: flag(raw.sheetHeadings, DEFAULTS.sheetHeadings),
+    sheetHeaderRow: flag(raw.sheetHeaderRow, DEFAULTS.sheetHeaderRow),
+    sheetHeaderColumn: flag(raw.sheetHeaderColumn, DEFAULTS.sheetHeaderColumn),
   };
 }
-
-/** Saving waits for a pause, so dragging a slider doesn't make every window reload each step. */
-const SAVE_DELAY = 200;
 
 const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const contrastQuery = window.matchMedia("(prefers-contrast: more)");
@@ -328,6 +366,7 @@ class Prefs {
   typesetter = $state(this.#initial.typesetter);
   sidebarWidth = $state(this.#initial.sidebarWidth);
   listWidth = $state(this.#initial.listWidth);
+  sideWidth = $state(this.#initial.sideWidth);
   sidebarSide = $state(this.#initial.sidebarSide);
   listSide = $state(this.#initial.listSide);
   tabs = $state(this.#initial.tabs);
@@ -335,15 +374,23 @@ class Prefs {
   outlineSide = $state(this.#initial.outlineSide);
   symbolsInText = $state(this.#initial.symbolsInText);
   symbolsInCode = $state(this.#initial.symbolsInCode);
+  sheetStats = $state(this.#initial.sheetStats);
+  sheetDates = $state(this.#initial.sheetDates);
+  sheetMoney = $state(this.#initial.sheetMoney);
+  sheetCurrency = $state(this.#initial.sheetCurrency);
+  sheetNegative = $state(this.#initial.sheetNegative);
+  sheetMoneyEdge = $state(this.#initial.sheetMoneyEdge);
+  sheetHeadings = $state(this.#initial.sheetHeadings);
+  sheetHeaderRow = $state(this.#initial.sheetHeaderRow);
+  sheetHeaderColumn = $state(this.#initial.sheetHeaderColumn);
   /** Settings → Editing → Links: what a click, ⌘-click and ⌘⇧-click on each kind of link does. */
   links = $state(this.#initial.links);
   #markWindowReady!: () => void;
   /** Resolves once this window's native look (opaque or see-through) has first been applied. */
   readonly windowReady = new Promise<void>((resolve) => (this.#markWindowReady = resolve));
 
-  /** What we last wrote (or read), so a change only goes out to other windows once. */
+  /** What we last wrote (or took up from another window), so a change only goes out to other windows once. */
   #saved = JSON.stringify(this.#initial);
-  #saveTimer: ReturnType<typeof setTimeout> | undefined;
   spacing = $state<Spacing>(this.#initial.spacing);
   noteWidth = $state(this.#initial.noteWidth);
   fullWidth = $state(this.#initial.fullWidth);
@@ -378,11 +425,11 @@ class Prefs {
     this.#apply();
     $effect.root(() => {
       $effect(() => this.#apply());
+      // Saved, and sent to the other windows, as it changes: they show it at once, a slider's
+      // every step too.
       $effect(() => {
         const json = this.#serialize();
-        if (json === this.#saved) return;
-        clearTimeout(this.#saveTimer);
-        this.#saveTimer = setTimeout(() => this.#save(json), SAVE_DELAY);
+        if (json !== this.#saved) this.#save(json);
       });
       // Below 100% opacity the window turns see-through, with the desktop blurred behind it;
       // at 100% it stays a normal Mac window (with the system's rounded corners and border).
@@ -395,13 +442,9 @@ class Prefs {
           .finally(() => this.#markWindowReady());
       });
     });
-    addEventListener("pagehide", () => {
-      clearTimeout(this.#saveTimer);
-      const json = this.#serialize();
-      if (json !== this.#saved) this.#save(json);
-    });
-    // Another window (main or floating) changed a setting: pick it up.
-    void onAnnounce((message) => message.type === "prefs" && this.#reload());
+    // Another window (Settings, main or floating) changed a setting: take it up, from the message
+    // rather than storage, which WebKit brings up to date in other windows only a moment later.
+    void onAnnounce((message) => message.type === "prefs" && this.#reload(message.prefs));
   }
 
   /**
@@ -471,6 +514,7 @@ class Prefs {
       typesetter: this.typesetter,
       sidebarWidth: this.sidebarWidth,
       listWidth: this.listWidth,
+      sideWidth: this.sideWidth,
       sidebarSide: this.sidebarSide,
       listSide: this.listSide,
       tabs: this.tabs,
@@ -479,6 +523,15 @@ class Prefs {
       symbolsInText: this.symbolsInText,
       symbolsInCode: this.symbolsInCode,
       links: $state.snapshot(this.links),
+      sheetStats: $state.snapshot(this.sheetStats),
+      sheetDates: this.sheetDates,
+      sheetMoney: this.sheetMoney,
+      sheetCurrency: this.sheetCurrency,
+      sheetNegative: this.sheetNegative,
+      sheetMoneyEdge: this.sheetMoneyEdge,
+      sheetHeadings: this.sheetHeadings,
+      sheetHeaderRow: this.sheetHeaderRow,
+      sheetHeaderColumn: this.sheetHeaderColumn,
     };
     return JSON.stringify(stored);
   }
@@ -490,14 +543,11 @@ class Prefs {
     } catch {
       // Private mode or full storage: preferences just won't persist.
     }
-    void announce({ type: "prefs" });
+    void announce({ type: "prefs", prefs: json });
   }
 
-  #reload() {
-    const next = read();
-    // Mark it as already saved, so applying it here doesn't echo it back out.
-    this.#saved = JSON.stringify(next);
-    clearTimeout(this.#saveTimer);
+  #reload(json: string) {
+    const next = read(json);
     this.theme = next.theme;
     this.appearance = next.appearance;
     this.contrast = next.contrast;
@@ -521,6 +571,7 @@ class Prefs {
     this.typesetter = next.typesetter;
     this.sidebarWidth = next.sidebarWidth;
     this.listWidth = next.listWidth;
+    this.sideWidth = next.sideWidth;
     this.sidebarSide = next.sidebarSide;
     this.listSide = next.listSide;
     this.tabs = next.tabs;
@@ -528,7 +579,18 @@ class Prefs {
     this.outlineSide = next.outlineSide;
     this.symbolsInText = next.symbolsInText;
     this.symbolsInCode = next.symbolsInCode;
+    if (next.sheetStats.join() !== this.sheetStats.join()) this.sheetStats = next.sheetStats;
+    this.sheetDates = next.sheetDates;
+    this.sheetMoney = next.sheetMoney;
+    this.sheetCurrency = next.sheetCurrency;
+    this.sheetNegative = next.sheetNegative;
+    this.sheetMoneyEdge = next.sheetMoneyEdge;
+    this.sheetHeadings = next.sheetHeadings;
+    this.sheetHeaderRow = next.sheetHeaderRow;
+    this.sheetHeaderColumn = next.sheetHeaderColumn;
     if (JSON.stringify(this.links) !== JSON.stringify(next.links)) this.links = next.links;
+    // As already saved, so taking it up here doesn't send it back out.
+    this.#saved = this.#serialize();
   }
 }
 

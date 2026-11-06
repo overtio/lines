@@ -152,67 +152,80 @@ Total, =SUM(B2:B3)
 ```
 :::
 
-#### 19. Divider in a callout with no icon
+#### 19. Named spreadsheet (csv name=), and a formula in another block using it in a callout with no icon
+
+:::^ icon=none
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+:::
+
+#### 20. Divider in a callout with no icon
 
 :::^ icon=none
 ---
 :::
 
-#### 20. Key: Value line in a callout with no icon
+#### 21. Key: Value line in a callout with no icon
 
 :::^ icon=none
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 21. Mention in a callout with no icon
+#### 22. Mention in a callout with no icon
 
 :::^ icon=none
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 22. Wiki link in a callout with no icon
+#### 23. Wiki link in a callout with no icon
 
 :::^ icon=none
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 23. Symbols in a callout with no icon
+#### 24. Symbols in a callout with no icon
 
 :::^ icon=none
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 24. GitHub links in a callout with no icon
+#### 25. GitHub links in a callout with no icon
 
 :::^ icon=none
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 25. Image in a callout with no icon
+#### 26. Image in a callout with no icon
 
 :::^ icon=none
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 26. Drawing in a callout with no icon
+#### 27. Drawing in a callout with no icon
 
 :::^ icon=none
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 27. File in a callout with no icon
+#### 28. File in a callout with no icon
 
 :::^ icon=none
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 28. Missing file in a callout with no icon
+#### 29. Missing file in a callout with no icon
 
 :::^ icon=none
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 29. Card in a callout with no icon
+#### 30. Card in a callout with no icon
 
 :::^ icon=none
 ::: card
@@ -220,7 +233,7 @@ Text in a card.
 :::
 :::
 
-#### 30. Callout (info) in a callout with no icon
+#### 31. Callout (info) in a callout with no icon
 
 :::^ icon=none
 :::i
@@ -228,7 +241,7 @@ Text in an info callout.
 :::
 :::
 
-#### 31. Callout (warning, chosen icon) in a callout with no icon
+#### 32. Callout (warning, chosen icon) in a callout with no icon
 
 :::^ icon=none
 :::! icon=flag
@@ -236,7 +249,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 32. Callout (decision, no icon) in a callout with no icon
+#### 33. Callout (decision, no icon) in a callout with no icon
 
 :::^ icon=none
 :::^ icon=none

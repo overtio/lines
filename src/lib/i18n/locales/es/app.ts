@@ -39,4 +39,8 @@ export default {
   "app.resizeHint": "Arrastra para cambiar el tamaño; doble clic para el ancho habitual",
   "app.loadError": "No se han podido cargar tus notas: {error}",
   "app.noSelection": "Selecciona una nota o crea una nueva.",
+  "app.side": "Al lado: {title}",
+  "app.sideSwap": "Intercambiar las dos notas",
+  "app.sideClose": "Cerrar esta nota",
+  "app.sideWidth": "Ancho de la nota de al lado",
 } satisfies Translation<typeof en>;
