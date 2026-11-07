@@ -175,7 +175,24 @@ plain code
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Code block, then Spreadsheet (csv block)
+#### 18. Code block, then API requests (http block): a variable, a named request and one using its response
+
+```
+plain code
+  indented line
+```
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 19. Code block, then Spreadsheet (csv block)
 
 ```
 plain code
@@ -188,7 +205,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Code block, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 20. Code block, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```
 plain code
@@ -203,7 +220,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Code block, then Divider
+#### 21. Code block, then Divider
 
 ```
 plain code
@@ -211,7 +228,7 @@ plain code
 ```
 ---
 
-#### 21. Code block, then Key: Value line
+#### 22. Code block, then Key: Value line
 
 ```
 plain code
@@ -219,7 +236,7 @@ plain code
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Code block, then Mention
+#### 23. Code block, then Mention
 
 ```
 plain code
@@ -227,7 +244,7 @@ plain code
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Code block, then Wiki link
+#### 24. Code block, then Wiki link
 
 ```
 plain code
@@ -235,7 +252,7 @@ plain code
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Code block, then Symbols
+#### 25. Code block, then Symbols
 
 ```
 plain code
@@ -243,7 +260,7 @@ plain code
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Code block, then GitHub links
+#### 26. Code block, then GitHub links
 
 ```
 plain code
@@ -251,7 +268,7 @@ plain code
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Code block, then Image
+#### 27. Code block, then Image
 
 ```
 plain code
@@ -259,7 +276,7 @@ plain code
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 27. Code block, then Drawing
+#### 28. Code block, then Drawing
 
 ```
 plain code
@@ -267,7 +284,7 @@ plain code
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Code block, then File
+#### 29. Code block, then File
 
 ```
 plain code
@@ -275,7 +292,7 @@ plain code
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Code block, then Missing file
+#### 30. Code block, then Missing file
 
 ```
 plain code
@@ -283,7 +300,7 @@ plain code
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Code block, then Card
+#### 31. Code block, then Card
 
 ```
 plain code
@@ -293,7 +310,7 @@ plain code
 Text in a card.
 :::
 
-#### 31. Code block, then Callout (info)
+#### 32. Code block, then Callout (info)
 
 ```
 plain code
@@ -303,7 +320,7 @@ plain code
 Text in an info callout.
 :::
 
-#### 32. Code block, then Callout (warning, chosen icon)
+#### 33. Code block, then Callout (warning, chosen icon)
 
 ```
 plain code
@@ -313,7 +330,7 @@ plain code
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Code block, then Callout (decision, no icon)
+#### 34. Code block, then Callout (decision, no icon)
 
 ```
 plain code

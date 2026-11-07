@@ -157,6 +157,16 @@ How plugins work is in [plugins.md](plugins.md).
 - Only Markdown notes take additions from plugins; a renderer plugin draws code blocks in Markdown notes, not in LaTeX ones.
 - Turning a plugin off or on in the Mac app's Settings window hasn't been tried there yet, nor in floating notes (each window should follow at once).
 
+## API requests
+
+What isn't done yet is in [requests.md](requests.md#not-yet): environments, assertions and tests, bodies from files, forms with files, GraphQL and WebSocket, plain `http://` beyond this computer, and importing a Bruno or Postman collection.
+
+- In the browser, only APIs that allow requests from other sites (CORS) answer, and headers the browser keeps from pages (`Cookie`) aren't sent.
+- Responses aren't saved in the note: once lines quits they're gone, and a request using an earlier one's response needs that one sent again.
+- A response shows at most its first 200 KB (Copy copies all of it), highlighted up to 50 KB.
+- Requests in a code block inside a list or a quote, indented, aren't read as requests.
+- Sending from the apps (through Tauri's HTTP plugin) hasn't been tried in the Mac app yet.
+
 ## Accessibility and languages
 
 - With Contrast on Standard, faint text (dates, counts, the sidebar's headings, hints) is below WCAG AA's 4.5:1 in every theme but the three accessibility ones, and secondary text is too in a few light themes (Solarized, Everforest, Ayu). Contrast → Increased, or the system's Increase Contrast, meets AA (docs/accessibility.md).

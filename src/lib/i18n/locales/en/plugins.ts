@@ -16,6 +16,8 @@ export default {
   "plugins.latex.description": "Notes written in LaTeX, drawn as you type, and exported as documents that compile.",
   "plugins.spreadsheet": "Spreadsheets",
   "plugins.spreadsheet.description": "Notes that are spreadsheets: cells and formulas, kept as CSV. Opens CSV and Excel files, and downloads as either. In Markdown notes, ```csv blocks are spreadsheets too.",
+  "plugins.http": "API Requests",
+  "plugins.http.description": "Sends requests written in the .http format, from .http notes and ```http blocks in Markdown notes, and shows their responses. Adds /request; a curl command pasted into a request becomes one.",
   "plugins.katex": "Math (KaTeX)",
   "plugins.katex.description": "Draws math in notes of any format, on screen and on paper.",
   "plugins.mermaid": "Diagrams (Mermaid)",

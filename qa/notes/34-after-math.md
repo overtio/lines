@@ -158,7 +158,23 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Math block, then Spreadsheet (csv block)
+#### 18. Math block, then API requests (http block): a variable, a named request and one using its response
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 19. Math block, then Spreadsheet (csv block)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -170,7 +186,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Math block, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 20. Math block, then Named spreadsheet (csv name=), and a formula in another block using it
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -184,77 +200,77 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Math block, then Divider
+#### 21. Math block, then Divider
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 ---
 
-#### 21. Math block, then Key: Value line
+#### 22. Math block, then Key: Value line
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Math block, then Mention
+#### 23. Math block, then Mention
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Math block, then Wiki link
+#### 24. Math block, then Wiki link
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Math block, then Symbols
+#### 25. Math block, then Symbols
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Math block, then GitHub links
+#### 26. Math block, then GitHub links
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Math block, then Image
+#### 27. Math block, then Image
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 ![A sample picture](attachment:photo.png)
 
-#### 27. Math block, then Drawing
+#### 28. Math block, then Drawing
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Math block, then File
+#### 29. Math block, then File
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Math block, then Missing file
+#### 30. Math block, then Missing file
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Math block, then Card
+#### 31. Math block, then Card
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -263,7 +279,7 @@ $$
 Text in a card.
 :::
 
-#### 31. Math block, then Callout (info)
+#### 32. Math block, then Callout (info)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -272,7 +288,7 @@ $$
 Text in an info callout.
 :::
 
-#### 32. Math block, then Callout (warning, chosen icon)
+#### 33. Math block, then Callout (warning, chosen icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -281,7 +297,7 @@ $$
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Math block, then Callout (decision, no icon)
+#### 34. Math block, then Callout (decision, no icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}

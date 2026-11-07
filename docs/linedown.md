@@ -17,6 +17,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Callout | `:::!` … `:::`, `:::info icon=flag` … `:::` | Pandoc fenced div |
 | Diagram | ` ```mermaid ` code block | GitHub, GitLab, Obsidian |
 | Spreadsheet | ` ```csv ` code block | Yes (a code block of CSV) |
+| API requests | ` ```http ` code block | JetBrains IDEs, VS Code (REST Client, httpYac), Visual Studio |
 | Math | `$x^2$`, `$$` … `$$`, ` ```math ` code block | GitHub, GitLab, Obsidian, Pandoc |
 | Attachment | `![](../attachments/<hash>.png)`, `[Name.pdf](../attachments/<hash>.pdf)` | Yes (relative links) |
 | Copyable value | `Key: Value` lines | Yes (plain text, read specially) |
@@ -112,7 +113,7 @@ Fenced code blocks (` ``` ` or `~~~`) are as in CommonMark. lines reads the info
 
 - The first word names the language, for syntax highlighting: ` ```sql `, ` ```ts `, ` ```python `. Any language in CodeMirror's language data works, by name or alias.
 - A block with no language whose text starts with `{` or `[` is treated as JSON, so it can be tidied.
-- ` ```mermaid ` is a diagram, and ` ```csv ` a spreadsheet (below).
+- ` ```mermaid ` is a diagram, ` ```csv ` a spreadsheet, and ` ```http ` (or ` ```rest `) requests to an API (below).
 
 ## Spreadsheets
 
@@ -123,6 +124,10 @@ A code block with the language `csv` is drawn as a spreadsheet's grid of cells, 
 A code block with the language `mermaid` is drawn as its [Mermaid](https://mermaid.js.org) diagram, in the theme's colors, by the Diagrams [plugin](plugins.md) (with it off, it's a code block). With the cursor in it, the code shows with the diagram below. Diagrams are drawn at the top level and in cards; in quotes and lists they stay code. This is the same syntax GitHub, GitLab and Obsidian use.
 
 - A width after a bar, following the language, sets the size a diagram is shown at, in pixels, as an image's does: ` ```mermaid |400 `. The diagram keeps its shape and is never wider than the note. Dragging the handle on its corner writes this width; double-clicking the handle takes it out. Printed notes and PNGs use it too. Other apps read only the first word as the language, so they still draw the diagram, at their own size.
+
+## API requests
+
+A code block with the language `http` (or `rest`) holds requests in the `.http` format, highlighted, with a Send button at the end of each request line, by the API Requests [plugin](plugins.md) (with it off, it's a code block). Requests are separated by `###` lines; `@name = value` lines are variables, used as `{{name}}` in any `http` block of the note. A response shows under its block while the note's open, and isn't written into the note. The format, variables and sending are in [requests.md](requests.md). Other apps show the block as code; editors that read `.http` files read its text as requests too.
 
 ## Math
 

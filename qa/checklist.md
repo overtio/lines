@@ -184,6 +184,21 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Picking `\frac` writes `\frac{}{}` with the cursor in the first braces; Tab goes to the second, then past it; Tab in the menu completes (`\al` → `\alpha`)
 - [ ] Smart quotes stay straight in math (`f'(x)`)
 
+## 6a. API requests
+
+- [ ] `/request` adds an ` ```http ` block with the cursor after `https://`; the block's methods, header names, `{{variables}}`, comments and JSON in bodies highlight in the theme's colors
+- [ ] Each request line ends in a Send button; clicking it, or ⌘↵ with the cursor anywhere in the request, sends it, and the response shows under the block: status (green for 2xx, red for 4xx and 5xx), time, size, and the body, JSON indented and highlighted, an image shown. ⌘↵ outside a request still makes a todo
+- [ ] Headers shows the response's headers; Copy copies the body or the headers; × closes it; while sending, × cancels and says Cancelled
+- [ ] `@api = …` in one block works in another block of the note; a request using `{{todo.response.body.$.userId}}` before `# @name todo` was sent says to send that first, and after, sends with the value; an unknown `{{name}}` says there's no such variable and sends nothing
+- [ ] Pasting a curl command (Chrome's Copy as cURL, with `$'…'` and `\` continued lines) into an `http` block writes it as a request, JSON bodies indented; pasted anywhere else it stays as written
+- [ ] The copy button after Send (shown while the line's hovered, always on touch) copies the request as curl, variables filled in
+- [ ] **+** on a response adds its body as a code block after the requests' block, and closes the response; ⌘Z takes it out
+- [ ] A note switched to HTTP Requests in its ⓘ panel shows in a monospace font, `###` titles bold and in the outline, Send on each request, and responses under each request; its title in the list is its first line, its excerpt its requests; `# #tag` tags it
+- [ ] Importing a `.http` file makes an HTTP Requests note; Download and Export write it as `.http`; ⌘P prints it highlighted
+- [ ] [Desktop] An API without CORS (`GET https://example.com`) answers; `Cookie` and `Origin` headers reach the server as written (`GET https://httpbin.org/headers`); `GET http://localhost:…` works, `GET http://example.com` says the apps only send to https:// and localhost
+- [ ] [Web] An API without CORS says it didn't answer, and why
+- [ ] VoiceOver reads Send, the response's status as it arrives, and its buttons
+
 ## 7. Images and files
 
 - [ ] Pasting an image, or dropping one onto a note, adds it on its own line; the cursor moves past it
@@ -308,11 +323,12 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 13a. Plugins
 
-- [ ] Settings → Plugins lists Formats (Markdown, LaTeX, Spreadsheets), Engines (Math, Diagrams, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
+- [ ] Settings → Plugins lists Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
 - [ ] Clicking a plugin's name (or its switch) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
 - [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On, and its format switch offers only Markdown and Spreadsheet; Turn On draws it as LaTeX again at once
 - [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
 - [ ] Turning TeX Typesetting on while LaTeX is off turns LaTeX on too
+- [ ] API Requests off: ```http blocks show as plain code with no Send buttons, `/request` is gone, and HTTP Requests notes show as plain text; on again, all back
 - [ ] Diagrams off: ```mermaid blocks show as code, `/diagram` is gone from the "/" menu, and the PDF prints them as code; on again, they're drawn again, and Diagram is right after Code block in the menu
 - [ ] Math off: `$…$`, `$$` blocks and LaTeX notes' math show as written, on screen and in the PDF; on again, drawn
 - [ ] TeX Typesetting off: a LaTeX note's PDF preview has no "Typeset with" switch

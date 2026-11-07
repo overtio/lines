@@ -54,6 +54,11 @@ const ELEMENTS = [
     name: "Table with formulas",
     md: "| Item | Cost |\n| --- | ---: |\n| Rent | 1200 |\n| Food | 450.50 |\n| Total | =SUM(B2:B3) |\n| Broken | =B2/0 |",
   },
+  {
+    id: "requests",
+    name: "API requests (http block): a variable, a named request and one using its response",
+    md: "```http\n@api = https://jsonplaceholder.typicode.com\n\n### A todo\n# @name todo\nGET {{api}}/todos/1\n\n### Its owner\nGET {{api}}/users/{{todo.response.body.$.userId}}\n```",
+  },
   { id: "spreadsheet", name: "Spreadsheet (csv block)", md: "```csv\nItem, Cost\nRent, 1200\nFood, 450.50\nTotal, =SUM(B2:B3)\n```" },
   {
     id: "spreadsheet-named",

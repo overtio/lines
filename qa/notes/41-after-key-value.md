@@ -124,7 +124,21 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Key: Value line, then Spreadsheet (csv block)
+#### 18. Key: Value line, then API requests (http block): a variable, a named request and one using its response
+
+**Wi-Fi password:** correct-horse-battery
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 19. Key: Value line, then Spreadsheet (csv block)
 
 **Wi-Fi password:** correct-horse-battery
 ```csv
@@ -134,7 +148,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Key: Value line, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 20. Key: Value line, then Named spreadsheet (csv name=), and a formula in another block using it
 
 **Wi-Fi password:** correct-horse-battery
 ```csv name=costs
@@ -146,78 +160,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Key: Value line, then Divider
+#### 21. Key: Value line, then Divider
 
 **Wi-Fi password:** correct-horse-battery
 ---
 
-#### 21. Key: Value line, then Key: Value line
+#### 22. Key: Value line, then Key: Value line
 
 **Wi-Fi password:** correct-horse-battery
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Key: Value line, then Mention
+#### 23. Key: Value line, then Mention
 
 **Wi-Fi password:** correct-horse-battery
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Key: Value line, then Wiki link
+#### 24. Key: Value line, then Wiki link
 
 **Wi-Fi password:** correct-horse-battery
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Key: Value line, then Symbols
+#### 25. Key: Value line, then Symbols
 
 **Wi-Fi password:** correct-horse-battery
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Key: Value line, then GitHub links
+#### 26. Key: Value line, then GitHub links
 
 **Wi-Fi password:** correct-horse-battery
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Key: Value line, then Image
+#### 27. Key: Value line, then Image
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample picture](attachment:photo.png)
 
-#### 27. Key: Value line, then Drawing
+#### 28. Key: Value line, then Drawing
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Key: Value line, then File
+#### 29. Key: Value line, then File
 
 **Wi-Fi password:** correct-horse-battery
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Key: Value line, then Missing file
+#### 30. Key: Value line, then Missing file
 
 **Wi-Fi password:** correct-horse-battery
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Key: Value line, then Card
+#### 31. Key: Value line, then Card
 
 **Wi-Fi password:** correct-horse-battery
 ::: card
 Text in a card.
 :::
 
-#### 31. Key: Value line, then Callout (info)
+#### 32. Key: Value line, then Callout (info)
 
 **Wi-Fi password:** correct-horse-battery
 :::i
 Text in an info callout.
 :::
 
-#### 32. Key: Value line, then Callout (warning, chosen icon)
+#### 33. Key: Value line, then Callout (warning, chosen icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Key: Value line, then Callout (decision, no icon)
+#### 34. Key: Value line, then Callout (decision, no icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::^ icon=none

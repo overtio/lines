@@ -192,7 +192,25 @@ flowchart LR
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Diagram, then Spreadsheet (csv block)
+#### 18. Diagram, then API requests (http block): a variable, a named request and one using its response
+
+```mermaid
+flowchart LR
+  A[Start] --> B{Choice}
+  B --> C[Done]
+```
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 19. Diagram, then Spreadsheet (csv block)
 
 ```mermaid
 flowchart LR
@@ -206,7 +224,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Diagram, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 20. Diagram, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```mermaid
 flowchart LR
@@ -222,7 +240,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Diagram, then Divider
+#### 21. Diagram, then Divider
 
 ```mermaid
 flowchart LR
@@ -231,7 +249,7 @@ flowchart LR
 ```
 ---
 
-#### 21. Diagram, then Key: Value line
+#### 22. Diagram, then Key: Value line
 
 ```mermaid
 flowchart LR
@@ -240,7 +258,7 @@ flowchart LR
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Diagram, then Mention
+#### 23. Diagram, then Mention
 
 ```mermaid
 flowchart LR
@@ -249,7 +267,7 @@ flowchart LR
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Diagram, then Wiki link
+#### 24. Diagram, then Wiki link
 
 ```mermaid
 flowchart LR
@@ -258,7 +276,7 @@ flowchart LR
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Diagram, then Symbols
+#### 25. Diagram, then Symbols
 
 ```mermaid
 flowchart LR
@@ -267,7 +285,7 @@ flowchart LR
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Diagram, then GitHub links
+#### 26. Diagram, then GitHub links
 
 ```mermaid
 flowchart LR
@@ -276,7 +294,7 @@ flowchart LR
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Diagram, then Image
+#### 27. Diagram, then Image
 
 ```mermaid
 flowchart LR
@@ -285,7 +303,7 @@ flowchart LR
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 27. Diagram, then Drawing
+#### 28. Diagram, then Drawing
 
 ```mermaid
 flowchart LR
@@ -294,7 +312,7 @@ flowchart LR
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Diagram, then File
+#### 29. Diagram, then File
 
 ```mermaid
 flowchart LR
@@ -303,7 +321,7 @@ flowchart LR
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Diagram, then Missing file
+#### 30. Diagram, then Missing file
 
 ```mermaid
 flowchart LR
@@ -312,7 +330,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Diagram, then Card
+#### 31. Diagram, then Card
 
 ```mermaid
 flowchart LR
@@ -323,7 +341,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 31. Diagram, then Callout (info)
+#### 32. Diagram, then Callout (info)
 
 ```mermaid
 flowchart LR
@@ -334,7 +352,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 32. Diagram, then Callout (warning, chosen icon)
+#### 33. Diagram, then Callout (warning, chosen icon)
 
 ```mermaid
 flowchart LR
@@ -345,7 +363,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Diagram, then Callout (decision, no icon)
+#### 34. Diagram, then Callout (decision, no icon)
 
 ```mermaid
 flowchart LR

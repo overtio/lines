@@ -1,0 +1,41 @@
+/** API requests in notes: .http notes and ```http blocks, sending them, and their responses. */
+export default {
+  "http.format": "HTTP Requests",
+  "http.send": "Send",
+  "http.copyCurl": "Copy as curl",
+  // A response, under its request.
+  "http.response": "Response",
+  "http.noResponse": "No response",
+  "http.sending": "Sending…",
+  "http.cancel": "Cancel request",
+  "http.close": "Close response",
+  "http.cancelled": "Cancelled.",
+  "http.show": "Show",
+  "http.body": "Body",
+  "http.headers": "Headers ({count})",
+  "http.copyBody": "Copy body",
+  "http.copyHeaders": "Copy headers",
+  "http.addToNote": "Add to note as a code block",
+  "http.added": "Response added to the note",
+  "http.image": "The image in the response",
+  "http.cut": "Showing the first {size}. Copy copies all of it.",
+  "http.empty": "No body.",
+  // {type} is a media type, like application/pdf.
+  "http.binary": "A {type} file, which isn’t text.",
+  "http.unknownType": "binary",
+  // Said to screen readers when a response arrives. {status} is like "200 OK".
+  "http.received": "Response: {status}",
+  // Why a request wasn't sent, or didn't come back.
+  "http.error.scope": "lines’ apps only send to https:// addresses, and to http:// on this computer (localhost).",
+  "http.error.browser": "{host} didn’t answer. In the browser, only APIs that allow requests from other sites (CORS) answer; the lines app sends to any.",
+  "http.error.network": "Couldn’t send it: {error}",
+  "http.error.header": "A header’s name or value has characters headers can’t.",
+  "http.error.unsupported": "lines doesn’t send {method} requests yet.",
+  "http.error.fileBody": "lines doesn’t send bodies from files (< ./file) yet.",
+  "http.error.relative": "The address needs its host: https://api.example.com/…, or a variable for it.",
+  "http.error.url": "That isn’t a web address lines can send to.",
+  "http.error.unsent": "Send the {name} request first: this one uses its response.",
+  "http.error.path": "{variable} isn’t in that response.",
+  "http.error.loop": "The variable {name} is made of itself.",
+  "http.error.variable": "There’s no variable named {name}. Add a line like @{name} = value.",
+};

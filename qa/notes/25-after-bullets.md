@@ -192,7 +192,25 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Bullet list, then Spreadsheet (csv block)
+#### 18. Bullet list, then API requests (http block): a variable, a named request and one using its response
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 19. Bullet list, then Spreadsheet (csv block)
 
 - First item
 - Second item
@@ -206,7 +224,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Bullet list, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 20. Bullet list, then Named spreadsheet (csv name=), and a formula in another block using it
 
 - First item
 - Second item
@@ -222,7 +240,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Bullet list, then Divider
+#### 21. Bullet list, then Divider
 
 - First item
 - Second item
@@ -231,7 +249,7 @@ Total, =costs!B2*2
 - Last item
 ---
 
-#### 21. Bullet list, then Key: Value line
+#### 22. Bullet list, then Key: Value line
 
 - First item
 - Second item
@@ -240,7 +258,7 @@ Total, =costs!B2*2
 - Last item
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Bullet list, then Mention
+#### 23. Bullet list, then Mention
 
 - First item
 - Second item
@@ -249,7 +267,7 @@ Total, =costs!B2*2
 - Last item
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Bullet list, then Wiki link
+#### 24. Bullet list, then Wiki link
 
 - First item
 - Second item
@@ -258,7 +276,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 - Last item
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Bullet list, then Symbols
+#### 25. Bullet list, then Symbols
 
 - First item
 - Second item
@@ -267,7 +285,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 - Last item
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Bullet list, then GitHub links
+#### 26. Bullet list, then GitHub links
 
 - First item
 - Second item
@@ -276,7 +294,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 - Last item
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Bullet list, then Image
+#### 27. Bullet list, then Image
 
 - First item
 - Second item
@@ -285,7 +303,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 ![A sample picture](attachment:photo.png)
 
-#### 27. Bullet list, then Drawing
+#### 28. Bullet list, then Drawing
 
 - First item
 - Second item
@@ -294,7 +312,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Bullet list, then File
+#### 29. Bullet list, then File
 
 - First item
 - Second item
@@ -303,7 +321,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Bullet list, then Missing file
+#### 30. Bullet list, then Missing file
 
 - First item
 - Second item
@@ -312,7 +330,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Bullet list, then Card
+#### 31. Bullet list, then Card
 
 - First item
 - Second item
@@ -323,7 +341,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 31. Bullet list, then Callout (info)
+#### 32. Bullet list, then Callout (info)
 
 - First item
 - Second item
@@ -334,7 +352,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 32. Bullet list, then Callout (warning, chosen icon)
+#### 33. Bullet list, then Callout (warning, chosen icon)
 
 - First item
 - Second item
@@ -345,7 +363,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Bullet list, then Callout (decision, no icon)
+#### 34. Bullet list, then Callout (decision, no icon)
 
 - First item
 - Second item

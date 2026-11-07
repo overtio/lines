@@ -158,7 +158,23 @@ Text in a warning callout with the flag icon.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Callout (warning, chosen icon), then Spreadsheet (csv block)
+#### 18. Callout (warning, chosen icon), then API requests (http block): a variable, a named request and one using its response
+
+:::! icon=flag
+Text in a warning callout with the flag icon.
+:::
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 19. Callout (warning, chosen icon), then Spreadsheet (csv block)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -170,7 +186,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Callout (warning, chosen icon), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 20. Callout (warning, chosen icon), then Named spreadsheet (csv name=), and a formula in another block using it
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -184,77 +200,77 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Callout (warning, chosen icon), then Divider
+#### 21. Callout (warning, chosen icon), then Divider
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 ---
 
-#### 21. Callout (warning, chosen icon), then Key: Value line
+#### 22. Callout (warning, chosen icon), then Key: Value line
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Callout (warning, chosen icon), then Mention
+#### 23. Callout (warning, chosen icon), then Mention
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Callout (warning, chosen icon), then Wiki link
+#### 24. Callout (warning, chosen icon), then Wiki link
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Callout (warning, chosen icon), then Symbols
+#### 25. Callout (warning, chosen icon), then Symbols
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Callout (warning, chosen icon), then GitHub links
+#### 26. Callout (warning, chosen icon), then GitHub links
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Callout (warning, chosen icon), then Image
+#### 27. Callout (warning, chosen icon), then Image
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 27. Callout (warning, chosen icon), then Drawing
+#### 28. Callout (warning, chosen icon), then Drawing
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Callout (warning, chosen icon), then File
+#### 29. Callout (warning, chosen icon), then File
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Callout (warning, chosen icon), then Missing file
+#### 30. Callout (warning, chosen icon), then Missing file
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Callout (warning, chosen icon), then Card
+#### 31. Callout (warning, chosen icon), then Card
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -263,7 +279,7 @@ Text in a warning callout with the flag icon.
 Text in a card.
 :::
 
-#### 31. Callout (warning, chosen icon), then Callout (info)
+#### 32. Callout (warning, chosen icon), then Callout (info)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -272,7 +288,7 @@ Text in a warning callout with the flag icon.
 Text in an info callout.
 :::
 
-#### 32. Callout (warning, chosen icon), then Callout (warning, chosen icon)
+#### 33. Callout (warning, chosen icon), then Callout (warning, chosen icon)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -281,7 +297,7 @@ Text in a warning callout with the flag icon.
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Callout (warning, chosen icon), then Callout (decision, no icon)
+#### 34. Callout (warning, chosen icon), then Callout (decision, no icon)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.

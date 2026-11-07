@@ -28,6 +28,8 @@ export default {
   "editor.slash.codeBlock.keywords": "code extrait",
   "editor.slash.diagram": "Diagramme",
   "editor.slash.diagram.keywords": "mermaid organigramme graphique schéma séquence",
+  "editor.slash.request": "Requête d’API",
+  "editor.slash.request.keywords": "http rest api requête curl get post endpoint",
   "editor.slash.math": "Formule",
   "editor.slash.math.keywords": "maths mathématiques équation latex",
   "editor.slash.card": "Carte",

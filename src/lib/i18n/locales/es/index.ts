@@ -1,6 +1,7 @@
 import type { Messages } from "../../index.svelte";
 import app from "./app";
 import editor from "./editor";
+import http from "./http";
 import latex from "./latex";
 import list from "./list";
 import lock from "./lock";
@@ -16,6 +17,7 @@ import sync from "./sync";
 export default {
   ...app,
   ...editor,
+  ...http,
   ...latex,
   ...list,
   ...lock,

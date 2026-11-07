@@ -124,7 +124,21 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Heading 2, then Spreadsheet (csv block)
+#### 18. Heading 2, then API requests (http block): a variable, a named request and one using its response
+
+## Heading two
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 19. Heading 2, then Spreadsheet (csv block)
 
 ## Heading two
 ```csv
@@ -134,7 +148,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Heading 2, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 20. Heading 2, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ## Heading two
 ```csv name=costs
@@ -146,78 +160,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Heading 2, then Divider
+#### 21. Heading 2, then Divider
 
 ## Heading two
 ---
 
-#### 21. Heading 2, then Key: Value line
+#### 22. Heading 2, then Key: Value line
 
 ## Heading two
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Heading 2, then Mention
+#### 23. Heading 2, then Mention
 
 ## Heading two
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Heading 2, then Wiki link
+#### 24. Heading 2, then Wiki link
 
 ## Heading two
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Heading 2, then Symbols
+#### 25. Heading 2, then Symbols
 
 ## Heading two
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Heading 2, then GitHub links
+#### 26. Heading 2, then GitHub links
 
 ## Heading two
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Heading 2, then Image
+#### 27. Heading 2, then Image
 
 ## Heading two
 ![A sample picture](attachment:photo.png)
 
-#### 27. Heading 2, then Drawing
+#### 28. Heading 2, then Drawing
 
 ## Heading two
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Heading 2, then File
+#### 29. Heading 2, then File
 
 ## Heading two
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Heading 2, then Missing file
+#### 30. Heading 2, then Missing file
 
 ## Heading two
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Heading 2, then Card
+#### 31. Heading 2, then Card
 
 ## Heading two
 ::: card
 Text in a card.
 :::
 
-#### 31. Heading 2, then Callout (info)
+#### 32. Heading 2, then Callout (info)
 
 ## Heading two
 :::i
 Text in an info callout.
 :::
 
-#### 32. Heading 2, then Callout (warning, chosen icon)
+#### 33. Heading 2, then Callout (warning, chosen icon)
 
 ## Heading two
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Heading 2, then Callout (decision, no icon)
+#### 34. Heading 2, then Callout (decision, no icon)
 
 ## Heading two
 :::^ icon=none

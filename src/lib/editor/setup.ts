@@ -1,7 +1,6 @@
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { markdownKeymap, markdownLanguage, pasteURLAsLink } from "@codemirror/lang-markdown";
-import { HighlightStyle, Language, LanguageDescription, ParseContext, syntaxHighlighting } from "@codemirror/language";
-import { languages } from "@codemirror/language-data";
+import { HighlightStyle, Language, ParseContext, syntaxHighlighting } from "@codemirror/language";
 import type { Parser } from "@lezer/common";
 import { type MarkdownParser, parseCode } from "@lezer/markdown";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
@@ -9,6 +8,7 @@ import { Compartment, EditorState, Prec, type Extension, type StateCommand } fro
 import { EditorView, keymap, placeholder } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
 import { cards } from "./cards";
+import { codeLanguage } from "./codeLanguages";
 import { cursor } from "./cursor";
 import { dragBlocks } from "./dragBlocks";
 import { fenceInput } from "./fences";
@@ -30,9 +30,6 @@ import { t as message } from "../i18n/index.svelte";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
 import type { MarkdownAddition } from "../plugins/types";
 
-/** Code blocks' languages by the name they give, looked up once each, as every edit parses the blocks again. */
-const codeLanguages = new Map<string, LanguageDescription | null>();
-
 /**
  * The parser for a code block's language (```sql, ```ts…). Each language is loaded the first time
  * a note uses it; until then the block shows as plain code.
@@ -41,8 +38,7 @@ function codeParser(info: string): Parser | null {
   // ```math is LaTeX, drawn as math (math.ts).
   const name = /\S*/.exec(info)![0].replace(/^math$/i, "latex");
   if (!name) return null;
-  let found = codeLanguages.get(name);
-  if (found === undefined) codeLanguages.set(name, (found = LanguageDescription.matchLanguageName(languages, name, true)));
+  const found = codeLanguage(name);
   if (!found) return null;
   return found.support ? found.support.language.parser : ParseContext.getSkippingParser(found.load());
 }
@@ -106,7 +102,8 @@ const formattingKeymap = keymap.of([
   { key: "Alt-Enter", run: openAtCursor },
 ]);
 
-const highlightStyle = HighlightStyle.define([
+/** Code's colors, the theme's. */
+export const highlightStyle = HighlightStyle.define([
   { tag: t.processingInstruction, color: "var(--text-faint)" },
   { tag: t.url, color: "var(--text-faint)" },
   { tag: t.contentSeparator, color: "var(--text-faint)" },

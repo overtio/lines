@@ -158,7 +158,23 @@ Text in a card.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Card, then Spreadsheet (csv block)
+#### 18. Card, then API requests (http block): a variable, a named request and one using its response
+
+::: card
+Text in a card.
+:::
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 19. Card, then Spreadsheet (csv block)
 
 ::: card
 Text in a card.
@@ -170,7 +186,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Card, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 20. Card, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ::: card
 Text in a card.
@@ -184,77 +200,77 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Card, then Divider
+#### 21. Card, then Divider
 
 ::: card
 Text in a card.
 :::
 ---
 
-#### 21. Card, then Key: Value line
+#### 22. Card, then Key: Value line
 
 ::: card
 Text in a card.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Card, then Mention
+#### 23. Card, then Mention
 
 ::: card
 Text in a card.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Card, then Wiki link
+#### 24. Card, then Wiki link
 
 ::: card
 Text in a card.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Card, then Symbols
+#### 25. Card, then Symbols
 
 ::: card
 Text in a card.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Card, then GitHub links
+#### 26. Card, then GitHub links
 
 ::: card
 Text in a card.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Card, then Image
+#### 27. Card, then Image
 
 ::: card
 Text in a card.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 27. Card, then Drawing
+#### 28. Card, then Drawing
 
 ::: card
 Text in a card.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Card, then File
+#### 29. Card, then File
 
 ::: card
 Text in a card.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Card, then Missing file
+#### 30. Card, then Missing file
 
 ::: card
 Text in a card.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Card, then Card
+#### 31. Card, then Card
 
 ::: card
 Text in a card.
@@ -263,7 +279,7 @@ Text in a card.
 Text in a card.
 :::
 
-#### 31. Card, then Callout (info)
+#### 32. Card, then Callout (info)
 
 ::: card
 Text in a card.
@@ -272,7 +288,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 32. Card, then Callout (warning, chosen icon)
+#### 33. Card, then Callout (warning, chosen icon)
 
 ::: card
 Text in a card.
@@ -281,7 +297,7 @@ Text in a card.
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Card, then Callout (decision, no icon)
+#### 34. Card, then Callout (decision, no icon)
 
 ::: card
 Text in a card.

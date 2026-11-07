@@ -1735,3 +1735,64 @@
   color: var(--text-faint);
   pointer-events: none;
 }
+
+/*
+ * API requests (plugins/http): a Send button at the end of each request's line, Copy as curl after
+ * it while the line's hovered, and the response under the request (Response.svelte).
+ */
+.cm-http-actions {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.6em;
+  vertical-align: middle;
+  position: relative;
+  top: -0.08em;
+  font-family: var(--font-ui);
+}
+
+.cm-http-send {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 7px 0 6px;
+  border: none;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.cm-http-send:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.cm-http-send:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.cm-line:hover .cm-http-curl {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .cm-http-send {
+    height: 28px;
+    padding: 0 10px 0 9px;
+  }
+
+  .cm-http-curl {
+    opacity: 1;
+  }
+}
+
+.cm-http-response {
+  font-size: 1rem;
+  cursor: auto;
+}

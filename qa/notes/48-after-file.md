@@ -124,7 +124,21 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. File, then Spreadsheet (csv block)
+#### 18. File, then API requests (http block): a variable, a named request and one using its response
+
+[Budget.csv](attachment:budget.csv)
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 19. File, then Spreadsheet (csv block)
 
 [Budget.csv](attachment:budget.csv)
 ```csv
@@ -134,7 +148,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. File, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 20. File, then Named spreadsheet (csv name=), and a formula in another block using it
 
 [Budget.csv](attachment:budget.csv)
 ```csv name=costs
@@ -146,78 +160,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. File, then Divider
+#### 21. File, then Divider
 
 [Budget.csv](attachment:budget.csv)
 ---
 
-#### 21. File, then Key: Value line
+#### 22. File, then Key: Value line
 
 [Budget.csv](attachment:budget.csv)
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. File, then Mention
+#### 23. File, then Mention
 
 [Budget.csv](attachment:budget.csv)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. File, then Wiki link
+#### 24. File, then Wiki link
 
 [Budget.csv](attachment:budget.csv)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. File, then Symbols
+#### 25. File, then Symbols
 
 [Budget.csv](attachment:budget.csv)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. File, then GitHub links
+#### 26. File, then GitHub links
 
 [Budget.csv](attachment:budget.csv)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. File, then Image
+#### 27. File, then Image
 
 [Budget.csv](attachment:budget.csv)
 ![A sample picture](attachment:photo.png)
 
-#### 27. File, then Drawing
+#### 28. File, then Drawing
 
 [Budget.csv](attachment:budget.csv)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. File, then File
+#### 29. File, then File
 
 [Budget.csv](attachment:budget.csv)
 [Budget.csv](attachment:budget.csv)
 
-#### 29. File, then Missing file
+#### 30. File, then Missing file
 
 [Budget.csv](attachment:budget.csv)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. File, then Card
+#### 31. File, then Card
 
 [Budget.csv](attachment:budget.csv)
 ::: card
 Text in a card.
 :::
 
-#### 31. File, then Callout (info)
+#### 32. File, then Callout (info)
 
 [Budget.csv](attachment:budget.csv)
 :::i
 Text in an info callout.
 :::
 
-#### 32. File, then Callout (warning, chosen icon)
+#### 33. File, then Callout (warning, chosen icon)
 
 [Budget.csv](attachment:budget.csv)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. File, then Callout (decision, no icon)
+#### 34. File, then Callout (decision, no icon)
 
 [Budget.csv](attachment:budget.csv)
 :::^ icon=none
