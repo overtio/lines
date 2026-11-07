@@ -132,7 +132,7 @@ async function render(source: string, { paper }: { paper: boolean }) {
     document.getElementById(`d${id}`)?.remove();
     const text = error instanceof Error ? error.message : String(error);
     // Where the error is, without Mermaid's list of every token it would have accepted.
-    throw new Error(text.replace(/\nExpecting [^]*$/, ""));
+    throw new Error(text.replace(/\nExpecting [^]*$/, ""), { cause: error });
   }
 }
 

@@ -6,6 +6,7 @@ import { attachmentNames, getAttachment, putAttachment, usedAttachments } from "
 import { isBlank, notes } from "../notes/store.svelte";
 import { syncRecords, type SyncRecord } from "../notes/storage";
 import type { Note } from "../notes/types";
+import { plugins } from "../plugins/registry.svelte";
 import { deserialize, hash, serialize } from "./format";
 import { BrowserFolderRemote, isBrowserFolder } from "./browserFolder";
 import { FolderRemote } from "./folder";
@@ -104,17 +105,42 @@ async function pool<T>(items: T[], run: (item: T) => Promise<void>) {
   if (failure) throw failure.reason;
 }
 
+/**
+ * Runs `work` with no other pass running, in any of the browser's tabs: they share this device's
+ * notes and sync records, so two passes at once would each make the same conflicted copy.
+ */
+function alone<T>(work: () => Promise<T>): Promise<T> {
+  return "locks" in navigator ? navigator.locks.request("lines.sync", work) : work();
+}
+
 function conflictCopy(note: Note): Note {
   const copy = { ...note, id: crypto.randomUUID(), createdAt: Date.now(), pinned: false };
   // A locked note that isn't open can't be changed; its title can.
   if (note.locked && !note.locked.open) {
     return { ...copy, locked: { ...note.locked, title: t("sync.conflicted", { title: note.locked.title || t("sync.untitled") }) } };
   }
-  const lines = note.body.split("\n");
+  return { ...copy, body: markConflicted(note), ...(note.locked ? { locked: { ...note.locked, sealed: "" } } : {}) };
+}
+
+/** How far down a note its title is looked for: past the longest properties. */
+const TITLE_LINES = 110;
+
+/**
+ * The note's text with its title marked as a conflicted copy's, on the line its language reads the
+ * title from: not a properties line, nor a spreadsheet's cells. Failing that, its first line with text.
+ */
+function markConflicted({ body, format }: Note): string {
+  const { meta } = plugins.language(format);
+  const plain = (text: string) => text.replace(/\s+/g, " ").trim();
+  const lines = body.split("\n");
+  const marked = (i: number) => [...lines.slice(0, i), t("sync.conflicted", { title: lines[i] }), ...lines.slice(i + 1)].join("\n");
+  const wanted = plain(t("sync.conflicted", { title: meta(body).title }));
+  for (let i = 0; i < Math.min(lines.length, TITLE_LINES); i++) {
+    const text = marked(i);
+    if (plain(meta(text).title) === wanted) return text;
+  }
   const first = lines.findIndex((line) => line.trim());
-  if (first === -1) lines.unshift(`# ${t("sync.conflictedCopy")}`);
-  else lines[first] = t("sync.conflicted", { title: lines[first] });
-  return { ...copy, body: lines.join("\n"), ...(note.locked ? { locked: { ...note.locked, sealed: "" } } : {}) };
+  return first === -1 ? `# ${t("sync.conflictedCopy")}\n${body}` : marked(first);
 }
 
 /** What the person calls where notes sync to: the drive or folder, or the bucket. */
@@ -135,16 +161,31 @@ class SyncEngine {
   #paused = false;
   /** Connected just now: screen readers hear once the first pass is done. */
   #settingUp = false;
+  /** The connection as last saved or read here, to tell when another tab changed it. */
+  #saved: string | null = null;
 
   /** Reads the saved connection. Once lines is unlocked, if the app lock is on. */
   async load() {
+    this.#saved = localStorage.getItem(CONFIG_KEY);
     this.config = await loadConfig();
     this.status = this.config ? "idle" : "off";
   }
 
   /** Saves the connection again, encrypted or not as the app lock now says. */
   async rewrite() {
-    await writeSecret(CONFIG_KEY, this.config);
+    await this.#save(this.config);
+  }
+
+  async #save(config: SyncConfig | null) {
+    await writeSecret(CONFIG_KEY, config);
+    this.#saved = localStorage.getItem(CONFIG_KEY);
+  }
+
+  /** Takes up a connection another tab saved since, if one did; whether it had. */
+  async #followOtherTab() {
+    if (localStorage.getItem(CONFIG_KEY) === this.#saved) return false;
+    await this.load();
+    return true;
   }
 
   start() {
@@ -169,16 +210,18 @@ class SyncEngine {
     this.config = null;
     clearTimeout(this.#timer);
     await (this.#queued ?? this.#running);
-    await syncRecords.clear();
-    localStorage.removeItem(LEFTOVERS_KEY);
     let next = config && normalizeConfig(config);
     // The encryption key only means something where it came from.
     if (next) {
       const same = previous?.encryption && sameLocation(previous, next);
       next = { ...next, encryption: same ? previous.encryption : undefined };
     }
+    await alone(async () => {
+      await syncRecords.clear();
+      localStorage.removeItem(LEFTOVERS_KEY);
+      await this.#save(next);
+    });
     this.config = next;
-    await writeSecret(CONFIG_KEY, next);
     this.error = null;
     this.encryptionIssue = null;
     this.lastSynced = null;
@@ -264,8 +307,11 @@ class SyncEngine {
     clearTimeout(this.#timer);
     try {
       await (this.#queued ?? this.#running);
-      this.status = "syncing";
-      await work(config);
+      await alone(async () => {
+        if (await this.#followOtherTab()) return;
+        this.status = "syncing";
+        await work(config);
+      });
     } finally {
       this.#paused = false;
       void this.syncNow();
@@ -276,7 +322,7 @@ class SyncEngine {
   async #switch(config: SyncConfig) {
     await syncRecords.clear();
     this.config = config;
-    await writeSecret(CONFIG_KEY, config);
+    await this.#save(config);
     this.encryptionIssue = null;
   }
 
@@ -298,11 +344,15 @@ class SyncEngine {
     const config = this.config;
     if (!config || !notes.ready || this.#paused) return Promise.resolve();
     clearTimeout(this.#timer);
-    this.#running = this.#run(config).finally(() => (this.#running = null));
+    this.#running = alone(() => this.#run(config)).finally(() => (this.#running = null));
     return this.#running;
   }
 
   async #run(config: SyncConfig) {
+    if (await this.#followOtherTab()) {
+      if (this.config) void this.syncNow();
+      return;
+    }
     // A cloud folder is on disk; its drive app catches up when the connection returns.
     if (!navigator.onLine && !isFolder(config)) {
       this.status = "offline";
@@ -400,9 +450,7 @@ class SyncEngine {
     const applyIfUnchanged = async (id: string, expected: string | null, note: Note) => {
       await notes.flush();
       const current = notes.get(id);
-      if ((current ? serialize(current.note) : null) !== expected) return false;
-      await notes.applyRemote(note);
-      return true;
+      return (current ? serialize(current.note) : null) === expected && notes.applyRemote(note);
     };
 
     await pool(local, async (note) => {
@@ -474,8 +522,7 @@ class SyncEngine {
         await syncRecords.delete(id);
       } else if (!notes.get(id)) {
         // New on another device, or edited there after we deleted it here.
-        await notes.applyRemote(fetched.note);
-        await record(id, fetched.etag ?? object.etag, fetched.text);
+        if (await notes.applyRemote(fetched.note)) await record(id, fetched.etag ?? object.etag, fetched.text);
       }
     });
 

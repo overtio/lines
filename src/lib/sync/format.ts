@@ -49,11 +49,18 @@ export function serialize(note: Note): string {
 }
 
 export function deserialize(text: string, fallbackId: string): Note {
-  const match = /^---\n([\s\S]*?)\n---\n?/.exec(text);
+  // With Windows line endings too, as another app may save it.
+  text = text.replace(/\r\n?/g, "\n");
+  let match = /^---\n([\s\S]*?)\n---\n?/.exec(text);
   const fields = new Map<string, string>();
   for (const line of match?.[1].split("\n") ?? []) {
     const colon = line.indexOf(":");
     if (colon > 0) fields.set(line.slice(0, colon).trim(), line.slice(colon + 1).trim());
+  }
+  // No id: not lines' own block but the note's properties, in a file written by hand or another app.
+  if (!fields.has("id")) {
+    match = null;
+    fields.clear();
   }
   const time = (key: string) => {
     const ms = Date.parse(fields.get(key) ?? "");

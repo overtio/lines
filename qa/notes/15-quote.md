@@ -1,6 +1,6 @@
 # QA · Everything in a quote
 
-Each element in a quote. Check: it draws as it does on its own, sits inside the container's edges with even space around it, and its Markdown shows while the cursor is in it. Tables, diagrams and attachments in quotes and list items stay as Markdown.
+Each element in a quote. Check: it draws as it does on its own, sits inside the container's edges with even space around it, and its Markdown shows while the cursor is in it. Tables, spreadsheets, diagrams and attachments in quotes and list items stay as Markdown.
 
 #qa/containers
 
@@ -107,7 +107,7 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > | Total | =SUM(B2:B3) |
 > | Broken | =B2/0 |
 
-#### 18. Spreadsheet (csv block) in a quote
+#### 18. Spreadsheet (csv block) in a quote (stays Markdown here)
 
 > ```csv
 > Item, Cost
@@ -116,7 +116,7 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > Total, =SUM(B2:B3)
 > ```
 
-#### 19. Named spreadsheet (csv name=), and a formula in another block using it in a quote
+#### 19. Named spreadsheet (csv name=), and a formula in another block using it in a quote (stays Markdown here)
 
 > ```csv name=costs
 > Item, Cost, Day

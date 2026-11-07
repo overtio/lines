@@ -96,7 +96,8 @@ export class SealedRemote implements Remote {
   async fileKey(key: string): Promise<string> {
     const slash = key.lastIndexOf("/");
     const [dir, name] = [key.slice(0, slash + 1), key.slice(slash + 1)];
-    if (name.endsWith(".md")) return dir + name.slice(0, -".md".length) + SEALED;
+    // Only notes: an attached .md file's name is its content hash, which stays hidden.
+    if (this.#context(dir) === "notes/" && name.endsWith(".md")) return dir + name.slice(0, -".md".length) + SEALED;
     return dir + toHex((await hmac(this.names, this.#context(key))).subarray(0, 16)) + SEALED;
   }
 

@@ -1,10 +1,11 @@
 import { isolateHistory } from "@codemirror/commands";
-import { type EditorState, StateField } from "@codemirror/state";
+import { Annotation, type EditorState, StateField } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
 import type { Cells, FindSheet } from "../../lib/plugins/types";
 import { changeBetween } from "../../lib/editor/util";
 import { t } from "../../lib/i18n/index.svelte";
-import { writeCsv } from "../../lib/sheets/csv";
+import { sameRows } from "../../lib/sheets/cells";
+import { csvLine, trimCells } from "../../lib/sheets/csv";
 import { type SheetChoice, sheetChoices, sheetFinder } from "./links";
 import { readSheet, type SheetText, titleOf } from "./sheet";
 
@@ -30,8 +31,10 @@ export interface Sheet {
   /** A block's name, which others find it by; renamed, or named, from the grid. */
   readonly name?: string | null;
   rename?(name: string | null): void;
-  /** A block's name for a formula elsewhere in its note, given one (Sheet1, Sheet2…) if it has none, as that formula points at it. */
+  /** A block's name for a formula elsewhere in its note: if it has none, the one it's given (Sheet1, Sheet2…) by `keepName`. */
   nameHere?(): string | null;
+  /** Gives a block the name `nameHere` gave out, once the pointing's done, so the grid doesn't move under the pointer. */
+  keepName?(): void;
   /** The title of the note it's in. */
   noteTitle(): string;
   /** Its name for a formula in another note: the note's title, and a block's name (or none for a note's first block without one). */
@@ -50,21 +53,65 @@ export interface Sheet {
   layout?: () => void;
 }
 
+/** A spreadsheet note as read, and while its CSV is as the grid last wrote it, each row's line of it. */
+interface SheetState extends SheetText {
+  lines: string[] | null;
+}
+
+/**
+ * Cells the grid wrote, without empty rows and columns at the end, and the CSV lines it wrote them
+ * as, after the title and a blank line: read back, they're the same cells, so they aren't read again.
+ */
+const written = Annotation.define<{ cells: Cells; lines: string[] }>();
+
+/** The CSV's length, its rows' lines between line breaks. */
+const csvLength = (lines: string[]) => lines.reduce((length, line) => length + line.length + 1, 0) - Math.min(1, lines.length);
+
 /** The note read as a sheet, again whenever its text changes. */
-export const sheetText = StateField.define<SheetText>({
-  create: (state) => readSheet(state.doc.toString()),
+export const sheetText = StateField.define<SheetState>({
+  create: (state) => ({ ...readSheet(state.doc.toString()), lines: null }),
   update(text, tr) {
     if (!tr.docChanged) return text;
+    const wrote = tr.annotation(written);
+    const dataFrom = text.head.length + 2;
+    if (wrote && tr.state.doc.length === dataFrom + csvLength(wrote.lines)) {
+      return { head: text.head, dataFrom, cells: sameRows(text.cells, wrote.cells), lines: wrote.lines };
+    }
     // Typing in the title leaves the cells as they are.
     let cellsChanged = false;
     tr.changes.iterChanges((_fromA, toA, _fromB, _toB, inserted) => {
       if (toA > text.head.length || inserted.toString().includes("\n")) cellsChanged = true;
     });
-    if (cellsChanged) return readSheet(tr.state.doc.toString());
+    if (cellsChanged) {
+      const read = readSheet(tr.state.doc.toString());
+      return { ...read, cells: sameRows(text.cells, read.cells), lines: null };
+    }
     const head = tr.state.doc.line(1).text;
     return { ...text, head, dataFrom: text.dataFrom + head.length - text.head.length };
   },
 });
+
+/**
+ * The change from a note's CSV lines `before` to as many `after`, after its title (`at`) and a blank
+ * line: the part that differs, as comparing the whole text finds it, from comparing only the lines
+ * from the first that differs to the last.
+ */
+function changedLines(at: number, before: string[], after: string[]) {
+  let first = 0;
+  while (first < before.length && before[first] === after[first]) first++;
+  if (first === before.length) return null;
+  let last = before.length - 1;
+  while (before[last] === after[last]) last--;
+  const was = before.slice(first, last + 1).join("\n");
+  const now = after.slice(first, last + 1).join("\n");
+  // Where one is the start or end of the other, the part that differs may reach into the lines around them.
+  if (was.startsWith(now) || now.startsWith(was) || was.endsWith(now) || now.endsWith(was)) {
+    return changeBetween(at, `\n\n${before.join("\n")}`, `\n\n${after.join("\n")}`);
+  }
+  let from = at + 2;
+  for (let r = 0; r < first; r++) from += before[r].length + 1;
+  return changeBetween(from, was, now);
+}
 
 /** A spreadsheet note's grid, below its title, kept up to date with the editor. */
 export class NoteSheet implements Sheet {
@@ -74,7 +121,7 @@ export class NoteSheet implements Sheet {
   label = $derived(titleOf(this.head) || t("sheet.label"));
   readonly fills = true;
   readonly find = sheetFinder(null);
-  sheets = () => sheetChoices(null);
+  sheets = () => sheetChoices(null, this.noteTitle());
   noteTitle = () => titleOf(this.head);
   nameElsewhere = () => this.noteTitle() || null;
   focus: Sheet["focus"];
@@ -96,9 +143,15 @@ export class NoteSheet implements Sheet {
 
   write(cells: Cells) {
     const { state } = this.view;
-    const from = state.field(sheetText).head.length;
-    const changes = changeBetween(from, state.doc.sliceString(from), `\n\n${writeCsv(cells)}`);
-    if (changes) this.view.dispatch({ changes, userEvent: "input.sheet", annotations: isolateHistory.of("full") });
+    const text = state.field(sheetText);
+    const rows = trimCells(cells);
+    const lines = rows.map((row) => csvLine(row));
+    // While the text is as last written, only the lines that changed are compared.
+    const changes =
+      text.lines?.length === lines.length ?
+        changedLines(text.head.length, text.lines, lines)
+      : changeBetween(text.head.length, state.doc.sliceString(text.head.length), `\n\n${lines.join("\n")}`);
+    if (changes) this.view.dispatch({ changes, userEvent: "input.sheet", annotations: [isolateHistory.of("full"), written.of({ cells: rows, lines })] });
   }
 
   /** Up into the title; below, the grid goes on. */

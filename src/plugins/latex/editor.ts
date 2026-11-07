@@ -1,17 +1,17 @@
 import type { CompletionSection } from "@codemirror/autocomplete";
-import { EditorSelection, type EditorState, type Extension, Prec, type Range, type StateCommand, StateField } from "@codemirror/state";
-import { Decoration, type DecorationSet, EditorView, keymap, WidgetType } from "@codemirror/view";
-import { t } from "../../lib/i18n/index.svelte";
-import { DOCUMENT_BEGIN, latexEscape, latexLines, latexText, preambleField } from "./text";
-import { type AttachmentWriter, attachmentPasting, choose, imageElement } from "../../lib/editor/attachments";
+import { EditorSelection, type EditorState, type Extension, Prec, type Range, type StateCommand, StateField, type Text } from "@codemirror/state";
+import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
+import { locale, t } from "../../lib/i18n/index.svelte";
+import { DOCUMENT_BEGIN, latexEscape, latexLine, latexText, preambleField } from "./text";
+import { type AttachmentWriter, attachmentPasting, choose } from "../../lib/editor/attachments";
 import { type Definitions, type Env, LIST_ENVS, scanLatex, type Span, type Table } from "./syntax";
-import { BulletWidget, NumberWidget } from "../../lib/editor/livePreview";
+import { BulletWidget, ImageWidget, NumberWidget } from "../../lib/editor/livePreview";
 import { followClick } from "../../lib/editor/links";
 import { numericColumn, tablePasting } from "../../lib/editor/tables";
-import { InlineMathWidget, type Macros, macrosOf, MathBlockWidget, mathElement } from "../../lib/editor/math";
+import { InlineMathWidget, type Macros, macrosOf, MathBlockWidget, mathElement, preloadMath } from "../../lib/editor/math";
 import { insert, SECTIONS, type SlashCommand, slashMenu } from "../../lib/editor/slashCommands";
 import { inOpenMath, MATH_COMMANDS, paragraphBefore, searchWords, TEXT_COMMANDS } from "../../lib/editor/texCommands";
-import { focusChanged, focused, isEditing } from "../../lib/editor/util";
+import { arrowsInto, focusChanged, focused, isEditing } from "../../lib/editor/util";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
 
 /*
@@ -36,6 +36,8 @@ interface Parsed {
   macros: Macros;
   theorems: Definitions["theorems"];
   preamble: Preamble | null;
+  /** The spans that can be drawn so they change the note's layout (`changesLayout`). */
+  layout: Set<Span>;
 }
 
 /** The note read into spans (latexSyntax.ts) and what it defines; read again when the text changes. */
@@ -45,18 +47,48 @@ const parsed = StateField.define<Parsed>({
 });
 
 function parse(state: EditorState): Parsed {
-  const text = state.doc.toString();
+  const { doc } = state;
+  const text = doc.toString();
   const { spans, definitions } = scanLatex(text);
   const begin = DOCUMENT_BEGIN.exec(text);
   const head = begin && text.slice(0, begin.index);
   const preamble = begin && {
     to: begin.index + begin[0].length,
-    lines: state.doc.lineAt(begin.index).number,
+    lines: doc.lineAt(begin.index).number,
     title: preambleField(head!, "title"),
     author: preambleField(head!, "author"),
   };
-  const title = preamble ? 0 : latexLines(text).findIndex((line) => line.text.trim()) + 1;
-  return { spans, title, macros: macrosOf(definitions.macros), theorems: { ...THEOREMS, ...definitions.theorems }, preamble };
+  let title = 0;
+  if (!preamble) for (let n = 1; !title && n <= doc.lines; n++) if (latexLine(doc.line(n).text).text.trim()) title = n;
+  const layout = new Set(spans.filter((span) => changesLayout(doc, span)));
+  return { spans, title, macros: macrosOf(definitions.macros), theorems: { ...THEOREMS, ...definitions.theorems }, preamble, layout };
+}
+
+/** Whether `from`–`to` has nothing else on its lines. */
+const ownLines = (doc: Text, from: number, to: number) =>
+  !doc.sliceString(doc.lineAt(from).from, from).trim() && !doc.sliceString(to, doc.lineAt(to).to).trim();
+
+/**
+ * Whether a span can be drawn as a block (display math or a table on lines of their own), or in
+ * place of a line break (a citation whose keys run onto the next line, say). Only decorations the
+ * editor's state gives can do that (`blocks`), as they have to be known for the whole note.
+ */
+function changesLayout(doc: Text, span: Span) {
+  switch (span.type) {
+    case "math":
+      return span.display && ownLines(doc, span.from, span.to);
+    case "table":
+      return ownLines(doc, span.from, span.to);
+    case "image":
+    case "cite":
+    case "ref":
+    case "item":
+      return doc.lineAt(span.from).to < span.to;
+    case "env":
+      return doc.lineAt(span.from).to < span.beginTo;
+    default:
+      return false;
+  }
 }
 
 /** How theorem-like environments are labelled, before the note's own \newtheorem ones. */
@@ -198,29 +230,6 @@ class RefWidget extends WidgetType {
   }
 }
 
-const imageCleanups = new WeakMap<HTMLElement, () => void>();
-
-class ImageWidget extends WidgetType {
-  constructor(readonly src: string) {
-    super();
-  }
-  eq(other: ImageWidget) {
-    return other.src === this.src;
-  }
-  toDOM(view: EditorView) {
-    // LaTeX has no description for an image, so it's named as one rather than left out.
-    const image = imageElement(this.src, t("latex.image"), () => view.requestMeasure());
-    imageCleanups.set(image.dom, image.destroy);
-    return image.dom;
-  }
-  destroy(dom: HTMLElement) {
-    imageCleanups.get(dom)?.();
-  }
-  ignoreEvent() {
-    return false;
-  }
-}
-
 /** Math in a table cell: $…$ or \(…\). */
 const CELL_MATH = /(?<!\\)\$((?:\\.|[^$\\])+)\$|\\\((.+?)\\\)/g;
 
@@ -312,9 +321,14 @@ const ENV_LINES: Record<string, string> = {
   flushright: "cm-lt-right",
 };
 
-function build(state: EditorState): DecorationSet {
+/**
+ * What's drawn for the note. Given `visible` (the part in view), what's drawn within lines, for that
+ * part only; without it, what changes the note's layout, for all of it: a folded preamble and the spans
+ * `changesLayout` finds. The note's spans are counted (footnotes, theorems) either way.
+ */
+function build(state: EditorState, visible?: { from: number; to: number }): DecorationSet {
   const { doc } = state;
-  const { spans, title, macros, theorems, preamble } = state.field(parsed);
+  const { spans, title, macros, theorems, preamble, layout } = state.field(parsed);
   // When the editor isn't focused, everything is drawn.
   const selection = state.field(focused) ? state.selection.ranges : [];
   const touches = (from: number, to: number) => selection.some((r) => r.from <= to && r.to >= from);
@@ -322,19 +336,36 @@ function build(state: EditorState): DecorationSet {
     const line = doc.lineAt(pos);
     return touches(line.from, line.to);
   };
+  const wanted = visible ? (span: Span) => span.to >= visible.from && span.from <= visible.to : (span: Span) => layout.has(span);
   const decos: Range<Decoration>[] = [];
+  /** A widget, or text replaced by one: kept if it's this part's, which is whether it changes the layout. */
+  const add = (deco: Range<Decoration>) => {
+    const changes = !!deco.value.spec.block || doc.lineAt(deco.from).to < deco.to;
+    if (changes !== !!visible) decos.push(deco);
+  };
   const hide = (from: number, to: number) => {
-    if (from < to && !doc.sliceString(from, to).includes("\n")) decos.push(hidden.range(from, to));
+    if (visible && from < to && !doc.sliceString(from, to).includes("\n")) decos.push(hidden.range(from, to));
   };
   const mark = (from: number, to: number, cls: string, attributes?: Record<string, string>) => {
-    if (from < to && cls) decos.push(Decoration.mark({ class: cls, attributes }).range(from, to));
+    if (visible && from < to && cls) decos.push(Decoration.mark({ class: cls, attributes }).range(from, to));
   };
   /** The markup around some text: hidden, or faint while the cursor is on `active`. */
   const markup = (active: boolean, ...ranges: [number, number][]) => {
-    for (const [from, to] of ranges) active ? mark(from, to, "cm-lt-mark", noSpellcheck) : hide(from, to);
+    for (const [from, to] of ranges) {
+      if (active) mark(from, to, "cm-lt-mark", noSpellcheck);
+      else hide(from, to);
+    }
+  };
+  // Lines are drawn only in view.
+  const firstLine = visible ? doc.lineAt(visible.from).number : 1;
+  const lastLine = visible ? doc.lineAt(visible.to).number : 0;
+  /** Each line from `first` to `last` that's drawn. */
+  const eachLine = (first: number, last: number, fn: (n: number) => void) => {
+    for (let n = Math.max(first, firstLine); n <= Math.min(last, lastLine); n++) fn(n);
   };
   const lines = new Map<number, { cls: string[]; style?: string }>();
   const lineClass = (n: number, cls: string, style?: string) => {
+    if (n < firstLine || n > lastLine) return;
     const line = lines.get(n) ?? { cls: [] };
     line.cls.push(cls);
     if (style) line.style = style;
@@ -343,40 +374,45 @@ function build(state: EditorState): DecorationSet {
   const lineRange = (from: number, to: number, cls: (n: number, first: number, last: number) => string) => {
     const first = doc.lineAt(from).number;
     const last = doc.lineAt(to).number;
-    for (let n = first; n <= last; n++) lineClass(n, cls(n, first, last));
+    eachLine(first, last, (n) => lineClass(n, cls(n, first, last)));
   };
-  /** Whether `from`–`to` has nothing else on its lines. */
-  const ownLines = (from: number, to: number) =>
-    !doc.sliceString(doc.lineAt(from).from, from).trim() && !doc.sliceString(to, doc.lineAt(to).to).trim();
   /** Lines in lists, by how many lists they're in; and lines that are items, or an environment's fence. */
   const listDepth = new Map<number, number>();
   const itemLines = new Set<number>();
   const fenceLines = new Set<number>();
   const codeLines = new Set<number>();
 
-  /**
-   * A theorem, lemma, proof…: its label (numbered, unless it's a proof or starred) in place of its
-   * \begin line, its lines marked down the side, and a proof's ∎ at its end.
-   */
-  const theorem = (span: Env, { label, counter }: Definitions["theorems"][string], first: number, last: number) => {
-    const proof = span.name === "proof";
-    const begin = doc.lineAt(span.from);
+  /** Theorems so far, by counter, for their numbers; and where they are, so math in them is marked down the side too. */
+  const numbers = new Map<string, number>();
+  const theoremRanges: [number, number][] = [];
+  const inTheorem = (pos: number) => (theoremRanges.some(([from, to]) => from < pos && pos < to) ? "cm-lt-theorem" : "");
+
+  /** A theorem's, lemma's or proof's label, numbered unless it's a proof or starred; null for any other environment. */
+  const theoremLabel = (span: Env) => {
+    const kind = theorems[span.name] ?? theorems[span.name.replace(/\*$/, "")];
+    if (!kind || span.endFrom >= span.to || !ownLines(doc, span.from, span.beginTo)) return null;
     theoremRanges.push([span.from, span.to]);
-    let text = label;
+    const proof = span.name === "proof";
+    let text = kind.label;
     if (!proof && !span.name.endsWith("*")) {
-      const number = (numbers.get(counter) ?? 0) + 1;
-      numbers.set(counter, number);
+      const number = (numbers.get(kind.counter) ?? 0) + 1;
+      numbers.set(kind.counter, number);
       text += ` ${number}`;
     }
     const note = /\[([^\]]*)\]/.exec(doc.sliceString(span.from, span.beginTo));
     // A proof's note is its label (\begin{proof}[Solution]); a theorem's goes after its number.
     if (note) text = proof ? latexText(note[1]) : `${text} (${latexText(note[1])})`;
-    lineClass(begin.number, "cm-lt-theorem cm-lt-theorem-head");
+    return new LabelWidget(`${text}.`, proof);
+  };
+
+  /** A theorem: its label in place of its \begin line, its lines marked down the side, and a proof's ∎ at its end. */
+  const theorem = (span: Env, label: LabelWidget, first: number, last: number) => {
+    lineClass(doc.lineAt(span.from).number, "cm-lt-theorem cm-lt-theorem-head");
     if (lineActive(span.from)) mark(span.from, span.beginTo, "cm-lt-mark", noSpellcheck);
-    else decos.push(Decoration.replace({ widget: new LabelWidget(`${text}.`, proof) }).range(span.from, span.beginTo));
-    for (let n = first; n <= last; n++) lineClass(n, "cm-lt-theorem");
+    else add(Decoration.replace({ widget: label }).range(span.from, span.beginTo));
+    eachLine(first, last, (n) => lineClass(n, "cm-lt-theorem"));
     fence(span.endFrom, span.to, true);
-    if (proof && last >= first) decos.push(Decoration.widget({ widget: qed, side: 1 }).range(doc.line(last).to));
+    if (label.proof && last >= first) add(Decoration.widget({ widget: qed, side: 1 }).range(doc.line(last).to));
   };
 
   /**
@@ -385,7 +421,7 @@ function build(state: EditorState): DecorationSet {
    */
   const fence = (from: number, to: number, closed: boolean) => {
     if (from >= to) return;
-    if (!closed || !ownLines(from, to)) return mark(from, to, "cm-lt-command", noSpellcheck);
+    if (!closed || !ownLines(doc, from, to)) return mark(from, to, "cm-lt-command", noSpellcheck);
     const active = lineActive(from);
     const n = doc.lineAt(from).number;
     fenceLines.add(n);
@@ -395,18 +431,15 @@ function build(state: EditorState): DecorationSet {
 
   // A whole document's preamble folds away, unless the cursor is in it.
   const folded = preamble && !isEditing(state, 0, preamble.to) ? preamble.to : -1;
-  if (preamble && folded > 0) {
-    decos.push(Decoration.replace({ widget: new PreambleWidget(preamble), block: true }).range(0, folded));
-  }
-  /** Theorems so far, by counter, for their numbers; and where they are, so math in them is marked down the side too. */
-  const numbers = new Map<string, number>();
-  const theoremRanges: [number, number][] = [];
-  const inTheorem = (pos: number) => (theoremRanges.some(([from, to]) => from < pos && pos < to) ? "cm-lt-theorem" : "");
+  if (preamble && folded > 0) add(Decoration.replace({ widget: new PreambleWidget(preamble), block: true }).range(0, folded));
 
   let footnotes = 0;
   for (const span of spans) {
     // What's in a folded preamble isn't drawn; \begin{document}'s \end{document} still is.
     if (span.from < folded && span.type !== "env") continue;
+    if (span.type === "footnote") footnotes++;
+    const head = span.type === "env" ? theoremLabel(span) : null;
+    if (!wanted(span)) continue;
     switch (span.type) {
       case "style":
         mark(span.open, span.close, span.cls);
@@ -414,11 +447,10 @@ function build(state: EditorState): DecorationSet {
         break;
 
       case "footnote":
-        footnotes++;
         mark(span.open, span.close, "cm-lt-footnote");
         if (touches(span.from, span.to)) markup(true, [span.from, span.open], [span.close, span.to]);
         else {
-          decos.push(Decoration.replace({ widget: new FootnoteWidget(footnotes) }).range(span.from, span.open));
+          add(Decoration.replace({ widget: new FootnoteWidget(footnotes) }).range(span.from, span.open));
           hide(span.close, span.to);
         }
         break;
@@ -435,33 +467,34 @@ function build(state: EditorState): DecorationSet {
 
       case "image":
         if (touches(span.from, span.to)) mark(span.from, span.to, "cm-lt-command", noSpellcheck);
-        else decos.push(Decoration.replace({ widget: new ImageWidget(span.src) }).range(span.from, span.to));
+        // LaTeX has no description for an image, so it's named as one rather than left out.
+        else add(Decoration.replace({ widget: new ImageWidget(span.src, t("latex.image")) }).range(span.from, span.to));
         break;
 
       case "math": {
-        if (span.display && ownLines(span.from, span.to)) {
+        if (span.display && ownLines(doc, span.from, span.to)) {
           const first = doc.lineAt(span.from);
           const last = doc.lineAt(span.to);
           if (isEditing(state, span.from, span.to)) {
             lineRange(span.from, span.to, () => "cm-lt-source");
             const widget = new MathBlockWidget(span.tex, NO_INSET, true, macros, inTheorem(span.from));
-            decos.push(Decoration.widget({ widget, block: true, side: 1 }).range(last.to));
+            add(Decoration.widget({ widget, block: true, side: 1 }).range(last.to));
           } else {
             const widget = new MathBlockWidget(span.tex, NO_INSET, false, macros, inTheorem(span.from));
-            decos.push(Decoration.replace({ widget, block: true }).range(first.from, last.to));
+            add(Decoration.replace({ widget, block: true }).range(first.from, last.to));
           }
         } else if (touches(span.from, span.to) || doc.lineAt(span.from).number !== doc.lineAt(span.to).number) {
           mark(span.from, span.to, "cm-lt-code", noSpellcheck);
         } else {
-          decos.push(Decoration.replace({ widget: new InlineMathWidget(span.tex, span.display, macros) }).range(span.from, span.to));
+          add(Decoration.replace({ widget: new InlineMathWidget(span.tex, span.display, macros) }).range(span.from, span.to));
         }
         break;
       }
 
       case "table":
-        if (ownLines(span.from, span.to) && !isEditing(state, span.from, span.to)) {
+        if (ownLines(doc, span.from, span.to) && !isEditing(state, span.from, span.to)) {
           const widget = new TableWidget(span, macros);
-          decos.push(Decoration.replace({ widget, block: true }).range(doc.lineAt(span.from).from, doc.lineAt(span.to).to));
+          add(Decoration.replace({ widget, block: true }).range(doc.lineAt(span.from).from, doc.lineAt(span.to).to));
         } else {
           lineRange(span.from, span.to, () => "cm-lt-source");
         }
@@ -481,26 +514,23 @@ function build(state: EditorState): DecorationSet {
 
       case "env": {
         const closed = span.endFrom < span.to;
-        const label = theorems[span.name] ?? theorems[span.name.replace(/\*$/, "")];
         const first = doc.lineAt(span.from).number + 1;
         const last = doc.lineAt(span.endFrom).number - 1;
-        if (label && closed && ownLines(span.from, span.beginTo)) {
-          theorem(span, label, first, last);
+        if (head) {
+          theorem(span, head, first, last);
           break;
         }
-        if (span.name === "thebibliography" && closed && ownLines(span.from, span.beginTo)) {
+        if (span.name === "thebibliography" && closed && ownLines(doc, span.from, span.beginTo)) {
           // Headed References, as LaTeX heads it.
           lineClass(doc.lineAt(span.from).number, "cm-lp-h cm-lp-h1");
           if (lineActive(span.from)) mark(span.from, span.beginTo, "cm-lt-mark", noSpellcheck);
-          else decos.push(Decoration.replace({ widget: new LabelWidget("References", false) }).range(span.from, span.beginTo));
+          else add(Decoration.replace({ widget: new LabelWidget("References", false) }).range(span.from, span.beginTo));
         } else if (span.from >= folded) fence(span.from, span.beginTo, closed);
         fence(span.endFrom, span.to, closed);
         // One that never closes would take in the rest of the note, so its lines stay as they are.
         if (!closed) break;
-        for (let n = first; n <= last; n++) {
-          if (LIST_ENVS.has(span.name)) listDepth.set(n, (listDepth.get(n) ?? 0) + 1);
-          else if (span.name in ENV_LINES) lineClass(n, ENV_LINES[span.name]);
-        }
+        if (LIST_ENVS.has(span.name)) eachLine(first, last, (n) => listDepth.set(n, (listDepth.get(n) ?? 0) + 1));
+        else if (span.name in ENV_LINES) eachLine(first, last, (n) => lineClass(n, ENV_LINES[span.name]));
         break;
       }
 
@@ -520,7 +550,7 @@ function build(state: EditorState): DecorationSet {
           else {
             // The space after it stays, between the key and the reference.
             const to = doc.sliceString(span.to - 1, span.to) === " " ? span.to - 1 : span.to;
-            decos.push(Decoration.replace({ widget: new RefWidget(`[${doc.sliceString(label.from, label.to)}]`, true) }).range(span.from, to));
+            add(Decoration.replace({ widget: new RefWidget(`[${doc.sliceString(label.from, label.to)}]`, true) }).range(span.from, to));
           }
           break;
         }
@@ -540,13 +570,13 @@ function build(state: EditorState): DecorationSet {
             : span.list === "enumerate"
               ? new NumberWidget(enumerated(span.number, span.level))
               : bullets[(span.depth - 1) % 3];
-          decos.push(Decoration.replace({ widget }).range(span.from, span.to));
+          add(Decoration.replace({ widget }).range(span.from, span.to));
         }
         break;
       }
 
       case "symbol":
-        if (!touches(span.from, span.to)) decos.push(Decoration.replace({ widget: new TextWidget(span.text) }).range(span.from, span.to));
+        if (!touches(span.from, span.to)) add(Decoration.replace({ widget: new TextWidget(span.text) }).range(span.from, span.to));
         break;
 
       case "escape":
@@ -578,7 +608,7 @@ function build(state: EditorState): DecorationSet {
         }
         hide(span.from, span.to);
         // On a line of its own, the line shrinks away like an environment's fence.
-        if (ownLines(span.from, span.to)) {
+        if (ownLines(doc, span.from, span.to)) {
           const n = doc.lineAt(span.from).number;
           fenceLines.add(n);
           lineClass(n, "cm-lt-fence");
@@ -595,7 +625,7 @@ function build(state: EditorState): DecorationSet {
         // Read without the brackets drawn around them: [a, b] is "Citation a, b", (eq:x) "Reference to eq:x".
         const inner = span.text.replace(/^[[(](.*)[\])]$/, "$1");
         const said = span.type === "cite" ? t("latex.citation", { keys: inner }) : t("latex.reference", { label: inner });
-        decos.push(Decoration.replace({ widget: new RefWidget(span.text, span.type === "cite", said) }).range(span.from, span.to));
+        add(Decoration.replace({ widget: new RefWidget(span.text, span.type === "cite", said) }).range(span.from, span.to));
         break;
       }
     }
@@ -610,7 +640,7 @@ function build(state: EditorState): DecorationSet {
     hide(line.from, line.from + line.text.length - line.text.trimStart().length);
   }
 
-  for (let n = folded > 0 ? doc.lineAt(folded).number + 1 : 1; n <= doc.lines; n++) {
+  for (let n = Math.max(firstLine, folded > 0 ? doc.lineAt(folded).number + 1 : 1); n <= lastLine; n++) {
     const line = doc.line(n);
     if (n === title) lineClass(n, "cm-lp-title");
     else if (doc.length && !line.text.trim() && !codeLines.has(n) && !fenceLines.has(n)) lineClass(n, "cm-lp-blank");
@@ -623,14 +653,42 @@ function build(state: EditorState): DecorationSet {
   return Decoration.set(decos, true);
 }
 
-const decorations = StateField.define<DecorationSet>({
-  create: build,
+/** What changes the note's layout, for the whole note; drawn again as the cursor moves onto any of it or away. */
+const blocks = StateField.define<DecorationSet>({
+  create: (state) => build(state),
   update(decos, tr) {
-    if (tr.docChanged || tr.selection || focusChanged(tr) || tr.startState.readOnly !== tr.state.readOnly) return build(tr.state);
+    if (tr.docChanged || focusChanged(tr) || (tr.selection && (onLayout(tr.startState) || onLayout(tr.state)))) return build(tr.state);
     return decos;
   },
   provide: (field) => EditorView.decorations.from(field),
 });
+
+/** Whether the cursor, or a selection, is on the lines of a span that changes the layout, or in a preamble, in a focused editor. */
+function onLayout(state: EditorState) {
+  if (!state.field(focused)) return false;
+  const { doc, selection } = state;
+  const { layout, preamble } = state.field(parsed);
+  const on = (from: number, to: number) => selection.ranges.some((r) => r.from <= to && r.to >= from);
+  if (preamble && on(0, preamble.to)) return true;
+  for (const span of layout) if (on(doc.lineAt(span.from).from, doc.lineAt(span.to).to)) return true;
+  return false;
+}
+
+/** The rest, for the part in view: drawn again as that changes, or the note, or the cursor moves. */
+const inView = ViewPlugin.fromClass(
+  class {
+    decorations: DecorationSet;
+    constructor(view: EditorView) {
+      this.decorations = build(view.state, view.viewport);
+    }
+    update(update: ViewUpdate) {
+      if (update.docChanged || update.viewportChanged || update.selectionSet || update.transactions.some(focusChanged)) {
+        this.decorations = build(update.state, update.view.viewport);
+      }
+    }
+  },
+  { decorations: (plugin) => plugin.decorations },
+);
 
 const events = EditorView.domEventHandlers({
   mousedown(event, view) {
@@ -824,7 +882,7 @@ const COMMANDS: SlashCommand[] = [
   command("file", "\\href", "paperclip", INSERT, choose("", latexWriter)),
   command("footnote", "\\footnote", "message-circle", INSERT, insert("\\footnote{|}")),
   command("link", "\\href", "link", INSERT, insert("\\href{https://}{|}")),
-  command("date", t("latex.slash.date.hint"), "calendar", INSERT, insert(() => new Date().toLocaleDateString(undefined, { dateStyle: "long" }))),
+  command("date", t("latex.slash.date.hint"), "calendar", INSERT, insert(() => new Date().toLocaleDateString(locale, { dateStyle: "long" }))),
 ];
 
 /** What "\" offers at `pos`: math commands in math, none in verbatim, and text commands elsewhere. */
@@ -848,7 +906,10 @@ const outline = outlineHeadings.of((state) =>
 export const latexEditing: Extension = [
   focused,
   parsed,
-  decorations,
+  blocks,
+  inView,
+  arrowsInto(blocks),
+  preloadMath,
   events,
   latexKeymap,
   slashMenu(COMMANDS, backslashCommands),

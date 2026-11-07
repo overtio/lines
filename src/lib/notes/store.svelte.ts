@@ -6,7 +6,6 @@ import { untrack } from "svelte";
 import { announce } from "../windows/channel";
 import { noteKeys } from "./noteKeys.svelte";
 import type { SampleSet } from "./samples";
-import { SvelteSet } from "svelte/reactivity";
 import { normalizeTag, renameTagIn, renameTypeIn } from "./parse";
 import { nameOf } from "./properties";
 import { IndexedDBStorage, type NoteStorage } from "./storage";
@@ -77,9 +76,50 @@ function matchesTag(tags: string[], tag: string) {
   return tags.some((t) => t === tag || t.startsWith(tag + "/"));
 }
 
+/** The list's order: pinned notes first, then the latest edited. */
+const listOrder = (a: Entry, b: Entry) => Number(b.note.pinned) - Number(a.note.pinned) || b.note.updatedAt - a.note.updatedAt;
+
+/**
+ * Work done once for each version of a note (its entry, or its meta, which is new only when its
+ * text is), rather than again for every note whenever one changes.
+ */
+function cached<K extends object, V>(compute: (key: K) => V) {
+  const cache = new WeakMap<K, V>();
+  return (key: K) => {
+    let value = cache.get(key);
+    if (value === undefined) cache.set(key, (value = compute(key)));
+    return value;
+  };
+}
+
+/** A note's tags, and the tags they're nested under (`travel` for `#travel/italy`). */
+const tagPathsOf = cached((meta: NoteMeta) => {
+  const paths = new Set<string>();
+  for (const tag of meta.tags) {
+    const parts = tag.split("/");
+    for (let i = 1; i <= parts.length; i++) paths.add(parts.slice(0, i).join("/"));
+  }
+  return [...paths];
+});
+
+/** A note's title as a mention finds it. */
+const mentionNameOf = cached((meta: NoteMeta) => nameOf(meta.title));
+
+/** What mentions and type tables show of a note (`objectsSignature`). */
+const objectLineOf = cached(({ note, meta }: Entry) =>
+  [note.id, meta.title, note.icon, meta.type, ...meta.properties.map((p) => `${p.key}:${p.value}`)].join("\u0001"),
+);
+
 class NotesStore {
   #storage: NoteStorage;
-  #pending = new Map<string, ReturnType<typeof setTimeout>>();
+  /**
+   * Notes changed and not stored yet, each with when it's due to be (SAVE_DELAY after its last
+   * change), the soonest first. One timer saves those due together.
+   */
+  #pending = new Map<string, number>();
+  #saveTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Each note's write under way, so its writes land in order and `flush` can wait for them. */
+  #saving = new Map<string, Promise<void>>();
   #changeListeners = new Set<() => void>();
   #flushers = new Set<() => void>();
   /**
@@ -101,9 +141,10 @@ class NotesStore {
   selectedId = $state<string | null>(null);
   /**
    * Notes picked in the list to act on together (⌘-click, ⇧-click, ⌘A), the open one among them.
-   * Empty when it's just the open note.
+   * Empty when it's just the open note. A new set for each change, so picking thousands of notes
+   * wakes the list once rather than once for each.
    */
-  picked = new SvelteSet<string>();
+  picked = $state.raw<ReadonlySet<string>>(new Set());
   filter = $state<Filter>({ kind: "all" });
   query = $state("");
   /** A freshly created note that the editor should focus once it opens. */
@@ -113,28 +154,47 @@ class NotesStore {
   /** Bumped when locked notes open or close, so editors take up (or let go of) their text. */
   lockRevision = $state(0);
 
-  selected = $derived(this.entries.find((e) => e.note.id === this.selectedId) ?? null);
+  /** Each entry by its note's id. */
+  #byId = $derived(new Map(this.entries.map((entry) => [entry.note.id, entry])));
+
+  selected = $derived(this.selectedId === null ? null : (this.#byId.get(this.selectedId) ?? null));
+
+  /** The list's order as last worked out, and its entries by id then (`#ordered`). */
+  #lastOrder = { entries: [] as Entry[], byId: new Map<string, Entry>() };
+
+  /**
+   * Every entry in the list's order. Sorted from the last order, with each entry as it is now and
+   * new ones first: after an edit that's in order but for a note or two, which sorts in about one
+   * pass. Choosing a list or searching only filters it.
+   */
+  #ordered = $derived.by(() => {
+    const byId = this.#byId;
+    const last = this.#lastOrder;
+    const ordered = this.entries.filter(({ note }) => !last.byId.has(note.id));
+    for (const { note } of last.entries) {
+      const entry = byId.get(note.id);
+      if (entry) ordered.push(entry);
+    }
+    ordered.sort(listOrder);
+    this.#lastOrder = { entries: ordered, byId };
+    return ordered;
+  });
 
   visible = $derived.by(() => {
     const f = this.filter;
     const terms = this.query.toLowerCase().split(/\s+/).filter(Boolean);
-    return this.entries
-      .filter(({ note, meta }) => {
-        if (f.kind === "trash") {
-          if (!note.trashed) return false;
-        } else {
-          if (note.trashed) return false;
-          if (f.kind === "todo" && !meta.hasOpenTodos) return false;
-          if (f.kind === "untagged" && meta.tags.length) return false;
-          if (f.kind === "tag" && !matchesTag(meta.tags, f.tag)) return false;
-          if (f.kind === "type" && meta.type !== f.type) return false;
-        }
-        return terms.every((t) => meta.searchText.includes(t));
-      })
-      .sort(
-        (a, b) =>
-          Number(b.note.pinned) - Number(a.note.pinned) || b.note.updatedAt - a.note.updatedAt,
-      );
+    return this.#ordered.filter(({ note, meta }) => {
+      if (f.kind === "trash") {
+        if (!note.trashed) return false;
+      } else {
+        if (note.trashed) return false;
+        if (f.kind === "todo" && !meta.hasOpenTodos) return false;
+        if (f.kind === "untagged" && meta.tags.length) return false;
+        if (f.kind === "tag" && !matchesTag(meta.tags, f.tag)) return false;
+        if (f.kind === "type" && meta.type !== f.type) return false;
+      }
+      return terms.every((t) => meta.searchText.includes(t));
+    });
   });
 
   counts = $derived.by(() => {
@@ -156,12 +216,7 @@ class NotesStore {
     const counts = new Map<string, number>();
     for (const { note, meta } of this.entries) {
       if (note.trashed) continue;
-      const paths = new Set<string>();
-      for (const tag of meta.tags) {
-        const parts = tag.split("/");
-        for (let i = 1; i <= parts.length; i++) paths.add(parts.slice(0, i).join("/"));
-      }
-      for (const p of paths) counts.set(p, (counts.get(p) ?? 0) + 1);
+      for (const path of tagPathsOf(meta)) counts.set(path, (counts.get(path) ?? 0) + 1);
     }
     return [...counts].sort(([a], [b]) => a.localeCompare(b)).map(([t, n]) => `${t}\t${n}`).join("\n");
   });
@@ -195,8 +250,9 @@ class NotesStore {
   objects = $derived.by(() => {
     const found = new Map<string, Entry>();
     for (const entry of this.entries) {
-      const name = nameOf(entry.meta.title);
-      if (!name || entry.note.trashed) continue;
+      if (entry.note.trashed) continue;
+      const name = mentionNameOf(entry.meta);
+      if (!name) continue;
       const other = found.get(name);
       const typed = !!entry.meta.type;
       if (!other || (typed !== !!other.meta.type ? typed : entry.note.updatedAt > other.note.updatedAt)) found.set(name, entry);
@@ -211,7 +267,7 @@ class NotesStore {
   objectsSignature = $derived.by(() =>
     this.entries
       .filter(({ note }) => !note.trashed)
-      .map(({ note, meta }) => [note.id, meta.title, note.icon, meta.type, ...meta.properties.map((p) => `${p.key}:${p.value}`)].join("\u0001"))
+      .map(objectLineOf)
       .join("\n"),
   );
 
@@ -249,7 +305,7 @@ class NotesStore {
   }
 
   get(id: string) {
-    return this.entries.find((e) => e.note.id === id);
+    return this.#byId.get(id);
   }
 
   /** The note a mention of `name` finds (see `objects`). */
@@ -320,17 +376,16 @@ class NotesStore {
 
   /** ⌘-click: adds the note to the picked ones (with the open one, the first time) and opens it, or takes it out. */
   togglePick(id: string) {
-    if (!this.picked.size && this.selectedId && this.selectedId !== id && this.visible.some((e) => e.note.id === this.selectedId)) {
-      this.picked.add(this.selectedId);
+    const picked = new Set(this.picked);
+    if (!picked.size && this.selectedId && this.selectedId !== id && this.visible.some((e) => e.note.id === this.selectedId)) {
+      picked.add(this.selectedId);
     }
     this.#anchor = id;
-    if (this.picked.has(id)) {
-      this.picked.delete(id);
-      if (this.selectedId === id) this.select(this.pickedEntries.at(-1)?.note.id ?? null);
-    } else {
-      this.picked.add(id);
-      this.select(id);
-    }
+    const unpicked = picked.delete(id);
+    if (!unpicked) picked.add(id);
+    this.picked = picked;
+    if (!unpicked) this.select(id);
+    else if (this.selectedId === id) this.select(this.pickedEntries.at(-1)?.note.id ?? null);
     this.#settlePicks();
   }
 
@@ -343,20 +398,19 @@ class NotesStore {
     if (to === -1) return;
     const start = from === -1 ? to : Math.min(from, to);
     const end = from === -1 ? to : Math.max(from, to);
-    this.picked.clear();
-    for (const pick of ids.slice(start, end + 1)) this.picked.add(pick);
+    this.picked = new Set(ids.slice(start, end + 1));
     this.select(id);
     this.#settlePicks();
   }
 
   /** ⌘A in the list: every note in it. */
   pickAll() {
-    for (const { note } of this.visible) this.picked.add(note.id);
+    this.picked = new Set([...this.picked, ...this.visible.map((e) => e.note.id)]);
     this.#settlePicks();
   }
 
   clearPicks() {
-    this.picked.clear();
+    if (this.picked.size) this.picked = new Set();
     this.#anchor = null;
   }
 
@@ -364,13 +418,22 @@ class NotesStore {
   #settlePicks() {
     if (this.picked.size > 1) return;
     const [only] = this.picked;
-    this.picked.clear();
-    if (only) this.select(only);
+    if (only) {
+      this.picked = new Set();
+      this.select(only);
+    }
+  }
+
+  /** Lets go of these notes, if they're picked. */
+  #unpick(ids: Iterable<string>) {
+    const picked = new Set(this.picked);
+    for (const id of ids) picked.delete(id);
+    if (picked.size !== this.picked.size) this.picked = picked;
   }
 
   /** Pins these notes, or unpins them. Like pinning one, it doesn't count as an edit. */
   setPinned(ids: string[], pinned: boolean) {
-    for (const id of ids) if (this.get(id)) this.#patch(id, { pinned });
+    this.#patch(ids, { pinned });
   }
 
   /** Adds `#tag` to these notes (not locked ones, whose text can't be read here), keeping their dates. */
@@ -384,11 +447,15 @@ class NotesStore {
   /** Moves these notes to the trash together; ⌘Z brings them all back. */
   trashMany(ids: string[]) {
     const batch = ++this.#batch;
-    for (const id of ids) this.trash(id, batch);
+    const trashing = ids.map((id) => this.get(id)?.note).filter((note): note is Note => !!note && !note.trashed);
+    for (const { id, pinned } of trashing) this.#trashed.push({ id, pinned, selected: this.selectedId === id, batch });
+    this.#unpick(trashing.map((note) => note.id));
+    this.#patch(trashing.map((note) => note.id), { trashed: true, pinned: false });
+    if (trashing.some((note) => note.id === this.selectedId)) this.selectedId = null;
   }
 
   restoreMany(ids: string[]) {
-    for (const id of ids) this.restore(id);
+    this.#patch(ids, { trashed: false });
   }
 
   deleteForeverMany(ids: string[]) {
@@ -450,7 +517,9 @@ class NotesStore {
 
   /** Closes every open locked note, once what's typed in them is stored, encrypted. */
   async closeLocked() {
-    for (let i = 0; i < 3 && this.entries.some(({ note }) => note.locked?.open && !note.locked.sealed); i++) await this.flush();
+    // Typing that comes in while they're saved is saved too, before their text goes.
+    do await this.flush();
+    while (this.entries.some(({ note }) => note.locked?.open && this.#hasUnsaved(note.id)));
     this.entries = this.entries.map((entry) => (entry.note.locked?.open ? entryOf(stored(entry.note)) : entry));
     this.lockRevision++;
   }
@@ -481,13 +550,8 @@ class NotesStore {
     this.#patch(id, { format: stored });
   }
 
-  trash(id: string, batch = ++this.#batch) {
-    const entry = this.get(id);
-    if (!entry || entry.note.trashed) return;
-    this.#trashed.push({ id, pinned: entry.note.pinned, selected: this.selectedId === id, batch });
-    this.picked.delete(id);
-    this.#patch(id, { trashed: true, pinned: false });
-    if (this.selectedId === id) this.selectedId = null;
+  trash(id: string) {
+    this.trashMany([id]);
   }
 
   /** Brings back the notes most recently moved to the trash (together), if nothing was edited since. */
@@ -497,7 +561,9 @@ class NotesStore {
       while (this.#trashed.at(-1)?.batch === last.batch) batch.push(this.#trashed.pop()!);
       const back = batch.filter((trashed) => this.get(trashed.id)?.note.trashed);
       if (!back.length) continue;
-      for (const trashed of back) this.#patch(trashed.id, { trashed: false, pinned: trashed.pinned });
+      for (const pinned of [true, false]) {
+        this.#patch(back.filter((trashed) => trashed.pinned === pinned).map((trashed) => trashed.id), { trashed: false, pinned });
+      }
       const open = back.find((trashed) => trashed.selected);
       if (open && this.filter.kind !== "trash") this.select(open.id);
       return true;
@@ -520,15 +586,16 @@ class NotesStore {
   async #deleteForever(ids: string[]) {
     if (!ids.length) return;
     const gone = new Set(ids);
+    this.#unpick(ids);
     for (const id of ids) {
-      this.picked.delete(id);
-      clearTimeout(this.#pending.get(id));
       this.#pending.delete(id);
       this.#templates.delete(id);
     }
     this.entries = this.entries.filter((e) => !gone.has(e.note.id));
     if (this.selectedId && gone.has(this.selectedId)) this.selectedId = null;
     this.#notify();
+    // A write still under way would bring them back.
+    await Promise.allSettled(ids.map((id) => this.#saving.get(id)));
     await this.#storage.delete(...ids);
     for (const id of ids) void announce({ type: "note", id, local: true });
   }
@@ -574,7 +641,7 @@ class NotesStore {
       changed.push(entry.note.id);
       return entryOf({ ...entry.note, body });
     });
-    for (const id of changed) void this.#save(id);
+    void this.#save(changed);
     if (changed.length) {
       this.#changedOutside(changed);
       this.#notify();
@@ -598,7 +665,7 @@ class NotesStore {
   async importFiles(files: File[]) {
     const { notesFromFiles } = await import("./import");
     const { notes, skipped } = await notesFromFiles(files);
-    for (const note of notes) await this.insert(note);
+    await this.insert(...notes);
     return { count: notes.length, skipped };
   }
 
@@ -606,7 +673,7 @@ class NotesStore {
   async addSamples(set: SampleSet) {
     const { sampleNotes } = await import("./samples");
     const added = await sampleNotes(set);
-    for (const note of added) await this.insert(note);
+    await this.insert(...added);
     return added.length;
   }
 
@@ -628,7 +695,7 @@ class NotesStore {
       createdAt: now - i * 1000,
       updatedAt: now - i * 1000,
     }));
-    for (const note of [...all].reverse()) await this.insert(note);
+    await this.insert(...all);
     this.filter = { kind: "all" };
     this.query = "";
     this.select(all[0].id);
@@ -643,34 +710,33 @@ class NotesStore {
     return note.id;
   }
 
-  async insert(note: Note) {
-    this.entries = [entryOf(note), ...this.entries];
-    await this.#save(note.id);
+  /** Adds these notes as they are, without opening them. */
+  async insert(...added: Note[]) {
+    if (!added.length) return;
+    this.entries = [...added.map(entryOf), ...this.entries];
+    await this.#save(added.map((note) => note.id));
     this.#notify();
   }
 
-  /** Store a note that came from a sync backend, without treating it as a local edit. */
+  /**
+   * Stores a note that came from a sync backend, without treating it as a local edit. Not if it
+   * was edited here meanwhile (false): that edit wins, and syncs.
+   */
   async applyRemote(incoming: Note) {
     noteKeys.notice(incoming);
     const note = await this.#opened(incoming);
-    const entry = entryOf(note);
-    const exists = this.entries.some((e) => e.note.id === note.id);
-    this.entries = exists
-      ? this.entries.map((e) => (e.note.id === note.id ? entry : e))
-      : [entry, ...this.entries];
-    clearTimeout(this.#pending.get(note.id));
-    this.#pending.delete(note.id);
+    if (this.#hasUnsaved(note.id)) return false;
+    this.#put(entryOf(note));
     this.#changedOutside([note.id]);
     await this.#storage.put(stored(note));
     void announce({ type: "note", id: note.id, local: false });
+    return true;
   }
 
-  /** Remove a note that was deleted on another device. */
+  /** Removes a note that was deleted on another device, unless it was edited here meanwhile. */
   async removeRemote(id: string) {
-    clearTimeout(this.#pending.get(id));
-    this.#pending.delete(id);
-    this.entries = this.entries.filter((e) => e.note.id !== id);
-    if (this.selectedId === id) this.selectedId = null;
+    if (this.#hasUnsaved(id)) return;
+    this.#drop(id);
     await this.#storage.delete(id);
     void announce({ type: "note", id, local: false });
   }
@@ -689,45 +755,82 @@ class NotesStore {
     const current = this.get(id);
     if (!note) {
       if (!current) return;
-      this.entries = this.entries.filter((e) => e.note.id !== id);
-      if (this.selectedId === id) this.selectedId = null;
+      this.#drop(id);
     } else {
       if (current && JSON.stringify(stored(current.note)) === JSON.stringify(found)) return;
-      const entry = entryOf(note);
-      this.entries = current ? this.entries.map((e) => (e.note.id === id ? entry : e)) : [entry, ...this.entries];
+      this.#put(entryOf(note));
       if (current?.note.body !== note.body) this.#changedOutside([id]);
     }
     if (local) this.#notify();
   }
 
-  /** Whether this window has edits to the note it hasn't saved, including typing in the editor. */
+  /** Puts the entry in place of its note's, or first if the note is new here. */
+  #put(entry: Entry) {
+    const { id } = entry.note;
+    this.entries = this.get(id) ? this.entries.map((e) => (e.note.id === id ? entry : e)) : [entry, ...this.entries];
+  }
+
+  /** Takes a note out of the list, deleted elsewhere. */
+  #drop(id: string) {
+    this.entries = this.entries.filter((e) => e.note.id !== id);
+    if (this.selectedId === id) this.selectedId = null;
+  }
+
+  /** Whether this window has edits to the note it hasn't stored, including typing in the editor. */
   #hasUnsaved(id: string) {
-    for (const flusher of this.#flushers) flusher();
-    return this.#pending.has(id);
+    this.#handOver();
+    return this.#pending.has(id) || this.#saving.has(id);
   }
 
-  /** Write any pending saves immediately (e.g. when the app is backgrounded or a window closes). */
+  /** Takes what's been typed in the editors and not reported yet. */
+  #handOver() {
+    for (const flusher of this.#flushers) flusher();
+  }
+
+  /**
+   * Writes any pending saves now, and waits for those under way (e.g. when the app is backgrounded
+   * or a window closes).
+   */
   flush(): Promise<void> {
-    for (const flusher of this.#flushers) flusher();
-    const writes = [];
-    for (const [id, timer] of this.#pending) {
-      clearTimeout(timer);
-      writes.push(this.#save(id));
-    }
-    return Promise.all(writes).then(() => {});
+    this.#handOver();
+    void this.#save([...this.#pending.keys()]);
+    return Promise.all(this.#saving.values()).then(() => {});
   }
 
-  #patch(id: string, changes: Partial<Note>) {
+  /** Changes a note, or several the same way, and saves them after a pause. */
+  #patch(which: string | string[], changes: Partial<Note>) {
+    const ids = new Set((typeof which === "string" ? [which] : which).filter((id) => this.get(id)));
+    if (!ids.size) return;
     this.entries = this.entries.map((e) => {
-      if (e.note.id !== id) return e;
+      if (!ids.has(e.note.id)) return e;
       const note = { ...e.note, ...changes };
       // An edit to a locked note waits to be encrypted again, which saving does.
       if (note.locked && changes.body !== undefined) note.locked = { ...note.locked, sealed: "" };
       return changes.body === undefined && !("locked" in changes) && !("format" in changes) ? { note, meta: e.meta } : entryOf(note);
     });
-    clearTimeout(this.#pending.get(id));
-    this.#pending.set(id, setTimeout(() => this.#save(id), SAVE_DELAY));
+    const due = performance.now() + SAVE_DELAY;
+    for (const id of ids) {
+      // Taken out and put back, so the soonest due stay first.
+      this.#pending.delete(id);
+      this.#pending.set(id, due);
+    }
+    if (!this.#saveTimer) this.#saveTimer = setTimeout(() => this.#saveDue(), SAVE_DELAY);
     this.#notify();
+  }
+
+  /** Saves the notes that are due, and waits for the next. */
+  #saveDue() {
+    this.#saveTimer = undefined;
+    const now = performance.now();
+    const due: string[] = [];
+    for (const [id, at] of this.#pending) {
+      if (at > now) {
+        this.#saveTimer = setTimeout(() => this.#saveDue(), at - now);
+        break;
+      }
+      due.push(id);
+    }
+    void this.#save(due);
   }
 
   /** Tells the editors with these notes open that their text changed. */
@@ -739,13 +842,23 @@ class NotesStore {
     for (const listener of this.#changeListeners) listener();
   }
 
-  async #save(id: string) {
-    this.#pending.delete(id);
-    let note = this.get(id)?.note;
-    if (!note) return;
-    if (note.locked && !note.locked.sealed) note = await this.#seal(note);
-    await this.#storage.put(stored(note));
-    void announce({ type: "note", id, local: true });
+  /** Writes these notes as they are now, in one go, after any writes of them already under way. */
+  #save(ids: string[]): Promise<void> {
+    if (!ids.length) return Promise.resolve();
+    for (const id of ids) this.#pending.delete(id);
+    const before = ids.map((id) => this.#saving.get(id));
+    const saving = (async () => {
+      await Promise.allSettled(before);
+      const notes = ids.map((id) => this.get(id)?.note).filter((note) => note !== undefined);
+      const sealed = await Promise.all(notes.map((note) => (note.locked && !note.locked.sealed ? this.#seal(note) : note)));
+      if (!sealed.length) return;
+      await this.#storage.put(...sealed.map(stored));
+      for (const { id } of sealed) void announce({ type: "note", id, local: true });
+    })().finally(() => {
+      for (const id of ids) if (this.#saving.get(id) === saving) this.#saving.delete(id);
+    });
+    for (const id of ids) this.#saving.set(id, saving);
+    return saving;
   }
 
   /** Encrypts an open locked note's Markdown, ready to store and sync. */
@@ -771,6 +884,8 @@ class NotesStore {
   }
 
   #discardIfBlank(id: string) {
+    // Typing the editor hasn't reported yet counts.
+    this.#handOver();
     const entry = this.get(id);
     if (entry?.note.locked) return void this.#templates.delete(id);
     const untouched = entry && (isBlank(entry.note.body) || entry.note.body === this.#templates.get(id)?.body);

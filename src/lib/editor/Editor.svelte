@@ -4,6 +4,7 @@
   import { untrack } from "svelte";
   import { frontMatter } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
+  import type { Note } from "../notes/types";
   import { tagIcons, typeIcons } from "../notes/tagIcons.svelte";
   import { plugins } from "../plugins/registry.svelte";
   import { prefs } from "../prefs.svelte";
@@ -14,6 +15,10 @@
   import { changesBetween } from "./util";
 
   let { noteId, trashed }: { noteId: string; trashed: boolean } = $props();
+  // Read through these, the effects below run again only when the note or whether it's read-only
+  // changes, not each time the note's entry does (a save, or sync).
+  const id = $derived(noteId);
+  const viewOnly = $derived(trashed);
 
   const SYNC_DELAY = 120;
   const MAX_CACHED = 30;
@@ -27,11 +32,14 @@
   /** Editor states and scroll positions per note, so undo history and place survive switching notes. */
   const cache = new Map<string, { state: EditorState; scroll: StateEffect<unknown> | null }>();
 
-  const extensions = createExtensions(() => {
+  function changed() {
     dirty = true;
     clearTimeout(syncTimer);
     syncTimer = setTimeout(sync, SYNC_DELAY);
-  });
+  }
+
+  /** A note's editor state, in its language from the start rather than read as Markdown first. */
+  const stateOf = (note: Note | undefined) => EditorState.create({ doc: note?.body ?? "", extensions: createExtensions(changed, note?.format) });
 
   /**
    * The editor owns the text while you type; the store gets a copy shortly
@@ -55,10 +63,10 @@
   }
 
   function cachedFor(id: string) {
-    const body = notes.get(id)?.note.body ?? "";
+    const note = notes.get(id)?.note;
     const cached = cache.get(id);
-    if (cached && cached.state.doc.toString() === body) return cached;
-    return { state: EditorState.create({ doc: body, extensions }), scroll: null };
+    if (cached && cached.state.doc.toString() === (note?.body ?? "")) return cached;
+    return { state: stateOf(note), scroll: null };
   }
 
   function open(id: string) {
@@ -116,8 +124,8 @@
   });
 
   $effect(() => {
-    const id = noteId;
-    untrack(() => open(id));
+    const note = id;
+    untrack(() => open(note));
   });
 
   $effect(() => {
@@ -134,19 +142,19 @@
   $effect(() => {
     void notes.lockRevision;
     untrack(() => {
-      for (const id of cache.keys()) if (notes.get(id)?.note.locked) cache.delete(id);
+      for (const cached of cache.keys()) if (notes.get(cached)?.note.locked) cache.delete(cached);
       const note = currentId !== null ? notes.get(currentId)?.note : undefined;
       if (!view || !note?.locked || view.state.doc.toString() === note.body) return;
       dirty = false;
       clearTimeout(syncTimer);
-      view.setState(EditorState.create({ doc: note.body, extensions }));
-      view.dispatch({ effects: readOnlyCompartment.reconfigure(readOnly(trashed)) });
+      view.setState(stateOf(note));
+      view.dispatch({ effects: setUp() });
       applyFormat();
     });
   });
 
   $effect(() => {
-    void notes.get(noteId)?.note.format;
+    void notes.get(id)?.note.format;
     untrack(applyFormat);
   });
 
@@ -163,17 +171,13 @@
     });
   });
 
-  $effect(() => {
-    const value = trashed;
-    noteId;
-    view?.dispatch({ effects: readOnlyCompartment.reconfigure(readOnly(value)) });
-  });
+  /** Whether the note can be edited, and the outline beside it (Settings → General → Layout). */
+  const setUp = () => [readOnlyCompartment.reconfigure(readOnly(viewOnly)), outlineCompartment.reconfigure(prefs.outline ? outline : [])];
 
-  // Settings → General → Layout: the outline beside the note.
   $effect(() => {
-    const on = prefs.outline;
-    noteId;
-    untrack(() => view?.dispatch({ effects: outlineCompartment.reconfigure(on ? outline : []) }));
+    void id;
+    const effects = setUp();
+    untrack(() => view?.dispatch({ effects }));
   });
 
   // Mentions show other notes' titles, icons and properties, and tags their icons; draw them again when those change.

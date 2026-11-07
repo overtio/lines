@@ -21,8 +21,10 @@
     if (ui.menu) previous = document.activeElement;
   });
 
+  /** Focus goes back before the item runs, so a dialog it opens gives focus back there too as it closes. */
   function choose(item: Exclude<MenuItem, "separator">) {
     ui.closeMenu();
+    if (previous instanceof HTMLElement && previous.isConnected) previous.focus({ preventScroll: true });
     item.run();
   }
 

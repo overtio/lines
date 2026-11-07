@@ -1,4 +1,5 @@
 import { t } from "../i18n/index.svelte";
+import { committed, request } from "../notes/storage";
 import type { Remote, RemoteObject } from "./remote";
 import { SyncError } from "./remote";
 
@@ -41,31 +42,20 @@ const DB_NAME = "lines-folders";
 const STORE = "folders";
 
 function database() {
-  return new Promise<IDBDatabase>((resolve, reject) => {
-    const open = indexedDB.open(DB_NAME, 1);
-    open.onupgradeneeded = () => open.result.createObjectStore(STORE);
-    open.onsuccess = () => resolve(open.result);
-    open.onerror = () => reject(open.error);
-  });
+  const open = indexedDB.open(DB_NAME, 1);
+  open.onupgradeneeded = () => open.result.createObjectStore(STORE);
+  return request(open);
 }
 
 async function saveHandle(id: string, handle: DirectoryHandle) {
-  const db = await database();
-  await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).put(handle, id);
-    tx.oncomplete = () => resolve();
-    tx.onerror = tx.onabort = () => reject(tx.error);
-  });
+  const tx = (await database()).transaction(STORE, "readwrite");
+  tx.objectStore(STORE).put(handle, id);
+  await committed(tx);
 }
 
 async function loadHandle(id: string): Promise<DirectoryHandle | null> {
-  const db = await database();
-  return new Promise((resolve, reject) => {
-    const req = db.transaction(STORE, "readonly").objectStore(STORE).get(id);
-    req.onsuccess = () => resolve((req.result as DirectoryHandle | undefined) ?? null);
-    req.onerror = () => reject(req.error);
-  });
+  const store = (await database()).transaction(STORE, "readonly").objectStore(STORE);
+  return (await request(store.get(id) as IDBRequest<DirectoryHandle | undefined>)) ?? null;
 }
 
 /** The browser's folder picker; the folder's name and the path to save in the sync config, or null if cancelled. */

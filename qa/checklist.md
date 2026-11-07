@@ -10,10 +10,10 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 0. Setup
 
-- [ ] Start from a fresh profile (a new browser profile, or Settings → Data → erase in the app), so first-launch behaviour can be checked
+- [ ] Start from a fresh profile (a new browser profile; in a development build of the app, Settings → Data → Reset Notes to Defaults…), so first-launch behaviour can be checked
 - [ ] A fresh start shows one note, **Welcome to lines** (the demo website: the feature tour instead), and everything in it renders
 - [ ] Settings → Data → **Add QA Notes**: the QA notes are added, tagged qa, and the list switches to that tag
-- [ ] Settings → Data → **Add Feature Tour**: the tour notes are added, with the picture and the CSV file working
+- [ ] Settings → Data → **Add Feature Tour**: the tour notes are added in order, with the picture and the CSV file working, and **Trip budget** a spreadsheet note with its formulas worked out
 - [ ] Look through every QA note (qa tag in the sidebar) in light and dark, and at phone width; each says what to check at the top
 
 ## 1. Typing and live Markdown
@@ -64,6 +64,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Hovering the value of a line like **Plate:** 3WBZ56 shows a copy button; it copies just the value and shows a check
 - [ ] [Touch] The copy button is always faintly visible
 - [ ] Times like 10:30 and URLs don't get a copy button
+- [ ] A Key: Value line (or bullet) that fills the line to the note's edge stays one line: its copy button shows in the margin rather than wrapping onto a line of its own
 
 ## 4. Tables
 
@@ -88,10 +89,10 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] The grid fills the editor's width and height, column letters and row numbers stay put while it scrolls both ways, and a long sheet scrolls smoothly
 - [ ] The current cell's outline (and a formula's references, filling, moving and a block's resize outline) is as thick in the first and last row and column as elsewhere, letters and numbers shown or hidden, and while writing in the cell; in a corner cell (all four with the letters and numbers hidden, else the bottom right) it rounds with the grid's corner, an even ring inside its border
 - [ ] Typing in a cell replaces what's there; Return, F2 or a double-click changes it instead; Return keeps it and moves down, Tab across, and after Tab-Tab-Return the next row's first cell; Esc leaves it as it was; ⌥Return makes a line break in the cell
-- [ ] Arrows move, ⇧ and arrows (or drag, or ⇧-click) select, ⌘ and an arrow goes to the end of what's written, ⌘A selects everything; clicking a column letter or row number selects it
-- [ ] `=SUM(B2:B4)` shows the sum; the bar above shows the cell's name and formula; numbers line up right, TRUE/FALSE and errors in the middle, errors in red; `$450.50`, `12%` and `2026-01-15` are read as money, a percentage and a date
+- [ ] Arrows move, ⇧ and arrows (or drag, or ⇧-click) select, ⌘ and an arrow goes to the end of what's written, ⌘A selects everything and Esc goes back to one cell; Home and End go to the row's first cell and its last written one (with ⌘, the sheet's first and last), Page Up and Page Down a screenful; clicking a column letter or row number selects it
+- [ ] `=SUM(B2:B4)` shows the sum; the bar above shows the cell's name and formula, and clicking it changes the cell; numbers line up right, TRUE/FALSE and errors in the middle, errors in red; `$450.50`, `12%` and `2026-01-15` are read as money, a percentage and a date
 - [ ] ⌫ clears the selection; ⌘Z and ⇧⌘Z undo and redo cell changes, one at a time, with focus staying in the grid
-- [ ] ⌘C then ⌘V elsewhere in the sheet pastes formulas with their references moved (`=SUM(B2:B3)` one column right is `=SUM(C2:C3)`); one cell pasted over a selection fills it; ⌘X cuts; copied cells paste into Numbers, Excel or Google Sheets as values; rows copied from those apps (or a web page's table) paste into the grid
+- [ ] ⌘C then ⌘V elsewhere in the sheet pastes formulas with their references moved (`=SUM(B2:B3)` one column right is `=SUM(C2:C3)`); one cell pasted over a selection fills it; ⌘X then ⌘V in the same grid moves the cells, as dragging them does (formulas pointing at them follow, and a moved formula keeps its references), pasting again copies; copied cells paste into Numbers, Excel or Google Sheets as values; rows copied from those apps (or a web page's table) paste into the grid
 - [ ] ⌘D fills down and ⌘R fills right, formulas moving as they go
 - [ ] The selection's corner has a small square (not in a read-only note, nor while writing in a cell); the pointer is a crosshair over it. Dragging it down, up, left or right shows a dashed outline of what will fill and, by the pointer, what goes in the last cell; letting go fills it and selects it all. A click on the square fills nothing; Esc while dragging stops
 - [ ] Filling goes on from the selection in each column (or row): 1, 2 → 3, 4; 10, 8 → 6, 4; 1.50, 2.25 → 3.00; Item 1 → Item 2; Room 007 → Room 008; Mon → Tue, Sun → Mon; JANUARY, MARCH → MAY; lundi → mardi with the app in French; 2026-01-31 → 2026-02-01; 2026-01-15, 2026-02-15 → 2026-03-15; dragged up, 3, 4 → 2, 1. One number repeats; `=A1*2` dragged down is `=A2*2`; a, b → a, b, a; an empty cell clears what it's dragged over
@@ -111,7 +112,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] [Mac] [Touch] Typing (with accents and an IME), copying and pasting, and the menu work the same as in Chrome
 - [ ] In a Markdown note, a ```csv block is a grid as big as its CSV (an empty one 3 × 3; past 15 rows it scrolls, and scrolling on past its end scrolls the note) and as wide as its columns, without the bar above, no sideways scrolling until its columns don't fit (ten months across do); `Rent, 1200` reads as two cells, `=SUM(…)` is worked out; no cell is outlined until you click into it, and the outline goes when you click back into the text
 - [ ] A block's round corner handle (on hover, or while working in it; always on a touch screen) dragged down and across adds rows and columns, a dashed outline and label (4 × 3) showing the size, and its CSV keeps the empty ones (`,,`); dragged back it takes out empty ones, but stops at any with something written; Esc while dragging stops; typing in a 3 × 3 block keeps it 3 × 3
-- [ ] Return in a block's last row goes to a new row below (kept once something's written in it); Tab past the last column, a new column
+- [ ] Return in a block's last row goes to a new row below (kept once something's written in it); Tab past the last column, a new column; ↓ from that new row goes back to the text, and ← → and Tab move along it; Insert Column Right on the last column (and inserting into an empty 3 × 3 block) widens the block
 - [ ] ```csv name=costs shows "costs" above the grid; clicking it, or Name… / Rename… in the menu, writes it in a field (only the accent ring around it, no light edges inside, in dark mode too; Return keeps, Esc doesn't, empty takes the name out), written after `csv` on the fence line, a width after it kept
 - [ ] Typing `=Fi` lists a note Finance (with a grid icon, "Note, its first spreadsheet") before FILTER and FIND; `=co` lists COUNT, COUNTIF, CONCAT, COUNTA, then Trip/costs, then the other CO… functions; `='` lists every spreadsheet (this note's named blocks, spreadsheet notes, notes with a csv block and their named blocks, not this note itself), `='bud` narrows to Budget 2026; Return, Tab or a click writes `='Budget 2026'!` (or `Finance!`), Esc puts the list away; VoiceOver says each as ↑ ↓ reach it
 - [ ] After `=Finance!` its column ranges (`B2:B4` · Cost, below its header) and cells (`B4` · $1,650.00 · Total · Cost) are listed, `=Finance!B` only column B's; choosing one writes it; with `=Finance!B4` written, a box under the cell shows "Finance!B4", $1,650.00 (a formula's result, money as it shows) and Total · Cost; `Finance!B2:B4` shows its values and "3 cells with something in them"; an empty cell shows "empty"; VoiceOver reads it with the cell
@@ -161,6 +162,9 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 6. Code blocks, diagrams and math
 
+- [ ] ↓ on the line above a table, diagram, math block or type table (and in a LaTeX note, its math, tables and folded preamble) stops on its first line, showing its source; ↑ on the line below stops on its last; ↑ and ↓ within a wrapped line still move along it
+- [ ] A long `$$` equation scrolls sideways inside its block on a phone, the note's text staying within the window; an attached file deep in cards stays inside them, a long name cut with "…"
+- [ ] Opening a note from a mention (⌥↵ or ⌘-click) or with ⌘N while typing: moving into a table or diagram shows its Markdown, and selecting text shows the format toolbar, without clicking first
 - [ ] Languages highlight in the theme's colors, loading the first time they're used; unknown languages show plain
 - [ ] The copy button copies the code without its fences
 - [ ] The wand tidies JSON (long numbers keep every digit), SQL and Prettier languages, in one undo step
@@ -228,25 +232,26 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Typing filters it (`/to` → Todo, `/checkbox` → Todo); no match closes it
 - [ ] ↑, ↓, Enter and clicking choose; Esc closes
 - [ ] Tab completes like a shell: `/to` + Tab makes a todo (one name left); `/he` + Tab becomes `/heading`; Tab again moves to the next heading and ⇧Tab back; Tab never indents the line while the menu is open
-- [ ] Each command does what it says: Text, Heading 1–3, Todo, Bullet list, Numbered list, Quote, Code block, Diagram, Math, Card, the five callouts, Table, Image, File, Divider, Link, Tag, Mention, Type table, Properties, Date
+- [ ] Each command does what it says: Text, Heading 1–3, Todo, Bullet list, Numbered list, Quote, Code block, Diagram, Math, Card, the five callouts, Table, Spreadsheet, Image, Photo, GIF, File, Drawing, Divider, Link, Tag, Mention, Type table, Properties, Date
 - [ ] `/properties` in a note without properties adds `---`, `type: ` and `---` at the top with the cursor after `type: `; in a note with them, it adds a line at their end
 - [ ] Block commands replace a line's existing prefix rather than stacking; Divider under text adds a blank line so the text doesn't become a heading
 
 ## 10. Note list
 
 - [ ] New note (⌘N in the apps, ⌥N on the web) starts with `# ` and the cursor in it; in a tag view the tag is added; in a type view it starts with `type:` properties and the cursor on the title; from Trash it switches to Notes
-- [ ] Leaving a new note untouched deletes it
+- [ ] Leaving a new note untouched deletes it; typing a title and pressing ⌘N (or opening another note) at once keeps it
 - [ ] Rows show icon (the note's own, or else its type's), title or "Untitled", excerpt, pin, lock and date; pinned first, then newest
 - [ ] A note with properties shows the line after them as its title, and an excerpt without them
-- [ ] ↑ and ↓ move between notes when the list has focus
+- [ ] ↑ and ↓ move between notes when the list has focus; Home and End go to the first and last note, however long the list, scrolling to it
+- [ ] With thousands of notes (import a few thousand Markdown files from Settings → Data), the list scrolls smoothly, its scrollbar spans every note, and Tab, F6 and ⇧F6 reach the open note's row however far it's scrolled; a note opened from a mention, search, ⌘N or a floating note's Show scrolls into view in the list
 - [ ] [Touch] Swiping right pins (restores in Trash), left trashes (in Trash, needs a tap to delete); a long swipe does the action; one row open at a time
 - [ ] [Desktop] Two-finger trackpad swipes do the same; Settings → General → Trackpad reverses them
-- [ ] Right-click (long-press [Touch], context-menu key, ⇧F10) opens the menu: Pin, Open to the Side (not for the open note, in the Trash or at phone width), Floating Window [Desktop], Icon, Lock items, Copy Text, Move to Trash / Delete Forever
-- [ ] Open to the Side (or ⌥-click, Alt-click elsewhere) opens the note beside the open one, its title over it with Swap and Close; each has its own editor (typing in one, ⌘Z, find); the line between them drags (and ← → from the keyboard, double-click for the usual width), the main note keeping at least 360 px; Swap exchanges them; selecting the note beside in the list closes it there; trashing it closes it; at phone width it goes; a locked note beside shows its lock
+- [ ] Right-click (long-press [Touch], context-menu key, ⇧F10) opens the menu: Pin, Open to the Side (not for the open note, in the Trash, or where the window has no room for two notes), Floating Window [Desktop], Icon, Lock items, Copy Text, Move to Trash / Delete Forever
+- [ ] Open to the Side (or ⌥-click, Alt-click elsewhere) opens the note beside the open one, its title over it with Swap and Close; each has its own editor (typing in one, ⌘Z, find); the line between them drags (and ← → from the keyboard, double-click for the usual width), the main note keeping at least 360 px; Swap exchanges them; selecting the note beside in the list closes it there; trashing it closes it; where the window has no room for both (a phone, a narrow window), it waits until there is, and ⌥-click just opens the note; a locked note beside shows its lock
 - [ ] ⌘Z right after trashing a note brings it back
 - [ ] ⌘-click (Ctrl-click on Windows and Linux) picks a note along with the open one, and again takes it out; ⇧-click picks every note from the last one clicked; ⌘A with a row focused picks every note in the list; ⇧↑ and ⇧↓ pick the way from the keyboard; a plain click, or Esc, picks just the one again
 - [ ] With two or more picked, they're highlighted and the bar above the list says how many ("3 notes selected"), with Add Tag, Pin to Top (Unpin when they all are), Move to Trash and × (in Trash: Restore and Delete Forever); right-clicking a picked note opens the same as a menu named "3 notes"; right-clicking another note lets the others go
-- [ ] Add Tag… opens a box with the tags in use as suggestions (↑ ↓ and Enter choose one, Tab fills it in to nest under it); Add puts the tag on the last line if that's a line of tags, else on a line of its own at the end, in a LaTeX note as `% #tag`; notes that have it already, and locked notes, are left as they are; the notes keep their dates; a screen reader hears "Added #tag to 3 notes"
+- [ ] Add Tag… opens a box with the tags in use as suggestions (↑ ↓ and Enter choose one, Tab fills it in to nest under it); spaces become dashes as you type ("Two words" adds `#two-words`); Add puts the tag on the last line if that's a line of tags, else on a line of its own at the end, in a LaTeX note as `% #tag`; notes that have it already, and locked notes, are left as they are; the notes keep their dates; a screen reader hears "Added #tag to 3 notes"
 - [ ] ⌫ (Delete) with a row focused moves the picked notes, or the open one, to the Trash, and focus stays in the list; ⌘Z brings them all back at once, pinned as they were
 - [ ] Changing the filter (a tag, Trash) or the search lets the picked notes go
 - [ ] Trash shows "Notes in the trash can be restored." and Empty Trash; empty states read right
@@ -256,7 +261,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Above the sync button: "Alpha 0.1.0" (the version in package.json), with a tooltip saying it's an early version; the GitHub mark opens github.com/overtio/lines (in the browser, from the apps); screen readers hear the explanation and "Source on GitHub"
 - [ ] Notes, Todo, Untagged and Trash filter the list, with counts
 - [ ] Tags show as a tree with counts; the chevron expands nested tags; clicking filters to the tag and those under it
-- [ ] Rename… renames a tag in every note (not inside code, not in locked notes), keeps its icon, and the filter follows
+- [ ] Rename… renames a tag in every note (not inside code, not in locked notes), keeps its icon, and the filter follows; a name with a space becomes dashes, and one with `#` is refused
 - [ ] Change Icon… works for tags, and Reset in its picker goes back to the hash; the menu has no separate Reset Icon
 - [ ] Types list each `type:` with a count and icon (`person` starts as a person, an unknown type as shapes); clicking filters to its notes, and the list's title is the type
 - [ ] Right-click a type → Rename… edits its name in place (Enter keeps it, Esc doesn't): every note of it gets the new `type`, every `@type.…` of it the new name (keeping its columns; not in code), the icon and the list's filter follow, and notes keep their dates; renaming onto another type merges them
@@ -274,7 +279,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 13. Settings
 
-- [ ] The sections are listed down the side, each with its icon: General, Appearance, Windows [Desktop], Text, Editing, Plugins, Sync, Privacy, Data, Shortcuts and About; each opens with its title, a line on what it's for, and its settings in groups of rows (a label and note on the left, the control on the right)
+- [ ] The sections are listed down the side, each with its icon: General, Appearance, Windows [Desktop], Typography, Editing, Plugins, Sync, Privacy, Data, Shortcuts and About; each opens with its title, a line on what it's for, and its settings in groups of rows (a label and note on the left, the control on the right)
 - [ ] ↑ and ↓ move through the sections (Home and End to the first and last), Tab goes on into the section, Esc closes; Settings opens on its section with that section focused; every change applies at once, in every window
 - [ ] Only the section scrolls, with one scrollbar, in every section (Shortcuts too, all the way to the end); the list of sections stays put, and each section opens at its top
 - [ ] Switches, selects, sliders and segmented choices look the same in every section; the selects open a list that the arrow keys and typing move through, and Esc closes the list before Settings
@@ -288,30 +293,31 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Shortcuts (also ⌘/ or Ctrl+/, even with the cursor in a note): every shortcut, grouped; shown the Mac way on a Mac (⌘⇧F, ⌃⌘L) and as Ctrl+Shift+F, Ctrl+Alt+L elsewhere, with the switch showing the other system's; new note is ⌘N (Ctrl+N) in the apps and ⌥N (Alt+N) on the web; Close a floating note only in the desktop apps; each shortcut listed does what it says; VoiceOver reads the keys in words ("Shift Command F")
 - [ ] Section names and labels fit in English, French and Spanish, wrapping rather than being cut off
 - [ ] General → Language: English, Español, Français and System; choosing one saves what's being typed and starts lines again in it, in every window (floating notes too); System follows the device (English when lines doesn't speak it); dates follow it (24-hour clock in French)
-- [ ] Appearance → Theme: each of the 16 themes in light and dark; Appearance → Mode: System follows the OS live
+- [ ] Appearance → Theme: each of the 16 themes in light and dark; Appearance → Light or dark: System follows the OS live
 - [ ] Appearance → Theme: the Accessibility group (High Contrast, Red-Green Friendly, Blue-Yellow Friendly) sits below the other themes with its heading and note; Tab stops once on the theme picker and the arrow keys move through every theme, across both groups
 - [ ] High Contrast, light and dark: pure white or black, text black or white, borders clearly visible, the chosen segment ringed; a note with a callout of each kind, code, a tag, a mention, a highlight and a done todo reads clearly; the selected row's date stays readable
 - [ ] Red-Green Friendly and Blue-Yellow Friendly, light and dark: the same note; callout kinds, danger (Delete, errors) and success are told apart, and look apart in Chrome DevTools → Rendering → Emulate vision deficiencies (protanopia and deuteranopia for Red-Green, tritanopia for Blue-Yellow)
 - [ ] Appearance → Icons: Lucide and SF Symbols [Mac]; on the web SF Symbols is disabled with a note
 - [ ] [Mac] Windows → Main window: opacity and blur
-- [ ] [Desktop] Windows → Floating notes: theme, appearance, opacity, blur and border [Mac], window buttons, over full-screen apps [Mac]
-- [ ] Text: the preview follows font, size, spacing presets and every slider; Reset to default
+- [ ] [Desktop] Windows → Floating notes: theme and appearance; [Mac] opacity, blur, border, window buttons and over full-screen apps (not shown on Windows and Linux, where they do nothing)
+- [ ] Typography: the preview follows font, size, spacing presets and every slider; Reset to default
 - [ ] Typography → Note width: Narrow, Medium (the default), Wide and Full change how wide notes' text runs, at once and in every window; Full fills the pane beside the sidebar and list, keeping the side margins; the slider sets any width from 480 to 1400 px (no choice then marked) and, dragged while on Full, goes back to a width; spacing presets leave the width alone; a width saved before this section keeps
+- [ ] ⌘+ and ⌘− (Ctrl+ and Ctrl− on Windows and Linux; ⌘= and the keypad's + and − too) make notes' text a pixel bigger or smaller, from 12 to 28 px, in the main window and floating notes alike, and Settings → Typography → Text size follows; ⌘0 goes back to 17 px; the page itself doesn't zoom (web); screen readers hear the new size; in the drawing editor the keys zoom the drawing instead
 - [ ] Editing → Symbols: turning off "in text" or "in code" shows the characters there at once (tables too), in every window, and is remembered; the other keeps its symbols
 - [ ] About: version, Source on GitHub, Report an issue, license, credits, third-party licenses load
 
 ## 13a. Plugins
 
-- [ ] Settings → Plugins lists Formats (Markdown, LaTeX, Spreadsheets), Engines (Math, Diagrams, Formulas, TeX Typesetting) and Look (Themes, Lucide, SF Symbols [Apple]), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no checkbox, and says it's in the Mac and iPhone apps
-- [ ] Clicking a plugin's row (not just its checkbox) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
-- [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On (no format switch, with Markdown the only format left); Turn On draws it as LaTeX again at once
+- [ ] Settings → Plugins lists Formats (Markdown, LaTeX, Spreadsheets), Engines (Math, Diagrams, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
+- [ ] Clicking a plugin's name (or its switch) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
+- [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On, and its format switch offers only Markdown and Spreadsheet; Turn On draws it as LaTeX again at once
 - [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
 - [ ] Turning TeX Typesetting on while LaTeX is off turns LaTeX on too
 - [ ] Diagrams off: ```mermaid blocks show as code, `/diagram` is gone from the "/" menu, and the PDF prints them as code; on again, they're drawn again, and Diagram is right after Code block in the menu
 - [ ] Math off: `$…$`, `$$` blocks and LaTeX notes' math show as written, on screen and in the PDF; on again, drawn
 - [ ] TeX Typesetting off: a LaTeX note's PDF preview has no "Typeset with" switch
 - [ ] Formulas off: formulas in tables and spreadsheets show as written, and a spreadsheet's share menu has no Download Values or Excel Workbook; on again, worked out
-- [ ] Unsplash and GIPHY are under More. Off, `/unsplash` or `/giphy` is gone from the "/" menu, and photos and GIFs already in notes still show. In a build without their keys they have no switch and say they need an API key
+- [ ] Unsplash or GIPHY off: `/unsplash` or `/giphy` is gone from the "/" menu, and photos and GIFs already in notes still show. In a build without their keys they have no switch and say they need an API key
 - [ ] Choices are remembered after reloading, and turning a plugin on or off in one window changes every window at once (the Settings window, floating notes [Desktop], other browser tabs [Web])
 
 ## 13b. Layout and tabs
@@ -320,6 +326,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Each arrangement, wide: the sidebar is outermost on its side and the list beside the note; dividers are on each pane's inner edge; hiding the sidebar slides it out to its side; focus mode slides both away and back
 - [ ] The sidebar's hide button is on its inner edge, with the icon of its side; its show button is in the note list's title bar on the sidebar's side when the list is on that side, else at the note toolbar's edge on that side; focus moves between the two as they swap
 - [ ] Dragging a pane's inner edge resizes it the way the pointer goes, on either side; from the keyboard, ← and → move the edge; double-click and Enter put it back
+- [ ] With the sidebar and list dragged wide, making the window smaller narrows the sidebar first, then the list, the note keeping at least 360 px; made bigger again, they go back to their widths
 - [ ] Tablet width: the sidebar drawer slides in from its own side, with the scrim; Esc closes it and focus goes back to the button that opened it
 - [ ] Phone width: the drawer comes from the sidebar's side, and its button is in the note list's title bar; the list and note still stack
 - [ ] F6 goes through the panes left to right in every arrangement
@@ -347,8 +354,9 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] [Web] Safari and Firefox explain that saving to a folder needs Chrome or Edge
 - [ ] S3 bucket (not on the demo website): every provider's help, Test connection, Connect, Disconnect, the CORS rule [Web]
 - [ ] Sync runs after edits, every minute, on focus and when back online; the sidebar shows its status
-- [ ] An edit on two devices keeps the newer and adds a "(conflicted copy)"; a delete on one side deletes on the other
-- [ ] Images and files sync both ways
+- [ ] An edit on two devices keeps the newer and adds a "(conflicted copy)"; a delete on one side deletes on the other; a conflicted copy of a note with properties keeps its type, and a spreadsheet's is marked on its title, not in a cell
+- [ ] [Web] With lines open in two tabs, sync runs in one pass at a time: a conflict makes one conflicted copy, not two; connecting or switching in one tab, the other follows; opening a second tab doesn't delete images the first could still bring back with ⌘Z
+- [ ] Images and files sync both ways, an empty file too [Desktop: through a cloud drive]
 - [ ] Folder sync keeps working offline; a bucket says Offline and catches up
 
 ## 15. Encryption
@@ -373,24 +381,23 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Lock Note the first time asks for a new password; after that for the password, or Touch ID [Mac]
 - [ ] A locked note shows its title and a password field; a wrong password shakes; the right one opens every note locked with it, in every window
 - [ ] A note locked with an older password says so
-- [ ] Lock Now locks them everywhere; they lock again after 5 minutes idle
+- [ ] Lock Now locks them everywhere; they lock again after 5 minutes idle; typing in an open locked note and choosing Lock Now at once keeps what was typed
 - [ ] Remove Lock; Change password (works on other devices once synced); Forgot password
 - [ ] Locked notes stay out of tags, Todo, search (except titles) and export
 
 ## 18. Export and share
 
 - [ ] Export makes a .zip of files named by title in their notes' formats (Markdown, LaTeX, spreadsheets as CSV with formulas), attachments in their folder, Trash in its folder when included
-- [ ] Settings → Data → Import Files… makes notes of Markdown, LaTeX, CSV (comma, semicolon or tab), TSV and Excel files: a workbook's each visible sheet a note "Workbook – Sheet", formulas kept, formulas into other sheets as values; other files are listed as not imported
-- [ ] A LaTeX note exports as a .tex file wrapped in \documentclass … \end{document}, and compiles with pdflatex; [Web] the share menu says Copy LaTeX and Download LaTeX
+- [ ] Settings → Data → Import Files… makes notes of Markdown, LaTeX, CSV (comma, semicolon or tab), TSV and Excel files: a workbook's each visible sheet a note "Workbook – Sheet" (one sheet: just "Workbook"), formulas kept, formulas into other sheets as values; other files are listed as not imported
+- [ ] A LaTeX note exports as a .tex file wrapped in \documentclass … \end{document}, and compiles with pdflatex; the share menu says Copy LaTeX and Download LaTeX
 - [ ] Closed locked notes are left out, and the panel says how many
 - [ ] [Web] It downloads; [Desktop] it saves to Downloads and Show in Finder works
 
 ## 18a. PDF
 
-- [ ] ⌘+ and ⌘− (Ctrl+ and Ctrl− on Windows and Linux; ⌘= and the keypad's + and − too) make notes' text a pixel bigger or smaller, from 12 to 28 px, in the main window and floating notes alike, and Settings → Typography → Text size follows; ⌘0 goes back to 17 px; the page itself doesn't zoom (web); screen readers hear the new size; in the drawing editor the keys zoom the drawing instead
 - [ ] ⌘P (Ctrl+P), or Share → Preview as PDF, opens the PDF preview of the open note; ⌘P with no note open does nothing (the browser doesn't print the window)
 - [ ] The pages are white with black text in every theme, light and dark; Paper switches between A4 and Letter and lays the pages out again, and the choice is remembered (Letter by default in the US and Canada)
-- [ ] Markdown: headings, lists, todos (ticked ones greyed), quotes, tables (with alignment), callouts with their colors and icons, cards, highlighted code, Mermaid diagrams, math, images, files, tags, mentions (as their text), properties at the top, type tables; symbols (→, ≠) as the editor shows them, following Settings → Typography
+- [ ] Markdown: headings, lists, todos (ticked ones greyed), quotes, tables (with alignment), callouts with their colors and icons, cards, highlighted code, Mermaid diagrams, math, images, files, tags, mentions (as their text), properties at the top, type tables; symbols (→, ≠) as the editor shows them, following Settings → Editing
 - [ ] No page cuts through a line of text, an image, math, a diagram or a table row; a heading isn't left alone at the bottom of a page; page numbers at the bottom
 - [ ] LaTeX (lines): the paper example has its title block, abstract, numbered sections, theorems and equations, "Section 2" and "(1)" where it \ref's them, a numbered table, references and its footnote at the end; lines join into paragraphs
 - [ ] Print… opens the print dialog showing the same pages, one per sheet, with nothing of the app; Save as PDF there names the file after the note
@@ -402,7 +409,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] The paper example (booktabs), the lecture notes and the problem set all typeset with TeX
 - [ ] A note with an error (`\undefined`) says "TeX stopped at line N of the note", with the error and TeX's log; Try Again typesets again
 - [ ] Save PDF: [Web] downloads "<title>.pdf"; [Desktop] saves to Downloads, with Show in Finder
-- [ ] A build without `pnpm tex-assets` says TeX isn't included in this version
+- [ ] A build without `bun run tex-assets` says TeX isn't included in this version
 - [ ] Esc or × closes the preview and focus goes back where it was; Tab stays inside it; a screen reader hears "2 pages, ready" and each page as "Page 1 of 2"
 
 ## 19. Floating notes [Desktop]
@@ -433,7 +440,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 22. LaTeX notes
 
-- [ ] The ⓘ panel switches a note between Markdown and LaTeX; the panel stays open, and the note redraws at once
+- [ ] The ⓘ panel switches a note between Markdown, LaTeX and Spreadsheet; the panel stays open, and the note redraws at once
 - [ ] A new note switched to LaTeX loses its "# "; one made under a tag keeps it as `% #tag`
 - [ ] In **QA · LaTeX note**, each construct draws as its heading says, and its LaTeX shows while the cursor is on it
 - [ ] Clicking drawn math or a table shows its LaTeX; displayed math is redrawn below as you type
@@ -441,14 +448,14 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] ⌘B, ⌘I and ⌘E wrap the selection in `\textbf{}`, `\emph{}` and `\texttt{}`, and again take it out
 - [ ] In a LaTeX note, pasting rows from a spreadsheet or pgAdmin makes a `tabular` (underscores escaped, numbers right-aligned, header over `\hline`); ⌘Z once gives the rows as copied
 - [ ] In a LaTeX note, pasting or dropping an image adds `\includegraphics{../attachments/…}` and shows it; a PDF adds an `\href` link; `/image` and `/file` do the same; an Unsplash link on an empty line shows the photo; a URL over selected text becomes `\href{url}{text}`; none of these happen in verbatim or math
-- [ ] `/` shows the LaTeX commands (Section, Bullet list, Math, Table…), and each inserts its LaTeX
+- [ ] `/` shows the LaTeX commands (Section, Bullet list, Math, Table…), and each inserts its LaTeX; `/date` writes today in the app's language, as in a Markdown note
 - [ ] `\` opens the command menu in sections (Text, Environments); inside math, or after an unclosed `$`, it shows math commands instead; after `\\` and in verbatim it doesn't open
 - [ ] An environment picked after text starts on a new line; Tab moves through `\begin{tabular}{ll}`'s places
 - [ ] The list shows the title and excerpt without commands; `% #tag` tags the note; note info counts the words as they read
 - [ ] A LaTeX note syncs to another device as LaTeX (`format: latex` in its file)
 - [ ] Each of the LaTeX examples (Settings → Data → Add LaTeX Examples) draws with no red math: the paper's preamble folds into its title and authors, clicking it shows the LaTeX; theorems are numbered (Lemma 1, Theorem 2), the proof ends with ∎, citations and references are chips, the bibliography is headed References
 - [ ] [Dev] Settings → Data → Reset Notes to Defaults… asks in the panel (Delete and Reset, or Cancel), then leaves only the welcome note, the tour and the examples; it works in the Mac app; it's disabled while sync is on, and missing from release builds
-- [ ] [Web] On the demo website (`pnpm build:site`), Data → Start Again → Reset Notes to Defaults… asks in the panel, then leaves only the tour and the examples (no separate welcome note) and opens the tour's first note; it's disabled while saving to a folder, saying to stop that first
+- [ ] [Web] On the demo website (`bun run build:site`), Data → Start Again → Reset Notes to Defaults… asks in the panel, then leaves only the tour and the examples (no separate welcome note) and opens the tour's first note; it's disabled while saving to a folder, saying to stop that first
 
 ## 23. Properties and mentions
 
@@ -475,6 +482,8 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] With Contrast → Increased, Lighthouse's accessibility audit (Chrome DevTools) scores 100 on the main window, with Settings open, and in a note with a table, math and a callout, in a few themes light and dark (Lines, Solarized, Ayu, Everforest); on Standard, only contrast fails
 - [ ] Contrast: System follows the device's Increase Contrast live; Increased darkens grey text, links, tags and borders in every theme, light and dark, and a selected row's date and count stay readable
 - [ ] Keyboard only, from launch: reach the sidebar, list, note, toolbar, menus, Settings and every control in it with Tab; use each with Enter or Space; arrows move in lists, menus, tabs, segmented controls and the icon picker; Esc closes what's open and focus returns to what opened it; focus is always visible
+- [ ] Focus never drops to the page: after renaming a tag or a type (Enter or Esc) it's on that row; after a menu item that opens a dialog (Share → Preview as PDF), then Esc, on what opened the menu; locking a note keeps it on the lock button; closing the last tab with Delete puts it in the note list; a window resized to or from phone width moves it to a pane that shows
+- [ ] With a dialog open (Settings on the web, the PDF preview, a password), the window's shortcuts wait: ⌥N, ⌘\\, ⇧⌘\\, ⌘P, ⌘F and F6 do nothing behind it; ⌃⌘L and ⌘+ / ⌘− still work
 - [ ] [Mac] VoiceOver (⌘F5): every button says what it does; the note list reads each note's title, pinned or locked, and date, then its excerpt after a pause; a note reads as its text; the rotor's Headings list a note's headings; list items say "bullet"; checkboxes say checked or not; a callout reads "Warning callout" … "End of warning callout" and properties "Properties" … "End of properties" (not colons and dashes); menus and dialogs are announced; "Copied" or a sync problem is spoken
 - [ ] F6 and ⇧F6 move between the sidebar, the note list and the note; Enter on a note in the list opens it with the cursor in its text
 - [ ] System text size or browser zoom at 200%: nothing overlaps or is cut off, and the note list and sidebar still work
@@ -484,4 +493,4 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] ⌥↵ with the cursor on a link opens it; on an attached file, opens the file; on a mention, its note (the main window shows it); on `@type.…`, that type's list; on a tag, its notes; on a mention of a note that isn't there, makes the note and says so
 - [ ] Format toolbar: with text selected, Tab reaches the toolbar, ← → move between its buttons, Enter applies one, Esc goes back to the text
 - [ ] A type table's column names sort from the keyboard (Enter), say which way they sort, and a row's title opens its note with Enter
-- [ ] `pnpm i18n` reports every message translated in Spanish and French
+- [ ] `bun run i18n` reports every message translated in Spanish and French

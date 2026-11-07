@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick, untrack } from "svelte";
+  import type { Attachment } from "svelte/attachments";
   import { speak } from "../a11y";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
@@ -18,6 +19,10 @@
 
   let {
     entry,
+    index,
+    count,
+    top,
+    measure,
     selected,
     picked,
     tabbable,
@@ -27,6 +32,13 @@
     onkeydown,
   }: {
     entry: Entry;
+    /** Its place in the list, from 0, of `count`; the list draws only some of its rows. */
+    index: number;
+    count: number;
+    /** Where it's placed when it's drawn apart from the rows around it (the list's ListWindow). */
+    top?: number;
+    /** Measures the row, so the list knows how tall it is. */
+    measure: Attachment<HTMLElement>;
     /** Its note is the open one. */
     selected: boolean;
     /** It's among the notes picked to act on together (⌘-click, ⇧-click, ⌘A). */
@@ -68,9 +80,6 @@
   /** The icon of its type (`type: person`), which a note of that type has unless it has its own. */
   const typeIcon = $derived(entry.meta.type ? typeIcons.get(entry.meta.type) : undefined);
   const icon = $derived(entry.note.icon ?? typeIcon);
-
-  // Screen readers call the row by its title, pinned or locked (hidden text by the icons) and date;
-  // the excerpt is its description, which they read after a pause, so moving through the list is quick.
 
   // Swipe right for the leading action and left for the trailing one, like Mail.
   const leading = $derived<Action>(
@@ -439,8 +448,8 @@
     });
   }
 
-  /** Whether it can open beside the selected note: on wide and medium screens, not in the Trash, and not the selected note itself. */
-  const canOpenBeside = $derived(ui.layout !== "narrow" && !entry.note.trashed && notes.selectedId !== id);
+  /** Whether it can open beside the selected note: where there's room, not in the Trash, and not the selected note itself. */
+  const canOpenBeside = $derived(ui.besideFits && !entry.note.trashed && notes.selectedId !== id);
 
   function openBeside() {
     notes.clearPicks();
@@ -496,9 +505,16 @@
   }
 </script>
 
-<!-- Lets the browser skip layout and paint for off-screen rows. (`menu-target`, `selected` and `swiped` hide the dividers beside it: NoteList.svelte.) -->
-<li bind:this={li} class={["relative [contain-intrinsic-size:auto_94px] [content-visibility:auto]", menuTarget && "menu-target"]}>
-  <div class={["relative overflow-hidden rounded-lg", swiped && "swiped"]}>
+<!-- `menu-target`, `selected` and `swiped` hide the dividers beside it (NoteList.svelte). Screen
+     readers hear where it is in the whole list, not only among the rows drawn. -->
+<li
+  bind:this={li}
+  class={[top === undefined ? "relative" : "absolute inset-x-3", menuTarget && "menu-target"]}
+  style:top={top === undefined ? undefined : `${top}px`}
+  aria-posinset={index + 1}
+  aria-setsize={count}
+>
+  <div class={["relative overflow-hidden rounded-lg", swiped && "swiped"]} {@attach measure}>
     {#each actions as { action, transform, edge, gap, armed } (edge)}
       <button
         class={["absolute inset-0 flex items-center", edge, tones[action.tone], slides]}
@@ -518,7 +534,9 @@
     {/each}
 
     <!-- Vertical scrolling stays native; sideways drags are ours. The background is a layer over the
-         list's color, which shows only while swiped, so the action underneath doesn't show through. -->
+         list's color, which shows only while swiped, so the action underneath doesn't show through.
+         Screen readers call the row by its title, pinned or locked and date; the excerpt is its
+         description, read after a pause, so moving through the list is quick. -->
     <button
       bind:this={item}
       class={[

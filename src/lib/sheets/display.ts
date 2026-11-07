@@ -47,6 +47,25 @@ const DAY = 86_400_000;
 const SYMBOLS: Record<string, string> = { $: "USD", "€": "EUR", "£": "GBP", "¥": "JPY", "₹": "INR", "₩": "KRW", "₽": "RUB", "₺": "TRY", "₪": "ILS", "₴": "UAH", "฿": "THB", "₱": "PHP", "₫": "VND", "₦": "NGN" };
 const MONEY = new RegExp(`^([-+]?)\\s*(?:([${Object.keys(SYMBOLS).join("")}])|([A-Z]{3})\\s)\\s*([-+]?)\\s*(\\d[\\d,]*(?:\\.\\d+)?|\\.\\d+)$`);
 
+const numberFormats = new Map<string, Intl.NumberFormat>();
+const dateFormats = new Map<string, Intl.DateTimeFormat>();
+
+/** A number format, made once: making one takes far longer than using it, and every cell shown uses one. */
+export function numberFormat(locale: string, options: Intl.NumberFormatOptions) {
+  const key = `${locale} ${JSON.stringify(options)}`;
+  let format = numberFormats.get(key);
+  if (!format) numberFormats.set(key, (format = new Intl.NumberFormat(locale, options)));
+  return format;
+}
+
+/** A date format, made once. */
+function dateFormat(locale: string, options: Intl.DateTimeFormatOptions) {
+  const key = `${locale} ${JSON.stringify(options)}`;
+  let format = dateFormats.get(key);
+  if (!format) dateFormats.set(key, (format = new Intl.DateTimeFormat(locale, options)));
+  return format;
+}
+
 /** The currency the device's region uses, for the setting's first choice. */
 export function localCurrency(locale: string): string {
   const region = new Intl.Locale(locale).maximize().region ?? "";
@@ -58,7 +77,7 @@ export function localCurrency(locale: string): string {
 /* Dates. */
 
 /** An ISO date's year, month and day, if it is one, and a real day. */
-function isoParts(text: string): [number, number, number] | null {
+export function isoParts(text: string): [number, number, number] | null {
   const match = ISO.exec(text);
   if (!match) return null;
   const [y, m, d] = match.slice(1).map(Number);
@@ -66,7 +85,7 @@ function isoParts(text: string): [number, number, number] | null {
 }
 
 const real = (y: number, m: number, d: number) => m >= 1 && m <= 12 && d >= 1 && d <= new Date(Date.UTC(y, m, 0)).getUTCDate();
-const iso = (y: number, m: number, d: number) => `${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+export const iso = (y: number, m: number, d: number) => `${String(y).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
 /** Months' names, long and short, in English and the locale's language, lowercase without dots: their number by name. */
 const monthNames = new Map<string, Map<string, number>>();
@@ -89,13 +108,14 @@ function monthsIn(locale: string) {
 
 /** The order the locale writes a date's numbers in: "mdy" in the US, "dmy" in most places, "ymd" in East Asia. */
 function dateOrder(locale: string) {
-  return new Intl.DateTimeFormat(locale, { day: "numeric", month: "numeric", year: "numeric" })
+  return dateFormat(locale, { day: "numeric", month: "numeric", year: "numeric" })
     .formatToParts(Date.UTC(2026, 10, 5))
     .flatMap(({ type }) => (type === "day" ? "d" : type === "month" ? "m" : type === "year" ? "y" : []))
     .join("");
 }
 
-const fullYear = (y: string) => (y.length === 2 ? 2000 + Number(y) - (Number(y) >= 70 ? 100 : 0) : Number(y));
+/** A year written with two digits as Excel reads it: 00–29 in the 2000s, 30–99 in the 1900s. */
+const fullYear = (y: string) => (y.length === 2 ? Number(y) + (Number(y) < 30 ? 2000 : 1900) : Number(y));
 
 /**
  * A date typed in a usual way (2026-11-05, 2026/11/05, 11/5/2026 or 5/11/2026 as the locale writes
@@ -136,12 +156,22 @@ export function readDate(text: string, locale: string): string | null {
   return null;
 }
 
+const dateStyles = new Map<string, Intl.DateTimeFormat>();
+
+/** The format of dates in a style, found quickly: every date shown is shown with it. */
+function dateStyle(locale: string, style: Exclude<DateStyle, "iso">) {
+  const key = `${locale} ${style}`;
+  let format = dateStyles.get(key);
+  if (!format) dateStyles.set(key, (format = dateFormat(locale, { dateStyle: style, timeZone: "UTC" })));
+  return format;
+}
+
 /** An ISO date as the setting shows it, in the locale's way; anything else as it is. */
 export function showDate(text: string, style: DateStyle, locale: string): string {
   const parts = isoParts(text);
   if (!parts || style === "iso") return text;
   const [y, m, d] = parts;
-  return new Intl.DateTimeFormat(locale, { dateStyle: style, timeZone: "UTC" }).format(Date.UTC(y, m - 1, d));
+  return dateStyle(locale, style).format(Date.UTC(y, m - 1, d));
 }
 
 /** An ISO date as a number of days, for sorting and counting. */
@@ -149,6 +179,9 @@ export const dateNumber = (text: string) => {
   const parts = isoParts(text);
   return parts ? Date.UTC(parts[0], parts[1] - 1, parts[2]) / DAY : null;
 };
+
+/** A number of days as an ISO date. */
+export const dateText = (days: number) => new Date(days * DAY).toISOString().slice(0, 10);
 
 /* Money. */
 
@@ -175,14 +208,21 @@ export function writtenMoney(text: string): { symbol: string; amount: number } |
   return money && { symbol: money.code ? `${money.code} ` : money.symbol, amount: money.amount };
 }
 
+/** Currencies' symbols, worked out once. */
+const symbols = new Map<string, string>();
+
 /** The symbol a currency's amounts are written with: its own ($, €), or its code (CHF). */
 export function symbolOf(currency: string): string {
-  const own = Object.entries(SYMBOLS).find(([, code]) => code === currency)?.[0];
-  if (own) return own;
-  const narrow = new Intl.NumberFormat("en", { style: "currency", currency, currencyDisplay: "narrowSymbol" })
-    .formatToParts(1)
-    .find(({ type }) => type === "currency")?.value;
-  return narrow && narrow.length === 1 ? narrow : `${currency} `;
+  let symbol = symbols.get(currency);
+  if (symbol === undefined) {
+    const own = Object.entries(SYMBOLS).find(([, code]) => code === currency)?.[0];
+    const narrow = own ? undefined : numberFormat("en", { style: "currency", currency, currencyDisplay: "narrowSymbol" })
+      .formatToParts(1)
+      .find(({ type }) => type === "currency")?.value;
+    symbol = own ?? (narrow && narrow.length === 1 ? narrow : `${currency} `);
+    symbols.set(currency, symbol);
+  }
+  return symbol;
 }
 
 /** An amount as a cell's written with the currency: $1200, CHF 30. */
@@ -194,19 +234,39 @@ const inRed = (negative: NegativeStyle) => negative === "red" || negative === "r
 /** A number as written (`-5`, `-1,200.5`, `-3%`) or shown below zero, with its minus, as the setting writes it: `(5)`. */
 export const negativeText = (text: string, negative: NegativeStyle) => (inParens(negative) && /^[-−]/.test(text) ? `(${text.slice(1)})` : text);
 
+const moneyStyles = new Map<string, Intl.NumberFormat>();
+
+/** The format of a currency's amounts in a style, found quickly: every amount shown is shown with it. */
+function moneyStyle(locale: string, currency: string, money: MoneyStyle) {
+  const key = `${locale} ${currency} ${money}`;
+  let format = moneyStyles.get(key);
+  if (!format) {
+    format = numberFormat(locale, {
+      style: "currency",
+      currency,
+      currencyDisplay: money === "code" ? "code" : "narrowSymbol",
+      ...(money === "whole" ? { maximumFractionDigits: 0, minimumFractionDigits: 0 } : {}),
+    });
+    moneyStyles.set(key, format);
+  }
+  return format;
+}
+
 /** An amount of money as the settings show it, in the locale's way; with `edge`, its symbol apart if the locale writes it first. */
 function moneyShown(amount: number, currency: string, look: Pick<CellLook, "money" | "negative" | "edge" | "locale">): Shown {
   const parens = inParens(look.negative) && amount < 0;
   const red = amount < 0 && inRed(look.negative);
   const room = inParens(look.negative) && amount >= 0;
+  const shown = parens ? -amount : amount;
   let parts: Intl.NumberFormatPart[];
   try {
-    parts = new Intl.NumberFormat(look.locale, {
-      style: "currency",
-      currency,
-      currencyDisplay: look.money === "code" ? "code" : "narrowSymbol",
-      ...(look.money === "whole" ? { maximumFractionDigits: 0, minimumFractionDigits: 0 } : {}),
-    }).formatToParts(parens ? -amount : amount);
+    const format = moneyStyle(look.locale, currency, look.money);
+    // Its parts only to set the symbol apart.
+    if (!look.edge) {
+      const text = format.format(shown);
+      return { text: parens ? `(${text})` : text, symbol: "", red, room };
+    }
+    parts = format.formatToParts(shown);
   } catch {
     return { text: String(amount), symbol: "", red, room };
   }

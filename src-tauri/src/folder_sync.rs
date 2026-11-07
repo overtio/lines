@@ -34,10 +34,12 @@ pub struct File {
   etag: String,
 }
 
-/// The cloud drive folders this computer has, best known first.
+/// The cloud drive folders this computer has, best known first. Off the main thread, like the
+/// other folder commands: looking into a drive's folder can wait on its app.
 #[tauri::command]
-pub fn sync_folder_candidates(app: AppHandle) -> Vec<Candidate> {
-  app.path().home_dir().map(|home| candidates_in(&home)).unwrap_or_default()
+pub async fn sync_folder_candidates(app: AppHandle) -> Vec<Candidate> {
+  let Ok(home) = app.path().home_dir() else { return Vec::new() };
+  tauri::async_runtime::spawn_blocking(move || candidates_in(&home)).await.unwrap_or_default()
 }
 
 fn candidates_in(home: &Path) -> Vec<Candidate> {
@@ -157,19 +159,23 @@ fn write_atomic(path: &Path, bytes: &[u8]) -> Result<std::fs::Metadata, String> 
   std::fs::metadata(path).map_err(|e| describe(path, e))
 }
 
-/// An image's bytes, or none if it isn't there (or the drive hasn't downloaded it yet). Images
-/// are never empty, so no bytes can mean missing.
+/// An attachment's bytes, as they are, or `null` if it isn't there (or the drive hasn't downloaded
+/// it yet). An empty file is there, with no bytes.
 #[tauri::command]
 pub async fn sync_folder_read_file(dir: String, name: String) -> Result<Response, String> {
   blocking(move || {
-    let path = file(&dir, &name)?;
-    match std::fs::read(&path) {
-      Ok(bytes) => Ok(Response::new(bytes)),
-      Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(Response::new(Vec::new())),
-      Err(e) => Err(describe(&path, e)),
-    }
+    let bytes = read_file(&file(&dir, &name)?)?;
+    Ok(bytes.map_or_else(|| Response::new("null".to_string()), Response::new))
   })
   .await
+}
+
+fn read_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
+  match std::fs::read(path) {
+    Ok(bytes) => Ok(Some(bytes)),
+    Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+    Err(e) => Err(describe(path, e)),
+  }
 }
 
 /// Writes an image: the raw request body, with the folder (percent-encoded) and file name in the
@@ -382,9 +388,11 @@ mod tests {
 
   #[test]
   fn rejects_relative_folders() {
+    // Absolute on every system: Windows' have a drive letter.
+    let absolute = std::env::temp_dir().join("lines");
     assert!(folder("relative/path").is_err());
-    assert!(folder("/tmp/../etc").is_err());
-    assert!(folder("/tmp/lines").is_ok());
+    assert!(folder(&absolute.join("..").join("etc").to_string_lossy()).is_err());
+    assert!(folder(&absolute.to_string_lossy()).is_ok());
   }
 
   #[test]
@@ -404,6 +412,11 @@ mod tests {
     sync_folder_delete(d.clone(), "a.md".into()).await.unwrap();
     assert!(sync_folder_read(d.clone(), "a.md".into()).await.unwrap().is_none());
     assert!(sync_folder_write(d.clone(), "../x.md".into(), "no".into()).await.is_err());
+    // An empty attachment is there; a missing one isn't.
+    let empty = dir.join("3f9c0a1b2c3d4e5f60718293a4b5c6d7.txt");
+    write_atomic(&empty, b"").unwrap();
+    assert_eq!(read_file(&empty).unwrap(), Some(Vec::new()));
+    assert_eq!(read_file(&dir.join("0f9c0a1b2c3d4e5f60718293a4b5c6d7.txt")).unwrap(), None);
     std::fs::remove_dir_all(&dir).unwrap();
     // A drive that's gone isn't recreated as an empty folder.
     let gone = dir.join("signed-out-drive/lines/notes");

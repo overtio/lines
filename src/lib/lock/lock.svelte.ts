@@ -65,11 +65,6 @@ class AppLock {
     return this.settings !== null;
   }
 
-  /** Reads the settings again, once another window changed them (the main window, for Settings). */
-  refresh() {
-    this.settings = read();
-  }
-
   #save(settings: LockSettings | null) {
     this.settings = settings;
     if (settings) localStorage.setItem(KEY, JSON.stringify(settings));

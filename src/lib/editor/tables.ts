@@ -1,8 +1,8 @@
 import { isolateHistory } from "@codemirror/commands";
 import { syntaxTree } from "@codemirror/language";
-import { type EditorState, type Extension, Prec, type Range, StateField, type Text } from "@codemirror/state";
-import { Decoration, type DecorationSet, EditorView, keymap, WidgetType } from "@codemirror/view";
-import type { SyntaxNode } from "@lezer/common";
+import { type EditorState, type Extension, Prec, type Text } from "@codemirror/state";
+import { EditorView, keymap, WidgetType } from "@codemirror/view";
+import type { SyntaxNode, SyntaxNodeRef } from "@lezer/common";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { githubLink, githubText } from "./github";
 import { copyButton, destroyCopyButton } from "./keyValue";
@@ -18,7 +18,7 @@ import { withSymbols } from "../notes/symbols";
 import { prefs } from "../prefs.svelte";
 import { t } from "../i18n/index.svelte";
 import { addActions, removeActions } from "./rendered";
-import { ancestors, focusChanged, focused, hasText, isEditing } from "./util";
+import { ancestors, arrowsInto, drawnBlock, drawnBlocks, focused, hasText, isEditing } from "./util";
 
 /*
  * GFM tables. Away from the cursor a table shows as a real table; click a cell (or move into the
@@ -576,41 +576,15 @@ function modelOf(state: EditorState, table: SyntaxNode): TableModel {
   return { rows, aligns: grid.aligns, columns: grid.columns };
 }
 
-function buildTables(state: EditorState): DecorationSet {
-  const decos: Range<Decoration>[] = [];
-  syntaxTree(state).iterate({
-    enter(node) {
-      if (BLOCK_PARENTS.has(node.name)) return;
-      if (node.name !== "Table") return false;
-      // Selecting across a table leaves it rendered; a cursor or selection in it shows the Markdown.
-      if (!isEditing(state, node.from, node.to)) {
-        const source = state.sliceDoc(node.from, node.to);
-        const table = node.node;
-        const widget = new TableWidget(source, () => modelOf(state, table), cardInset(state, table));
-        decos.push(Decoration.replace({ widget, block: true }).range(node.from, node.to));
-      }
-      return false;
-    },
-  });
-  return Decoration.set(decos);
+function drawTable(state: EditorState, node: SyntaxNodeRef) {
+  // Selecting across a table leaves it rendered; a cursor or selection in it shows the Markdown.
+  if (node.name !== "Table" || isEditing(state, node.from, node.to)) return null;
+  const table = node.node;
+  const widget = new TableWidget(state.sliceDoc(node.from, node.to), () => modelOf(state, table), cardInset(state, table));
+  return drawnBlock(widget, node.from, node.to);
 }
 
-const tableDecorations = StateField.define<DecorationSet>({
-  create: buildTables,
-  update(decos, tr) {
-    if (
-      tr.docChanged ||
-      tr.selection ||
-      focusChanged(tr) ||
-      tr.effects.some((effect) => effect.is(symbolsChanged)) ||
-      syntaxTree(tr.startState) !== syntaxTree(tr.state)
-    ) {
-      return buildTables(tr.state);
-    }
-    return decos;
-  },
-  provide: (field) => EditorView.decorations.from(field),
-});
+const tableDecorations = drawnBlocks(drawTable, { inside: [...BLOCK_PARENTS], also: (tr) => tr.effects.some((effect) => effect.is(symbolsChanged)) });
 
 /** Clicking a rendered cell puts the cursor at the end of that cell's text. */
 const clickToEdit = EditorView.domEventHandlers({
@@ -640,5 +614,6 @@ export const tables: Extension = [
   tableDecorations,
   clickToEdit,
   tableKeymap,
+  arrowsInto(tableDecorations),
   Prec.high(tablePasting(tableMarkdown, inMarkdownCode)),
 ];

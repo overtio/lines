@@ -31,6 +31,8 @@ export interface Property {
   value: string;
   /** Which line of the note it's on, from 1. */
   line: number;
+  /** The last line it takes: further down for a value that goes on below, like a YAML list. */
+  end: number;
 }
 
 export interface FrontMatter {
@@ -56,11 +58,12 @@ export function frontMatter(text: string): FrontMatter | null {
     if (CLOSE.test(line)) return { lines: n, properties };
     const property = PROPERTY.exec(line);
     const continued = !property && properties.length ? CONTINUED.exec(line) : null;
-    if (property) properties.push({ key: property[1], value: unquote(property[2] ?? ""), line: n });
+    if (property) properties.push({ key: property[1], value: unquote(property[2] ?? ""), line: n, end: n });
     else if (continued) {
       const last = properties[properties.length - 1];
       const item = unquote(continued[1] ?? continued[2]);
       last.value = last.value ? `${last.value}${continued[1] !== undefined ? "," : ""} ${item}` : item;
+      last.end = n;
     } else if (line.trim() && !COMMENT.test(line)) return null;
   }
   return null;
@@ -97,7 +100,7 @@ export const typeLabel = (type: string) => type.charAt(0).toUpperCase() + type.s
  * (`![[…]]`) isn't one.
  */
 export const MENTION =
-  /(?<![\p{L}\p{N}_.\/\\@`])@(?:\[([^\]\n]+)\]|([\p{L}\p{N}_][\p{L}\p{N}_-]*))(?:\.([\p{L}_][\p{L}\p{N}_-]*))?|(?<![!\\])\[\[([^[\]\n|#]*[^\s[\]|#][^[\]\n|#]*)(?:#[^[\]\n|]*)?(?:\|([^[\]\n]+))?\]\]/gu;
+  /(?<![\p{L}\p{N}_./\\@`])@(?:\[([^\]\n]+)\]|([\p{L}\p{N}_][\p{L}\p{N}_-]*))(?:\.([\p{L}_][\p{L}\p{N}_-]*))?|(?<![!\\])\[\[([^[\]\n|#]*[^\s[\]|#][^[\]\n|#]*)(?:#[^[\]\n|]*)?(?:\|([^[\]\n]+))?\]\]/gu;
 
 export interface Mention {
   /** The note's name, as written. */

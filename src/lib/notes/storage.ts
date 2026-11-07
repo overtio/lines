@@ -10,7 +10,8 @@ import type { Note } from "./types";
 export interface NoteStorage {
   all(): Promise<Note[]>;
   get(id: string): Promise<Note | undefined>;
-  put(note: Note): Promise<void>;
+  /** Stores these notes together. */
+  put(...notes: Note[]): Promise<void>;
   delete(...ids: string[]): Promise<void>;
 }
 
@@ -19,7 +20,7 @@ const NOTES = "notes";
 const SYNC = "sync";
 const ATTACHMENTS = "attachments";
 
-function request<T>(req: IDBRequest<T>): Promise<T> {
+export function request<T>(req: IDBRequest<T>): Promise<T> {
   return new Promise((resolve, reject) => {
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -27,7 +28,7 @@ function request<T>(req: IDBRequest<T>): Promise<T> {
 }
 
 /** Resolves once the transaction has committed, not just when its requests succeeded. */
-function committed(tx: IDBTransaction): Promise<void> {
+export function committed(tx: IDBTransaction): Promise<void> {
   return new Promise((resolve, reject) => {
     tx.oncomplete = () => resolve();
     tx.onerror = tx.onabort = () => reject(tx.error);
@@ -76,8 +77,8 @@ class ObjectStore<T extends { id: string }> {
     await committed(tx);
   }
 
-  put(value: T) {
-    return this.#write((store) => store.put(value));
+  put(...values: T[]) {
+    return this.#write((store) => values.forEach((value) => store.put(value)));
   }
 
   delete(...ids: string[]) {
@@ -106,8 +107,9 @@ export class IndexedDBStorage implements NoteStorage {
     return value && this.#open(value);
   }
 
-  async put(note: Note) {
-    await this.#store.put(vault.sealing ? await sealRecord(NOTES, note.id, utf8(JSON.stringify(note))) : note);
+  async put(...notes: Note[]) {
+    const seal = (note: Note) => sealRecord(NOTES, note.id, utf8(JSON.stringify(note)));
+    await this.#store.put(...(vault.sealing ? await Promise.all(notes.map(seal)) : notes));
   }
 
   delete(...ids: string[]) {

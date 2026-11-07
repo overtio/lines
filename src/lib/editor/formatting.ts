@@ -15,7 +15,7 @@ import type { IconName } from "../icons/icons";
 import { t } from "../i18n/index.svelte";
 import { coarsePointer, isApple } from "../platform";
 import { selectedBlock } from "./attachments";
-import { ancestors } from "./util";
+import { ancestors, focusAtStart } from "./util";
 
 /*
  * Inline formatting: bold, italic, underline, strikethrough, code and highlight. The shortcuts and the
@@ -152,13 +152,14 @@ interface ToolbarState {
 const toolbarState = StateField.define<ToolbarState>({
   create: () => ({ pointerDown: false, focused: false, dismissed: false }),
   update(value, tr) {
-    let next = tr.selection ? { ...value, dismissed: false } : value;
+    let { pointerDown, focused, dismissed } = value;
+    if (tr.selection) dismissed = false;
     for (const effect of tr.effects) {
-      if (effect.is(pointer)) next = { ...next, pointerDown: effect.value };
-      if (effect.is(focus)) next = { ...next, focused: effect.value };
-      if (effect.is(dismiss)) next = { ...next, dismissed: true };
+      if (effect.is(pointer)) pointerDown = effect.value;
+      if (effect.is(focus)) focused = effect.value;
+      if (effect.is(dismiss)) dismissed = true;
     }
-    return next;
+    return pointerDown === value.pointerDown && focused === value.focused && dismissed === value.dismissed ? value : { pointerDown, focused, dismissed };
   },
   provide: (field) =>
     showTooltip.compute([field, "selection"], (state) => {
@@ -315,4 +316,5 @@ export const formatToolbar: Extension = [
   hideOnEscape,
   // Focus moving into the toolbar (a screen reader's, say) keeps it there rather than hiding it.
   EditorView.focusChangeEffect.of((_state, focusing) => focus.of(focusing || !!document.activeElement?.closest(".cm-format-bar"))),
+  focusAtStart(focus),
 ];

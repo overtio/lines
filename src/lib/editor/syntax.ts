@@ -62,7 +62,7 @@ const AT = 64, OPEN_BRACKET = 91, BANG = 33;
 const MENTION_AT = /@(?:\[[^\]\n]+\]|[\p{L}\p{N}_][\p{L}\p{N}_-]*)(?:\.[\p{L}_][\p{L}\p{N}_-]*)?/uy;
 const TYPE_AT = /@type\.[\p{L}\p{N}_][\p{L}\p{N}_-]*(?:\([^()\n]*\))?/iuy;
 /** What can't come right before a mention's `@`: emails, `owner/repo@sha`, `\@`. */
-const NOT_BEFORE_MENTION = /[\p{L}\p{N}_.\/\\@`]/u;
+const NOT_BEFORE_MENTION = /[\p{L}\p{N}_./\\@`]/u;
 /** A wiki link at the start of the text (see notes/properties.ts `MENTION`). */
 const WIKI_AT = /\[\[[^[\]\n|#]*[^\s[\]|#][^[\]\n|#]*(?:#[^[\]\n|]*)?(?:\|[^[\]\n]+)?\]\]/uy;
 
@@ -272,6 +272,42 @@ const isDigit = (code: number) => code >= 48 && code <= 57;
 const isMathFence = (line: Line) => line.next === DOLLAR && line.indent - line.baseIndent < 4 && line.text.slice(line.pos).trim() === "$$";
 
 /**
+ * Where inline math can close in a paragraph's text: each `$` that isn't escaped (an odd number of
+ * backslashes before it), and isn't after a space or before a digit; and each unescaped `$$`. That
+ * doesn't depend on where the math opened, so it's found once rather than read again from each `$`
+ * to the paragraph's end, which a paragraph of prices made slow.
+ */
+const closers = new WeakMap<InlineContext, { single: number[]; double: number[] }>();
+
+function closersIn(cx: InlineContext) {
+  let found = closers.get(cx);
+  if (!found) {
+    found = { single: [], double: [] };
+    for (let i = cx.offset; i < cx.end; i++) {
+      const char = cx.char(i);
+      if (char === BACKSLASH) i++;
+      else if (char === DOLLAR) {
+        if (cx.char(i + 1) === DOLLAR) found.double.push(i);
+        if (!isSpace(cx.char(i - 1)) && !isDigit(cx.char(i + 1))) found.single.push(i);
+      }
+    }
+    closers.set(cx, found);
+  }
+  return found;
+}
+
+/** The first of `positions` (in order) at or after `pos`, or -1. */
+function firstFrom(positions: number[], pos: number) {
+  let [low, high] = [0, positions.length];
+  while (low < high) {
+    const mid = (low + high) >> 1;
+    if (positions[mid] < pos) low = mid + 1;
+    else high = mid;
+  }
+  return low < positions.length ? positions[low] : -1;
+}
+
+/**
  * LaTeX math, as in Pandoc and GitHub: `$x^2$` within text, `$$\sum x$$` displayed, and a block
  * between `$$` lines. Nothing inside is read as Markdown, so `$a_1 * b_2$` stays math.
  */
@@ -292,20 +328,11 @@ export const TexMath: MarkdownConfig = {
         // so prices ("$5 and $10") stay text.
         const first = cx.char(pos + size);
         if (first === -1 || first === DOLLAR || (size === 1 && isSpace(first))) return -1;
-        for (let i = pos + size; i < cx.end; i++) {
-          const char = cx.char(i);
-          if (char === BACKSLASH) i++;
-          else if (char === DOLLAR) {
-            if (size === 2) {
-              if (cx.char(i + 1) !== DOLLAR) continue;
-            } else if (isSpace(cx.char(i - 1)) || isDigit(cx.char(i + 1))) continue;
-            const end = i + size;
-            return cx.addElement(
-              cx.elt("InlineMath", pos, end, [cx.elt("MathMark", pos, pos + size), cx.elt("MathMark", i, end)]),
-            );
-          }
-        }
-        return -1;
+        const { single, double } = closersIn(cx);
+        const close = firstFrom(size === 1 ? single : double, pos + size);
+        if (close < 0) return -1;
+        const end = close + size;
+        return cx.addElement(cx.elt("InlineMath", pos, end, [cx.elt("MathMark", pos, pos + size), cx.elt("MathMark", close, end)]));
       },
     },
   ],

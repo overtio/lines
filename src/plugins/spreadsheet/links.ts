@@ -42,17 +42,27 @@ function scan(body: string, cells: boolean) {
 /** The names of a note's ```csv blocks (null for one without). */
 export const blockNames = (body: string) => scan(body, false).map(({ name }) => name);
 
-/** A note's blocks with their cells, for the notes being worked out now. */
-const read = new Map<string, { name: string | null; cells: Cells }[]>();
-function blocksIn(body: string) {
-  let blocks = read.get(body);
-  if (!blocks) {
-    blocks = scan(body, true).map(({ name, text }) => ({ name, cells: parseCsv(text) }));
-    read.set(body, blocks);
-    if (read.size > 20) read.delete(read.keys().next().value!);
+/**
+ * What's read from a note's text, kept for the notes being worked out now: the same cells while the
+ * text is the same, so their sheets aren't worked out again.
+ */
+function cached<T>(cache: Map<string, T>, body: string, read: () => T): T {
+  let found = cache.get(body);
+  if (found === undefined) {
+    cache.set(body, (found = read()));
+    if (cache.size > 20) cache.delete(cache.keys().next().value!);
   }
-  return blocks;
+  return found;
 }
+
+const blocksRead = new Map<string, { name: string | null; cells: Cells }[]>();
+const sheetsRead = new Map<string, Cells>();
+
+/** A Markdown note's blocks, with their cells. */
+const blocksIn = (body: string) => cached(blocksRead, body, () => scan(body, true).map(({ name, text }) => ({ name, cells: parseCsv(text) })));
+
+/** A spreadsheet note's cells. */
+const cellsIn = (body: string) => cached(sheetsRead, body, () => readSheet(body).cells);
 
 /** A note's text with its ```csv blocks' cells as `rewrite` makes them (null leaves a block as it is). */
 export function rewriteBlocks(body: string, rewrite: (cells: Cells) => Cells | null) {
@@ -72,7 +82,7 @@ function inNote(title: string, block?: string): LinkedSheet | null {
   const entry = notes.find(title);
   if (!entry || entry.note.trashed || isClosed(entry.note)) return null;
   const { id, body, format } = entry.note;
-  if (format === "spreadsheet") return block === undefined ? { id, cells: readSheet(body).cells, find: sheetFinder(null, id) } : null;
+  if (format === "spreadsheet") return block === undefined ? { id, cells: cellsIn(body), find: sheetFinder(null, id) } : null;
   if (format) return null;
   const blocks = blocksIn(body);
   const found = block === undefined ? blocks[0] : named(blocks, block);
@@ -101,15 +111,17 @@ export interface SheetChoice {
 }
 
 /**
- * The sheets a formula can name, from a note's text (`body`, null for a spreadsheet note's): its own
- * named blocks, spreadsheet notes, and other notes' blocks (by the note's name for the first, and
- * note/name for each named one).
+ * The sheets a formula can name, from a note's text (`body`, null for a spreadsheet note's) and
+ * title: its own named blocks, spreadsheet notes, and other notes' blocks (by the note's name for
+ * the first, and note/name for each named one).
  */
-export function sheetChoices(body: string | null): SheetChoice[] {
+export function sheetChoices(body: string | null, title: string): SheetChoice[] {
   const choices: SheetChoice[] = [];
   if (body !== null) for (const { name } of scan(body, false)) if (name) choices.push({ name, about: t("sheet.inThisNote") });
+  // Not this note: by its title, as its text may not be saved yet.
+  const own = nameOf(title);
   for (const { note, meta } of notes.entries) {
-    if (note.trashed || isClosed(note) || !meta.title || note.body === body) continue;
+    if (note.trashed || isClosed(note) || !meta.title || note.body === body || nameOf(meta.title) === own) continue;
     if (note.format === "spreadsheet") choices.push({ name: meta.title, about: t("sheet.spreadsheetNote") });
     if (note.format) continue;
     const blocks = scan(note.body, false);

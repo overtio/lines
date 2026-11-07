@@ -5,11 +5,10 @@
   import { prefs } from "../prefs.svelte";
   import { ui } from "../ui.svelte";
   import IconButton from "./ui/IconButton.svelte";
-
-  /** The button that shows the sidebar, where `ui.sidebarToggle` puts it, with the sidebar's side in its icon. */
 </script>
 
-<!-- `sidebar-toggle` is where App.svelte gives focus back when the sidebar hides. -->
+<!-- The button that shows the sidebar, where `ui.sidebarToggle` puts it, with the sidebar's side in its
+     icon. `sidebar-toggle` is where App.svelte gives focus back when the sidebar hides. -->
 <div class="flex shrink-0" transition:slide={{ axis: "x", duration: reducedMotion.matches ? 0 : 200 }}>
   <IconButton
     class="sidebar-toggle"

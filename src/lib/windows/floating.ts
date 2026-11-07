@@ -102,10 +102,16 @@ export async function openFloating(id: string) {
   });
 }
 
-/** Reopens the floating notes that were open when the app last quit. */
-export function restoreFloating() {
+/**
+ * Reopens the floating notes that were open when the app last quit. Those still open (this window
+ * started again, after the app lock or a new language) are left where they are, not brought forward.
+ */
+export async function restoreFloating() {
+  const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
   for (const [id, state] of Object.entries(readAll())) {
     const entry = notes.get(id);
-    if (state.open && entry && !entry.note.trashed) void openFloating(id);
+    if (!state.open || !entry || entry.note.trashed) continue;
+    if (await WebviewWindow.getByLabel(floatingLabel(id))) floatingOpen.add(id);
+    else void openFloating(id);
   }
 }

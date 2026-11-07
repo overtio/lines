@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Dialog } from "bits-ui";
+  import { untrack } from "svelte";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { touchIdAvailable } from "../lock/lock.svelte";
@@ -13,30 +14,37 @@
 
   let touchIdError = $state<string | null>(null);
   let hasTouchId = $state(false);
+  let content = $state<HTMLElement | null>(null);
   /** What had focus before the dialog opened, to give it back after. */
-  let opener: HTMLElement | null = null;
+  let opener: Element | null = null;
 
   void touchIdAvailable.then((available) => (hasTouchId = available));
 
   const request = $derived(lockedNotes.asking);
   const touchId = $derived(hasTouchId && request?.purpose === "open" && !!noteKeys.settings?.touchId);
 
+  // Noted before the dialog's form takes focus as it opens.
+  $effect.pre(() => {
+    if (request) untrack(() => (opener ??= document.activeElement));
+  });
+
   function onOpenAutoFocus() {
     touchIdError = null;
-    opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   }
 
   function onCloseAutoFocus(event: Event) {
     event.preventDefault();
     // Locking a note may have moved focus on (to the note's lock), so only where nothing has it.
-    if (opener?.isConnected && (document.activeElement === document.body || !document.activeElement)) opener.focus();
+    const active = document.activeElement;
+    const lost = !active || active === document.body || !!content?.contains(active);
+    if (lost && opener instanceof HTMLElement && opener.isConnected) opener.focus();
     opener = null;
   }
 
   function done() {
-    const then = request?.then;
+    const after = request?.after;
     lockedNotes.asking = null;
-    then?.();
+    after?.();
   }
 
   async function useTouchId() {
@@ -54,6 +62,7 @@
     <Dialog.Overlay class="fixed inset-0 z-40 bg-scrim" />
     <!-- A click outside leaves it open, as a password half typed would be lost. -->
     <Dialog.Content
+      bind:ref={content}
       {onOpenAutoFocus}
       {onCloseAutoFocus}
       interactOutsideBehavior="ignore"

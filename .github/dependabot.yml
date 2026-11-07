@@ -1,0 +1,45 @@
+# Weekly pull requests updating dependencies: the packages (Bun), the native app's crates (Cargo)
+# and the workflows' actions. Only versions published at least 10 days ago, as bunfig.toml
+# asks of every install. Minor and patch updates come together, one pull request each.
+version: 2
+updates:
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 10
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      packages:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: cargo
+    directory: /src-tauri
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 10
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      crates:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 10
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
+        update-types: [minor, patch]

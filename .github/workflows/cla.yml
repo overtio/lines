@@ -1,0 +1,42 @@
+# Asks each contributor to agree to the contributor agreement (CLA.md) on their first pull request,
+# and records it: signatures are kept in signatures/cla.json on the cla-signatures branch. The
+# check is required on main. CONTRIBUTING.md says why.
+name: CLA
+
+on:
+  issue_comment:
+    types: [created]
+  # Not `pull_request`: a pull request from a fork gets no token that can comment or record. This
+  # never checks out or runs the pull request's code.
+  pull_request_target:
+    types: [opened, synchronize, closed]
+
+permissions:
+  # To check again once someone signs.
+  actions: write
+  # To record signatures on the cla-signatures branch.
+  contents: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  cla:
+    if: github.event_name == 'pull_request_target' || github.event.comment.body == 'recheck' || github.event.comment.body == 'I have read the lines Contributor License Agreement, and I agree to it.'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: contributor-assistant/github-action@ca4a40a7d1004f18d9960b404b97e5f30a505a08 # v2.6.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path-to-document: https://github.com/overtio/lines/blob/main/CLA.md
+          path-to-signatures: signatures/cla.json
+          branch: cla-signatures
+          # The maintainer, who the agreement is with, and bots.
+          allowlist: olekslitus,dependabot[bot],github-actions[bot]
+          custom-pr-sign-comment: I have read the lines Contributor License Agreement, and I agree to it.
+          custom-notsigned-prcomment: |
+            Thank you for contributing to lines! Before it can be merged, please read the [contributor agreement](https://github.com/overtio/lines/blob/main/CLA.md): you keep the copyright in your contribution, and lines stays open source. If you agree, reply to this pull request with this sentence, exactly:
+          custom-allsigned-prcomment: Everyone who contributed to this pull request has agreed to the contributor agreement. Thank you!
+          signed-commit-message: "chore(cla): $contributorName agreed, in #$pullRequestNo"
+          create-file-commit-message: "chore(cla): start recording agreements"
+          lock-pullrequest-aftermerge: false

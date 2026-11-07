@@ -1,5 +1,5 @@
 export const isTauri = "__TAURI_INTERNALS__" in window;
-/** The demo website (`pnpm build:site`): the web app with the feature tour, saving only to a folder. */
+/** The demo website (`bun run build:site`): the web app with the feature tour, saving only to a folder. */
 export const isSite = import.meta.env.VITE_SITE === "1";
 
 const ua = navigator.userAgent;

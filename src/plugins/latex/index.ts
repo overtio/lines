@@ -6,7 +6,7 @@ import type { NoteMeta } from "../../lib/notes/types";
 import type { Plugin } from "../../lib/plugins/types";
 import { latexEditing } from "./editor";
 import { printDocument } from "./print";
-import { latexContent, latexDocument, latexLines, latexPlainText } from "./text";
+import { latexContent, latexDocument, latexLine, latexLines, latexPlainText } from "./text";
 
 /*
  * Notes written in LaTeX (docs/latex.md): drawn as you type them (editor.ts, reading the note with
@@ -17,10 +17,16 @@ import { latexContent, latexDocument, latexLines, latexPlainText } from "./text"
 /** A LaTeX note's title and excerpt come from its text as it reads; its tags can be in comments (`% #work`). */
 function meta(body: string): NoteMeta {
   const { text, title } = latexContent(body);
-  const lines = latexLines(text)
-    .map((line) => line.text.replace(/\s+/g, " ").trim())
-    .filter(Boolean);
-  if (title) lines.unshift(title);
+  // Lines are read only until there's a title and an excerpt, which in a long note are a few of them.
+  const lines = title ? [title] : [];
+  let excerpt = -1;
+  for (const line of text.split("\n")) {
+    if (excerpt >= 200) break;
+    const read = latexLine(line).text.replace(/\s+/g, " ").trim();
+    if (!read) continue;
+    if (lines.length) excerpt += read.length + 1;
+    lines.push(read);
+  }
   return {
     title: lines[0] ?? "",
     excerpt: lines.slice(1).join(" ").slice(0, 200),

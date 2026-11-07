@@ -26,7 +26,8 @@ export async function notesFromFiles(files: File[]): Promise<{ notes: Note[]; sk
       continue;
     }
     const data = new Uint8Array(await file.arrayBuffer());
-    const bodies = language.read ? await language.read({ name: file.name, data }) : [new TextDecoder().decode(data)];
+    // With Windows line endings too, so a file's properties are read.
+    const bodies = language.read ? await language.read({ name: file.name, data }) : [new TextDecoder().decode(data).replace(/\r\n?/g, "\n")];
     const time = file.lastModified || Date.now();
     for (const body of bodies) {
       const note: Note = { id: crypto.randomUUID(), body, createdAt: time, updatedAt: time, pinned: false, trashed: false };

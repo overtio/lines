@@ -1,12 +1,12 @@
 import { syntaxTree } from "@codemirror/language";
-import { type EditorState, type Extension, type Range, Prec, StateField } from "@codemirror/state";
-import { Decoration, type DecorationSet, EditorView, keymap, WidgetType } from "@codemirror/view";
-import type { SyntaxNode } from "@lezer/common";
+import { type EditorState, type Extension, Prec } from "@codemirror/state";
+import { type EditorView, keymap, ViewPlugin, WidgetType } from "@codemirror/view";
+import type { SyntaxNode, SyntaxNodeRef } from "@lezer/common";
 import { t } from "../i18n/index.svelte";
 import { plugins } from "../plugins/registry.svelte";
 import type { MathEngine } from "../plugins/types";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
-import { focusChanged, focused, isEditing } from "./util";
+import { arrowsInto, clickToShowCode, drawnBlock, drawnBlocks, focused, isEditing } from "./util";
 
 /*
  * Math, drawn by a math engine plugin (KaTeX): `$x^2$` within text (livePreview.ts and tables.ts
@@ -26,6 +26,39 @@ export async function loadMath(): Promise<MathEngine | null> {
   loaded.add(engine);
   return engine;
 }
+
+/** Math, or what may be: `$`, `\(`, `\[`, an equation's environment, or a ```math block. */
+const MATH = /\$|\\[([]|\\begin\{(?:equation|align|gather|multline|eqnarray|displaymath)|```math/;
+
+/** Engines that have started to load. */
+const loading = new WeakSet<MathEngine>();
+
+/** Starts to load the math engine if `text` has math in it. */
+function preload(text: Iterable<string>) {
+  const engine = plugins.math;
+  if (!engine || loading.has(engine)) return;
+  for (const part of text) {
+    if (!MATH.test(part)) continue;
+    loading.add(engine);
+    void loadMath().catch(() => loading.delete(engine));
+    return;
+  }
+}
+
+/**
+ * Starts to load the math engine once a note with math is open, or math is typed, rather than when
+ * math first comes into view: loading it then stalls the frame that shows it, a jolt while scrolling.
+ */
+export const preloadMath = ViewPlugin.define((view) => {
+  preload(view.state.doc.iterLines());
+  return {
+    update(update) {
+      const inserted: string[] = [];
+      update.changes.iterChanges((_fromA, _toA, _fromB, _toB, text) => void inserted.push(text.toString()));
+      preload(inserted);
+    },
+  };
+});
 
 /** A note's own math commands (\newcommand…), and a key that's the same for the same ones. */
 export interface Macros {
@@ -120,17 +153,10 @@ export class MathBlockWidget extends WidgetType {
       dom.textContent = t("latex.emptyMath");
       return dom;
     }
-    dom.append(
-      mathElement(
-        this.tex,
-        true,
-        () => {
-          heights.set(this.tex, dom.offsetHeight);
-          view.requestMeasure();
-        },
-        this.macros,
-      ),
-    );
+    // How tall it's drawn, for when it's next out of view: once now, and again once the engine has drawn it.
+    const remember = () => view.requestMeasure({ read: () => dom.offsetHeight, write: (height) => void (height && heights.set(this.tex, height)) });
+    dom.append(mathElement(this.tex, true, remember, this.macros));
+    remember();
     return dom;
   }
   get estimatedHeight() {
@@ -158,57 +184,18 @@ function blockTex(state: EditorState, node: SyntaxNode): string | null {
   return code ? doc.sliceString(code.from, code.to) : "";
 }
 
-function buildBlocks(state: EditorState): DecorationSet {
-  const decos: Range<Decoration>[] = [];
-  syntaxTree(state).iterate({
-    enter(ref) {
-      // Blocks are drawn at the top level or in cards; nothing else needs a look inside.
-      if (ref.name === "Document" || ref.name === "Card") return true;
-      const tex = blockTex(state, ref.node);
-      if (tex === null) return false;
-      // Only blocks on lines of their own (not in a quote or list item, whose lines start with > or -).
-      const first = state.doc.lineAt(ref.from);
-      if (state.sliceDoc(first.from, ref.from).trim()) return false;
-      const inset = cardInset(state, ref.node);
-      if (isEditing(state, ref.from, ref.to)) {
-        const widget = new MathBlockWidget(tex, inset, true);
-        decos.push(Decoration.widget({ widget, block: true, side: 1 }).range(state.doc.lineAt(ref.to).to));
-      } else {
-        const widget = new MathBlockWidget(tex, inset, false);
-        decos.push(Decoration.replace({ widget, block: true }).range(first.from, state.doc.lineAt(ref.to).to));
-      }
-      return false;
-    },
-  });
-  return Decoration.set(decos, true);
+function drawBlock(state: EditorState, ref: SyntaxNodeRef) {
+  const tex = blockTex(state, ref.node);
+  if (tex === null) return null;
+  // Only blocks on lines of their own (not in a quote or list item, whose lines start with > or -).
+  const first = state.doc.lineAt(ref.from);
+  if (state.sliceDoc(first.from, ref.from).trim()) return null;
+  const editing = isEditing(state, ref.from, ref.to);
+  return drawnBlock(new MathBlockWidget(tex, cardInset(state, ref.node), editing), first.from, state.doc.lineAt(ref.to).to, editing);
 }
 
-const blocks = StateField.define<DecorationSet>({
-  create: buildBlocks,
-  update(decos, tr) {
-    if (tr.docChanged || tr.selection || focusChanged(tr) || syntaxTree(tr.startState) !== syntaxTree(tr.state)) {
-      return buildBlocks(tr.state);
-    }
-    return decos;
-  },
-  provide: (field) => EditorView.decorations.from(field),
-});
-
 /** Clicking a block shows its LaTeX, with the cursor at the start. */
-const clickToEdit = EditorView.domEventHandlers({
-  mousedown(event, view) {
-    const dom = (event.target as HTMLElement).closest<HTMLElement>(".cm-lp-math-block");
-    if (!dom) return false;
-    event.preventDefault();
-    if (event.button !== 0 || view.state.readOnly || dom.classList.contains("is-preview")) return true;
-    const { doc } = view.state;
-    const fence = doc.lineAt(view.posAtDOM(dom));
-    const anchor = fence.number < doc.lines ? doc.line(fence.number + 1).from : fence.to;
-    view.dispatch({ selection: { anchor }, scrollIntoView: true });
-    view.focus();
-    return true;
-  },
-});
+const clickToEdit = clickToShowCode(".cm-lp-math-block");
 
 /** Enter after a `$$` that opens a block adds the closing `$$`, with the cursor on the line between. */
 const closeBlock = Prec.high(
@@ -239,4 +226,7 @@ const closeBlock = Prec.high(
   ]),
 );
 
-export const mathBlocks: Extension = [focused, blocks, clickToEdit, closeBlock];
+// Blocks are drawn at the top level or in cards.
+const blocks = drawnBlocks(drawBlock);
+
+export const mathBlocks: Extension = [focused, blocks, clickToEdit, closeBlock, arrowsInto(blocks), preloadMath];

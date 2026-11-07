@@ -87,14 +87,16 @@ With the Spreadsheets plugin off, the note shows as this text, which can still b
 
 ### The grid
 
-Click a cell, or move to it with the arrow keys, and type: what you type replaces what's there. Return (or F2, or a double-click) changes what's there instead. The bar above the grid shows the current cell and what's written in it, a formula rather than its result.
+Click a cell, or move to it with the arrow keys, and type: what you type replaces what's there. Return (or F2, or a double-click) changes what's there instead. The bar above the grid shows the current cell and what's written in it, a formula rather than its result; clicking it changes the cell too.
 
 | Keys | |
 |---|---|
 | ↑ ↓ ← →, Tab, ⇧Tab | Move between cells. ↑ from the first row goes to the title. |
 | ⇧ and an arrow, ⇧-click, drag | Select cells |
-| ⌘ and an arrow, Home, End | To the end of what's written, along the row or column |
-| ⌘A | Select everything written |
+| ⌘ and an arrow | To the end of what's written, along the row or column |
+| Home, End | To the row's first cell, or its last with something written; with ⌘, the sheet's first or last |
+| Page Up, Page Down | A screenful up or down |
+| ⌘A | Select everything written; Esc goes back to the one cell |
 | Return, F2 | Change what's in the cell, or just type over it |
 | Return, ⇧Return, Tab | While writing: keep it and move down, up or across. After Tab across a row, Return goes to the next row's first cell. |
 | ↑ ↓, Return or Tab, Esc | While a formula's suggestions show: move through them, take one, put them away |
@@ -112,7 +114,7 @@ Click a cell, or move to it with the arrow keys, and type: what you type replace
 From the title, Return, Tab or ↓ goes into the grid.
 
 - **Rows and columns** are put in and taken out from the cells' menu, as many as are selected. Formulas still point at the same cells afterwards: insert a row above row 3 and `=SUM(B2:B4)` becomes `=SUM(B2:B5)`.
-- **Copying** gives other apps tab-separated values, as Excel, Numbers and Google Sheets paste them, showing what the cells work out to. Pasted into a spreadsheet note, cells copied from one keep their formulas, with relative references moved as in other spreadsheet apps (`=B2*2` pasted a row down is `=B3*2`). One cell pasted over a selection fills it.
+- **Copying** gives other apps tab-separated values, as Excel, Numbers and Google Sheets paste them, showing what the cells work out to. Pasted into a spreadsheet, cells copied from one keep their formulas, with relative references moved as in other spreadsheet apps (`=B2*2` pasted a row down is `=B3*2`). One cell pasted over a selection fills it.
 - **Filling.** Drag the small square on the selection's corner down, up or across, and the cells it's dragged over go on from the selection, as in Excel and Numbers. A dashed outline shows what will fill, and a label by the pointer what goes in the last cell; Esc stops. Each column (or row) goes on by itself:
   - numbers along their trend (1, 2 → 3, 4; 10, 8 → 6, 4), keeping their decimals (1.50, 2.25 → 3.00)
   - text ending in a number counts on (Item 1 → Item 2; Room 007, Room 009 → Room 011)
@@ -146,7 +148,7 @@ From the title, Return, Tab or ↓ goes into the grid.
 
 ### Opening and saving files
 
-- **Import** (Settings → Data → Import Files…) makes a spreadsheet note of a `.csv` file (comma, semicolon or tab-separated, found by itself) or a `.tsv` file, titled by the file's name, and one of each sheet of an Excel workbook (`.xlsx`), titled "Workbook – Sheet". Formulas come in as formulas. A formula that reaches into another sheet comes in as its value, as each sheet is a note of its own. Cells whose format shows them differently (dates, money) come in as they show. The same button imports Markdown and LaTeX files as notes.
+- **Import** (Settings → Data → Import Files…) makes a spreadsheet note of a `.csv` file (comma, semicolon or tab-separated, found by itself) or a `.tsv` file, titled by the file's name, and one of each visible sheet of an Excel workbook (`.xlsx`), titled "Workbook – Sheet" (just "Workbook" when it has one sheet). Formulas come in as formulas. A formula that reaches into another sheet comes in as its value, as each sheet is a note of its own. Cells whose format shows them differently (dates, money) come in as they show. The same button imports Markdown and LaTeX files as notes.
 - **The share menu** has **Copy CSV** (formulas as written), **Copy Plain Text** (the title, then what the cells work out to, tab-separated), **Download CSV** (formulas as written), **Download Values as CSV** (what they work out to) and **Download Excel Workbook** (formulas and their values, which Excel, Numbers and Google Sheets open). In the desktop apps, downloads go to the Downloads folder and are shown in Finder.
 - **Export** (Settings → Data) writes spreadsheet notes as CSV files with their formulas, beside the Markdown and LaTeX ones.
 - **Printing and PDFs** show the title and the cells, formulas worked out, dates and money as on screen.

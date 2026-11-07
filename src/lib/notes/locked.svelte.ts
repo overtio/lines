@@ -28,7 +28,7 @@ export class WrongPassword extends Error {
 /** What the password dialog asks for: a new password, or the one there is; then what happens next. */
 export interface PasswordRequest {
   purpose: "set" | "open";
-  then: () => void;
+  after: () => void;
 }
 
 class LockedNotes {
@@ -42,7 +42,7 @@ class LockedNotes {
   /** Locks a note. Right away while locked notes are open; otherwise once the password is given (or set). */
   lockNote(id: string) {
     if (noteKeys.ready) return void notes.lock(id);
-    this.asking = { purpose: noteKeys.known ? "open" : "set", then: () => void notes.lock(id) };
+    this.asking = { purpose: noteKeys.known ? "open" : "set", after: () => void notes.lock(id) };
   }
 
   /** Sets the password for locked notes on this device, the first time a note is locked. */

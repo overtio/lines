@@ -1,6 +1,11 @@
 <script module lang="ts">
-  /** The cells last copied from a sheet, so pasting them into one keeps their formulas, moved as copying moves them. */
-  let copied: { text: string; inputs: string[][]; row: number; column: number } | null = null;
+  import type { Sheet } from "./state.svelte";
+
+  /**
+   * The cells last copied from a sheet, so pasting them into one keeps their formulas, moved as
+   * copying moves them; and the sheet they were cut from, where pasting them moves them.
+   */
+  let copied: { text: string; inputs: string[][]; row: number; column: number; cut: Sheet | null } | null = null;
 </script>
 
 <script lang="ts">
@@ -12,18 +17,19 @@
   import { locale, type MessageKey, t } from "../../lib/i18n/index.svelte";
   import { copyText, isApple } from "../../lib/platform";
   import { floating } from "../../lib/components/ui/styles";
-  import type { CellValue, Cells, FormulaCompletion, FormulaEngine, FormulaFunction, FormulaSheet } from "../../lib/plugins/types";
+  import type { CellArea, CellValue, Cells, FormulaEngine, FormulaSheet } from "../../lib/plugins/types";
   import { prefs, type SheetStat } from "../../lib/prefs.svelte";
-  import { cellName, columnName, isFormula, movedCells, shiftCells } from "../../lib/sheets/cells";
-  import { dateNumber, moneyText, negativeText, readDate, readMoney, showMoney } from "../../lib/sheets/display";
+  import { areaBetween, cellName, columnName, isFormula, movedCells, shiftCells } from "../../lib/sheets/cells";
+  import { cellShown as shownAs, dateNumber, moneyText, negativeText, readDate, readMoney, showMoney } from "../../lib/sheets/display";
   import { writeCsv } from "../../lib/sheets/csv";
   import { continueCells } from "../../lib/sheets/fill";
   import { loadedFormulas, loadFormulas, sheetName } from "../../lib/sheets/formulas";
   import { type MenuItem, ui } from "../../lib/ui.svelte";
   import Icon from "../../lib/icons/Icon.svelte";
+  import { FormulaHelp, type Suggestion } from "./help.svelte";
   import { type Point, pointing as pointers, type Writer } from "./pointing.svelte";
-  import { cellLook, showCell, spokenCell } from "./sheet";
-  import type { Sheet } from "./state.svelte";
+  import { sheetLook, showCell, spokenCell } from "./sheet";
+  import { ColumnWidths, textWidth } from "./widths";
 
   /*
    * A spreadsheet's cells, drawn as a grid in place of their CSV: a spreadsheet note's (editor.ts),
@@ -51,7 +57,6 @@
   let { sheet, view }: { sheet: Sheet; view: EditorView } = $props();
 
   type Change = Point & { input: string };
-  type Area = { top: number; left: number; bottom: number; right: number };
 
   const MIN_WIDTH = 56;
   const DEFAULT_WIDTH = 96;
@@ -99,9 +104,9 @@
   /** Whether the grid has the keyboard, or its menu is open. */
   let focused = $state(false);
   /** Dragging the selection's corner: the cells it reaches, whether going on and repeating are swapped (fill.ts), and where the pointer is in the grid's box. */
-  let filling = $state<{ area: Area; other: boolean; x: number; y: number } | null>(null);
+  let filling = $state<{ area: CellArea; other: boolean; x: number; y: number } | null>(null);
   /** Cells held a moment and picked up to move: those, and how far they've been dragged, `rows` down and `columns` across. */
-  let moving = $state<{ area: Area; rows: number; columns: number } | null>(null);
+  let moving = $state<{ area: CellArea; rows: number; columns: number } | null>(null);
   /** A block's corner being dragged: the size it makes it, and where the pointer is in the grid's box. */
   let resizing = $state<{ rows: number; columns: number; x: number; y: number } | null>(null);
   /** Writing a block's name, above it. */
@@ -148,174 +153,17 @@
   const written = (point: Point) => sheet.cells[point.row]?.[point.column] ?? "";
 
   // Writing a formula.
-  /** The functions most formulas use, suggested before the rest that start the same way. */
-  const COMMON = [
-    "SUM", "AVERAGE", "IF", "COUNT", "MIN", "MAX", "ROUND", "SUMIF", "COUNTIF", "IFERROR", "VLOOKUP", "XLOOKUP", "INDEX", "MATCH",
-    "AND", "OR", "NOT", "ABS", "TODAY", "NOW", "DATE", "CONCAT", "TEXT", "LEFT", "RIGHT", "MID", "LEN", "UPPER", "LOWER", "TRIM",
-    "COUNTA", "AVERAGEIF", "SUMPRODUCT", "MEDIAN", "PRODUCT", "POWER", "SQRT", "ROUNDUP", "ROUNDDOWN", "YEAR", "MONTH", "DAY",
-  ];
   /** Where the cursor is in what's being written. */
   let caret = $state(0);
-  /** The suggestions put away with Esc, until more is typed. */
-  let dismissed = $state(false);
-  /** The suggestion ↑ and ↓ are on. */
-  let picked = $state(0);
   /** Cells pointed at for the formula, and where their reference is written in it, which pointing again replaces. */
   let pointing = $state<{ from: number; to: number; anchor: Point; corner: Point; elsewhere?: string } | null>(null);
 
   const formula = $derived(!!editing && draft.startsWith("="));
-  const completion = $derived<FormulaCompletion | null>(formula && engine ? engine.complete(draft, caret) : null);
-  const catalog = $derived(engine && new Map(engine.functions().map((fn) => [fn.name, fn])));
-  /** Something to write at the cursor, from where what's typed of it starts: a function (`SUM(`), another sheet (`Budget!`), or one of its cells (`B4`). */
-  type Suggestion = { name: string; about: string; insert: string; from: number; kind: "function" | "sheet" | "cell" };
-  /** The most other sheets, and their cells, suggested at once. */
-  const MAX_SHEETS = 8;
-  const MAX_CELLS = 60;
-
-  // Another sheet's cells, after its name (`Finance!`): suggested, and what the one written holds shown.
-
-  /** A cell or range of another sheet being written, after its name and `!`: the name, and what's typed of the reference. */
-  const elsewhere = $derived.by(() => {
-    if (!formula) return null;
-    const match = /(?:'((?:[^']|'')+)'|([A-Za-z_][\w.]*))!(\$?[A-Za-z]{0,3}\$?\d*(?::\$?[A-Za-z]{0,3}\$?\d*)?)$/.exec(draft.slice(0, caret));
-    if (!match) return null;
-    const name = match[1]?.replaceAll("''", "'") ?? match[2];
-    return { name, written: `${match[0].slice(0, match[0].length - match[3].length)}${match[3]}`, ref: match[3], from: caret - match[3].length };
-  });
-
-  /** The other sheet's cells, worked out, kept while it's written about. */
-  let other: { id: string; cells: Cells; calc: FormulaSheet } | null = null;
-  $effect(() => () => other?.calc.free());
-
-  function otherSheet(name: string) {
-    const linked = sheet.find(name);
-    if (!linked || !engine) return null;
-    if (other?.id !== linked.id || other.cells !== linked.cells) {
-      other?.calc.free();
-      const calc = engine.sheet(linked.find);
-      calc.update(linked.cells);
-      other = { id: linked.id, cells: linked.cells, calc };
-    }
-    return other;
-  }
-
-  /** Text that labels a row or column: written, not a formula or a number. */
-  const label = (text: string | undefined) => (text && !isFormula(text) && !/^[-+$€£¥\d.,%]+$/.test(text) ? text : "");
-
-  /** What a cell of another sheet is about: its row's label (in the first column) and its column's header (in the first row). */
-  const labels = (cells: Cells, row: number, column: number) =>
-    row ? [column ? label(cells[row]?.[0]) : "", label(cells[0]?.[column])].filter(Boolean).join(" · ") : "";
-
-  /** A reference's cells, if it's a whole one (B4, $B$4, B2:B9). */
-  function refArea(ref: string): Area | null {
-    const match = /^\$?([A-Za-z]{1,3})\$?(\d+)(?::\$?([A-Za-z]{1,3})\$?(\d+))?$/.exec(ref);
-    if (!match) return null;
-    const column = (letters: string) => [...letters.toUpperCase()].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) - 1;
-    const [a, b] = [{ row: Number(match[2]) - 1, column: column(match[1]) }, { row: Number(match[4] ?? match[2]) - 1, column: column(match[3] ?? match[1]) }];
-    if (a.row < 0 || b.row < 0) return null;
-    return { top: Math.min(a.row, b.row), left: Math.min(a.column, b.column), bottom: Math.max(a.row, b.row), right: Math.max(a.column, b.column) };
-  }
-
-  /** The other sheet's columns (top to last cell written) and cells with something in them, starting with what's typed after the `!`. */
-  function cellSuggestions(): Suggestion[] {
-    const at = elsewhere && !elsewhere.ref.includes(":") && !refArea(elsewhere.ref) ? elsewhere : null;
-    const found = at && otherSheet(at.name);
-    if (!at || !found) return [];
-    const typed = at.ref.replaceAll("$", "").toUpperCase();
-    const { cells, calc } = found;
-    const out: Suggestion[] = [];
-    const width = cells.reduce((most, row) => Math.max(most, row.length), 0);
-    for (let column = 0; column < width; column++) {
-      let last = -1;
-      cells.forEach((row, r) => row[column] && (last = r));
-      // Below its header, if it has one.
-      const header = label(cells[0]?.[column]);
-      const first = header && last > 1 ? 1 : 0;
-      if (last <= first) continue;
-      const name = `${columnName(column)}${first + 1}:${columnName(column)}${last + 1}`;
-      if (name.startsWith(typed)) out.push({ name, about: header || t("sheet.column", { name: columnName(column) }), insert: name, from: at.from, kind: "cell" });
-    }
-    cells.forEach((row, r) =>
-      row.forEach((input, c) => {
-        const name = cellName(r, c);
-        if (!input || !name.startsWith(typed)) return;
-        const value = showCell(calc.value(r, c).text);
-        out.push({ name, about: [value, labels(cells, r, c)].filter(Boolean).join(" · "), insert: name, from: at.from, kind: "cell" });
-      }),
-    );
-    return out.slice(0, MAX_CELLS);
-  }
-
-  /** What the reference to another sheet just written holds: a cell's value, or a range's first few. */
-  const preview = $derived.by(() => {
-    const area = elsewhere && refArea(elsewhere.ref);
-    const found = area && otherSheet(elsewhere!.name);
-    if (!area || !found) return null;
-    const values: string[] = [];
-    let count = 0;
-    for (let r = area.top; r <= Math.min(area.bottom, found.cells.length - 1); r++) {
-      for (let c = area.left; c <= area.right; c++) {
-        const text = showCell(found.calc.value(r, c).text);
-        if (!text) continue;
-        count++;
-        if (values.length < 6) values.push(text);
-      }
-    }
-    const one = area.top === area.bottom && area.left === area.right;
-    return {
-      written: elsewhere!.written,
-      value: one ? values[0] || t("sheet.empty") : values.join(", ") + (count > values.length ? ", …" : "") || t("sheet.empty"),
-      about: one ? labels(found.cells, area.top, area.left) : t("sheet.cells", { count }),
-    };
-  });
-
-  /** Another sheet's name being written: after a quote (`='Bud`), or as a word that could be a function's name (`=Fin`). */
-  const sheetTyped = $derived.by(() => {
-    if (!formula) return null;
-    const quoted = /(?:^=|[(,;+\-*/^&<>=:\s])'((?:[^']|'')*)$/.exec(draft.slice(0, caret));
-    if (quoted) return { typed: quoted[1].replaceAll("''", "'"), from: caret - quoted[1].length - 1, quoted: true };
-    const name = completion?.name;
-    return name?.typed ? { typed: name.typed, from: name.from, quoted: false } : null;
-  });
-
-  /**
-   * What's suggested writing a formula: the functions starting with the word typed (everyday ones
-   * first), and the other sheets it can name whose name (or a word of it) starts so, after the
-   * everyday functions; after a quote, only sheets.
-   */
-  const suggestions = $derived.by((): Suggestion[] => {
-    if (dismissed) return [];
-    if (elsewhere) return cellSuggestions();
-    if (!sheetTyped) return [];
-    const { typed, from, quoted } = sheetTyped;
-    const query = typed.toLocaleLowerCase();
-    const rank = (name: string) => {
-      const lower = name.toLocaleLowerCase();
-      return lower.startsWith(query) ? 3 : lower.split(/[\s/_-]+/).some((word) => word.startsWith(query)) ? 2 : quoted && lower.includes(query) ? 1 : 0;
-    };
-    const sheets = (sheet.sheets?.() ?? [])
-      .map((choice) => ({ choice, rank: rank(choice.name) }))
-      .filter(({ rank }) => rank > 0)
-      .sort((a, b) => b.rank - a.rank || a.choice.name.localeCompare(b.choice.name))
-      .slice(0, MAX_SHEETS)
-      .map(({ choice }): Suggestion => ({ ...choice, insert: `${sheetName(choice.name)}!`, from, kind: "sheet" }));
-    if (quoted || !catalog) return sheets;
-    const upper = typed.toUpperCase();
-    const common = (fn: FormulaFunction) => (COMMON.includes(fn.name) ? COMMON.indexOf(fn.name) : COMMON.length);
-    const functions = [...catalog.values()]
-      .filter((fn) => fn.name.startsWith(upper))
-      .sort((a, b) => common(a) - common(b) || a.name.localeCompare(b.name))
-      .map((fn): Suggestion => ({ name: fn.name, about: fn.about, insert: `${fn.name}(`, from, kind: "function" }));
-    const everyday = functions.filter((fn) => COMMON.includes(fn.name));
-    return [...everyday, ...sheets, ...functions.slice(everyday.length)];
-  });
-  /** Inside a function's parentheses: the function, and which of its arguments the cursor is on. */
-  const hint = $derived.by(() => {
-    const fn = !suggestions.length && completion?.argument && catalog?.get(completion.argument.name.toUpperCase());
-    return fn ? { fn, at: Math.min(completion!.argument!.index, fn.args.length - 1) } : null;
-  });
+  /** What's suggested, previewed and hinted while it's written (help.svelte.ts). */
+  const help = new FormulaHelp({ sheet: () => sheet, engine: () => engine, formula: () => (formula ? draft : null), caret: () => caret });
+  $effect(() => () => help.free());
   /** Can the cells clicked or reached with the arrow keys be written into the formula? */
-  const canPoint = $derived(formula && (!!pointing || !!completion?.reference));
+  const canPoint = $derived(formula && (!!pointing || !!help.completion?.reference));
 
   /** The references in the formula, each in a color of the theme's, outlined on the grid and in the bar above it. */
   const COLORS = ["var(--syn-function)", "var(--syn-string)", "var(--syn-number)", "var(--syn-keyword)", "var(--syn-type)"];
@@ -338,8 +186,7 @@
     caret = input!.selectionStart;
     if (!typed) return;
     pointing = null;
-    dismissed = false;
-    picked = 0;
+    help.typed();
   }
 
   function choose(suggestion: Suggestion) {
@@ -349,10 +196,10 @@
     follow(true);
   }
 
-  const referenceText = (a: Point, b: Point) =>
-    a.row === b.row && a.column === b.column
-      ? cellName(a.row, a.column)
-      : `${cellName(Math.min(a.row, b.row), Math.min(a.column, b.column))}:${cellName(Math.max(a.row, b.row), Math.max(a.column, b.column))}`;
+  function referenceText(a: Point, b: Point) {
+    const { top, left, bottom, right } = areaBetween(a, b);
+    return top === bottom && left === right ? cellName(top, left) : `${cellName(top, left)}:${cellName(bottom, right)}`;
+  }
 
   /** Writes the reference of the cells from `anchor` to `corner` at the cursor, or in place of the one pointed at before. */
   /** …or, `elsewhere`, those of the other grid in the note of that name. */
@@ -385,12 +232,12 @@
   });
 
   /** The cells here a formula in another grid points at, outlined until it's done. */
-  let pointedHere = $state<Area | null>(null);
+  let pointedHere = $state<CellArea | null>(null);
 
   /**
    * A click (or drag) here while another grid writes a formula: these cells' reference, written
-   * there. In the same note it names this grid by its name (given one if it has none); elsewhere,
-   * by its note's too.
+   * there. In the same note it names this grid by its name (if it has none, one it's given once
+   * let go, so it doesn't move under the pointer); elsewhere, by its note's too.
    */
   function pointFromHere(cell: Point) {
     const to = pointers.writer;
@@ -399,11 +246,14 @@
     const mark = (a: Point, b: Point) => {
       if (to) to.point(name, a, b);
       else pointers.send(name, a, b);
-      pointedHere = { top: Math.min(a.row, b.row), left: Math.min(a.column, b.column), bottom: Math.max(a.row, b.row), right: Math.max(a.column, b.column) };
+      pointedHere = areaBetween(a, b);
     };
-    (to ? to.unmark : pointers.remoteMarks).add(() => (pointedHere = null));
+    (to ? to.unmark : pointers.remoteMarks).add(() => {
+      pointedHere = null;
+      sheet.keepName?.();
+    });
     mark(cell, cell);
-    whileDragging((over) => (to ? pointers.writer === to : pointers.remote !== null) && mark(cell, over));
+    whileDragging((over) => (to ? pointers.writer === to : pointers.remote !== null) && mark(cell, over), () => sheet.keepName?.());
   }
 
   /** The arrow keys while pointing: the cell next to the one pointed at (at first, the one being written in), or with ⇧ the range stretched. */
@@ -419,32 +269,26 @@
     }
   }
 
-  // Columns as wide as what's in them, within limits.
-  const context = document.createElement("canvas").getContext("2d");
-  const textWidths = new Map<string, number>();
-  function measure(text: string) {
-    let width = textWidths.get(text);
-    if (width === undefined && context) {
-      context.font = font;
-      width = Math.max(...text.split("\n").map((line) => context.measureText(line).width));
-      textWidths.set(text, width);
-    }
-    return width ?? text.length * 8;
-  }
+  /** How cells show what's in them, as Settings says. */
+  const look = $derived(sheetLook());
 
+  // Columns as wide as what's in them, within limits.
+  const cellWidths = new ColumnWidths();
   const dataColumns = $derived(sheet.cells.reduce((most, row) => Math.max(most, row.length), 0));
   const dataWidths = $derived.by(() => {
     void revision;
-    void font;
-    const widths = Array<number>(dataColumns).fill(0);
-    sheet.cells.forEach((row, r) =>
-      row.forEach((text, c) => {
-        if (!text) return;
-        const look = cellLook(shown(r, c).text);
-        widths[c] = Math.max(widths[c], measure(look.symbol + look.text + (look.room ? ")" : "")) + (look.symbol ? SYMBOL_GAP : 0) + PADDING);
-      }),
+    // Measured once the grid's in the page and its font known (fit, before it's first shown).
+    if (!font) return Array<number>(dataColumns).fill(DEFAULT_WIDTH);
+    const widest = cellWidths.measure(
+      sheet.cells,
+      (row, column) => {
+        const cell = shownAs(shown(row, column).text, look);
+        return textWidth(cell.symbol + cell.text + (cell.room ? ")" : ""), font) + (cell.symbol ? SYMBOL_GAP : 0) + PADDING;
+      },
+      calc && engine ? engine.references : null,
+      [font, look, calc],
     );
-    return widths.map((width) => (width ? Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, Math.ceil(width))) : DEFAULT_WIDTH));
+    return widest.map((width) => (width ? Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, Math.ceil(width))) : DEFAULT_WIDTH));
   });
   const widthOf = (column: number) => dataWidths[column] ?? DEFAULT_WIDTH;
 
@@ -508,12 +352,7 @@
   const lastRow = $derived(Math.min(rows, Math.ceil((scrollTop + viewHeight) / rowHeight) + OVERSCAN));
   const rowList = $derived(Array.from({ length: Math.max(0, lastRow - firstRow) }, (_, i) => firstRow + i));
 
-  const range = $derived({
-    top: Math.min(active.row, corner.row),
-    bottom: Math.max(active.row, corner.row),
-    left: Math.min(active.column, corner.column),
-    right: Math.max(active.column, corner.column),
-  });
+  const range = $derived(areaBetween(active, corner));
   const selected = (row: number, column: number) => row >= range.top && row <= range.bottom && column >= range.left && column <= range.right;
   const box = (top: number, left: number, bottom: number, right: number) => ({
     top: top * rowHeight,
@@ -574,7 +413,6 @@
     if (!root?.isConnected) return;
     const style = getComputedStyle(root);
     font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-    textWidths.clear();
     rowHeight = Math.round(parseFloat(style.fontSize) * 2.1);
     if (scroller) {
       gridTop = scroller.offsetTop + scroller.clientTop;
@@ -630,9 +468,13 @@
 
   const clamp = (value: number, most: number) => Math.min(most, Math.max(0, value));
 
-  /** Moves to a cell, or with `extend` stretches the selection to it; with `grow`, to the row after a block's last, which writing in adds. */
+  /**
+   * Moves to a cell, or with `extend` stretches the selection to it; with `grow`, to the row after a
+   * block's last, which writing in adds (and along it, once there).
+   */
   function go(row: number, column: number, extend = false, say = false, grow = false) {
-    const point = { row: clamp(row, maxRow + (grow && !sheet.fills ? 1 : 0)), column: clamp(column, MAX_COLUMN) };
+    const past = !sheet.fills && (grow || active.row > maxRow) ? 1 : 0;
+    const point = { row: clamp(row, maxRow + past), column: clamp(column, MAX_COLUMN) };
     corner = point;
     if (!extend) active = point;
     tabStart = null;
@@ -657,8 +499,8 @@
 
   const STEPS: Record<string, [number, number]> = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 
-  function setCells(changes: Change[]) {
-    if (sheet.readOnly) return;
+  /** The cells with `changes` made; undefined if they change nothing. */
+  function changed(changes: Change[]): Cells | undefined {
     let cells: Cells | undefined;
     const copiedRows = new Set<number>();
     for (const { row, column, input: text } of changes) {
@@ -672,6 +514,11 @@
       while (cells[row].length < column) cells[row].push("");
       cells[row][column] = text;
     }
+    return cells;
+  }
+
+  function setCells(changes: Change[]) {
+    const cells = sheet.readOnly ? undefined : changed(changes);
     if (cells) sheet.write(sized(cells));
   }
 
@@ -734,7 +581,7 @@
   }
 
   /** What's written filling the cells `from` out to `to`, going on from them along each column (or row). */
-  function filled(from: Area, to: Area, other: boolean): Change[] {
+  function filled(from: CellArea, to: CellArea, other: boolean): Change[] {
     const down = to.top < from.top || to.bottom > from.bottom;
     const forward = down ? to.bottom > from.bottom : to.right > from.right;
     const [first, last] = down ? [from.top, from.bottom] : [from.left, from.right];
@@ -760,7 +607,7 @@
   }
 
   /** Fills the cells `from` out to `to`, and selects them all. */
-  function fillTo(from: Area, to: Area, other = false) {
+  function fillTo(from: CellArea, to: CellArea, other = false) {
     const changes = filled(from, to, other);
     if (sheet.readOnly || !changes.length) return;
     setCells(changes);
@@ -770,7 +617,7 @@
   }
 
   /** The selection, out as far as `cell` along a row or column (the farther), as dragging its corner reaches. */
-  function reach(from: Area, cell: Point): Area {
+  function reach(from: CellArea, cell: Point): CellArea {
     const down = cell.row - from.bottom;
     const up = from.top - cell.row;
     const right = cell.column - from.right;
@@ -858,7 +705,8 @@
     const from = { ...range };
     const end = (column: number) => {
       let row = from.bottom;
-      while (column >= 0 && written({ row: row + 1, column })) row++;
+      if (column < 0) return row;
+      while (written({ row: row + 1, column })) row++;
       return row;
     };
     const bottom = Math.max(end(from.left - 1), end(from.right + 1));
@@ -866,7 +714,7 @@
   }
 
   /** The cells written at the start of the selection (its top rows, or first columns), to go on through the rest of it; null if it's all written. */
-  function autofillFrom(axis: "row" | "column"): Area | null {
+  function autofillFrom(axis: "row" | "column"): CellArea | null {
     const down = axis === "row";
     const [first, last] = down ? [range.top, range.bottom] : [range.left, range.right];
     const [across, end] = down ? [range.left, range.right] : [range.top, range.bottom];
@@ -957,13 +805,16 @@
     );
   }
 
-  /** Puts the cells picked up where they've been dragged, over what's there, formulas pointing at them following, and selects them there. */
+  /** Puts the cells picked up where they've been dragged. */
   function drop() {
     const picked = moving;
     moving = null;
-    if (!picked || (!picked.rows && !picked.columns) || sheet.readOnly) return;
-    const { area, rows, columns } = picked;
-    sheet.write(sized(engine ? engine.moveCells(sheet.cells, area, rows, columns) : movedCells(sheet.cells, area, rows, columns)));
+    if (picked && (picked.rows || picked.columns) && !sheet.readOnly) moveArea(sheet.cells, picked.area, picked.rows, picked.columns);
+  }
+
+  /** Moves the cells in `area` of `cells` over what's there, formulas pointing at them following, and selects them there. */
+  function moveArea(cells: Cells, area: CellArea, rows: number, columns: number) {
+    sheet.write(sized(engine ? engine.moveCells(cells, area, rows, columns) : movedCells(cells, area, rows, columns)));
     active = { row: area.top + rows, column: area.left + columns };
     corner = { row: area.bottom + rows, column: area.right + columns };
     speak(t("sheet.moved", { count: (area.bottom - area.top + 1) * (area.right - area.left + 1) }));
@@ -1199,7 +1050,8 @@
   /** Puts in (or, negative, takes out) rows or columns, formulas still pointing at the same cells. */
   function shift(axis: "row" | "column", at: number, count: number) {
     if (sheet.readOnly) return;
-    sheet.write(engine ? engine.shift(sheet.cells, axis, at, count) : shiftCells(sheet.cells, axis, at, count));
+    const cells = sized(sheet.cells);
+    sheet.write(engine ? engine.shift(cells, axis, at, count) : shiftCells(cells, axis, at, count));
     if (count < 0) go(range.top, range.left);
     const n = Math.abs(count);
     speak(
@@ -1209,8 +1061,8 @@
     );
   }
 
-  /** The selection as tab-separated values, as other spreadsheet apps paste them, and as written. */
-  function copySelection() {
+  /** The selection as tab-separated values, as other spreadsheet apps paste them, and as written; `cut`, to be moved by pasting here. */
+  function copySelection(cut = false) {
     const inputs: Cells = [];
     const values: Cells = [];
     for (let row = range.top; row <= range.bottom; row++) {
@@ -1222,7 +1074,7 @@
       }
     }
     const text = writeCsv(values, "\t");
-    copied = { text, inputs, row: range.top, column: range.left };
+    copied = { text, inputs, row: range.top, column: range.left, cut: cut ? sheet : null };
     return text;
   }
 
@@ -1234,7 +1086,8 @@
 
   function oncut(event: ClipboardEvent) {
     if (editing) return;
-    oncopy(event);
+    event.preventDefault();
+    event.clipboardData?.setData("text/plain", copySelection(true));
     clear();
   }
 
@@ -1244,8 +1097,24 @@
     if (sheet.readOnly) return;
     const plain = event.clipboardData.getData("text/plain").replace(/\r\n?/g, "\n");
     const html = event.clipboardData.getData("text/html");
-    if (copied && plain === copied.text) paste(copied.inputs, copied);
-    else paste((html.includes("<table") ? htmlTable(html) : null) ?? parseTabbed(plain), null);
+    if (copied && plain === copied.text) {
+      if (!(copied.cut === sheet && pasteCut(copied))) paste(copied.inputs, copied);
+    } else paste((html.includes("<table") ? htmlTable(html) : null) ?? parseTabbed(plain), null);
+  }
+
+  /**
+   * Cells cut from here and pasted here: moved, as dragging them does, so formulas pointing at them
+   * follow, as cutting and pasting does in other spreadsheet apps. Pasted again, they're copies.
+   * False if something's been written where they were since.
+   */
+  function pasteCut(cut: NonNullable<typeof copied>) {
+    const area = { top: cut.row, left: cut.column, bottom: cut.row + cut.inputs.length - 1, right: cut.column + (cut.inputs[0]?.length ?? 1) - 1 };
+    for (let row = area.top; row <= area.bottom; row++) for (let column = area.left; column <= area.right; column++) if (written({ row, column })) return false;
+    cut.cut = null;
+    // Back where they were, then moved.
+    const back = changed(cut.inputs.flatMap((line, r) => line.map((input, c) => ({ row: area.top + r, column: area.left + c, input }))));
+    moveArea(back ?? sheet.cells, area, active.row - area.top, active.column - area.left);
+    return true;
   }
 
   /** Pastes rows of cells at the current cell; one cell pasted over a selection fills it. Copied from a sheet (`from`), formulas move. */
@@ -1282,7 +1151,7 @@
         label: t("sheet.cut"),
         icon: "scissors",
         run: () => {
-          void copyText(copySelection());
+          void copyText(copySelection(true));
           clear();
         },
       });
@@ -1339,14 +1208,15 @@
     const step = STEPS[event.key];
     if (editing) {
       const multiline = draft.includes("\n");
+      const { suggestions } = help;
       const count = suggestions.length;
       if (count && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
-        picked = (picked + (event.key === "ArrowDown" ? 1 : -1) + count) % count;
-        document.getElementById(`${id}-fn-${picked}`)?.scrollIntoView({ block: "nearest" });
+        help.picked = (help.picked + (event.key === "ArrowDown" ? 1 : -1) + count) % count;
+        document.getElementById(`${id}-fn-${help.picked}`)?.scrollIntoView({ block: "nearest" });
         // Said rather than pointed at with aria-activedescendant, which makes WebKit take focus out of the field.
-        speak(`${suggestions[picked].name}: ${suggestions[picked].about}`);
-      } else if (count && (event.key === "Tab" || (event.key === "Enter" && !event.altKey && !mod))) choose(suggestions[picked]);
-      else if (count && event.key === "Escape") dismissed = true;
+        speak(`${suggestions[help.picked].name}: ${suggestions[help.picked].about}`);
+      } else if (count && (event.key === "Tab" || (event.key === "Enter" && !event.altKey && !mod))) choose(suggestions[help.picked]);
+      else if (count && event.key === "Escape") help.dismissed = true;
       else if (step && canPoint && !mod) pointBy(step, event.shiftKey);
       else if (event.key === "Enter" && event.altKey) {
         // A line break in the cell, as ⌥↵ makes in Excel and Numbers.
@@ -1368,7 +1238,7 @@
     }
     const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
     // ↑ from the first row goes into the text above (a note's title), and ↓ from a block's last into the text below.
-    if (step && !event.shiftKey && !mod && (step[0] < 0 ? active.row === 0 : step[0] > 0 && !sheet.fills && active.row === maxRow)) leave(step[0] < 0);
+    if (step && !event.shiftKey && !mod && (step[0] < 0 ? active.row === 0 : step[0] > 0 && !sheet.fills && active.row >= maxRow)) leave(step[0] < 0);
     else if (step) {
       const from = event.shiftKey ? corner : active;
       const to = mod ? edge(from, event.key) : { row: from.row + step[0], column: from.column + step[1] };
@@ -1433,14 +1303,21 @@
     press(event, cell, inSelection);
   }
 
-  /** Calls `over` with each cell the pointer moves over until it's let go. */
-  function whileDragging(over: (cell: Point) => void) {
+  /** Calls `over` with each cell the pointer moves over until it's let go, then `end`. */
+  function whileDragging(over: (cell: Point) => void, end?: () => void) {
     const drag = (move: PointerEvent) => {
       const cell = cellAt(document.elementFromPoint(move.clientX, move.clientY));
       if (cell) over(cell);
     };
     window.addEventListener("pointermove", drag);
-    window.addEventListener("pointerup", () => window.removeEventListener("pointermove", drag), { once: true });
+    window.addEventListener(
+      "pointerup",
+      () => {
+        window.removeEventListener("pointermove", drag);
+        end?.();
+      },
+      { once: true },
+    );
   }
 
   /** Writing a formula, a click on a cell writes its reference, and a drag a range's. */
@@ -1514,7 +1391,7 @@
   }
 
   const editWidth = $derived(
-    editing ? Math.min(Math.max(current.width, Math.ceil(measure(draft) + PADDING + 8)), Math.max(current.width, viewWidth - current.left)) : current.width,
+    editing ? Math.min(Math.max(current.width, Math.ceil(textWidth(draft, font) + PADDING + 8)), Math.max(current.width, viewWidth - current.left)) : current.width,
   );
   const editLines = $derived(editing ? draft.split("\n").length : 1);
 
@@ -1722,7 +1599,7 @@
             {/if}
             {#each columnList as column (column)}
               {@const value = shown(row, column)}
-              {@const look = cellLook(value.text)}
+              {@const cell = shownAs(value.text, look)}
               <div
                 role="gridcell"
                 aria-colindex={column + (headings ? 2 : 1)}
@@ -1736,14 +1613,14 @@
                   row < rows - 1 && "border-b",
                   value.kind === "number" && "text-right",
                   (value.kind === "boolean" || value.kind === "error") && "text-center",
-                  (value.kind === "error" || look.red) && "text-danger",
+                  (value.kind === "error" || cell.red) && "text-danger",
                   isHeader(row, column) && "bg-code font-semibold",
                 ]}
                 style:width="{columnWidths[column]}px"
                 style:line-height="{rowHeight - 1}px"
                 title={isFormula(sheet.cells[row]?.[column] ?? "") ? sheet.cells[row][column] : undefined}
               >
-                {#if look.symbol}<span class="float-left pe-2">{look.symbol}</span>{/if}{look.text}{#if look.room && value.kind === "number"}<span class="invisible">)</span>{/if}
+                {#if cell.symbol}<span class="float-left pe-2">{cell.symbol}</span>{/if}{cell.text}{#if cell.room && value.kind === "number"}<span class="invisible">)</span>{/if}
               </div>
             {/each}
           </div>
@@ -1840,8 +1717,8 @@
           inputmode={editing ? "text" : "none"}
           aria-label={t("sheet.cell", { cell: cellName(active.row, active.column) })}
           aria-autocomplete={formula ? "list" : undefined}
-          aria-controls={suggestions.length ? `${id}-functions` : undefined}
-          aria-describedby={[preview ? `${id}-preview` : hint && `${id}-hint`, stats && `${id}-stats`].filter(Boolean).join(" ") || undefined}
+          aria-controls={help.suggestions.length ? `${id}-functions` : undefined}
+          aria-describedby={[help.preview ? `${id}-preview` : help.hint && `${id}-hint`, stats && `${id}-stats`].filter(Boolean).join(" ") || undefined}
           {onkeydown}
           onkeyup={() => editing && follow(false)}
           onpointerup={() => {
@@ -1869,7 +1746,7 @@
       </div>
     </div>
   </div>
-  {#if (suggestions.length || preview || hint) && cellShown}
+  {#if (help.suggestions.length || help.preview || help.hint) && cellShown}
     <div
       bind:offsetHeight={helpHeight}
       class="{floating} absolute p-[5px] font-ui"
@@ -1877,22 +1754,22 @@
       style:left="{helpLeft}px"
       style:width="{helpWidth}px"
     >
-      {#if suggestions.length}
+      {#if help.suggestions.length}
         <div id="{id}-functions" role="listbox" aria-label={t("sheet.functions")} class="max-h-[min(16rem,40vh)] overflow-y-auto">
-          {#each suggestions as suggestion, i (`${suggestion.kind} ${suggestion.name}`)}
+          {#each help.suggestions as suggestion, i (`${suggestion.kind} ${suggestion.name}`)}
             <div
               id="{id}-fn-{i}"
               role="option"
               tabindex="-1"
-              aria-selected={i === picked}
-              data-highlighted={i === picked ? "" : undefined}
+              aria-selected={i === help.picked}
+              data-highlighted={i === help.picked ? "" : undefined}
               class="flex cursor-default flex-col gap-1 rounded-sm px-2.5 py-1.5 data-highlighted:bg-active"
               onpointerdown={(event) => {
                 // The cell keeps the keyboard.
                 event.preventDefault();
                 choose(suggestion);
               }}
-              onpointerenter={() => (picked = i)}
+              onpointerenter={() => (help.picked = i)}
             >
               <span class="flex min-w-0 items-center gap-1.5 text-xs text-fg">
                 {#if suggestion.kind === "sheet"}<Icon name="sheet" size={13} class="shrink-0 text-muted" />{/if}
@@ -1902,13 +1779,15 @@
             </div>
           {/each}
         </div>
-      {:else if preview}
+      {:else if help.preview}
+        {@const preview = help.preview}
         <div id="{id}-preview" class="px-2.5 py-1.5">
           <p class="m-0 truncate font-mono text-xs text-muted">{preview.written}</p>
           <p class="m-0 mt-1 truncate text-sm text-fg tabular-nums">{preview.value}</p>
           {#if preview.about}<p class="m-0 mt-0.5 truncate text-2xs text-faint">{preview.about}</p>{/if}
         </div>
-      {:else if hint}
+      {:else if help.hint}
+        {@const hint = help.hint}
         <div id="{id}-hint" class="px-2.5 py-1.5">
           <p class="m-0 font-mono text-xs text-muted">
             {hint.fn.name}({#each hint.fn.args as arg, i (i)}{i ? ", " : ""}<span class={[i === hint.at && "font-semibold text-fg"]}

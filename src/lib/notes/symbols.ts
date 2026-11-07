@@ -19,7 +19,7 @@ export const SYMBOLS: Record<string, string> = {
  * One of them, but not inside a longer run of the same characters (`-->`, `<!--`, `!==`, `>>=`,
  * which mean something else), nor after a backslash: `\->` stays as typed.
  */
-const PATTERN = /(?<![<>=!\-\\])(?:<->|<=>|->|<-|=>|<=|>=|!=)(?![<>=\-])/g;
+const PATTERN = /(?<![<>=!\-\\])(?:<->|<=>|->|<-|=>|<=|>=|!=)(?![<>=-])/g;
 
 /** Each one in `text`: where it is, and the symbol it's shown as. */
 export function findSymbols(text: string): { from: number; to: number; symbol: string }[] {

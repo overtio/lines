@@ -12,14 +12,21 @@ const FENCE_RE = /^[ \t]*(`{3,}|~{3,})[\s\S]*?(?:^[ \t]*\1|(?![\s\S]))/gm;
 const INLINE_CODE_RE = /`[^`\n]*`/g;
 const OPEN_TODO_RE = /^\s*[-*+] \[ \]/m;
 
+/** A tag as it's kept, in lowercase; null for a name that can't be one (`123`, `two words`, `a#b`). */
 export function normalizeTag(raw: string): string | null {
   const tag = raw.replace(/\/{2,}/g, "/").replace(/^\/+|\/+$/g, "").toLowerCase();
-  if (!tag || /^\d+$/.test(tag)) return null;
+  if (!tag || /^\d+$/.test(tag) || ![...tag].every((char) => TAG_CHAR.test(char))) return null;
   return tag;
 }
 
+/** A tag's name as it's typed: spaces become dashes, and characters a tag can't hold go (but `#`). */
+export const cleanTagInput = (text: string) => text.replace(/\s+/g, "-").replace(/[^\p{L}\p{N}_\-/#]/gu, "");
+
 export function extractTags(body: string): string[] {
-  const text = body.replace(FENCE_RE, "").replace(INLINE_CODE_RE, "");
+  // Tags in code don't count. Most notes have none, and looking for it is most of the work.
+  let text = body;
+  if (text.includes("```") || text.includes("~~~")) text = text.replace(FENCE_RE, "");
+  if (text.includes("`")) text = text.replace(INLINE_CODE_RE, "");
   const tags = new Set<string>();
   for (const match of text.matchAll(TAG_RE)) {
     const tag = normalizeTag(match[2]);
@@ -78,7 +85,7 @@ function codeRanges(body: string): [number, number][] {
 }
 
 /** A reference to a type, `@type.recipe` (properties.ts); its columns, if any, follow the name. */
-const TYPE_REF_RE = /(?<![\p{L}\p{N}_.\/\\@`])@type\.([\p{L}\p{N}_][\p{L}\p{N}_-]*)/giu;
+const TYPE_REF_RE = /(?<![\p{L}\p{N}_./\\@`])@type\.([\p{L}\p{N}_][\p{L}\p{N}_-]*)/giu;
 
 /**
  * Renames the type `from` to `to` in `body`: its `type` property, if it's of that type, as `to` is
@@ -91,7 +98,8 @@ export function renameTypeIn(body: string, from: string, to: string): string {
   if (property && nameOf(property.value) === target) {
     const lines = body.split("\n");
     const line = lines[property.line - 1];
-    lines[property.line - 1] = `${line.slice(0, line.indexOf(":") + 1)} ${to}`;
+    // A value written over several lines (a YAML list) is replaced whole.
+    lines.splice(property.line - 1, property.end - property.line + 1, `${line.slice(0, line.indexOf(":") + 1)} ${to}`);
     body = lines.join("\n");
   }
   const code = codeRanges(body);

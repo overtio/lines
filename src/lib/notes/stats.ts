@@ -33,7 +33,7 @@ export function plainLine(line: string): string {
     // A wiki link reads as what it shows: `[[Ada Lovelace]]` as `Ada Lovelace`, `[[Ada Lovelace|Ada]]` as `Ada`.
     .replace(/(?<![!\\])\[\[([^[\]\n|#]+)(?:#[^[\]\n|]*)?(?:\|([^[\]\n]+))?\]\]/gu, (_, name: string, shown?: string) => (shown ?? name).trim())
     // A mention of a note with spaces in its title: `@[Ada Lovelace]` reads `@Ada Lovelace`.
-    .replace(/(?<![\p{L}\p{N}_.\/\\@])@\[([^\]\n]+)\]/gu, "@$1")
+    .replace(/(?<![\p{L}\p{N}_./\\@])@\[([^\]\n]+)\]/gu, "@$1")
     // _emphasis_, but not the underscores inside snake_case words.
     .replace(/(?<![\p{L}\p{N}])_([^_\n]+)_(?![\p{L}\p{N}])/gu, "$1")
     .trimEnd();

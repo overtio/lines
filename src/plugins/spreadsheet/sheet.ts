@@ -20,12 +20,18 @@ export interface SheetText {
   cells: Cells;
 }
 
-export function readSheet(body: string): SheetText {
+/** The first line, and where the cells' CSV starts. */
+export function headOf(body: string): Omit<SheetText, "cells"> {
   const headEnd = body.includes("\n") ? body.indexOf("\n") : body.length;
   let dataFrom = Math.min(body.length, headEnd + 1);
   const blankEnd = body.indexOf("\n", dataFrom);
   if (blankEnd >= 0 && !body.slice(dataFrom, blankEnd).trim()) dataFrom = blankEnd + 1;
-  return { head: body.slice(0, headEnd), dataFrom, cells: parseCsv(body.slice(dataFrom)) };
+  return { head: body.slice(0, headEnd), dataFrom };
+}
+
+export function readSheet(body: string): SheetText {
+  const { head, dataFrom } = headOf(body);
+  return { head, dataFrom, cells: parseCsv(body.slice(dataFrom)) };
 }
 
 const TAGS = /(^|\s)#[\p{L}\p{N}_\-/]+/gu;
@@ -51,7 +57,7 @@ export const sheetCells = (body: string) => trimCells(readSheet(body).cells);
 const NUMBER = /^(?:[-+]?[$€£¥]?\s*[\d.,]+%?|\d{4}-\d{2}-\d{2})$/;
 
 /** How cells show what's in them, as Settings → Editing → Spreadsheets says. */
-const look = (): CellLook => ({
+export const sheetLook = (): CellLook => ({
   dates: prefs.sheetDates,
   money: prefs.sheetMoney,
   negative: prefs.sheetNegative,
@@ -61,13 +67,13 @@ const look = (): CellLook => ({
 });
 
 /** What a cell shows, as the grid draws it: dates, money and numbers below zero as Settings says. */
-export const cellLook = (text: string) => cellShown(text, look());
+export const cellLook = (text: string) => cellShown(text, sheetLook());
 
 /** What a cell shows, as text: to copy, or list. */
-export const showCell = (text: string) => displayed(text, look());
+export const showCell = (text: string) => displayed(text, sheetLook());
 
 /** What a cell shows, read out: with a minus rather than in parentheses, which screen readers may leave unsaid. */
-export const spokenCell = (text: string) => displayed(text, { ...look(), negative: "minus" });
+export const spokenCell = (text: string) => displayed(text, { ...sheetLook(), negative: "minus" });
 
 /** What a cell shows, printed as the grid draws it: money's symbol at its left edge, red, and room for a `)` if Settings says so. */
 export function printedCell(text: string): Node | string {

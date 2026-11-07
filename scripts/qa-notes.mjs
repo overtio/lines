@@ -4,7 +4,7 @@
 // qa/README.md.
 //
 // When a feature adds something that can appear in a note, add it to ELEMENTS (and to CONTAINERS
-// if other things can go inside it), then run `pnpm qa-notes` and commit the notes it writes.
+// if other things can go inside it), then run `bun run qa-notes` and commit the notes it writes.
 
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -96,7 +96,7 @@ const CONTAINERS = [
 ];
 
 /** Some things are only drawn at the top level and in cards; elsewhere they stay Markdown. */
-const DRAWN = new Set(["diagram", "diagram-sized", "math", "table", "table-formulas", "image", "drawing", "file", "missing-file"]);
+const DRAWN = new Set(["diagram", "diagram-sized", "math", "table", "table-formulas", "spreadsheet", "spreadsheet-named", "image", "drawing", "file", "missing-file"]);
 const DRAWN_ONLY_IN = new Set(["top-level", "card", "callout", "callout-none", "nested"]);
 
 const notes = [];
@@ -334,13 +334,13 @@ note(
   "Mentions",
   "Mentions of other notes and their properties. Check each line against what it says should happen. ⌘-click a chip or a value to open its note; with the cursor on a mention it shows as written.",
   [
-    `${label(1, "Mentions")}\n\n- @[QA · Ada] is a chip with its type's icon and \"QA · Ada\"\n- @[qa · ada] and @[QA  ·  Ada] are the same chip (case and spaces don't matter)\n- @[QA · Company] has the icon of its type, qa-company`,
-    `${label(2, "Properties")}\n\n- @[QA · Ada].fullname reads \"Ada Lovelace\", underlined\n- @[QA · Ada].born_on and @[QA · Ada].bornOn both read \"10 December 1815\" (the key is \"Born on\")\n- @[QA · Ada].employer reads \"QA · Company\"\n- @[QA · Ada].languages reads \"English, French\"\n- @[QA · Ada].motto reads without its quotes`,
+    `${label(1, "Mentions")}\n\n- @[QA · Ada] is a chip with its type's icon and "QA · Ada"\n- @[qa · ada] and @[QA  ·  Ada] are the same chip (case and spaces don't matter)\n- @[QA · Company] has the icon of its type, qa-company`,
+    `${label(2, "Properties")}\n\n- @[QA · Ada].fullname reads "Ada Lovelace", underlined\n- @[QA · Ada].born_on and @[QA · Ada].bornOn both read "10 December 1815" (the key is "Born on")\n- @[QA · Ada].employer reads "QA · Company"\n- @[QA · Ada].languages reads "English, French"\n- @[QA · Ada].motto reads without its quotes`,
     `${label(3, "Not found")}\n\n- @[No such note] stays as written, grey with a dashed underline; hovering it offers to create it (don't, so the line stays a test)\n- @[QA · Ada].phone stays as written: Ada has no phone`,
     `${label(4, "Not mentions")}\n\n- ada@example.org is an email address\n- overtio/lines@main is not a mention\n- \\@[QA · Ada] (escaped) stays text\n- \`@[QA · Ada]\` in code stays code\n- A sentence ending after @[QA · Ada]. The full stop isn't a property: typing it opens the properties menu, and Enter then starts a new line.`,
     `${label(5, "Type tables")}\n\nEvery note of the type qa-person, with every property:\n\n@type.qa-person\n\nJust two columns:\n\n@type.qa-person(fullname, email)\n\nA type with no notes:\n\n@type.qa-nothing\n\nWithin text, @type.qa-person is a chip.`,
     `${label(6, "Typing")}\n\nType @ and a letter on the line below: a menu of notes opens, with types on the right. Enter or Tab writes the mention. Then type . for a menu of its properties.\n\n`,
-    `${label(7, "Wiki links")}\n\n- [[QA · Ada]] is the same chip as @[QA · Ada]\n- [[QA · Ada|her]] reads \"her\", with Ada's icon; hovering it shows \"QA · Ada\"\n- [[QA · Ada#Born]] is Ada's chip (the heading is read past)\n- [[No such note]] stays as written, grey with a dashed underline, and offers to create it on hover (don't)\n- ![[QA · Ada]] (an embed) and \\[[QA · Ada]] (escaped) stay text\n\nType two opening square brackets on the line below: the menu of notes opens at once, and Enter writes the wiki link.\n\n`,
+    `${label(7, "Wiki links")}\n\n- [[QA · Ada]] is the same chip as @[QA · Ada]\n- [[QA · Ada|her]] reads "her", with Ada's icon; hovering it shows "QA · Ada"\n- [[QA · Ada#Born]] is Ada's chip (the heading is read past)\n- [[No such note]] stays as written, grey with a dashed underline, and offers to create it on hover (don't)\n- ![[QA · Ada]] (an embed) and \\[[QA · Ada]] (escaped) stay text\n\nType two opening square brackets on the line below: the menu of notes opens at once, and Enter writes the wiki link.\n\n`,
   ],
   "objects",
 );
@@ -355,7 +355,7 @@ CONTAINERS.forEach((container, c) => {
   note(
     `${String(10 + c).padStart(2, "0")}-${container.id}.md`,
     `Everything ${container.name}`,
-    `Each element ${container.name}. Check: it draws as it does on its own, sits inside the container's edges with even space around it, and its Markdown shows while the cursor is in it. Tables, diagrams and attachments in quotes and list items stay as Markdown.`,
+    `Each element ${container.name}. Check: it draws as it does on its own, sits inside the container's edges with even space around it, and its Markdown shows while the cursor is in it. Tables, spreadsheets, diagrams and attachments in quotes and list items stay as Markdown.`,
     sections,
     "containers",
   );

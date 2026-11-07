@@ -1,6 +1,6 @@
-import { syntaxTree } from "@codemirror/language";
-import { type EditorState, type Extension, type Range, StateField } from "@codemirror/state";
-import { Decoration, type DecorationSet, EditorView, WidgetType } from "@codemirror/view";
+import type { EditorState, Extension } from "@codemirror/state";
+import { type EditorView, WidgetType } from "@codemirror/view";
+import type { SyntaxNodeRef } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
 import type { IconName } from "../icons/icons";
@@ -12,7 +12,7 @@ import { ui } from "../ui.svelte";
 import { windowLabel } from "../windows/channel";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { iconOf, objectsChanged, openNote, valueText } from "./objects";
-import { focusChanged, focused, isEditing } from "./util";
+import { arrowsInto, drawnBlock, drawnBlocks, focused, isEditing } from "./util";
 
 /*
  * Type tables: `@type.recipe` on a line of its own is drawn as a table of the notes of that type,
@@ -333,48 +333,18 @@ class TypeTableWidget extends WidgetType {
   }
 }
 
-/** Where blocks can be drawn: at the top level, or in cards. */
-const BLOCK_PLACES = new Set(["Document", "Card", "Paragraph"]);
-
-function buildTables(state: EditorState): DecorationSet {
-  const decos: Range<Decoration>[] = [];
-  syntaxTree(state).iterate({
-    enter(node) {
-      if (BLOCK_PLACES.has(node.name)) return true;
-      if (node.name !== "Mention") return false;
-      const text = state.sliceDoc(node.from, node.to);
-      const ref = readTypeRef(text);
-      const line = state.doc.lineAt(node.from);
-      // Only a reference on a line of its own.
-      if (!ref || line.text.trim() !== text) return false;
-      const data = tableData(ref);
-      const inset = cardInset(state, node.node);
-      if (isEditing(state, line.from, line.to)) {
-        decos.push(Decoration.widget({ widget: new TypeTableWidget(data, inset, true), block: true, side: 1 }).range(line.to));
-      } else {
-        decos.push(Decoration.replace({ widget: new TypeTableWidget(data, inset, false), block: true }).range(line.from, line.to));
-      }
-      return false;
-    },
-  });
-  return Decoration.set(decos, true);
+function drawTable(state: EditorState, node: SyntaxNodeRef) {
+  if (node.name !== "Mention") return null;
+  const text = state.sliceDoc(node.from, node.to);
+  const ref = readTypeRef(text);
+  const line = state.doc.lineAt(node.from);
+  // Only a reference on a line of its own.
+  if (!ref || line.text.trim() !== text) return null;
+  const editing = isEditing(state, line.from, line.to);
+  return drawnBlock(new TypeTableWidget(tableData(ref), cardInset(state, node.node), editing), line.from, line.to, editing);
 }
 
-const tables = StateField.define<DecorationSet>({
-  create: buildTables,
-  update(decos, tr) {
-    if (
-      tr.docChanged ||
-      tr.selection ||
-      focusChanged(tr) ||
-      tr.effects.some((effect) => effect.is(objectsChanged)) ||
-      syntaxTree(tr.startState) !== syntaxTree(tr.state)
-    ) {
-      return buildTables(tr.state);
-    }
-    return decos;
-  },
-  provide: (field) => EditorView.decorations.from(field),
-});
+// Drawn at the top level, or in cards, from a paragraph.
+const tables = drawnBlocks(drawTable, { inside: ["Document", "Card", "Paragraph"], also: (tr) => tr.effects.some((effect) => effect.is(objectsChanged)) });
 
-export const typeTables: Extension = [focused, tables];
+export const typeTables: Extension = [focused, tables, arrowsInto(tables)];

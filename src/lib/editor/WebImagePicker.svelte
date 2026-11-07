@@ -186,7 +186,7 @@
           {#each images as image, i (image.id)}
             <button
               role="option"
-              aria-selected="false"
+              aria-selected={i === active}
               tabindex={i === active ? 0 : -1}
               aria-label={label(image)}
               title={label(image)}
