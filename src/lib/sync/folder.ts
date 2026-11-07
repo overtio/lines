@@ -45,9 +45,9 @@ export class FolderRemote implements Remote {
   }
 
   async getFile(key: string) {
-    const bytes = await this.#call<ArrayBuffer>("sync_folder_read_file", this.#split(key));
-    // Nothing comes back for a file that isn't there, or that the drive hasn't downloaded yet.
-    return bytes.byteLength ? new Blob([bytes]) : null;
+    // Null for a file that isn't there, or that the drive hasn't downloaded yet.
+    const bytes = await this.#call<ArrayBuffer | null>("sync_folder_read_file", this.#split(key));
+    return bytes && new Blob([bytes]);
   }
 
   async putFile(key: string, data: Blob) {

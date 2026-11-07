@@ -8,7 +8,7 @@ What to check before a release, and the notes to check it with.
   - `09-latex.tex`: a note written in LaTeX ([docs/latex.md](../docs/latex.md)), with everything lines draws in one.
   - `10`–`16`: every element inside every container (top level, card, callout, callout with no icon, callout in a card, quote, list item).
   - `17`–`19`: objects: two notes with properties and a type (a person and a company), mentions of them, and tables of a type.
-  - `20`–`45`: every element followed straight away by every other, with no blank line between.
+  - `20`–`52`: every element followed straight away by every other, with no blank line between.
 
 ## Before a release
 
@@ -23,6 +23,6 @@ The demo website works too: open it in a private window and add the QA notes the
 
 Every change that users can see updates these in the same change:
 
-- **Something new a note can hold, or a new way of writing one:** add it to `ELEMENTS` (and to `CONTAINERS` if things go inside it) in `scripts/qa-notes.mjs`, run `pnpm qa-notes`, and commit the notes it writes. Also update [docs/linedown.md](../docs/linedown.md). For LaTeX notes, it's `LATEX` in the same script, and [docs/latex.md](../docs/latex.md).
+- **Something new a note can hold, or a new way of writing one:** add it to `ELEMENTS` (and to `CONTAINERS` if things go inside it) in `scripts/qa-notes.mjs`, run `bun run qa-notes`, and commit the notes it writes. Also update [docs/linedown.md](../docs/linedown.md). For LaTeX notes, it's `LATEX` in the same script, and [docs/latex.md](../docs/latex.md).
 - **A new interaction** (a shortcut, a button, a menu item, a gesture, a setting, a behaviour): add a line to [checklist.md](checklist.md) under its area, saying what to do and what should happen, with the platform in brackets if it's limited to one.
 - **A new feature worth showing:** add it to the feature tour (`src/lib/notes/tour/`), which the demo website starts with.

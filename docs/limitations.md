@@ -25,6 +25,11 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - Notes kept only in the browser can be lost: clearing site data deletes them, the browser may evict them when the disk is low (lines doesn't ask for persistent storage), and Safari deletes them after 7 days without a visit.
 - The demo website shares its storage with every other site on `overtio.github.io`. It needs a domain of its own before people keep real notes there.
 
+## Import and export
+
+- Import takes files, not an export's .zip. Imported, an export's notes come back without their images and files, whose links then show as missing.
+- An export holds at most 65,535 files and 4 GB (it doesn't use ZIP64).
+
 ## Unsplash photos
 
 - An Unsplash photo is kept as the link to its page, not as a file, so it needs the internet to show, and isn't in exports or sync as a picture.
@@ -64,6 +69,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 
 - Not tried in the Mac app yet (WebKit), on an iPhone or with a touch screen; only in Chrome. Typing in a cell, IMEs, copying and pasting, and the cells' menu are the parts most likely to differ there.
 - One sheet per note. A workbook's sheets come in as notes of their own, and formulas that reach into another sheet come in as their values.
+- A synced spreadsheet note's file still ends in `.md`, with `format: spreadsheet` in its front matter, as a LaTeX note's does. Export and Download write `.csv` files.
 - How money, dates and numbers below zero show is one choice for every spreadsheet, in Settings, not a cell's own as in Excel.
 - No formatting is kept but money's symbol and dates: bold, colors, borders, other number formats (a percentage as written), merged cells, column widths and frozen rows. A formula's result shows as money (or a percentage, or with thousands separators) when the first cell it points at is (through arithmetic and functions that give back an amount, not `COUNT`); with money in two currencies, the first's, and money times a percentage is money only written money first (`=B2*C2`, not `=C2*B2`). Charts, pivot tables, comments and conditional formatting in a workbook are left out.
 - Columns can't be resized, filtered or hidden, and whole rows and columns can't be dragged by their numbers and letters (cells can, held a moment). Sorting is by one column at a time, and a header row is told by Settings highlighting it, or else by looking (all text, over numbers).
@@ -72,6 +78,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Dates show in the chosen style only when written as `2026-11-05` (as typing and pasting keep them); a CSV file's `11/5/2026` shows as written. Times aren't read.
 - Function suggestions and their descriptions are in English in every language, as the functions' names are. They're IronCalc's, from its own spreadsheet app.
 - While pointing, ⌘ and an arrow doesn't jump to the edge of what's written.
+- Copied cells paste with their formulas only in the window they were copied in; in another (a floating note, another browser tab) they paste as what they show.
 - Formulas are in English with commas, and numbers and dates are read as in US English, whatever the app's language: `1.200,50` is text, not a number.
 - Find in a note (⌘F) doesn't search a spreadsheet's cells. The note list's search does. In a Markdown note, it finds text in a ` ```csv ` block but can't show it in the grid; the cells' Edit as CSV shows the block's text.
 - A ` ```csv ` block is comma-separated only; a ` ```tsv ` block is code. Empty rows at the end of a one-column block aren't kept.
@@ -87,7 +94,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - lines' pages break between lines, never through one, but don't keep a paragraph's last line from starting a page alone, or a table's header with its rows. A block taller than a page (a very long code line wrapped many times, say) is cut where the page ends. Text isn't hyphenated.
 - A printed LaTeX note follows LaTeX in what it can: lines join into paragraphs, sections, theorems, `equation`s, figures and tables are numbered and `\ref` shows their numbers. But footnotes are gathered at the end rather than at the foot of their page; an `align`'s lines aren't numbered; `\cite` shows its key, not a number; commands lines doesn't know print their last argument's text or nothing; and the layout is lines', not a document class's (`\documentclass[twocolumn]` is one column).
 - TeX's PDF uses pdfLaTeX with TeX Live's basic packages only: a note needing others (TikZ, `enumitem`, `microtype`…) stops with "File … not found". `booktabs` stands in with plain rules. Fonts and scripts beyond pdfLaTeX's (no XeLaTeX or LuaLaTeX yet), BibTeX's `.bib` files (there's nowhere to keep one), and `\input`ed files aren't available.
-- TeX downloads about 125 MB the first time, so that once needs the internet; the browser keeps it afterwards. It's only there when the build includes it (`pnpm tex-assets`, see the README); a build without it says so.
+- TeX downloads about 125 MB the first time, so that once needs the internet; the browser keeps it afterwards. It's only there when the build includes it (`bun run tex-assets`, see the README); a build without it says so.
 - When TeX stops at an error in a file other than the note (a package), the line it names is that file's, though the preview says it's the note's.
 - PNG images are of lines' pages, not TeX's PDF. They're drawn by copying the pages into an SVG picture (modern-screenshot), so what the browser can't copy that way is missing: a web image from a site that doesn't allow it (CORS) shows blank. Images are drawn at twice the page's size, but no bigger than every browser can draw (16.7 million pixels, WebKit's limit on iPhone and iPad): a note longer than about five pages as One Image comes out smaller, and from about twenty pages its text is less sharp than on screen. One per Page keeps every page sharp.
 - Saving PNGs hasn't been tried in the Mac app (WebKit) yet.
@@ -133,8 +140,8 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 
 - Tabs have no keyboard shortcuts of their own beyond their tablist (← →, Delete): browsers keep ⌘W, Ctrl+Tab and ⌘1–9 for their own tabs.
 - There are no tabs at phone width, nor in floating notes, and a tab can't be dragged to another place or into its own window.
-- Open tabs are kept on each device, in the window's own storage; they don't sync.
-- Two notes side by side: only two, at wide and medium widths (at phone width it closes), and never the same note in both (selecting the one beside closes it). The note beside isn't remembered when lines restarts, and has no tabs of its own.
+- Open tabs are kept on each device; they don't sync.
+- Two notes side by side: only two, and only where the window has room for both (the notes' pane at least 660 px wide; otherwise the note beside waits, and Open to the Side isn't offered), and never the same note in both (selecting the one beside closes it). The note beside isn't remembered when lines restarts, and has no tabs of its own.
 - Panes on the right, and tabs, haven't been tried in the Mac app yet: the window buttons' room in each arrangement, and dragging the window by the space around the tabs.
 - Links (Settings → Editing → Links): a web link can't open in a background tab of the browser, as browsers decide that; tab choices for mentions need tabs on, and in a floating note they open the note in the main window.
 - The outline shows only with room for it beside the text (none at phone width, nor with Compact spacing in a narrow window), and in Markdown and LaTeX notes; plain-text notes have no headings. In a very long note, headings far down join it a moment after the note opens, as the note is read in the background.
@@ -165,7 +172,7 @@ How plugins work is in [plugins.md](plugins.md).
 
 - Still visible to the storage provider: how many notes and attachments there are, their sizes, when they change, and note ids (random).
 - If every device that has the key is lost and the passphrase is forgotten, the encrypted notes in the bucket can't be recovered.
-- With encryption on, the bucket no longer holds Markdown that other apps can open. Export still makes plain Markdown.
+- With encryption on, the bucket no longer holds files that other apps can open. Export still makes plain ones.
 
 ## App lock
 

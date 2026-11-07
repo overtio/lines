@@ -23,8 +23,11 @@ With the app lock on, the notes and attachments in `lines` are encrypted (see [s
 
 | Key | What's in it |
 |---|---|
-| `lines.prefs` | Theme, appearance, font, text size, note width, spacing, icon set, layout, links |
-| `lines.tagIcons` | Icons given to tags |
+| `lines.prefs` | Theme, appearance, font, text size, note width, spacing, icon set, layout, symbols, spreadsheets, links |
+| `lines.language` | The language chosen in Settings, unless it's System |
+| `lines.plugins` | Plugins turned off or on in Settings |
+| `lines.tabs` | The open tabs, when tabs are on |
+| `lines.tagIcons`, `lines.typeIcons` | Icons given to tags and types |
 | `lines.sync` | Where notes sync to: the folder (its name and an id for its handle) or the bucket and its keys. Encrypted while the app lock is on |
 | `lines.sync.leftovers` | Set only while encrypted copies are being removed after turning end-to-end encryption off |
 | `lines.seeded` | That the welcome note or feature tour has been added once, so deleting them doesn't bring them back |
@@ -37,7 +40,7 @@ After **Save to a folder** (Chrome, Edge and other Chromium browsers), lines als
 
 ```
 <folder>/
-  notes/<id>.md          One per note: front matter (id, dates, pin, trash, icon, format), then its Markdown or LaTeX
+  notes/<id>.md          One per note: front matter (id, dates, pin, trash, icon, format), then its Markdown, LaTeX or spreadsheet
   attachments/<hash>.<ext>
 ```
 

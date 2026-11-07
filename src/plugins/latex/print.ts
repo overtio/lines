@@ -243,7 +243,7 @@ export function printDocument(body: string, parts: Parts): HTMLElement {
         if (!span.display) return void flow.inline().append(parts.math(span.tex, false, macros));
         let tex = span.tex;
         // A numbered equation shows its number, and its \label names it.
-        if (/^\\begin\{equation\}/.test(text(span.from, span.to))) {
+        if (text(span.from, span.to).startsWith("\\begin{equation}")) {
           lastNumber = String(++equations);
           tex = `${tex.replace(/^\\begin\{equation\*\}|\\end\{equation\*\}$/g, "")}\\tag{${lastNumber}}`;
           const label = /\\label\{([^{}]*)\}/.exec(text(span.from, span.to));
@@ -263,7 +263,7 @@ export function printDocument(body: string, parts: Parts): HTMLElement {
         const written = text(span.from, span.to);
         const keys = /\{([^{}]*)\}\s*$/.exec(written)?.[1].split(",").map((key) => key.trim()) ?? [];
         const dom = el("span", "doc-ref", span.text);
-        refs.push({ dom, keys, wrap: /^\\eqref/.test(written) ? (number) => `(${number})` : (number) => number });
+        refs.push({ dom, keys, wrap: written.startsWith("\\eqref") ? (number) => `(${number})` : (number) => number });
         return void flow.inline().append(dom);
       }
       case "item":

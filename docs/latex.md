@@ -1,6 +1,6 @@
 # LaTeX notes
 
-A note can be written in LaTeX instead of Markdown. Switch it in the note's info panel (the ⓘ button in its toolbar): **Markdown** or **LaTeX**. The note's text stays as it is; lines reads it the other way. LaTeX notes are a [plugin](plugins.md), on unless it's turned off in Settings → Plugins; while it's off, LaTeX notes show as plain text.
+A note can be written in LaTeX instead of Markdown. Switch it in the note's info panel (the ⓘ button in its toolbar): **Markdown**, **LaTeX** or **Spreadsheet** ([spreadsheets.md](spreadsheets.md)). The note's text stays as it is; lines reads it the other way. LaTeX notes are a [plugin](plugins.md), on unless it's turned off in Settings → Plugins; while it's off, LaTeX notes show as plain text.
 
 A LaTeX note is drawn the way a Markdown note is: the text is plain LaTeX, and commands are hidden unless the cursor is on them. `\section{Plan}` reads as a heading, `\textbf{Friday}` as bold, an `itemize` as a list, math as math. What lines doesn't draw stays as written, faint.
 
@@ -94,7 +94,7 @@ A note that has a `\begin{document}` line is a whole document, as you'd download
 
 ## Export
 
-Download (in the note's share menu, on the web) and Export (Settings → Data) write a LaTeX note as a `.tex` file that compiles on its own:
+Download LaTeX (in the note's share menu) and Export (Settings → Data) write a LaTeX note as a `.tex` file that compiles on its own:
 
 ```latex
 \documentclass{article}

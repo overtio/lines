@@ -21,11 +21,12 @@
   import { speak } from "./lib/a11y";
   import { t } from "./lib/i18n/index.svelte";
   import { lock } from "./lib/lock/lock.svelte";
+  import { fileName } from "./lib/notes/export";
   import { lockedNotes } from "./lib/notes/locked.svelte";
   import { isClosed, notes } from "./lib/notes/store.svelte";
   import { plugins } from "./lib/plugins/registry.svelte";
   import { copyText, isApple, isDesktopApp, isNewNoteShortcut, newNoteKey, revealFile, saveFile } from "./lib/platform";
-  import { ui, type MenuItem } from "./lib/ui.svelte";
+  import { NOTE_MIN, ui, type MenuItem } from "./lib/ui.svelte";
   import { openSettings } from "./lib/windows/settings.svelte";
   import { PANE_WIDTHS, prefs } from "./lib/prefs.svelte";
   import { canFloat, floatingOpen, toggleFloating } from "./lib/windows/floating";
@@ -71,17 +72,25 @@
 
   // The sidebar and note list are dragged wider or narrower at their inner edges, where they're
   // columns; the note keeps at least NOTE_MIN.
-  const NOTE_MIN = 360;
   let windowWidth = $state(innerWidth);
   let resizing = $state(false);
   const sidebarColumn = $derived(ui.layout === "wide" && ui.sidebarOpen && !ui.focus);
   const listColumn = $derived(ui.layout !== "narrow" && !ui.focus);
-  /** How far the note list's inner edge is from its side of the window: past the sidebar, when that's on the same side. */
-  const listOffset = $derived(prefs.listWidth + (sidebarColumn && prefs.sidebarSide === prefs.listSide ? prefs.sidebarWidth : 0));
-  const sidebarMax = $derived(Math.max(PANE_WIDTHS.sidebar.min, Math.min(PANE_WIDTHS.sidebar.max, windowWidth - prefs.listWidth - NOTE_MIN)));
-  const listMax = $derived(
-    Math.max(PANE_WIDTHS.list.min, Math.min(PANE_WIDTHS.list.max, windowWidth - (sidebarColumn ? prefs.sidebarWidth : 0) - NOTE_MIN)),
+  /**
+   * Their widths as dragged, unless the window has since got too small to leave the note its room:
+   * then the sidebar gives way, down to its narrowest, and after it the list.
+   */
+  const room = $derived(windowWidth - NOTE_MIN);
+  const listWidth = $derived(
+    Math.max(PANE_WIDTHS.list.min, Math.min(prefs.listWidth, room - (sidebarColumn ? PANE_WIDTHS.sidebar.min : 0))),
   );
+  const sidebarWidth = $derived(
+    ui.layout === "wide" ? Math.max(PANE_WIDTHS.sidebar.min, Math.min(prefs.sidebarWidth, room - (listColumn ? listWidth : 0))) : prefs.sidebarWidth,
+  );
+  /** How far the note list's inner edge is from its side of the window: past the sidebar, when that's on the same side. */
+  const listOffset = $derived(listWidth + (sidebarColumn && prefs.sidebarSide === prefs.listSide ? sidebarWidth : 0));
+  const sidebarMax = $derived(Math.max(PANE_WIDTHS.sidebar.min, Math.min(PANE_WIDTHS.sidebar.max, room - listWidth)));
+  const listMax = $derived(Math.max(PANE_WIDTHS.list.min, Math.min(PANE_WIDTHS.list.max, room - (sidebarColumn ? sidebarWidth : 0))));
 
   const wide = $derived(ui.layout === "wide");
   const narrow = $derived(ui.layout === "narrow");
@@ -182,20 +191,23 @@
   /*
    * On a phone one pane shows at a time, and the other is inert. Focus moves with them: to the
    * open note's toolbar, and back to its row in the list, unless it's already somewhere that shows.
+   * A window resized to or from that narrow hides a pane or a button too, and focus with it.
    */
   let shownId: string | null = null;
-  let firstShown = true;
+  let wasNarrow: boolean | null = null;
   $effect(() => {
     const id = notes.selectedId;
     const narrow = ui.layout === "narrow";
     untrack(() => {
       const previous = shownId;
+      const resized = wasNarrow !== null && wasNarrow !== narrow;
+      const slid = wasNarrow !== null && narrow && !!id !== !!previous;
       shownId = id;
-      if (firstShown) return void (firstShown = false);
-      if (!narrow || !!id === !!previous) return;
+      wasNarrow = narrow;
+      if (!resized && !slid) return;
       requestAnimationFrame(() => {
         const active = document.activeElement;
-        if (active && active !== document.body && !(id ? listPane : editorPane).contains(active)) return;
+        if (active && active !== document.body && !(narrow && (id ? listPane : editorPane).contains(active))) return;
         const target = id
           ? editorPane.querySelector<HTMLElement>(".toolbar button")
           : (listPane.querySelector<HTMLElement>(`[data-id="${previous}"]`) ?? listPane.querySelector<HTMLElement>('.item[tabindex="0"]'));
@@ -205,20 +217,19 @@
   });
 
   /*
-   * A note open beside the selected one (SideNote.svelte), on wide and medium screens. Never the
+   * A note open beside the selected one (SideNote.svelte), where there's room for both. Never the
    * same note in both (neither editor would see the other's typing): selecting the one beside
    * closes it. Trashed or deleted, it goes.
    */
-  let editorWidth = $state(0);
   const beside = $derived.by(() => {
-    const entry = ui.side && !narrow && ui.side !== notes.selectedId ? notes.get(ui.side) : undefined;
+    const entry = ui.side && ui.besideFits && ui.side !== notes.selectedId ? notes.get(ui.side) : undefined;
     return entry && !entry.note.trashed ? entry : null;
   });
   $effect(() => {
     if (ui.side && notes.ready && (ui.side === notes.selectedId || !notes.get(ui.side) || notes.get(ui.side)!.note.trashed)) untrack(() => (ui.side = null));
   });
   /** As wide as dragged, leaving the main note at least NOTE_MIN. */
-  const sideMax = $derived(Math.max(PANE_WIDTHS.side.min, Math.min(PANE_WIDTHS.side.max, editorWidth - NOTE_MIN)));
+  const sideMax = $derived(Math.max(PANE_WIDTHS.side.min, Math.min(PANE_WIDTHS.side.max, ui.editorWidth - NOTE_MIN)));
   const sideWidth = $derived(Math.min(prefs.sideWidth, sideMax));
 
   // Tabs turned off: they go with them.
@@ -254,7 +265,7 @@
       { label: t("app.copySource", { language: source }), icon: "copy", run: () => copy(language.copyAs?.text(body) ?? body) },
       { label: t("app.copyPlainText"), icon: "file-text", run: () => copy(language.plainText(body)) },
     );
-    const filename = title.replace(/[\\/:*?"<>|]+/g, "-").trim().slice(0, 80) || t("list.untitled");
+    const filename = fileName(title);
     items.push(
       "separator",
       {
@@ -325,6 +336,9 @@
     });
   }
 
+  /** A dialog over the notes (Settings, a PDF's preview, a password): the window's shortcuts wait for it to close. */
+  const modalOpen = () => !!document.querySelector('[aria-modal="true"]');
+
   /** ⌘Z right after moving a note to the trash brings it back, even from inside the editor; ⌘+ and ⌘− size the text. */
   function onKeydownCapture(event: KeyboardEvent) {
     // A drawing's keys are Excalidraw's (⌘Z undoes a stroke there, not a trashing).
@@ -333,6 +347,7 @@
       event.stopPropagation();
       return;
     }
+    if (modalOpen()) return;
     // ⌘/ (Ctrl+/) lists the keyboard shortcuts, before a note's editor takes it (for comments,
     // which Markdown notes don't use).
     if ((event.metaKey || event.ctrlKey) && !event.shiftKey && !event.altKey && event.key === "/") {
@@ -343,7 +358,7 @@
     }
     // ⌘P (Ctrl+P) previews the open note as a PDF, rather than printing the window. In the
     // preview, it prints or saves (PdfPreview.svelte).
-    if ((event.metaKey || event.ctrlKey) && !event.shiftKey && !event.altKey && event.key.toLowerCase() === "p" && !ui.pdf) {
+    if ((event.metaKey || event.ctrlKey) && !event.shiftKey && !event.altKey && event.key.toLowerCase() === "p") {
       event.preventDefault();
       event.stopPropagation();
       if (selected && !closed) ui.pdf = { id: selected.note.id, save: false };
@@ -416,6 +431,13 @@
   }
 
   function onKeydown(event: KeyboardEvent) {
+    // ⌃⌘L locks lines (Ctrl+Alt+L elsewhere), by key position so other keyboard layouts work too.
+    if (event.code === "KeyL" && event.ctrlKey && (isApple ? event.metaKey : event.altKey) && lock.enabled) {
+      event.preventDefault();
+      void lock.lockNow();
+      return;
+    }
+    if (modalOpen()) return;
     if (event.key === "F6" && !event.metaKey && !event.ctrlKey && !event.altKey) {
       event.preventDefault();
       cyclePane(event.shiftKey);
@@ -432,12 +454,6 @@
       notes.create();
       return;
     }
-    // ⌃⌘L locks lines (Ctrl+Alt+L elsewhere), by key position so other keyboard layouts work too.
-    if (event.code === "KeyL" && event.ctrlKey && (isApple ? event.metaKey : event.altKey) && lock.enabled) {
-      event.preventDefault();
-      void lock.lockNow();
-      return;
-    }
     const mod = event.metaKey || event.ctrlKey;
     if (!mod) return;
     const key = event.key.toLowerCase();
@@ -448,7 +464,7 @@
       ui.focus = false;
       if (ui.layout === "narrow") notes.select(null);
       searchInput?.focus();
-    } else if (key === "f" && !event.altKey && !event.defaultPrevented && selected && !closed && !ui.settings && !ui.pdf) {
+    } else if (key === "f" && !event.altKey && !event.defaultPrevented && selected && !closed) {
       // ⌘F finds in the open note from anywhere in the window, not only with the cursor in it.
       if (findInPane(editorPane)) event.preventDefault();
     } else if (event.code === "Backslash" && event.shiftKey) {
@@ -473,8 +489,8 @@
   ]}
   data-sidebar={prefs.sidebarSide}
   data-first={first}
-  style:--sidebar-w="{prefs.sidebarWidth}px"
-  style:--list-w="{prefs.listWidth}px"
+  style:--sidebar-w="{sidebarWidth}px"
+  style:--list-w="{listWidth}px"
   style:grid-template-areas={grid?.areas}
   style:grid-template-columns={grid?.columns}
 >
@@ -499,12 +515,12 @@
   {#if sidebarColumn}
     <PaneResizer
       label={t("app.sidebarWidth")}
-      width={prefs.sidebarWidth}
+      width={sidebarWidth}
       min={PANE_WIDTHS.sidebar.min}
       max={sidebarMax}
       initial={PANE_WIDTHS.sidebar.initial}
       side={prefs.sidebarSide}
-      offset={prefs.sidebarWidth}
+      offset={sidebarWidth}
       onresize={(width) => (prefs.sidebarWidth = width)}
       ondrag={(dragging) => (resizing = dragging)}
     />
@@ -512,7 +528,7 @@
   {#if listColumn}
     <PaneResizer
       label={t("app.listWidth")}
-      width={prefs.listWidth}
+      width={listWidth}
       min={PANE_WIDTHS.list.min}
       max={listMax}
       initial={PANE_WIDTHS.list.initial}
@@ -527,110 +543,108 @@
     class={["editor-pane relative flex min-h-0 min-w-0 bg-surface", narrow ? ["col-start-2", stacked] : "[grid-area:editor]"]}
     inert={narrow && !selected}
     bind:this={editorPane}
-    bind:clientWidth={editorWidth}
+    bind:clientWidth={ui.editorWidth}
   >
     <!-- The selected note, and beside it the one opened to the side. -->
     <div class="flex min-h-0 min-w-0 flex-1 flex-col">
-    <header class="toolbar flex h-(--titlebar-h) shrink-0 items-center gap-1 px-3 pt-(--titlebar-pad-top)" data-tauri-drag-region>
-      {#if ui.sidebarToggle === "editor" && prefs.sidebarSide === "left"}
-        <SidebarToggle />
-      {/if}
-      {#if narrow}
-        <IconButton icon="chevron-left" iconSize={22} label={t("app.backToNotes")} onclick={() => notes.select(null)} />
-      {:else if selected || ui.focus}
-        <IconButton
-          icon={ui.focus ? "minimize-2" : "maximize-2"}
-          iconSize={16}
-          on={ui.focus}
-          label={ui.focus ? t("app.unfocus") : t("app.focus")}
-          tooltip={ui.focus ? t("app.unfocusWithKey", { key: focusKey }) : t("app.focusWithKey", { key: focusKey })}
-          onclick={() => (ui.focus = !ui.focus)}
-        />
-      {/if}
-      {#if tabs.shown}
-        <TabBar />
-      {:else}
-        <div class="flex-1 self-stretch" data-tauri-drag-region></div>
-      {/if}
-      {#if selected}
-        {#if selected.note.trashed}
-          <Button variant="quiet" icon="restore" onclick={() => restore(selected.note.id)}>{t("app.restore")}</Button>
-          <Button variant="danger" onclick={() => deleteForever(selected.note.id)}>{t("app.deleteForever")}</Button>
-        {:else}
-          {#if canFloat}
-            {@const floating = floatingOpen.has(selected.note.id)}
-            <IconButton
-              icon="picture-in-picture-2"
-              iconSize={17}
-              on={floating}
-              label={floating ? t("app.unfloat") : t("app.float")}
-              onclick={() => toggleFloating(selected.note.id)}
-            />
-          {/if}
-          {#if !selected.note.locked}
-            <IconButton icon="lock" iconSize={17} label={t("app.lockNote")} onclick={() => lockedNotes.lockNote(selected.note.id)} />
-          {:else if !closed}
-            <IconButton
-              icon="lock-open"
-              iconSize={17}
-              open={lockMenuOpen}
-              label={t("app.lockedOpen")}
-              aria-haspopup="menu"
-              aria-expanded={lockMenuOpen}
-              onclick={openLockMenu}
-            />
-          {/if}
-          {#if !closed}
-            <IconButton icon="info" iconSize={17} open={!!infoAnchor} label={t("app.info")} aria-expanded={!!infoAnchor} onclick={toggleInfo} />
-            <IconButton
-              icon="share"
-              iconSize={17}
-              open={shareOpen}
-              label={t("app.share")}
-              aria-haspopup="menu"
-              aria-expanded={shareOpen}
-              onclick={openShare}
-            />
-          {/if}
-          <IconButton
-            icon={selected.note.pinned ? "pin-off" : "pin"}
-            iconSize={17}
-            on={selected.note.pinned}
-            label={selected.note.pinned ? t("app.unpin") : t("app.pin")}
-            onclick={() => togglePin(selected.note.id, selected.note.pinned)}
-          />
-          <IconButton icon="trash" iconSize={17} label={t("app.trash")} onclick={() => trash(selected.note.id)} />
+      <header class="toolbar flex h-(--titlebar-h) shrink-0 items-center gap-1 px-3 pt-(--titlebar-pad-top)" data-tauri-drag-region>
+        {#if ui.sidebarToggle === "editor" && prefs.sidebarSide === "left"}
+          <SidebarToggle />
         {/if}
-      {/if}
-      {#if ui.sidebarToggle === "editor" && prefs.sidebarSide === "right"}
-        <SidebarToggle />
-      {/if}
-    </header>
+        {#if narrow}
+          <IconButton icon="chevron-left" iconSize={22} label={t("app.backToNotes")} onclick={() => notes.select(null)} />
+        {:else if selected || ui.focus}
+          <IconButton
+            icon={ui.focus ? "minimize-2" : "maximize-2"}
+            iconSize={16}
+            on={ui.focus}
+            label={ui.focus ? t("app.unfocus") : t("app.focus")}
+            tooltip={ui.focus ? t("app.unfocusWithKey", { key: focusKey }) : t("app.focusWithKey", { key: focusKey })}
+            onclick={() => (ui.focus = !ui.focus)}
+          />
+        {/if}
+        {#if tabs.shown}
+          <TabBar />
+        {:else}
+          <div class="flex-1 self-stretch" data-tauri-drag-region></div>
+        {/if}
+        {#if selected}
+          {#if selected.note.trashed}
+            <Button variant="quiet" icon="restore" onclick={() => restore(selected.note.id)}>{t("app.restore")}</Button>
+            <Button variant="danger" onclick={() => deleteForever(selected.note.id)}>{t("app.deleteForever")}</Button>
+          {:else}
+            {#if canFloat}
+              {@const floating = floatingOpen.has(selected.note.id)}
+              <IconButton
+                icon="picture-in-picture-2"
+                iconSize={17}
+                on={floating}
+                label={floating ? t("app.unfloat") : t("app.float")}
+                onclick={() => toggleFloating(selected.note.id)}
+              />
+            {/if}
+            {#if !closed}
+              <!-- One button, locked or not, so focus stays on it as it changes. -->
+              {@const locked = !!selected.note.locked}
+              <IconButton
+                icon={locked ? "lock-open" : "lock"}
+                iconSize={17}
+                open={lockMenuOpen}
+                label={locked ? t("app.lockedOpen") : t("app.lockNote")}
+                aria-haspopup={locked ? "menu" : undefined}
+                aria-expanded={locked ? lockMenuOpen : undefined}
+                onclick={locked ? openLockMenu : () => lockedNotes.lockNote(selected.note.id)}
+              />
+              <IconButton icon="info" iconSize={17} open={!!infoAnchor} label={t("app.info")} aria-expanded={!!infoAnchor} onclick={toggleInfo} />
+              <IconButton
+                icon="share"
+                iconSize={17}
+                open={shareOpen}
+                label={t("app.share")}
+                aria-haspopup="menu"
+                aria-expanded={shareOpen}
+                onclick={openShare}
+              />
+            {/if}
+            <IconButton
+              icon={selected.note.pinned ? "pin-off" : "pin"}
+              iconSize={17}
+              on={selected.note.pinned}
+              label={selected.note.pinned ? t("app.unpin") : t("app.pin")}
+              onclick={() => togglePin(selected.note.id, selected.note.pinned)}
+            />
+            <IconButton icon="trash" iconSize={17} label={t("app.trash")} onclick={() => trash(selected.note.id)} />
+          {/if}
+        {/if}
+        {#if ui.sidebarToggle === "editor" && prefs.sidebarSide === "right"}
+          <SidebarToggle />
+        {/if}
+      </header>
 
-    {#if selected}
-      <!-- The editor stays, out of sight, so other notes keep their undo history and place. -->
-      <div class="min-h-0 flex-1" hidden={closed}>
-        <Editor noteId={selected.note.id} trashed={selected.note.trashed || closed} />
-      </div>
-      {#if closed}
-        {#key selected.note.id}
-          <LockedNoteView entry={selected} />
-        {/key}
+      {#if selected}
+        <!-- The editor stays, out of sight, so other notes keep their undo history and place. -->
+        <div class="min-h-0 flex-1" hidden={closed}>
+          <Editor noteId={selected.note.id} trashed={selected.note.trashed || closed} />
+        </div>
+        {#if closed}
+          {#key selected.note.id}
+            <LockedNoteView entry={selected} />
+          {/key}
+        {/if}
+      {:else if notes.loadError}
+        <div class={placeholder}>
+          <Icon name="circle-alert" size={36} strokeWidth={1.25} />
+          <p class="m-0 text-md" role="alert">{t("app.loadError", { error: notes.loadError })}</p>
+        </div>
+      {:else if notes.ready}
+        <div class={placeholder}>
+          <Icon name="feather" size={36} strokeWidth={1.25} />
+          <p class="m-0 text-md">{t("app.noSelection")}</p>
+          <Button variant="quiet" onclick={() => notes.create()}>
+            {t("list.newNote")} <kbd class="ml-1.5 font-[inherit] text-xs text-faint">{newNoteKey}</kbd>
+          </Button>
+        </div>
       {/if}
-    {:else if notes.loadError}
-      <div class={placeholder}>
-        <Icon name="circle-alert" size={36} strokeWidth={1.25} />
-        <p class="m-0 text-md" role="alert">{t("app.loadError", { error: notes.loadError })}</p>
-      </div>
-    {:else if notes.ready}
-      <div class={placeholder}>
-        <Icon name="feather" size={36} strokeWidth={1.25} />
-        <p class="m-0 text-md">{t("app.noSelection")}</p>
-        <Button variant="quiet" onclick={() => notes.create()}>
-          {t("list.newNote")} <kbd class="ml-1.5 font-[inherit] text-xs text-faint">{newNoteKey}</kbd>
-        </Button>
-      </div>
-    {/if}
     </div>
     {#if beside}
       <PaneResizer

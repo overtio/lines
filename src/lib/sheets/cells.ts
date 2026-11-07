@@ -15,8 +15,23 @@ export function columnName(n: number): string {
 /** A cell as people name it: B4. */
 export const cellName = (row: number, column: number) => `${columnName(column)}${row + 1}`;
 
+/** The cells from one corner to the other, whichever way round. */
+export const areaBetween = (a: { row: number; column: number }, b: { row: number; column: number }): CellArea => ({
+  top: Math.min(a.row, b.row),
+  left: Math.min(a.column, b.column),
+  bottom: Math.max(a.row, b.row),
+  right: Math.max(a.column, b.column),
+});
+
 /** Whether a cell as written is a formula: `=` and something after it. */
 export const isFormula = (input: string) => input.length > 1 && input.startsWith("=");
+
+/** `now`, its rows that are the same as `was`'s being `was`'s, so what's kept for a row (worked out, measured) is kept. */
+export const sameRows = (was: Cells, now: Cells): Cells =>
+  now.map((row, r) => {
+    const before = was[r];
+    return before && (before === row || (before.length === row.length && before.every((cell, c) => cell === row[c]))) ? before : row;
+  });
 
 /** The cells with `count` empty rows or columns put in at `at`, or (negative) as many taken out there. */
 export function shiftCells(cells: Cells, axis: "row" | "column", at: number, count: number): Cells {
@@ -27,7 +42,8 @@ export function shiftCells(cells: Cells, axis: "row" | "column", at: number, cou
     return copy;
   };
   if (axis === "row") return splice(cells, () => []) as Cells;
-  return cells.map((row) => (row.length > at ? (splice(row, () => "") as string[]) : row));
+  // A row ending at `at` takes them too, so a block grows by columns put in after its last.
+  return cells.map((row) => (row.length >= at ? (splice(row, () => "") as string[]) : row));
 }
 
 /** Where a cell ends up when rows or columns are put in or taken out; null if it's taken out. */

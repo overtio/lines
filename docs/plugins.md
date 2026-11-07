@@ -15,17 +15,17 @@ Settings → Plugins lists them. A plugin that isn't needed can be turned off, a
 | Diagrams (Mermaid) | Draws ` ```mermaid ` code blocks, and adds `/diagram` | Yes | `src/plugins/mermaid/` |
 | Formulas (IronCalc) | The formula engine, for formulas in tables and spreadsheets, and Excel workbooks | Yes | `src/plugins/ironcalc/` |
 | TeX Typesetting | Makes a LaTeX note's PDF with TeX. Needs LaTeX. | Yes | `src/plugins/tex/` |
+| Unsplash | `/unsplash`: search Unsplash's free photos and put one in a note. Needs an API key when lines is built ([README](../README.md#development)) | Yes | `src/plugins/unsplash/` |
+| GIPHY | `/giphy`: search GIPHY's GIFs and put one in a note. Needs an API key when lines is built | Yes | `src/plugins/giphy/` |
 | Themes | The sixteen themes. Always on. | Yes | `src/plugins/themes/` |
 | Lucide | lines' icons. Always on. | Yes | `src/plugins/lucide/` |
 | SF Symbols | Apple's icons, in the Mac and iPhone apps | Yes | `src/plugins/sf-symbols/` |
-| Unsplash | `/unsplash`: search Unsplash's free photos and put one in a note. Needs an API key when lines is built (README) | Yes | `src/plugins/unsplash/` |
-| GIPHY | `/giphy`: search GIPHY's GIFs and put one in a note. Needs an API key when lines is built | Yes | `src/plugins/giphy/` |
 
 ## Turning a plugin off
 
 Nothing is lost. A plugin turned off stops adding what it adds, at once, in every window:
 
-- **A format.** Its notes keep their format and show as plain text, which can still be read and changed. Their ⓘ panel says so, with a button that turns the plugin back on. Export, Copy and Download still write them as what they are (a LaTeX note as a `.tex` file that compiles). With Spreadsheets off, a ` ```csv ` block in a Markdown note is a code block too, and `/spreadsheet` is gone from the "/" menu.
+- **A format.** Its notes keep their format and show as plain text, which can still be read and changed. Their ⓘ panel says so, with a button that turns the plugin back on. Export, Copy and Download still write them as what they are (a LaTeX note as a `.tex` file that compiles). With Spreadsheets off, a ` ```csv ` block in a Markdown note is a code block too, `/spreadsheet` is gone from the "/" menu, and tables have no Convert to Spreadsheet button.
 - **An engine.** With Math off, math shows as it's written. With Diagrams off, a ` ```mermaid ` block is a code block and `/diagram` is gone from the "/" menu. With Formulas off, formulas show as written, and spreadsheets don't download as values or Excel workbooks. Without TeX, a LaTeX note's PDF is laid out by lines.
 - **A theme or an icon set.** What was chosen is kept, and lines shows its own (Lines, Lucide) until the plugin is on again.
 - **A plugin others need** (TeX needs LaTeX): those wait, and say what they need. Turning one on turns on what it needs too.
@@ -62,7 +62,7 @@ export const graphviz = (): Plugin => ({
 
 That's all a new renderer needs: ` ```dot ` blocks in Markdown notes are then drawn on screen and on paper, with the resize handle and the width after the language (` ```dot |400 `) that Mermaid's diagrams have.
 
-Load anything big the first time it's needed (`import()`), as KaTeX, Mermaid and TeX do, so lines starts as fast with the plugin as without it.
+Load anything big the first time it's needed (`import()`), as KaTeX, Mermaid and TeX do, so lines starts as fast with the plugin as without it. A stylesheet is the exception: added once the page is drawn, it restyles all of it, a stall that shows while scrolling, so import it with the plugin, as KaTeX does.
 
 ### What a plugin can add
 

@@ -6,7 +6,7 @@ import { latexDocument } from "../latex/text";
 /*
  * Typesets a LaTeX note as a PDF with a real TeX engine: BusyTeX's pdfLaTeX, built to
  * WebAssembly, with TeX Live's basic packages. Its files (about 130 MB) are put in public/busytex
- * by `pnpm tex-assets`, or served from VITE_TEX_ASSETS. The first PDF downloads them; the
+ * by `bun run tex-assets`, or served from VITE_TEX_ASSETS. The first PDF downloads them; the
  * packages are then kept in the browser (IndexedDB), and the engine in its HTTP cache.
  */
 

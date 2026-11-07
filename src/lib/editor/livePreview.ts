@@ -164,7 +164,13 @@ class RuleWidget extends WidgetType {
   }
 }
 
-const typeIconCleanups = new WeakMap<HTMLElement, Record<string, unknown>>();
+/** The icons mounted in widgets, to unmount when they go. */
+const icons = new WeakMap<HTMLElement, Record<string, unknown>>();
+
+function unmountIcon(dom: HTMLElement) {
+  const icon = icons.get(dom);
+  if (icon) void unmount(icon);
+}
 
 /** The icon before a `type` property's value. */
 class TypeIconWidget extends WidgetType {
@@ -177,16 +183,13 @@ class TypeIconWidget extends WidgetType {
   toDOM() {
     const el = document.createElement("span");
     el.className = "cm-lp-prop-type-icon";
-    typeIconCleanups.set(el, mount(Icon, { target: el, props: { name: this.icon, size: 14, strokeWidth: 2 } }));
+    icons.set(el, mount(Icon, { target: el, props: { name: this.icon, size: 14, strokeWidth: 2 } }));
     return el;
   }
   destroy(dom: HTMLElement) {
-    const icon = typeIconCleanups.get(dom);
-    if (icon) void unmount(icon);
+    unmountIcon(dom);
   }
 }
-
-const tagIconCleanups = new WeakMap<HTMLElement, Record<string, unknown>>();
 
 /** A tag's `#`, drawn as the tag's icon in the sidebar (a hash unless one was chosen); screen readers still hear "#". */
 class TagIconWidget extends WidgetType {
@@ -199,7 +202,7 @@ class TagIconWidget extends WidgetType {
   toDOM() {
     const el = document.createElement("span");
     el.className = "cm-lp-tag-icon";
-    tagIconCleanups.set(el, mount(Icon, { target: el, props: { name: this.icon, size: 13, strokeWidth: 2.25 } }));
+    icons.set(el, mount(Icon, { target: el, props: { name: this.icon, size: 13, strokeWidth: 2.25 } }));
     const spoken = document.createElement("span");
     spoken.className = "sr-only";
     spoken.textContent = "#";
@@ -207,8 +210,7 @@ class TagIconWidget extends WidgetType {
     return el;
   }
   destroy(dom: HTMLElement) {
-    const icon = tagIconCleanups.get(dom);
-    if (icon) void unmount(icon);
+    unmountIcon(dom);
   }
   // A click puts the cursor here, which shows the `#`.
   ignoreEvent() {
@@ -219,7 +221,7 @@ class TagIconWidget extends WidgetType {
 const imageCleanups = new WeakMap<HTMLElement, () => void>();
 
 /** An image within text; one on a line of its own is drawn as a block by attachments.ts. */
-class ImageWidget extends WidgetType {
+export class ImageWidget extends WidgetType {
   constructor(readonly src: string, readonly alt: string) {
     super();
   }

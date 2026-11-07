@@ -1,8 +1,8 @@
 import { isolateHistory } from "@codemirror/commands";
 import { syntaxTree } from "@codemirror/language";
-import { EditorSelection, type EditorState, type Extension, Prec, type Range, StateField } from "@codemirror/state";
-import { Decoration, type DecorationSet, EditorView, keymap, WidgetType } from "@codemirror/view";
-import type { SyntaxNode } from "@lezer/common";
+import { EditorSelection, type EditorState, type Extension, Prec } from "@codemirror/state";
+import { EditorView, keymap, WidgetType } from "@codemirror/view";
+import type { SyntaxNode, SyntaxNodeRef } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
 import type { IconName } from "../icons/icons";
@@ -20,12 +20,12 @@ import {
 } from "../notes/attachments";
 import { coarsePointer } from "../platform";
 import { locale, type MessageKey, t } from "../i18n/index.svelte";
-import { actionBar, dropBar } from "./actions";
+import { actionBar, dropBar, resizeHandle } from "./actions";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { editDrawing, isDrawing, knownDrawing } from "./drawings";
 import { giphyStill } from "./giphy";
 import { isUnsplashPhoto, unsplashImage, unsplashPhoto } from "./unsplash";
-import { ancestors, focusChanged, focused, isEditing } from "./util";
+import { ancestors, blockPos, drawnBlock, drawnBlocks, focused, isEditing } from "./util";
 
 /*
  * Images and files in notes. One on a line of its own is drawn as a block in its place (the image,
@@ -67,6 +67,7 @@ export function imageElement(src: string, label: string, onChange: () => void): 
     onChange();
   };
   let cancel = () => {};
+  let gone = false;
   const name = attachmentName(src);
   if (!name) {
     img.src = unsplashImage(src) ?? giphyStill(src) ?? src;
@@ -74,6 +75,7 @@ export function imageElement(src: string, label: string, onChange: () => void): 
   } else {
     const show = () =>
       void attachmentURL(name).then((url) => {
+        if (gone) return;
         if (url) {
           img.src = url;
           dom.replaceChildren(img);
@@ -85,7 +87,13 @@ export function imageElement(src: string, label: string, onChange: () => void): 
       });
     show();
   }
-  return { dom, destroy: () => cancel() };
+  return {
+    dom,
+    destroy: () => {
+      gone = true;
+      cancel();
+    },
+  };
 }
 
 function placeholder(text: string) {
@@ -133,8 +141,10 @@ function fileElement(name: string, label: string, onChange: () => void): { dom: 
   text.append(title, meta);
   dom.append(icon, text);
   let cancel = () => {};
+  let gone = false;
   const show = () =>
     void getAttachment(name).then((data) => {
+      if (gone) return;
       dom.classList.toggle("is-missing", !data);
       meta.textContent = data ? t("editor.file.meta", { kind: ext.toUpperCase(), size: formatSize(data.size) }) : t("editor.file.notHere");
       if (!data) cancel = whenArrived(name, show);
@@ -144,6 +154,7 @@ function fileElement(name: string, label: string, onChange: () => void): { dom: 
   return {
     dom,
     destroy: () => {
+      gone = true;
       cancel();
       void unmount(component);
     },
@@ -195,11 +206,24 @@ class BlockWidget extends WidgetType {
     frame.className = "cm-lp-image-frame";
     frame.append(content.dom);
     dom.append(kind === "image" ? frame : content.dom);
-    if (kind === "image") frame.append(resizeHandle(view, dom));
+    if (kind === "image") {
+      const handle = resizeHandle(view, dom, "cm-lp-image-resize", {
+        target: () => dom.querySelector<HTMLImageElement>(".cm-lp-image"),
+        min: 48,
+        max: () => {
+          const style = getComputedStyle(dom);
+          return dom.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        },
+        show: setWidth,
+        write: (width) => writeWidth(view, dom, width),
+      });
+      frame.append(handle);
+    }
     const name = attachmentName(src);
     if (kind === "image" && name) {
       void isDrawing(name).then((drawing) => {
-        if (!drawing || dom.dataset.src !== src) return;
+        // Not if it's gone meanwhile (scrolled away, say).
+        if (!drawing || !cleanups.has(dom)) return;
         dom.dataset.drawing = "";
         const edit = document.createElement("button");
         edit.className = "cm-lp-action cm-lp-drawing-edit";
@@ -232,6 +256,7 @@ class BlockWidget extends WidgetType {
   }
   destroy(dom: HTMLElement) {
     cleanups.get(dom)?.();
+    cleanups.delete(dom);
   }
   get estimatedHeight() {
     return this.block.kind === "file" ? 60 : (heights.get(`${this.block.src}\n${this.block.label}`) ?? 200);
@@ -243,83 +268,21 @@ class BlockWidget extends WidgetType {
 
 /* Resizing images. */
 
-/** The narrowest an image can be dragged. */
-const MIN_WIDTH = 48;
-
 function setWidth(img: HTMLImageElement, width: number) {
   img.style.width = `${width}px`;
   // A width chosen is kept, whatever its height.
   img.style.maxHeight = "none";
 }
 
-/** The block drawn at `dom`. */
-function blockAt(view: EditorView, dom: HTMLElement) {
-  const pos = view.posAtDOM(dom);
-  // A preview sits after its line's end; the block it shows is on that line.
-  const line = view.state.doc.lineAt(dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos);
-  return blockOnLine(view.state, line.number);
-}
-
 /** Writes an image's width into its label (`![Lake|400](…)`), or takes it out (null). */
 function writeWidth(view: EditorView, dom: HTMLElement, width: number | null) {
-  const block = blockAt(view, dom);
+  const block = blockOnLine(view.state, view.state.doc.lineAt(blockPos(view, dom)).number);
   if (!block || block.kind !== "image") return;
   const label = withWidth(block.label, width);
   if (label === block.label) return;
   // After "![".
   const from = block.from + 2;
   view.dispatch({ changes: { from, to: from + block.label.length, insert: label }, userEvent: "input.resize" });
-}
-
-/**
- * The handle on an image's bottom right corner: dragged, it makes the image wider or narrower
- * (keeping its shape, and no wider than the note); double-clicked, back to its own size. From the
- * keyboard, the width is the number after the bar in its Markdown.
- */
-function resizeHandle(view: EditorView, dom: HTMLElement) {
-  const handle = document.createElement("span");
-  handle.className = "cm-lp-resize cm-lp-image-resize";
-  handle.title = coarsePointer.matches ? "" : t("editor.image.resizeHint");
-  handle.setAttribute("aria-hidden", "true");
-  handle.addEventListener("pointerdown", (event) => {
-    const img = dom.querySelector<HTMLImageElement>(".cm-lp-image");
-    if (event.button !== 0 || view.state.readOnly || !img) return;
-    // No mousedown follows, so the editor doesn't select the image or move the cursor.
-    event.preventDefault();
-    event.stopPropagation();
-    try {
-      handle.setPointerCapture(event.pointerId);
-    } catch {
-      // A pointer the browser no longer tracks: moves over the handle still resize.
-    }
-    const style = getComputedStyle(dom);
-    const max = dom.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
-    const start = img.getBoundingClientRect().width;
-    const x = event.clientX;
-    let width = start;
-    dom.classList.add("is-resizing");
-    const move = (moved: PointerEvent) => {
-      width = Math.round(Math.min(max, Math.max(MIN_WIDTH, start + moved.clientX - x)));
-      setWidth(img, width);
-      view.requestMeasure();
-    };
-    const end = () => {
-      handle.removeEventListener("pointermove", move);
-      handle.removeEventListener("pointerup", end);
-      handle.removeEventListener("pointercancel", end);
-      dom.classList.remove("is-resizing");
-      if (Math.abs(width - start) >= 1) writeWidth(view, dom, width);
-    };
-    handle.addEventListener("pointermove", move);
-    handle.addEventListener("pointerup", end);
-    handle.addEventListener("pointercancel", end);
-  });
-  handle.addEventListener("dblclick", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!view.state.readOnly) writeWidth(view, dom, null);
-  });
-  return handle;
 }
 
 /** An image or file drawn as a block, and where its Markdown is. */
@@ -358,41 +321,15 @@ export function drawnAsBlock(state: EditorState, node: SyntaxNode): Block | null
   return blockOf(state, node);
 }
 
-function buildBlocks(state: EditorState): DecorationSet {
-  const decos: Range<Decoration>[] = [];
-  syntaxTree(state).iterate({
-    enter(node) {
-      // Blocks are in top-level paragraphs or cards; nothing else needs a look inside.
-      if (node.name === "Document" || node.name === "Card" || node.name === "Paragraph") return true;
-      if (node.name !== "Image" && node.name !== "Link") return false;
-      const block = drawnAsBlock(state, node.node);
-      if (!block) return false;
-      const line = state.doc.lineAt(node.from);
-      const inset = cardInset(state, node.node);
-      if (isEditing(state, line.from, line.to)) {
-        const selected = state.selection.ranges.some((r) => r.from <= node.from && r.to >= node.to && !r.empty);
-        const widget = new BlockWidget(block, inset, true, selected);
-        decos.push(Decoration.widget({ widget, block: true, side: 1 }).range(line.to));
-      } else {
-        const widget = new BlockWidget(block, inset, false);
-        decos.push(Decoration.replace({ widget, block: true }).range(line.from, line.to));
-      }
-      return false;
-    },
-  });
-  return Decoration.set(decos, true);
+function drawBlock(state: EditorState, node: SyntaxNodeRef) {
+  if (node.name !== "Image" && node.name !== "Link") return null;
+  const block = drawnAsBlock(state, node.node);
+  if (!block) return null;
+  const line = state.doc.lineAt(node.from);
+  const editing = isEditing(state, line.from, line.to);
+  const selected = editing && state.selection.ranges.some((r) => r.from <= node.from && r.to >= node.to && !r.empty);
+  return drawnBlock(new BlockWidget(block, cardInset(state, node.node), editing, selected), line.from, line.to, editing);
 }
-
-const blocks = StateField.define<DecorationSet>({
-  create: buildBlocks,
-  update(decos, tr) {
-    if (tr.docChanged || tr.selection || focusChanged(tr) || syntaxTree(tr.startState) !== syntaxTree(tr.state)) {
-      return buildBlocks(tr.state);
-    }
-    return decos;
-  },
-  provide: (field) => EditorView.decorations.from(field),
-});
 
 /** The block on line `n`, if there is one. */
 function blockOnLine(state: EditorState, n: number) {
@@ -500,9 +437,7 @@ const clickToSelect = EditorView.domEventHandlers({
     const opens = event.detail === 2 || event.metaKey || event.ctrlKey || (coarsePointer.matches && !view.hasFocus);
     const button = !!(event.target as HTMLElement).closest(".cm-lp-drawing-edit");
     if ("drawing" in dom.dataset && event.button === 0 && (opens || button) && !view.state.readOnly) {
-      const pos = view.posAtDOM(dom);
-      const line = view.state.doc.lineAt(dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos);
-      void editDrawing(view, src, line.from);
+      void editDrawing(view, src, view.state.doc.lineAt(blockPos(view, dom)).from);
       return true;
     }
     if (name && event.button === 0 && opens) {
@@ -510,9 +445,7 @@ const clickToSelect = EditorView.domEventHandlers({
       return true;
     }
     if (event.button !== 0 || view.state.readOnly) return true;
-    const pos = view.posAtDOM(dom);
-    // A preview sits after its line's end; the block it shows is on that line.
-    const line = view.state.doc.lineAt(dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos);
+    const line = view.state.doc.lineAt(blockPos(view, dom));
     const from = line.from + (/^\s*/.exec(line.text)?.[0].length ?? 0);
     view.dispatch({ selection: { anchor: from, head: line.to } });
     view.focus();
@@ -722,4 +655,4 @@ export const chooseFiles = choose("");
 /** Pasting and dropping files, and pasting Unsplash links, written by `writer`. */
 export const attachmentPasting = (writer: AttachmentWriter): Extension => [dropAndPaste(writer), pastePhoto(writer)];
 
-export const attachmentBlocks: Extension = [focused, blocks, blockKeymap, clickToSelect, attachmentPasting(markdownWriter)];
+export const attachmentBlocks: Extension = [focused, drawnBlocks(drawBlock, { inside: ["Document", "Card", "Paragraph"] }), blockKeymap, clickToSelect, attachmentPasting(markdownWriter)];

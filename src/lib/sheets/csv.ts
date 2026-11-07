@@ -66,7 +66,7 @@ export function sniffDelimiter(text: string): string {
   return best;
 }
 
-/** Without the empty rows and columns at its end. */
+/** Without the empty rows and columns at its end; rows already as wide as the rest are the same rows. */
 export function trimCells(cells: Cells): Cells {
   let rows = cells.length;
   while (rows && cells[rows - 1].every((cell) => !cell)) rows--;
@@ -75,11 +75,28 @@ export function trimCells(cells: Cells): Cells {
     const row = cells[r];
     for (let c = row.length; c > columns; c--) if (row[c - 1]) columns = c;
   }
-  return cells.slice(0, rows).map((row) => Array.from({ length: columns }, (_, c) => row[c] ?? ""));
+  return cells.slice(0, rows).map((row) => (row.length === columns ? row : Array.from({ length: columns }, (_, c) => row[c] ?? "")));
 }
 
 function quote(cell: string, delimiter: string) {
   return cell.includes(delimiter) || /["\r\n]|^\s|\s$/.test(cell) ? `"${cell.replaceAll('"', '""')}"` : cell;
+}
+
+/** Rows written as CSV lines, kept for the rows they're written from (which are never changed once written). */
+const lines = new WeakMap<string[], string>();
+
+/** A row as a line of CSV, or with another delimiter. */
+export function csvLine(row: string[], delimiter = ","): string {
+  if (delimiter !== ",") return row.map((cell) => quote(cell, delimiter)).join(delimiter);
+  let line = lines.get(row);
+  if (line === undefined) lines.set(row, (line = row.map((cell) => quote(cell, delimiter)).join(delimiter)));
+  return line;
+}
+
+/** Every row as wide as the widest; those already are the same rows. */
+export function padCells(cells: Cells): Cells {
+  const width = cells.reduce((most, row) => Math.max(most, row.length), 0);
+  return cells.map((row) => (row.length === width ? row : Array.from({ length: width }, (_, c) => row[c] ?? "")));
 }
 
 /**
@@ -87,8 +104,5 @@ function quote(cell: string, delimiter: string) {
  * rows or columns at the end, or with `keep` with them: a block in a note is as big as its CSV.
  */
 export function writeCsv(cells: Cells, delimiter = ",", keep = false): string {
-  const width = cells.reduce((most, row) => Math.max(most, row.length), 0);
-  return (keep ? cells.map((row) => Array.from({ length: width }, (_, c) => row[c] ?? "")) : trimCells(cells))
-    .map((row) => row.map((cell) => quote(cell, delimiter)).join(delimiter))
-    .join("\n");
+  return (keep ? padCells(cells) : trimCells(cells)).map((row) => csvLine(row, delimiter)).join("\n");
 }

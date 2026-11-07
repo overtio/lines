@@ -3,6 +3,7 @@
   import { onDestroy, onMount, untrack } from "svelte";
   import { speak } from "../a11y";
   import { t } from "../i18n/index.svelte";
+  import { fileName } from "../notes/export";
   import type { Entry } from "../notes/store.svelte";
   import { isApple, isDesktopApp, isTauri, revealFile, saveFile } from "../platform";
   import { plugins } from "../plugins/registry.svelte";
@@ -44,7 +45,7 @@
   const language = plugins.language(note.format);
   /** Typesetters for its language, besides lines' own pages. */
   const typesetters = untrack(() => plugins.typesettersFor(language.id));
-  const filename = title.replace(/[\\/:*?"<>|]+/g, "-").trim().slice(0, 80) || t("list.untitled");
+  const filename = fileName(title);
   /** The system print dialog: in browsers, and in the desktop apps (not on iPhone or iPad). */
   const canPrint = !isTauri || isDesktopApp;
 

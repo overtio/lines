@@ -27,7 +27,6 @@
   let nav = $state<HTMLElement>();
   let rail = $state<HTMLButtonElement>();
   let list = $state<HTMLElement>();
-  let open = $state(false);
   /** The heading pointed at, or focused in the card; -1 for none. */
   let pointed = $state(-1);
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -54,8 +53,10 @@
     );
   const duration = (ms: number) => (reducedMotion.matches ? 0 : ms);
 
-  $effect(() => {
-    if (!shown) open = false;
+  /** Whether the card of headings is open: closed again whenever the outline hides or shows. */
+  let open = $derived.by(() => {
+    void shown;
+    return false;
   });
 
   /** After a moment, so the pointer passing over on its way somewhere doesn't open it, and can cross to the card. */

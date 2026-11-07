@@ -47,7 +47,7 @@ trashed: false
 Plain Markdown, readable by any editor.
 ```
 
-A note with an icon has an `icon` line, and a note written in LaTeX a `format: latex` line, followed by its LaTeX ([latex.md](latex.md)).
+A note with an icon has an `icon` line. A note in another format has a `format` line, followed by its text: `format: latex` and its LaTeX ([latex.md](latex.md)), or `format: spreadsheet` and its title and CSV ([spreadsheets.md](spreadsheets.md#its-text)).
 
 A note's own [properties](linedown.md#properties) are part of its text, so they come after this block, in a second one:
 
@@ -69,7 +69,7 @@ On each sync, lines compares every note with what it last exchanged with the buc
 | --- | --- |
 | Changed on this device | Uploaded |
 | Changed on another device | Downloaded, including into an open editor |
-| Changed on both | The newer edit wins, and the other is saved as a separate note titled “… (conflicted copy)”. Nothing is lost. |
+| Changed on both | The newer edit wins, and the other is saved as a separate note titled “… (conflicted copy)”, its properties and type kept (a spreadsheet's mark goes on its title line, not in its cells). Nothing is lost. |
 | Deleted on one device | Deleted on the others, unless another device edited it in the meantime, in which case the edit wins |
 
 Images and files in notes sit next to them, named after their content and keeping their extension:
@@ -79,7 +79,9 @@ Images and files in notes sit next to them, named after their content and keepin
 <bucket>/<folder>/attachments/<hash>.pdf
 ```
 
-A note shows an image as `![](../attachments/<hash>.png)` and links a file as `[Report.pdf](../attachments/<hash>.pdf)`, so the folder reads correctly in other Markdown apps too. Since a name always means the same bytes, there's nothing to merge: each sync uploads the attachments your notes use that the bucket lacks, and downloads the ones this device lacks. Every device keeps a copy of every attachment, so large files take room everywhere. One no note uses any more is removed from the device at the next launch, but stays in the bucket for now.
+A note shows an image as `![](../attachments/<hash>.png)` and links a file as `[Report.pdf](../attachments/<hash>.pdf)`, so the folder reads correctly in other Markdown apps too. Since a name always means the same bytes, there's nothing to merge: each sync uploads the attachments your notes use that the bucket lacks, and downloads the ones this device lacks. Every device keeps a copy of every attachment, so large files take room everywhere. One no note uses any more is removed from the device at the next launch (one where lines isn't open in another tab, which could still bring it back with undo), but stays in the bucket for now.
+
+Only one sync pass runs at a time, even with lines open in several browser tabs, so a conflict makes one copy, not one per tab.
 
 Several devices can share one bucket and folder. To keep separate libraries in one bucket, use different folders.
 
@@ -102,7 +104,7 @@ Turning it on syncs once, uploads everything again encrypted, and removes the pl
 
 If you forget the passphrase, any device that still syncs can set a new one (Change passphrase…), since it already has the key. With no such device left, the encrypted notes can't be recovered; the copies on each device are unaffected.
 
-With encryption on, the bucket no longer holds Markdown other apps can open; Settings → Data → Export still makes a .zip of plain Markdown files.
+With encryption on, the bucket no longer holds Markdown other apps can open; Settings → Data → Export still makes a .zip of plain files, each in its note's format.
 
 ## Locked notes
 

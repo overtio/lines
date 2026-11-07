@@ -1,11 +1,10 @@
 import { syntaxTree } from "@codemirror/language";
 import type { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
-import type { SyntaxNode } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import { t } from "../i18n/index.svelte";
 import { ATTACHMENT_PATH, attachmentName, getAttachment, saveAttachment } from "../notes/attachments";
-import { fenceLanguage } from "./rendered";
+import { fenceAt, fenceLanguage } from "./rendered";
 
 /*
  * Drawings: Excalidraw sketches kept as SVG attachments with their scene inside, as excalidraw.com
@@ -118,16 +117,11 @@ export function newDrawing(view: EditorView, from: number, to: number) {
 
 /** The Mermaid code block at or around `pos`: where it starts and ends, and its code. */
 function diagramAt(state: EditorState, pos: number) {
-  for (const side of [1, -1] as const) {
-    for (let node: SyntaxNode | null = syntaxTree(state).resolveInner(pos, side); node; node = node.parent) {
-      if (node.name !== "FencedCode") continue;
-      const info = node.getChild("CodeInfo");
-      if (!info || fenceLanguage(state.sliceDoc(info.from, info.to)) !== "mermaid") return null;
-      const code = node.getChild("CodeText");
-      return { from: node.from, to: node.to, source: code ? state.sliceDoc(code.from, code.to) : "" };
-    }
-  }
-  return null;
+  const node = fenceAt(state, pos);
+  const info = node?.getChild("CodeInfo");
+  if (!node || !info || fenceLanguage(state.sliceDoc(info.from, info.to)) !== "mermaid") return null;
+  const code = node.getChild("CodeText");
+  return { from: node.from, to: node.to, source: code ? state.sliceDoc(code.from, code.to) : "" };
 }
 
 /**

@@ -4,7 +4,7 @@ Linedown is the Markdown that lines reads and writes: [CommonMark](https://commo
 
 Everything here is plain text that other Markdown apps open without trouble. An app that doesn't know an addition shows its characters as they are (`==highlight==`, `#tag`), or, for cards and callouts, as a Pandoc fenced div.
 
-The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, cards, math, mentions), on top of `@lezer/markdown` with GFM. What the editor draws for each construct is in `src/lib/editor/`. The QA notes in `qa/notes/` show every construct, alone and combined (see [qa/README.md](../qa/README.md)).
+The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underline, cards, math, mentions), on top of `@lezer/markdown` with GFM. What the editor draws for each construct is in `src/lib/editor/`. The QA notes in `qa/notes/` show every construct, alone and combined (see [qa/README.md](../qa/README.md)).
 
 | Construct | Linedown | Standard? |
 |---|---|---|
@@ -116,7 +116,7 @@ Fenced code blocks (` ``` ` or `~~~`) are as in CommonMark. lines reads the info
 
 ## Spreadsheets
 
-A code block with the language `csv` is drawn as a spreadsheet's grid of cells, by the Spreadsheets [plugin](plugins.md) (with it off, it's a code block). Its text is CSV, row 1 on the block's first line, and a cell starting with `=` is a formula, worked out by the Formulas plugin (IronCalc). Changing a cell writes the block again as CSV. The text shows in place of the grid only while the cursor is in it, from the cells' Edit as CSV; spaces after commas are left out, as in `Rent, 1200`. Like diagrams, spreadsheets are drawn at the top level and in cards. A name after the language (` ```csv name=costs `, or `name="Q1 costs"`) lets formulas in other blocks and notes use its cells (`=costs!B2`, `='Trip/costs'!B2`); a width after a bar (`|400`) can follow it, as for diagrams. Empty rows and columns at the end of its CSV are kept: they're its size. Other apps show the CSV as a code block. More in [spreadsheets.md](spreadsheets.md#spreadsheets-in-markdown-notes).
+A code block with the language `csv` is drawn as a spreadsheet's grid of cells, by the Spreadsheets [plugin](plugins.md) (with it off, it's a code block). Its text is CSV, row 1 on the block's first line, and a cell starting with `=` is a formula, worked out by the Formulas plugin (IronCalc). Changing a cell writes the block again as CSV. Spaces after commas (`Rent, 1200`) are left out of the cells. The text shows in place of the grid only while the cursor is in it, from the cells' Edit as CSV. Like diagrams, spreadsheets are drawn at the top level and in cards. A name after the language (` ```csv name=costs `, or `name="Q1 costs"`) lets formulas in other blocks and notes use its cells (`=costs!B2`, `='Trip/costs'!B2`). A width after a bar (`|400`), as diagrams take, is kept but not used: a grid is as wide as its columns. Empty rows and columns at the end of its CSV are kept: they're its size. Other apps show the CSV as a code block. More in [spreadsheets.md](spreadsheets.md#spreadsheets-in-markdown-notes).
 
 ## Diagrams
 
@@ -297,9 +297,9 @@ lines shows some pairs of characters as the symbol they stand for, without chang
 
 When lines saves notes to a folder or a bucket, each note is a Markdown file named after its id, with a small front matter block (id, dates, pin, trash, icon, format) ahead of its Linedown; a note's own properties come after it, as part of its text. Locked notes and end-to-end encryption change what's stored. See [sync.md](sync.md). An export (Settings → Data) writes plain Linedown files named after their titles, without front matter.
 
-## LaTeX notes
+## Other formats
 
-A note can be written in LaTeX instead: see [latex.md](latex.md).
+A note can be written in LaTeX instead ([latex.md](latex.md)), or be a spreadsheet ([spreadsheets.md](spreadsheets.md#spreadsheet-notes)).
 
 ## Changing Linedown
 

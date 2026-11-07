@@ -78,31 +78,32 @@
         onselect={(id) => (prefs.floatingAppearance = id)}
       />
     </FieldRow>
-    <FieldRow label={t("settings.opacity")}>
-      <Slider class="w-60" bind:value={prefs.floatingOpacity} {...OPACITY} label={t("settings.opacity")} format={formatPercent} />
-    </FieldRow>
+    <!-- The rest is the Mac's: see-through windows, hidden window buttons, and full-screen apps. -->
     {#if windowLookAvailable}
+      <FieldRow label={t("settings.opacity")}>
+        <Slider class="w-60" bind:value={prefs.floatingOpacity} {...OPACITY} label={t("settings.opacity")} format={formatPercent} />
+      </FieldRow>
       <FieldRow label={t("settings.blur")}>
         <Switch label={t("settings.blur")} checked={prefs.floatingBlur} onchange={(on) => (prefs.floatingBlur = on)} />
       </FieldRow>
       <FieldRow label={t("settings.floatingBorder")}>
         <Switch label={t("settings.floatingBorder")} checked={prefs.floatingBorder} onchange={(on) => (prefs.floatingBorder = on)} />
       </FieldRow>
+      <FieldRow label={t("settings.windowButtons")} note={t("settings.windowButtonsNote", { onHover: t("settings.windowButtonsHover") })}>
+        <Segmented
+          label={t("settings.windowButtonsLabel")}
+          options={windowButtons}
+          value={prefs.floatingButtons}
+          onselect={(id) => (prefs.floatingButtons = id)}
+        />
+      </FieldRow>
+      <FieldRow label={t("settings.overFullscreen")} note={t("settings.overFullscreenNote")}>
+        <Switch
+          label={t("settings.overFullscreen")}
+          checked={prefs.floatingOverFullscreen}
+          onchange={(on) => (prefs.floatingOverFullscreen = on)}
+        />
+      </FieldRow>
     {/if}
-    <FieldRow label={t("settings.windowButtons")} note={t("settings.windowButtonsNote", { onHover: t("settings.windowButtonsHover") })}>
-      <Segmented
-        label={t("settings.windowButtonsLabel")}
-        options={windowButtons}
-        value={prefs.floatingButtons}
-        onselect={(id) => (prefs.floatingButtons = id)}
-      />
-    </FieldRow>
-    <FieldRow label={t("settings.overFullscreen")} note={t("settings.overFullscreenNote")}>
-      <Switch
-        label={t("settings.overFullscreen")}
-        checked={prefs.floatingOverFullscreen}
-        onchange={(on) => (prefs.floatingOverFullscreen = on)}
-      />
-    </FieldRow>
   </FieldGroup>
 {/if}

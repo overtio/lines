@@ -2,7 +2,7 @@
 
 **Calm, local-first notes in plain Markdown.** Type Markdown and see it formatted as you write. Your notes stay on your device, as ordinary text you can open anywhere.
 
-**[Try it in your browser →](https://overtio.github.io/lines/)** No account, nothing to install.
+**[Try it in your browser →](https://overtio.github.io/lines/)** No account, nothing to install. Or download the apps for Mac, Windows and Linux from [the releases](https://github.com/overtio/lines/releases).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/screenshot-dark.png">
@@ -34,6 +34,7 @@ The [demo website](https://overtio.github.io/lines/) opens with a tour: one shor
 - **Drag to move.** Grab the grip beside any line, list item, heading, table or card to move it, or use <kbd>⌥↑</kbd> / <kbd>⌥↓</kbd>.
 - **Arrows and symbols.** `->` shows as →, `!=` as ≠, and so on, on screen only. The note keeps what you typed.
 - **Copy buttons** on values in `Key: Value` lines and on table cells.
+- **Find and replace** in a note (<kbd>⌘F</kbd>), matching case, whole words or a regular expression.
 
 ### More than text
 
@@ -53,7 +54,14 @@ Switch a note to LaTeX from its ⓘ panel and write `\section`, theorems, citati
 
 ### Spreadsheets
 
-Switch a note to a spreadsheet from its ⓘ panel and work in a grid of cells, with formulas worked out by [IronCalc](https://www.ironcalc.com): the keys you know from Excel, functions suggested as you type, cells pointed at with the mouse or the arrow keys, copy and paste with other apps, series filled by dragging the selection's corner (1, 2 → 3, 4; Monday → Tuesday), cells moved by holding and dragging them, sorting, money, dates and negative numbers shown your way (accounting style too), the sum and average of what's selected, and rows and columns inserted with formulas that follow. Formulas can use other notes' spreadsheets (`=Budget!B4`), and follow them when they're renamed. It's kept as CSV, so it syncs and searches like any note. A ` ```csv ` code block (`/spreadsheet`) is a spreadsheet inside a Markdown note, worked in the same way, sized by dragging its corner, and turned into a Markdown table (or back) with a button. Import CSV files and Excel workbooks from Settings → Data, and download a spreadsheet as CSV (formulas or values) or as an Excel workbook. See [docs/spreadsheets.md](docs/spreadsheets.md).
+Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block). Formulas are worked out by [IronCalc](https://www.ironcalc.com). See [docs/spreadsheets.md](docs/spreadsheets.md).
+
+- **Works like Excel**: its keys, functions suggested as you type, cells pointed at with the mouse or the arrow keys, copy and paste with other apps, sorting, and rows and columns inserted with formulas that follow.
+- **Fill and move.** Drag the selection's corner to carry on a series (1, 2 → 3, 4; Monday → Tuesday), or hold cells a moment and drag them elsewhere.
+- **Money, dates and numbers below zero** shown your way, accounting style too, and the sum and average of what's selected.
+- **Formulas across notes.** `=Budget!B4` uses another note's spreadsheet, and follows it when it's renamed.
+- **Plain CSV underneath**, so it syncs and searches like any note. A block turns into a Markdown table, and back, with a button.
+- **CSV and Excel files.** Import them from Settings → Data; download a spreadsheet as CSV (formulas or values) or as an Excel workbook.
 
 ### Organizing
 
@@ -130,17 +138,22 @@ Press <kbd>⌘/</kbd> to see them all. On Windows and Linux, use <kbd>Ctrl</kbd>
 | [Storage](docs/storage.md) | Where the web app keeps your notes, and for how long |
 | [Limitations](docs/limitations.md) | What doesn't work yet, and what hasn't been tried on real devices |
 | [Accessibility](docs/accessibility.md) | Keyboard and screen reader use, and how it's checked |
+| [Performance](docs/performance.md) | How fast lines is with thousands of notes, and the benchmarks that check it |
+| [Releasing](docs/releasing.md) | Versions, release notes, and how the apps are built and published |
 | [Translations](docs/translations.md) | How translations work, and adding a language |
 
 ## Development
 
-You need [Node.js](https://nodejs.org) 22+ and [pnpm](https://pnpm.io). The native apps also need [Rust](https://rustup.rs) and the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/).
+You need [Bun](https://bun.com) 1.4+, which installs the packages and runs the scripts, and [Node.js](https://nodejs.org) 22+, which Vite, svelte-check and Tauri's CLI run on. The native apps also need [Rust](https://rustup.rs) and the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/).
 
 ```sh
-pnpm install
-pnpm dev            # web app at http://localhost:1420
-pnpm tauri dev      # desktop app (macOS, Windows, Linux)
-pnpm tauri build
+bun install
+bun run dev          # web app at http://localhost:1420
+bun run tauri dev    # desktop app (macOS, Windows, Linux)
+bun run tauri build
+bun run check        # types (svelte-check, tsc)
+bun run lint         # Oxlint
+bun run bench        # benchmarks in WebKit and Chromium (docs/performance.md)
 ```
 
 In a debug build of the desktop app, <kbd>F12</kbd> (or View → Developer Tools on a Mac) opens the Web Inspector.
@@ -152,12 +165,12 @@ Set up the native projects once, then run on a simulator or device:
 
 ```sh
 # iOS (needs Xcode)
-pnpm tauri ios init
-pnpm tauri ios dev
+bun run tauri ios init
+bun run tauri ios dev
 
 # Android (needs Android Studio, the SDK and NDK)
-pnpm tauri android init
-pnpm tauri android dev
+bun run tauri android init
+bun run tauri android dev
 ```
 
 </details>
@@ -165,7 +178,7 @@ pnpm tauri android dev
 <details>
 <summary><b>TeX, for typesetting LaTeX notes</b></summary>
 
-TeX itself (BusyTeX's engine and TeX Live's basic packages, about 125 MB) isn't in git. `pnpm tex-assets` downloads it into `public/busytex/`, so `pnpm dev` and builds include it. Without it everything else works, and the PDF preview says TeX isn't included. To keep the 125 MB out of a build (the desktop app embeds it), serve it from elsewhere and set `VITE_TEX_ASSETS` to that address when building.
+TeX itself (BusyTeX's engine and TeX Live's basic packages, about 125 MB) isn't in git. `bun run tex-assets` downloads it into `public/busytex/`, so `bun run dev` and builds include it. Without it everything else works, and the PDF preview says TeX isn't included. To keep the 125 MB out of a build (the desktop app embeds it), serve it from elsewhere and set `VITE_TEX_ASSETS` to that address when building.
 
 </details>
 
@@ -189,8 +202,8 @@ The website workflow reads them from the repository's secrets `UNSPLASH_ACCESS_K
 The web app with the feature tour instead of the welcome note, saving to a folder on the visitor's computer or in the browser ([docs/storage.md](docs/storage.md)). `.github/workflows/website.yml` publishes it to GitHub Pages on every push to main.
 
 ```sh
-pnpm build:site   # to dist-site/, works from any subfolder
-pnpm exec vite preview --outDir dist-site
+bun run build:site   # to dist-site/, works from any subfolder
+bunx vite preview --outDir dist-site
 ```
 
 </details>
@@ -216,17 +229,21 @@ pnpm exec vite preview --outDir dist-site
 src/
   App.svelte                 App shell and responsive layout
   app.css                    Design tokens (the theme's colors, one scale of sizes) as Tailwind's, light and dark
+  bench/                     The benchmarks' library of notes and in-page timing, only in `--mode bench` builds
   plugins/                   lines' own plugins, one folder each (docs/plugins.md)
     markdown/                Markdown, the format notes are written in by default (its editor is lib/editor)
     latex/                   LaTeX notes: editor.ts draws them, syntax.ts reads them, text.ts for the list and
                              exports, print.ts lays them out on paper
     spreadsheet/             Spreadsheet notes: sheet.ts reads their title and CSV, editor.ts and Grid.svelte
                              draw the grid to work in, index.ts lists, prints, imports and exports them;
-                             block.svelte.ts draws ```csv blocks in Markdown notes as the same grid
+                             block.svelte.ts draws ```csv blocks in Markdown notes as the same grid;
+                             links.ts finds the other spreadsheets formulas name, pointing.svelte.ts
+                             points at their cells, renames.svelte.ts follows them when they're renamed
     ironcalc/                The formula engine (IronCalc in WebAssembly), and reading and writing Excel workbooks
     tex/                     Typesets a LaTeX note with TeX (BusyTeX's pdfLaTeX in WebAssembly)
     katex/                   The math engine (KaTeX)
     mermaid/                 Mermaid diagrams: the renderer, its colors, /diagram
+    unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
     themes/                  The sixteen themes, as their colors
     lucide/  sf-symbols/     Icon sets
   lib/
@@ -249,6 +266,8 @@ src/
       dragBlocks.ts          Grips for dragging lines and blocks to move them
       cursor.ts              Draws the text cursor (WebKit can leave a stray native caret behind)
       rendered.ts            Code blocks drawn by renderer plugins (```mermaid): live, resizable, with their buttons; or to work in (```csv)
+      actions.ts             A block's buttons, down its right side or inside its corner
+      find.svelte.ts         The find bar (⌘F): finding and replacing in a note; FindBar.svelte draws it
       drawings.ts            Excalidraw drawings (SVGs holding their scene): spotting, opening, /drawing, from a diagram
       math.ts                Draws $math$ and $$ blocks with the math engine plugin
       texCommands.ts         The "\" menu of LaTeX commands, in math and in LaTeX notes
@@ -311,8 +330,11 @@ src/
 src-tauri/                   Native shell (Rust); sf_symbols.rs draws SF Symbols, lock.rs shares the
                              unlocked key with floating notes and does Touch ID
 src-tauri/icons/source/      App icon artwork (SVG): Mac layout and full-bleed for iOS/Android
-docs/                        Linedown, LaTeX, plugins, sync, storage, limitations, accessibility, translations
+docs/                        Linedown, LaTeX, spreadsheets, plugins, sync, storage, limitations, accessibility, translations, performance
 qa/                          Release checklist and QA notes (generated by scripts/qa-notes.mjs)
+scripts/bench.mjs            The benchmarks (bun run bench): builds, seeds 5,000 notes, drives WebKit and Chromium
+scripts/release.mjs          Versions and release notes from the commits (docs/releasing.md)
+.github/workflows/           Checks on every pull request, the release pull request, releases, the website
 ```
 
 </details>
@@ -352,7 +374,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 **Spreadsheets**
 - [ ] Several sheets in one spreadsheet note, with formulas between them
 - [ ] Column widths, number formats and bold kept in the note
-- [ ] Sort and filter
+- [ ] Filter, and sort by more than one column
 - [ ] Moving cells and resizing blocks with a finger
 
 **Notes**
@@ -413,16 +435,23 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [x] Choose what a click, ⌘-click and ⇧⌘-click do on links, tags and mentions
 - [x] Several notes at once: select, tag, pin and trash them together
 - [x] Plugins: formats, math and diagram engines, typesetters, themes and icon sets, each turned off or on in Settings → Plugins
+- [x] Spreadsheets: formulas in tables, spreadsheet notes and ` ```csv ` blocks, worked out by IronCalc; CSV and Excel files in and out
+- [x] Formulas that use other notes' spreadsheets, and follow them when they're renamed
+- [x] Find and replace in a note
+- [x] Two notes side by side (Open to the Side)
+- [x] Photos and GIFs from the web (`/unsplash`, `/giphy`)
+- [x] Settings in a window of its own in the desktop apps
 
 </details>
 
 ## Contributing
 
-Issues and pull requests are welcome. A change people can see also updates the docs, the QA checklist and the feature tour where they're affected (see [qa/README.md](qa/README.md)). Before opening a pull request, please run:
+Issues and pull requests are welcome; [CONTRIBUTING.md](CONTRIBUTING.md) says how, for people and coding agents alike, including the [contributor agreement](CLA.md) you agree to on your first pull request. In short: one change per pull request, its title a [Conventional Commit](https://www.conventionalcommits.org) (`fix(sync): keep edits made while a pass is running`), since it becomes the commit on main and the release notes. A change people can see also updates the docs, the QA checklist and the feature tour where they're affected. Before opening a pull request, please run:
 
 ```sh
-pnpm check
-pnpm build
+bun run check
+bun run lint
+bun run build
 ```
 
 ## License

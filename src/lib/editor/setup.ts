@@ -30,6 +30,9 @@ import { t as message } from "../i18n/index.svelte";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
 import type { MarkdownAddition } from "../plugins/types";
 
+/** Code blocks' languages by the name they give, looked up once each, as every edit parses the blocks again. */
+const codeLanguages = new Map<string, LanguageDescription | null>();
+
 /**
  * The parser for a code block's language (```sql, ```ts…). Each language is loaded the first time
  * a note uses it; until then the block shows as plain code.
@@ -37,7 +40,9 @@ import type { MarkdownAddition } from "../plugins/types";
 function codeParser(info: string): Parser | null {
   // ```math is LaTeX, drawn as math (math.ts).
   const name = /\S*/.exec(info)![0].replace(/^math$/i, "latex");
-  const found = name ? LanguageDescription.matchLanguageName(languages, name, true) : null;
+  if (!name) return null;
+  let found = codeLanguages.get(name);
+  if (found === undefined) codeLanguages.set(name, (found = LanguageDescription.matchLanguageName(languages, name, true)));
   if (!found) return null;
   return found.support ? found.support.language.parser : ParseContext.getSkippingParser(found.load());
 }
@@ -273,7 +278,8 @@ export function readOnly(value: boolean): Extension {
   return [EditorState.readOnly.of(value), EditorView.editable.of(!value)];
 }
 
-export function createExtensions(onChange: () => void): Extension[] {
+/** A note's editor, set up for its language (`format`) from the start. */
+export function createExtensions(onChange: () => void, format?: string): Extension[] {
   return [
     history(),
     EditorView.lineWrapping,
@@ -286,7 +292,7 @@ export function createExtensions(onChange: () => void): Extension[] {
       // and the spellchecker use the device's own languages rather than reading it as French, say.
       lang: "",
     }),
-    formatCompartment.of(formatEditing()),
+    formatCompartment.of(formatEditing(format)),
     cursor,
     syntaxHighlighting(highlightStyle),
     find,

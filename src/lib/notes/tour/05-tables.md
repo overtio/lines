@@ -23,18 +23,6 @@ A cell that starts with `=` is a formula, as in a spreadsheet. Columns are A, B,
 
 Click a cell to see its formula. Type `/table` to start one.
 
-## Spreadsheets
-
-A `csv` code block is a spreadsheet in the note: a grid of cells with the keys you know from Excel and Numbers. Click a cell and type, or press Return to change it; ↓ from the line above goes in. Type `/spreadsheet` to start one. Drag the small square on the selection's corner to go on from it, as in Excel: January → February, 1, 2 → 3, 4.
-
-```csv
-Month, Spent
-January, 820
-February, 760
-March, 905
-Average, =AVERAGE(B2:B4)
-```
-
-For a whole spreadsheet, switch a note to Spreadsheet in its ⓘ panel. Settings → Data imports CSV files and Excel workbooks.
+For a grid of cells to work in, see the next note.
 
 #tour

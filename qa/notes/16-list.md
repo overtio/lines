@@ -1,6 +1,6 @@
 # QA · Everything in a list item
 
-Each element in a list item. Check: it draws as it does on its own, sits inside the container's edges with even space around it, and its Markdown shows while the cursor is in it. Tables, diagrams and attachments in quotes and list items stay as Markdown.
+Each element in a list item. Check: it draws as it does on its own, sits inside the container's edges with even space around it, and its Markdown shows while the cursor is in it. Tables, spreadsheets, diagrams and attachments in quotes and list items stay as Markdown.
 
 #qa/containers
 
@@ -141,7 +141,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   | Total | =SUM(B2:B3) |
   | Broken | =B2/0 |
 
-#### 18. Spreadsheet (csv block) in a list item
+#### 18. Spreadsheet (csv block) in a list item (stays Markdown here)
 
 - List item
 
@@ -152,7 +152,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Total, =SUM(B2:B3)
   ```
 
-#### 19. Named spreadsheet (csv name=), and a formula in another block using it in a list item
+#### 19. Named spreadsheet (csv name=), and a formula in another block using it in a list item (stays Markdown here)
 
 - List item
 

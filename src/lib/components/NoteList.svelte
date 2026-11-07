@@ -14,7 +14,7 @@
 </script>
 
 <script lang="ts">
-  import { untrack } from "svelte";
+  import { flushSync, untrack } from "svelte";
   import { speak } from "../a11y";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
@@ -24,6 +24,7 @@
   import { deletePicked, pinPicked, restorePicked, tagPicked, trashPicked } from "../notes/picked";
   import { prefs } from "../prefs.svelte";
   import { ui } from "../ui.svelte";
+  import { ListWindow } from "./listWindow.svelte";
   import NoteRow from "./NoteRow.svelte";
   import SidebarToggle from "./SidebarToggle.svelte";
   import IconButton from "./ui/IconButton.svelte";
@@ -38,12 +39,10 @@
   });
 
   /**
-   * The row Tab lands on: the open note's, else the first. The others are reached with the arrow
+   * Which row Tab lands on: the open note's, else the first. The others are reached with the arrow
    * keys, so the list is one stop on the way through the app rather than one per note.
    */
-  const tabStop = $derived(
-    notes.visible.some((e) => e.note.id === notes.selectedId) ? notes.selectedId : (notes.visible[0]?.note.id ?? null),
-  );
+  const tabStop = $derived(Math.max(0, notes.visible.findIndex((e) => e.note.id === notes.selectedId)));
 
   // Screen readers hear how many notes a search finds, once typing pauses.
   $effect(() => {
@@ -63,9 +62,31 @@
   // Only a new day re-renders the rows' dates; a new Date for each edit would redo every row.
   const now = $derived(new Date(today));
 
+  /** The space between rows, where their divider is (the styles below). */
+  const ROW_GAP = 6;
+
   let list: HTMLUListElement;
   /** The row that's swiped open, if any. */
   let swipedId = $state<string | null>(null);
+
+  /**
+   * The rows drawn: those in view and some way around, and the one Tab lands on wherever it is, so
+   * focus can go to it (Tab, F6, after a note is trashed) and stay on it as the list scrolls.
+   */
+  const rows = new ListWindow({
+    element: () => list,
+    items: () => notes.visible,
+    key: (entry) => entry.note.id,
+    keep: () => tabStop,
+    gap: ROW_GAP,
+    overscan: 1500,
+  });
+
+  // A note opened from elsewhere (a mention, a search, a new note) is shown in the list too.
+  $effect(() => {
+    const id = notes.selectedId;
+    untrack(() => rows.show(notes.visible.findIndex((e) => e.note.id === id)));
+  });
 
   const picked = $derived(notes.pickedEntries);
   const inTrash = $derived(notes.filter.kind === "trash");
@@ -119,22 +140,24 @@
       focusList();
       return;
     }
-    const ids = notes.visible.map((e) => e.note.id);
-    const index = ids.indexOf(notes.selectedId ?? "");
+    const entries = notes.visible;
+    const index = entries.findIndex((e) => e.note.id === notes.selectedId);
     let to: number;
     if (event.key === "ArrowDown") to = index + 1;
     else if (event.key === "ArrowUp") to = index - 1;
     else if (event.key === "Home") to = 0;
-    else if (event.key === "End") to = ids.length - 1;
+    else if (event.key === "End") to = entries.length - 1;
     else return;
     event.preventDefault();
-    const next = ids[Math.max(0, Math.min(ids.length - 1, to))];
+    const next = entries[Math.max(0, Math.min(entries.length - 1, to))]?.note.id;
     if (!next) return;
     if (event.shiftKey) notes.pickRange(next);
     else {
       notes.clearPicks();
       notes.select(next);
     }
+    // Its row is drawn now, as the one Tab lands on, wherever it is; focus scrolls to it.
+    flushSync();
     list.querySelector<HTMLElement>(`[data-id="${next}"]`)?.focus();
   }
 </script>
@@ -236,21 +259,32 @@
     </p>
   {/if}
 
-  <!-- The same inset as the search field, so the rows line up under it. -->
+  <!-- The same inset as the search field, so the rows line up under it. The rows not drawn are
+       space above and below the drawn ones (the styles below), so it scrolls as far as all of them. -->
   <ul
-    class="items flex-1 overflow-y-auto overscroll-contain px-3 pb-6 outline-none"
+    class="items relative flex-1 overflow-y-auto overscroll-contain px-3 pb-6 outline-none"
+    style:--before="{rows.before}px"
+    style:--after="{rows.after}px"
     bind:this={list}
+    bind:clientHeight={rows.viewHeight}
     aria-labelledby="note-list-title"
-    onscroll={() => (swipedId = null)}
+    onscroll={() => {
+      swipedId = null;
+      rows.scrolled();
+    }}
   >
-    {#each notes.visible as entry (entry.note.id)}
+    {#each rows.drawn as { item: entry, index, top } (entry.note.id)}
       {@const id = entry.note.id}
       <NoteRow
         {entry}
         {now}
+        {index}
+        count={notes.visible.length}
+        {top}
+        measure={rows.measure(id)}
         selected={id === notes.selectedId}
         picked={notes.picked.has(id)}
-        tabbable={id === tabStop}
+        tabbable={index === tabStop}
         open={swipedId === id}
         onswipe={(open) => (swipedId = open ? id : swipedId === id ? null : swipedId)}
         onkeydown={onListKeydown}
@@ -261,15 +295,33 @@
 
 <style>
   /*
-   * A gap between rows, with a divider centered in it, which hides next to a highlighted, swiped or
-   * right-clicked row. It's on the li because content-visibility clips anything outside it, and
-   * it's CSS because it depends on the rows beside.
+   * The space of the rows not drawn. It's in the list's flow, so the browser's scroll anchoring
+   * keeps the rows in view still as it changes.
    */
-  .items > :global(li + li) {
+  .items::before,
+  .items::after {
+    content: "";
+    display: block;
+  }
+
+  .items::before {
+    height: var(--before);
+  }
+
+  .items::after {
+    height: var(--after);
+  }
+
+  /*
+   * A gap above every row but the list's first (ROW_GAP), with a divider centered in it, which
+   * hides next to a highlighted, swiped or right-clicked row. It's CSS because it depends on the
+   * rows beside.
+   */
+  .items > :global(li:not([aria-posinset="1"])) {
     padding-top: 6px;
   }
 
-  .items > :global(li + li::before) {
+  .items > :global(li:not([aria-posinset="1"])::before) {
     content: "";
     position: absolute;
     top: 2.5px;

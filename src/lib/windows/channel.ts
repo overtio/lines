@@ -37,7 +37,7 @@ export type WindowMessage =
   | { type: "settings-section"; section: string }
   /** The Settings window asks the main window to do something, and hears how it went. */
   | { type: "call"; id: string; target: string; method: string; args: unknown[] }
-  | { type: "reply"; id: string; result?: unknown; error?: string }
+  | { type: "reply"; id: string; result?: unknown; error?: string; state: import("./settings.svelte").LockState }
   /** How sync is doing in the main window, and the Settings window asking for it. */
   | { type: "sync-state"; state: import("./settings.svelte").SyncState }
   | { type: "sync-ask" }

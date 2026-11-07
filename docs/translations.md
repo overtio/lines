@@ -24,7 +24,7 @@ Dates and numbers are written the device's way in the app's language: `en-GB` wi
 1. Copy `src/lib/i18n/locales/fr/` to a folder named for the language's [BCP 47](https://www.rfc-editor.org/info/bcp47) tag, like `de/` or `pt-BR/`.
 2. Translate the messages in each file. Keys stay as they are.
 3. Add it to `LANGUAGES` in `src/lib/i18n/index.svelte.ts`, named in its own language (`{ id: "de", name: "Deutsch", messages: de }`), with its import.
-4. `pnpm i18n` lists any message not yet translated, file by file. `pnpm check` finds keys English doesn't have (a typo, or a message since removed).
+4. `bun run i18n` lists any message not yet translated, file by file. `bun run check` finds keys English doesn't have (a typo, or a message since removed).
 
 A language can ship partly translated; what's missing shows in English.
 
@@ -40,4 +40,4 @@ A language can ship partly translated; what's missing shows in English.
 
 ## Adding text to the app
 
-New text goes into the English file for its area, with a key starting with that area (`list.emptyTrash`), and is looked up with `t()`. Add the Spanish and French while you're there if you can; otherwise `pnpm i18n` lists them for a translator. Text set once when a file loads (`const LABELS = [t("…")]`) is fine, because the language never changes while lines runs.
+New text goes into the English file for its area, with a key starting with that area (`list.emptyTrash`), and is looked up with `t()`. Add the Spanish and French while you're there if you can; otherwise `bun run i18n` lists them for a translator. Text set once when a file loads (`const LABELS = [t("…")]`) is fine, because the language never changes while lines runs.

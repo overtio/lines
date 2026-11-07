@@ -11,6 +11,8 @@ import { t } from "./i18n/index.svelte";
 
 /** OWASP's recommendation for PBKDF2-HMAC-SHA256 (2023). */
 const ITERATIONS = 600_000;
+/** The most a key may ask for: room for stronger ones later, not for one that never finishes opening. */
+const MAX_ITERATIONS = 10 * ITERATIONS;
 /** The first byte of everything sealed here, so the format can change later. */
 const VERSION = 1;
 
@@ -106,7 +108,9 @@ export async function lockKey(raw: Bytes, passphrase: string): Promise<LockedKey
 }
 
 export async function unlockKey(locked: LockedKey, passphrase: string): Promise<Bytes> {
-  if (locked.kdf !== "PBKDF2-SHA256" || !(locked.iterations >= 100_000)) throw new Unreadable(t("lock.error.unknownFormat"));
+  if (locked.kdf !== "PBKDF2-SHA256" || !(locked.iterations >= 100_000 && locked.iterations <= MAX_ITERATIONS)) {
+    throw new Unreadable(t("lock.error.unknownFormat"));
+  }
   const key = await passphraseKey(passphrase, fromBase64(locked.salt), locked.iterations);
   try {
     return await open(key, fromBase64(locked.key), "key");

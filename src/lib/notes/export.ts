@@ -4,17 +4,21 @@ import { zip, type ZipEntry } from "../zip";
 import { getAttachment, referencedAttachments } from "./attachments";
 import { isClosed, type Entry } from "./store.svelte";
 
-/** A title made safe as a file name on every system: "Trip: Rome/Paris?" → "Trip - Rome-Paris". */
-function fileName(title: string) {
+/**
+ * A title made safe as a file name on every system: "Trip: Rome/Paris?" → "Trip - Rome-Paris".
+ * Composed, as macOS treats "é" typed either way as the same name.
+ */
+export function fileName(title: string) {
   const safe = title
+    .normalize("NFC")
     .replace(/[\\/]+/g, "-")
     .replace(/\s*:\s*/g, " - ")
-    .replace(/[*?"<>|\u0000-\u001f]+/g, "")
-    .replace(/\s+/g, " ")
-    .replace(/^[.\s-]+|[.\s-]+$/g, "")
-    .slice(0, 100)
-    .trim();
-  return safe || t("list.untitled");
+    .replace(/[*?"<>|]+/g, "")
+    // oxlint-disable-next-line no-control-regex -- control characters are what it takes out
+    .replace(/[\s\u0000-\u001f]+/g, " ")
+    .replace(/^[.\s-]+|[.\s-]+$/g, "");
+  // By character, so an emoji isn't cut in half.
+  return Array.from(safe).slice(0, 100).join("").trim() || t("list.untitled");
 }
 
 /**

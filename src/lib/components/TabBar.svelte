@@ -44,8 +44,11 @@
     ui.openMenu({ x, y, label: titleOf(id), items });
   }
 
-  /** After the bar redraws, focus goes to the open tab. */
-  const focusOpen = () => requestAnimationFrame(() => bar?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.focus());
+  /** After the bar redraws, focus goes to the open tab, or to the note list once the last has closed. */
+  const focusOpen = () =>
+    requestAnimationFrame(() =>
+      (bar?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]') ?? document.querySelector<HTMLElement>('.note-list .item[tabindex="0"]'))?.focus(),
+    );
 
   function onkeydown(event: KeyboardEvent) {
     const target = event.target as HTMLElement;

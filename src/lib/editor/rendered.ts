@@ -1,17 +1,15 @@
 import { isolateHistory } from "@codemirror/commands";
-import { syntaxTree } from "@codemirror/language";
-import { type EditorState, type Extension, Prec, type Range, StateField } from "@codemirror/state";
-import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, WidgetType } from "@codemirror/view";
-import type { SyntaxNode } from "@lezer/common";
+import { type EditorState, type Extension, Prec } from "@codemirror/state";
+import { EditorView, keymap, ViewPlugin, WidgetType } from "@codemirror/view";
+import type { SyntaxNode, SyntaxNodeRef } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
 import { t } from "../i18n/index.svelte";
 import { plugins } from "../plugins/registry.svelte";
 import type { BlockAction, BlockEditor, EditableBlock, Renderer } from "../plugins/types";
-import { actionBar, dropBar, keepBeside } from "./actions";
+import { actionBar, dropBar, keepBeside, resizeHandle } from "./actions";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
-import { coarsePointer } from "../platform";
-import { ancestors, changeBetween, focusChanged, focused, isEditing } from "./util";
+import { ancestors, arrowsInto, blockPos, changeBetween, clickToShowCode, drawnBlock, drawnBlocks, focused, isEditing, showCode } from "./util";
 
 /*
  * Code blocks drawn by a renderer plugin: ```mermaid as its diagram, say, in the theme's colors.
@@ -144,11 +142,6 @@ function message(text: string, error = false) {
   return pre;
 }
 
-/* Resizing. */
-
-/** The narrowest a drawing can be dragged. */
-const MIN_WIDTH = 80;
-
 /** Puts a drawing in a frame with its resize handle, at its width. */
 function frame(dom: HTMLElement, svg: SVGSVGElement, view: EditorView) {
   // Its own width, from its style (Mermaid draws it as wide as the note, up to that) or its view box.
@@ -156,7 +149,14 @@ function frame(dom: HTMLElement, svg: SVGSVGElement, view: EditorView) {
   const frame = document.createElement("span");
   frame.className = "cm-lp-diagram-frame";
   svg.replaceWith(frame);
-  frame.append(svg, resizeHandle(view, dom));
+  const handle = resizeHandle(view, dom, "cm-lp-diagram-resize", {
+    target: () => svg,
+    min: 80,
+    max: () => dom.clientWidth,
+    show: setWidth,
+    write: (width) => writeWidth(view, dom, width),
+  });
+  frame.append(svg, handle);
   setWidth(svg, live.get(dom)?.width ?? null);
 }
 
@@ -170,60 +170,8 @@ function setWidth(svg: SVGSVGElement, width: number | null) {
 
 /** Writes a drawing's width after its language (```mermaid |400), or takes it out (null). */
 function writeWidth(view: EditorView, dom: HTMLElement, width: number | null) {
-  const pos = view.posAtDOM(dom);
-  // A preview sits after the block's last line; the block is just before it.
-  const node = fenceAt(view.state, dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos);
+  const node = fenceAt(view.state, blockPos(view, dom));
   if (node) writeInfo(view, node, { width }, "input.resize");
-}
-
-/**
- * The handle on a drawing's bottom right corner: dragged, it makes the drawing wider or narrower
- * (keeping its shape, and no wider than the note); double-clicked, back to its own size. From the
- * keyboard, the width is the number after the bar on its first line.
- */
-function resizeHandle(view: EditorView, dom: HTMLElement) {
-  const handle = document.createElement("span");
-  handle.className = "cm-lp-resize cm-lp-diagram-resize";
-  handle.title = coarsePointer.matches ? "" : t("editor.image.resizeHint");
-  handle.setAttribute("aria-hidden", "true");
-  handle.addEventListener("pointerdown", (event) => {
-    const svg = dom.querySelector<SVGSVGElement>(".cm-lp-diagram-frame > svg");
-    if (event.button !== 0 || view.state.readOnly || !svg) return;
-    // No mousedown follows, so the editor doesn't show the diagram's code.
-    event.preventDefault();
-    event.stopPropagation();
-    try {
-      handle.setPointerCapture(event.pointerId);
-    } catch {
-      // A pointer the browser no longer tracks: moves over the handle still resize.
-    }
-    const max = dom.clientWidth;
-    const start = svg.getBoundingClientRect().width;
-    const x = event.clientX;
-    let width = start;
-    dom.classList.add("is-resizing");
-    const move = (moved: PointerEvent) => {
-      width = Math.round(Math.min(max, Math.max(MIN_WIDTH, start + moved.clientX - x)));
-      setWidth(svg, width);
-      view.requestMeasure();
-    };
-    const end = () => {
-      handle.removeEventListener("pointermove", move);
-      handle.removeEventListener("pointerup", end);
-      handle.removeEventListener("pointercancel", end);
-      dom.classList.remove("is-resizing");
-      if (Math.abs(width - start) >= 1) writeWidth(view, dom, width);
-    };
-    handle.addEventListener("pointermove", move);
-    handle.addEventListener("pointerup", end);
-    handle.addEventListener("pointercancel", end);
-  });
-  handle.addEventListener("dblclick", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!view.state.readOnly) writeWidth(view, dom, null);
-  });
-  return handle;
 }
 
 /**
@@ -239,11 +187,7 @@ export function addActions(view: EditorView, dom: HTMLElement, actions: BlockAct
     button.className = "cm-lp-action";
     button.title = action.label;
     button.setAttribute("aria-label", action.label);
-    button.addEventListener("click", () => {
-      const pos = view.posAtDOM(dom);
-      // A preview sits after the block's last line; the block is just before it.
-      action.run(view, dom.classList.contains("is-preview") ? Math.max(0, pos - 1) : pos);
-    });
+    button.addEventListener("click", () => action.run(view, blockPos(view, dom)));
     bar.append(button);
     return mount(Icon, { target: button, props: { name: action.icon, size: 15 } });
   });
@@ -385,11 +329,7 @@ class Block implements EditableBlock {
 
   showCode() {
     const node = this.#node();
-    if (!node) return;
-    const { doc } = this.view.state;
-    const fence = doc.lineAt(node.from);
-    this.view.dispatch({ selection: { anchor: fence.number < doc.lines ? doc.line(fence.number + 1).from : fence.to }, scrollIntoView: true });
-    this.view.focus();
+    if (node) showCode(this.view, node.from);
   }
 }
 
@@ -505,68 +445,29 @@ const editableKeymap = Prec.high(
   ]),
 );
 
-function buildBlocks(state: EditorState): DecorationSet {
-  const decos: Range<Decoration>[] = [];
-  syntaxTree(state).iterate({
-    enter(node) {
-      // Drawn blocks are top-level blocks or in cards; nothing else needs a look inside.
-      if (node.name === "Document" || node.name === "Card") return true;
-      if (node.name !== "FencedCode") return false;
-      const info = node.node.getChild("CodeInfo");
-      const rendered = info && renderedInfo(state.sliceDoc(info.from, info.to));
-      if (!rendered) return false;
-      // Only blocks on lines of their own (not in a quote or list item, whose lines start with > or -).
-      const first = state.doc.lineAt(node.from);
-      if (state.sliceDoc(first.from, node.from).trim()) return false;
-      const code = node.node.getChild("CodeText");
-      const source = code ? state.sliceDoc(code.from, code.to) : "";
-      const inset = cardInset(state, node.node);
-      if (rendered.renderer.editor) {
-        // In place of its code, which shows as it is while the cursor's in it.
-        if (!isEditing(state, node.from, node.to)) {
-          const widget = new EditableWidget(rendered.renderer, source, rendered.name, inset);
-          decos.push(Decoration.replace({ widget, block: true }).range(first.from, state.doc.lineAt(node.to).to));
-        }
-      } else if (isEditing(state, node.from, node.to)) {
-        const widget = new RenderedWidget(rendered.renderer, source, rendered.width, inset, true);
-        decos.push(Decoration.widget({ widget, block: true, side: 1 }).range(state.doc.lineAt(node.to).to));
-      } else {
-        const widget = new RenderedWidget(rendered.renderer, source, rendered.width, inset, false);
-        decos.push(Decoration.replace({ widget, block: true }).range(first.from, state.doc.lineAt(node.to).to));
-      }
-      return false;
-    },
-  });
-  return Decoration.set(decos, true);
+function drawBlock(state: EditorState, node: SyntaxNodeRef) {
+  if (node.name !== "FencedCode") return null;
+  const info = node.node.getChild("CodeInfo");
+  const rendered = info && renderedInfo(state.sliceDoc(info.from, info.to));
+  if (!rendered) return null;
+  // Only blocks on lines of their own (not in a quote or list item, whose lines start with > or -).
+  const first = state.doc.lineAt(node.from);
+  if (state.sliceDoc(first.from, node.from).trim()) return null;
+  const code = node.node.getChild("CodeText");
+  const source = code ? state.sliceDoc(code.from, code.to) : "";
+  const inset = cardInset(state, node.node);
+  const last = state.doc.lineAt(node.to).to;
+  const editing = isEditing(state, node.from, node.to);
+  // A block to work in shows its code as it is while the cursor's in it; a drawing, above it.
+  if (!rendered.renderer.editor) return drawnBlock(new RenderedWidget(rendered.renderer, source, rendered.width, inset, editing), first.from, last, editing);
+  return editing ? null : drawnBlock(new EditableWidget(rendered.renderer, source, rendered.name, inset), first.from, last);
 }
 
-const blocks = StateField.define<DecorationSet>({
-  create: buildBlocks,
-  update(decos, tr) {
-    if (tr.docChanged || tr.selection || focusChanged(tr) || syntaxTree(tr.startState) !== syntaxTree(tr.state)) {
-      return buildBlocks(tr.state);
-    }
-    return decos;
-  },
-  provide: (field) => EditorView.decorations.from(field),
-});
+// Drawn blocks are top-level blocks or in cards.
+const blocks = drawnBlocks(drawBlock);
 
-/** Clicking a drawing shows its code, with the cursor at the start. */
-const clickToEdit = EditorView.domEventHandlers({
-  mousedown(event, view) {
-    const dom = (event.target as HTMLElement).closest<HTMLElement>(".cm-lp-diagram");
-    if (!dom) return false;
-    event.preventDefault();
-    // Its buttons' own, on click, and its resize handle's.
-    if ((event.target as HTMLElement).closest(".cm-lp-actions, .cm-lp-diagram-resize")) return true;
-    if (event.button !== 0 || view.state.readOnly || dom.classList.contains("is-preview")) return true;
-    const { doc } = view.state;
-    const fence = doc.lineAt(view.posAtDOM(dom));
-    const anchor = fence.number < doc.lines ? doc.line(fence.number + 1).from : fence.to;
-    view.dispatch({ selection: { anchor }, scrollIntoView: true });
-    view.focus();
-    return true;
-  },
-});
+/** Clicking a drawing shows its code, with the cursor at the start; its buttons and resize handle do their own. */
+const clickToEdit = clickToShowCode(".cm-lp-diagram", ".cm-lp-actions, .cm-lp-diagram-resize");
 
-export const renderedBlocks: Extension = [focused, blocks, clickToEdit, editableUpdates, editableKeymap];
+// ↑ and ↓ go into a spreadsheet's grid, or else into a block's code.
+export const renderedBlocks: Extension = [focused, blocks, clickToEdit, editableUpdates, editableKeymap, arrowsInto(blocks)];

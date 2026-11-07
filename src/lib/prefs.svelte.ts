@@ -447,10 +447,6 @@ class Prefs {
     void onAnnounce((message) => message.type === "prefs" && this.#reload(message.prefs));
   }
 
-  /**
-   * Reads every preference that changes line heights, so an effect calling it
-   * re-runs when they change and can tell CodeMirror to measure again.
-   */
   /** Makes notes' text a step bigger (1) or smaller (-1), or its usual size (0), within its range; returns the new size. */
   stepTextSize(by: -1 | 0 | 1) {
     const next = by === 0 ? DEFAULTS.textSize : this.textSize + by * TEXT_SIZE.step;
@@ -458,6 +454,10 @@ class Prefs {
     return this.textSize;
   }
 
+  /**
+   * Reads every preference that changes line heights, so an effect calling it
+   * re-runs when they change and can tell CodeMirror to measure again.
+   */
   watchLayout() {
     return [this.font, this.textSize, $state.snapshot(this.spacing)];
   }

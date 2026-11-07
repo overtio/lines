@@ -1,4 +1,6 @@
 import { t } from "../i18n/index.svelte";
+import type { LockSettings } from "../lock/lock.svelte";
+import type { NotesPassword } from "../notes/noteKeys.svelte";
 import { isDesktopApp } from "../platform";
 import { sectionOf, type SettingsSection } from "../components/settings/sections";
 import { ui } from "../ui.svelte";
@@ -75,6 +77,15 @@ const FORWARDED: Record<string, string[]> = {
   notes: ["addSamples", "reset", "setFilter"],
 };
 
+/**
+ * The app lock's and locked notes' settings as the main window has them after a call, sent with
+ * its reply: read from storage, they could still be the old ones in this window for a moment.
+ */
+export interface LockState {
+  lock: LockSettings | null;
+  noteKeys: NotesPassword | null;
+}
+
 /** Sync's state as Settings shows it. */
 export interface SyncState {
   config: unknown;
@@ -86,24 +97,11 @@ export interface SyncState {
 
 /**
  * In the Settings window: these objects' forwarded methods run in the main window instead, and
- * `after` runs once each is done there (to read again what it changed). Sync's state follows the main window's.
+ * `after` takes up the lock settings each leaves there. Sync's state follows the main window's;
+ * this resolves once it's first heard.
  */
-export function forwardToMain(targets: Record<string, Target>, sync: SyncState, after: () => void) {
+export async function forwardToMain(targets: Record<string, Target>, sync: SyncState, after: (state: LockState) => void) {
   const waiting = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void }>();
-  void onAnnounce((message) => {
-    if (message.type === "reply") {
-      const call = waiting.get(message.id);
-      if (!call) return;
-      waiting.delete(message.id);
-      after();
-      if (message.error === undefined) call.resolve(message.result);
-      else call.reject(new Error(message.error));
-    } else if (message.type === "sync-state") {
-      Object.assign(sync, message.state);
-    } else if (message.type === "settings-section") {
-      ui.settings = sectionOf(message.section);
-    }
-  });
   for (const [name, names] of Object.entries(FORWARDED)) {
     for (const method of names) {
       methods(targets[name])[method] = (...args: unknown[]) =>
@@ -114,11 +112,30 @@ export function forwardToMain(targets: Record<string, Target>, sync: SyncState, 
         });
     }
   }
+  let heard!: () => void;
+  const synced = new Promise<void>((resolve) => (heard = resolve));
+  // Listening before asking, so the answer isn't missed.
+  await onAnnounce((message) => {
+    if (message.type === "reply") {
+      const call = waiting.get(message.id);
+      if (!call) return;
+      waiting.delete(message.id);
+      after(message.state);
+      if (message.error === undefined) call.resolve(message.result);
+      else call.reject(new Error(message.error));
+    } else if (message.type === "sync-state") {
+      Object.assign(sync, message.state);
+      heard();
+    } else if (message.type === "settings-section") {
+      ui.settings = sectionOf(message.section);
+    }
+  });
   void announce({ type: "sync-ask" });
+  return synced;
 }
 
 /** In the main window: does what the Settings window asks, and tells it how sync is doing. */
-export function serveSettings(targets: Record<string, Target>, syncState: () => SyncState) {
+export function serveSettings(targets: Record<string, Target>, syncState: () => SyncState, lockState: () => LockState) {
   const tell = () => void announce({ type: "sync-state", state: syncState() });
   $effect.root(() => {
     $effect(tell);
@@ -129,9 +146,9 @@ export function serveSettings(targets: Record<string, Target>, syncState: () => 
     try {
       const method = methods(targets[message.target])[message.method] as Method;
       const result = await method.apply(targets[message.target], message.args as never[]);
-      void announce({ type: "reply", id: message.id, result: result ?? null });
+      void announce({ type: "reply", id: message.id, result: result ?? null, state: lockState() });
     } catch (e) {
-      void announce({ type: "reply", id: message.id, error: e instanceof Error ? e.message : String(e) });
+      void announce({ type: "reply", id: message.id, error: e instanceof Error ? e.message : String(e), state: lockState() });
     }
   });
 }

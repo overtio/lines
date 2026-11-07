@@ -1,6 +1,9 @@
 import type { SettingsSection } from "./components/settings/sections";
 import type { IconName } from "./icons/icons";
-import { prefs } from "./prefs.svelte";
+import { PANE_WIDTHS, prefs } from "./prefs.svelte";
+
+/** The narrowest the open note gets, beside the sidebar and note list or a note open beside it. */
+export const NOTE_MIN = 360;
 
 export type Layout = "wide" | "medium" | "narrow";
 
@@ -56,8 +59,10 @@ class UIState {
   sidebarOpen = $state(this.layout === "wide");
   /** Focus mode: just the note, with the sidebar and note list tucked away. */
   focus = $state(false);
-  /** The note open beside the selected one (Open to the Side), on wide and medium screens. */
+  /** The note open beside the selected one (Open to the Side), shown while there's room (`besideFits`). */
   side = $state<string | null>(null);
+  /** How wide the note's pane is (App.svelte), which decides whether a note fits beside the open one. */
+  editorWidth = $state(0);
   /** The open Settings tab, or null when Settings is closed. */
   settings = $state<SettingsSection | null>(null);
   menu = $state.raw<Menu | null>(null);
@@ -88,6 +93,11 @@ class UIState {
   get sidebarToggle(): "list" | "editor" | null {
     if ((this.layout === "wide" && this.sidebarOpen) || (this.focus && this.layout !== "narrow")) return null;
     return this.layout === "narrow" || prefs.listSide === prefs.sidebarSide ? "list" : "editor";
+  }
+
+  /** A note can show beside the open one: not on a phone, and with room for both. */
+  get besideFits() {
+    return this.layout !== "narrow" && this.editorWidth >= NOTE_MIN + PANE_WIDTHS.side.min;
   }
 
   toggleSidebar() {

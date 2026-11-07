@@ -56,20 +56,21 @@ function withoutComment(line: string) {
   return at ? line.slice(0, at.index) : line;
 }
 
-/** Each line of a LaTeX note as it reads, and whether it's a heading. Lines that are all markup are empty. */
-export function latexLines(body: string): { text: string; heading: boolean }[] {
-  return body.split("\n").map((line) => {
-    const code = withoutComment(line);
-    let text = "";
-    let last = 0;
-    for (const math of code.matchAll(MATH)) {
-      text += latexText(code.slice(last, math.index)) + math[0];
-      last = math.index + math[0].length;
-    }
-    text += latexText(code.slice(last));
-    return { text: text.trimEnd(), heading: HEADING.test(code) };
-  });
+/** A line of a LaTeX note as it reads, and whether it's a heading. A line that's all markup is empty. */
+export function latexLine(line: string): { text: string; heading: boolean } {
+  const code = withoutComment(line);
+  let text = "";
+  let last = 0;
+  for (const math of code.matchAll(MATH)) {
+    text += latexText(code.slice(last, math.index)) + math[0];
+    last = math.index + math[0].length;
+  }
+  text += latexText(code.slice(last));
+  return { text: text.trimEnd(), heading: HEADING.test(code) };
 }
+
+/** Each line of a LaTeX note as it reads (`latexLine`). */
+export const latexLines = (body: string) => body.split("\n").map(latexLine);
 
 /** The `begin{document}` line of a whole document, which ends its preamble. */
 export const DOCUMENT_BEGIN = /^[^%\n]*\\begin\{document\}.*$/m;

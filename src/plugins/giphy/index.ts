@@ -2,7 +2,7 @@ import { giphyGif } from "../../lib/editor/giphy";
 import { named, SECTIONS } from "../../lib/editor/slashCommands";
 import { type FoundImage, type ImageLibrary, pickWebImage } from "../../lib/editor/webImages";
 import { language, t } from "../../lib/i18n/index.svelte";
-import { webFetch } from "../../lib/platform";
+import { reducedMotion, webFetch } from "../../lib/platform";
 import type { Plugin } from "../../lib/plugins/types";
 
 /*
@@ -28,8 +28,6 @@ interface Found {
   data: Gif[];
   pagination: { total_count: number; count: number; offset: number };
 }
-
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function found(gif: Gif): FoundImage {
   const { fixed_width: moving, fixed_width_still: still } = gif.images;

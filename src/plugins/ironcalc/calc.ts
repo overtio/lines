@@ -1,7 +1,7 @@
 import init, { columnNameFromNumber, getAllTimezones, getTokens, type MarkedToken, Model } from "@ironcalc/wasm-xlsx";
 import wasm from "@ironcalc/wasm-xlsx/wasm_bg.wasm?url";
 import { trimCells } from "../../lib/sheets/csv";
-import { writtenMoney } from "../../lib/sheets/display";
+import { numberFormat, writtenMoney } from "../../lib/sheets/display";
 import { sheetName } from "../../lib/sheets/formulas";
 import { isFormula, movedCells, shiftCells, shifted } from "../../lib/sheets/cells";
 import type {
@@ -68,8 +68,8 @@ function setInput(model: Model, sheet: number, row: number, column: number, inpu
   }
 }
 
-/** What's written with a format of its own: money, a percentage, a date. */
-const FORMATTED = /^[-+]?\s*[$€£¥]|%\s*$|^\d{1,4}[-/.]\d{1,2}[-/.]\d{1,4}$/;
+/** What IronCalc gives a format of its own: a date. (Money and percentages reach it as plain numbers.) */
+const FORMATTED = /^\d{1,4}[-/.]\d{1,2}[-/.]\d{1,4}$/;
 
 /*
  * Numbers written with money's symbol, as a percentage or with thousands separators go to IronCalc as
@@ -95,42 +95,55 @@ function unitOf(input: string): { unit: Unit; plain: string } | null {
   return GROUPED.test(text) ? { unit: "grouped", plain: text.replaceAll(",", "") } : null;
 }
 
-/** Rows as IronCalc's given them, each kept for the row it's made from, so a row that's the same stays the same row. */
-const plainRows = new WeakMap<string[], string[]>();
-function plain(cells: Cells): Cells {
-  return cells.map((row) => {
-    let out = plainRows.get(row);
-    if (!out) {
-      const made = row.map((input) => (isFormula(input) ? input : (unitOf(input)?.plain ?? input)));
-      out = made.some((input, c) => input !== row[c]) ? made : row;
-      plainRows.set(row, out);
-    }
-    return out;
-  });
+/**
+ * A row as IronCalc's given it, and what each of its cells' numbers is written with; kept for the
+ * row they're read from, so a row that's the same stays the same row, and isn't read again.
+ */
+const rowsRead = new WeakMap<string[], { plain: string[]; units: (Unit | null)[] }>();
+function readRow(row: string[]) {
+  let read = rowsRead.get(row);
+  if (!read) {
+    const found = row.map((input) => (isFormula(input) ? null : unitOf(input)));
+    const made = row.map((input, c) => found[c]?.plain ?? input);
+    read = { plain: made.some((input, c) => input !== row[c]) ? made : row, units: found.map((unit) => unit?.unit ?? null) };
+    rowsRead.set(row, read);
+  }
+  return read;
 }
 
-/** A number written out in full (to ten places, without an exponent), with what it's shown with. */
+const plain = (cells: Cells): Cells => cells.map((row) => readRow(row).plain);
+
+/** Numbers written out in full: to ten places, without an exponent; and with thousands separators. */
+const FULL = numberFormat("en-US", { useGrouping: false, maximumFractionDigits: 10 });
+const FULL_GROUPED = numberFormat("en-US", { useGrouping: true, maximumFractionDigits: 10 });
+
+/** A number written out in full, with what it's shown with. */
 function withUnit(value: number, unit: Unit) {
-  const full = (n: number, grouped = false) => n.toLocaleString("en-US", { useGrouping: grouped, maximumFractionDigits: 10 });
-  if (unit === "percent") return `${full(value * 100)}%`;
-  if (unit === "grouped") return full(value, true);
-  return `${value < 0 ? "-" : ""}${unit.money}${full(Math.abs(value))}`;
+  if (unit === "percent") return `${FULL.format(value * 100)}%`;
+  if (unit === "grouped") return FULL_GROUPED.format(value);
+  return `${value < 0 ? "-" : ""}${unit.money}${FULL.format(Math.abs(value))}`;
 }
 
-/** A cell set again: cleared first, formats included ("$5" makes a cell show money, and 5 written over it later shouldn't). */
-function reset(model: Model, sheet: number, row: number, column: number, input: string) {
-  model.rangeClearAll(sheet, row + 1, column + 1, row + 1, column + 1);
+/**
+ * A cell set again: cleared first, formats included ("$5" makes a cell show money, and 5 written
+ * over it later shouldn't), unless `clear` is false: a new workbook's cells have nothing to clear.
+ */
+function reset(model: Model, sheet: number, row: number, column: number, input: string, clear = true) {
+  if (clear) model.rangeClearAll(sheet, row + 1, column + 1, row + 1, column + 1);
   if (input) setInput(model, sheet, row, column, input);
 }
+
+type Cell = { sheet: number; row: number; column: number };
+type Formula = Cell & { input: string };
 
 /**
  * Sets what changed from `was` to `now` in a sheet, but for formulas, which are given back to set
  * once every sheet's cells are (they take on the formats of those they point at as they're set).
- * Says whether a cell's format may have changed, which every formula needs setting again for.
+ * Gives back the cells whose format may have changed too, which formulas pointing at them need
+ * setting again for; says whether anything changed.
  */
-function change(model: Model, sheet: number, was: Cells, now: Cells, formulas: { sheet: number; row: number; column: number; input: string }[]) {
+function change(model: Model, sheet: number, was: Cells, now: Cells, formulas: Formula[], formatted: Cell[], clear: boolean) {
   let changed = false;
-  let formats = false;
   for (let r = 0; r < Math.max(was.length, now.length); r++) {
     const before = was[r] ?? [];
     const after = now[r] ?? [];
@@ -142,12 +155,12 @@ function change(model: Model, sheet: number, was: Cells, now: Cells, formulas: {
       changed = true;
       if (isFormula(input)) formulas.push({ sheet, row: r, column: c, input });
       else {
-        reset(model, sheet, r, c, input);
-        if (FORMATTED.test(input) || FORMATTED.test(old)) formats = true;
+        reset(model, sheet, r, c, input, clear);
+        if (FORMATTED.test(input) || FORMATTED.test(old)) formatted.push({ sheet, row: r, column: c });
       }
     }
   }
-  return { changed, formats };
+  return changed;
 }
 
 /* Other sheets, named in formulas. */
@@ -197,6 +210,9 @@ export function renameSheets(formula: string, rename: (name: string) => string |
 /** The most sheets a sheet's formulas reach, through others' formulas too. */
 const MAX_LINKED = 50;
 
+/** Whether what's written in a cell is a formula that may name another sheet. */
+const namesSheets = (input: string) => isFormula(input) && input.includes("!");
+
 /**
  * Every sheet the cells' formulas reach, and theirs in turn: each sheet's cells (these first), with
  * the names in its formulas written as the workbook calls those sheets; the linked sheets' ids; and
@@ -228,8 +244,9 @@ function link(cells: Cells, find?: FindSheet) {
     inputs.push(
       find ?
         cells.map((row) => {
+          if (!row.some(namesSheets)) return row;
           // Rows with nothing renamed stay the same rows, so updating skips them.
-          const out = row.map((input) => (isFormula(input) && input.includes("!") ? renameSheets(input, index) : input));
+          const out = row.map((input) => (namesSheets(input) ? renameSheets(input, index) : input));
           return out.some((input, c) => input !== row[c]) ? out : row;
         })
       : cells,
@@ -262,25 +279,26 @@ class Sheet implements FormulaSheet {
       this.#ids = ids;
       this.#inputs = [];
     }
+    const fresh = !this.#inputs.length;
     this.#model.pauseEvaluation();
     let changed = false;
-    let formats = false;
-    let formulas: { sheet: number; row: number; column: number; input: string }[] = [];
+    let formulas: Formula[] = [];
+    const formatted: Cell[] = [];
     inputs.forEach((now, sheet) => {
-      const done = change(this.#model, sheet, this.#inputs[sheet] ?? [], now, formulas);
-      changed ||= done.changed;
-      formats ||= done.formats;
+      if (change(this.#model, sheet, this.#inputs[sheet] ?? [], now, formulas, formatted, !fresh)) changed = true;
     });
-    // A new workbook, or a cell's format changed: every formula, to take on the formats it points at now.
-    const all = formats || !this.#inputs.length;
-    if (all) {
-      formulas = inputs.flatMap((cells, sheet) =>
-        cells.flatMap((row, r) => row.flatMap((input, c) => (isFormula(input) ? [{ sheet, row: r, column: c, input }] : []))),
-      );
-    }
-    // The sheets this one names first, then its own; all twice, so one pointing at another takes on the format it took on.
+    // Formulas take on the formats of what they point at: in a new workbook, every one; when a cell's
+    // format may have changed, those pointing at it, and at them in turn.
+    const all = fresh || formatted.length > 0;
+    if (fresh) formulas = everyFormula(inputs);
+    else if (formatted.length) formulas = pointingAt(everyFormula(inputs), formulas, formatted);
+    // The sheets this one names first, then its own; all once more if one points at another set after
+    // it, so it takes on the format that one took on.
     formulas.sort((a, b) => b.sheet - a.sheet);
-    for (let pass = all ? 2 : 1; pass > 0; pass--) for (const { sheet, row, column, input } of formulas) reset(this.#model, sheet, row, column, input);
+    const passes = all && pointsAhead(formulas) ? 2 : 1;
+    for (let pass = 0; pass < passes; pass++) {
+      for (const { sheet, row, column, input } of formulas) reset(this.#model, sheet, row, column, input, pass > 0 || !fresh);
+    }
     this.#model.resumeEvaluation();
     if (changed) this.#model.evaluate();
     this.#inputs = inputs;
@@ -288,13 +306,16 @@ class Sheet implements FormulaSheet {
 
   value(row: number, column: number): CellValue {
     if (row >= MAX_ROW || column >= MAX_COLUMN) return EMPTY;
+    const input = this.#written[0]?.[row]?.[column] ?? "";
+    // Written with a unit, a number shows as written: IronCalc was given it plain.
+    if (input !== (this.#inputs[0]?.[row]?.[column] ?? "") && !isFormula(input) && this.#model.getCellType(0, row + 1, column + 1) === 1) {
+      return { text: input.trim(), kind: "number" };
+    }
     const text = this.#model.getFormattedCellValue(0, row + 1, column + 1);
     if (!text) return EMPTY;
     const kind = KINDS[this.#model.getCellType(0, row + 1, column + 1)] ?? "text";
-    if (kind !== "number") return { text, kind };
-    const input = this.#written[0]?.[row]?.[column] ?? "";
-    // Written with a unit: as written. A formula's result: in full, in the way of what it points at.
-    if (!isFormula(input)) return { text: unitOf(input) ? input.trim() : text, kind };
+    if (kind !== "number" || !isFormula(input)) return { text, kind };
+    // A formula's result: in full, in the way of what it points at.
     const unit = this.#unitAt(0, row, column);
     const value = Number(text);
     return { text: unit && Number.isFinite(value) ? withUnit(value, unit) : text, kind };
@@ -306,13 +327,14 @@ class Sheet implements FormulaSheet {
    * COUNT, say): `=B2*2`, `=SUM(B2:B9)` and `=Budget!B4` of money are money.
    */
   #unitAt(sheet: number, row: number, column: number, depth = 0): Unit | null {
-    const input = this.#written[sheet]?.[row]?.[column] ?? "";
-    if (!isFormula(input)) return unitOf(input)?.unit ?? null;
+    const line = this.#written[sheet]?.[row];
+    const input = line?.[column] ?? "";
+    if (!isFormula(input)) return line ? (readRow(line).units[column] ?? null) : null;
     // Far enough to go through formulas pointing at formulas, not round a circle of them.
-    const first = depth < 20 ? firstReferenceOf(input) : null;
+    const first = depth < 20 ? readFormula(input).first : null;
     if (!first) return null;
-    const at = first.sheet === null ? sheet : Number(/^‹(\d+)›$/.exec(first.sheet)?.[1] ?? -1);
-    return at < 0 ? null : this.#unitAt(at, first.row - 1, first.column - 1, depth + 1);
+    const at = first.sheet === null ? sheet : sheetIndex(first.sheet);
+    return at < 0 ? null : this.#unitAt(at, first.from.row - 1, first.from.column - 1, depth + 1);
   }
 
   free() {
@@ -329,31 +351,104 @@ const KEEPS = new Set([
   "AVERAGEIF", "AVERAGEIFS", "MAXIFS", "MINIFS", "SUMPRODUCT",
 ]);
 
-/** Each formula's first reference, from 1 (its sheet as written, null for its own), or null if a unit doesn't carry through it. */
-const firstReference = new Map<string, { sheet: string | null; row: number; column: number } | null>();
+type Corner = { row: number; column: number; absolute_row: boolean; absolute_column: boolean };
 
-function firstReferenceOf(formula: string) {
-  let first = firstReference.get(formula);
-  if (first === undefined) {
-    const functions = [...formula.matchAll(/([A-Za-z][\w.]*)\s*\(/g)].map(([, name]) => name.toUpperCase());
-    first = functions.every((name) => KEEPS.has(name)) ? referenceIn(formula) : null;
-    if (firstReference.size > 2000) firstReference.clear();
-    firstReference.set(formula, first);
-  }
-  return first;
+/** A reference in a formula: its sheet as written (null for its own), its corners from 1 as written, and where it's written, in characters. */
+interface Reference {
+  sheet: string | null;
+  from: Corner;
+  to: Corner;
+  start: number;
+  end: number;
 }
 
-function referenceIn(formula: string) {
-  try {
-    for (const { token } of getTokens(formula)) {
-      if (typeof token !== "object") continue;
-      if ("Reference" in token) return { sheet: token.Reference.sheet ?? null, row: token.Reference.row, column: token.Reference.column };
-      if ("Range" in token) return { sheet: token.Range.sheet ?? null, row: token.Range.left.row, column: token.Range.left.column };
+/** What's read from formulas, by their text: their references, and the first if a unit carries through every function in it. */
+const formulasRead = new Map<string, { references: Reference[]; first: Reference | null }>();
+
+function readFormula(formula: string) {
+  let read = formulasRead.get(formula);
+  if (!read) {
+    let references: Reference[] = [];
+    try {
+      references = getTokens(formula).flatMap(({ token, start, end }) =>
+        typeof token !== "object" ? []
+        : "Reference" in token ? [{ sheet: token.Reference.sheet ?? null, from: token.Reference, to: token.Reference, start, end }]
+        : "Range" in token ? [{ sheet: token.Range.sheet ?? null, from: token.Range.left, to: token.Range.right, start, end }]
+        : [],
+      );
+    } catch {
+      // Not a formula IronCalc reads: no references, nor money.
     }
-  } catch {
-    // Not a formula IronCalc reads: no money.
+    const functions = [...formula.matchAll(/([A-Za-z][\w.]*)\s*\(/g)].map(([, name]) => name.toUpperCase());
+    read = { references, first: functions.every((name) => KEEPS.has(name)) ? (references[0] ?? null) : null };
+    if (formulasRead.size >= 50_000) formulasRead.clear();
+    formulasRead.set(formula, read);
   }
-  return null;
+  return read;
+}
+
+/** The workbook's sheet a formula names (`‹1›`); -1 for a name that isn't one of its own. */
+const sheetIndex = (name: string) => Number(/^‹(\d+)›$/.exec(name)?.[1] ?? -1);
+
+/** The formulas in each sheet's cells, by row. */
+const everyFormula = (inputs: Cells[]): Formula[] =>
+  inputs.flatMap((cells, sheet) => cells.flatMap((row, r) => row.flatMap((input, c) => (isFormula(input) ? [{ sheet, row: r, column: c, input }] : []))));
+
+/** Whether a formula in `sheet` points at a cell. */
+function pointsAt(formula: string, sheet: number, cell: Cell) {
+  return readFormula(formula).references.some(({ sheet: name, from, to }) => {
+    const row = cell.row + 1;
+    const column = cell.column + 1;
+    return (
+      (name === null ? sheet : sheetIndex(name)) === cell.sheet &&
+      row >= Math.min(from.row, to.row) &&
+      row <= Math.max(from.row, to.row) &&
+      column >= Math.min(from.column, to.column) &&
+      column <= Math.max(from.column, to.column)
+    );
+  });
+}
+
+/** Of `all` formulas, in their order, those `changed` and those pointing at them or the `cells`, and at those in turn. */
+function pointingAt(all: Formula[], changed: Formula[], cells: Cell[]): Formula[] {
+  const at = ({ sheet, row, column }: Cell) => `${sheet} ${row} ${column}`;
+  const found = new Set(changed.map(at));
+  for (let reached: Cell[] = [...cells, ...changed]; reached.length; ) {
+    const next = all.filter((formula) => !found.has(at(formula)) && reached.some((cell) => pointsAt(formula.input, formula.sheet, cell)));
+    for (const formula of next) found.add(at(formula));
+    reached = next;
+  }
+  return all.filter((formula) => found.has(at(formula)));
+}
+
+/**
+ * Whether a formula points at cells where there may be one set after it, in the order `formulas`
+ * are set: the sheets named first, and in a sheet, by row and then column.
+ */
+function pointsAhead(formulas: Formula[]) {
+  // The last row with a formula in each column of each sheet.
+  const last = new Map<number, number[]>();
+  for (const { sheet, row, column } of formulas) {
+    if (!last.has(sheet)) last.set(sheet, []);
+    const rows = last.get(sheet)!;
+    rows[column] = Math.max(rows[column] ?? -1, row);
+  }
+  return formulas.some(({ sheet, row, column, input }) =>
+    readFormula(input).references.some(({ sheet: name, from, to }) => {
+      const at = name === null ? sheet : sheetIndex(name);
+      const rows = last.get(at);
+      // A sheet set before this one's formulas, or one without formulas.
+      if (!rows || at > sheet) return false;
+      const top = Math.min(from.row, to.row) - 1;
+      const bottom = Math.max(from.row, to.row) - 1;
+      const right = Math.min(Math.max(from.column, to.column) - 1, rows.length - 1);
+      for (let c = Math.min(from.column, to.column) - 1; c <= right; c++) {
+        const most = Math.min(bottom, rows[c] ?? -1);
+        if (most >= top && (at < sheet || most > row || (most === row && c > column))) return true;
+      }
+      return false;
+    }),
+  );
 }
 
 export function shift(cells: Cells, axis: "row" | "column", at: number, count: number): Cells {
@@ -438,8 +533,6 @@ export function moveCells(cells: Cells, area: CellArea, rows: number, columns: n
   }
 }
 
-type Corner = { row: number; column: number; absolute_row: boolean; absolute_column: boolean };
-
 /** A reference copied `rows` down and `columns` across; null when that's off the sheet. */
 function moveCorner(corner: Corner, rows: number, columns: number): Corner | null {
   const row = corner.absolute_row ? corner.row : corner.row + rows;
@@ -513,31 +606,23 @@ export function complete(formula: string, cursor: number): FormulaCompletion {
 
 export function references(formula: string): FormulaReference[] {
   if (!isFormula(formula)) return [];
-  const chars = Array.from(formula);
-  let tokens: MarkedToken[];
-  try {
-    tokens = getTokens(formula);
-  } catch {
-    return [];
-  }
-  return tokens.flatMap(({ token, start, end }) => {
-    if (typeof token !== "object") return [];
-    let corners;
-    if ("Reference" in token && !token.Reference.sheet) corners = [token.Reference, token.Reference];
-    else if ("Range" in token && !token.Range.sheet) corners = [token.Range.left, token.Range.right];
-    else return [];
-    const [a, b] = corners;
-    return [
-      {
-        from: unitsTo(chars, start),
-        to: unitsTo(chars, end),
-        top: Math.min(a.row, b.row) - 1,
-        left: Math.min(a.column, b.column) - 1,
-        bottom: Math.max(a.row, b.row) - 1,
-        right: Math.max(a.column, b.column) - 1,
-      },
-    ];
-  });
+  // Characters and UTF-16 units are the same but for those beyond them (emoji).
+  const chars = /[\uD800-\uDFFF]/.test(formula) ? Array.from(formula) : null;
+  const units = (n: number) => (chars ? unitsTo(chars, n) : n);
+  return readFormula(formula).references.flatMap(({ sheet, from: a, to: b, start, end }) =>
+    sheet ?
+      []
+    : [
+        {
+          from: units(start),
+          to: units(end),
+          top: Math.min(a.row, b.row) - 1,
+          left: Math.min(a.column, b.column) - 1,
+          bottom: Math.max(a.row, b.row) - 1,
+          right: Math.max(a.column, b.column) - 1,
+        },
+      ],
+  );
 }
 
 let catalog: FormulaFunction[] | undefined;

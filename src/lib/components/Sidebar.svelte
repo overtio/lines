@@ -60,13 +60,19 @@
   let renamingType = $state<string | null>(null);
   let typeDraft = $state("");
 
-  function finishTypeRename() {
+  /** Renames the type, if it was given a new name; from the keyboard, focus goes back to its row. */
+  function finishTypeRename(refocus = false) {
     const from = renamingType;
     renamingType = null;
+    if (!from) return;
     const to = typeDraft.trim();
-    if (!from || !to || to.toLowerCase() === from) return;
-    notes.renameType(from, to);
-    typeIcons.rename(from, to.toLowerCase());
+    let type = from;
+    if (to && to.toLowerCase() !== from) {
+      notes.renameType(from, to);
+      typeIcons.rename(from, to.toLowerCase());
+      type = to.toLowerCase();
+    }
+    if (refocus) requestAnimationFrame(() => document.querySelector<HTMLElement>(`.sidebar [data-type="${CSS.escape(type)}"]`)?.focus());
   }
 
   /** Only what a type can be called: letters, digits, spaces, `-` and `_`. */
@@ -75,11 +81,10 @@
   }
 
   function onTypeRenameKeydown(event: KeyboardEvent) {
-    if (event.key === "Enter" || event.key === "Escape") {
-      event.preventDefault();
-      if (event.key === "Escape") typeDraft = renamingType ?? "";
-      (event.currentTarget as HTMLInputElement).blur();
-    }
+    if (event.key !== "Enter" && event.key !== "Escape") return;
+    event.preventDefault();
+    if (event.key === "Escape") typeDraft = renamingType ?? "";
+    finishTypeRename(true);
   }
 
   const heading = "mx-2.5 mt-0 mb-1.5 text-2xs font-semibold tracking-[0.04em] text-faint uppercase";
@@ -168,8 +173,9 @@
               active={notes.filter.kind === "type" && notes.filter.type === type}
               marked={typeMenuFor === type || ui.iconPicker?.key === `type:${type}`}
               rename={renamingType === type
-                ? { value: typeDraft, "aria-label": t("sidebar.typeName"), oninput: onTypeInput, onkeydown: onTypeRenameKeydown, onblur: finishTypeRename }
+                ? { value: typeDraft, "aria-label": t("sidebar.typeName"), oninput: onTypeInput, onkeydown: onTypeRenameKeydown, onblur: () => finishTypeRename() }
                 : undefined}
+              data-type={type}
               onclick={() => choose({ kind: "type", type })}
               oncontextmenu={(event) => onTypeContextMenu(event, type)}
               {@attach longPress((x, y) => showTypeMenu(type, x, y))}

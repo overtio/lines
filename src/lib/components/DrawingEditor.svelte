@@ -67,7 +67,7 @@
   /** Excalidraw's names for the app's languages. */
   const LANGUAGES: Record<string, string> = { es: "es-ES", fr: "fr-FR" };
   /** A drawing with no background of its own, which shows the note's (or Excalidraw's white before). */
-  const CLEAR = ["transparent", "#ffffff"];
+  const CLEAR = new Set(["transparent", "#ffffff"]);
 
   /**
    * The theme's accent, for what Excalidraw draws on its canvas (the selection), which it can't
@@ -129,7 +129,7 @@
       const initialData = scene ? await excalidraw.loadFromBlob(scene, null, null) : mermaid ? await fromMermaid(excalidraw, mermaid) : null;
       // Drawn on the note's own background, as it's shown in the note, unless it has one of its own.
       const background = initialData?.appState.viewBackgroundColor?.toLowerCase();
-      const viewBackgroundColor = !background || CLEAR.includes(background) ? "transparent" : background;
+      const viewBackgroundColor = !background || CLEAR.has(background) ? "transparent" : background;
       host.style.setProperty("--drawing-selection", selectionColor());
       const root = client.createRoot(host);
       unmountReact = () => root.unmount();
@@ -231,7 +231,7 @@
         appState: {
           ...appState,
           // Clear behind it, so it sits on the note in any theme, unless a background was chosen.
-          exportBackground: !CLEAR.includes(appState.viewBackgroundColor.toLowerCase()),
+          exportBackground: !CLEAR.has(appState.viewBackgroundColor.toLowerCase()),
           exportEmbedScene: true,
           exportWithDarkMode: false,
           // Its own size: it's drawn sharp at any size anyway.

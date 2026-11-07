@@ -13,6 +13,9 @@ lines writes Markdown with a few additions of its own. We call it Linedown.
 | `:::i`, `:::?`, `:::!`, `:::!!!`, `:::^` | a callout |
 | `:::! icon=flag`, `:::! icon=none` | a callout with another icon, or none |
 | ` ```mermaid ` | a diagram |
+| ` ```csv ` | a spreadsheet |
+| `$x^2$`, `$$` on lines around a block | math |
+| `=SUM(B2:B3)` in a table cell | what it works out to |
 | `Key: Value` | a value you can copy |
 | `---` `type: person` `---` at the top | properties, and a type in the sidebar |
 | `@Oleks`, `@[Two Words]` | a mention of another note |

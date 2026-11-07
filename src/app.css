@@ -235,10 +235,6 @@
   --font-text: var(--font-mono);
 }
 
-/*
- * Native macOS window: the traffic lights are centered on the 52px title row
- * (trafficLightPosition in tauri.conf.json), so whichever pane is leftmost leaves room for them.
- */
 :root[data-translucent] body {
   /* The panes paint the window; the page behind them stays clear so the desktop shows through. */
   background: transparent;
@@ -267,7 +263,11 @@
   pointer-events: none;
 }
 
-/* The window buttons' room, in the leftmost pane: a sidebar on the left, or the pane App.svelte marks as first. */
+/*
+ * Native macOS window: the traffic lights are centered on the 52px title row (trafficLightPosition
+ * in tauri.conf.json), so the leftmost pane leaves room for them: a sidebar on the left, or the
+ * pane App.svelte marks as first.
+ */
 :root[data-platform="mac-app"] .app[data-sidebar="left"] .sidebar .titlebar,
 :root[data-platform="mac-app"] .app[data-first="list"] .note-list .titlebar,
 :root[data-platform="mac-app"] .app[data-first="editor"] .editor-pane .toolbar {

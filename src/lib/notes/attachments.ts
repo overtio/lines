@@ -193,7 +193,8 @@ export async function openAttachment(name: string, label: string) {
   const data = await getAttachment(name);
   if (!data) return;
   const ext = name.slice(name.lastIndexOf(".") + 1);
-  label = label.replace(/[\/\\:\u0000-\u001f]/g, "-").trim().replace(/^\.+/, "") || name;
+  // oxlint-disable-next-line no-control-regex -- control characters are what it takes out
+  label = label.replace(/[/\\:\u0000-\u001f]/g, "-").trim().replace(/^\.+/, "") || name;
   const fileName = label.toLowerCase().endsWith(`.${ext}`) ? label : `${label}.${ext}`;
   if (isDesktopApp) {
     const { invoke } = await import("@tauri-apps/api/core");
@@ -210,12 +211,21 @@ export async function openAttachment(name: string, label: string) {
   }
 }
 
+/** Held by every tab lines is open in, so one can tell whether it's the only one. */
+const OPEN = "lines.open";
+
 /**
  * Deletes the attachments no note shows any more, trashed ones included. Run at launch, so an
- * attachment whose Markdown was deleted can still come back with undo for as long as the app is open.
+ * attachment whose Markdown was deleted can still come back with undo for as long as the app is
+ * open; so not while lines is open in another tab too.
  */
 export async function removeUnusedAttachments(notes: Iterable<Note>) {
-  const used = usedAttachments(notes);
-  const unused = (await attachmentNames()).filter((name) => !used.has(name));
-  if (unused.length) await attachmentStore.delete(...unused);
+  const remove = async () => {
+    const used = usedAttachments(notes);
+    const unused = (await attachmentNames()).filter((name) => !used.has(name));
+    if (unused.length) await attachmentStore.delete(...unused);
+  };
+  if (!("locks" in navigator)) return remove();
+  await navigator.locks.request(OPEN, { ifAvailable: true }, (alone) => alone && remove());
+  void navigator.locks.request(OPEN, { mode: "shared" }, () => new Promise(() => {}));
 }

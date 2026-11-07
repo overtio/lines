@@ -3,7 +3,7 @@
   import { speak } from "../a11y";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
-  import { normalizeTag } from "../notes/parse";
+  import { cleanTagInput, normalizeTag } from "../notes/parse";
   import { notes, type TagNode } from "../notes/store.svelte";
   import { pointAt, takeFocus } from "../popover";
   import { ui } from "../ui.svelte";
@@ -48,15 +48,10 @@
   /** It opens at a point: the pointer, or a button's corner. */
   const anchor = $derived(prompt && pointAt(prompt.x, prompt.y));
 
-  // A new search starts with nothing chosen.
-  $effect(() => {
-    void value;
-    active = -1;
-  });
-
   function close() {
     ui.tagPrompt = null;
     value = "";
+    active = -1;
   }
 
   function add(name: string) {
@@ -85,6 +80,7 @@
       // Fills in the suggestion, to type a tag nested under it.
       event.preventDefault();
       value = `${suggestions[active]}/`;
+      active = -1;
     }
   }
 </script>
@@ -117,6 +113,11 @@
           <input
             bind:this={input}
             bind:value
+            oninput={(event) => {
+              // "two words" is #two-words.
+              event.currentTarget.value = value = cleanTagInput(event.currentTarget.value);
+              active = -1;
+            }}
             placeholder={t("list.tagName")}
             aria-label={t("list.tagName")}
             autocomplete="off"

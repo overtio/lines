@@ -1,0 +1,67 @@
+# Keeps the next release's pull request up to date: after each merge into main, works out the next
+# version from the commits since the last release (scripts/release.mjs), and opens or updates
+# "chore(release): v…" with the version files bumped and CHANGELOG.md's new notes. Merging it
+# releases (release.yml). docs/releasing.md has the whole process.
+name: Release pull request
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  # To start the checks on the release branch, and pass the contributor agreement's (its own commit needs none).
+  actions: write
+  statuses: write
+
+concurrency:
+  group: release-pr
+  cancel-in-progress: true
+
+jobs:
+  update:
+    # A release's own commit is tagged by release.yml instead.
+    if: "${{ !startsWith(github.event.head_commit.message, 'chore(release): ') }}"
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Every commit and tag, to find the last release and what came after it.
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: package.json
+      - name: Work out the next release
+        id: next
+        run: bun scripts/release.mjs prepare >> "$GITHUB_OUTPUT"
+      - name: Open or update its pull request
+        if: steps.next.outputs.version
+        env:
+          VERSION: ${{ steps.next.outputs.version }}
+        run: |
+          title="chore(release): v$VERSION"
+          body="$RUNNER_TEMP/body.md"
+          {
+            echo "Merging this releases lines $VERSION: it's tagged, and the Mac, Windows and Linux apps are built and attached to its GitHub release. It's kept up to date as more is merged."
+            echo
+            bun scripts/release.mjs notes "$VERSION"
+          } > "$body"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c release/next
+          git add -A
+          git commit -m "$title"
+          git push --force origin release/next
+          if [ "$(gh pr view release/next --json state --jq .state 2>/dev/null)" = "OPEN" ]; then
+            gh pr edit release/next --title "$title" --body-file "$body"
+          else
+            gh pr create --base main --head release/next --title "$title" --body-file "$body"
+          fi
+          gh workflow run checks.yml --ref release/next
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$(git rev-parse HEAD)" -f state=success -f context=cla -f description="The release workflow's own commit"
+      - name: Close the release pull request, when nothing since the last release calls for one
+        if: ${{ !steps.next.outputs.version }}
+        run: gh pr close release/next --delete-branch 2>/dev/null || true

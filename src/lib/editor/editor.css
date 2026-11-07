@@ -842,6 +842,8 @@
 .cm-lp-math.is-display {
   display: inline-block;
   width: 100%;
+  /* A long equation scrolls (below); it doesn't widen the note past its window. */
+  contain: inline-size;
 }
 
 .cm-lp-math .katex-display {
@@ -879,7 +881,11 @@
   vertical-align: bottom;
 }
 
-/* An image on a line of its own (attachments.ts). */
+/* An image or file on a line of its own (attachments.ts): never wider than the note, however far in it is. */
+.cm-lp-block {
+  contain: inline-size;
+}
+
 .cm-lp-image-block {
   padding: 0.35em 0;
   line-height: 0;
@@ -1260,8 +1266,9 @@
   width: 1.4em;
   height: 1.4em;
   /* Centred on the text (a little above the x-height middle, where caps and digits sit),
-     without making the line any taller. */
-  margin: -0.3em 0 -0.3em 0.3em;
+     without making the line any taller, or any longer: unseen until hovered, it never wraps a
+     line, and at the end of a full one it sits in the note's margin. */
+  margin: -0.3em -1.7em -0.3em 0.3em;
   padding: 0;
   vertical-align: middle;
   position: relative;

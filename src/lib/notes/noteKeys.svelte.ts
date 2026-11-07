@@ -1,4 +1,4 @@
-import { aesKey, fromBase64, fromUtf8, isLockedKey, lockKey, open, randomBytes, seal, toBase64, unlockKey, utf8, WrongPassphrase, type Bytes } from "../crypto";
+import { aesKey, fromBase64, fromUtf8, isLockedKey, lockKey, open, randomBytes, seal, toBase64, unlockKey, Unreadable, utf8, WrongPassphrase, type Bytes } from "../crypto";
 import { t } from "../i18n/index.svelte";
 import { plugins } from "../plugins/registry.svelte";
 import { referencedAttachments } from "./attachments";
@@ -67,11 +67,6 @@ class NoteKeys {
     return !!this.settings || this.#seen.size > 0;
   }
 
-  /** Reads the settings again, once another window changed them (the main window, for Settings). */
-  refresh() {
-    this.settings = read();
-  }
-
   save(settings: NotesPassword | null) {
     this.settings = settings;
     if (settings) localStorage.setItem(SETTINGS, JSON.stringify(settings));
@@ -129,7 +124,8 @@ class NoteKeys {
         await this.add(await unlockKey(wrapped, password), id);
         opened.push(id);
       } catch (error) {
-        if (!(error instanceof WrongPassphrase)) throw error;
+        // Another password's, or a key this version of lines can't open: the others may still open.
+        if (!(error instanceof WrongPassphrase || error instanceof Unreadable)) throw error;
       }
     }
     // A device without a password of its own takes the one it was just given, for notes it locks.

@@ -10,7 +10,8 @@ import { calculate, loadFormulas, loadedFormulas } from "../../lib/sheets/formul
 import { sheetBlock, sheetCommand } from "./block.svelte";
 import { sheetEditing } from "./editor";
 import { sheetFinder } from "./links";
-import { printedCell, printedCells, readSheet, sheetBody, sheetCells, sheetCsv, tagsOf, titleOf } from "./sheet";
+import "./preload.svelte";
+import { headOf, printedCell, printedCells, readSheet, sheetBody, sheetCells, sheetCsv, tagsOf, titleOf } from "./sheet";
 
 /*
  * Spreadsheet notes: cells and formulas, kept as CSV under the note's title (sheet.ts), and drawn
@@ -26,15 +27,26 @@ function values(cells: Cells): Cells {
   return engine ? calculate(engine, cells, sheetFinder(null)).map((row) => row.map((value) => value.text)) : cells;
 }
 
-function meta(body: string): NoteMeta {
-  const { head, cells } = readSheet(body);
-  return {
-    title: titleOf(head),
-    excerpt: cells
+/** The text of its cells, formulas left out, as far as 200 characters: read from only as much of its CSV as that takes. */
+function excerpt(body: string, dataFrom: number) {
+  for (let size = 4096; ; size *= 8) {
+    const end = Math.min(body.length, dataFrom + size);
+    const rows = parseCsv(body.slice(dataFrom, end));
+    // The last row read may be cut short.
+    if (end < body.length) rows.pop();
+    const text = rows
       .flat()
       .filter((cell) => cell && !isFormula(cell))
-      .join(" ")
-      .slice(0, 200),
+      .join(" ");
+    if (text.length >= 200 || end === body.length) return text.slice(0, 200);
+  }
+}
+
+function meta(body: string): NoteMeta {
+  const { head, dataFrom } = headOf(body);
+  return {
+    title: titleOf(head),
+    excerpt: excerpt(body, dataFrom),
     tags: tagsOf(head),
     hasOpenTodos: false,
     searchText: body.toLowerCase(),

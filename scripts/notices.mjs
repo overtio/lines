@@ -1,12 +1,13 @@
 // Writes public/third-party-notices.txt: the license of every open source package that ships in
-// lines, for the About tab. Run with `pnpm notices` after changing dependencies.
+// lines, for the About tab. Run with `bun run notices` after changing dependencies.
 //
-// JavaScript packages come from `pnpm licenses list --prod`, plus Svelte's runtime (a dev
-// dependency, but bundled). Rust crates come from `cargo metadata` for the native apps.
+// JavaScript packages are the production dependencies in package.json and everything they depend
+// on, as installed, plus Svelte's runtime and Tailwind's CSS (dev dependencies, but bundled). Rust
+// crates come from `cargo metadata` for the native apps.
 // Identical license texts are printed once, followed by every package they cover.
 
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -46,21 +47,51 @@ function section(title, packages) {
 }
 
 // JavaScript
-const listed = JSON.parse(run("pnpm", ["licenses", "list", "--prod", "--json"]));
-const js = Object.values(listed)
-  .flat()
-  .map((p) => ({ name: p.name, version: p.versions[0], license: p.license, dir: p.paths[0] }));
-// Svelte's runtime is compiled into the app, and Tailwind's CSS into its stylesheet, though they're
-// dev dependencies.
-for (const name of ["svelte", "esm-env", "clsx", "tailwindcss"]) {
-  const store = join(root, "node_modules/.pnpm");
-  const entry = readdirSync(store).find((d) => d.startsWith(`${name}@`));
-  if (!entry) continue;
-  const dir = join(store, entry, "node_modules", name);
-  const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
-  js.push({ name, version: pkg.version, license: pkg.license, dir });
+
+/** Where package `name` is installed, as Node finds it from `from`: the nearest node_modules up from there. */
+function installed(name, from) {
+  for (let dir = from; ; dir = dirname(dir)) {
+    const candidate = join(dir, "node_modules", name);
+    if (existsSync(join(candidate, "package.json"))) return realpathSync(candidate);
+    if (dirname(dir) === dir) return null;
+  }
 }
-js.sort((a, b) => a.name.localeCompare(b.name));
+
+const readPackage = (dir) => JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
+const licenseOf = ({ license, licenses }) =>
+  (typeof license === "string" ? license : license?.type) ?? licenses?.map((l) => l.type ?? l).join(" OR ") ?? "see repository";
+
+/**
+ * The packages these depend on, and theirs in turn, each version once: optional and peer ones where
+ * installed, but not native modules for one system (they can't be in a web page), nor Svelte (below).
+ */
+function dependencies(names, from) {
+  const found = new Map();
+  const queue = names.map((name) => [name, from]);
+  while (queue.length) {
+    const [name, parent] = queue.shift();
+    // Type definitions don't ship.
+    const dir = name === "svelte" || name.startsWith("@types/") ? null : installed(name, parent);
+    if (!dir || found.has(dir)) continue;
+    const pkg = readPackage(dir);
+    if (pkg.os) continue;
+    found.set(dir, { name: pkg.name, version: pkg.version, license: licenseOf(pkg), dir });
+    for (const next of Object.keys({ ...pkg.dependencies, ...pkg.optionalDependencies, ...pkg.peerDependencies })) queue.push([next, dir]);
+  }
+  return [...found.values()];
+}
+
+const js = dependencies(Object.keys(readPackage(root).dependencies), root);
+// Svelte's runtime (with what it imports) is compiled into the app, and Tailwind's CSS into its
+// stylesheet, though they're dev dependencies; their compilers aren't.
+const svelte = installed("svelte", root);
+for (const [name, from] of [["svelte", root], ["esm-env", svelte], ["clsx", svelte], ["tailwindcss", root]]) {
+  const dir = installed(name, from);
+  if (!dir || js.some((p) => p.dir === dir)) continue;
+  const pkg = readPackage(dir);
+  js.push({ name: pkg.name, version: pkg.version, license: licenseOf(pkg), dir });
+}
+js.sort((a, b) => a.name.localeCompare(b.name) || a.version.localeCompare(b.version));
 
 // Rust (native apps only): every crate any app target pulls in.
 const TARGETS = [

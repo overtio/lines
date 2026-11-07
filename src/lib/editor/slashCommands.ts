@@ -234,7 +234,10 @@ const slashSource = (commands: SlashCommand[]) => (context: CompletionContext): 
 
 const iconNodes = new Map<string, HTMLElement>();
 
-/** One mounted icon per command (or note, in the "@" menu), reused each time the menu redraws. */
+/**
+ * A command's icon (or a note's, in the "@" menu): each is mounted once, and copied into every
+ * option that shows it, as several notes can have the same one.
+ */
 const renderIcon = (commands: SlashCommand[]) => (completion: Completion) => {
   const name = "icon" in completion ? (completion as IconCompletion).icon : commands.find((c) => c.name === completion.label)?.icon;
   if (!name) return null;
@@ -245,7 +248,7 @@ const renderIcon = (commands: SlashCommand[]) => (completion: Completion) => {
     mount(Icon, { target: node, props: { name, size: 16, strokeWidth: 1.75 } });
     iconNodes.set(name, node);
   }
-  return node;
+  return node.cloneNode(true);
 };
 
 /** A "/" command in the menu, with its Markdown shown faintly on the right. */

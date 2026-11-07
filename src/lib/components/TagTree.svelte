@@ -10,6 +10,7 @@
   import Icon from "../icons/Icon.svelte";
   import { menuPoint } from "../popover";
   import { longPress } from "../longPress";
+  import { cleanTagInput, normalizeTag } from "../notes/parse";
   import { notes, type TagNode } from "../notes/store.svelte";
   import { tagIcons } from "../notes/tagIcons.svelte";
   import { ui } from "../ui.svelte";
@@ -43,30 +44,31 @@
     draft = tag;
   }
 
-  function finishRename() {
+  /** Renames the tag, if it was given a new name; from the keyboard, focus goes back to its row. */
+  function finishRename(refocus = false) {
     const from = renaming;
     renaming = null;
+    if (!from) return;
     const to = draft.replace(/^#+/, "").replace(/\/{2,}/g, "/").replace(/^\/+|\/+$/g, "");
-    if (!from || !to || to.toLowerCase() === from) return;
-    notes.renameTag(from, to);
-    tagIcons.rename(from, to.toLowerCase());
+    let tag = from;
+    if (to && to.toLowerCase() !== from) {
+      notes.renameTag(from, to);
+      tagIcons.rename(from, to.toLowerCase());
+      tag = normalizeTag(to) ?? from;
+    }
+    if (refocus) requestAnimationFrame(() => document.querySelector<HTMLElement>(`.sidebar [data-tag="${CSS.escape(tag)}"]`)?.focus());
   }
 
   /** Only characters a tag can contain; spaces become dashes as you type. */
   function oninput(event: Event & { currentTarget: HTMLInputElement }) {
-    const clean = event.currentTarget.value.replace(/\s+/g, "-").replace(/[^\p{L}\p{N}_\-/#]/gu, "");
-    event.currentTarget.value = draft = clean;
+    event.currentTarget.value = draft = cleanTagInput(event.currentTarget.value);
   }
 
   function onRenameKeydown(event: KeyboardEvent) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      (event.currentTarget as HTMLInputElement).blur();
-    } else if (event.key === "Escape") {
-      event.preventDefault();
-      draft = renaming ?? "";
-      (event.currentTarget as HTMLInputElement).blur();
-    }
+    if (event.key !== "Enter" && event.key !== "Escape") return;
+    event.preventDefault();
+    if (event.key === "Escape") draft = renaming ?? "";
+    finishRename(true);
   }
 
   function showMenu(tag: string, x: number, y: number) {
@@ -125,8 +127,9 @@
           active={notes.filter.kind === "tag" && notes.filter.tag === node.path}
           marked={menuFor === node.path || ui.iconPicker?.key === `tag:${node.path}`}
           rename={renaming === node.path
-            ? { value: draft, "aria-label": t("list.tagName"), oninput, onkeydown: onRenameKeydown, onblur: finishRename }
+            ? { value: draft, "aria-label": t("list.tagName"), oninput, onkeydown: onRenameKeydown, onblur: () => finishRename() }
             : undefined}
+          data-tag={node.path}
           onclick={() => onchoose(node.path)}
           oncontextmenu={(event) => oncontextmenu(event, node.path)}
           {@attach longPress((x, y) => showMenu(node.path, x, y))}

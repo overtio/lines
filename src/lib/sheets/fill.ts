@@ -1,4 +1,5 @@
 import { isFormula } from "./cells";
+import { dateNumber, dateText, iso, isoParts } from "./display";
 
 /*
  * Filling cells from those before them, as dragging a selection's corner does in Excel and Numbers.
@@ -20,8 +21,6 @@ export interface FillOptions {
 
 const NUMBER = /^[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?$/i;
 const NUMBERED = /^(.*?)(\d+)(\D*)$/;
-const DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
-const DAY = 86_400_000;
 
 /** The `count` cells after `cells`, which are in the order they're filled in. */
 export function continueCells(cells: string[], count: number, options: FillOptions): string[] {
@@ -48,7 +47,7 @@ function series(cells: string[], { other = false, locale }: FillOptions): ((at: 
     return (at) => written(trend(at), decimals);
   }
   if (other) return null;
-  return dates(cells) ?? names(cells, locale) ?? numbered(cells);
+  return dates(cells) ?? names(cells, locale) ?? names(cells.map((cell) => cell.replace(SEPT, "$1$2")), locale) ?? numbered(cells);
 }
 
 /** The straight line that best fits numbers at 0, 1, 2…, as Excel's series follow: exactly an arithmetic one's. */
@@ -94,28 +93,24 @@ function numbered(cells: string[]) {
 
 /** Dates written as ISO dates: a day apart (or as many), or the same day of each month or year. */
 function dates(cells: string[]) {
-  const read = cells.map((cell) => DATE.exec(cell)?.slice(1).map(Number));
-  if (read.some((part) => !part || part[1] < 1 || part[1] > 12 || part[2] < 1 || part[2] > 31)) return null;
-  const parts = read as number[][];
-  const [year, month, day] = parts[0];
-  const months = parts.map(([y, m]) => y * 12 + m - 1);
-  const monthStep = cells.length > 1 && parts.every((part) => part[2] === day) ? steady(months) : null;
+  const parts = cells.map(isoParts);
+  if (parts.some((part) => !part)) return null;
+  const [year, month, day] = parts[0]!;
+  const months = parts.map((part) => part![0] * 12 + part![1] - 1);
+  const monthStep = cells.length > 1 && parts.every((part) => part![2] === day) ? steady(months) : null;
   if (monthStep) {
     return (at: number) => {
       const whole = year * 12 + month - 1 + monthStep * at;
       const [y, m] = [Math.floor(whole / 12), ((whole % 12) + 12) % 12];
       // The 31st a month on is the last day of a shorter month.
       const last = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
-      return iso(Date.UTC(y, m, Math.min(day, last)));
+      return iso(y, m + 1, Math.min(day, last));
     };
   }
-  const step = steady(parts.map(([y, m, d]) => Date.UTC(y, m - 1, d) / DAY));
-  if (step === null) return null;
-  const first = Date.UTC(year, month - 1, day);
-  return (at: number) => iso(first + step * at * DAY);
+  const days = cells.map((cell) => dateNumber(cell)!);
+  const step = steady(days);
+  return step === null ? null : (at: number) => dateText(days[0] + step * at);
 }
-
-const iso = (time: number) => new Date(time).toISOString().slice(0, 10);
 
 /** Days' and months' names, long and short, in English and the app's language. */
 const lists = new Map<string, string[][]>();
@@ -138,6 +133,9 @@ function namesIn(locale: string) {
 }
 
 const plain = (name: string) => name.toLocaleLowerCase().replace(/\.$/, "");
+
+/** September as Sept, as it's often written, for English's Sep. */
+const SEPT = /^(sep)t(\.?)$/i;
 
 /** Days or months by name (Monday, Tue, March), going round the week or year, written as the first is. */
 function names(cells: string[], locale = "en") {

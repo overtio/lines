@@ -1,0 +1,7 @@
+# Bun's settings for lines (https://bun.com/docs/runtime/bunfig).
+
+[install]
+# Only versions published at least 10 days ago, so a compromised release has time to be caught.
+minimumReleaseAge = 864000
+# Each package sees only what it depends on, as pnpm did.
+linker = "isolated"

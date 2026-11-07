@@ -43,6 +43,8 @@ if (isTauri) {
 }
 
 if (import.meta.env.DEV) Object.assign(window, { lines: { notes, sync, lock, lockedNotes, noteKeys, plugins } });
+// The benchmarks' helpers (scripts/bench.mjs), only in builds made for them.
+if (import.meta.env.MODE === "bench") await import("./bench/harness");
 
 /** A floating note's window is labelled "note-<id>", Settings' "settings"; the main window "main". */
 const label = windowLabel();
@@ -106,10 +108,12 @@ async function start() {
     if (lock.enabled) watchActivity();
   } else if (isSettingsWindow) {
     ui.settings = initialSection();
-    forwardToMain({ sync, lock, lockedNotes, notes }, sync, () => {
-      lock.refresh();
-      noteKeys.refresh();
+    const synced = forwardToMain({ sync, lock, lockedNotes, notes }, sync, (state) => {
+      lock.settings = state.lock;
+      noteKeys.settings = state.noteKeys;
     });
+    // Sync's panels start from what the main window says, so they wait to hear it (a moment at most).
+    await Promise.race([synced, new Promise((resolve) => setTimeout(resolve, 1000))]);
     mount(Settings, { target, props: { windowed: true } });
     if (lock.enabled) watchActivity();
     void closeWithMain();
@@ -119,6 +123,7 @@ async function start() {
   }
 
   await notes.load();
+  performance.mark("lines:notes-loaded");
   // Locked notes open in another window open here too.
   void announce({ type: "notes-ask" });
   // Only the main window syncs; it hears about edits made in floating notes above.
@@ -131,15 +136,19 @@ async function start() {
   sync.start();
   // Settings, in its own window, asks this one to sync, lock and add notes.
   if (isTauri) {
-    serveSettings({ sync, lock, lockedNotes, notes }, () => ({
-      config: sync.config,
-      status: sync.status,
-      error: sync.error,
-      lastSynced: sync.lastSynced,
-      encryptionIssue: sync.encryptionIssue,
-    }));
+    serveSettings(
+      { sync, lock, lockedNotes, notes },
+      () => ({
+        config: sync.config,
+        status: sync.status,
+        error: sync.error,
+        lastSynced: sync.lastSynced,
+        encryptionIssue: sync.encryptionIssue,
+      }),
+      () => ({ lock: lock.settings, noteKeys: noteKeys.settings }),
+    );
   }
-  if (canFloat) restoreFloating();
+  if (canFloat) void restoreFloating();
 }
 
 /** Settings belongs to the main window: closing that closes it too. */

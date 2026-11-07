@@ -1,6 +1,6 @@
 // Lists the messages each language hasn't translated yet, by file, against English
-// (src/lib/i18n/locales/en). Run with `pnpm i18n`. A message a language lacks shows in English;
-// keys English doesn't have are type errors, which `pnpm check` finds.
+// (src/lib/i18n/locales/en). Run with `bun run i18n`. A message a language lacks shows in English;
+// keys English doesn't have are type errors, which `bun run check` finds.
 
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";

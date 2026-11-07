@@ -1,4 +1,5 @@
 import { isolateHistory } from "@codemirror/commands";
+import { Text } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
 import { mount, tick, unmount } from "svelte";
 import { fenceAt, focusEditable } from "../../lib/editor/rendered";
@@ -6,7 +7,8 @@ import { tableMarkdown } from "../../lib/editor/tables";
 import { insert, named, SECTIONS } from "../../lib/editor/slashCommands";
 import { t } from "../../lib/i18n/index.svelte";
 import type { BlockEditor, Cells, EditableBlock, FindSheet, MarkdownAddition, Renderer } from "../../lib/plugins/types";
-import { parseCsv, trimCells, writeCsv } from "../../lib/sheets/csv";
+import { sameRows } from "../../lib/sheets/cells";
+import { csvLine, padCells, parseCsv, trimCells, writeCsv } from "../../lib/sheets/csv";
 import { showFormulas } from "../../lib/sheets/formulas";
 import Grid from "./Grid.svelte";
 import { plugins } from "../../lib/plugins/registry.svelte";
@@ -30,9 +32,12 @@ class BlockSheet implements Sheet {
   readonly fills = false;
   focus: Sheet["focus"];
   layout: Sheet["layout"];
-  /** The note's text, for the blocks in it that its formulas name. */
-  #note = $state("");
+  #doc = $state.raw(Text.empty);
+  /** The note's text, for the blocks in it that its formulas name: read only by formulas that name one. */
+  #note = $derived(this.#doc.toString());
   #source: string | null = null;
+  /** The code last written, and its cells, which it reads back as: they aren't read again. */
+  #wrote: { source: string; cells: Cells } | null = null;
 
   constructor(private readonly block: EditableBlock) {
     this.sync();
@@ -43,17 +48,21 @@ class BlockSheet implements Sheet {
   }
 
   sync() {
-    if (this.block.source !== this.#source) {
-      this.#source = this.block.source;
-      this.cells = parseCsv(this.#source);
+    const { source } = this.block;
+    if (source !== this.#source) {
+      this.#source = source;
+      this.cells = sameRows(this.cells, this.#wrote?.source === source ? this.#wrote.cells : parseCsv(source));
     }
     this.readOnly = this.block.readOnly;
     this.name = this.block.name;
-    this.#note = this.block.view.state.doc.toString();
+    this.#doc = this.block.view.state.doc;
   }
 
   find: FindSheet = (name) => sheetFinder(this.#note)(name);
-  sheets = () => sheetChoices(this.#note);
+  sheets = () => sheetChoices(this.#note, this.noteTitle());
+
+  /** The name given out for a formula pointing here while it has none, for `keepName`. */
+  #given: string | null = null;
 
   nameHere = () => {
     if (this.name) return this.name;
@@ -62,9 +71,12 @@ class BlockSheet implements Sheet {
     const taken = new Set(blockNames(this.#note).map((name) => name?.toLocaleLowerCase()));
     let n = 1;
     while (taken.has(t("sheet.defaultName", { n }).toLocaleLowerCase())) n++;
-    const name = t("sheet.defaultName", { n });
-    this.rename(name);
-    return name;
+    return (this.#given = t("sheet.defaultName", { n }));
+  };
+
+  keepName = () => {
+    if (this.#given && !this.name && !this.readOnly) this.rename(this.#given);
+    this.#given = null;
   };
 
   noteTitle = () => plugins.language().meta(this.#note).title;
@@ -81,7 +93,12 @@ class BlockSheet implements Sheet {
 
   write(cells: Cells) {
     // Empty rows and columns at the end kept: they're its size.
-    this.block.write(writeCsv(cells, ",", true));
+    const rows = padCells(cells);
+    const source = writeCsv(rows, ",", true);
+    // An empty last line isn't read back as a row: the line break before it ends the one before.
+    const last = rows.at(-1);
+    this.#wrote = last && !csvLine(last) ? null : { source, cells: rows };
+    this.block.write(source);
   }
 
   rename(name: string | null) {
