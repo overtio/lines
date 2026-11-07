@@ -52,7 +52,7 @@ The response shows under the request (under the code block, in a Markdown note):
 
 ## curl
 
-- The button after **Send** copies a request as a curl command, with what variables can be filled in filled in.
+- **curl**, after **Send** (shown while the line's hovered), copies the request as a curl command, with what variables can be filled in filled in. The Copy button in a block's corner copies the block's text as written.
 - A curl command pasted into a request (in a `.http` note, or an `http` block), as browsers' "Copy as cURL" and API docs give them, is written as the request it makes: its method, address, headers (`-H`, `-u` as `Authorization`, `-A`, `-b`, `-e`) and body (`-d`, `--data-raw`, `--json`; `-G` puts it in the address). Forms with files (`-F`) aren't.
 
 ## Not yet

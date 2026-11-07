@@ -191,7 +191,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Headers shows the response's headers; Copy copies the body or the headers; × closes it; while sending, × cancels and says Cancelled
 - [ ] `@api = …` in one block works in another block of the note; a request using `{{todo.response.body.$.userId}}` before `# @name todo` was sent says to send that first, and after, sends with the value; an unknown `{{name}}` says there's no such variable and sends nothing
 - [ ] Pasting a curl command (Chrome's Copy as cURL, with `$'…'` and `\` continued lines) into an `http` block writes it as a request, JSON bodies indented; pasted anywhere else it stays as written
-- [ ] The copy button after Send (shown while the line's hovered, always on touch) copies the request as curl, variables filled in
+- [ ] **curl** after Send (shown while the line's hovered, always on touch) copies the request as a curl command, variables filled in, and shows a check for a moment; the block's corner Copy still copies its text as written
 - [ ] **+** on a response adds its body as a code block after the requests' block, and closes the response; ⌘Z takes it out
 - [ ] A note switched to HTTP Requests in its ⓘ panel shows in a monospace font, `###` titles bold and in the outline, Send on each request, and responses under each request; its title in the list is its first line, its excerpt its requests; `# #tag` tags it
 - [ ] Importing a `.http` file makes an HTTP Requests note; Download and Export write it as `.http`; ⌘P prints it highlighted

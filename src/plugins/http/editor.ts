@@ -5,11 +5,11 @@ import { tags } from "@lezer/highlight";
 import { mount, unmount } from "svelte";
 import { speak } from "../../lib/a11y";
 import { fenceAt, fenceLanguage } from "../../lib/editor/rendered";
-import { copyButton, destroyCopyButton } from "../../lib/editor/keyValue";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
 import Icon from "../../lib/icons/Icon.svelte";
+import type { IconName } from "../../lib/icons/icons";
 import { t } from "../../lib/i18n/index.svelte";
-import { modKey } from "../../lib/platform";
+import { copyText, modKey } from "../../lib/platform";
 import { type Asked, fromCurl, toCurl } from "./curl";
 import { httpLanguage } from "./language";
 import { type HttpRequest, type HttpText, parseHttp } from "./parse";
@@ -303,8 +303,25 @@ function curlOf(state: EditorState, where: Where, field: StateField<Responses>, 
 
 /* The buttons on each request's line. */
 
-const buttons = new WeakMap<HTMLElement, { icon: Record<string, unknown>; copy: HTMLElement }>();
+const icons = new WeakMap<HTMLElement, Record<string, unknown>[]>();
 
+/** A small button on a request's line: an icon and a word. */
+function lineButton(className: string, word: string, icon: IconName, run: (button: HTMLButtonElement) => void) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = className;
+  const spot = document.createElement("span");
+  spot.className = "cm-http-icon";
+  const text = document.createElement("span");
+  text.textContent = word;
+  button.append(spot, text);
+  // Keep the click from moving the cursor.
+  button.addEventListener("mousedown", (event) => event.preventDefault());
+  button.addEventListener("click", () => run(button));
+  return { button, icon: mount(Icon, { target: spot, props: { name: icon, size: 12, strokeWidth: 2.25 } }) };
+}
+
+/** Send, and curl: the request as a curl command, copied (a check shows for a moment). */
 class SendWidget extends WidgetType {
   constructor(
     readonly where: Where,
@@ -319,31 +336,28 @@ class SendWidget extends WidgetType {
     const { where, field } = this;
     const dom = document.createElement("span");
     dom.className = "cm-http-actions";
-    const sendButton = document.createElement("button");
-    sendButton.type = "button";
-    sendButton.className = "cm-http-send";
-    sendButton.title = `${t("http.send")} (${modKey}↵)`;
-    const icon = document.createElement("span");
-    const text = document.createElement("span");
-    text.textContent = t("http.send");
-    sendButton.append(icon, text);
-    sendButton.addEventListener("mousedown", (event) => event.preventDefault());
-    sendButton.addEventListener("click", () => {
+    const sending = lineButton("cm-http-send", t("http.send"), "send", () => {
       const request = requestOnLine(view.state, where, view.posAtDOM(dom));
       if (request) send(view, where, field, request.line);
     });
-    const copy = copyButton(() => curlOf(view.state, where, field, view.posAtDOM(dom)), t("http.copyCurl"), "cm-lp-copy cm-http-curl");
-    copy.title = t("http.copyCurl");
-    dom.append(sendButton, copy);
-    buttons.set(dom, { icon: mount(Icon, { target: icon, props: { name: "send", size: 12, strokeWidth: 2.25 } }), copy });
+    sending.button.title = `${t("http.send")} (${modKey}↵)`;
+    let copied: ReturnType<typeof setTimeout> | undefined;
+    const curl = lineButton("cm-http-curl", "curl", "check", (button) => {
+      void copyText(curlOf(view.state, where, field, view.posAtDOM(dom)));
+      speak(t("editor.copied"));
+      button.classList.add("is-copied");
+      clearTimeout(copied);
+      copied = setTimeout(() => button.classList.remove("is-copied"), 1200);
+    });
+    curl.button.title = t("http.copyCurl");
+    curl.button.setAttribute("aria-label", t("http.copyCurl"));
+    dom.append(sending.button, curl.button);
+    icons.set(dom, [sending.icon, curl.icon]);
     return dom;
   }
   destroy(dom: HTMLElement) {
-    const parts = buttons.get(dom);
-    if (!parts) return;
-    void unmount(parts.icon);
-    destroyCopyButton(parts.copy);
-    buttons.delete(dom);
+    for (const icon of icons.get(dom) ?? []) void unmount(icon);
+    icons.delete(dom);
   }
   ignoreEvent() {
     return true;

@@ -15,7 +15,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 
 - An `@api = …` line is a variable, used as `{{api}}` in any block of the note
 - `# @name todo` names a request, so the ones after it can use its response: send **A todo**, then **The person it belongs to**
-- Paste a curl command into a block and it becomes a request; the button after **Send** copies a request as curl
+- Paste a curl command into a block and it becomes a request; **curl** after **Send** copies a request as a curl command
 - A response's **+** adds its body to the note as a code block
 
 ```http

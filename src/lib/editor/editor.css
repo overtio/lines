@@ -1750,21 +1750,26 @@
   font-family: var(--font-ui);
 }
 
-.cm-http-send {
+.cm-http-send,
+.cm-http-curl {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   height: 20px;
-  padding: 0 7px 0 6px;
+  padding: 0 7px;
   border: none;
   border-radius: 5px;
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  color: var(--accent);
   font-size: 11.5px;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
-  transition: background-color 120ms ease, color 120ms ease;
+  transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
+}
+
+.cm-http-send {
+  padding-left: 6px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
 }
 
 .cm-http-send:hover {
@@ -1772,19 +1777,50 @@
   color: var(--on-accent);
 }
 
-.cm-http-send:focus-visible {
+.cm-http-send:focus-visible,
+.cm-http-curl:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
 
-.cm-line:hover .cm-http-curl {
+/* A command's name, quieter, shown while the line's hovered; a check once it's copied. */
+.cm-http-curl {
+  margin-left: 2px;
+  background: none;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  opacity: 0;
+}
+
+.cm-http-curl:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.cm-line:hover .cm-http-curl,
+.cm-http-curl:focus-visible,
+.cm-http-curl.is-copied {
   opacity: 1;
 }
 
+.cm-http-curl .cm-http-icon {
+  display: none;
+}
+
+.cm-http-curl.is-copied {
+  color: var(--success);
+}
+
+.cm-http-curl.is-copied .cm-http-icon {
+  display: flex;
+}
+
 @media (pointer: coarse) {
-  .cm-http-send {
+  .cm-http-send,
+  .cm-http-curl {
     height: 28px;
-    padding: 0 10px 0 9px;
+    padding: 0 10px;
   }
 
   .cm-http-curl {
