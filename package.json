@@ -30,7 +30,7 @@
     "@codemirror/state": "^6.7.6",
     "@codemirror/view": "^6.43.15",
     "@excalidraw/excalidraw": "0.18.1",
-    "@excalidraw/mermaid-to-excalidraw": "2.2.2",
+    "@excalidraw/mermaid-to-excalidraw": "3.1.0",
     "@ironcalc/wasm-xlsx": "0.9.1",
     "@lezer/common": "^1.5.4",
     "@lezer/highlight": "^1.2.5",
