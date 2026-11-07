@@ -388,9 +388,11 @@ mod tests {
 
   #[test]
   fn rejects_relative_folders() {
+    // Absolute on every system: Windows' have a drive letter.
+    let absolute = std::env::temp_dir().join("lines");
     assert!(folder("relative/path").is_err());
-    assert!(folder("/tmp/../etc").is_err());
-    assert!(folder("/tmp/lines").is_ok());
+    assert!(folder(&absolute.join("..").join("etc").to_string_lossy()).is_err());
+    assert!(folder(&absolute.to_string_lossy()).is_ok());
   }
 
   #[test]
