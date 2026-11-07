@@ -18,7 +18,6 @@ export default {
   "http.addToNote": "Add to note as a code block",
   "http.added": "Response added to the note",
   "http.image": "The image in the response",
-  "http.cut": "Showing the first {size}. Copy copies all of it.",
   "http.empty": "No body.",
   // {type} is a media type, like application/pdf.
   "http.binary": "A {type} file, which isn’t text.",

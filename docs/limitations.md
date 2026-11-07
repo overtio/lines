@@ -163,9 +163,9 @@ What isn't done yet is in [requests.md](requests.md#not-yet): environments, asse
 
 - In the browser, only APIs that allow requests from other sites (CORS) answer, and headers the browser keeps from pages (`Cookie`) aren't sent.
 - Responses aren't saved in the note: once lines quits they're gone, and a request using an earlier one's response needs that one sent again.
-- A response shows at most its first 200 KB (Copy copies all of it), highlighted up to 50 KB.
+- **+** adds a response's body to the note only up to 200 KB.
 - Requests in a code block inside a list or a quote, indented, aren't read as requests.
-- Sending from the apps (through Tauri's HTTP plugin) hasn't been tried in the Mac app yet.
+- Sending from the Windows and Linux apps hasn't been tried yet.
 
 ## Accessibility and languages
 

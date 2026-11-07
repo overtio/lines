@@ -187,7 +187,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 ## 6a. API requests
 
 - [ ] `/request` adds an ` ```http ` block with the cursor after `https://`; the block's methods, header names, `{{variables}}`, comments and JSON in bodies highlight in the theme's colors
-- [ ] Each request line ends in a Send button; clicking it, or ⌘↵ with the cursor anywhere in the request, sends it, and the response shows under the block: status (green for 2xx, red for 4xx and 5xx), time, size, and the body, JSON indented and highlighted, an image shown. ⌘↵ outside a request still makes a todo
+- [ ] Each request line ends in a Send button; clicking it, or ⌘↵ with the cursor anywhere in the request, sends it, and the response shows under the block: status (green for 2xx, red for 4xx and 5xx), time, size, and the body, JSON indented and highlighted however long (a 1 MB one too, typing in the note staying quick), its objects folding from the margin, an image shown. ⌘↵ outside a request still makes a todo
 - [ ] Headers shows the response's headers; Copy copies the body or the headers; × closes it; while sending, × cancels and says Cancelled
 - [ ] `@api = …` in one block works in another block of the note; a request using `{{todo.response.body.$.userId}}` before `# @name todo` was sent says to send that first, and after, sends with the value; an unknown `{{name}}` says there's no such variable and sends nothing
 - [ ] Pasting a curl command (Chrome's Copy as cURL, with `$'…'` and `\` continued lines) into an `http` block writes it as a request, JSON bodies indented; pasted anywhere else it stays as written

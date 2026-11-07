@@ -1792,7 +1792,9 @@
   }
 }
 
+/* As wide as the note, whatever it holds: a long address or line in it would otherwise widen the note. */
 .cm-http-response {
+  contain: inline-size;
   font-size: 1rem;
   cursor: auto;
 }

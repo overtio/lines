@@ -19,7 +19,6 @@ export default {
   "http.addToNote": "Ajouter à la note comme bloc de code",
   "http.added": "Réponse ajoutée à la note",
   "http.image": "L’image de la réponse",
-  "http.cut": "Seuls les premiers {size} sont affichés. Copier copie tout.",
   "http.empty": "Pas de corps.",
   "http.binary": "Un fichier {type}, qui n’est pas du texte.",
   "http.unknownType": "binaire",

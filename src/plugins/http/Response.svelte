@@ -1,15 +1,13 @@
 <script lang="ts">
   // A request's response, under it in the note: its status, how long it took and its size, then its
-  // body (formatted and highlighted when it's JSON or XML, shown when it's an image) or its headers.
-  import { highlightCode } from "@lezer/highlight";
+  // body (JSON indented, highlighted in an editor of its own, body.ts; an image shown) or its headers.
   import { speak } from "../../lib/a11y";
   import IconButton from "../../lib/components/ui/IconButton.svelte";
   import Segmented from "../../lib/components/ui/Segmented.svelte";
   import { formatSize } from "../../lib/editor/attachments";
-  import { codeLanguage } from "../../lib/editor/codeLanguages";
-  import { highlightStyle } from "../../lib/editor/setup";
   import { locale, t } from "../../lib/i18n/index.svelte";
   import { copyText } from "../../lib/platform";
+  import { bodyView, type Shown } from "./body";
   import type { Exchange, Received } from "./send.svelte";
 
   let {
@@ -23,16 +21,14 @@
     addToNote?: (text: string, language: string) => void;
   } = $props();
 
-  /** As much of a body as is shown; Copy copies all of it. */
-  const SHOWN = 200_000;
-  /** As much as is highlighted: every token is an element, which slows the note down. */
-  const HIGHLIGHTED = 50_000;
+  /** As much of a body as can be added to the note: more would make a note too slow to work in. */
+  const ADDABLE = 200_000;
 
   let tab = $state<"body" | "headers">("body");
   const received = $derived(exchange.received);
 
   /** The body as it shows: JSON indented, and the language it's highlighted as. */
-  function readable(response: Received): { text: string; language: string } {
+  function readable(response: Received): Shown {
     const { text, type } = response;
     if (/json/.test(type) || (!type && /^\s*[[{]/.test(text))) {
       try {
@@ -69,38 +65,6 @@
     speak(t("editor.copied"));
   }
 
-  /** Draws `text` into the element, then highlights it once its language has loaded. */
-  function highlighted(node: HTMLElement, shown: { text: string; language: string }) {
-    let drawing = 0;
-    const draw = ({ text, language }: { text: string; language: string }) => {
-      const run = ++drawing;
-      node.textContent = text;
-      const found = language && text.length <= HIGHLIGHTED ? codeLanguage(language) : null;
-      void found?.load().then((support) => {
-        if (run !== drawing) return;
-        const parts = document.createDocumentFragment();
-        highlightCode(
-          text,
-          support.language.parser.parse(text),
-          highlightStyle,
-          (piece, classes) => {
-            if (!classes) return parts.append(piece);
-            const span = document.createElement("span");
-            span.className = classes;
-            span.textContent = piece;
-            parts.append(span);
-          },
-          () => parts.append("\n"),
-        );
-        node.replaceChildren(parts);
-      });
-    };
-    draw(shown);
-    return {
-      update: draw,
-      destroy: () => void drawing++,
-    };
-  }
 </script>
 
 <section class="cm-http-response-panel my-1.5 overflow-hidden rounded-lg border border-line bg-panel font-ui text-[13px] leading-normal whitespace-normal text-fg" aria-label={t("http.response")}>
@@ -129,7 +93,7 @@
         ]}
       />
       <IconButton icon="copy" iconSize={15} label={tab === "headers" ? t("http.copyHeaders") : t("http.copyBody")} onclick={copy} />
-      {#if addToNote && body && body.text.length <= SHOWN && tab === "body"}
+      {#if addToNote && body && body.text.length <= ADDABLE && tab === "body"}
         <IconButton icon="plus" iconSize={15} label={t("http.addToNote")} onclick={() => addToNote(body.text, body.language)} />
       {/if}
     {/if}
@@ -155,10 +119,7 @@
       </div>
     {:else if body}
       {#if body.text}
-        <pre class="max-h-[min(420px,60vh)] overflow-auto px-3 py-2.5 font-mono text-[12px] leading-relaxed whitespace-pre-wrap break-all select-text" use:highlighted={{ text: body.text.slice(0, SHOWN), language: body.language }}></pre>
-        {#if body.text.length > SHOWN}
-          <p class="border-t border-line px-3 py-2 text-muted">{t("http.cut", { size: formatSize(SHOWN) })}</p>
-        {/if}
+        <div class="cm-http-body" use:bodyView={body}></div>
       {:else}
         <p class="px-3 py-2.5 text-muted">{t("http.empty")}</p>
       {/if}
