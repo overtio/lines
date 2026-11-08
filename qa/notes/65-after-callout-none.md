@@ -412,14 +412,28 @@ Text in a decision callout with no icon.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Callout (decision, no icon), then Missing file
+#### 40. Callout (decision, no icon), then Audio
+
+:::^ icon=none
+Text in a decision callout with no icon.
+:::
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Callout (decision, no icon), then Video
+
+:::^ icon=none
+Text in a decision callout with no icon.
+:::
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Callout (decision, no icon), then Missing file
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Callout (decision, no icon), then Card
+#### 43. Callout (decision, no icon), then Card
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -428,7 +442,7 @@ Text in a decision callout with no icon.
 Text in a card.
 :::
 
-#### 42. Callout (decision, no icon), then Callout (info)
+#### 44. Callout (decision, no icon), then Callout (info)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -437,7 +451,7 @@ Text in a decision callout with no icon.
 Text in an info callout.
 :::
 
-#### 43. Callout (decision, no icon), then Callout (warning, chosen icon)
+#### 45. Callout (decision, no icon), then Callout (warning, chosen icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -446,7 +460,7 @@ Text in a decision callout with no icon.
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Callout (decision, no icon), then Callout (decision, no icon)
+#### 46. Callout (decision, no icon), then Callout (decision, no icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.

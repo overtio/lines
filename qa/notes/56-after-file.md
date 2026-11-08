@@ -334,33 +334,43 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 [Budget.csv](attachment:budget.csv)
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. File, then Missing file
+#### 40. File, then Audio
+
+[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. File, then Video
+
+[Budget.csv](attachment:budget.csv)
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. File, then Missing file
 
 [Budget.csv](attachment:budget.csv)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. File, then Card
+#### 43. File, then Card
 
 [Budget.csv](attachment:budget.csv)
 ::: card
 Text in a card.
 :::
 
-#### 42. File, then Callout (info)
+#### 44. File, then Callout (info)
 
 [Budget.csv](attachment:budget.csv)
 :::i
 Text in an info callout.
 :::
 
-#### 43. File, then Callout (warning, chosen icon)
+#### 45. File, then Callout (warning, chosen icon)
 
 [Budget.csv](attachment:budget.csv)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. File, then Callout (decision, no icon)
+#### 46. File, then Callout (decision, no icon)
 
 [Budget.csv](attachment:budget.csv)
 :::^ icon=none

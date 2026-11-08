@@ -607,7 +607,31 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Timing diagram (wavedrom block), then Missing file
+#### 40. Timing diagram (wavedrom block), then Audio
+
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Timing diagram (wavedrom block), then Video
+
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Timing diagram (wavedrom block), then Missing file
 
 ```wavedrom
 { signal: [
@@ -619,7 +643,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Timing diagram (wavedrom block), then Card
+#### 43. Timing diagram (wavedrom block), then Card
 
 ```wavedrom
 { signal: [
@@ -633,7 +657,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 42. Timing diagram (wavedrom block), then Callout (info)
+#### 44. Timing diagram (wavedrom block), then Callout (info)
 
 ```wavedrom
 { signal: [
@@ -647,7 +671,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 43. Timing diagram (wavedrom block), then Callout (warning, chosen icon)
+#### 45. Timing diagram (wavedrom block), then Callout (warning, chosen icon)
 
 ```wavedrom
 { signal: [
@@ -661,7 +685,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Timing diagram (wavedrom block), then Callout (decision, no icon)
+#### 46. Timing diagram (wavedrom block), then Callout (decision, no icon)
 
 ```wavedrom
 { signal: [

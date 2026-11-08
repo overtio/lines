@@ -26,6 +26,12 @@ A terminal recording you made with `asciinema rec` plays above its card, in your
 
 [terminal.cast](attachment:terminal.cast)
 
+Audio and video play right in the note, and audio keeps playing while you scroll and write. A video resizes by its corner, as a picture does.
+
+[Chime.mp3](attachment:chime.mp3)
+
+[Sky.mp4](attachment:sky.mp4)
+
 ## Copy values
 
 A line like a label and a value gets a copy button when you hover the value:

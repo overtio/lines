@@ -334,33 +334,43 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 [terminal.cast](attachment:terminal.cast)
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Terminal recording (.cast file), then Missing file
+#### 40. Terminal recording (.cast file), then Audio
+
+[terminal.cast](attachment:terminal.cast)
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Terminal recording (.cast file), then Video
+
+[terminal.cast](attachment:terminal.cast)
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Terminal recording (.cast file), then Missing file
 
 [terminal.cast](attachment:terminal.cast)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Terminal recording (.cast file), then Card
+#### 43. Terminal recording (.cast file), then Card
 
 [terminal.cast](attachment:terminal.cast)
 ::: card
 Text in a card.
 :::
 
-#### 42. Terminal recording (.cast file), then Callout (info)
+#### 44. Terminal recording (.cast file), then Callout (info)
 
 [terminal.cast](attachment:terminal.cast)
 :::i
 Text in an info callout.
 :::
 
-#### 43. Terminal recording (.cast file), then Callout (warning, chosen icon)
+#### 45. Terminal recording (.cast file), then Callout (warning, chosen icon)
 
 [terminal.cast](attachment:terminal.cast)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Terminal recording (.cast file), then Callout (decision, no icon)
+#### 46. Terminal recording (.cast file), then Callout (decision, no icon)
 
 [terminal.cast](attachment:terminal.cast)
 :::^ icon=none

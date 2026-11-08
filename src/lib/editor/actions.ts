@@ -48,6 +48,12 @@ export function dropBar(bar: HTMLElement) {
   watches.delete(bar);
 }
 
+/** Shows what a handle resizes at a width, kept whatever its height; or at its own size (null). */
+export function setWidth(target: HTMLElement, width: number | null) {
+  target.style.width = width ? `${width}px` : "";
+  target.style.maxHeight = width ? "none" : "";
+}
+
 /** How a block's resize handle resizes what it draws. */
 interface Resizing<T extends Element> {
   /** What's drawn, once it's there. */
@@ -61,9 +67,9 @@ interface Resizing<T extends Element> {
 }
 
 /**
- * The handle on the bottom right corner of what `block` draws (an image, a diagram): dragged, it
- * makes that wider or narrower, keeping its shape; double-clicked, back to its own size. From the
- * keyboard, the width is the number after the bar in its Markdown.
+ * The handle on the bottom right corner of what `block` draws (an image, a video, a diagram):
+ * dragged, it makes that wider or narrower, keeping its shape; double-clicked, back to its own
+ * size. From the keyboard, the width is the number after the bar in its Markdown.
  */
 export function resizeHandle<T extends Element>(view: EditorView, block: HTMLElement, className: string, resizing: Resizing<T>) {
   const handle = document.createElement("span");

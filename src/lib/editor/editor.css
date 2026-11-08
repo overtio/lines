@@ -1024,7 +1024,7 @@
   box-shadow: 0 0 0 2px var(--accent);
 }
 
-/* The image with its resize handle (bottom right) and, for a drawing, its edit button beside it. */
+/* The image or video with its resize handle (bottom right) and, for a drawing, its edit button beside it. */
 .cm-lp-image-frame {
   position: relative;
   display: inline-block;
@@ -1072,16 +1072,13 @@
   }
 }
 
-/* An image's and a diagram's show on hover, while it's selected or being resized. */
+/* An image's, a video's and a diagram's show on hover, while it's selected or being resized. */
 .cm-lp-image-resize,
 .cm-lp-diagram-resize {
   opacity: 0;
 }
 
-.cm-lp-image-block:hover .cm-lp-image-resize,
-.cm-lp-image-block.is-preview .cm-lp-image-resize,
-.cm-lp-image-block.is-selected .cm-lp-image-resize,
-.cm-lp-image-block.is-resizing .cm-lp-image-resize,
+:is(.cm-lp-image-block, .cm-lp-video-block):is(:hover, .is-preview, .is-selected, .is-resizing) .cm-lp-image-resize,
 .cm-lp-diagram:hover .cm-lp-diagram-resize,
 .cm-lp-diagram.is-preview .cm-lp-diagram-resize,
 .cm-lp-diagram.is-resizing .cm-lp-diagram-resize {
@@ -1089,6 +1086,7 @@
 }
 
 .cm-lp-image-block.is-resizing,
+.cm-lp-video-block.is-resizing,
 .cm-lp-diagram.is-resizing {
   cursor: nwse-resize;
 }
@@ -1098,14 +1096,15 @@
   box-shadow: 0 0 0 2px var(--accent);
 }
 
-.cm-lp-image-block.is-resizing .cm-lp-image {
+.cm-lp-image-block.is-resizing .cm-lp-image,
+.cm-lp-video-block.is-resizing .cm-lp-video {
   box-shadow: 0 0 0 2px var(--accent);
 }
 
-/* Nothing to resize in a note that can't change (the Trash), or before the image has loaded. */
+/* Nothing to resize in a note that can't change (the Trash), or before the image or video has loaded. */
 .cm-content[contenteditable="false"] .cm-lp-image-resize,
 .cm-content[contenteditable="false"] .cm-lp-diagram-resize,
-.cm-lp-image-frame:not(:has(.cm-lp-image)) .cm-lp-image-resize {
+.cm-lp-image-frame:not(:has(.cm-lp-image, .cm-lp-video)) .cm-lp-image-resize {
   display: none;
 }
 
@@ -1138,14 +1137,16 @@
   }
 }
 
-/* A file on a line of its own (attachments.ts): a card naming it, double-clicked to open. */
-.cm-lp-file-block {
+/* A file on a line of its own (attachments.ts): a card naming it, double-clicked to open. Audio and video play in its place. */
+.cm-lp-file-block,
+.cm-lp-audio-block,
+.cm-lp-video-block {
   padding: 0.3em 0;
   line-height: 1.3;
   cursor: default;
 }
 
-.cm-lp-file-block.is-preview {
+:is(.cm-lp-file-block, .cm-lp-audio-block, .cm-lp-video-block).is-preview {
   padding-bottom: 0.6em;
 }
 
@@ -1215,9 +1216,71 @@
   color: var(--text-faint);
 }
 
-.cm-focused .cm-lp-file-block.is-selected .cm-lp-file {
+.cm-focused .cm-lp-block.is-selected .cm-lp-file {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px var(--accent);
+}
+
+/*
+ * Audio (media.ts, AudioPlayer.svelte): a file's card, its icon a play button, with a slider for
+ * how far it's played and the time after it.
+ */
+.cm-lp-audio {
+  width: min(100%, 26em);
+}
+
+.cm-lp-audio-play {
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.12s;
+}
+
+.cm-lp-audio-play:hover {
+  background: var(--accent-soft);
+}
+
+@media (pointer: coarse) {
+  .cm-lp-audio-play {
+    width: 2.6em;
+    height: 2.6em;
+  }
+}
+
+.cm-lp-audio-text {
+  flex: 1;
+}
+
+.cm-lp-audio-seek {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+}
+
+.cm-lp-audio-slider {
+  flex: 1;
+}
+
+.cm-lp-audio-time {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Video, with the browser's own controls; edged and selected as an image is. */
+.cm-lp-video-slot {
+  display: block;
+}
+
+.cm-lp-video {
+  display: block;
+  max-width: 100%;
+  max-height: 480px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.cm-focused .cm-lp-video-block.is-selected .cm-lp-video {
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
 /* A link a plugin draws on a line of its own (attachments.ts), like asciinema's embed code as the recording's player. */
@@ -1947,7 +2010,7 @@
     border-top: 10px solid Canvas;
   }
 
-  .cm-focused .cm-lp-file-block.is-selected .cm-lp-file {
+  .cm-focused .cm-lp-block.is-selected :is(.cm-lp-file, .cm-lp-video) {
     outline: 2px solid Highlight;
   }
 }

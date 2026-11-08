@@ -373,13 +373,25 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
 
   [terminal.cast](attachment:terminal.cast)
 
-#### 40. Missing file in a list item (stays Markdown here)
+#### 40. Audio in a list item (stays Markdown here)
+
+- List item
+
+  [Chime.mp3](attachment:chime.mp3)
+
+#### 41. Video in a list item (stays Markdown here)
+
+- List item
+
+  [Sky.mp4](attachment:sky.mp4)
+
+#### 42. Missing file in a list item (stays Markdown here)
 
 - List item
 
   [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Card in a list item
+#### 43. Card in a list item
 
 - List item
 
@@ -387,7 +399,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a card.
   :::
 
-#### 42. Callout (info) in a list item
+#### 44. Callout (info) in a list item
 
 - List item
 
@@ -395,7 +407,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in an info callout.
   :::
 
-#### 43. Callout (warning, chosen icon) in a list item
+#### 45. Callout (warning, chosen icon) in a list item
 
 - List item
 
@@ -403,7 +415,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a warning callout with the flag icon.
   :::
 
-#### 44. Callout (decision, no icon) in a list item
+#### 46. Callout (decision, no icon) in a list item
 
 - List item
 

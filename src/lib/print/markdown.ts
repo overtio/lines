@@ -9,7 +9,7 @@ import { Card, Highlight, Mention, Tag, TexMath, Underline } from "../editor/syn
 import { tableData } from "../editor/typeTables";
 import { fenceLanguage, renderedInfo } from "../editor/rendered";
 import { isUnsplashPhoto } from "../editor/unsplash";
-import { attachmentName } from "../notes/attachments";
+import { attachmentName, imageSize, mediaLink } from "../notes/attachments";
 import { frontMatter, readTypeRef, typeLabel } from "../notes/properties";
 import { isFormula } from "../sheets/cells";
 import { withSymbols } from "../notes/symbols";
@@ -153,6 +153,8 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
         const marks = node.getChildren("LinkMark");
         const label = el("span");
         inline(node, label, marks[0]?.to ?? node.from, marks[1]?.from ?? node.to);
+        // A video's width (`[Sky.mp4|400]`) is how it's shown in the note.
+        if (mediaLink(href) === "video") label.textContent = imageSize(label.textContent ?? "").alt;
         if (attachmentName(href)) return void into.appendChild(el("span", "doc-file", parts.icon("paperclip", 13), label));
         return void into.appendChild(link(href, label));
       }

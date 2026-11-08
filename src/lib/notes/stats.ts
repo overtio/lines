@@ -1,3 +1,4 @@
+import { imageSize, mediaLink } from "./attachments";
 import { frontMatter } from "./properties";
 
 export interface NoteStats {
@@ -28,7 +29,11 @@ export function plainLine(line: string): string {
     .replace(/^\s*(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?/, "")
     // Link text may have escaped brackets, as attached files' names do: `[a \[draft\].txt](…)`.
     .replace(/!\[(?:\\.|[^\]\\])*\]\([^)]*\)/g, "")
-    .replace(/\[((?:\\.|[^\]\\])*)\]\([^)]*\)/g, (_, text: string) => text.replace(/\\([[\]\\])/g, "$1"))
+    .replace(/\[((?:\\.|[^\]\\])*)\]\(([^)]*)\)/g, (_, text: string, href: string) => {
+      const shown = text.replace(/\\([[\]\\])/g, "$1");
+      // A video's width (`[Sky.mp4|400]`) is how it's shown, not part of its name.
+      return mediaLink(href) === "video" ? imageSize(shown).alt : shown;
+    })
     .replace(/\*\*|__|~~|==|`|\*|<\/?u>/gi, "")
     // A wiki link reads as what it shows: `[[Ada Lovelace]]` as `Ada Lovelace`, `[[Ada Lovelace|Ada]]` as `Ada`.
     .replace(/(?<![!\\])\[\[([^[\]\n|#]+)(?:#[^[\]\n|]*)?(?:\|([^[\]\n]+))?\]\]/gu, (_, name: string, shown?: string) => (shown ?? name).trim())

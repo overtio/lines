@@ -334,33 +334,43 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ![A sample picture](attachment:photo.png)
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Image, then Missing file
+#### 40. Image, then Audio
+
+![A sample picture](attachment:photo.png)
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Image, then Video
+
+![A sample picture](attachment:photo.png)
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Image, then Missing file
 
 ![A sample picture](attachment:photo.png)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Image, then Card
+#### 43. Image, then Card
 
 ![A sample picture](attachment:photo.png)
 ::: card
 Text in a card.
 :::
 
-#### 42. Image, then Callout (info)
+#### 44. Image, then Callout (info)
 
 ![A sample picture](attachment:photo.png)
 :::i
 Text in an info callout.
 :::
 
-#### 43. Image, then Callout (warning, chosen icon)
+#### 45. Image, then Callout (warning, chosen icon)
 
 ![A sample picture](attachment:photo.png)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Image, then Callout (decision, no icon)
+#### 46. Image, then Callout (decision, no icon)
 
 ![A sample picture](attachment:photo.png)
 :::^ icon=none

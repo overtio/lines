@@ -3,7 +3,9 @@ import { EditorSelection, type EditorState, type Extension, Prec, type Range, ty
 import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
 import { locale, t } from "../../lib/i18n/index.svelte";
 import { DOCUMENT_BEGIN, latexEscape, latexLine, latexText, preambleField } from "./text";
-import { type AttachmentWriter, attachmentPasting, choose } from "../../lib/editor/attachments";
+import { type AttachmentWriter, attachmentPasting, choose, mediaBlock } from "../../lib/editor/attachments";
+import { mediaPlayers } from "../../lib/editor/media";
+import { mediaLink } from "../../lib/notes/attachments";
 import { type Definitions, type Env, LIST_ENVS, scanLatex, type Span, type Table } from "./syntax";
 import { BulletWidget, ImageWidget, NumberWidget } from "../../lib/editor/livePreview";
 import { followClick } from "../../lib/editor/links";
@@ -73,9 +75,10 @@ const ownLines = (doc: Text, from: number, to: number) =>
   !doc.sliceString(doc.lineAt(from).from, from).trim() && !doc.sliceString(to, doc.lineAt(to).to).trim();
 
 /**
- * Whether a span can be drawn as a block (display math or a table on lines of their own), or in
- * place of a line break (a citation whose keys run onto the next line, say). Only decorations the
- * editor's state gives can do that (`blocks`), as they have to be known for the whole note.
+ * Whether a span can be drawn as a block (display math, a table, or audio or video on lines of their
+ * own), or in place of a line break (a citation whose keys run onto the next line, say). Only
+ * decorations the editor's state gives can do that (`blocks`), as they have to be known for the
+ * whole note.
  */
 function changesLayout(doc: Text, span: Span) {
   switch (span.type) {
@@ -83,6 +86,8 @@ function changesLayout(doc: Text, span: Span) {
       return span.display && ownLines(doc, span.from, span.to);
     case "table":
       return ownLines(doc, span.from, span.to);
+    case "link":
+      return !!mediaLink(span.href) && ownLines(doc, span.from, span.to);
     case "image":
     case "cite":
     case "ref":
@@ -465,6 +470,14 @@ function build(state: EditorState, visible?: { from: number; to: number }): Deco
         break;
 
       case "link": {
+        const media = layout.has(span) && mediaLink(span.href);
+        if (media) {
+          const editing = isEditing(state, span.from, span.to);
+          const widget = mediaBlock(media, span.href, latexText(doc.sliceString(span.textFrom, span.textTo)), editing);
+          const line = doc.lineAt(span.from);
+          add(editing ? Decoration.widget({ widget, block: true, side: 1 }).range(line.to) : Decoration.replace({ widget, block: true }).range(line.from, line.to));
+          if (!editing) break;
+        }
         // A link to a site a plugin reads short (GitHub, arXiv): \url{…} as that, \href{…}{text} with the mark in front.
         const short = !touches(span.from, span.to) && shortLink(span.href);
         if (short && doc.sliceString(span.textFrom, span.textTo) === span.href) {
@@ -945,6 +958,7 @@ const editing = (papers: readonly PaperSource[]): Extension => [
   slashMenu(slashCommands(papers), backslashCommands),
   Prec.high(tablePasting(tabular, literalAt)),
   attachmentPasting(latexWriter),
+  mediaPlayers,
   pasteLink,
   outline,
 ];

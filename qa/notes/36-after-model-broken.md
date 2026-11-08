@@ -451,7 +451,23 @@ sphere(3;
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Broken model (openscad block), then Missing file
+#### 40. Broken model (openscad block), then Audio
+
+```openscad
+cube(10)
+sphere(3;
+```
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Broken model (openscad block), then Video
+
+```openscad
+cube(10)
+sphere(3;
+```
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Broken model (openscad block), then Missing file
 
 ```openscad
 cube(10)
@@ -459,7 +475,7 @@ sphere(3;
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Broken model (openscad block), then Card
+#### 43. Broken model (openscad block), then Card
 
 ```openscad
 cube(10)
@@ -469,7 +485,7 @@ sphere(3;
 Text in a card.
 :::
 
-#### 42. Broken model (openscad block), then Callout (info)
+#### 44. Broken model (openscad block), then Callout (info)
 
 ```openscad
 cube(10)
@@ -479,7 +495,7 @@ sphere(3;
 Text in an info callout.
 :::
 
-#### 43. Broken model (openscad block), then Callout (warning, chosen icon)
+#### 45. Broken model (openscad block), then Callout (warning, chosen icon)
 
 ```openscad
 cube(10)
@@ -489,7 +505,7 @@ sphere(3;
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Broken model (openscad block), then Callout (decision, no icon)
+#### 46. Broken model (openscad block), then Callout (decision, no icon)
 
 ```openscad
 cube(10)

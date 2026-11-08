@@ -15,6 +15,8 @@ import {
   getAttachment,
   imageSize,
   isImage,
+  type MediaKind,
+  mediaKind,
   openAttachment,
   withWidth,
   saveAttachment,
@@ -24,20 +26,21 @@ import { coarsePointer } from "../platform";
 import { locale, type MessageKey, t } from "../i18n/index.svelte";
 import { plugins } from "../plugins/registry.svelte";
 import type { Embed, EmbedLink, FileView, Renderer, Shown } from "../plugins/types";
-import { actionBar, dropBar, resizeHandle } from "./actions";
+import { actionBar, dropBar, resizeHandle, setWidth } from "./actions";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { editDrawing, isDrawing, knownDrawing } from "./drawings";
 import { giphyStill } from "./giphy";
+import { mediaElement, mediaPlayers } from "./media";
 import { addActions, fencedBlock, removeActions } from "./rendered";
 import { isUnsplashPhoto, unsplashImage, unsplashPhoto } from "./unsplash";
 import { ancestors, blockPos, drawnBlock, drawnBlocks, focused, INTERACTIVE, isEditing, OWN_INPUT, whenClicked } from "./util";
 
 /*
  * Images and files in notes. One on a line of its own is drawn as a block in its place (the image,
- * or a card naming the file, below what a plugin shows of it: a 3D model to turn); with the cursor
- * on that line its Markdown shows, with the block below it. Such an image has a handle on its
- * corner that resizes it, written into its label as Obsidian does (`![Lake|400](…)`), and a
- * drawing (drawings.ts) a button to edit it. A file that a renderer plugin makes blocks from
+ * a player for audio and video (media.ts), or a card naming the file, below what a plugin shows of
+ * it: a 3D model to turn); with the cursor on that line its Markdown shows, with the block below
+ * it. Such an image or video has a handle on its corner that resizes it, written into its label as
+ * Obsidian does (`![Lake|400](…)`), and a drawing (drawings.ts) a button to edit it. A file that a renderer plugin makes blocks from
  * (`Renderer.fromFiles`) has a button that puts its block in its place: a CSV file's spreadsheet.
  * A link a plugin draws (an embed: asciinema's embed code as the recording's player) is a block too.
  * Images within text are drawn inline by livePreview.ts, and files within text are links.
@@ -207,12 +210,15 @@ const cleanups = new WeakMap<HTMLElement, () => void>();
 /** What plugins show in blocks (a recording's player), by the block's element, to give it the keyboard. */
 const shownBy = new WeakMap<HTMLElement, () => Shown | null>();
 
+/** What a block draws, without where its Markdown is: a LaTeX note's audio or video has no Markdown. */
+type Drawable = Pick<Block, "kind" | "src" | "label" | "embed" | "sizing">;
+
 /** What a block draws: two blocks with the same draw the same thing. */
-const blockKey = (block: Block) => [block.kind, block.src, block.label, block.embed?.link.image ?? ""].join("\n");
+const blockKey = (block: Drawable) => [block.kind, block.src, block.label, block.embed?.link.image ?? ""].join("\n");
 
 class BlockWidget extends WidgetType {
   constructor(
-    readonly block: Block,
+    readonly block: Drawable,
     /** How far in it sits, in cards. */
     readonly inset: CardInset,
     /** Drawn below its Markdown while the cursor is on it, rather than in its place. */
@@ -253,16 +259,19 @@ class BlockWidget extends WidgetType {
       return dom;
     }
     const onChange = () => view.requestMeasure();
+    const name = attachmentName(src);
     const viewer = kind === "file" ? plugins.fileView(src) : undefined;
-    const viewed = viewer && viewedFile(viewer, attachmentName(src)!, label, onChange);
+    const viewed = viewer && viewedFile(viewer, name!, label, onChange);
     if (viewed) shownBy.set(dom, viewed.shown);
-    const content = kind === "image" ? imageElement(src, label, onChange) : (viewed ?? fileElement(attachmentName(src)!, label, onChange));
+    const player = (kind === "audio" || kind === "video") && playerElement(view, kind, name!, label, onChange);
+    if (player) shownBy.set(dom, () => player);
+    const content = kind === "image" ? imageElement(src, label, onChange) : (player || viewed || fileElement(name!, label, onChange));
     let destroy = content.destroy;
-    // An image sits in a frame with its resize handle on its corner (and a drawing's edit button beside it).
+    // An image or video sits in a frame with its resize handle on its corner (and a drawing's edit button beside it).
     const frame = document.createElement("span");
     frame.className = "cm-lp-image-frame";
     frame.append(content.dom);
-    dom.append(kind === "image" ? frame : content.dom);
+    dom.append(kind === "image" || kind === "video" ? frame : content.dom);
     const { converter } = this;
     if (converter?.fromFiles) {
       const { label, icon } = converter.fromFiles;
@@ -272,10 +281,11 @@ class BlockWidget extends WidgetType {
       const bar = addActions(view, dom, [{ label, icon, run }], content.dom);
       if (bar) content.dom.append(bar);
     }
-    if (kind === "image") {
+    if (this.block.sizing) {
       const handle = resizeHandle(view, dom, "cm-lp-image-resize", {
-        target: () => dom.querySelector<HTMLImageElement>(".cm-lp-image"),
-        min: 48,
+        target: () => dom.querySelector<HTMLElement>(".cm-lp-image, .cm-lp-video"),
+        // Room for a video's controls.
+        min: kind === "video" ? 160 : 48,
         max: () => {
           const style = getComputedStyle(dom);
           return dom.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
@@ -285,7 +295,6 @@ class BlockWidget extends WidgetType {
       });
       frame.append(handle);
     }
-    const name = attachmentName(src);
     if (kind === "image" && name) {
       void isDrawing(name).then((drawing) => {
         // Not if it's gone meanwhile (scrolled away, say).
@@ -314,10 +323,22 @@ class BlockWidget extends WidgetType {
     cleanups.set(dom, destroy);
     return dom;
   }
-  /** Moving the cursor onto or off the block keeps it as it is. */
+  /** Moving the cursor onto or off the block keeps it as it is, and so does a new width for a video, which takes it as it plays. */
   updateDOM(dom: HTMLElement) {
-    if (dom.dataset.key !== blockKey(this.block) || dom.dataset.converter !== this.converter?.id) return false;
+    if (dom.dataset.converter !== this.converter?.id) return false;
+    if (dom.dataset.key !== blockKey(this.block) && !this.#resize(dom)) return false;
     this.#classes(dom);
+    return true;
+  }
+  /** Shows a video drawn for the same file and name at this block's width; false if it isn't one. */
+  #resize(dom: HTMLElement) {
+    const { kind, src, label } = this.block;
+    const video = dom.querySelector<HTMLElement>(".cm-lp-video");
+    const { alt, width } = imageSize(label);
+    if (kind !== "video" || dom.dataset.src !== src || imageSize(dom.dataset.label ?? "").alt !== alt || !video) return false;
+    setWidth(video, width);
+    dom.dataset.label = label;
+    dom.dataset.key = blockKey(this.block);
     return true;
   }
   destroy(dom: HTMLElement) {
@@ -326,8 +347,10 @@ class BlockWidget extends WidgetType {
     removeActions(dom);
   }
   get estimatedHeight() {
-    if (this.block.kind !== "file") return heights.get(`${this.block.src}\n${this.block.label}`) ?? (this.block.kind === "image" ? 200 : 420);
-    return plugins.fileView(this.block.src) ? 420 : 60;
+    const { kind, src, label } = this.block;
+    if (kind === "file") return plugins.fileView(src) ? 420 : 60;
+    if (kind === "audio") return 60;
+    return heights.get(`${src}\n${label}`) ?? (kind === "image" ? 200 : kind === "video" ? 300 : 420);
   }
   /** What takes its own clicks and keys (a recording's player) has them; the rest selects the block. */
   ignoreEvent(event: Event) {
@@ -346,7 +369,7 @@ function backToNote(view: EditorView, dom: HTMLElement, event: KeyboardEvent) {
 }
 
 /** What a plugin draws for a link (embeds). */
-function drawEmbed(view: EditorView, dom: HTMLElement, block: Block) {
+function drawEmbed(view: EditorView, dom: HTMLElement, block: Drawable) {
   const { link, by } = block.embed!;
   const frame = document.createElement("div");
   frame.className = "cm-lp-embed";
@@ -359,23 +382,27 @@ function drawEmbed(view: EditorView, dom: HTMLElement, block: Block) {
   cleanups.set(dom, () => drawn.destroy());
 }
 
-/* Resizing images. */
+/**
+ * Audio or video linked on a line of its own in a LaTeX note (`\href`): its player, in place of the
+ * line, or below it while it's edited (`preview`).
+ */
+export const mediaBlock = (kind: MediaKind, href: string, label: string, preview: boolean) => new BlockWidget({ kind, src: href, label }, { depth: 0, icons: 0 }, preview);
 
-function setWidth(img: HTMLImageElement, width: number) {
-  img.style.width = `${width}px`;
-  // A width chosen is kept, whatever its height.
-  img.style.maxHeight = "none";
+/** An audio or video file's player, or its card while it can't play: a video at the width its label gives (`|400`), as an image is. */
+function playerElement(view: EditorView, kind: MediaKind, name: string, label: string, onChange: () => void) {
+  const { alt, width } = kind === "video" ? imageSize(label) : { alt: label, width: null };
+  return mediaElement(view, kind, name, alt || name, width, onChange, () => fileElement(name, alt, onChange));
 }
 
-/** Writes an image's width into its label (`![Lake|400](…)`), or takes it out (null). */
+/* Resizing images and videos. */
+
+/** Writes an image's or video's width into its label (`![Lake|400](…)`, `[Sky.mp4|400](…)`), or takes it out (null). */
 function writeWidth(view: EditorView, dom: HTMLElement, width: number | null) {
-  const block = blockOnLine(view.state, view.state.doc.lineAt(blockPos(view, dom)).number);
-  if (!block || block.kind !== "image") return;
-  const label = withWidth(block.label, width);
-  if (label === block.label) return;
-  // After "![".
-  const from = block.from + 2;
-  view.dispatch({ changes: { from, to: from + block.label.length, insert: label }, userEvent: "input.resize" });
+  const sizing = blockOnLine(view.state, view.state.doc.lineAt(blockPos(view, dom)).number)?.sizing;
+  if (!sizing) return;
+  const before = view.state.sliceDoc(sizing.from, sizing.to);
+  const label = withWidth(before, width);
+  if (label !== before) view.dispatch({ changes: { ...sizing, insert: label }, userEvent: "input.resize" });
 }
 
 /**
@@ -403,9 +430,9 @@ async function convertFile(view: EditorView, pos: number, renderer: Renderer) {
   view.focus();
 }
 
-/** An image or file drawn as a block, or a link a plugin draws (an embed), and where its Markdown is. */
+/** An image, file, audio or video drawn as a block, or a link a plugin draws (an embed), and where its Markdown is. */
 interface Block {
-  kind: "image" | "file" | "embed";
+  kind: "image" | "file" | MediaKind | "embed";
   from: number;
   to: number;
   /** The image's address, the file's, or the embed's link's (its image's, if it doesn't link). */
@@ -413,6 +440,8 @@ interface Block {
   /** The image's alt text, the file's name, or the embed's text. */
   label: string;
   embed?: { link: EmbedLink; by: Embed };
+  /** Where its label is, as written, for the width its corner's handle writes there: an image's or a video's. */
+  sizing?: { from: number; to: number };
 }
 
 /** An `Image` or `Link` node's address and text (the alt text, for an image), and where its text is. */
@@ -437,8 +466,9 @@ function blockOf(state: EditorState, node: SyntaxNode): Block | null {
   const parts = linkParts(state, node);
   if (!parts) return null;
   const { src, label } = parts;
+  const sizing = { from: parts.from, to: parts.to };
   if (node.name === "Image") {
-    return embedBlock(node, { href: null, image: src, label }) ?? { kind: "image", from: node.from, to: node.to, src, label };
+    return embedBlock(node, { href: null, image: src, label }) ?? { kind: "image", from: node.from, to: node.to, src, label, sizing };
   }
   if (node.name !== "Link") return null;
   const image = node.getChild("Image");
@@ -446,7 +476,10 @@ function blockOf(state: EditorState, node: SyntaxNode): Block | null {
   const text = label.replace(/\\(.)/g, "$1");
   const embed = embedBlock(node, { href: src, image: shown?.src ?? null, label: shown?.label ?? text });
   if (embed) return embed;
-  return attachmentName(src) ? { kind: "file", from: node.from, to: node.to, src, label: text } : null;
+  const name = attachmentName(src);
+  const kind = name && (mediaKind(name) ?? "file");
+  if (!kind) return null;
+  return { kind, from: node.from, to: node.to, src, label: text, sizing: kind === "video" ? sizing : undefined };
 }
 
 /**
@@ -544,8 +577,8 @@ function backspace(view: EditorView) {
 }
 
 /**
- * Enter on a selected drawing opens it, and on what a plugin shows that takes the keyboard (a
- * recording) gives it the keyboard, rather than replacing it with a new line.
+ * Enter on a selected drawing opens it, and on what takes the keyboard (audio, video, or what a
+ * plugin shows: a recording) plays it and gives it the keyboard, rather than replacing it with a new line.
  */
 function openBlock(view: EditorView) {
   const block = selectedBlock(view.state);
@@ -831,6 +864,7 @@ export const attachmentPasting = (writer: AttachmentWriter, { embeds = false } =
 export const attachmentBlocks: Extension = [
   focused,
   drawnBlocks(drawBlock, { inside: ["Document", "Card", "Paragraph"] }),
+  mediaPlayers,
   blockKeymap,
   clickToSelect,
   attachmentPasting(markdownWriter, { embeds: true }),

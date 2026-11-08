@@ -451,7 +451,23 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 40. Missing file in a callout in a card
+#### 40. Audio in a callout in a card
+
+::: card
+:::!
+[Chime.mp3](attachment:chime.mp3)
+:::
+:::
+
+#### 41. Video in a callout in a card
+
+::: card
+:::!
+[Sky.mp4](attachment:sky.mp4)
+:::
+:::
+
+#### 42. Missing file in a callout in a card
 
 ::: card
 :::!
@@ -459,7 +475,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 41. Card in a callout in a card
+#### 43. Card in a callout in a card
 
 ::: card
 :::!
@@ -469,7 +485,7 @@ Text in a card.
 :::
 :::
 
-#### 42. Callout (info) in a callout in a card
+#### 44. Callout (info) in a callout in a card
 
 ::: card
 :::!
@@ -479,7 +495,7 @@ Text in an info callout.
 :::
 :::
 
-#### 43. Callout (warning, chosen icon) in a callout in a card
+#### 45. Callout (warning, chosen icon) in a callout in a card
 
 ::: card
 :::!
@@ -489,7 +505,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 44. Callout (decision, no icon) in a callout in a card
+#### 46. Callout (decision, no icon) in a callout in a card
 
 ::: card
 :::!

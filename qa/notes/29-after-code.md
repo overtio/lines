@@ -451,7 +451,23 @@ plain code
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Code block, then Missing file
+#### 40. Code block, then Audio
+
+```
+plain code
+  indented line
+```
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Code block, then Video
+
+```
+plain code
+  indented line
+```
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Code block, then Missing file
 
 ```
 plain code
@@ -459,7 +475,7 @@ plain code
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Code block, then Card
+#### 43. Code block, then Card
 
 ```
 plain code
@@ -469,7 +485,7 @@ plain code
 Text in a card.
 :::
 
-#### 42. Code block, then Callout (info)
+#### 44. Code block, then Callout (info)
 
 ```
 plain code
@@ -479,7 +495,7 @@ plain code
 Text in an info callout.
 :::
 
-#### 43. Code block, then Callout (warning, chosen icon)
+#### 45. Code block, then Callout (warning, chosen icon)
 
 ```
 plain code
@@ -489,7 +505,7 @@ plain code
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Code block, then Callout (decision, no icon)
+#### 46. Code block, then Callout (decision, no icon)
 
 ```
 plain code

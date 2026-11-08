@@ -334,33 +334,43 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 # Heading one
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Heading 1, then Missing file
+#### 40. Heading 1, then Audio
+
+# Heading one
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Heading 1, then Video
+
+# Heading one
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Heading 1, then Missing file
 
 # Heading one
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Heading 1, then Card
+#### 43. Heading 1, then Card
 
 # Heading one
 ::: card
 Text in a card.
 :::
 
-#### 42. Heading 1, then Callout (info)
+#### 44. Heading 1, then Callout (info)
 
 # Heading one
 :::i
 Text in an info callout.
 :::
 
-#### 43. Heading 1, then Callout (warning, chosen icon)
+#### 45. Heading 1, then Callout (warning, chosen icon)
 
 # Heading one
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Heading 1, then Callout (decision, no icon)
+#### 46. Heading 1, then Callout (decision, no icon)
 
 # Heading one
 :::^ icon=none

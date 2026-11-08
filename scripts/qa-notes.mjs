@@ -112,6 +112,8 @@ const ELEMENTS = [
   { id: "file", name: "File", md: "[Budget.csv](attachment:budget.csv)" },
   { id: "model-file", name: "Attached 3D model (STL)", md: "[Bracket.stl](attachment:bracket.stl)" },
   { id: "recording", name: "Terminal recording (.cast file)", md: "[terminal.cast](attachment:terminal.cast)" },
+  { id: "audio", name: "Audio", md: "[Chime.mp3](attachment:chime.mp3)" },
+  { id: "video", name: "Video", md: "[Sky.mp4](attachment:sky.mp4)" },
   { id: "missing-file", name: "Missing file", md: "[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)" },
   { id: "card", name: "Card", md: "::: card\nText in a card.\n:::" },
   { id: "callout", name: "Callout (info)", md: ":::i\nText in an info callout.\n:::" },
@@ -131,7 +133,7 @@ const CONTAINERS = [
 ];
 
 /** Some things are only drawn at the top level and in cards; elsewhere they stay Markdown. */
-const DRAWN = new Set(["diagram", "diagram-sized", "timing", "math", "table", "table-formulas", "spreadsheet", "spreadsheet-named", "image", "drawing", "file", "missing-file"]);
+const DRAWN = new Set(["diagram", "diagram-sized", "timing", "math", "table", "table-formulas", "spreadsheet", "spreadsheet-named", "image", "drawing", "file", "audio", "video", "missing-file"]);
 const DRAWN_ONLY_IN = new Set(["top-level", "card", "callout", "callout-none", "nested"]);
 
 const notes = [];

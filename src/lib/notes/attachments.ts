@@ -40,10 +40,19 @@ const TYPES: Record<string, string> = {
   zip: "application/zip",
   mp3: "audio/mpeg",
   m4a: "audio/mp4",
+  aac: "audio/aac",
   wav: "audio/wav",
+  flac: "audio/flac",
+  ogg: "audio/ogg",
+  oga: "audio/ogg",
+  opus: "audio/ogg",
+  aif: "audio/aiff",
+  aiff: "audio/aiff",
   mp4: "video/mp4",
+  m4v: "video/mp4",
   mov: "video/quicktime",
   webm: "video/webm",
+  ogv: "video/ogg",
 };
 
 /**
@@ -60,8 +69,9 @@ export const isAttachmentName = (name: string) => NAME.test(name);
 export const isImage = (file: Blob) => file.type in IMAGES;
 
 /**
- * An image's description, and the width it's shown at when one follows a bar, as Obsidian writes
- * it: `![Lake at dawn|400](…)`. A height (`|400x300`) is read and left out: images keep their shape.
+ * An image's description (or a video's name), and the width it's shown at when one follows a bar,
+ * as Obsidian writes it: `![Lake at dawn|400](…)`, `[Sky.mp4|400](…)`. A height (`|400x300`) is
+ * read and left out: images and videos keep their shape.
  */
 export function imageSize(label: string): { alt: string; width: number | null } {
   const match = /^(.*?)\s*\|\s*(\d{1,5})(?:\s*x\s*\d{1,5})?\s*$/.exec(label);
@@ -121,6 +131,20 @@ export const extensionOf = (name: string) => name.slice(name.lastIndexOf(".") + 
 
 const typeOf = (name: string) => TYPES[extensionOf(name)] ?? "application/octet-stream";
 
+export type MediaKind = "audio" | "video";
+
+/** Whether an attachment is audio or video, which notes play; null for any other file. */
+export function mediaKind(name: string): MediaKind | null {
+  const kind = typeOf(name).split("/")[0];
+  return kind === "audio" || kind === "video" ? kind : null;
+}
+
+/** The kind of audio or video an attachment link points at; null for any other link. */
+export function mediaLink(href: string): MediaKind | null {
+  const name = attachmentName(href);
+  return name ? mediaKind(name) : null;
+}
+
 /** Stores an attachment (one saved here, or downloaded by sync) and tells every window. */
 export async function putAttachment(name: string, data: Blob) {
   await store(name, data);
@@ -141,7 +165,10 @@ async function store(name: string, data: Blob) {
 export async function getAttachment(name: string): Promise<Blob | null> {
   const value = await attachmentStore.get(name);
   if (!value) return null;
-  return isSealed(value) ? new Blob([await openRecord("attachments", value)], { type: typeOf(name) }) : value.data;
+  const type = typeOf(name);
+  if (isSealed(value)) return new Blob([await openRecord("attachments", value)], { type });
+  // One stored before its kind was known here (a FLAC file, say) gets its type now, which WebKit needs to play it.
+  return value.data.type === type ? value.data : new Blob([value.data], { type });
 }
 
 /** Writes every attachment again, encrypted or not as the lock now says. */
