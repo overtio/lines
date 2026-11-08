@@ -266,11 +266,12 @@
 /*
  * Native macOS window: the traffic lights are centered on the 52px title row (trafficLightPosition
  * in tauri.conf.json), so the leftmost pane leaves room for them: a sidebar on the left, or the
- * pane App.svelte marks as first.
+ * pane App.svelte marks as first. The PDF preview covers the window, so its title row does too.
  */
 :root[data-platform="mac-app"] .app[data-sidebar="left"] .sidebar .titlebar,
 :root[data-platform="mac-app"] .app[data-first="list"] .note-list .titlebar,
-:root[data-platform="mac-app"] .app[data-first="editor"] .editor-pane .toolbar {
+:root[data-platform="mac-app"] .app[data-first="editor"] .editor-pane .toolbar,
+:root[data-platform="mac-app"] .pdf-preview .titlebar {
   padding-left: 92px;
 }
 

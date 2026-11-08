@@ -276,10 +276,12 @@
       {onkeydown}
       class="pdf-preview fixed inset-0 z-50 flex flex-col bg-sidebar text-fg outline-none print:static print:block print:bg-transparent"
     >
+      <!-- A title row as tall as the window's, which the Mac app's traffic lights sit on (app.css). -->
       <header
-        class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5 border-b border-line bg-panel pt-[max(10px,env(safe-area-inset-top))] pr-3 pb-2 pl-5 print:hidden"
+        class="titlebar flex min-h-(--titlebar-h) flex-wrap items-center justify-between gap-x-4 gap-y-2.5 border-b border-line bg-panel pt-[max(8px,env(safe-area-inset-top))] pr-3 pb-2 pl-5 print:hidden"
+        data-tauri-drag-region
       >
-        <div class="flex min-w-0 items-baseline gap-2.5">
+        <div class="flex min-w-0 items-baseline gap-2.5" data-tauri-drag-region>
           <Dialog.Title class="m-0 text-md font-[650] whitespace-nowrap">{t("print.title")}</Dialog.Title>
           <span class="truncate text-sm text-muted">{title}</span>
         </div>
