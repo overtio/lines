@@ -256,7 +256,7 @@
   const ready = $derived(using !== "lines" ? typesetting.state === "done" : laidOut && canPrint);
 
   const pngItem =
-    "flex w-full cursor-default flex-col items-start gap-0.5 rounded-sm px-2.5 py-[7px] text-left outline-none select-none data-highlighted:bg-active";
+    "flex w-full cursor-pointer flex-col items-start gap-0.5 rounded-sm px-2.5 py-[7px] text-left outline-none select-none data-highlighted:bg-active";
 </script>
 
 {#snippet savedMessage(file: { path: string | null; filename: string })}

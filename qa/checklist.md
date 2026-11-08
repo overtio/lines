@@ -346,6 +346,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 ## 12. Menus, pickers and note info
 
 - [ ] Menus open at the pointer, stay inside the window, move with ↑ ↓, and close on Esc, a click outside, scroll or resize
+- [ ] Pointing at a menu item shows the hand cursor, as buttons do: menus, Select lists, the "/" menu, Save PNG's choices and a formula's suggestions; a dimmed item keeps the arrow
 - [ ] The icon picker searches by name, Enter picks the first match, arrow keys move around the grid, and focus starts on the current icon
 - [ ] Share: Share… where the system has it, Copy Markdown, Copy Plain Text, Download Markdown ([Web] downloads; [Desktop] saves to Downloads and shows it in Finder)
 - [ ] Note info shows words, characters, sentences, paragraphs, reading time and dates
