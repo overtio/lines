@@ -213,7 +213,21 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Callout (warning, chosen icon), then Math block
+#### 19. Callout (warning, chosen icon), then Timing diagram (wavedrom block)
+
+:::! icon=flag
+Text in a warning callout with the flag icon.
+:::
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Callout (warning, chosen icon), then Math block
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -222,7 +236,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Callout (warning, chosen icon), then Table
+#### 21. Callout (warning, chosen icon), then Table
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -232,7 +246,7 @@ Text in a warning callout with the flag icon.
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Callout (warning, chosen icon), then Table with formulas
+#### 22. Callout (warning, chosen icon), then Table with formulas
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -244,7 +258,7 @@ Text in a warning callout with the flag icon.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Callout (warning, chosen icon), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Callout (warning, chosen icon), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -265,14 +279,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Callout (warning, chosen icon), then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Callout (warning, chosen icon), then Secret ({{name}}, kept in a locked secrets note)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Callout (warning, chosen icon), then API requests (http block): a variable, a named request and one using its response
+#### 25. Callout (warning, chosen icon), then API requests (http block): a variable, a named request and one using its response
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -288,7 +302,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Callout (warning, chosen icon), then Spreadsheet (csv block)
+#### 26. Callout (warning, chosen icon), then Spreadsheet (csv block)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -300,7 +314,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Callout (warning, chosen icon), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Callout (warning, chosen icon), then Named spreadsheet (csv name=), and a formula in another block using it
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -314,98 +328,98 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Callout (warning, chosen icon), then Divider
+#### 28. Callout (warning, chosen icon), then Divider
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 ---
 
-#### 28. Callout (warning, chosen icon), then Key: Value line
+#### 29. Callout (warning, chosen icon), then Key: Value line
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Callout (warning, chosen icon), then Mention
+#### 30. Callout (warning, chosen icon), then Mention
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Callout (warning, chosen icon), then Wiki link
+#### 31. Callout (warning, chosen icon), then Wiki link
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Callout (warning, chosen icon), then Symbols
+#### 32. Callout (warning, chosen icon), then Symbols
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Callout (warning, chosen icon), then GitHub links
+#### 33. Callout (warning, chosen icon), then GitHub links
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Callout (warning, chosen icon), then arXiv links
+#### 34. Callout (warning, chosen icon), then arXiv links
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Callout (warning, chosen icon), then Image
+#### 35. Callout (warning, chosen icon), then Image
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 35. Callout (warning, chosen icon), then Drawing
+#### 36. Callout (warning, chosen icon), then Drawing
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Callout (warning, chosen icon), then File
+#### 37. Callout (warning, chosen icon), then File
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Callout (warning, chosen icon), then Attached 3D model (STL)
+#### 38. Callout (warning, chosen icon), then Attached 3D model (STL)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Callout (warning, chosen icon), then Terminal recording (.cast file)
+#### 39. Callout (warning, chosen icon), then Terminal recording (.cast file)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Callout (warning, chosen icon), then Missing file
+#### 40. Callout (warning, chosen icon), then Missing file
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Callout (warning, chosen icon), then Card
+#### 41. Callout (warning, chosen icon), then Card
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -414,7 +428,7 @@ Text in a warning callout with the flag icon.
 Text in a card.
 :::
 
-#### 41. Callout (warning, chosen icon), then Callout (info)
+#### 42. Callout (warning, chosen icon), then Callout (info)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -423,7 +437,7 @@ Text in a warning callout with the flag icon.
 Text in an info callout.
 :::
 
-#### 42. Callout (warning, chosen icon), then Callout (warning, chosen icon)
+#### 43. Callout (warning, chosen icon), then Callout (warning, chosen icon)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -432,7 +446,7 @@ Text in a warning callout with the flag icon.
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Callout (warning, chosen icon), then Callout (decision, no icon)
+#### 44. Callout (warning, chosen icon), then Callout (decision, no icon)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.

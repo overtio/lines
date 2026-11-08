@@ -177,14 +177,26 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. File, then Math block
+#### 19. File, then Timing diagram (wavedrom block)
+
+[Budget.csv](attachment:budget.csv)
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. File, then Math block
 
 [Budget.csv](attachment:budget.csv)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. File, then Table
+#### 21. File, then Table
 
 [Budget.csv](attachment:budget.csv)
 | Left | Center | Right |
@@ -192,7 +204,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. File, then Table with formulas
+#### 22. File, then Table with formulas
 
 [Budget.csv](attachment:budget.csv)
 | Item | Cost |
@@ -202,7 +214,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. File, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. File, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 [Budget.csv](attachment:budget.csv)
 ```hurl
@@ -221,12 +233,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. File, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. File, then Secret ({{name}}, kept in a locked secrets note)
 
 [Budget.csv](attachment:budget.csv)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. File, then API requests (http block): a variable, a named request and one using its response
+#### 25. File, then API requests (http block): a variable, a named request and one using its response
 
 [Budget.csv](attachment:budget.csv)
 ```http
@@ -240,7 +252,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. File, then Spreadsheet (csv block)
+#### 26. File, then Spreadsheet (csv block)
 
 [Budget.csv](attachment:budget.csv)
 ```csv
@@ -250,7 +262,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. File, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. File, then Named spreadsheet (csv name=), and a formula in another block using it
 
 [Budget.csv](attachment:budget.csv)
 ```csv name=costs
@@ -262,93 +274,93 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. File, then Divider
+#### 28. File, then Divider
 
 [Budget.csv](attachment:budget.csv)
 ---
 
-#### 28. File, then Key: Value line
+#### 29. File, then Key: Value line
 
 [Budget.csv](attachment:budget.csv)
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. File, then Mention
+#### 30. File, then Mention
 
 [Budget.csv](attachment:budget.csv)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. File, then Wiki link
+#### 31. File, then Wiki link
 
 [Budget.csv](attachment:budget.csv)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. File, then Symbols
+#### 32. File, then Symbols
 
 [Budget.csv](attachment:budget.csv)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. File, then GitHub links
+#### 33. File, then GitHub links
 
 [Budget.csv](attachment:budget.csv)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. File, then arXiv links
+#### 34. File, then arXiv links
 
 [Budget.csv](attachment:budget.csv)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. File, then Image
+#### 35. File, then Image
 
 [Budget.csv](attachment:budget.csv)
 ![A sample picture](attachment:photo.png)
 
-#### 35. File, then Drawing
+#### 36. File, then Drawing
 
 [Budget.csv](attachment:budget.csv)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. File, then File
+#### 37. File, then File
 
 [Budget.csv](attachment:budget.csv)
 [Budget.csv](attachment:budget.csv)
 
-#### 37. File, then Attached 3D model (STL)
+#### 38. File, then Attached 3D model (STL)
 
 [Budget.csv](attachment:budget.csv)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. File, then Terminal recording (.cast file)
+#### 39. File, then Terminal recording (.cast file)
 
 [Budget.csv](attachment:budget.csv)
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. File, then Missing file
+#### 40. File, then Missing file
 
 [Budget.csv](attachment:budget.csv)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. File, then Card
+#### 41. File, then Card
 
 [Budget.csv](attachment:budget.csv)
 ::: card
 Text in a card.
 :::
 
-#### 41. File, then Callout (info)
+#### 42. File, then Callout (info)
 
 [Budget.csv](attachment:budget.csv)
 :::i
 Text in an info callout.
 :::
 
-#### 42. File, then Callout (warning, chosen icon)
+#### 43. File, then Callout (warning, chosen icon)
 
 [Budget.csv](attachment:budget.csv)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. File, then Callout (decision, no icon)
+#### 44. File, then Callout (decision, no icon)
 
 [Budget.csv](attachment:budget.csv)
 :::^ icon=none

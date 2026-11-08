@@ -35,6 +35,30 @@ pie title Where the time goes
   "Formatting" : 10
 ```
 
+## Timing diagrams
+
+For electronics, a `wavedrom` code block draws signals over time with [WaveDrom](https://wavedrom.com): each character of a `wave` is a clock cycle. Type `/timing` for one.
+
+```wavedrom
+{ signal: [
+  { name: "clk",   wave: "p.......|.." },
+  { name: "req",   wave: "0.1...0.|.." },
+  { name: "data",  wave: "x..3.4.x|5x", data: ["addr", "data", "next"] },
+  { name: "ready", wave: "0....10.|1." }
+] }
+```
+
+It draws a register's bit fields too, like this one, and logic circuits (`assign`).
+
+```wavedrom
+{ reg: [
+  { bits: 8, name: "data" },
+  { bits: 4, name: "addr", type: 4 },
+  { bits: 3, name: "flags", type: 5 },
+  { bits: 1, name: "en", type: 2 }
+] }
+```
+
 ## 3D models
 
 An `openscad` code block is [OpenSCAD](https://openscad.org) code, drawn as the model it makes. Drag it to turn it around, pinch (or hold ⌘ and scroll) to zoom, and click it to change its numbers: the model follows as you type. Its button downloads it as an STL file, ready for a 3D printer. Type `/model` to start one.

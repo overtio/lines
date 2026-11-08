@@ -30,6 +30,8 @@ export default {
   "editor.slash.diagram.keywords": "mermaid organigramme graphique schéma séquence",
   "editor.slash.model": "Modèle 3D",
   "editor.slash.model.keywords": "openscad scad cao 3d modèle stl maillage imprimer solide",
+  "editor.slash.timing": "Chronogramme",
+  "editor.slash.timing.keywords": "wavedrom diagramme temporel signal onde horloge bus registre bits logique porte numérique électronique",
   "editor.slash.request": "Requête d’API",
   "editor.slash.request.keywords": "http rest api requête curl get post endpoint",
   "editor.slash.hurl": "Test Hurl",
@@ -141,6 +143,7 @@ export default {
 
   "editor.diagram": "Diagramme",
   "editor.emptyDiagram": "Diagramme vide",
+  "editor.wavedrom.what": "Un diagramme WaveDrom a besoin de signaux (signal: […]), des champs d’un registre (reg: […]) ou de logique (assign: […]).",
 
   "editor.dragHandle": "Faites glisser pour déplacer, cliquez pour sélectionner",
 

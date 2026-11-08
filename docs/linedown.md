@@ -16,6 +16,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Card | `::: card` … `:::` | Pandoc fenced div |
 | Callout | `:::!` … `:::`, `:::info icon=flag` … `:::` | Pandoc fenced div |
 | Diagram | ` ```mermaid ` code block | GitHub, GitLab, Obsidian |
+| Timing diagram | ` ```wavedrom ` code block | Apps with a WaveDrom plugin (Obsidian, VS Code's Markdown Preview Enhanced, MkDocs) |
 | 3D model | ` ```openscad ` code block, ` ```stl ` code block | OpenSCAD (its code); GitHub (` ```stl `) |
 | Spreadsheet | ` ```csv ` code block | Yes (a code block of CSV) |
 | API requests | ` ```http ` code block | JetBrains IDEs, VS Code (REST Client, httpYac), Visual Studio |
@@ -118,7 +119,7 @@ Fenced code blocks (` ``` ` or `~~~`) are as in CommonMark. lines reads the info
 
 - The first word names the language, for syntax highlighting: ` ```sql `, ` ```ts `, ` ```python `. Any language in CodeMirror's language data works, by name or alias.
 - A block with no language whose text starts with `{` or `[` is treated as JSON, so it can be tidied.
-- ` ```mermaid ` is a diagram, ` ```openscad ` (or ` ```scad `) and ` ```stl ` 3D models, ` ```csv ` a spreadsheet, and ` ```http ` (or ` ```rest `) requests to an API, and ` ```hurl ` requests with checks of their responses (below).
+- ` ```mermaid ` is a diagram, ` ```wavedrom ` a timing diagram, ` ```openscad ` (or ` ```scad `) and ` ```stl ` 3D models, ` ```csv ` a spreadsheet, and ` ```http ` (or ` ```rest `) requests to an API, and ` ```hurl ` requests with checks of their responses (below).
 
 ## Spreadsheets
 
@@ -129,6 +130,24 @@ A code block with the language `csv` is drawn as a spreadsheet's grid of cells, 
 A code block with the language `mermaid` is drawn as its [Mermaid](https://mermaid.js.org) diagram, in the theme's colors, by the Diagrams [plugin](plugins.md): [Pele](https://pele.run), or Mermaid itself if it's turned on instead (with both off, it's a code block). With the cursor in it, the code shows with the diagram below. Diagrams are drawn at the top level and in cards; in quotes and lists they stay code. This is the same syntax GitHub, GitLab and Obsidian use.
 
 - A width after a bar, following the language, sets the size a diagram is shown at, in pixels, as an image's does: ` ```mermaid |400 `. The diagram keeps its shape and is never wider than the note. Dragging the handle on its corner writes this width; double-clicking the handle takes it out. Printed notes and PNGs use it too. Other apps read only the first word as the language, so they still draw the diagram, at their own size.
+
+## Timing diagrams
+
+A code block with the language `wavedrom` is drawn by [WaveDrom](https://wavedrom.com), the diagrams of digital electronics, by the Timing Diagrams [plugin](plugins.md) (with it off, it's a code block). Its text is WaveJSON, as WaveDrom's own editor takes it, read as [JSON5](https://json5.org): keys without quotes, single quotes, comments and trailing commas are fine, but it isn't run as JavaScript. What's drawn depends on what it holds:
+
+- `signal: […]`: a timing diagram, a lane for each signal. Each character of its `wave` is a clock cycle: `0` and `1` low and high, `p` and `n` a clock, `x` unknown, `z` high impedance, `=` and `2` to `9` data (named in `data`, in colors), `.` the same again, `|` a gap. `{}` leaves a lane empty, `node` and `edge` draw arrows between points, and `head` gives it a title.
+- `reg: […]`: a register's bit fields, from bit 0 up, each with its `bits`, `name`, `attr` and a `type` that colors it.
+- `assign: […]`: a logic circuit, from expressions like `["out", ["|", ["&", "a", "b"], ["~", "c"]]]`.
+
+```wavedrom
+{ signal: [
+  { name: "clk",   wave: "p......" },
+  { name: "data",  wave: "x.34.5x", data: ["A", "B", "C"] },
+  { name: "ready", wave: "0.1..0." }
+] }
+```
+
+It's drawn as Mermaid diagrams are, in the note's font and the theme's colors: names and labels in the text color, waves and outlines muted, plain data, gates and their inputs in boxes tinted with the accent, colored data and fields in the theme's colors of the same hue, and arrows in the accent. On paper it's black on white, with light fills. A width after a bar works as a diagram's does (` ```wavedrom |400 `). `config: { skin: "narrow" }` picks one of WaveDrom's other looks (`narrow`, `narrower`, `narrowerer`, `lowkey`); its `dark` look is left to the theme. Names can use WaveDrom's markup (`<b>`, `<i>`, `<sub>`, `<sup>`, `<o>` for a line over); other markup is left out. Other apps show the block as code, or draw it with a WaveDrom plugin.
 
 ## 3D models
 

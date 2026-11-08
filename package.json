@@ -43,6 +43,7 @@
     "asciinema-player": "3.17.0",
     "aws4fetch": "^1.0.20",
     "bits-ui": "^2.20.2",
+    "json5": "2.2.3",
     "katex": "0.19.1",
     "mermaid": "12.2.0",
     "modern-screenshot": "4.7.0",
@@ -53,7 +54,8 @@
     "react-dom": "19.3.1",
     "sql-formatter": "15.9.0",
     "texlyre-busytex": "1.4.1",
-    "three": "0.186.1"
+    "three": "0.186.1",
+    "wavedrom": "3.8.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.3.1",

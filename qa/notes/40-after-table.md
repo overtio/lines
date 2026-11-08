@@ -231,7 +231,22 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Table, then Math block
+#### 19. Table, then Timing diagram (wavedrom block)
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Table, then Math block
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -241,7 +256,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Table, then Table
+#### 21. Table, then Table
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -252,7 +267,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Table, then Table with formulas
+#### 22. Table, then Table with formulas
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -265,7 +280,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Table, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Table, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -287,7 +302,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Table, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Table, then Secret ({{name}}, kept in a locked secrets note)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -295,7 +310,7 @@ jsonpath "$.name" isString
 | longer cell text | `code` | 22 |
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Table, then API requests (http block): a variable, a named request and one using its response
+#### 25. Table, then API requests (http block): a variable, a named request and one using its response
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -312,7 +327,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Table, then Spreadsheet (csv block)
+#### 26. Table, then Spreadsheet (csv block)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -325,7 +340,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Table, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Table, then Named spreadsheet (csv name=), and a formula in another block using it
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -340,7 +355,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Table, then Divider
+#### 28. Table, then Divider
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -348,7 +363,7 @@ Total, =costs!B2*2
 | longer cell text | `code` | 22 |
 ---
 
-#### 28. Table, then Key: Value line
+#### 29. Table, then Key: Value line
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -356,7 +371,7 @@ Total, =costs!B2*2
 | longer cell text | `code` | 22 |
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Table, then Mention
+#### 30. Table, then Mention
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -364,7 +379,7 @@ Total, =costs!B2*2
 | longer cell text | `code` | 22 |
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Table, then Wiki link
+#### 31. Table, then Wiki link
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -372,7 +387,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 | longer cell text | `code` | 22 |
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Table, then Symbols
+#### 32. Table, then Symbols
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -380,7 +395,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | longer cell text | `code` | 22 |
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Table, then GitHub links
+#### 33. Table, then GitHub links
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -388,7 +403,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | longer cell text | `code` | 22 |
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Table, then arXiv links
+#### 34. Table, then arXiv links
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -396,7 +411,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Table, then Image
+#### 35. Table, then Image
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -404,7 +419,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 ![A sample picture](attachment:photo.png)
 
-#### 35. Table, then Drawing
+#### 36. Table, then Drawing
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -412,7 +427,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Table, then File
+#### 37. Table, then File
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -420,7 +435,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Table, then Attached 3D model (STL)
+#### 38. Table, then Attached 3D model (STL)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -428,7 +443,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Table, then Terminal recording (.cast file)
+#### 39. Table, then Terminal recording (.cast file)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -436,7 +451,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Table, then Missing file
+#### 40. Table, then Missing file
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -444,7 +459,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Table, then Card
+#### 41. Table, then Card
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -454,7 +469,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 41. Table, then Callout (info)
+#### 42. Table, then Callout (info)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -464,7 +479,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 42. Table, then Callout (warning, chosen icon)
+#### 43. Table, then Callout (warning, chosen icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -474,7 +489,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Table, then Callout (decision, no icon)
+#### 44. Table, then Callout (decision, no icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |

@@ -195,7 +195,20 @@ endsolid pyramid
 ```
 :::
 
-#### 19. Math block in a card
+#### 19. Timing diagram (wavedrom block) in a card
+
+::: card
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+:::
+
+#### 20. Math block in a card
 
 ::: card
 $$
@@ -203,7 +216,7 @@ $$
 $$
 :::
 
-#### 20. Table in a card
+#### 21. Table in a card
 
 ::: card
 | Left | Center | Right |
@@ -212,7 +225,7 @@ $$
 | longer cell text | `code` | 22 |
 :::
 
-#### 21. Table with formulas in a card
+#### 22. Table with formulas in a card
 
 ::: card
 | Item | Cost |
@@ -223,7 +236,7 @@ $$
 | Broken | =B2/0 |
 :::
 
-#### 22. Hurl entries (hurl block): a capture used by the next entry, and asserts in a card
+#### 23. Hurl entries (hurl block): a capture used by the next entry, and asserts in a card
 
 ::: card
 ```hurl
@@ -243,13 +256,13 @@ jsonpath "$.name" isString
 ```
 :::
 
-#### 23. Secret ({{name}}, kept in a locked secrets note) in a card
+#### 24. Secret ({{name}}, kept in a locked secrets note) in a card
 
 ::: card
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::
 
-#### 24. API requests (http block): a variable, a named request and one using its response in a card
+#### 25. API requests (http block): a variable, a named request and one using its response in a card
 
 ::: card
 ```http
@@ -264,7 +277,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 :::
 
-#### 25. Spreadsheet (csv block) in a card
+#### 26. Spreadsheet (csv block) in a card
 
 ::: card
 ```csv
@@ -275,7 +288,7 @@ Total, =SUM(B2:B3)
 ```
 :::
 
-#### 26. Named spreadsheet (csv name=), and a formula in another block using it in a card
+#### 27. Named spreadsheet (csv name=), and a formula in another block using it in a card
 
 ::: card
 ```csv name=costs
@@ -288,85 +301,85 @@ Total, =costs!B2*2
 ```
 :::
 
-#### 27. Divider in a card
+#### 28. Divider in a card
 
 ::: card
 ---
 :::
 
-#### 28. Key: Value line in a card
+#### 29. Key: Value line in a card
 
 ::: card
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 29. Mention in a card
+#### 30. Mention in a card
 
 ::: card
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 30. Wiki link in a card
+#### 31. Wiki link in a card
 
 ::: card
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 31. Symbols in a card
+#### 32. Symbols in a card
 
 ::: card
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 32. GitHub links in a card
+#### 33. GitHub links in a card
 
 ::: card
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 33. arXiv links in a card
+#### 34. arXiv links in a card
 
 ::: card
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::
 
-#### 34. Image in a card
+#### 35. Image in a card
 
 ::: card
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 35. Drawing in a card
+#### 36. Drawing in a card
 
 ::: card
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 36. File in a card
+#### 37. File in a card
 
 ::: card
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 37. Attached 3D model (STL) in a card
+#### 38. Attached 3D model (STL) in a card
 
 ::: card
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 38. Terminal recording (.cast file) in a card
+#### 39. Terminal recording (.cast file) in a card
 
 ::: card
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 39. Missing file in a card
+#### 40. Missing file in a card
 
 ::: card
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 40. Card in a card
+#### 41. Card in a card
 
 ::: card
 ::: card
@@ -374,7 +387,7 @@ Text in a card.
 :::
 :::
 
-#### 41. Callout (info) in a card
+#### 42. Callout (info) in a card
 
 ::: card
 :::i
@@ -382,7 +395,7 @@ Text in an info callout.
 :::
 :::
 
-#### 42. Callout (warning, chosen icon) in a card
+#### 43. Callout (warning, chosen icon) in a card
 
 ::: card
 :::! icon=flag
@@ -390,7 +403,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 43. Callout (decision, no icon) in a card
+#### 44. Callout (decision, no icon) in a card
 
 ::: card
 :::^ icon=none

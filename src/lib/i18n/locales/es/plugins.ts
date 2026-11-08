@@ -25,6 +25,8 @@ export default {
   "plugins.pele.description": "Dibuja los bloques de código mermaid como diagramas de flujo, de secuencia y más, rápido y con los colores del tema, y añade /diagrama.",
   "plugins.mermaid": "Diagramas (Mermaid)",
   "plugins.mermaid.description": "Dibuja los bloques de código mermaid con el propio Mermaid, en lugar de Pele: tarda más en cargar, y dispone los diagramas como GitHub. Añade /diagrama.",
+  "plugins.wavedrom": "Cronogramas (WaveDrom)",
+  "plugins.wavedrom.description": "Dibuja los bloques de código wavedrom como cronogramas, campos de bits de registros y circuitos lógicos, y añade /cronograma.",
   "plugins.models": "Modelos 3D",
   "plugins.models.description": "Dibuja modelos 3D para girarlos y acercarse: bloques openscad, hechos con OpenSCAD a partir de su código mientras escribes, bloques stl y archivos OpenSCAD, STL, OBJ, 3MF, glTF, STEP e IGES adjuntos. Añade /modelo.",
   "plugins.ironcalc": "Cálculo (IronCalc)",

@@ -141,6 +141,16 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - The note list's previews and search show the characters as typed.
 - In code, a symbol is drawn in the code font, and some code fonts draw arrows small.
 
+## Timing diagrams
+
+- WaveJSON is read as JSON5, not run as JavaScript: a diagram that makes its waves with code (`"0".repeat(8)`, a function) says what it can't read.
+- WaveDrom lays text out for Helvetica's widths, and lines draws it in the note's font. A diagram grows to show every name whole, but a long data label can run past its box, more so in a wide font.
+- WaveDrom's `dark` look isn't used: the theme's colors stand in for it. Logic circuits don't light up under the pointer, as they do on WaveDrom's site.
+- A name written as markup keeps only WaveDrom's own (`<b>`, `<sub>`…); anything else (links, pictures) is left out, so a diagram can't run code or load anything from the web.
+- They're in Markdown notes only: LaTeX notes don't draw `tikz-timing`, and TeX's PDF has no TikZ.
+- WaveDrom (about 320 KB, 46 KB compressed) loads the first time a note has one.
+- Not tried in the Mac app yet; checked in Chromium and WebKit on the web.
+
 ## Drawings
 
 - Drawings are Excalidraw's: what it can draw is what there is. Its shape library (and its browser, libraries.excalidraw.com), its help, its links, its image tool (pictures go in the note instead), live collaboration and AI features aren't part of lines. Its ? key still opens its list of shortcuts.
@@ -264,6 +274,7 @@ What isn't done yet is in [secrets.md](secrets.md#not-yet).
 - [ ] Formats as plugins: Org mode, AsciiDoc, WikiText and reStructuredText
 - [ ] Install plugins made by others, safely; themes and icon sets from a file
 - [ ] Drawings in LaTeX notes, saved as a PDF beside the SVG for TeX
+- [ ] Circuit schematics in CircuiTikZ (` ```circuitikz ` blocks, and `circuitikz` in LaTeX notes), drawn as you type
 - [ ] Save lines' PDF straight to a file in the apps (the web view's own PDF output), and print on iPhone and iPad
 - [ ] More of TeX Live for TeX's PDFs, fetched as a note needs it; XeLaTeX for other scripts and fonts
 - [ ] Encrypt images and files in locked notes

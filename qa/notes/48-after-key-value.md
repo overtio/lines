@@ -177,14 +177,26 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Key: Value line, then Math block
+#### 19. Key: Value line, then Timing diagram (wavedrom block)
+
+**Wi-Fi password:** correct-horse-battery
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Key: Value line, then Math block
 
 **Wi-Fi password:** correct-horse-battery
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Key: Value line, then Table
+#### 21. Key: Value line, then Table
 
 **Wi-Fi password:** correct-horse-battery
 | Left | Center | Right |
@@ -192,7 +204,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Key: Value line, then Table with formulas
+#### 22. Key: Value line, then Table with formulas
 
 **Wi-Fi password:** correct-horse-battery
 | Item | Cost |
@@ -202,7 +214,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Key: Value line, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Key: Value line, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 **Wi-Fi password:** correct-horse-battery
 ```hurl
@@ -221,12 +233,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Key: Value line, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Key: Value line, then Secret ({{name}}, kept in a locked secrets note)
 
 **Wi-Fi password:** correct-horse-battery
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Key: Value line, then API requests (http block): a variable, a named request and one using its response
+#### 25. Key: Value line, then API requests (http block): a variable, a named request and one using its response
 
 **Wi-Fi password:** correct-horse-battery
 ```http
@@ -240,7 +252,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Key: Value line, then Spreadsheet (csv block)
+#### 26. Key: Value line, then Spreadsheet (csv block)
 
 **Wi-Fi password:** correct-horse-battery
 ```csv
@@ -250,7 +262,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Key: Value line, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Key: Value line, then Named spreadsheet (csv name=), and a formula in another block using it
 
 **Wi-Fi password:** correct-horse-battery
 ```csv name=costs
@@ -262,93 +274,93 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Key: Value line, then Divider
+#### 28. Key: Value line, then Divider
 
 **Wi-Fi password:** correct-horse-battery
 ---
 
-#### 28. Key: Value line, then Key: Value line
+#### 29. Key: Value line, then Key: Value line
 
 **Wi-Fi password:** correct-horse-battery
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Key: Value line, then Mention
+#### 30. Key: Value line, then Mention
 
 **Wi-Fi password:** correct-horse-battery
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Key: Value line, then Wiki link
+#### 31. Key: Value line, then Wiki link
 
 **Wi-Fi password:** correct-horse-battery
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Key: Value line, then Symbols
+#### 32. Key: Value line, then Symbols
 
 **Wi-Fi password:** correct-horse-battery
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Key: Value line, then GitHub links
+#### 33. Key: Value line, then GitHub links
 
 **Wi-Fi password:** correct-horse-battery
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Key: Value line, then arXiv links
+#### 34. Key: Value line, then arXiv links
 
 **Wi-Fi password:** correct-horse-battery
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Key: Value line, then Image
+#### 35. Key: Value line, then Image
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample picture](attachment:photo.png)
 
-#### 35. Key: Value line, then Drawing
+#### 36. Key: Value line, then Drawing
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Key: Value line, then File
+#### 37. Key: Value line, then File
 
 **Wi-Fi password:** correct-horse-battery
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Key: Value line, then Attached 3D model (STL)
+#### 38. Key: Value line, then Attached 3D model (STL)
 
 **Wi-Fi password:** correct-horse-battery
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Key: Value line, then Terminal recording (.cast file)
+#### 39. Key: Value line, then Terminal recording (.cast file)
 
 **Wi-Fi password:** correct-horse-battery
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Key: Value line, then Missing file
+#### 40. Key: Value line, then Missing file
 
 **Wi-Fi password:** correct-horse-battery
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Key: Value line, then Card
+#### 41. Key: Value line, then Card
 
 **Wi-Fi password:** correct-horse-battery
 ::: card
 Text in a card.
 :::
 
-#### 41. Key: Value line, then Callout (info)
+#### 42. Key: Value line, then Callout (info)
 
 **Wi-Fi password:** correct-horse-battery
 :::i
 Text in an info callout.
 :::
 
-#### 42. Key: Value line, then Callout (warning, chosen icon)
+#### 43. Key: Value line, then Callout (warning, chosen icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Key: Value line, then Callout (decision, no icon)
+#### 44. Key: Value line, then Callout (decision, no icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::^ icon=none

@@ -195,7 +195,20 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Quote, then Math block
+#### 19. Quote, then Timing diagram (wavedrom block)
+
+> A quote that runs over
+> two lines.
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Quote, then Math block
 
 > A quote that runs over
 > two lines.
@@ -203,7 +216,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Quote, then Table
+#### 21. Quote, then Table
 
 > A quote that runs over
 > two lines.
@@ -212,7 +225,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Quote, then Table with formulas
+#### 22. Quote, then Table with formulas
 
 > A quote that runs over
 > two lines.
@@ -223,7 +236,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Quote, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Quote, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 > A quote that runs over
 > two lines.
@@ -243,13 +256,13 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Quote, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Quote, then Secret ({{name}}, kept in a locked secrets note)
 
 > A quote that runs over
 > two lines.
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Quote, then API requests (http block): a variable, a named request and one using its response
+#### 25. Quote, then API requests (http block): a variable, a named request and one using its response
 
 > A quote that runs over
 > two lines.
@@ -264,7 +277,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Quote, then Spreadsheet (csv block)
+#### 26. Quote, then Spreadsheet (csv block)
 
 > A quote that runs over
 > two lines.
@@ -275,7 +288,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Quote, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Quote, then Named spreadsheet (csv name=), and a formula in another block using it
 
 > A quote that runs over
 > two lines.
@@ -288,85 +301,85 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Quote, then Divider
+#### 28. Quote, then Divider
 
 > A quote that runs over
 > two lines.
 ---
 
-#### 28. Quote, then Key: Value line
+#### 29. Quote, then Key: Value line
 
 > A quote that runs over
 > two lines.
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Quote, then Mention
+#### 30. Quote, then Mention
 
 > A quote that runs over
 > two lines.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Quote, then Wiki link
+#### 31. Quote, then Wiki link
 
 > A quote that runs over
 > two lines.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Quote, then Symbols
+#### 32. Quote, then Symbols
 
 > A quote that runs over
 > two lines.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Quote, then GitHub links
+#### 33. Quote, then GitHub links
 
 > A quote that runs over
 > two lines.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Quote, then arXiv links
+#### 34. Quote, then arXiv links
 
 > A quote that runs over
 > two lines.
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Quote, then Image
+#### 35. Quote, then Image
 
 > A quote that runs over
 > two lines.
 ![A sample picture](attachment:photo.png)
 
-#### 35. Quote, then Drawing
+#### 36. Quote, then Drawing
 
 > A quote that runs over
 > two lines.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Quote, then File
+#### 37. Quote, then File
 
 > A quote that runs over
 > two lines.
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Quote, then Attached 3D model (STL)
+#### 38. Quote, then Attached 3D model (STL)
 
 > A quote that runs over
 > two lines.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Quote, then Terminal recording (.cast file)
+#### 39. Quote, then Terminal recording (.cast file)
 
 > A quote that runs over
 > two lines.
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Quote, then Missing file
+#### 40. Quote, then Missing file
 
 > A quote that runs over
 > two lines.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Quote, then Card
+#### 41. Quote, then Card
 
 > A quote that runs over
 > two lines.
@@ -374,7 +387,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 41. Quote, then Callout (info)
+#### 42. Quote, then Callout (info)
 
 > A quote that runs over
 > two lines.
@@ -382,7 +395,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 42. Quote, then Callout (warning, chosen icon)
+#### 43. Quote, then Callout (warning, chosen icon)
 
 > A quote that runs over
 > two lines.
@@ -390,7 +403,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Quote, then Callout (decision, no icon)
+#### 44. Quote, then Callout (decision, no icon)
 
 > A quote that runs over
 > two lines.

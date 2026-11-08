@@ -19,6 +19,7 @@ import { spreadsheet } from "./spreadsheet";
 import { tex } from "./tex";
 import { themes } from "./themes";
 import { unsplash } from "./unsplash";
+import { wavedrom } from "./wavedrom";
 
 /*
  * The plugins lines comes with, in the order Settings → Plugins lists them. The core finds them
@@ -35,6 +36,7 @@ export const builtIn = (): Plugin[] => [
   // Before Mermaid: if both were on, Pele would draw the diagrams.
   pele(),
   mermaid(),
+  wavedrom(),
   models(),
   ironcalc(),
   tex(),

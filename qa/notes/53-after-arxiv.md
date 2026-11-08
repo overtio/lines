@@ -177,14 +177,26 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. arXiv links, then Math block
+#### 19. arXiv links, then Timing diagram (wavedrom block)
+
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. arXiv links, then Math block
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. arXiv links, then Table
+#### 21. arXiv links, then Table
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 | Left | Center | Right |
@@ -192,7 +204,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. arXiv links, then Table with formulas
+#### 22. arXiv links, then Table with formulas
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 | Item | Cost |
@@ -202,7 +214,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. arXiv links, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. arXiv links, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 ```hurl
@@ -221,12 +233,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. arXiv links, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. arXiv links, then Secret ({{name}}, kept in a locked secrets note)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. arXiv links, then API requests (http block): a variable, a named request and one using its response
+#### 25. arXiv links, then API requests (http block): a variable, a named request and one using its response
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 ```http
@@ -240,7 +252,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. arXiv links, then Spreadsheet (csv block)
+#### 26. arXiv links, then Spreadsheet (csv block)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 ```csv
@@ -250,7 +262,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. arXiv links, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. arXiv links, then Named spreadsheet (csv name=), and a formula in another block using it
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 ```csv name=costs
@@ -262,93 +274,93 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. arXiv links, then Divider
+#### 28. arXiv links, then Divider
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 ---
 
-#### 28. arXiv links, then Key: Value line
+#### 29. arXiv links, then Key: Value line
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. arXiv links, then Mention
+#### 30. arXiv links, then Mention
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. arXiv links, then Wiki link
+#### 31. arXiv links, then Wiki link
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. arXiv links, then Symbols
+#### 32. arXiv links, then Symbols
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. arXiv links, then GitHub links
+#### 33. arXiv links, then GitHub links
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. arXiv links, then arXiv links
+#### 34. arXiv links, then arXiv links
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. arXiv links, then Image
+#### 35. arXiv links, then Image
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 ![A sample picture](attachment:photo.png)
 
-#### 35. arXiv links, then Drawing
+#### 36. arXiv links, then Drawing
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. arXiv links, then File
+#### 37. arXiv links, then File
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [Budget.csv](attachment:budget.csv)
 
-#### 37. arXiv links, then Attached 3D model (STL)
+#### 38. arXiv links, then Attached 3D model (STL)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. arXiv links, then Terminal recording (.cast file)
+#### 39. arXiv links, then Terminal recording (.cast file)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. arXiv links, then Missing file
+#### 40. arXiv links, then Missing file
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. arXiv links, then Card
+#### 41. arXiv links, then Card
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 ::: card
 Text in a card.
 :::
 
-#### 41. arXiv links, then Callout (info)
+#### 42. arXiv links, then Callout (info)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::i
 Text in an info callout.
 :::
 
-#### 42. arXiv links, then Callout (warning, chosen icon)
+#### 43. arXiv links, then Callout (warning, chosen icon)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. arXiv links, then Callout (decision, no icon)
+#### 44. arXiv links, then Callout (decision, no icon)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::^ icon=none

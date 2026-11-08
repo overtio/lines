@@ -159,20 +159,31 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Math block at the top level
+#### 19. Timing diagram (wavedrom block) at the top level
+
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Math block at the top level
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Table at the top level
+#### 21. Table at the top level
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Table with formulas at the top level
+#### 22. Table with formulas at the top level
 
 | Item | Cost |
 | --- | ---: |
@@ -181,7 +192,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Hurl entries (hurl block): a capture used by the next entry, and asserts at the top level
+#### 23. Hurl entries (hurl block): a capture used by the next entry, and asserts at the top level
 
 ```hurl
 # A todo
@@ -199,11 +210,11 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Secret ({{name}}, kept in a locked secrets note) at the top level
+#### 24. Secret ({{name}}, kept in a locked secrets note) at the top level
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. API requests (http block): a variable, a named request and one using its response at the top level
+#### 25. API requests (http block): a variable, a named request and one using its response at the top level
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -216,7 +227,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Spreadsheet (csv block) at the top level
+#### 26. Spreadsheet (csv block) at the top level
 
 ```csv
 Item, Cost
@@ -225,7 +236,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Named spreadsheet (csv name=), and a formula in another block using it at the top level
+#### 27. Named spreadsheet (csv name=), and a formula in another block using it at the top level
 
 ```csv name=costs
 Item, Cost, Day
@@ -236,77 +247,77 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Divider at the top level
+#### 28. Divider at the top level
 
 ---
 
-#### 28. Key: Value line at the top level
+#### 29. Key: Value line at the top level
 
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Mention at the top level
+#### 30. Mention at the top level
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Wiki link at the top level
+#### 31. Wiki link at the top level
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Symbols at the top level
+#### 32. Symbols at the top level
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. GitHub links at the top level
+#### 33. GitHub links at the top level
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. arXiv links at the top level
+#### 34. arXiv links at the top level
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Image at the top level
+#### 35. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 35. Drawing at the top level
+#### 36. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. File at the top level
+#### 37. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Attached 3D model (STL) at the top level
+#### 38. Attached 3D model (STL) at the top level
 
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Terminal recording (.cast file) at the top level
+#### 39. Terminal recording (.cast file) at the top level
 
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Missing file at the top level
+#### 40. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Card at the top level
+#### 41. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 41. Callout (info) at the top level
+#### 42. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 42. Callout (warning, chosen icon) at the top level
+#### 43. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Callout (decision, no icon) at the top level
+#### 44. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

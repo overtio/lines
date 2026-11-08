@@ -231,7 +231,22 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Code block, then Math block
+#### 19. Code block, then Timing diagram (wavedrom block)
+
+```
+plain code
+  indented line
+```
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Code block, then Math block
 
 ```
 plain code
@@ -241,7 +256,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Code block, then Table
+#### 21. Code block, then Table
 
 ```
 plain code
@@ -252,7 +267,7 @@ plain code
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Code block, then Table with formulas
+#### 22. Code block, then Table with formulas
 
 ```
 plain code
@@ -265,7 +280,7 @@ plain code
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Code block, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Code block, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ```
 plain code
@@ -287,7 +302,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Code block, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Code block, then Secret ({{name}}, kept in a locked secrets note)
 
 ```
 plain code
@@ -295,7 +310,7 @@ plain code
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Code block, then API requests (http block): a variable, a named request and one using its response
+#### 25. Code block, then API requests (http block): a variable, a named request and one using its response
 
 ```
 plain code
@@ -312,7 +327,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Code block, then Spreadsheet (csv block)
+#### 26. Code block, then Spreadsheet (csv block)
 
 ```
 plain code
@@ -325,7 +340,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Code block, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Code block, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```
 plain code
@@ -340,7 +355,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Code block, then Divider
+#### 28. Code block, then Divider
 
 ```
 plain code
@@ -348,7 +363,7 @@ plain code
 ```
 ---
 
-#### 28. Code block, then Key: Value line
+#### 29. Code block, then Key: Value line
 
 ```
 plain code
@@ -356,7 +371,7 @@ plain code
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Code block, then Mention
+#### 30. Code block, then Mention
 
 ```
 plain code
@@ -364,7 +379,7 @@ plain code
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Code block, then Wiki link
+#### 31. Code block, then Wiki link
 
 ```
 plain code
@@ -372,7 +387,7 @@ plain code
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Code block, then Symbols
+#### 32. Code block, then Symbols
 
 ```
 plain code
@@ -380,7 +395,7 @@ plain code
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Code block, then GitHub links
+#### 33. Code block, then GitHub links
 
 ```
 plain code
@@ -388,7 +403,7 @@ plain code
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Code block, then arXiv links
+#### 34. Code block, then arXiv links
 
 ```
 plain code
@@ -396,7 +411,7 @@ plain code
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Code block, then Image
+#### 35. Code block, then Image
 
 ```
 plain code
@@ -404,7 +419,7 @@ plain code
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 35. Code block, then Drawing
+#### 36. Code block, then Drawing
 
 ```
 plain code
@@ -412,7 +427,7 @@ plain code
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Code block, then File
+#### 37. Code block, then File
 
 ```
 plain code
@@ -420,7 +435,7 @@ plain code
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Code block, then Attached 3D model (STL)
+#### 38. Code block, then Attached 3D model (STL)
 
 ```
 plain code
@@ -428,7 +443,7 @@ plain code
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Code block, then Terminal recording (.cast file)
+#### 39. Code block, then Terminal recording (.cast file)
 
 ```
 plain code
@@ -436,7 +451,7 @@ plain code
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Code block, then Missing file
+#### 40. Code block, then Missing file
 
 ```
 plain code
@@ -444,7 +459,7 @@ plain code
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Code block, then Card
+#### 41. Code block, then Card
 
 ```
 plain code
@@ -454,7 +469,7 @@ plain code
 Text in a card.
 :::
 
-#### 41. Code block, then Callout (info)
+#### 42. Code block, then Callout (info)
 
 ```
 plain code
@@ -464,7 +479,7 @@ plain code
 Text in an info callout.
 :::
 
-#### 42. Code block, then Callout (warning, chosen icon)
+#### 43. Code block, then Callout (warning, chosen icon)
 
 ```
 plain code
@@ -474,7 +489,7 @@ plain code
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Code block, then Callout (decision, no icon)
+#### 44. Code block, then Callout (decision, no icon)
 
 ```
 plain code

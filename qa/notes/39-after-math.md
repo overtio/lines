@@ -213,7 +213,21 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Math block, then Math block
+#### 19. Math block, then Timing diagram (wavedrom block)
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Math block, then Math block
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -222,7 +236,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Math block, then Table
+#### 21. Math block, then Table
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -232,7 +246,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Math block, then Table with formulas
+#### 22. Math block, then Table with formulas
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -244,7 +258,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Math block, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Math block, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -265,14 +279,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Math block, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Math block, then Secret ({{name}}, kept in a locked secrets note)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Math block, then API requests (http block): a variable, a named request and one using its response
+#### 25. Math block, then API requests (http block): a variable, a named request and one using its response
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -288,7 +302,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Math block, then Spreadsheet (csv block)
+#### 26. Math block, then Spreadsheet (csv block)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -300,7 +314,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Math block, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Math block, then Named spreadsheet (csv name=), and a formula in another block using it
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -314,98 +328,98 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Math block, then Divider
+#### 28. Math block, then Divider
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 ---
 
-#### 28. Math block, then Key: Value line
+#### 29. Math block, then Key: Value line
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Math block, then Mention
+#### 30. Math block, then Mention
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Math block, then Wiki link
+#### 31. Math block, then Wiki link
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Math block, then Symbols
+#### 32. Math block, then Symbols
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Math block, then GitHub links
+#### 33. Math block, then GitHub links
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Math block, then arXiv links
+#### 34. Math block, then arXiv links
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Math block, then Image
+#### 35. Math block, then Image
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 ![A sample picture](attachment:photo.png)
 
-#### 35. Math block, then Drawing
+#### 36. Math block, then Drawing
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Math block, then File
+#### 37. Math block, then File
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Math block, then Attached 3D model (STL)
+#### 38. Math block, then Attached 3D model (STL)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Math block, then Terminal recording (.cast file)
+#### 39. Math block, then Terminal recording (.cast file)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Math block, then Missing file
+#### 40. Math block, then Missing file
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Math block, then Card
+#### 41. Math block, then Card
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -414,7 +428,7 @@ $$
 Text in a card.
 :::
 
-#### 41. Math block, then Callout (info)
+#### 42. Math block, then Callout (info)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -423,7 +437,7 @@ $$
 Text in an info callout.
 :::
 
-#### 42. Math block, then Callout (warning, chosen icon)
+#### 43. Math block, then Callout (warning, chosen icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -432,7 +446,7 @@ $$
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Math block, then Callout (decision, no icon)
+#### 44. Math block, then Callout (decision, no icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
