@@ -23,6 +23,9 @@ export const modKey = isApple ? "⌘" : "Ctrl+";
 /** The Mac, Windows or Linux app (not the web, and not phones or tablets). */
 export const isDesktopApp = isTauri && !isTouch && !/iPhone|iPad|Android/.test(ua);
 
+/** The system print dialog: in browsers, and in the desktop apps (not on iPhone or iPad). */
+export const canPrint = !isTauri || isDesktopApp;
+
 /**
  * Browsers keep ⌘N / Ctrl+N for opening a new window and don't let pages have it,
  * so the web app uses ⌥N / Alt+N for a new note. The native apps get the usual shortcut.

@@ -71,10 +71,10 @@ class UIState {
   /** Notes a tag is being added to, and where its box opens. */
   tagPrompt = $state.raw<TagPrompt | null>(null);
   /**
-   * The note whose PDF is being previewed, and whether to save (or print) it as soon as it's ready,
-   * or to offer its PNG images.
+   * The note whose PDF is being previewed, and what it goes straight on to once it's ready:
+   * printing, exporting the PDF (printed, or saved from a typesetter), or offering PNG images.
    */
-  pdf = $state.raw<{ id: string; save: boolean; png?: boolean } | null>(null);
+  pdf = $state.raw<{ id: string; action?: "print" | "export" | "png" } | null>(null);
 
   constructor() {
     window.addEventListener("resize", () => {

@@ -25,7 +25,7 @@
   import { lockedNotes } from "./lib/notes/locked.svelte";
   import { isClosed, notes } from "./lib/notes/store.svelte";
   import { plugins } from "./lib/plugins/registry.svelte";
-  import { copyText, isApple, isNewNoteShortcut, newNoteKey } from "./lib/platform";
+  import { canPrint, copyText, isApple, isNewNoteShortcut, newNoteKey } from "./lib/platform";
   import { saveAndShow } from "./lib/save";
   import { NOTE_MIN, ui, type MenuItem } from "./lib/ui.svelte";
   import { openSettings } from "./lib/windows/settings.svelte";
@@ -284,10 +284,11 @@
     const id = selected.note.id;
     items.push(
       "separator",
-      { label: t("app.previewPdf"), icon: "eye", run: () => (ui.pdf = { id, save: false }) },
-      { label: t("app.exportPdf"), icon: "printer", run: () => (ui.pdf = { id, save: true }) },
-      { label: t("app.exportPng"), icon: "image", run: () => (ui.pdf = { id, save: false, png: true }) },
+      { label: t("app.previewPdf"), icon: "eye", run: () => (ui.pdf = { id }) },
+      { label: t("app.exportPdf"), icon: "file-down", run: () => (ui.pdf = { id, action: "export" }) },
+      { label: t("app.exportPng"), icon: "image", run: () => (ui.pdf = { id, action: "png" }) },
     );
+    if (canPrint) items.push({ label: t("print.print"), icon: "printer", run: () => (ui.pdf = { id, action: "print" }) });
     const anchor = event.currentTarget as HTMLElement;
     const rect = anchor.getBoundingClientRect();
     shareOpen = true;
@@ -347,7 +348,7 @@
     if ((event.metaKey || event.ctrlKey) && !event.shiftKey && !event.altKey && event.key.toLowerCase() === "p") {
       event.preventDefault();
       event.stopPropagation();
-      if (selected && !closed) ui.pdf = { id: selected.note.id, save: false };
+      if (selected && !closed) ui.pdf = { id: selected.note.id };
       return;
     }
     const target = event.target as HTMLElement;
@@ -659,7 +660,7 @@
 <NotesPasswordDialog />
 {#if ui.pdf && notes.get(ui.pdf.id)}
   {#key ui.pdf}
-    <PdfPreview entry={notes.get(ui.pdf.id)!} save={ui.pdf.save} png={ui.pdf.png} onclose={() => (ui.pdf = null)} />
+    <PdfPreview entry={notes.get(ui.pdf.id)!} action={ui.pdf.action} onclose={() => (ui.pdf = null)} />
   {/key}
 {/if}
 <ContextMenu />
