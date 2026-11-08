@@ -356,49 +356,56 @@ Text in an info callout.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Callout (info), then Image
+#### 33. Callout (info), then arXiv links
+
+:::i
+Text in an info callout.
+:::
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Callout (info), then Image
 
 :::i
 Text in an info callout.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 34. Callout (info), then Drawing
+#### 35. Callout (info), then Drawing
 
 :::i
 Text in an info callout.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Callout (info), then File
+#### 36. Callout (info), then File
 
 :::i
 Text in an info callout.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Callout (info), then Attached 3D model (STL)
+#### 37. Callout (info), then Attached 3D model (STL)
 
 :::i
 Text in an info callout.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Callout (info), then Terminal recording (.cast file)
+#### 38. Callout (info), then Terminal recording (.cast file)
 
 :::i
 Text in an info callout.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Callout (info), then Missing file
+#### 39. Callout (info), then Missing file
 
 :::i
 Text in an info callout.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Callout (info), then Card
+#### 40. Callout (info), then Card
 
 :::i
 Text in an info callout.
@@ -407,7 +414,7 @@ Text in an info callout.
 Text in a card.
 :::
 
-#### 40. Callout (info), then Callout (info)
+#### 41. Callout (info), then Callout (info)
 
 :::i
 Text in an info callout.
@@ -416,7 +423,7 @@ Text in an info callout.
 Text in an info callout.
 :::
 
-#### 41. Callout (info), then Callout (warning, chosen icon)
+#### 42. Callout (info), then Callout (warning, chosen icon)
 
 :::i
 Text in an info callout.
@@ -425,7 +432,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Callout (info), then Callout (decision, no icon)
+#### 43. Callout (info), then Callout (decision, no icon)
 
 :::i
 Text in an info callout.

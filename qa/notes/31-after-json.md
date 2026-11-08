@@ -356,49 +356,56 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. JSON block (no language), then Image
+#### 33. JSON block (no language), then arXiv links
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. JSON block (no language), then Image
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 34. JSON block (no language), then Drawing
+#### 35. JSON block (no language), then Drawing
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. JSON block (no language), then File
+#### 36. JSON block (no language), then File
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 36. JSON block (no language), then Attached 3D model (STL)
+#### 37. JSON block (no language), then Attached 3D model (STL)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. JSON block (no language), then Terminal recording (.cast file)
+#### 38. JSON block (no language), then Terminal recording (.cast file)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. JSON block (no language), then Missing file
+#### 39. JSON block (no language), then Missing file
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. JSON block (no language), then Card
+#### 40. JSON block (no language), then Card
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -407,7 +414,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 40. JSON block (no language), then Callout (info)
+#### 41. JSON block (no language), then Callout (info)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -416,7 +423,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 41. JSON block (no language), then Callout (warning, chosen icon)
+#### 42. JSON block (no language), then Callout (warning, chosen icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -425,7 +432,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. JSON block (no language), then Callout (decision, no icon)
+#### 43. JSON block (no language), then Callout (decision, no icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}

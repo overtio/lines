@@ -356,49 +356,56 @@ $$
 $$
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Math block, then Image
+#### 33. Math block, then arXiv links
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Math block, then Image
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 ![A sample picture](attachment:photo.png)
 
-#### 34. Math block, then Drawing
+#### 35. Math block, then Drawing
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Math block, then File
+#### 36. Math block, then File
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Math block, then Attached 3D model (STL)
+#### 37. Math block, then Attached 3D model (STL)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Math block, then Terminal recording (.cast file)
+#### 38. Math block, then Terminal recording (.cast file)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Math block, then Missing file
+#### 39. Math block, then Missing file
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Math block, then Card
+#### 40. Math block, then Card
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -407,7 +414,7 @@ $$
 Text in a card.
 :::
 
-#### 40. Math block, then Callout (info)
+#### 41. Math block, then Callout (info)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -416,7 +423,7 @@ $$
 Text in an info callout.
 :::
 
-#### 41. Math block, then Callout (warning, chosen icon)
+#### 42. Math block, then Callout (warning, chosen icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -425,7 +432,7 @@ $$
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Math block, then Callout (decision, no icon)
+#### 43. Math block, then Callout (decision, no icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}

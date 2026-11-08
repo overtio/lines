@@ -59,6 +59,60 @@ export interface Contributions {
   markdown?: MarkdownAddition[];
   /** How code blocks in more languages are highlighted, in the editor and on paper: ```http. */
   codeLanguages?: LanguageDescription[];
+  /** Links to a site that read short, the way the site writes them: GitHub's `owner/repo#12`. */
+  links?: ShortLinks[];
+  /** Where research papers are found, to search from a note and link to: arXiv. */
+  papers?: PaperSource[];
+}
+
+/**
+ * Links to a site, drawn short with the site's mark in front, in notes of any format and on paper.
+ * The note keeps the whole address, which shows again while the cursor is on it.
+ */
+export interface ShortLinks {
+  id: string;
+  /** The mark in front, as SVG markup drawn in the text's color (`fill="currentColor"`). */
+  mark: string;
+  /** How a link reads in short (`overtio/lines#12`), or null for one that stays as it is. */
+  text(url: URL): string | null;
+}
+
+/** One page of what a search on the web found, and whether there are more. */
+export interface SearchPage<T> {
+  items: T[];
+  more: boolean;
+}
+
+/** A research paper, as a source found it. */
+export interface Paper {
+  /** The source's own name for it, unique among what it finds: arXiv's `1706.03762`. */
+  id: string;
+  title: string;
+  /** Its authors' names, in order. */
+  authors: string[];
+  /** The year it came out. */
+  year?: number;
+  /** Where it's from, said after the year: arXiv's category (`cs.CL`), or a journal. */
+  venue?: string;
+  /** Where the note links to: its page, with its abstract. */
+  url: string;
+}
+
+/**
+ * A place research papers are found. Each is searched from Markdown and LaTeX notes with "/paper",
+ * which links to the paper chosen.
+ */
+export interface PaperSource {
+  id: string;
+  /** As people know it: "arXiv". */
+  name: string;
+  /** Said under its search, linking to it, as its terms ask. `title` is more, shown on hover. */
+  credit: { text: string; href: string; title?: string };
+  /**
+   * One page (1 for the first) of the papers `query` finds: words, an author, or how the source
+   * names a paper (`1706.03762`, a link to it). With no query, nothing.
+   */
+  search(query: string, page: number, signal: AbortSignal): Promise<SearchPage<Paper>>;
 }
 
 /** A markup language notes can be written in. Nothing in lines outside its plugin knows how it reads. */

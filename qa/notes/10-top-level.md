@@ -260,49 +260,53 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Image at the top level
+#### 33. arXiv links at the top level
+
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 34. Drawing at the top level
+#### 35. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. File at the top level
+#### 36. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Attached 3D model (STL) at the top level
+#### 37. Attached 3D model (STL) at the top level
 
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Terminal recording (.cast file) at the top level
+#### 38. Terminal recording (.cast file) at the top level
 
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Missing file at the top level
+#### 39. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Card at the top level
+#### 40. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 40. Callout (info) at the top level
+#### 41. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 41. Callout (warning, chosen icon) at the top level
+#### 42. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Callout (decision, no icon) at the top level
+#### 43. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

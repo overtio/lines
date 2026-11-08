@@ -28,7 +28,7 @@ The editor is CodeMirror, whose text is real text a screen reader reads, with it
 - Headings are headings (`role="heading"` with their level), so a screen reader's heading navigation (VoiceOver's rotor, NVDA's H) moves through a note's sections. Quotes are quotes. Bullets say "bullet"; numbers read as written.
 - Markup that's hidden from sight but still in the text is said in words instead: a callout's `:::!` lines read "Warning callout" … "End of warning callout" (a card's, "Card" … "End of card"), the properties' `---` lines "Properties" … "End of properties", a code block's fences "Code" … "End of code". With the cursor on the line, its Markdown is there as usual.
 - Checkboxes are `role="checkbox"` with `aria-checked`, named by their task; ⌘↵ on the line ticks them.
-- Chips (mentions, GitHub links), copy buttons, tables, images and files have names; images use their alt text (without a width written after a bar, `|400`).
+- Chips (mentions, links drawn short like GitHub's and arXiv's), copy buttons, tables, images and files have names; images use their alt text (without a width written after a bar, `|400`).
 - An image's resize handle is for a pointer only; from the keyboard, the width is the number after the bar in its Markdown (`![Lake|400](…)`), shown while the cursor is on its line. A diagram's is the same, with its width after the language on its first line (` ```mermaid |400 `).
 - Symbols shown for typed characters (`->` as →, `!=` as ≠) are read as the symbol ("right arrow", "not equal to"), as they look. With the cursor touching one, the typed characters are there to read and edit; Settings → Editing turns symbols off for anyone who'd rather hear the characters.
 - Menus (`/`, `\`, `@`) are CodeMirror's autocomplete, a listbox the screen reader follows.
@@ -64,10 +64,11 @@ A spreadsheet's grid (`src/plugins/spreadsheet/Grid.svelte`, [spreadsheets.md](s
 
 - ⌘F (Ctrl+F) opens the find bar from anywhere while a note is open, with focus in its field, a search landmark named "Find in note". The count ("3 of 12") is a status that's read as it changes; the match case, regular expression and whole-word options are toggle buttons (`aria-pressed`); the button that shows Replace says whether it's expanded. ↵ and ⇧↵ move through the matches, which CodeMirror announces with their line; Esc closes the bar and puts focus back in the note.
 
-## Photos and GIFs from the web
+## Photos, GIFs and papers from the web
 
 - `/unsplash` and `/giphy` open a dialog named "Search Unsplash" ("Search GIPHY") with focus in its search field. The pictures are a listbox of options, one Tab stop: ↓ from the field goes into them, the arrow keys, Home and End move between them, ↑ from the top row goes back to the field, and ↵ puts the focused one in the note. Each is named by its description and who made it ("Snowy peak, by Jane Doe"). A status says when it's searching, how many it found, that nothing was found, or that the service couldn't be reached. Esc closes it and puts focus back in the note.
 - With reduced motion, GIFs show still: in the picker, and GIPHY's GIFs in notes (their first frame, which GIPHY serves).
+- `/paper` opens a dialog named "Search arXiv", the same way: the papers are a listbox, one Tab stop, ↓ from the field into them, ↑ and ↓ between them, ↵ to link to one. Each is named by its title, authors, year and subject ("Attention Is All You Need, Ashish Vaswani et al., 2017, cs.CL"). Before anything's typed, the status says what can be searched for.
 
 ## Terminal recordings
 

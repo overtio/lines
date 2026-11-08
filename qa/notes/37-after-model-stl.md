@@ -1732,7 +1732,57 @@ endsolid pyramid
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. 3D model (stl block), then Image
+#### 33. 3D model (stl block), then arXiv links
+
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. 3D model (stl block), then Image
 
 ```stl
 solid pyramid
@@ -1782,7 +1832,7 @@ endsolid pyramid
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 34. 3D model (stl block), then Drawing
+#### 35. 3D model (stl block), then Drawing
 
 ```stl
 solid pyramid
@@ -1832,7 +1882,7 @@ endsolid pyramid
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. 3D model (stl block), then File
+#### 36. 3D model (stl block), then File
 
 ```stl
 solid pyramid
@@ -1882,7 +1932,7 @@ endsolid pyramid
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 36. 3D model (stl block), then Attached 3D model (STL)
+#### 37. 3D model (stl block), then Attached 3D model (STL)
 
 ```stl
 solid pyramid
@@ -1932,7 +1982,7 @@ endsolid pyramid
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. 3D model (stl block), then Terminal recording (.cast file)
+#### 38. 3D model (stl block), then Terminal recording (.cast file)
 
 ```stl
 solid pyramid
@@ -1982,7 +2032,7 @@ endsolid pyramid
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. 3D model (stl block), then Missing file
+#### 39. 3D model (stl block), then Missing file
 
 ```stl
 solid pyramid
@@ -2032,7 +2082,7 @@ endsolid pyramid
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. 3D model (stl block), then Card
+#### 40. 3D model (stl block), then Card
 
 ```stl
 solid pyramid
@@ -2084,7 +2134,7 @@ endsolid pyramid
 Text in a card.
 :::
 
-#### 40. 3D model (stl block), then Callout (info)
+#### 41. 3D model (stl block), then Callout (info)
 
 ```stl
 solid pyramid
@@ -2136,7 +2186,7 @@ endsolid pyramid
 Text in an info callout.
 :::
 
-#### 41. 3D model (stl block), then Callout (warning, chosen icon)
+#### 42. 3D model (stl block), then Callout (warning, chosen icon)
 
 ```stl
 solid pyramid
@@ -2188,7 +2238,7 @@ endsolid pyramid
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. 3D model (stl block), then Callout (decision, no icon)
+#### 43. 3D model (stl block), then Callout (decision, no icon)
 
 ```stl
 solid pyramid

@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 [terminal.cast](attachment:terminal.cast)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Terminal recording (.cast file), then Image
+#### 33. Terminal recording (.cast file), then arXiv links
+
+[terminal.cast](attachment:terminal.cast)
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Terminal recording (.cast file), then Image
 
 [terminal.cast](attachment:terminal.cast)
 ![A sample picture](attachment:photo.png)
 
-#### 34. Terminal recording (.cast file), then Drawing
+#### 35. Terminal recording (.cast file), then Drawing
 
 [terminal.cast](attachment:terminal.cast)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Terminal recording (.cast file), then File
+#### 36. Terminal recording (.cast file), then File
 
 [terminal.cast](attachment:terminal.cast)
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Terminal recording (.cast file), then Attached 3D model (STL)
+#### 37. Terminal recording (.cast file), then Attached 3D model (STL)
 
 [terminal.cast](attachment:terminal.cast)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Terminal recording (.cast file), then Terminal recording (.cast file)
+#### 38. Terminal recording (.cast file), then Terminal recording (.cast file)
 
 [terminal.cast](attachment:terminal.cast)
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Terminal recording (.cast file), then Missing file
+#### 39. Terminal recording (.cast file), then Missing file
 
 [terminal.cast](attachment:terminal.cast)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Terminal recording (.cast file), then Card
+#### 40. Terminal recording (.cast file), then Card
 
 [terminal.cast](attachment:terminal.cast)
 ::: card
 Text in a card.
 :::
 
-#### 40. Terminal recording (.cast file), then Callout (info)
+#### 41. Terminal recording (.cast file), then Callout (info)
 
 [terminal.cast](attachment:terminal.cast)
 :::i
 Text in an info callout.
 :::
 
-#### 41. Terminal recording (.cast file), then Callout (warning, chosen icon)
+#### 42. Terminal recording (.cast file), then Callout (warning, chosen icon)
 
 [terminal.cast](attachment:terminal.cast)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Terminal recording (.cast file), then Callout (decision, no icon)
+#### 43. Terminal recording (.cast file), then Callout (decision, no icon)
 
 [terminal.cast](attachment:terminal.cast)
 :::^ icon=none

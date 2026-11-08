@@ -1,7 +1,9 @@
 import { isApple } from "../lib/platform";
 import type { Plugin } from "../lib/plugins/types";
+import { arxiv } from "./arxiv";
 import { asciinema } from "./asciinema";
 import { giphy } from "./giphy";
+import { github } from "./github";
 import { requests } from "./http";
 import { ironcalc } from "./ironcalc";
 import { katex } from "./katex";
@@ -39,6 +41,8 @@ export const builtIn = (): Plugin[] => [
   unsplash(),
   giphy(),
   asciinema(),
+  github(),
+  arxiv(),
   themes(),
   lucide(),
   // Its symbols may only be used on Apple's platforms.

@@ -356,49 +356,56 @@ Text in a warning callout with the flag icon.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Callout (warning, chosen icon), then Image
+#### 33. Callout (warning, chosen icon), then arXiv links
+
+:::! icon=flag
+Text in a warning callout with the flag icon.
+:::
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Callout (warning, chosen icon), then Image
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 34. Callout (warning, chosen icon), then Drawing
+#### 35. Callout (warning, chosen icon), then Drawing
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Callout (warning, chosen icon), then File
+#### 36. Callout (warning, chosen icon), then File
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Callout (warning, chosen icon), then Attached 3D model (STL)
+#### 37. Callout (warning, chosen icon), then Attached 3D model (STL)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Callout (warning, chosen icon), then Terminal recording (.cast file)
+#### 38. Callout (warning, chosen icon), then Terminal recording (.cast file)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Callout (warning, chosen icon), then Missing file
+#### 39. Callout (warning, chosen icon), then Missing file
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Callout (warning, chosen icon), then Card
+#### 40. Callout (warning, chosen icon), then Card
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -407,7 +414,7 @@ Text in a warning callout with the flag icon.
 Text in a card.
 :::
 
-#### 40. Callout (warning, chosen icon), then Callout (info)
+#### 41. Callout (warning, chosen icon), then Callout (info)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -416,7 +423,7 @@ Text in a warning callout with the flag icon.
 Text in an info callout.
 :::
 
-#### 41. Callout (warning, chosen icon), then Callout (warning, chosen icon)
+#### 42. Callout (warning, chosen icon), then Callout (warning, chosen icon)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -425,7 +432,7 @@ Text in a warning callout with the flag icon.
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Callout (warning, chosen icon), then Callout (decision, no icon)
+#### 43. Callout (warning, chosen icon), then Callout (decision, no icon)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.

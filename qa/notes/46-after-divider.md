@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 ---
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Divider, then Image
+#### 33. Divider, then arXiv links
+
+---
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Divider, then Image
 
 ---
 ![A sample picture](attachment:photo.png)
 
-#### 34. Divider, then Drawing
+#### 35. Divider, then Drawing
 
 ---
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Divider, then File
+#### 36. Divider, then File
 
 ---
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Divider, then Attached 3D model (STL)
+#### 37. Divider, then Attached 3D model (STL)
 
 ---
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Divider, then Terminal recording (.cast file)
+#### 38. Divider, then Terminal recording (.cast file)
 
 ---
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Divider, then Missing file
+#### 39. Divider, then Missing file
 
 ---
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Divider, then Card
+#### 40. Divider, then Card
 
 ---
 ::: card
 Text in a card.
 :::
 
-#### 40. Divider, then Callout (info)
+#### 41. Divider, then Callout (info)
 
 ---
 :::i
 Text in an info callout.
 :::
 
-#### 41. Divider, then Callout (warning, chosen icon)
+#### 42. Divider, then Callout (warning, chosen icon)
 
 ---
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Divider, then Callout (decision, no icon)
+#### 43. Divider, then Callout (decision, no icon)
 
 ---
 :::^ icon=none

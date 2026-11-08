@@ -388,7 +388,15 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 3. Third
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Numbered list, then Image
+#### 33. Numbered list, then arXiv links
+
+1. First
+2. Second
+   1. Nested
+3. Third
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Numbered list, then Image
 
 1. First
 2. Second
@@ -396,7 +404,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 ![A sample picture](attachment:photo.png)
 
-#### 34. Numbered list, then Drawing
+#### 35. Numbered list, then Drawing
 
 1. First
 2. Second
@@ -404,7 +412,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Numbered list, then File
+#### 36. Numbered list, then File
 
 1. First
 2. Second
@@ -412,7 +420,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Numbered list, then Attached 3D model (STL)
+#### 37. Numbered list, then Attached 3D model (STL)
 
 1. First
 2. Second
@@ -420,7 +428,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Numbered list, then Terminal recording (.cast file)
+#### 38. Numbered list, then Terminal recording (.cast file)
 
 1. First
 2. Second
@@ -428,7 +436,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Numbered list, then Missing file
+#### 39. Numbered list, then Missing file
 
 1. First
 2. Second
@@ -436,7 +444,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Numbered list, then Card
+#### 40. Numbered list, then Card
 
 1. First
 2. Second
@@ -446,7 +454,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 40. Numbered list, then Callout (info)
+#### 41. Numbered list, then Callout (info)
 
 1. First
 2. Second
@@ -456,7 +464,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 41. Numbered list, then Callout (warning, chosen icon)
+#### 42. Numbered list, then Callout (warning, chosen icon)
 
 1. First
 2. Second
@@ -466,7 +474,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Numbered list, then Callout (decision, no icon)
+#### 43. Numbered list, then Callout (decision, no icon)
 
 1. First
 2. Second

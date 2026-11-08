@@ -64,6 +64,8 @@ class Plugins {
   readonly markdown = $derived(this.#from("markdown"));
   readonly embeds = $derived(this.markdown.flatMap((addition) => addition.embeds ?? []));
   readonly codeLanguages = $derived(this.#from("codeLanguages"));
+  readonly links = $derived(this.#from("links"));
+  readonly papers = $derived(this.#from("papers"));
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).

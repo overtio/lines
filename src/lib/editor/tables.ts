@@ -4,7 +4,7 @@ import { type EditorState, type Extension, Prec, type Text } from "@codemirror/s
 import { EditorView, keymap, WidgetType } from "@codemirror/view";
 import type { SyntaxNode, SyntaxNodeRef } from "@lezer/common";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
-import { githubLink, githubText } from "./github";
+import { shortLink, shortLinkElement } from "./shortLinks";
 import { copyButton, destroyCopyButton } from "./keyValue";
 import { followsLink } from "./links";
 import { mathElement } from "./math";
@@ -420,14 +420,13 @@ function renderInline(parent: HTMLElement, content: Inline[], view: EditorView, 
       parent.append(mathElement(item.tex, item.display, () => view.requestMeasure()));
       continue;
     }
-    // A GitHub link reads short, or gets the mark in front of its own text (see github.ts).
-    const github = item.href ? githubText(item.href) : null;
-    const bare = item.children.length === 1 && item.children[0] === item.href;
-    if (github && bare) {
-      parent.append(githubLink(item.href!, github));
-      continue;
+    // A link reads short, or gets the mark in front of its own text (see shortLinks.ts).
+    const short = item.href ? shortLink(item.href) : null;
+    if (short) {
+      const bare = item.children.length === 1 && item.children[0] === item.href;
+      parent.append(shortLinkElement(item.href!, short.mark, bare ? short.text : ""));
+      if (bare) continue;
     }
-    if (github) parent.append(githubLink(item.href!, ""));
     const span = document.createElement("span");
     span.className = item.cls;
     if (item.href) span.dataset.href = item.href;

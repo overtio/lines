@@ -324,43 +324,49 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 33. Image in a callout with no icon
+#### 33. arXiv links in a callout with no icon
+
+:::^ icon=none
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+:::
+
+#### 34. Image in a callout with no icon
 
 :::^ icon=none
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 34. Drawing in a callout with no icon
+#### 35. Drawing in a callout with no icon
 
 :::^ icon=none
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 35. File in a callout with no icon
+#### 36. File in a callout with no icon
 
 :::^ icon=none
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 36. Attached 3D model (STL) in a callout with no icon
+#### 37. Attached 3D model (STL) in a callout with no icon
 
 :::^ icon=none
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 37. Terminal recording (.cast file) in a callout with no icon
+#### 38. Terminal recording (.cast file) in a callout with no icon
 
 :::^ icon=none
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 38. Missing file in a callout with no icon
+#### 39. Missing file in a callout with no icon
 
 :::^ icon=none
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 39. Card in a callout with no icon
+#### 40. Card in a callout with no icon
 
 :::^ icon=none
 ::: card
@@ -368,7 +374,7 @@ Text in a card.
 :::
 :::
 
-#### 40. Callout (info) in a callout with no icon
+#### 41. Callout (info) in a callout with no icon
 
 :::^ icon=none
 :::i
@@ -376,7 +382,7 @@ Text in an info callout.
 :::
 :::
 
-#### 41. Callout (warning, chosen icon) in a callout with no icon
+#### 42. Callout (warning, chosen icon) in a callout with no icon
 
 :::^ icon=none
 :::! icon=flag
@@ -384,7 +390,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 42. Callout (decision, no icon) in a callout with no icon
+#### 43. Callout (decision, no icon) in a callout with no icon
 
 :::^ icon=none
 :::^ icon=none

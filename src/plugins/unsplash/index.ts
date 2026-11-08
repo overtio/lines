@@ -59,12 +59,12 @@ const library: ImageLibrary = {
     // With nothing typed, Unsplash's own picks.
     if (!query) {
       const photos = await get<Photo[]>(`${API}/photos?${paging}`, signal);
-      return { images: photos.filter((photo) => !photo.premium).map(found), more: photos.length === PER_PAGE };
+      return { items: photos.filter((photo) => !photo.premium).map(found), more: photos.length === PER_PAGE };
     }
     paging.set("query", query);
     paging.set("lang", language);
     const { results, total_pages } = await get<{ results: Photo[]; total_pages: number }>(`${API}/search/photos?${paging}`, signal);
-    return { images: results.filter((photo) => !photo.premium).map(found), more: page < total_pages };
+    return { items: results.filter((photo) => !photo.premium).map(found), more: page < total_pages };
   },
   // Unsplash counts a photo's downloads this way, which its terms ask for.
   chosen(image) {

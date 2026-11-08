@@ -97,6 +97,11 @@ const ELEMENTS = [
     name: "GitHub links",
     md: "Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)",
   },
+  {
+    id: "arxiv",
+    name: "arXiv links",
+    md: "Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)",
+  },
   { id: "image", name: "Image", md: "![A sample picture](attachment:photo.png)" },
   { id: "drawing", name: "Drawing", md: "![A sample drawing](attachment:drawing.svg)" },
   { id: "file", name: "File", md: "[Budget.csv](attachment:budget.csv)" },
@@ -296,11 +301,11 @@ note(
 );
 
 note(
-  "08-github-links.md",
-  "GitHub links",
-  "Each kind of GitHub link. Check: each one shows as written in code after the arrow, with GitHub's mark, and shows its URL while the cursor is on it; ⌘-click opens it. A link with text of its own keeps its text, with the mark in front.",
+  "08-short-links.md",
+  "Links drawn short",
+  "Each kind of GitHub and arXiv link. Check: each one shows as written in code after the arrow, with GitHub's mark or arXiv's graduation cap, and shows its URL while the cursor is on it; ⌘-click opens it. A link with text of its own keeps its text, with the mark in front.",
   [
-    `${label(1, "Bare URLs")}\n\n${[
+    `${label(1, "GitHub: bare URLs")}\n\n${[
       ["https://github.com/overtio", "@overtio"],
       ["https://github.com/overtio/lines", "overtio/lines"],
       ["https://github.com/overtio/lines.git", "overtio/lines"],
@@ -312,18 +317,32 @@ note(
       ["https://github.com/overtio/lines/tree/main", "overtio/lines@main"],
       ["https://github.com/overtio/lines/releases/tag/v1.0.0", "overtio/lines@v1.0.0"],
       ["https://github.com/overtio/lines/compare/v1.0...main", "overtio/lines@v1.0...main"],
-      ["https://github.com/overtio/lines/blob/main/src/lib/editor/github.ts#L10-L20", "overtio/lines › github.ts:10-20"],
+      ["https://github.com/overtio/lines/blob/main/src/lib/editor/shortLinks.ts#L10-L20", "overtio/lines › shortLinks.ts:10-20"],
       ["https://github.com/overtio/lines/tree/main/docs", "overtio/lines › docs"],
       ["https://github.com/overtio/lines/actions", "overtio/lines › actions"],
       ["www.github.com/overtio/lines", "overtio/lines"],
     ]
       .map(([url, short]) => `- ${url} → \`${short}\``)
       .join("\n")}`,
-    `${label(2, "Other ways of writing them")}\n\n- <https://github.com/overtio/lines/issues/3> (angle brackets) → \`overtio/lines#3\`\n- [https://github.com/overtio/lines/issues/4](https://github.com/overtio/lines/issues/4) (text is the URL) → \`overtio/lines#4\`\n- [the parser bug](https://github.com/overtio/lines/issues/7) → the mark, then "the parser bug"`,
-    `${label(3, "Not shortened")}\n\n- https://github.com stays a plain link\n- https://github.com/settings/profile stays a plain link\n- https://gist.github.com/overtio/1 stays a plain link\n- https://example.com/overtio/lines stays a plain link\n- \`https://github.com/overtio/lines\` in code stays code`,
-    `${label(4, "In a table")}\n\n| Link | Shows |\n| --- | --- |\n| https://github.com/overtio/lines/issues/12 | \`overtio/lines#12\` |\n| [docs](https://github.com/overtio/lines/tree/main/docs) | the mark, then docs |`,
+    `${label(2, "GitHub: other ways of writing them")}\n\n- <https://github.com/overtio/lines/issues/3> (angle brackets) → \`overtio/lines#3\`\n- [https://github.com/overtio/lines/issues/4](https://github.com/overtio/lines/issues/4) (text is the URL) → \`overtio/lines#4\`\n- [the parser bug](https://github.com/overtio/lines/issues/7) → the mark, then "the parser bug"`,
+    `${label(3, "GitHub: not shortened")}\n\n- https://github.com stays a plain link\n- https://github.com/settings/profile stays a plain link\n- https://gist.github.com/overtio/1 stays a plain link\n- https://example.com/overtio/lines stays a plain link\n- \`https://github.com/overtio/lines\` in code stays code`,
+    `${label(4, "In a table")}\n\n| Link | Shows |\n| --- | --- |\n| https://github.com/overtio/lines/issues/12 | \`overtio/lines#12\` |\n| [docs](https://github.com/overtio/lines/tree/main/docs) | the mark, then docs |\n| https://arxiv.org/abs/2006.11239 | \`arXiv:2006.11239\` |\n| [DDPM](https://arxiv.org/abs/2006.11239) | the cap, then DDPM |`,
+    `${label(5, "arXiv: papers")}\n\n${[
+      ["https://arxiv.org/abs/1706.03762", "arXiv:1706.03762"],
+      ["https://arxiv.org/abs/1706.03762v7", "arXiv:1706.03762v7"],
+      ["https://arxiv.org/pdf/1706.03762v7", "arXiv:1706.03762v7"],
+      ["https://arxiv.org/pdf/2105.05233.pdf", "arXiv:2105.05233"],
+      ["https://arxiv.org/html/2401.00001v1", "arXiv:2401.00001v1"],
+      ["https://arxiv.org/abs/hep-th/9901001", "arXiv:hep-th/9901001"],
+      ["https://export.arxiv.org/abs/math.GT/0309136", "arXiv:math.GT/0309136"],
+      ["https://doi.org/10.48550/arXiv.1706.03762", "arXiv:1706.03762"],
+      ["www.arxiv.org/abs/2006.11239", "arXiv:2006.11239"],
+    ]
+      .map(([url, short]) => `- ${url} → \`${short}\``)
+      .join("\n")}\n- [Attention Is All You Need](https://arxiv.org/abs/1706.03762) → the cap, then "Attention Is All You Need"`,
+    `${label(6, "arXiv: not shortened")}\n\n- https://arxiv.org stays a plain link\n- https://arxiv.org/list/cs.LG/recent stays a plain link\n- https://arxiv.org/a/vaswani_a_1 stays a plain link\n- https://arxiv.org/abs/not-an-id stays a plain link\n- \`https://arxiv.org/abs/1706.03762\` in code stays code`,
   ],
-  "github",
+  "short-links",
 );
 
 /* Objects (notes/properties.ts): two notes with properties, and mentions of them. */
@@ -416,6 +435,7 @@ const LATEX = [
   ["Quote and centered", "\\begin{quote}\nA quote.\n\\end{quote}\n\n\\begin{center}\nCentered text.\n\\end{center}"],
   ["Code", "\\begin{verbatim}\nraw \\textbf{not bold} $not math$\n\\end{verbatim}"],
   ["Links and footnotes", "A \\href{https://example.com}{named link}, a bare \\url{https://example.com}, and a footnote.\\footnote{The footnote's text.}"],
+  ["Links drawn short", "\\url{https://arxiv.org/abs/1706.03762} reads arXiv:1706.03762 and \\url{https://github.com/overtio/lines/issues/12} overtio/lines\\#12, each with its mark; \\href{https://arxiv.org/abs/2006.11239}{a named one} keeps its text with the mark in front."],
   ["Comments and other commands", "Text % a comment with #qa/latex-tag\n\\maketitle \\vspace{1em} \\label{x} stay faint."],
   ["Line break", "First line\\\\\nsecond line."],
   ["Theorems", "\\newtheorem{lem}[theorem]{Lemma}\n\n\\begin{lem}[Small]\nA lemma, numbered along with theorems: Lemma 1.\n\\end{lem}\n\n\\begin{theorem}\nTheorem 2, with math in its frame:\n\\[ a^2 + b^2 = c^2 \\]\n\\end{theorem}\n\n\\begin{proof}\nItalic Proof., and a box at the end.\n\\end{proof}"],

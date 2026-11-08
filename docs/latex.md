@@ -43,7 +43,7 @@ The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.
 | `quote`, `quotation`, `abstract`, `verse` | A quote |
 | `center`, `flushright` | Centered or right-aligned lines |
 | `verbatim`, `lstlisting`, `minted` | A code block |
-| `\href{url}{text}`, `\url{…}` | Links (⌘-click to open) |
+| `\href{url}{text}`, `\url{…}` | Links (⌘-click to open). Links to GitHub and arXiv are drawn short, as in Markdown notes ([linedown.md](linedown.md#links-drawn-short)): `\url{https://arxiv.org/abs/1706.03762}` as `arXiv:1706.03762`, an `\href` with the mark before its text |
 | `\footnote{…}` | A small number, then the footnote's text, smaller |
 | `\includegraphics{…}` | The image, if it's an attachment (`../attachments/…`) or on the web |
 | `\%`, `\&`, `\$`, `\#`, `\_`, `\{`, `\}`, `~`, `--`, `---`, ` `` `, `''`, `\ldots`, `\LaTeX` | The characters they stand for |
@@ -75,7 +75,7 @@ The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.
   - A terminal recording's link (asciinema) stays a link, and a `.cast` file is a file's `\href`: recordings play in Markdown notes only, as a paper can't hold one.
   - A web address pasted over selected text links it: `\href{https://…}{text}`.
   - In verbatim, math, a table or a comment, a paste stays as it is.
-- `/` at the start of a line opens LaTeX commands: sections, lists, quote, math, equations, code, table, image, file, footnote, link and today's date.
+- `/` at the start of a line opens LaTeX commands: sections, lists, quote, math, equations, code, table, image, file, footnote, link and today's date. In the apps, `/paper` (after link) searches arXiv and puts the paper chosen in as `\href{https://arxiv.org/abs/…}{Its Title}`, the title as arXiv has it (TeX already), with any `&`, `%` or `#` escaped.
 - `\` opens a menu of commands, filtered as you type (`\te` → `\textbf`, `\textit`, `\texttt`…): styles, sections, links, footnotes and environments (`\begin{itemize}`…). Inside math it offers math instead: `\frac`, `\sqrt`, `\sum`, `\int`, arrows, relations, `\mathbb`, Greek letters and matrices, each with the symbol it makes. Picking one writes it with its braces; Tab moves to the next pair of braces, then past the command. Tab in the menu completes like a shell, as in the `/` menu. `\\` (a line break) doesn't open it.
 
 ## Whole documents

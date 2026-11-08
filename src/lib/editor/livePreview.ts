@@ -26,7 +26,7 @@ import {
 } from "./cards";
 import { FormatWidget, formatterFor } from "./formatCode";
 import { drawnAsBlock, imageElement } from "./attachments";
-import { GitHubWidget, githubText } from "./github";
+import { shortLink, ShortLinkWidget, type ShortLink } from "./shortLinks";
 import { CopyWidget, keyValue } from "./keyValue";
 import { InlineMathWidget } from "./math";
 import { followClick, openHref } from "./links";
@@ -286,9 +286,9 @@ function build(view: EditorView): DecorationSet {
   /** A heading's line, which screen readers also hear as a heading of its level (and can jump between). */
   const heading = (pos: number, level: string) => decos.push(headingLines[Number(level) - 1].range(doc.lineAt(pos).from));
   const spaceAfter = (pos: number) => (doc.sliceString(pos, pos + 1) === " " ? pos + 1 : pos);
-  /** Draws a GitHub link short, in place of `from`–`to`. */
-  const githubChip = (from: number, to: number, href: string, text: string) => {
-    decos.push(Decoration.replace({ widget: new GitHubWidget(href, text) }).range(from, to));
+  /** Draws a link short, in place of `from`–`to` (shortLinks.ts). */
+  const shortChip = (from: number, to: number, href: string, short: ShortLink) => {
+    decos.push(Decoration.replace({ widget: new ShortLinkWidget(href, short.mark, short.text) }).range(from, to));
     return false;
   };
   const hideChildren = (node: SyntaxNode, name: string) => {
@@ -395,11 +395,11 @@ function build(view: EditorView): DecorationSet {
           const textFrom = marks[0].to;
           const textTo = marks[1].from;
           const href = doc.sliceString(url.from, url.to);
-          const text = !touches(node.from, node.to) && githubText(href);
-          if (text) {
-            // A GitHub link whose text is its URL reads short; one with text of its own gets the mark.
-            if (doc.sliceString(textFrom, textTo) === href) return githubChip(node.from, node.to, href, text);
-            decos.push(Decoration.widget({ widget: new GitHubWidget(href, ""), side: -1 }).range(textFrom));
+          const short = !touches(node.from, node.to) && shortLink(href);
+          if (short) {
+            // A link whose text is its URL reads short; one with text of its own gets the mark.
+            if (doc.sliceString(textFrom, textTo) === href) return shortChip(node.from, node.to, href, short);
+            decos.push(Decoration.widget({ widget: new ShortLinkWidget(href, short.mark, ""), side: -1 }).range(textFrom));
           }
           mark(textFrom, textTo, "cm-lp-link", { "data-href": href });
           if (!touches(node.from, node.to)) {
@@ -413,8 +413,8 @@ function build(view: EditorView): DecorationSet {
           const url = node.getChild("URL");
           if (!url) return false;
           const href = doc.sliceString(url.from, url.to);
-          const text = !touches(node.from, node.to) && githubText(href);
-          if (text) return githubChip(node.from, node.to, href, text);
+          const short = !touches(node.from, node.to) && shortLink(href);
+          if (short) return shortChip(node.from, node.to, href, short);
           mark(url.from, url.to, "cm-lp-link", { "data-href": href });
           if (!touches(node.from, node.to)) hideChildren(node, "LinkMark");
           return false;
@@ -425,8 +425,8 @@ function build(view: EditorView): DecorationSet {
           const parent = node.parent?.name;
           if (parent === "Link" || parent === "Image" || parent === "LinkReference") return;
           const href = doc.sliceString(node.from, node.to);
-          const text = !touches(node.from, node.to) && githubText(href);
-          if (text) return githubChip(node.from, node.to, href, text);
+          const short = !touches(node.from, node.to) && shortLink(href);
+          if (short) return shortChip(node.from, node.to, href, short);
           mark(node.from, node.to, "cm-lp-link", { "data-href": href });
           return;
         }

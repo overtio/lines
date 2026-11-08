@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 Ask @[QA · Ada] at @[QA · Ada].email.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Mention, then Image
+#### 33. Mention, then arXiv links
+
+Ask @[QA · Ada] at @[QA · Ada].email.
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Mention, then Image
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ![A sample picture](attachment:photo.png)
 
-#### 34. Mention, then Drawing
+#### 35. Mention, then Drawing
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Mention, then File
+#### 36. Mention, then File
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Mention, then Attached 3D model (STL)
+#### 37. Mention, then Attached 3D model (STL)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Mention, then Terminal recording (.cast file)
+#### 38. Mention, then Terminal recording (.cast file)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Mention, then Missing file
+#### 39. Mention, then Missing file
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Mention, then Card
+#### 40. Mention, then Card
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ::: card
 Text in a card.
 :::
 
-#### 40. Mention, then Callout (info)
+#### 41. Mention, then Callout (info)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::i
 Text in an info callout.
 :::
 
-#### 41. Mention, then Callout (warning, chosen icon)
+#### 42. Mention, then Callout (warning, chosen icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Mention, then Callout (decision, no icon)
+#### 43. Mention, then Callout (decision, no icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::^ icon=none

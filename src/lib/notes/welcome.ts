@@ -12,7 +12,7 @@ Type \`/\` at the start of a line for headings, lists, tables, callouts, code, i
 - Start a line with \`#\`, \`##\` or \`###\` for headings
 - Use \`-\` for lists and \`- [ ]\` for todos
   - Tab nests an item, Shift-Tab moves it back out
-- Add a [link](https://example.com) and ⌘-click to open it. GitHub links read short: https://github.com/overtio/lines
+- Add a [link](https://example.com) and ⌘-click to open it. GitHub and arXiv links read short: https://github.com/overtio/lines, https://arxiv.org/abs/1706.03762
 - Hover a line for the grip on its left, and drag it to move the line
 - Type \`-\` and then \`>\` for an arrow: Home -> cabin. \`!\` and \`=\` make ≠
 

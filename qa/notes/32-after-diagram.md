@@ -420,7 +420,16 @@ flowchart LR
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Diagram, then Image
+#### 33. Diagram, then arXiv links
+
+```mermaid
+flowchart LR
+  A[Start] --> B{Choice}
+  B --> C[Done]
+```
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Diagram, then Image
 
 ```mermaid
 flowchart LR
@@ -429,7 +438,7 @@ flowchart LR
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 34. Diagram, then Drawing
+#### 35. Diagram, then Drawing
 
 ```mermaid
 flowchart LR
@@ -438,7 +447,7 @@ flowchart LR
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Diagram, then File
+#### 36. Diagram, then File
 
 ```mermaid
 flowchart LR
@@ -447,7 +456,7 @@ flowchart LR
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Diagram, then Attached 3D model (STL)
+#### 37. Diagram, then Attached 3D model (STL)
 
 ```mermaid
 flowchart LR
@@ -456,7 +465,7 @@ flowchart LR
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Diagram, then Terminal recording (.cast file)
+#### 38. Diagram, then Terminal recording (.cast file)
 
 ```mermaid
 flowchart LR
@@ -465,7 +474,7 @@ flowchart LR
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Diagram, then Missing file
+#### 39. Diagram, then Missing file
 
 ```mermaid
 flowchart LR
@@ -474,7 +483,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Diagram, then Card
+#### 40. Diagram, then Card
 
 ```mermaid
 flowchart LR
@@ -485,7 +494,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 40. Diagram, then Callout (info)
+#### 41. Diagram, then Callout (info)
 
 ```mermaid
 flowchart LR
@@ -496,7 +505,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 41. Diagram, then Callout (warning, chosen icon)
+#### 42. Diagram, then Callout (warning, chosen icon)
 
 ```mermaid
 flowchart LR
@@ -507,7 +516,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Diagram, then Callout (decision, no icon)
+#### 43. Diagram, then Callout (decision, no icon)
 
 ```mermaid
 flowchart LR

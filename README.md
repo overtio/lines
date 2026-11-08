@@ -47,9 +47,10 @@ The [demo website](https://overtio.github.io/lines/) opens with a tour: one shor
 - **Drawings** with [Excalidraw](https://excalidraw.com), saved in the note as an SVG any Markdown app can show.
 - **Images and files.** Paste or drop them in. Drag an image's corner to resize it.
 - **Photos and GIFs from the web.** `/unsplash` searches Unsplash's free photos and `/giphy` GIPHY's GIFs, and puts the one you pick in the note.
+- **Research papers.** `/paper` searches [arXiv](https://arxiv.org) by title, author or topic and links to the paper you pick by its title, in Markdown and LaTeX notes (in the apps). More sources of papers can be added as plugins.
 - **API requests.** Write requests in an ` ```http ` block (`/request`) and send them from the note, a lighter Postman or Bruno: variables, one request using another's response, curl commands pasted in or copied out. The `.http` format JetBrains' IDEs, VS Code and Visual Studio read, so a whole note of requests opens there too, or [Hurl](https://hurl.dev)'s, whose captures and asserts check each response. See [docs/requests.md](docs/requests.md).
 - **Terminal recordings** from [asciinema](https://asciinema.org) play right in the note, in your theme's colors. Paste a recording's link, or drop in a `.cast` file.
-- **GitHub links** read short, like `overtio/lines#12`, with GitHub's mark.
+- **GitHub and arXiv links** read short, like `overtio/lines#12` with GitHub's mark, or `arXiv:1706.03762`.
 
 ### LaTeX notes
 
@@ -256,6 +257,8 @@ src/
     pele/                    Mermaid diagrams drawn by Pele (the default): the renderer and its colors
     mermaid/                 Mermaid diagrams drawn by Mermaid itself, and what both add (blocks.ts): /diagram, Copy and Edit as Drawing
     unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
+    github/                  Links to GitHub drawn short
+    arxiv/                   Links to arXiv's papers drawn short, and searching arXiv for /paper (pacing requests as arXiv asks)
     themes/                  The sixteen themes, as their colors
     lucide/  sf-symbols/     Icon sets
   lib/
@@ -285,6 +288,9 @@ src/
       texCommands.ts         The "\" menu of LaTeX commands, in math and in LaTeX notes
       attachments.ts         Image and file blocks; pasting, dropping, /image and /file
       webImages.ts           Picking a picture from a library on the web (/unsplash, /giphy)
+      papers.ts              /paper: picking a paper from a source (PaperPicker.svelte) and linking to it
+      WebSearchPicker.svelte The picker both use: searching as you type, more on scrolling, the arrow keys
+      shortLinks.ts          Links drawn short with a site's mark, as plugins read them (GitHub, arXiv)
       fences.ts              Closes ``` and ::: fences as you type them; ` or : wraps a selection
       lists.ts               Tab / Shift-Tab nesting for list items; Backspace after a marker
       keyValue.ts            Copy buttons for Key: Value lines
@@ -376,7 +382,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] Plugins made by others: a plugin format, installing one from Settings → Plugins, and running its code safely (the apps only run lines' own scripts now)
 - [ ] Themes and icon sets from a file, which need no code
 - [ ] More renderers for code blocks: Graphviz, PlantUML, D2, Vega-Lite charts, music in ABC
-- [ ] Drawings (Excalidraw), code highlighting, GitHub links and symbols as plugins
+- [ ] Drawings (Excalidraw), code highlighting and symbols as plugins
 - [ ] Choose the format new notes start in
 - [ ] Plugins that add to LaTeX notes, as they can to Markdown ones
 - [ ] Sync which plugins are on
@@ -384,6 +390,12 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] [SQLite files](https://github.com/overtio/lines/issues/2): their tables, and SQL query blocks, read-only
 - [ ] 3D models: OpenSCAD's customizer (sliders for a model's numbers), measuring, section views, fonts for `text()` and libraries such as BOSL2
 - [ ] [API requests](https://github.com/overtio/lines/issues/165): environments, test runs with a report, and Bruno, Postman and OpenAPI import; [Hurl](https://github.com/overtio/lines/issues/167) with the `hurl` program where it's installed
+
+**Research papers**
+- [ ] More sources for `/paper`: Semantic Scholar, OpenAlex (which, unlike arXiv, takes requests from web pages, so the website could search too), PubMed, bioRxiv
+- [ ] A paper as a note of its own, `type: paper`, with its authors, year, link and abstract as properties, so `@type.paper` is a reading list
+- [ ] Citations in LaTeX notes: `\cite` a paper found with `/paper`, its BibTeX entry kept in the note
+- [ ] Open a paper elsewhere from its link: its PDF, alphaXiv, Semantic Scholar, Connected Papers
 
 **Spreadsheets**
 - [ ] Several sheets in one spreadsheet note, with formulas between them

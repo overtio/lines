@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Wiki link, then Image
+#### 33. Wiki link, then arXiv links
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Wiki link, then Image
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ![A sample picture](attachment:photo.png)
 
-#### 34. Wiki link, then Drawing
+#### 35. Wiki link, then Drawing
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Wiki link, then File
+#### 36. Wiki link, then File
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Wiki link, then Attached 3D model (STL)
+#### 37. Wiki link, then Attached 3D model (STL)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Wiki link, then Terminal recording (.cast file)
+#### 38. Wiki link, then Terminal recording (.cast file)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Wiki link, then Missing file
+#### 39. Wiki link, then Missing file
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Wiki link, then Card
+#### 40. Wiki link, then Card
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ::: card
 Text in a card.
 :::
 
-#### 40. Wiki link, then Callout (info)
+#### 41. Wiki link, then Callout (info)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::i
 Text in an info callout.
 :::
 
-#### 41. Wiki link, then Callout (warning, chosen icon)
+#### 42. Wiki link, then Callout (warning, chosen icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Wiki link, then Callout (decision, no icon)
+#### 43. Wiki link, then Callout (decision, no icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::^ icon=none

@@ -22,6 +22,8 @@ Settings → Plugins lists them. A plugin that isn't needed can be turned off, a
 | Unsplash | `/unsplash`: search Unsplash's free photos and put one in a note. Needs an API key when lines is built ([README](../README.md#development)) | Yes | `src/plugins/unsplash/` |
 | GIPHY | `/giphy`: search GIPHY's GIFs and put one in a note. Needs an API key when lines is built | Yes | `src/plugins/giphy/` |
 | asciinema | Plays terminal recordings in Markdown notes: asciinema.org's embed code, and attached `.cast` files ([linedown.md](linedown.md#terminal-recordings)) | Yes | `src/plugins/asciinema/` |
+| GitHub | Draws links to GitHub short, with GitHub's mark: `overtio/lines#12` ([linedown.md](linedown.md#github)) | Yes | `src/plugins/github/` |
+| arXiv | Draws links to arXiv's papers as arXiv cites them, `arXiv:1706.03762`, and in the apps is a source of papers for `/paper` ([linedown.md](linedown.md#arxiv)) | Yes | `src/plugins/arxiv/` |
 | Themes | The sixteen themes. Always on. | Yes | `src/plugins/themes/` |
 | Lucide | lines' icons. Always on. | Yes | `src/plugins/lucide/` |
 | SF Symbols | Apple's icons, in the Mac and iPhone apps | Yes | `src/plugins/sf-symbols/` |
@@ -31,6 +33,7 @@ Settings → Plugins lists them. A plugin that isn't needed can be turned off, a
 Nothing is lost. A plugin turned off stops adding what it adds, at once, in every window:
 
 - **A format.** Its notes keep their format and show as plain text, which can still be read and changed. Their ⓘ panel says so, with a button that turns the plugin back on. Export, Copy and Download still write them as what they are (a LaTeX note as a `.tex` file that compiles). With Spreadsheets off, a ` ```csv ` block in a Markdown note is a code block too, `/spreadsheet` is gone from the "/" menu, and tables and CSV files have no Convert to Spreadsheet button. With API Requests off, ` ```http ` and ` ```hurl ` blocks are code blocks with no Send buttons, and `/request` and `/hurl` are gone. With Secrets off, `{{name}}` is text and `/secret` is gone; requests still use secrets.
+- **Links drawn short, or a source of papers.** With GitHub or arXiv off, its links are ordinary links. With arXiv off, `/paper` is gone (until another source of papers is on).
 - **An engine.** With Math off, math shows as it's written. With both Diagrams plugins off, a ` ```mermaid ` block is a code block and `/diagram` is gone from the "/" menu. With 3D Models off, ` ```openscad ` and ` ```stl ` blocks are code blocks, `/model` is gone, and an attached model is a card naming its file. With asciinema off, a recording's embed code is the picture it's written as (asciinema's preview), and an attached `.cast` file is a card naming it. With Formulas off, formulas show as written, and spreadsheets don't download as values or Excel workbooks. Without TeX, a LaTeX note's PDF is laid out by lines.
 - **A theme or an icon set.** What was chosen is kept, and lines shows its own (Lines, Lucide) until the plugin is on again.
 - **A plugin others need** (TeX needs LaTeX): those wait, and say what they need. Turning one on turns on what it needs too.
@@ -102,7 +105,57 @@ Every part of `contributes` is optional, and a plugin can add several kinds of t
 
 **`typesetters`**: ways to make a PDF for notes in some languages, offered beside lines' own pages in the PDF preview.
 
-**`markdown`**: new syntax for Markdown notes. A `syntax` extension for the parser ([`@lezer/markdown`](https://github.com/lezer-parser/markdown)), `editor` extensions that draw it, `commands` for the "/" menu (each can go `after` another, by id; several after the same one keep their plugins' order), and `print`, a printer for each node the syntax adds. A command can open a picker of pictures from a library on the web with `pickWebImage` (`src/lib/editor/webImages.ts`): the library searches, and the picker is the same for each, as Unsplash's and GIPHY's are.
+**`links`**: sites whose links are drawn short, the way the site writes them, with its `mark` (SVG markup in `currentColor`) in front. `text(url)` says how a link reads, or null for one that stays as it is: GitHub's plugin reads `https://github.com/overtio/lines/issues/12` as `overtio/lines#12`, arXiv's `https://arxiv.org/abs/1706.03762` as `arXiv:1706.03762`. Markdown and LaTeX notes draw them in text and tables (`src/lib/editor/shortLinks.ts`), and printed Markdown reads them short. The first plugin on that reads a link draws it.
+
+**`papers`**: places research papers are found (`PaperSource`). Each is a `/paper` command in Markdown and LaTeX notes, its name beside it in the menu, which opens a picker searching it (`src/lib/editor/PaperPicker.svelte`) and puts the paper chosen in the note as a link named by its title, as the note's format writes links. A source has its `name`, the `credit` its terms ask for under the results, and `search(query, page, signal)`, which gives one page of `Paper`s (`id`, `title`, `authors`, `year`, `venue`, the `url` to link to) and whether there are more; with nothing typed, nothing. Searching is the source's to pace and to keep answers of: arXiv's waits three seconds between requests, as arXiv asks. A source usually comes with `links` for its papers, as arXiv's does. Semantic Scholar, OpenAlex, PubMed, bioRxiv or a library's catalog would each be one:
+
+```ts
+import { t } from "../../lib/i18n/index.svelte";
+import { webFetch } from "../../lib/platform";
+import type { Paper, Plugin } from "../../lib/plugins/types";
+
+interface Work {
+  id: string;
+  title: string;
+  publication_year: number;
+  authorships: { author: { display_name: string } }[];
+  doi: string | null;
+}
+
+/** A work as OpenAlex describes it, as a paper: linked to by its DOI, or else its page on OpenAlex. */
+const paper = (work: Work): Paper => ({
+  id: work.id,
+  title: work.title,
+  authors: work.authorships.map((each) => each.author.display_name),
+  year: work.publication_year,
+  url: work.doi ?? work.id,
+});
+
+export const openalex = (): Plugin => ({
+  id: "openalex",
+  name: "OpenAlex",
+  description: t("plugins.openalex.description"),
+  icon: "graduation-cap",
+  enabledByDefault: false,
+  contributes: {
+    papers: [
+      {
+        id: "openalex",
+        name: "OpenAlex",
+        credit: { text: "Papers from OpenAlex", href: "https://openalex.org" },
+        async search(query, page, signal) {
+          if (!query) return { items: [], more: false };
+          const response = await (await webFetch())(`https://api.openalex.org/works?search=${encodeURIComponent(query)}&page=${page}`, { signal });
+          const { results, meta } = await response.json();
+          return { items: results.map(paper), more: page * meta.per_page < meta.count };
+        },
+      },
+    ],
+  },
+});
+```
+
+**`markdown`**: new syntax for Markdown notes. A `syntax` extension for the parser ([`@lezer/markdown`](https://github.com/lezer-parser/markdown)), `editor` extensions that draw it, `commands` for the "/" menu (each can go `after` another, by id; several after the same one keep their plugins' order), and `print`, a printer for each node the syntax adds. A command can open a picker of pictures from a library on the web with `pickWebImage` (`src/lib/editor/webImages.ts`): the library searches, and the picker is the same for each, as Unsplash's and GIPHY's are. Pictures and papers are both picked in `WebSearchPicker.svelte`, which searches as you type, loads more on scrolling and moves through what it found with the arrow keys; something else to search on the web can use it too.
 
 `embeds`, also in `markdown`, draw links on a line of their own as something to watch or use, as `files` do attachments: asciinema's draws a recording's embed code as its player. An `Embed` says which links it `draws` (`EmbedLink`: where it links, the image it shows if it's one, its text), and `draw` puts what it draws into an element, calling back when its size changes, and gives back a `Shown`, as a file view does. The core does the rest, as for images and files (`src/lib/editor/attachments.ts`): ↑ and ↓ stop on it, a click beside it selects it, and it's moved and deleted as a block; `cm-lp-own-input` works the same. With `paste`, a link pasted on an empty line becomes what the embed writes, its embed code say, and undo turns it back into the link.
 
@@ -113,6 +166,6 @@ A plugin can need others (`requires`): it runs only while they do, and turning i
 ## Not yet
 
 - Plugins come with lines; there's no installing one made by someone else yet. That needs a way to run their code safely (the apps only run lines' own scripts), and to check where it came from. See the [roadmap](../README.md#roadmap).
-- Some of lines isn't a plugin yet: drawings (Excalidraw), highlighting code blocks, GitHub links, symbols (`->` as →), and the objects and mentions in Markdown notes.
-- Only Markdown takes additions from other plugins.
+- Some of lines isn't a plugin yet: drawings (Excalidraw), highlighting code blocks, symbols (`->` as →), and the objects and mentions in Markdown notes.
+- Only Markdown takes additions from other plugins (`markdown`). Links drawn short and sources of papers are used by Markdown and LaTeX notes both.
 - Whether a plugin is on doesn't sync between devices.

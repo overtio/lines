@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 ![A sample picture](attachment:photo.png)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Image, then Image
+#### 33. Image, then arXiv links
+
+![A sample picture](attachment:photo.png)
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Image, then Image
 
 ![A sample picture](attachment:photo.png)
 ![A sample picture](attachment:photo.png)
 
-#### 34. Image, then Drawing
+#### 35. Image, then Drawing
 
 ![A sample picture](attachment:photo.png)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Image, then File
+#### 36. Image, then File
 
 ![A sample picture](attachment:photo.png)
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Image, then Attached 3D model (STL)
+#### 37. Image, then Attached 3D model (STL)
 
 ![A sample picture](attachment:photo.png)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Image, then Terminal recording (.cast file)
+#### 38. Image, then Terminal recording (.cast file)
 
 ![A sample picture](attachment:photo.png)
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Image, then Missing file
+#### 39. Image, then Missing file
 
 ![A sample picture](attachment:photo.png)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Image, then Card
+#### 40. Image, then Card
 
 ![A sample picture](attachment:photo.png)
 ::: card
 Text in a card.
 :::
 
-#### 40. Image, then Callout (info)
+#### 41. Image, then Callout (info)
 
 ![A sample picture](attachment:photo.png)
 :::i
 Text in an info callout.
 :::
 
-#### 41. Image, then Callout (warning, chosen icon)
+#### 42. Image, then Callout (warning, chosen icon)
 
 ![A sample picture](attachment:photo.png)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Image, then Callout (decision, no icon)
+#### 43. Image, then Callout (decision, no icon)
 
 ![A sample picture](attachment:photo.png)
 :::^ icon=none

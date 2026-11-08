@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Symbols, then Image
+#### 33. Symbols, then arXiv links
+
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Symbols, then Image
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ![A sample picture](attachment:photo.png)
 
-#### 34. Symbols, then Drawing
+#### 35. Symbols, then Drawing
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Symbols, then File
+#### 36. Symbols, then File
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Symbols, then Attached 3D model (STL)
+#### 37. Symbols, then Attached 3D model (STL)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Symbols, then Terminal recording (.cast file)
+#### 38. Symbols, then Terminal recording (.cast file)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Symbols, then Missing file
+#### 39. Symbols, then Missing file
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Symbols, then Card
+#### 40. Symbols, then Card
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ::: card
 Text in a card.
 :::
 
-#### 40. Symbols, then Callout (info)
+#### 41. Symbols, then Callout (info)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::i
 Text in an info callout.
 :::
 
-#### 41. Symbols, then Callout (warning, chosen icon)
+#### 42. Symbols, then Callout (warning, chosen icon)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Symbols, then Callout (decision, no icon)
+#### 43. Symbols, then Callout (decision, no icon)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::^ icon=none

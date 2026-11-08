@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 [Bracket.stl](attachment:bracket.stl)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Attached 3D model (STL), then Image
+#### 33. Attached 3D model (STL), then arXiv links
+
+[Bracket.stl](attachment:bracket.stl)
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Attached 3D model (STL), then Image
 
 [Bracket.stl](attachment:bracket.stl)
 ![A sample picture](attachment:photo.png)
 
-#### 34. Attached 3D model (STL), then Drawing
+#### 35. Attached 3D model (STL), then Drawing
 
 [Bracket.stl](attachment:bracket.stl)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Attached 3D model (STL), then File
+#### 36. Attached 3D model (STL), then File
 
 [Bracket.stl](attachment:bracket.stl)
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Attached 3D model (STL), then Attached 3D model (STL)
+#### 37. Attached 3D model (STL), then Attached 3D model (STL)
 
 [Bracket.stl](attachment:bracket.stl)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Attached 3D model (STL), then Terminal recording (.cast file)
+#### 38. Attached 3D model (STL), then Terminal recording (.cast file)
 
 [Bracket.stl](attachment:bracket.stl)
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Attached 3D model (STL), then Missing file
+#### 39. Attached 3D model (STL), then Missing file
 
 [Bracket.stl](attachment:bracket.stl)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Attached 3D model (STL), then Card
+#### 40. Attached 3D model (STL), then Card
 
 [Bracket.stl](attachment:bracket.stl)
 ::: card
 Text in a card.
 :::
 
-#### 40. Attached 3D model (STL), then Callout (info)
+#### 41. Attached 3D model (STL), then Callout (info)
 
 [Bracket.stl](attachment:bracket.stl)
 :::i
 Text in an info callout.
 :::
 
-#### 41. Attached 3D model (STL), then Callout (warning, chosen icon)
+#### 42. Attached 3D model (STL), then Callout (warning, chosen icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Attached 3D model (STL), then Callout (decision, no icon)
+#### 43. Attached 3D model (STL), then Callout (decision, no icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::^ icon=none

@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 [Budget.csv](attachment:budget.csv)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. File, then Image
+#### 33. File, then arXiv links
+
+[Budget.csv](attachment:budget.csv)
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. File, then Image
 
 [Budget.csv](attachment:budget.csv)
 ![A sample picture](attachment:photo.png)
 
-#### 34. File, then Drawing
+#### 35. File, then Drawing
 
 [Budget.csv](attachment:budget.csv)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. File, then File
+#### 36. File, then File
 
 [Budget.csv](attachment:budget.csv)
 [Budget.csv](attachment:budget.csv)
 
-#### 36. File, then Attached 3D model (STL)
+#### 37. File, then Attached 3D model (STL)
 
 [Budget.csv](attachment:budget.csv)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. File, then Terminal recording (.cast file)
+#### 38. File, then Terminal recording (.cast file)
 
 [Budget.csv](attachment:budget.csv)
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. File, then Missing file
+#### 39. File, then Missing file
 
 [Budget.csv](attachment:budget.csv)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. File, then Card
+#### 40. File, then Card
 
 [Budget.csv](attachment:budget.csv)
 ::: card
 Text in a card.
 :::
 
-#### 40. File, then Callout (info)
+#### 41. File, then Callout (info)
 
 [Budget.csv](attachment:budget.csv)
 :::i
 Text in an info callout.
 :::
 
-#### 41. File, then Callout (warning, chosen icon)
+#### 42. File, then Callout (warning, chosen icon)
 
 [Budget.csv](attachment:budget.csv)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. File, then Callout (decision, no icon)
+#### 43. File, then Callout (decision, no icon)
 
 [Budget.csv](attachment:budget.csv)
 :::^ icon=none

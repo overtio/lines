@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. GitHub links, then Image
+#### 33. GitHub links, then arXiv links
+
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. GitHub links, then Image
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ![A sample picture](attachment:photo.png)
 
-#### 34. GitHub links, then Drawing
+#### 35. GitHub links, then Drawing
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. GitHub links, then File
+#### 36. GitHub links, then File
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Budget.csv](attachment:budget.csv)
 
-#### 36. GitHub links, then Attached 3D model (STL)
+#### 37. GitHub links, then Attached 3D model (STL)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. GitHub links, then Terminal recording (.cast file)
+#### 38. GitHub links, then Terminal recording (.cast file)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. GitHub links, then Missing file
+#### 39. GitHub links, then Missing file
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. GitHub links, then Card
+#### 40. GitHub links, then Card
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ::: card
 Text in a card.
 :::
 
-#### 40. GitHub links, then Callout (info)
+#### 41. GitHub links, then Callout (info)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::i
 Text in an info callout.
 :::
 
-#### 41. GitHub links, then Callout (warning, chosen icon)
+#### 42. GitHub links, then Callout (warning, chosen icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. GitHub links, then Callout (decision, no icon)
+#### 43. GitHub links, then Callout (decision, no icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::^ icon=none

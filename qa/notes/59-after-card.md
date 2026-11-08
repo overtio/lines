@@ -356,49 +356,56 @@ Text in a card.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Card, then Image
+#### 33. Card, then arXiv links
+
+::: card
+Text in a card.
+:::
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Card, then Image
 
 ::: card
 Text in a card.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 34. Card, then Drawing
+#### 35. Card, then Drawing
 
 ::: card
 Text in a card.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Card, then File
+#### 36. Card, then File
 
 ::: card
 Text in a card.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Card, then Attached 3D model (STL)
+#### 37. Card, then Attached 3D model (STL)
 
 ::: card
 Text in a card.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Card, then Terminal recording (.cast file)
+#### 38. Card, then Terminal recording (.cast file)
 
 ::: card
 Text in a card.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Card, then Missing file
+#### 39. Card, then Missing file
 
 ::: card
 Text in a card.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Card, then Card
+#### 40. Card, then Card
 
 ::: card
 Text in a card.
@@ -407,7 +414,7 @@ Text in a card.
 Text in a card.
 :::
 
-#### 40. Card, then Callout (info)
+#### 41. Card, then Callout (info)
 
 ::: card
 Text in a card.
@@ -416,7 +423,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 41. Card, then Callout (warning, chosen icon)
+#### 42. Card, then Callout (warning, chosen icon)
 
 ::: card
 Text in a card.
@@ -425,7 +432,7 @@ Text in a card.
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Card, then Callout (decision, no icon)
+#### 43. Card, then Callout (decision, no icon)
 
 ::: card
 Text in a card.

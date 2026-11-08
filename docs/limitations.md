@@ -56,6 +56,16 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - The player (about 185 KB, 65 KB compressed) loads the first time a note has a recording.
 - Not tried in the Mac app yet: loading recordings through the app's own fetch, and the player under its content security policy.
 
+## /paper and arXiv
+
+- Searching arXiv works in the apps only. arXiv's API doesn't take requests from web pages (CORS), so on the demo website `/paper` isn't there; links to arXiv still read short.
+- It needs the internet. What you search for goes to arXiv, nothing else: lines doesn't send it your notes.
+- arXiv asks for no more than one request every three seconds, so a search right after another waits for its turn (the picker says it's searching). What's been searched is kept until lines quits and isn't asked again.
+- arXiv's ranking is its own, and plain: lines looks for every word in titles and authors first, which finds the paper meant far more often, and in abstracts too when that finds nothing. arXiv's own syntax (`au:hinton AND ti:distilling`) goes to it as typed.
+- arXiv is the only source of papers so far. Others (Semantic Scholar, OpenAlex, PubMed…) can be added as plugins ([plugins.md](plugins.md#what-a-plugin-can-add)); one that allows requests from web pages would bring `/paper` to the website too.
+- A paper goes in as a link named by its title, as arXiv writes it: a title with math (`$k$-means`) shows it drawn in Markdown, and TeX accents (`Schr\"odinger`) aren't turned into the letters they make. Its authors, year and abstract aren't added.
+- Searching from the Windows, Linux, iOS and Android apps hasn't been tried yet.
+
 ## Math
 
 - Math is drawn by KaTeX, which covers most of LaTeX's math mode but not all of it (no `\newcommand` shared between blocks, no TikZ or other packages), and not whole LaTeX documents.
@@ -173,8 +183,8 @@ How plugins work is in [plugins.md](plugins.md).
 - Plugins come with lines; one made by someone else can't be installed yet.
 - A note in a format whose plugin is off shows as plain text: no live preview, and its title is its first line as written. Exports and downloads still write it in its format.
 - Turning a plugin on or off isn't synced: each device keeps its own.
-- Drawings (Excalidraw), highlighting code blocks, GitHub links, symbols, and objects and mentions are still part of the core and Markdown, not plugins.
-- Only Markdown notes take additions from plugins; a renderer plugin draws code blocks in Markdown notes, not in LaTeX ones, and an embed (asciinema's recordings) draws links in Markdown notes only.
+- Drawings (Excalidraw), highlighting code blocks, symbols, and objects and mentions are still part of the core and Markdown, not plugins.
+- Only Markdown notes take additions from plugins; a renderer plugin draws code blocks in Markdown notes, not in LaTeX ones, and an embed (asciinema's recordings) draws links in Markdown notes only. Links drawn short and sources of papers are the exceptions: LaTeX notes have them too.
 - Turning a plugin off or on in the Mac app's Settings window hasn't been tried there yet, nor in floating notes (each window should follow at once).
 
 ## 3D models

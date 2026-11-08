@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Secret ({{name}}, kept in a locked secrets note), then Image
+#### 33. Secret ({{name}}, kept in a locked secrets note), then arXiv links
+
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Secret ({{name}}, kept in a locked secrets note), then Image
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ![A sample picture](attachment:photo.png)
 
-#### 34. Secret ({{name}}, kept in a locked secrets note), then Drawing
+#### 35. Secret ({{name}}, kept in a locked secrets note), then Drawing
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Secret ({{name}}, kept in a locked secrets note), then File
+#### 36. Secret ({{name}}, kept in a locked secrets note), then File
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Secret ({{name}}, kept in a locked secrets note), then Attached 3D model (STL)
+#### 37. Secret ({{name}}, kept in a locked secrets note), then Attached 3D model (STL)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Secret ({{name}}, kept in a locked secrets note), then Terminal recording (.cast file)
+#### 38. Secret ({{name}}, kept in a locked secrets note), then Terminal recording (.cast file)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Secret ({{name}}, kept in a locked secrets note), then Missing file
+#### 39. Secret ({{name}}, kept in a locked secrets note), then Missing file
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Secret ({{name}}, kept in a locked secrets note), then Card
+#### 40. Secret ({{name}}, kept in a locked secrets note), then Card
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ::: card
 Text in a card.
 :::
 
-#### 40. Secret ({{name}}, kept in a locked secrets note), then Callout (info)
+#### 41. Secret ({{name}}, kept in a locked secrets note), then Callout (info)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::i
 Text in an info callout.
 :::
 
-#### 41. Secret ({{name}}, kept in a locked secrets note), then Callout (warning, chosen icon)
+#### 42. Secret ({{name}}, kept in a locked secrets note), then Callout (warning, chosen icon)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Secret ({{name}}, kept in a locked secrets note), then Callout (decision, no icon)
+#### 43. Secret ({{name}}, kept in a locked secrets note), then Callout (decision, no icon)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::^ icon=none

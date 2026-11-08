@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Paragraph, then Image
+#### 33. Paragraph, then arXiv links
+
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Paragraph, then Image
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ![A sample picture](attachment:photo.png)
 
-#### 34. Paragraph, then Drawing
+#### 35. Paragraph, then Drawing
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Paragraph, then File
+#### 36. Paragraph, then File
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Paragraph, then Attached 3D model (STL)
+#### 37. Paragraph, then Attached 3D model (STL)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Paragraph, then Terminal recording (.cast file)
+#### 38. Paragraph, then Terminal recording (.cast file)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Paragraph, then Missing file
+#### 39. Paragraph, then Missing file
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Paragraph, then Card
+#### 40. Paragraph, then Card
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ::: card
 Text in a card.
 :::
 
-#### 40. Paragraph, then Callout (info)
+#### 41. Paragraph, then Callout (info)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::i
 Text in an info callout.
 :::
 
-#### 41. Paragraph, then Callout (warning, chosen icon)
+#### 42. Paragraph, then Callout (warning, chosen icon)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Paragraph, then Callout (decision, no icon)
+#### 43. Paragraph, then Callout (decision, no icon)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::^ icon=none

@@ -40,4 +40,6 @@ export default {
   "plugins.giphy.description": "Añade /giphy, para buscar GIF en GIPHY y poner uno en una nota. Lo que buscas se envía a GIPHY.",
   "plugins.asciinema.description": "Reproduce grabaciones de terminal en las notas: el código para insertar de asciinema.org y los archivos .cast que añadas. Las grabaciones de asciinema.org se cargan desde allí.",
   "plugins.noKey": "Necesita una clave de la API de {name}, con la que no se compiló esta copia de lines.",
+  "plugins.github.description": "Muestra los enlaces a GitHub abreviados, como los escribe GitHub, con su logotipo: overtio/lines#12.",
+  "plugins.arxiv.description": "Muestra los enlaces a artículos de arXiv como los cita arXiv: arXiv:1706.03762. En las apps, añade /artículo, para buscar en arXiv y enlazar un artículo. Lo que buscas se envía a arXiv.",
 } satisfies Translation<typeof en>;

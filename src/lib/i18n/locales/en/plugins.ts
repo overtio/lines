@@ -43,4 +43,7 @@ export default {
   // asciinema is a name, not translated.
   "plugins.asciinema.description": "Plays terminal recordings in notes: asciinema.org’s embed code, and .cast files you add. Recordings on asciinema.org load from there.",
   "plugins.noKey": "Needs an API key from {name}, which this copy of lines wasn’t built with.",
+  // GitHub and arXiv are names, not translated.
+  "plugins.github.description": "Shows links to GitHub short, the way GitHub writes them, with its mark: overtio/lines#12.",
+  "plugins.arxiv.description": "Shows links to arXiv’s papers the way arXiv cites them: arXiv:1706.03762. In the apps, adds /paper, to search arXiv and link to a paper. What you search for goes to arXiv.",
 };

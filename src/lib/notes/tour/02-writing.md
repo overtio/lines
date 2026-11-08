@@ -6,7 +6,8 @@ Type Markdown and it's formatted as you go. The text stays exactly what you type
 - <u>Underline</u> with ⌘U, which writes `<u>` and `</u>` around the text
 - ==Highlight== with `==`, and `code` with backticks
 - A [link](https://example.com): ⌘-click (Ctrl-click) to open it
-- GitHub links read short, like https://github.com/overtio/lines/issues/1
+- GitHub and arXiv links read short, like https://github.com/overtio/lines/issues/1 and https://arxiv.org/abs/1706.03762
+- In the apps, `/paper` searches arXiv for a paper by its title, an author or a topic, and links to the one you pick
 - Select some text for a small toolbar that does the same
 
 ## Arrows and symbols

@@ -51,7 +51,7 @@ export const latex = (): Plugin => ({
         name: "LaTeX",
         extensions: ["tex"],
         mimeType: "application/x-tex",
-        editor: () => latexEditing,
+        editor: latexEditing,
         meta,
         plainText: latexPlainText,
         stats: (body) => countLines(latexLines(latexContent(body).text)),
