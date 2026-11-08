@@ -488,6 +488,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] A note with an error (`\undefined`) says "TeX stopped at line N of the note", with the error and TeX's log; Try Again typesets again
 - [ ] Save PDF: [Web] downloads "<title>.pdf"; [Desktop] saves to Downloads, with Show in Finder
 - [ ] A build without `bun run tex-assets` says TeX isn't included in this version
+- [ ] [Mac] The preview's title row leaves room for the window's traffic lights, lined up with them as the app's own title rows are; dragging it moves the window
 - [ ] Esc or × closes the preview and focus goes back where it was; Tab stays inside it; a screen reader hears "2 pages, ready" and each page as "Page 1 of 2"
 
 ## 19. Floating notes [Desktop]
