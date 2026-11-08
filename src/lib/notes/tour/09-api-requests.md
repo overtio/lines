@@ -1,6 +1,6 @@
 # API requests
 
-An `http` code block holds requests to try an API with, like a lighter Postman or Bruno. Press **Send** in the block's corner, or ⌘↵ with the cursor in a request, and the response shows under the block. A block of several requests sends them all, in order. Type `/request` to start one.
+An `http` code block holds requests to try an API with, like a lighter Postman or Bruno. Press **Send** in the block's corner, or ⌘↵ with the cursor in a request, and the response shows under the block. Type `/request` to start one.
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -14,11 +14,9 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
 - An `@api = …` line is a variable, used as `{{api}}` in any block of the note
-- `# @name todo` names a request, so the ones after it can use its response: **Send all** sends **A todo**, then **The person it belongs to** with its answer
-- Paste a curl command into a block and it becomes a request; the terminal icon beside Copy, in the block's corner, copies its requests as curl commands
+- `# @name todo` names a request, so the ones after it can use its response. A block of several says **Send all**: it sends **A todo**, then **The person it belongs to** with its answer
+- The terminal icon beside Copy, in the block's corner, copies the requests as curl commands, and a curl command pasted into a block becomes a request
 - A response's **+** adds its body to the note as a code block
-- In a response, the icon after an address sends a request to it, written into the note; hover a value's line to copy it
-- Keep tokens out of notes: put them in a locked note of type `secrets`, and write `{{github}}` where one goes, in a request or anywhere else
 
 ```http
 ### Make something (this API only pretends to)
@@ -31,6 +29,16 @@ Content-Type: application/json
 }
 ```
 
-Requests are written in the `.http` format that JetBrains' IDEs, VS Code and Visual Studio read too. A whole note can be requests: switch it to HTTP Requests in its ⓘ panel, or import a `.http` file.
+## Follow the links
 
-In the browser, only APIs that allow requests from other sites answer, as this one does. The lines app sends to any.
+Many APIs answer with the addresses of more. Send this one, then press the paper plane after an address in the response, the `"url"` of an ability, say: a request to it is written into the block and sent. Hover a line of the response for a button that copies its value.
+
+```http
+GET https://pokeapi.co/api/v2/pokemon/ditto
+```
+
+Requests are written in the `.http` format that JetBrains' IDEs, VS Code and Visual Studio read too. A whole note can be requests, as the next one, **Pokédex**, is: switch a note to HTTP Requests in its ⓘ panel, or import a `.http` file.
+
+In the browser, only APIs that allow requests from other sites answer, as these do. The lines app sends to any.
+
+#tour

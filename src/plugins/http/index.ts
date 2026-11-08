@@ -1,6 +1,6 @@
 import { insert, named, SECTIONS } from "../../lib/editor/slashCommands";
 import { t } from "../../lib/i18n/index.svelte";
-import { addTagIn, extractTags } from "../../lib/notes/parse";
+import { extractTags } from "../../lib/notes/parse";
 import { countLines } from "../../lib/notes/stats";
 import type { NoteMeta } from "../../lib/notes/types";
 import type { Plugin } from "../../lib/plugins/types";
@@ -39,6 +39,24 @@ function meta(body: string): NoteMeta {
   };
 }
 
+/** A comment line before any request (not a `###` one), and one of nothing but tags. */
+const LEADING_COMMENT = /^\s*(?:#(?!##)|\/\/)/;
+const TAG_LINE = /^\s*#\s*(?:#[\p{L}\p{N}_/-]+\s*)+$/u;
+
+/**
+ * The note with `# #tag` added, unless it has the tag: in the comments at its top, which are
+ * outside every request (at its end, it would be the last request's body).
+ */
+function addTag(body: string, tag: string) {
+  if (meta(body).tags.includes(tag)) return body;
+  const lines = body.split("\n");
+  let after = 0;
+  while (after < lines.length && LEADING_COMMENT.test(lines[after])) after++;
+  if (after && TAG_LINE.test(lines[after - 1])) lines[after - 1] = `${lines[after - 1].trimEnd()} #${tag}`;
+  else lines.splice(after, 0, `# #${tag}`);
+  return lines.join("\n");
+}
+
 /** On paper: the requests as written, highlighted. */
 const print = (body: string, parts: Parts) => el("div", "doc doc-requests", parts.code(body, "http"));
 
@@ -59,9 +77,9 @@ export const http = (): Plugin => ({
         meta,
         plainText: (body) => body,
         stats: (body) => countLines(body.split("\n").map((text) => ({ text, heading: text.startsWith("###") }))),
-        // In a comment, which the format ignores.
-        addTag: (body, tag) => addTagIn(body, tag, "#"),
-        newNote: ({ tag }) => (tag ? `### \n\n# #${tag}` : "### "),
+        addTag,
+        // A tag in a comment just below the title, which the request written after it keeps among its headers.
+        newNote: ({ tag }) => (tag ? `### \n# #${tag}` : "### "),
         file: (body) => body,
         print,
       },

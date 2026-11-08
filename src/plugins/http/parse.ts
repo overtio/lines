@@ -43,7 +43,7 @@ export interface HttpText {
   requests: HttpRequest[];
   /** `@name = value` lines, by name: a later one with the same name wins. */
   variables: Map<string, string>;
-  /** Comment lines' text, without their `#` or `//`, for the note's title and tags. */
+  /** Comment lines' text (outside bodies), without their `#` or `//`, for the note's title and tags. */
   comments: string[];
 }
 
@@ -127,7 +127,10 @@ export function parseHttp(text: string): HttpText {
       if (section === "headers") {
         if (!line.trim()) section = "body";
         else if (CONTINUATION.test(line) && !request.headers.length) request.url += line.trim();
-        else if (COMMENT.test(line)) continue;
+        else if (COMMENT.test(line)) {
+          const text = COMMENT.exec(line)![1].trim();
+          if (text && !text.startsWith("@")) comments.push(text);
+        }
         else {
           const header = HEADER.exec(line);
           if (header) request.headers.push([header[1], header[2].trim()]);
