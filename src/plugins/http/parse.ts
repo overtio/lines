@@ -1,3 +1,6 @@
+import type { Asked } from "./curl";
+import type { ReadText, Request } from "./request";
+
 /*
  * Reads requests written in the .http format, the one JetBrains' HTTP Client, VS Code's REST Client
  * and httpYac, and Visual Studio read (https://github.com/JetBrains/http-request-in-editor-spec).
@@ -17,35 +20,9 @@
  * (`>> file`) are kept in the text but not part of the body.
  */
 
-export interface HttpRequest {
-  /** Where it starts: its `###` line, or the start of the text. */
-  from: number;
-  /** Its request line, from its start to its end. */
-  line: number;
-  lineEnd: number;
-  /** The end of its last line with anything on it, before the next `###`. */
-  to: number;
-  /** Where its part of the text ends: the end of the line before the next `###`, or of the text. */
-  end: number;
-  /** What its `###` line says after the separator. */
-  title: string;
-  /** Its name, from `# @name login`, for the requests after it to use its response. */
-  name: string | null;
-  method: string;
-  url: string;
-  headers: [string, string][];
-  body: string | null;
-  /** Its body is read from a file (`< ./body.json`), which lines doesn't do. */
-  fileBody: boolean;
-}
-
-export interface HttpText {
-  requests: HttpRequest[];
-  /** `@name = value` lines, by name: a later one with the same name wins. */
-  variables: Map<string, string>;
-  /** Comment lines' text (outside bodies), without their `#` or `//`, for the note's title and tags. */
-  comments: string[];
-}
+/** A request read from .http text, and the text read. */
+export type HttpRequest = Request;
+export type HttpText = ReadText;
 
 export const METHODS = ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "TRACE", "CONNECT"];
 
@@ -166,6 +143,13 @@ export function parseHttp(text: string): HttpText {
     }
   }
   return { requests, variables, comments };
+}
+
+/** A request as .http text: what lines doesn't send of it as comments, its line, headers, then its body. */
+export function writeHttp({ method, url, headers, body, user }: Asked, notes: string[] = []): string {
+  const all = user ? [...headers, ["Authorization", `Basic ${btoa(String.fromCharCode(...new TextEncoder().encode(user)))}`] as [string, string]] : headers;
+  const lines = [...notes.map((note) => `# ${note}`), `${method} ${url}`, ...all.map(([name, value]) => `${name}: ${value}`)];
+  return body !== null ? `${lines.join("\n")}\n\n${body}` : lines.join("\n");
 }
 
 /** The request whose part of the text `pos` is in, if it has one. */

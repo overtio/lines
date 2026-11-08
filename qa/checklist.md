@@ -210,6 +210,15 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Printing and the PDF show `token ••••••`; Copy, Download and Export keep `{{token}}`
 - [ ] Secrets off: `{{token}}` is text, `/secret` is gone; requests still use it
 
+## 6c. Hurl
+
+- [ ] `/hurl` adds a ` ```hurl ` block; methods, `HTTP 200`, `[Sections]`, names, queries, filters, predicates, strings, regular expressions and `{{templates}}` highlight
+- [ ] Send all runs the entries in order: a `[Captures]` value (`owner: jsonpath "$.userId"`) is used by the next entry's `{{owner}}`; `[Query]`, `[Form]`, `[BasicAuth]` and `[Cookies]` are sent (`https://httpbin.org/anything` echoes them); a JSON body is sent as JSON
+- [ ] A response shows "3 passed" in green or "1 failed" in red beside its status; Checks lists each check with ✓ or ✗, and what the response had for a failed one; it opens on Checks when one failed. Send all stops at the first entry that fails
+- [ ] Asserts with jsonpath (wildcards, filters `[?@.price < 10]`), header, regex, xpath on HTML, duration, sha256 `== hex,…;`, `count`, `nth`, `toInt`, `not`, `exists`, `isString`, `matches /…/` and `== {{variable}}` work; one lines can't do (`certificate`, `version`) says so in its check
+- [ ] A note switched to Hurl: Send at the end of each request line, ⌘⇧↵ sends all, the comment above each request is in the outline; importing a `.hurl` file makes a Hurl note
+- [ ] [Desktop] An entry without `location: true` shows a redirect's own status (`HTTP 302`); with it, the page it leads to
+
 ## 7. Images and files
 
 - [ ] Pasting an image, or dropping one onto a note, adds it on its own line; the cursor moves past it
@@ -339,7 +348,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On, and its format switch offers only Markdown and Spreadsheet; Turn On draws it as LaTeX again at once
 - [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
 - [ ] Turning TeX Typesetting on while LaTeX is off turns LaTeX on too
-- [ ] API Requests off: ```http blocks show as plain code with no Send buttons, `/request` is gone, and HTTP Requests notes show as plain text; on again, all back
+- [ ] API Requests off: ```http and ```hurl blocks show as plain code with no Send buttons, `/request` and `/hurl` are gone, and HTTP Requests and Hurl notes show as plain text; on again, all back
 - [ ] Diagrams off: ```mermaid blocks show as code, `/diagram` is gone from the "/" menu, and the PDF prints them as code; on again, they're drawn again, and Diagram is right after Code block in the menu
 - [ ] Math off: `$…$`, `$$` blocks and LaTeX notes' math show as written, on screen and in the PDF; on again, drawn
 - [ ] TeX Typesetting off: a LaTeX note's PDF preview has no "Typeset with" switch

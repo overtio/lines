@@ -124,12 +124,31 @@ The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Secret ({{name}}, kept in a locked secrets note), then Secret ({{name}}, kept in a locked secrets note)
+#### 18. Secret ({{name}}, kept in a locked secrets note), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Secret ({{name}}, kept in a locked secrets note), then Secret ({{name}}, kept in a locked secrets note)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 19. Secret ({{name}}, kept in a locked secrets note), then API requests (http block): a variable, a named request and one using its response
+#### 20. Secret ({{name}}, kept in a locked secrets note), then API requests (http block): a variable, a named request and one using its response
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ```http
@@ -143,7 +162,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 20. Secret ({{name}}, kept in a locked secrets note), then Spreadsheet (csv block)
+#### 21. Secret ({{name}}, kept in a locked secrets note), then Spreadsheet (csv block)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ```csv
@@ -153,7 +172,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 21. Secret ({{name}}, kept in a locked secrets note), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Secret ({{name}}, kept in a locked secrets note), then Named spreadsheet (csv name=), and a formula in another block using it
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ```csv name=costs
@@ -165,78 +184,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 22. Secret ({{name}}, kept in a locked secrets note), then Divider
+#### 23. Secret ({{name}}, kept in a locked secrets note), then Divider
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ---
 
-#### 23. Secret ({{name}}, kept in a locked secrets note), then Key: Value line
+#### 24. Secret ({{name}}, kept in a locked secrets note), then Key: Value line
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 **Wi-Fi password:** correct-horse-battery
 
-#### 24. Secret ({{name}}, kept in a locked secrets note), then Mention
+#### 25. Secret ({{name}}, kept in a locked secrets note), then Mention
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 25. Secret ({{name}}, kept in a locked secrets note), then Wiki link
+#### 26. Secret ({{name}}, kept in a locked secrets note), then Wiki link
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 26. Secret ({{name}}, kept in a locked secrets note), then Symbols
+#### 27. Secret ({{name}}, kept in a locked secrets note), then Symbols
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 27. Secret ({{name}}, kept in a locked secrets note), then GitHub links
+#### 28. Secret ({{name}}, kept in a locked secrets note), then GitHub links
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 28. Secret ({{name}}, kept in a locked secrets note), then Image
+#### 29. Secret ({{name}}, kept in a locked secrets note), then Image
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ![A sample picture](attachment:photo.png)
 
-#### 29. Secret ({{name}}, kept in a locked secrets note), then Drawing
+#### 30. Secret ({{name}}, kept in a locked secrets note), then Drawing
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 30. Secret ({{name}}, kept in a locked secrets note), then File
+#### 31. Secret ({{name}}, kept in a locked secrets note), then File
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Budget.csv](attachment:budget.csv)
 
-#### 31. Secret ({{name}}, kept in a locked secrets note), then Missing file
+#### 32. Secret ({{name}}, kept in a locked secrets note), then Missing file
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 32. Secret ({{name}}, kept in a locked secrets note), then Card
+#### 33. Secret ({{name}}, kept in a locked secrets note), then Card
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ::: card
 Text in a card.
 :::
 
-#### 33. Secret ({{name}}, kept in a locked secrets note), then Callout (info)
+#### 34. Secret ({{name}}, kept in a locked secrets note), then Callout (info)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::i
 Text in an info callout.
 :::
 
-#### 34. Secret ({{name}}, kept in a locked secrets note), then Callout (warning, chosen icon)
+#### 35. Secret ({{name}}, kept in a locked secrets note), then Callout (warning, chosen icon)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 35. Secret ({{name}}, kept in a locked secrets note), then Callout (decision, no icon)
+#### 36. Secret ({{name}}, kept in a locked secrets note), then Callout (decision, no icon)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::^ icon=none

@@ -2,12 +2,12 @@
 
 Notes can hold requests to an API, to try it, explore it and keep what you learned beside it: a lighter [Bruno](https://www.usebruno.com) or Postman. The API Requests [plugin](plugins.md) sends them and shows the responses. ([#165](https://github.com/overtio/lines/issues/165))
 
-Requests are written in the `.http` format, the one the JetBrains IDEs' HTTP Client, VS Code (REST Client and httpYac), Visual Studio and Neovim (kulala) read. It has a [published spec](https://github.com/JetBrains/http-request-in-editor-spec), so requests written in lines open in those editors, and theirs in lines.
+Requests are written in the `.http` format, or in [Hurl](#hurl)'s, which adds checks of the response. The `.http` format is the one the JetBrains IDEs' HTTP Client, VS Code (REST Client and httpYac), Visual Studio and Neovim (kulala) read. It has a [published spec](https://github.com/JetBrains/http-request-in-editor-spec), so requests written in lines open in those editors, and theirs in lines.
 
 ## Where requests go
 
-- **In a Markdown note**, in a code block whose language is `http` (or `rest`). `/request` adds one. A note can have several, with writing between them.
-- **A whole note of requests**: switch a note to HTTP Requests in its ⓘ panel, or import a `.http` or `.rest` file (Settings → Data → Import). It's kept as the `.http` file it is, and exports as one. Its title is its first line as it reads (a `###` title, a comment or a request), and its `###` titles are its outline.
+- **In a Markdown note**, in a code block whose language is `http` (or `rest`), or `hurl`. `/request` and `/hurl` add one. A note can have several, with writing between them.
+- **A whole note of requests**: switch a note to HTTP Requests or Hurl in its ⓘ panel, or import a `.http`, `.rest` or `.hurl` file (Settings → Data → Import). It's kept as the `.http` file it is, and exports as one. Its title is its first line as it reads (a `###` title, a comment or a request), and its `###` titles are its outline.
 
 ## Writing a request
 
@@ -45,7 +45,7 @@ A request that uses a variable that isn't there, or a response that hasn't come 
 
 ## Sending
 
-In an `http` block, **Send** in its top right corner sends its request; a block of several says **Send all**, and sends each in turn, so later ones can use earlier ones' responses. In a `.http` note, **Send** is at the end of each request's line. <kbd>⌘↵</kbd> (<kbd>Ctrl+Enter</kbd>) anywhere in a request sends just that one. Requests are only ever sent by one of those: opening a note sends nothing.
+In a block, **Send** in its top right corner sends its request; a block of several says **Send all**, and sends each in turn, so later ones can use earlier ones' responses. In a `.http` or `.hurl` note, **Send** is at the end of each request's line. <kbd>⌘↵</kbd> (<kbd>Ctrl+Enter</kbd>) anywhere in a request sends just that one, and <kbd>⌘⇧↵</kbd> sends every request of its block, or note, in turn. Requests are only ever sent by one of those: opening a note sends nothing.
 
 The response shows under the request (under the code block, in a Markdown note): its status, how long it took, its size, and its body, formatted and highlighted when it's JSON, XML or HTML (JSON's objects and arrays fold from the margin), shown when it's an image. Its headers are a tab away. Copy copies the body or the headers; in a Markdown note, **+** adds the body to the note as a code block. In the body:
 
@@ -57,6 +57,41 @@ The response shows under the request (under the code block, in a Markdown note):
 - **In the apps**, requests go through lines' native code, so any API answers, with every header as written, `Cookie` and `Origin` included.
 - **In the browser** (the demo website), they're ordinary web requests, so only APIs that allow requests from other sites (CORS) answer, and the browser leaves out headers it doesn't let pages set, such as `Cookie`.
 
+## Hurl
+
+[Hurl](https://hurl.dev) files are entries one after another: a request, and what its response should be. lines reads them itself and sends them as it sends `.http` requests, so they work in the browser too, without the `hurl` program.
+
+```hurl
+# Sign in
+POST https://api.example.com/login
+[Form]
+user: ada
+password: {{password}}
+HTTP 200
+[Captures]
+token: jsonpath "$.token"
+
+# My profile
+GET https://api.example.com/me
+Authorization: Bearer {{token}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" == "Ada"
+header "Content-Type" contains "json"
+duration < 1000
+```
+
+- **Requests**: the method and address, headers, then `[Query]` (`[QueryStringParams]`), `[Form]` (`[FormParams]`), `[Cookies]`, `[BasicAuth]` and `[Options]` (`location: true` follows redirects; `variable: name=value`), and a body: JSON, XML, a ```` ``` ```` block or a `` `oneline` `` string. JSON and XML bodies are sent with their Content-Type. The comment just above a request is its title, in a `.hurl` note's outline.
+- **Responses**: `HTTP 200` (or `HTTP *`), header lines that must match, `[Captures]`, `[Asserts]`, and a body that must match.
+- **Queries**: `status`, `url`, `header "…"`, `cookie "…"` (what the response sets, where it can be read), `body`, `bytes`, `jsonpath "…"` ([RFC 9535](https://www.rfc-editor.org/rfc/rfc9535): wildcards, slices, descendants, filters), `xpath "…"`, `regex "…"` or `regex /…/`, `variable "…"`, `duration`, `sha256`.
+- **Filters**: `count`, `nth`, `first`, `last`, `regex`, `replace`, `replaceRegex`, `split`, `jsonpath`, `xpath`, `toInt`, `toFloat`, `toString`, `toDate` (ISO 8601), `dateFormat`, `daysAfterNow`, `daysBeforeNow`, `urlDecode`, `urlEncode`, `urlQueryParam`, `htmlEscape`, `htmlUnescape`, `base64Decode`, `base64Encode` (and their URL-safe twins), `toHex`, `utf8Decode`, `utf8Encode`, `charsetDecode`, `location`.
+- **Predicates**: `==`, `!=`, `>`, `>=`, `<`, `<=`, `startsWith`, `endsWith`, `contains`, `includes`, `matches`, `exists`, `isBoolean`, `isCollection`, `isDate`, `isEmpty`, `isFloat`, `isInteger`, `isIpv4`, `isIpv6`, `isIsoDate`, `isList`, `isNumber`, `isObject`, `isString`, `isUuid`, each with `not` before it if wanted. Values: `"strings"`, numbers, `true`, `false`, `null`, `/regular expressions/`, `hex,…;`, `base64,…;`, and `{{variables}}`, as their own type.
+- **Variables**: what an entry captures, the entries after it use; `{{newUuid}}` and `{{newDate}}` are made up; a name nothing else has is a [secret](secrets.md), as Hurl's `--secret` is.
+
+The response shows how its checks went beside its status (**3 passed**, **1 failed**), and **Checks** lists each, with what the response had when it failed; it opens on Checks when one did. **Send all** stops at the first entry that fails, as Hurl does.
+
+What lines can't do from a fetch, and the `hurl` program can: the HTTP version (`HTTP/2 200` checks the status only, and `version` isn't read), `ip`, `certificate`, `redirects` and `rawbytes`; not following redirects in the browser (the apps can); `[Multipart]`, `file,` bodies, `md5`, GraphQL bodies, and the options that tune curl or repeat entries (`retry`, `delay`, `repeat`, `skip`), which are read and left alone. Entries share no cookie store, as Hurl's do. A check lines can't make says so.
+
 ## curl
 
 - **Copy as curl** (Terminal's icon) copies requests as curl commands, with what variables can be filled in filled in: in an `http` block it's in the corner, between Send and Copy, and copies each request in the block; in a `.http` note it's after a request's **Send**, while the line's hovered, and copies that request. Copy copies the block's text as written.
@@ -65,7 +100,7 @@ The response shows under the request (under the code block, in a Markdown note):
 ## Not yet
 
 - Environments (`http-client.env.json` and its private twin), to switch between a test and a live API. Secrets cover the private part ([secrets.md](secrets.md)).
-- Assertions and tests, and sending every request in a note as a test run.
+- Running a whole note, or every Hurl note, as a test suite with a report; running the `hurl` program where it's installed.
 - JetBrains' JavaScript response handlers (`> {% … %}`): kept in the text, not run. Saving a response to a file (`>> file`) isn't done either.
 - A body read from a file (`< ./body.json`), forms with files, GraphQL and WebSocket requests.
 - Plain `http://` to hosts other than this computer: the apps' network permissions allow `https://` and `localhost`.

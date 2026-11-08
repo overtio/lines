@@ -175,7 +175,29 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Numbered list, then Secret ({{name}}, kept in a locked secrets note)
+#### 18. Numbered list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+1. First
+2. Second
+   1. Nested
+3. Third
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Numbered list, then Secret ({{name}}, kept in a locked secrets note)
 
 1. First
 2. Second
@@ -183,7 +205,7 @@ $$
 3. Third
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 19. Numbered list, then API requests (http block): a variable, a named request and one using its response
+#### 20. Numbered list, then API requests (http block): a variable, a named request and one using its response
 
 1. First
 2. Second
@@ -200,7 +222,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 20. Numbered list, then Spreadsheet (csv block)
+#### 21. Numbered list, then Spreadsheet (csv block)
 
 1. First
 2. Second
@@ -213,7 +235,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 21. Numbered list, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Numbered list, then Named spreadsheet (csv name=), and a formula in another block using it
 
 1. First
 2. Second
@@ -228,7 +250,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 22. Numbered list, then Divider
+#### 23. Numbered list, then Divider
 
 1. First
 2. Second
@@ -236,7 +258,7 @@ Total, =costs!B2*2
 3. Third
 ---
 
-#### 23. Numbered list, then Key: Value line
+#### 24. Numbered list, then Key: Value line
 
 1. First
 2. Second
@@ -244,7 +266,7 @@ Total, =costs!B2*2
 3. Third
 **Wi-Fi password:** correct-horse-battery
 
-#### 24. Numbered list, then Mention
+#### 25. Numbered list, then Mention
 
 1. First
 2. Second
@@ -252,7 +274,7 @@ Total, =costs!B2*2
 3. Third
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 25. Numbered list, then Wiki link
+#### 26. Numbered list, then Wiki link
 
 1. First
 2. Second
@@ -260,7 +282,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 3. Third
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 26. Numbered list, then Symbols
+#### 27. Numbered list, then Symbols
 
 1. First
 2. Second
@@ -268,7 +290,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 3. Third
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 27. Numbered list, then GitHub links
+#### 28. Numbered list, then GitHub links
 
 1. First
 2. Second
@@ -276,7 +298,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 3. Third
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 28. Numbered list, then Image
+#### 29. Numbered list, then Image
 
 1. First
 2. Second
@@ -284,7 +306,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 ![A sample picture](attachment:photo.png)
 
-#### 29. Numbered list, then Drawing
+#### 30. Numbered list, then Drawing
 
 1. First
 2. Second
@@ -292,7 +314,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 ![A sample drawing](attachment:drawing.svg)
 
-#### 30. Numbered list, then File
+#### 31. Numbered list, then File
 
 1. First
 2. Second
@@ -300,7 +322,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [Budget.csv](attachment:budget.csv)
 
-#### 31. Numbered list, then Missing file
+#### 32. Numbered list, then Missing file
 
 1. First
 2. Second
@@ -308,7 +330,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 32. Numbered list, then Card
+#### 33. Numbered list, then Card
 
 1. First
 2. Second
@@ -318,7 +340,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 33. Numbered list, then Callout (info)
+#### 34. Numbered list, then Callout (info)
 
 1. First
 2. Second
@@ -328,7 +350,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 34. Numbered list, then Callout (warning, chosen icon)
+#### 35. Numbered list, then Callout (warning, chosen icon)
 
 1. First
 2. Second
@@ -338,7 +360,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 35. Numbered list, then Callout (decision, no icon)
+#### 36. Numbered list, then Callout (decision, no icon)
 
 1. First
 2. Second

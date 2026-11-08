@@ -175,7 +175,29 @@ plain code
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Code block, then Secret ({{name}}, kept in a locked secrets note)
+#### 18. Code block, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+```
+plain code
+  indented line
+```
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Code block, then Secret ({{name}}, kept in a locked secrets note)
 
 ```
 plain code
@@ -183,7 +205,7 @@ plain code
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 19. Code block, then API requests (http block): a variable, a named request and one using its response
+#### 20. Code block, then API requests (http block): a variable, a named request and one using its response
 
 ```
 plain code
@@ -200,7 +222,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 20. Code block, then Spreadsheet (csv block)
+#### 21. Code block, then Spreadsheet (csv block)
 
 ```
 plain code
@@ -213,7 +235,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 21. Code block, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Code block, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```
 plain code
@@ -228,7 +250,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 22. Code block, then Divider
+#### 23. Code block, then Divider
 
 ```
 plain code
@@ -236,7 +258,7 @@ plain code
 ```
 ---
 
-#### 23. Code block, then Key: Value line
+#### 24. Code block, then Key: Value line
 
 ```
 plain code
@@ -244,7 +266,7 @@ plain code
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 24. Code block, then Mention
+#### 25. Code block, then Mention
 
 ```
 plain code
@@ -252,7 +274,7 @@ plain code
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 25. Code block, then Wiki link
+#### 26. Code block, then Wiki link
 
 ```
 plain code
@@ -260,7 +282,7 @@ plain code
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 26. Code block, then Symbols
+#### 27. Code block, then Symbols
 
 ```
 plain code
@@ -268,7 +290,7 @@ plain code
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 27. Code block, then GitHub links
+#### 28. Code block, then GitHub links
 
 ```
 plain code
@@ -276,7 +298,7 @@ plain code
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 28. Code block, then Image
+#### 29. Code block, then Image
 
 ```
 plain code
@@ -284,7 +306,7 @@ plain code
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 29. Code block, then Drawing
+#### 30. Code block, then Drawing
 
 ```
 plain code
@@ -292,7 +314,7 @@ plain code
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 30. Code block, then File
+#### 31. Code block, then File
 
 ```
 plain code
@@ -300,7 +322,7 @@ plain code
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 31. Code block, then Missing file
+#### 32. Code block, then Missing file
 
 ```
 plain code
@@ -308,7 +330,7 @@ plain code
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 32. Code block, then Card
+#### 33. Code block, then Card
 
 ```
 plain code
@@ -318,7 +340,7 @@ plain code
 Text in a card.
 :::
 
-#### 33. Code block, then Callout (info)
+#### 34. Code block, then Callout (info)
 
 ```
 plain code
@@ -328,7 +350,7 @@ plain code
 Text in an info callout.
 :::
 
-#### 34. Code block, then Callout (warning, chosen icon)
+#### 35. Code block, then Callout (warning, chosen icon)
 
 ```
 plain code
@@ -338,7 +360,7 @@ plain code
 Text in a warning callout with the flag icon.
 :::
 
-#### 35. Code block, then Callout (decision, no icon)
+#### 36. Code block, then Callout (decision, no icon)
 
 ```
 plain code

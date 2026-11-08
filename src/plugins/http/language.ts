@@ -18,7 +18,7 @@ interface State {
 const REFERENCE = /^\{\{[^{}\n]*\}\}/;
 
 /** Text up to the next `{{`, as the token `style`. */
-function textOrReference(stream: StringStream, style: string | null) {
+export function textOrReference(stream: StringStream, style: string | null) {
   if (stream.match(REFERENCE)) return "macroName";
   stream.next();
   while (!stream.eol() && !stream.match("{{", false)) stream.next();
@@ -26,7 +26,7 @@ function textOrReference(stream: StringStream, style: string | null) {
 }
 
 /** A body's text: JSON's keys, strings, numbers and constants stand out, whatever it is. */
-function bodyToken(stream: StringStream) {
+export function bodyToken(stream: StringStream) {
   if (stream.match(REFERENCE)) return "macroName";
   if (stream.match(/^"(?:[^"\\]|\\.)*"?/)) return stream.match(/^\s*:/, false) ? "propertyName" : "string";
   if (stream.match(/^-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b/)) return "number";

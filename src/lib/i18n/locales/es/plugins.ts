@@ -16,7 +16,7 @@ export default {
   "plugins.spreadsheet": "Hojas de cálculo",
   "plugins.spreadsheet.description": "Notas que son hojas de cálculo: celdas y fórmulas, guardadas como CSV. Abre archivos CSV y de Excel, y se descargan en cualquiera de los dos. En las notas Markdown, los bloques ```csv también son hojas de cálculo.",
   "plugins.http": "Solicitudes a API",
-  "plugins.http.description": "Envía solicitudes escritas en el formato .http, desde notas .http y bloques ```http en notas Markdown, y muestra sus respuestas. Añade /solicitud; un comando curl pegado en una solicitud se convierte en una.",
+  "plugins.http.description": "Envía solicitudes escritas en el formato .http o en el de Hurl, desde notas .http y .hurl y bloques ```http y ```hurl en notas Markdown, muestra sus respuestas y comprueba lo que afirman las entradas Hurl. Añade /solicitud y /hurl; un comando curl pegado en una solicitud se convierte en una.",
   "plugins.secrets": "Secretos",
   "plugins.secrets.description": "Muestra {{nombre}} en las notas Markdown como un secreto guardado en una nota bloqueada de tipo secrets, para mostrarlo un momento o copiarlo, y añade /secreto. Las solicitudes usan los secretos igual.",
   "plugins.katex": "Fórmulas (KaTeX)",

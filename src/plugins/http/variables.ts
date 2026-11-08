@@ -1,10 +1,13 @@
 /*
- * `{{name}}` in a request: a variable from an `@name = value` line, one lines makes up
- * (`{{$uuid}}`, `{{$timestamp}}`, `{{$randomInt 1 100}}`), or part of a named request's last
+ * `{{name}}` in a request: a variable from an `@name = value` line (or a Hurl capture), one lines
+ * makes up (`{{$uuid}}`, `{{$timestamp}}`, `{{$randomInt 1 100}}`, Hurl's `{{newUuid}}` and
+ * `{{newDate}}`), or part of a named request's last
  * response (`{{login.response.body.$.token}}`, `{{login.response.headers.Location}}`), as VS Code's
  * REST Client and Visual Studio write them; or, when no variable has the name, a secret
  * (notes/secrets.svelte.ts). No scripts run.
  */
+
+import { jsonPath } from "./jsonpath";
 
 /** A response as variables read it. */
 export interface ResponseValues {
@@ -60,21 +63,6 @@ function made(expression: string): string | undefined {
   return undefined;
 }
 
-/** Where `path` (`$.data[0].id`, `$['a b']`) leads in `value`, or undefined. */
-export function jsonPath(value: unknown, path: string): unknown {
-  if (!path.startsWith("$")) return undefined;
-  let at: unknown = value;
-  const steps = /\.([^.[\]]+)|\[\s*(\d+)\s*\]|\[\s*(['"])(.*?)\3\s*\]/gy;
-  steps.lastIndex = 1;
-  while (steps.lastIndex < path.length) {
-    const step = steps.exec(path);
-    if (!step || at === null || typeof at !== "object") return undefined;
-    const key = step[1] ?? step[4] ?? Number(step[2]);
-    at = (at as Record<string | number, unknown>)[key];
-  }
-  return at;
-}
-
 /** A part of a response: `body.*`, `body.$.token`, `headers.Location`. */
 function part(response: ResponseValues, expression: string, path: string): string {
   const [kind, ...rest] = path.split(".");
@@ -89,7 +77,7 @@ function part(response: ResponseValues, expression: string, path: string): strin
       const found = jsonPath(JSON.parse(response.text), selector);
       if (found !== undefined) return typeof found === "string" ? found : JSON.stringify(found);
     } catch {
-      // Not JSON: nothing to find in it.
+      // Not JSON, or not a path: nothing to find.
     }
   }
   throw new VariableError("path", expression);
@@ -112,6 +100,9 @@ export function fillIn(text: string, scope: Scope, depth = 0): string {
     }
     const value = scope.variables.get(expression);
     if (value === undefined) {
+      // Hurl's made-up values.
+      if (expression === "newUuid") return crypto.randomUUID();
+      if (expression === "newDate") return new Date().toISOString();
       // A secret is its value as it is, not filled in further.
       const secret = scope.secret?.(expression);
       if (secret === undefined) throw new VariableError("unknown", expression);

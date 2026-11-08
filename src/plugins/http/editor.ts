@@ -1,4 +1,4 @@
-import { ensureSyntaxTree, HighlightStyle, syntaxHighlighting, syntaxTree } from "@codemirror/language";
+import { ensureSyntaxTree, HighlightStyle, type Language, syntaxHighlighting, syntaxTree } from "@codemirror/language";
 import { type EditorState, type Extension, MapMode, Prec, StateEffect, StateField } from "@codemirror/state";
 import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
@@ -11,23 +11,28 @@ import Icon from "../../lib/icons/Icon.svelte";
 import { t } from "../../lib/i18n/index.svelte";
 import { secrets } from "../../lib/notes/secrets.svelte";
 import { modKey } from "../../lib/platform";
-import { type Asked, fromCurl, shellVariable, toCurl } from "./curl";
+import { type Asked, readCurl, shellVariable, toCurl } from "./curl";
+import { http, hurl } from "./dialects";
+import { check, type Say } from "./hurl/check";
+import { hurlLanguage } from "./hurl/language";
 import { httpLanguage } from "./language";
-import { type HttpRequest, type HttpText, parseHttp } from "./parse";
+import type { Dialect, ReadText, Request } from "./request";
 import Response from "./Response.svelte";
 import { Exchange } from "./send.svelte";
 import { fillIn, fillInWhatCan, type Scope, VariableError } from "./variables";
 
 /*
- * Sending requests from a note: a Send button at the end of each request line (and ⌘↵ in a
- * request), the response under it, Copy as curl, and curl commands pasted into a request written
- * as one. In .http notes the whole note is requests; in Markdown notes, each ```http block is.
- * Responses last until lines quits, for the requests after them to use (`{{login.response…}}`).
+ * Sending requests from a note, in .http or Hurl (dialects.ts): Send (and ⌘↵ in a request), the
+ * response under it with what a Hurl entry checks, Copy as curl, and curl commands pasted into a
+ * request written as one. In .http and .hurl notes the whole note is requests; in Markdown notes,
+ * each ```http or ```hurl block is. Responses, and what Hurl entries capture, last until lines
+ * quits, for the requests after them to use.
  */
 
-/** Where a note's requests are. */
+/** Where a note's requests are, and the format they're written in. */
 interface Where {
-  /** The stretches of .http text between `from` and `to`. */
+  dialect: Dialect;
+  /** The stretches of request text between `from` and `to`. */
   sections(state: EditorState, from: number, to: number): { from: number; to: number }[];
   /** Where the response to the request whose line starts at `line` goes, if it's still there. */
   responseAt(state: EditorState, line: number): number | null;
@@ -35,71 +40,79 @@ interface Where {
   markdown: boolean;
 }
 
-/** Requests read from .http text, by the text, so drawing again doesn't read it again. */
-const read = new Map<string, HttpText>();
+/** Text read as requests, by format and text, so drawing again doesn't read it again. */
+const read = new Map<string, ReadText>();
 
-function parsed(text: string) {
-  let found = read.get(text);
+function parsed(dialect: Dialect, text: string) {
+  const key = `${dialect.id}\u0000${text}`;
+  let found = read.get(key);
   if (!found) {
     if (read.size >= 64) read.delete(read.keys().next().value!);
-    read.set(text, (found = parseHttp(text)));
+    read.set(key, (found = dialect.read(text)));
   }
   return found;
 }
 
 /** The requests between `from` and `to`, where they are in the note, and the variables written there. */
 function requestsIn(state: EditorState, where: Where, from = 0, to = state.doc.length) {
-  const requests: HttpRequest[] = [];
+  const requests: Request[] = [];
   const variables = new Map<string, string>();
   for (const section of where.sections(state, from, to)) {
-    const text = parsed(state.sliceDoc(section.from, section.to));
+    const text = parsed(where.dialect, state.sliceDoc(section.from, section.to));
     const at = (pos: number) => pos + section.from;
     for (const request of text.requests) {
       requests.push({ ...request, from: at(request.from), line: at(request.line), lineEnd: at(request.lineEnd), to: at(request.to), end: at(request.end) });
+      for (const [name, value] of request.variables ?? []) variables.set(name, value);
     }
     for (const [name, value] of text.variables) variables.set(name, value);
   }
   return { requests, variables };
 }
 
-const HTTP_BLOCK = /^(?:http|rest)$/;
-
 /** Blocks a code block can't be inside, which aren't looked through. */
 const NO_CODE = new Set(["Paragraph", "ATXHeading1", "ATXHeading2", "ATXHeading3", "ATXHeading4", "ATXHeading5", "ATXHeading6", "SetextHeading1", "SetextHeading2", "Table", "HTMLBlock", "CodeBlock", "CommentBlock", "LinkReference", "HorizontalRule"]);
 
-/** All of a .http note. */
-const wholeNote: Where = {
-  sections: (state) => [{ from: 0, to: state.doc.length }],
-  responseAt: (state, line) => requestsIn(state, wholeNote).requests.find((request) => request.line === line)?.to ?? null,
-  markdown: false,
-};
+/** All of a .http or .hurl note. */
+function wholeNote(dialect: Dialect): Where {
+  const where: Where = {
+    dialect,
+    sections: (state) => [{ from: 0, to: state.doc.length }],
+    responseAt: (state, line) => requestsIn(state, where).requests.find((request) => request.line === line)?.to ?? null,
+    markdown: false,
+  };
+  return where;
+}
 
-/** The code of each ```http block in a Markdown note. */
-const httpBlocks: Where = {
-  sections(state, from, to) {
-    const found: { from: number; to: number }[] = [];
-    const tree = to > syntaxTree(state).length ? (ensureSyntaxTree(state, to, 200) ?? syntaxTree(state)) : syntaxTree(state);
-    tree.iterate({
-      from,
-      to,
-      enter: (node) => {
-        if (NO_CODE.has(node.name)) return false;
-        if (node.name !== "FencedCode") return;
-        const info = node.node.getChild("CodeInfo");
-        const code = node.node.getChild("CodeText");
-        if (info && code && HTTP_BLOCK.test(fenceLanguage(state.sliceDoc(info.from, info.to)))) found.push({ from: code.from, to: code.to });
-        return false;
-      },
-    });
-    return found;
-  },
-  responseAt(state, line) {
-    const block = fenceAt(state, line);
-    if (!block || !httpBlocks.sections(state, block.from, block.to).length) return null;
-    return state.doc.lineAt(block.to).to;
-  },
-  markdown: true,
-};
+/** The code of each block of `dialect`'s requests in a Markdown note. */
+function codeBlocks(dialect: Dialect): Where {
+  const where: Where = {
+    dialect,
+    sections(state, from, to) {
+      const found: { from: number; to: number }[] = [];
+      const tree = to > syntaxTree(state).length ? (ensureSyntaxTree(state, to, 200) ?? syntaxTree(state)) : syntaxTree(state);
+      tree.iterate({
+        from,
+        to,
+        enter: (node) => {
+          if (NO_CODE.has(node.name)) return false;
+          if (node.name !== "FencedCode") return;
+          const info = node.node.getChild("CodeInfo");
+          const code = node.node.getChild("CodeText");
+          if (info && code && dialect.blocks.test(fenceLanguage(state.sliceDoc(info.from, info.to)))) found.push({ from: code.from, to: code.to });
+          return false;
+        },
+      });
+      return found;
+    },
+    responseAt(state, line) {
+      const block = fenceAt(state, line);
+      if (!block || !where.sections(state, block.from, block.to).length) return null;
+      return state.doc.lineAt(block.to).to;
+    },
+    markdown: true,
+  };
+  return where;
+}
 
 /* Responses. */
 
@@ -224,14 +237,15 @@ const LOCAL = /^(?:localhost|127\.\d+\.\d+\.\d+|\[::1\])(?::\d+)?(?:[/?#]|$)/;
 /** A full address: one written without its scheme gets http:// on this computer, else https://. */
 function address(url: string) {
   // Relative, with its scheme, or starting with a shell variable (copied as curl).
-  if (url.startsWith("/") || url.startsWith("\uE000") || /^[a-z][\w+.-]*:\/\//i.test(url)) return url;
+  if (url.startsWith("/") || url.startsWith("") || /^[a-z][\w+.-]*:\/\//i.test(url)) return url;
   return `${LOCAL.test(url) ? "http" : "https"}://${url}`;
 }
 
 /** What's wrong with sending `asked`, if anything is. */
-function problem(asked: Asked, request: HttpRequest) {
+function problem(asked: Asked, request: Request) {
   if (UNSUPPORTED.has(asked.method)) return t("http.error.unsupported", { method: asked.method });
   if (request.fileBody) return t("http.error.fileBody");
+  if (request.unsupported) return t("http.error.notYet", { what: request.unsupported });
   if (asked.url.startsWith("/")) return t("http.error.relative");
   try {
     const url = new URL(asked.url);
@@ -250,26 +264,48 @@ function variableProblem(error: VariableError) {
   return t("http.error.variable", { name: error.variable });
 }
 
-const written = (request: HttpRequest): Asked => ({ method: request.method, url: request.url, headers: request.headers, body: request.body });
+const written = (request: Request): Asked => ({ method: request.method, url: request.url, headers: request.headers, body: request.body });
 
-/** Fills in a request's variables: every one (`fill`), or what can be. */
-function filledIn(request: HttpRequest, scope: Scope, fill: (text: string, scope: Scope) => string): Asked {
-  return {
-    method: request.method,
-    url: address(fill(request.url, scope)),
-    headers: request.headers.map(([name, value]) => [fill(name, scope), fill(value, scope)]),
-    body: request.body === null ? null : fill(request.body, scope),
-  };
+/** Encoded for an address or a form, but a shell variable (copied as curl), which stays as it is. */
+const encode = (text: string) => (text.includes("") ? text : encodeURIComponent(text));
+
+/** Fills in a request's variables (every one with `fill`, or what can be), and adds Hurl's query, form, cookies and user. */
+function filledIn(request: Request, scope: Scope, fill: (text: string, scope: Scope) => string): Asked {
+  const each = (text: string) => fill(text, scope);
+  let url = address(each(request.url));
+  const headers: [string, string][] = request.headers.map(([name, value]) => [each(name), each(value)]);
+  let body = request.body === null ? null : each(request.body);
+  const pairs = (list: [string, string][]) => list.map(([name, value]) => `${encode(each(name))}=${encode(each(value))}`).join("&");
+  if (request.query?.length) url += (url.includes("?") ? "&" : "?") + pairs(request.query);
+  if (request.form?.length && body === null) {
+    body = pairs(request.form);
+    if (!headers.some(([name]) => name.toLowerCase() === "content-type")) headers.push(["Content-Type", "application/x-www-form-urlencoded"]);
+  }
+  if (request.cookies?.length) headers.push(["Cookie", request.cookies.map(([name, value]) => `${each(name)}=${each(value)}`).join("; ")]);
+  if (request.bodyType && !headers.some(([name]) => name.toLowerCase() === "content-type")) headers.push(["Content-Type", request.bodyType]);
+  return { method: request.method, url, headers, body, user: request.user && each(request.user) };
 }
 
-/** What a request's `{{names}}` stand for: variables, earlier responses, and `secret`. */
+/** What Hurl entries captured, newest last, as their own types. */
+function capturedIn(state: EditorState, field: StateField<Responses>) {
+  const values = new Map<string, unknown>();
+  for (const exchange of state.field(field).sent) for (const [name, value] of exchange.captured) values.set(name, value);
+  return values;
+}
+
+/** A captured or written value, as text in a request. */
+const asText = (value: unknown) => (typeof value === "string" ? value : value instanceof Date ? value.toISOString() : JSON.stringify(value));
+
+/** What a request's `{{names}}` stand for: variables, Hurl's captures, earlier responses, and `secret`. */
 function scopeOf(state: EditorState, field: StateField<Responses>, variables: Map<string, string>, secret?: Scope["secret"]): Scope {
   const { sent } = state.field(field);
   const response = (name: string) => {
     for (let i = sent.length - 1; i >= 0; i--) if (sent[i].name === name && sent[i].received) return sent[i].received!;
     return undefined;
   };
-  return { variables, response, secret };
+  const all = new Map(variables);
+  for (const [name, value] of capturedIn(state, field)) all.set(name, asText(value));
+  return { variables: all, response, secret };
 }
 
 /** The request whose line `pos` is on. */
@@ -278,11 +314,19 @@ function requestOnLine(state: EditorState, where: Where, pos: number) {
   return requestsIn(state, where, line.from, line.to).requests.find((request) => request.line <= pos && pos <= request.lineEnd) ?? null;
 }
 
-async function send(view: EditorView, where: Where, field: StateField<Responses>, line: number) {
-  const { state } = view;
-  const { requests, variables } = requestsIn(state, where);
+const say: Say = (key, params) => t(`hurl.check.${key}`, params);
+
+/** A written variable's value as Hurl types it: a number, true, false or null, or text. */
+function typed(value: string): unknown {
+  if (/^(?:-?\d+(?:\.\d+)?|true|false|null)$/.test(value)) return JSON.parse(value);
+  return value;
+}
+
+/** Sends the request whose line starts at `line`, and checks its response, if it's a Hurl entry. */
+async function send(view: EditorView, where: Where, field: StateField<Responses>, line: number): Promise<Exchange | null> {
+  const { requests, variables } = requestsIn(view.state, where);
   const request = requests.find((each) => each.line === line);
-  if (!request) return;
+  if (!request) return null;
   let exchange: Exchange;
   // The secrets it's sent with, to show as dots.
   const used: string[] = [];
@@ -311,22 +355,50 @@ async function send(view: EditorView, where: Where, field: StateField<Responses>
     exchange.fail(variableProblem(error));
   }
   view.dispatch({ effects: show.of({ line, exchange }) });
-  if (exchange.state === "failed") return speak(exchange.error);
-  await exchange.send();
+  if (exchange.state === "failed") {
+    speak(exchange.error);
+    return exchange;
+  }
+  await exchange.send(request.follow ?? true);
   const { received } = exchange;
-  speak(received ? t("http.received", { status: `${received.status} ${received.statusText}`.trim() }) : exchange.error);
+  if (received && request.expect) {
+    const captured = capturedIn(view.state, field);
+    const scope = scopeOf(view.state, field, variables, secret);
+    exchange.checks = await check(
+      request.expect,
+      {
+        answer: received,
+        variable: (name) => exchange.captured.get(name) ?? captured.get(name) ?? (variables.has(name) ? typed(variables.get(name)!) : secrets.get(name)),
+        fill: (text) => fillInWhatCan(text, scope),
+        say,
+      },
+      exchange.captured,
+    );
+  }
+  const failed = exchange.checks?.filter((each) => !each.ok).length ?? 0;
+  const status = received ? t("http.received", { status: `${received.status} ${received.statusText}`.trim() }) : exchange.error;
+  speak(failed ? `${status}. ${t("hurl.failed", { failed: String(failed), count: String(exchange.checks!.length) })}` : status);
+  return exchange;
 }
 
-/** Each request in the ```http block at `at()`, one after another, so later ones can use earlier ones' responses. */
-async function sendBlock(view: EditorView, field: StateField<Responses>, at: () => number | null) {
+/**
+ * Sends requests one after another, so later ones can use earlier ones' responses: those `lines()`
+ * gives, found again before each, as the note can change while one is on its way. Hurl's stop at
+ * the first that fails.
+ */
+async function sendAll(view: EditorView, where: Where, field: StateField<Responses>, lines: () => number[]) {
   for (let index = 0; ; index++) {
-    // Found again each time: the note can change while one is on its way.
-    const pos = at();
-    const block = pos === null ? null : fenceAt(view.state, pos);
-    const requests = block ? requestsIn(view.state, httpBlocks, block.from, block.to).requests : [];
-    if (index >= requests.length) return;
-    await send(view, httpBlocks, field, requests[index].line);
+    const line = lines()[index];
+    if (line === undefined) return;
+    const exchange = await send(view, where, field, line);
+    if (where.dialect.stops && exchange && !exchange.passed) return;
   }
+}
+
+/** The request lines of the block at `pos`, in a Markdown note. */
+function blockLines(view: EditorView, where: Where, pos: number | null) {
+  const block = pos === null ? null : fenceAt(view.state, pos);
+  return block ? requestsIn(view.state, where, block.from, block.to).requests.map((request) => request.line) : [];
 }
 
 /** Headers a request with no body has no use for. */
@@ -345,35 +417,23 @@ async function followAddress(view: EditorView, where: Where, field: StateField<R
   // After its last line: the blank lines before the next request stay between them.
   const at = where.markdown ? section?.to : request.to;
   if (at === undefined) return;
-  const lines = ["###", `GET ${url}`, ...request.headers.filter(([name]) => !BODY_HEADERS.test(name)).map(([name, value]) => `${name}: ${value}`)];
-  const insert = `\n\n${lines.join("\n")}`;
-  const line = at + insert.indexOf("GET ");
+  const text = where.dialect.write({ method: "GET", url, headers: request.headers.filter(([name]) => !BODY_HEADERS.test(name)), body: null });
+  const insert = `\n\n${where.dialect.separator}${text}`;
+  const line = at + insert.indexOf(text);
   view.dispatch({ changes: { from: at, insert }, userEvent: "input" });
   await send(view, where, field, line);
 }
 
-/** A request as a curl command, with what variables can be filled in filled in, and secrets (and other names) as shell variables. */
-function curlOf(state: EditorState, where: Where, field: StateField<Responses>, pos: number) {
-  const request = requestOnLine(state, where, pos);
-  if (!request) return "";
-  const { variables } = requestsIn(state, where);
-  return toCurl(filledIn(request, scopeOf(state, field, variables, shellVariable), (text, scope) => fillInWhatCan(text, scope)));
-}
-
-/** Every request in the ```http block at `pos`, as curl commands. */
-function blockCurl(state: EditorState, field: StateField<Responses>, pos: number) {
-  const block = fenceAt(state, pos);
-  if (!block) return "";
-  const scope = scopeOf(state, field, requestsIn(state, httpBlocks).variables, shellVariable);
-  return requestsIn(state, httpBlocks, block.from, block.to)
-    .requests.map((request) => toCurl(filledIn(request, scope, (text, each) => fillInWhatCan(text, each))))
-    .join("\n\n");
+/** Requests as curl commands, with what variables can be filled in filled in, and secrets (and other names) as shell variables. */
+function curlOf(state: EditorState, where: Where, field: StateField<Responses>, requests: Request[]) {
+  const scope = scopeOf(state, field, requestsIn(state, where).variables, shellVariable);
+  return requests.map((request) => toCurl(filledIn(request, scope, (text, each) => fillInWhatCan(text, each)))).join("\n\n");
 }
 
 /*
- * The buttons. An http block's are in its top right corner, left of its Copy: Send, which sends
- * each of its requests in turn, and Copy as curl (Terminal's icon). In a .http note, each request's
- * are at the end of its line.
+ * The buttons. A code block's are in its top right corner, left of its Copy: Send, which sends each
+ * of its requests in turn, and Copy as curl (Terminal's icon). In a .http or .hurl note, each
+ * request's are at the end of its line.
  */
 
 const copyAsCurl = (text: () => string, className: string) => {
@@ -410,22 +470,27 @@ function destroySendButton(button: HTMLElement) {
 /** Where a widget's button is in the note, while it's there. */
 const placeOf = (view: EditorView, dom: HTMLElement) => (dom.isConnected ? view.posAtDOM(dom) : null);
 
-/** Send and Copy as curl, at the end of a request's line in a .http note. */
+/** Send and Copy as curl, at the end of a request's line in a .http or .hurl note. */
 class RequestButtons extends WidgetType {
-  constructor(readonly field: StateField<Responses>) {
+  constructor(
+    readonly where: Where,
+    readonly field: StateField<Responses>,
+  ) {
     super();
   }
   eq(other: RequestButtons) {
     return other.field === this.field;
   }
   toDOM(view: EditorView) {
+    const { where, field } = this;
     const dom = document.createElement("span");
     dom.className = "cm-http-actions";
+    const request = () => requestOnLine(view.state, where, view.posAtDOM(dom));
     const sending = sendButton("cm-http-send", t("http.send"), `${t("http.send")} (${modKey}↵)`, () => {
-      const request = requestOnLine(view.state, wholeNote, view.posAtDOM(dom));
-      if (request) void send(view, wholeNote, this.field, request.line);
+      const found = request();
+      if (found) void send(view, where, field, found.line);
     });
-    dom.append(sending, copyAsCurl(() => curlOf(view.state, wholeNote, this.field, view.posAtDOM(dom)), "cm-lp-copy cm-http-curl"));
+    dom.append(sending, copyAsCurl(() => curlOf(view.state, where, field, [request()].filter((each) => each !== null)), "cm-lp-copy cm-http-curl"));
     return dom;
   }
   destroy(dom: HTMLElement) {
@@ -437,9 +502,10 @@ class RequestButtons extends WidgetType {
   }
 }
 
-/** Send and Copy as curl, in an http block's top right corner. */
+/** Send and Copy as curl, in a code block's top right corner. */
 class BlockButtons extends WidgetType {
   constructor(
+    readonly where: Where,
     readonly field: StateField<Responses>,
     /** How many requests the block has: Send says "Send all" for more than one. */
     readonly count: number,
@@ -450,13 +516,19 @@ class BlockButtons extends WidgetType {
     return other.field === this.field && other.count === this.count;
   }
   toDOM(view: EditorView) {
+    const { where, field } = this;
     const dom = document.createElement("span");
     dom.className = "cm-http-block-actions";
     const all = this.count > 1;
-    const sending = sendButton("cm-http-send", all ? t("http.sendAll") : t("http.send"), all ? t("http.sendAllTitle", { key: `${modKey}↵` }) : `${t("http.send")} (${modKey}↵)`, () => {
-      void sendBlock(view, this.field, () => placeOf(view, dom));
+    const title = all ? t(where.dialect.stops ? "http.sendAllStopsTitle" : "http.sendAllTitle", { key: `${modKey}↵` }) : `${t("http.send")} (${modKey}↵)`;
+    const sending = sendButton("cm-http-send", all ? t("http.sendAll") : t("http.send"), title, () => {
+      void sendAll(view, where, field, () => blockLines(view, where, placeOf(view, dom)));
     });
-    dom.append(sending, copyAsCurl(() => blockCurl(view.state, this.field, view.posAtDOM(dom)), "cm-lp-copy cm-http-curl"));
+    const curl = () => {
+      const block = fenceAt(view.state, view.posAtDOM(dom));
+      return block ? curlOf(view.state, where, field, requestsIn(view.state, where, block.from, block.to).requests) : "";
+    };
+    dom.append(sending, copyAsCurl(curl, "cm-lp-copy cm-http-curl"));
     return dom;
   }
   destroy(dom: HTMLElement) {
@@ -469,7 +541,7 @@ class BlockButtons extends WidgetType {
 }
 
 function buttons(where: Where, field: StateField<Responses>) {
-  const onLine = Decoration.widget({ widget: new RequestButtons(field), side: 1 });
+  const onLine = Decoration.widget({ widget: new RequestButtons(where, field), side: 1 });
   const draw = (view: EditorView) => {
     const { state } = view;
     const ranges = new Map<number, ReturnType<typeof onLine.range>>();
@@ -483,8 +555,8 @@ function buttons(where: Where, field: StateField<Responses>) {
       for (const section of where.sections(state, from, to)) {
         // At the end of the block's first line, its opening fence, after its Copy (side 1) and any Format button (side 2).
         const fence = state.doc.lineAt(Math.max(0, section.from - 1)).to;
-        const count = parsed(state.sliceDoc(section.from, section.to)).requests.length;
-        if (count && fence >= from && fence <= to) ranges.set(fence, Decoration.widget({ widget: new BlockButtons(field, count), side: 3 }).range(fence));
+        const count = parsed(where.dialect, state.sliceDoc(section.from, section.to)).requests.length;
+        if (count && fence >= from && fence <= to) ranges.set(fence, Decoration.widget({ widget: new BlockButtons(where, field, count), side: 3 }).range(fence));
       }
     }
     return Decoration.set([...ranges.values()], true);
@@ -503,7 +575,7 @@ function buttons(where: Where, field: StateField<Responses>) {
   );
 }
 
-/** Whether `pos` is in a request's text: anywhere in a .http note, inside a ```http block's code in a Markdown one. */
+/** Whether `pos` is in a request's text: anywhere in a .http or .hurl note, inside a block's code in a Markdown one. */
 function inRequests(state: EditorState, where: Where, pos: number) {
   const line = state.doc.lineAt(pos);
   return where.sections(state, line.from, line.to).some((section) => section.from <= pos && pos <= section.to);
@@ -512,6 +584,13 @@ function inRequests(state: EditorState, where: Where, pos: number) {
 /** Sending, responses and curl for requests wherever `where` finds them. */
 function requestEditing(where: Where): Extension {
   const field = responsesField(where);
+  /** The request the cursor is in, and the requests of its block (or note), if it's in one. */
+  const around = (view: EditorView) => {
+    const pos = view.state.selection.main.head;
+    if (!inRequests(view.state, where, pos)) return null;
+    const all = where.markdown ? requestsIn(view.state, where, pos, pos).requests : requestsIn(view.state, where).requests;
+    return { all, request: all.find((each) => each.from <= pos && pos <= each.end) ?? null };
+  };
   return [
     field,
     buttons(where, field),
@@ -520,11 +599,19 @@ function requestEditing(where: Where): Extension {
         {
           key: "Mod-Enter",
           run: (view) => {
+            const found = around(view)?.request;
+            if (!found) return false;
+            void send(view, where, field, found.line);
+            return true;
+          },
+        },
+        {
+          key: "Mod-Shift-Enter",
+          run: (view) => {
+            const found = around(view);
+            if (!found?.all.length) return false;
             const pos = view.state.selection.main.head;
-            if (!inRequests(view.state, where, pos)) return false;
-            const request = requestsIn(view.state, where, pos, pos).requests.find((each) => each.from <= pos && pos <= each.end);
-            if (!request) return false;
-            void send(view, where, field, request.line);
+            void sendAll(view, where, field, () => (where.markdown ? blockLines(view, where, pos) : requestsIn(view.state, where).requests.map((each) => each.line)));
             return true;
           },
         },
@@ -532,20 +619,20 @@ function requestEditing(where: Where): Extension {
     ),
     EditorView.clipboardInputFilter.of((text, state) => {
       if (!/^\s*curl\s/.test(text) || !inRequests(state, where, state.selection.main.from)) return text;
-      return fromCurl(text) ?? text;
+      const command = readCurl(text);
+      return command ? where.dialect.write(command.asked, command.notes) : text;
     }),
   ];
 }
 
-/** ```http blocks in Markdown notes. */
-export const blockRequests = requestEditing(httpBlocks);
+/** ```http and ```hurl blocks in Markdown notes. */
+export const blockRequests: Extension = [requestEditing(codeBlocks(http)), requestEditing(codeBlocks(hurl))];
 
-/** The `###` titles, as a .http note's outline. */
-function titles(state: EditorState) {
-  return requestsIn(state, wholeNote)
+/** Titles (`###` ones in .http, the comment just above a Hurl entry) as a note's outline. */
+const titles = (where: Where) => (state: EditorState) =>
+  requestsIn(state, where)
     .requests.filter((request) => request.title)
     .map((request) => ({ level: 1, title: request.title, from: request.from }));
-}
 
 const noteTheme = EditorView.theme({
   ".cm-content": { fontFamily: "var(--font-mono)", fontSize: "0.9em" },
@@ -554,13 +641,20 @@ const noteTheme = EditorView.theme({
 /** Titles stand out, as headings do in other notes. */
 const noteHighlights = syntaxHighlighting(HighlightStyle.define([{ tag: tags.heading, fontWeight: "600" }]));
 
-/** A .http note's editing: everything the blocks have, and its titles as the outline. */
-export const noteRequests: Extension = [
-  httpLanguage,
-  requestEditing(wholeNote),
-  outlineHeadings.of(titles),
-  noteTheme,
-  noteHighlights,
-  EditorView.contentAttributes.of({ spellcheck: "false", autocorrect: "off", autocapitalize: "off" }),
-];
+function noteEditing(dialect: Dialect, language: Language): Extension {
+  const where = wholeNote(dialect);
+  return [
+    language,
+    requestEditing(where),
+    outlineHeadings.of(titles(where)),
+    noteTheme,
+    noteHighlights,
+    EditorView.contentAttributes.of({ spellcheck: "false", autocorrect: "off", autocapitalize: "off" }),
+  ];
+}
 
+/** A .http note's editing: everything the blocks have, and its titles as the outline. */
+export const noteRequests = noteEditing(http, httpLanguage);
+
+/** A .hurl note's: the same, with each entry's title comment in the outline. */
+export const hurlNoteRequests = noteEditing(hurl, hurlLanguage);

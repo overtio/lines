@@ -1,6 +1,7 @@
 import { t } from "../../lib/i18n/index.svelte";
 import { isTauri, webFetch } from "../../lib/platform";
 import type { Asked } from "./curl";
+import type { Check } from "./request";
 import type { ResponseValues } from "./variables";
 
 /*
@@ -69,6 +70,10 @@ export class Exchange {
   state = $state<"sending" | "received" | "failed">("sending");
   received = $state.raw<Received | null>(null);
   error = $state("");
+  /** What its Hurl entry expected of the response, checked; null for a request that expects nothing. */
+  checks = $state.raw<Check[] | null>(null);
+  /** The values its Hurl entry captured, by name, for the entries after it. */
+  captured = new Map<string, unknown>();
   readonly #abort = new AbortController();
 
   constructor(
@@ -95,11 +100,18 @@ export class Exchange {
     this.#abort.abort();
   }
 
-  async send() {
-    const { method, url, headers, body } = this.asked;
+  /** Whether it was received, and passed every check it has. */
+  get passed() {
+    return this.state === "received" && (this.checks ?? []).every((each) => each.ok);
+  }
+
+  /** Sends it, following redirects unless `follow` is false (Hurl's default; the apps only: a browser always follows). */
+  async send(follow = true) {
+    const { method, url, headers, body, user } = this.asked;
     const sent = new Headers();
     try {
       for (const [name, value] of headers) if (!SET_FOR_US.has(name.toLowerCase())) sent.append(name, value);
+      if (user && !sent.has("Authorization")) sent.set("Authorization", `Basic ${btoa(String.fromCharCode(...new TextEncoder().encode(user)))}`);
     } catch {
       return this.fail(t("http.error.header"));
     }
@@ -113,6 +125,8 @@ export class Exchange {
         headers: sent,
         body: body !== null && method !== "GET" && method !== "HEAD" ? body : undefined,
         signal: this.#abort.signal,
+        // Tauri's option; a browser's fetch ignores it.
+        ...(follow ? {} : { maxRedirections: 0 }),
       });
       const bytes = new Uint8Array(await response.arrayBuffer());
       const contentType = response.headers.get("content-type") ?? "";

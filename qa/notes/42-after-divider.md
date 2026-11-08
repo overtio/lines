@@ -124,12 +124,31 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Divider, then Secret ({{name}}, kept in a locked secrets note)
+#### 18. Divider, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+---
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Divider, then Secret ({{name}}, kept in a locked secrets note)
 
 ---
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 19. Divider, then API requests (http block): a variable, a named request and one using its response
+#### 20. Divider, then API requests (http block): a variable, a named request and one using its response
 
 ---
 ```http
@@ -143,7 +162,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 20. Divider, then Spreadsheet (csv block)
+#### 21. Divider, then Spreadsheet (csv block)
 
 ---
 ```csv
@@ -153,7 +172,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 21. Divider, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Divider, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ---
 ```csv name=costs
@@ -165,78 +184,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 22. Divider, then Divider
+#### 23. Divider, then Divider
 
 ---
 ---
 
-#### 23. Divider, then Key: Value line
+#### 24. Divider, then Key: Value line
 
 ---
 **Wi-Fi password:** correct-horse-battery
 
-#### 24. Divider, then Mention
+#### 25. Divider, then Mention
 
 ---
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 25. Divider, then Wiki link
+#### 26. Divider, then Wiki link
 
 ---
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 26. Divider, then Symbols
+#### 27. Divider, then Symbols
 
 ---
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 27. Divider, then GitHub links
+#### 28. Divider, then GitHub links
 
 ---
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 28. Divider, then Image
+#### 29. Divider, then Image
 
 ---
 ![A sample picture](attachment:photo.png)
 
-#### 29. Divider, then Drawing
+#### 30. Divider, then Drawing
 
 ---
 ![A sample drawing](attachment:drawing.svg)
 
-#### 30. Divider, then File
+#### 31. Divider, then File
 
 ---
 [Budget.csv](attachment:budget.csv)
 
-#### 31. Divider, then Missing file
+#### 32. Divider, then Missing file
 
 ---
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 32. Divider, then Card
+#### 33. Divider, then Card
 
 ---
 ::: card
 Text in a card.
 :::
 
-#### 33. Divider, then Callout (info)
+#### 34. Divider, then Callout (info)
 
 ---
 :::i
 Text in an info callout.
 :::
 
-#### 34. Divider, then Callout (warning, chosen icon)
+#### 35. Divider, then Callout (warning, chosen icon)
 
 ---
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 35. Divider, then Callout (decision, no icon)
+#### 36. Divider, then Callout (decision, no icon)
 
 ---
 :::^ icon=none

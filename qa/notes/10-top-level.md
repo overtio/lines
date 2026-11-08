@@ -107,11 +107,29 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Secret ({{name}}, kept in a locked secrets note) at the top level
+#### 18. Hurl entries (hurl block): a capture used by the next entry, and asserts at the top level
+
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Secret ({{name}}, kept in a locked secrets note) at the top level
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 19. API requests (http block): a variable, a named request and one using its response at the top level
+#### 20. API requests (http block): a variable, a named request and one using its response at the top level
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -124,7 +142,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 20. Spreadsheet (csv block) at the top level
+#### 21. Spreadsheet (csv block) at the top level
 
 ```csv
 Item, Cost
@@ -133,7 +151,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 21. Named spreadsheet (csv name=), and a formula in another block using it at the top level
+#### 22. Named spreadsheet (csv name=), and a formula in another block using it at the top level
 
 ```csv name=costs
 Item, Cost, Day
@@ -144,65 +162,65 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 22. Divider at the top level
+#### 23. Divider at the top level
 
 ---
 
-#### 23. Key: Value line at the top level
+#### 24. Key: Value line at the top level
 
 **Wi-Fi password:** correct-horse-battery
 
-#### 24. Mention at the top level
+#### 25. Mention at the top level
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 25. Wiki link at the top level
+#### 26. Wiki link at the top level
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 26. Symbols at the top level
+#### 27. Symbols at the top level
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 27. GitHub links at the top level
+#### 28. GitHub links at the top level
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 28. Image at the top level
+#### 29. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 29. Drawing at the top level
+#### 30. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 30. File at the top level
+#### 31. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 31. Missing file at the top level
+#### 32. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 32. Card at the top level
+#### 33. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 33. Callout (info) at the top level
+#### 34. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 34. Callout (warning, chosen icon) at the top level
+#### 35. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 35. Callout (decision, no icon) at the top level
+#### 36. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

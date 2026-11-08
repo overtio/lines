@@ -158,14 +158,35 @@ Text in an info callout.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Callout (info), then Secret ({{name}}, kept in a locked secrets note)
+#### 18. Callout (info), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+:::i
+Text in an info callout.
+:::
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Callout (info), then Secret ({{name}}, kept in a locked secrets note)
 
 :::i
 Text in an info callout.
 :::
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 19. Callout (info), then API requests (http block): a variable, a named request and one using its response
+#### 20. Callout (info), then API requests (http block): a variable, a named request and one using its response
 
 :::i
 Text in an info callout.
@@ -181,7 +202,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 20. Callout (info), then Spreadsheet (csv block)
+#### 21. Callout (info), then Spreadsheet (csv block)
 
 :::i
 Text in an info callout.
@@ -193,7 +214,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 21. Callout (info), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Callout (info), then Named spreadsheet (csv name=), and a formula in another block using it
 
 :::i
 Text in an info callout.
@@ -207,77 +228,77 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 22. Callout (info), then Divider
+#### 23. Callout (info), then Divider
 
 :::i
 Text in an info callout.
 :::
 ---
 
-#### 23. Callout (info), then Key: Value line
+#### 24. Callout (info), then Key: Value line
 
 :::i
 Text in an info callout.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 24. Callout (info), then Mention
+#### 25. Callout (info), then Mention
 
 :::i
 Text in an info callout.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 25. Callout (info), then Wiki link
+#### 26. Callout (info), then Wiki link
 
 :::i
 Text in an info callout.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 26. Callout (info), then Symbols
+#### 27. Callout (info), then Symbols
 
 :::i
 Text in an info callout.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 27. Callout (info), then GitHub links
+#### 28. Callout (info), then GitHub links
 
 :::i
 Text in an info callout.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 28. Callout (info), then Image
+#### 29. Callout (info), then Image
 
 :::i
 Text in an info callout.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 29. Callout (info), then Drawing
+#### 30. Callout (info), then Drawing
 
 :::i
 Text in an info callout.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 30. Callout (info), then File
+#### 31. Callout (info), then File
 
 :::i
 Text in an info callout.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 31. Callout (info), then Missing file
+#### 32. Callout (info), then Missing file
 
 :::i
 Text in an info callout.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 32. Callout (info), then Card
+#### 33. Callout (info), then Card
 
 :::i
 Text in an info callout.
@@ -286,7 +307,7 @@ Text in an info callout.
 Text in a card.
 :::
 
-#### 33. Callout (info), then Callout (info)
+#### 34. Callout (info), then Callout (info)
 
 :::i
 Text in an info callout.
@@ -295,7 +316,7 @@ Text in an info callout.
 Text in an info callout.
 :::
 
-#### 34. Callout (info), then Callout (warning, chosen icon)
+#### 35. Callout (info), then Callout (warning, chosen icon)
 
 :::i
 Text in an info callout.
@@ -304,7 +325,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 35. Callout (info), then Callout (decision, no icon)
+#### 36. Callout (info), then Callout (decision, no icon)
 
 :::i
 Text in an info callout.

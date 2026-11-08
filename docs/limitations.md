@@ -164,6 +164,7 @@ What isn't done yet is in [requests.md](requests.md#not-yet): environments, asse
 - In the browser, only APIs that allow requests from other sites (CORS) answer, and headers the browser keeps from pages (`Cookie`) aren't sent.
 - Responses aren't saved in the note: once lines quits they're gone, and a request using an earlier one's response needs that one sent again.
 - **+** adds a response's body to the note only up to 200 KB.
+- Hurl: what lines doesn't read or check of a Hurl file is in [requests.md](requests.md#hurl): the HTTP version, certificates, cookies shared between entries, `[Multipart]`, `md5`, and the options that tune curl or repeat entries. Not following redirects works in the apps only. Dates in `toDate` are read as ISO 8601.
 - Requests in a code block inside a list or a quote, indented, aren't read as requests.
 - Sending from the Windows and Linux apps hasn't been tried yet.
 

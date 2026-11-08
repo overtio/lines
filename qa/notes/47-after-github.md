@@ -124,12 +124,31 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. GitHub links, then Secret ({{name}}, kept in a locked secrets note)
+#### 18. GitHub links, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. GitHub links, then Secret ({{name}}, kept in a locked secrets note)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 19. GitHub links, then API requests (http block): a variable, a named request and one using its response
+#### 20. GitHub links, then API requests (http block): a variable, a named request and one using its response
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ```http
@@ -143,7 +162,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 20. GitHub links, then Spreadsheet (csv block)
+#### 21. GitHub links, then Spreadsheet (csv block)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ```csv
@@ -153,7 +172,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 21. GitHub links, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. GitHub links, then Named spreadsheet (csv name=), and a formula in another block using it
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ```csv name=costs
@@ -165,78 +184,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 22. GitHub links, then Divider
+#### 23. GitHub links, then Divider
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ---
 
-#### 23. GitHub links, then Key: Value line
+#### 24. GitHub links, then Key: Value line
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 **Wi-Fi password:** correct-horse-battery
 
-#### 24. GitHub links, then Mention
+#### 25. GitHub links, then Mention
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 25. GitHub links, then Wiki link
+#### 26. GitHub links, then Wiki link
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 26. GitHub links, then Symbols
+#### 27. GitHub links, then Symbols
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 27. GitHub links, then GitHub links
+#### 28. GitHub links, then GitHub links
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 28. GitHub links, then Image
+#### 29. GitHub links, then Image
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ![A sample picture](attachment:photo.png)
 
-#### 29. GitHub links, then Drawing
+#### 30. GitHub links, then Drawing
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 30. GitHub links, then File
+#### 31. GitHub links, then File
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Budget.csv](attachment:budget.csv)
 
-#### 31. GitHub links, then Missing file
+#### 32. GitHub links, then Missing file
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 32. GitHub links, then Card
+#### 33. GitHub links, then Card
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ::: card
 Text in a card.
 :::
 
-#### 33. GitHub links, then Callout (info)
+#### 34. GitHub links, then Callout (info)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::i
 Text in an info callout.
 :::
 
-#### 34. GitHub links, then Callout (warning, chosen icon)
+#### 35. GitHub links, then Callout (warning, chosen icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 35. GitHub links, then Callout (decision, no icon)
+#### 36. GitHub links, then Callout (decision, no icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::^ icon=none

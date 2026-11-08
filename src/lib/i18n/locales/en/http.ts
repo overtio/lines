@@ -4,6 +4,7 @@ export default {
   "http.send": "Send",
   "http.sendAll": "Send all",
   "http.sendAllTitle": "Send each request in the block, in order ({key} sends the one the cursor is in)",
+  "http.sendAllStopsTitle": "Send each entry in the block, in order, stopping at the first that fails ({key} sends the one the cursor is in)",
   "http.copyCurl": "Copy as curl",
   // A response, under its request.
   "http.response": "Response",
@@ -37,6 +38,7 @@ export default {
   "http.error.header": "A header’s name or value has characters headers can’t.",
   "http.error.unsupported": "lines doesn’t send {method} requests yet.",
   "http.error.fileBody": "lines doesn’t send bodies from files (< ./file) yet.",
+  "http.error.notYet": "lines doesn’t send {what} yet.",
   "http.error.relative": "The address needs its host: https://api.example.com/…, or a variable for it.",
   "http.error.url": "That isn’t a web address lines can send to.",
   "http.error.unsent": "Send the {name} request first: this one uses its response.",

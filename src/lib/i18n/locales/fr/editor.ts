@@ -30,6 +30,8 @@ export default {
   "editor.slash.diagram.keywords": "mermaid organigramme graphique schéma séquence",
   "editor.slash.request": "Requête d’API",
   "editor.slash.request.keywords": "http rest api requête curl get post endpoint",
+  "editor.slash.hurl": "Test Hurl",
+  "editor.slash.hurl.keywords": "hurl test vérifier assert api requête http",
   "editor.slash.secret": "Secret",
   "editor.slash.secret.keywords": "mot de passe token clé api identifiant",
   "editor.slash.math": "Formule",

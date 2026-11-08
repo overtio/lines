@@ -54,6 +54,11 @@ const ELEMENTS = [
     name: "Table with formulas",
     md: "| Item | Cost |\n| --- | ---: |\n| Rent | 1200 |\n| Food | 450.50 |\n| Total | =SUM(B2:B3) |\n| Broken | =B2/0 |",
   },
+  {
+    id: "hurl",
+    name: "Hurl entries (hurl block): a capture used by the next entry, and asserts",
+    md: "```hurl\n# A todo\nGET https://jsonplaceholder.typicode.com/todos/1\nHTTP 200\n[Captures]\nowner: jsonpath \"$.userId\"\n[Asserts]\njsonpath \"$.id\" == 1\n\n# Its owner\nGET https://jsonplaceholder.typicode.com/users/{{owner}}\nHTTP 200\n[Asserts]\njsonpath \"$.name\" isString\n```",
+  },
   { id: "secret", name: "Secret ({{name}}, kept in a locked secrets note)", md: "The token is {{qa-token}}, and {{no-such-secret}} isn't one." },
   {
     id: "requests",

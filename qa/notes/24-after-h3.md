@@ -124,12 +124,31 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Heading 3, then Secret ({{name}}, kept in a locked secrets note)
+#### 18. Heading 3, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+### Heading three
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Heading 3, then Secret ({{name}}, kept in a locked secrets note)
 
 ### Heading three
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 19. Heading 3, then API requests (http block): a variable, a named request and one using its response
+#### 20. Heading 3, then API requests (http block): a variable, a named request and one using its response
 
 ### Heading three
 ```http
@@ -143,7 +162,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 20. Heading 3, then Spreadsheet (csv block)
+#### 21. Heading 3, then Spreadsheet (csv block)
 
 ### Heading three
 ```csv
@@ -153,7 +172,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 21. Heading 3, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Heading 3, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ### Heading three
 ```csv name=costs
@@ -165,78 +184,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 22. Heading 3, then Divider
+#### 23. Heading 3, then Divider
 
 ### Heading three
 ---
 
-#### 23. Heading 3, then Key: Value line
+#### 24. Heading 3, then Key: Value line
 
 ### Heading three
 **Wi-Fi password:** correct-horse-battery
 
-#### 24. Heading 3, then Mention
+#### 25. Heading 3, then Mention
 
 ### Heading three
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 25. Heading 3, then Wiki link
+#### 26. Heading 3, then Wiki link
 
 ### Heading three
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 26. Heading 3, then Symbols
+#### 27. Heading 3, then Symbols
 
 ### Heading three
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 27. Heading 3, then GitHub links
+#### 28. Heading 3, then GitHub links
 
 ### Heading three
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 28. Heading 3, then Image
+#### 29. Heading 3, then Image
 
 ### Heading three
 ![A sample picture](attachment:photo.png)
 
-#### 29. Heading 3, then Drawing
+#### 30. Heading 3, then Drawing
 
 ### Heading three
 ![A sample drawing](attachment:drawing.svg)
 
-#### 30. Heading 3, then File
+#### 31. Heading 3, then File
 
 ### Heading three
 [Budget.csv](attachment:budget.csv)
 
-#### 31. Heading 3, then Missing file
+#### 32. Heading 3, then Missing file
 
 ### Heading three
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 32. Heading 3, then Card
+#### 33. Heading 3, then Card
 
 ### Heading three
 ::: card
 Text in a card.
 :::
 
-#### 33. Heading 3, then Callout (info)
+#### 34. Heading 3, then Callout (info)
 
 ### Heading three
 :::i
 Text in an info callout.
 :::
 
-#### 34. Heading 3, then Callout (warning, chosen icon)
+#### 35. Heading 3, then Callout (warning, chosen icon)
 
 ### Heading three
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 35. Heading 3, then Callout (decision, no icon)
+#### 36. Heading 3, then Callout (decision, no icon)
 
 ### Heading three
 :::^ icon=none

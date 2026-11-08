@@ -1,7 +1,7 @@
 /*
  * curl commands, to and from requests: "Copy as curl" writes one to run in a terminal, and a curl
- * command pasted into a request (as browsers' "Copy as cURL" and API docs give them) is written
- * as the request it makes.
+ * command pasted into a request (as browsers' "Copy as cURL" and API docs give them) is read as the
+ * request it makes, which each format writes its own way.
  */
 
 export interface Asked {
@@ -9,6 +9,8 @@ export interface Asked {
   url: string;
   headers: [string, string][];
   body: string | null;
+  /** `user:password`, sent as Basic authorization (Hurl's [BasicAuth], curl's -u). */
+  user?: string;
 }
 
 /**
@@ -26,9 +28,10 @@ function quote(text: string) {
 }
 
 /** The command, an option to a line as API docs write them. */
-export function toCurl({ method, url, headers, body }: Asked): string {
+export function toCurl({ method, url, headers, body, user }: Asked): string {
   const verb = method === "HEAD" ? "--head " : method !== "GET" || body !== null ? `-X ${method} ` : "";
   const lines = [`curl ${verb}${quote(url)}`, ...headers.map(([name, value]) => `-H ${quote(`${name}: ${value}`)}`)];
+  if (user) lines.push(`-u ${quote(user)}`);
   if (body !== null) lines.push(`--data-raw ${quote(body)}`);
   return lines.join(" \\\n  ");
 }
@@ -86,12 +89,13 @@ const SKIPPED_WITH_VALUE = new Set([
 
 const header = (headers: [string, string][], name: string) => headers.find(([each]) => each.toLowerCase() === name.toLowerCase());
 
-/** The .http text of the request a curl command makes, or null if `command` isn't one. */
-export function fromCurl(command: string): string | null {
+/** The request a curl command makes, and what of it lines doesn't send (as comments to write); null if `command` isn't one. */
+export function readCurl(command: string): { asked: Asked; notes: string[] } | null {
   const args = words(command.trim());
   if (args[0] !== "curl") return null;
   let method: string | null = null;
   let url: string | null = null;
+  let user: string | undefined;
   let get = false;
   const headers: [string, string][] = [];
   const data: string[] = [];
@@ -127,7 +131,7 @@ export function fromCurl(command: string): string | null {
         break;
       case "-u":
       case "--user":
-        headers.push(["Authorization", `Basic ${btoa(String.fromCharCode(...new TextEncoder().encode(value())))}`]);
+        user = value();
         break;
       case "-A":
       case "--user-agent":
@@ -156,7 +160,7 @@ export function fromCurl(command: string): string | null {
         break;
       case "-F":
       case "--form":
-        notes.push(`# Not sent: lines doesn't send forms with files yet (-F ${value()})`);
+        notes.push(`Not sent: lines doesn't send forms with files yet (-F ${value()})`);
         break;
       default:
         if (SKIPPED_WITH_VALUE.has(option)) {
@@ -182,6 +186,5 @@ export function fromCurl(command: string): string | null {
       // Not JSON after all: as it was written.
     }
   }
-  const lines = [...notes, `${verb} ${url}`, ...headers.map(([name, value]) => `${name}: ${value}`)];
-  return body !== null ? `${lines.join("\n")}\n\n${body}` : lines.join("\n");
+  return { asked: { method: verb, url, headers, body, user }, notes };
 }

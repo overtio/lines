@@ -175,7 +175,29 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Table, then Secret ({{name}}, kept in a locked secrets note)
+#### 18. Table, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Table, then Secret ({{name}}, kept in a locked secrets note)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -183,7 +205,7 @@ $$
 | longer cell text | `code` | 22 |
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 19. Table, then API requests (http block): a variable, a named request and one using its response
+#### 20. Table, then API requests (http block): a variable, a named request and one using its response
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -200,7 +222,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 20. Table, then Spreadsheet (csv block)
+#### 21. Table, then Spreadsheet (csv block)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -213,7 +235,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 21. Table, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Table, then Named spreadsheet (csv name=), and a formula in another block using it
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -228,7 +250,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 22. Table, then Divider
+#### 23. Table, then Divider
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -236,7 +258,7 @@ Total, =costs!B2*2
 | longer cell text | `code` | 22 |
 ---
 
-#### 23. Table, then Key: Value line
+#### 24. Table, then Key: Value line
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -244,7 +266,7 @@ Total, =costs!B2*2
 | longer cell text | `code` | 22 |
 **Wi-Fi password:** correct-horse-battery
 
-#### 24. Table, then Mention
+#### 25. Table, then Mention
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -252,7 +274,7 @@ Total, =costs!B2*2
 | longer cell text | `code` | 22 |
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 25. Table, then Wiki link
+#### 26. Table, then Wiki link
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -260,7 +282,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 | longer cell text | `code` | 22 |
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 26. Table, then Symbols
+#### 27. Table, then Symbols
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -268,7 +290,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | longer cell text | `code` | 22 |
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 27. Table, then GitHub links
+#### 28. Table, then GitHub links
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -276,7 +298,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | longer cell text | `code` | 22 |
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 28. Table, then Image
+#### 29. Table, then Image
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -284,7 +306,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 ![A sample picture](attachment:photo.png)
 
-#### 29. Table, then Drawing
+#### 30. Table, then Drawing
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -292,7 +314,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 30. Table, then File
+#### 31. Table, then File
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -300,7 +322,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [Budget.csv](attachment:budget.csv)
 
-#### 31. Table, then Missing file
+#### 32. Table, then Missing file
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -308,7 +330,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 32. Table, then Card
+#### 33. Table, then Card
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -318,7 +340,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 33. Table, then Callout (info)
+#### 34. Table, then Callout (info)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -328,7 +350,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 34. Table, then Callout (warning, chosen icon)
+#### 35. Table, then Callout (warning, chosen icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -338,7 +360,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 35. Table, then Callout (decision, no icon)
+#### 36. Table, then Callout (decision, no icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |

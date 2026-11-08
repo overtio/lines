@@ -192,7 +192,30 @@ flowchart LR
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Diagram, then Secret ({{name}}, kept in a locked secrets note)
+#### 18. Diagram, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+```mermaid
+flowchart LR
+  A[Start] --> B{Choice}
+  B --> C[Done]
+```
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Diagram, then Secret ({{name}}, kept in a locked secrets note)
 
 ```mermaid
 flowchart LR
@@ -201,7 +224,7 @@ flowchart LR
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 19. Diagram, then API requests (http block): a variable, a named request and one using its response
+#### 20. Diagram, then API requests (http block): a variable, a named request and one using its response
 
 ```mermaid
 flowchart LR
@@ -219,7 +242,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 20. Diagram, then Spreadsheet (csv block)
+#### 21. Diagram, then Spreadsheet (csv block)
 
 ```mermaid
 flowchart LR
@@ -233,7 +256,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 21. Diagram, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Diagram, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```mermaid
 flowchart LR
@@ -249,7 +272,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 22. Diagram, then Divider
+#### 23. Diagram, then Divider
 
 ```mermaid
 flowchart LR
@@ -258,7 +281,7 @@ flowchart LR
 ```
 ---
 
-#### 23. Diagram, then Key: Value line
+#### 24. Diagram, then Key: Value line
 
 ```mermaid
 flowchart LR
@@ -267,7 +290,7 @@ flowchart LR
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 24. Diagram, then Mention
+#### 25. Diagram, then Mention
 
 ```mermaid
 flowchart LR
@@ -276,7 +299,7 @@ flowchart LR
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 25. Diagram, then Wiki link
+#### 26. Diagram, then Wiki link
 
 ```mermaid
 flowchart LR
@@ -285,7 +308,7 @@ flowchart LR
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 26. Diagram, then Symbols
+#### 27. Diagram, then Symbols
 
 ```mermaid
 flowchart LR
@@ -294,7 +317,7 @@ flowchart LR
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 27. Diagram, then GitHub links
+#### 28. Diagram, then GitHub links
 
 ```mermaid
 flowchart LR
@@ -303,7 +326,7 @@ flowchart LR
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 28. Diagram, then Image
+#### 29. Diagram, then Image
 
 ```mermaid
 flowchart LR
@@ -312,7 +335,7 @@ flowchart LR
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 29. Diagram, then Drawing
+#### 30. Diagram, then Drawing
 
 ```mermaid
 flowchart LR
@@ -321,7 +344,7 @@ flowchart LR
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 30. Diagram, then File
+#### 31. Diagram, then File
 
 ```mermaid
 flowchart LR
@@ -330,7 +353,7 @@ flowchart LR
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 31. Diagram, then Missing file
+#### 32. Diagram, then Missing file
 
 ```mermaid
 flowchart LR
@@ -339,7 +362,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 32. Diagram, then Card
+#### 33. Diagram, then Card
 
 ```mermaid
 flowchart LR
@@ -350,7 +373,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 33. Diagram, then Callout (info)
+#### 34. Diagram, then Callout (info)
 
 ```mermaid
 flowchart LR
@@ -361,7 +384,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 34. Diagram, then Callout (warning, chosen icon)
+#### 35. Diagram, then Callout (warning, chosen icon)
 
 ```mermaid
 flowchart LR
@@ -372,7 +395,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 35. Diagram, then Callout (decision, no icon)
+#### 36. Diagram, then Callout (decision, no icon)
 
 ```mermaid
 flowchart LR

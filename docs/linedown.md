@@ -18,6 +18,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Diagram | ` ```mermaid ` code block | GitHub, GitLab, Obsidian |
 | Spreadsheet | ` ```csv ` code block | Yes (a code block of CSV) |
 | API requests | ` ```http ` code block | JetBrains IDEs, VS Code (REST Client, httpYac), Visual Studio |
+| API tests | ` ```hurl ` code block | Hurl |
 | Secret | `{{github}}` | No (shown as written; the value is in a locked note) |
 | Math | `$x^2$`, `$$` … `$$`, ` ```math ` code block | GitHub, GitLab, Obsidian, Pandoc |
 | Attachment | `![](../attachments/<hash>.png)`, `[Name.pdf](../attachments/<hash>.pdf)` | Yes (relative links) |
@@ -114,7 +115,7 @@ Fenced code blocks (` ``` ` or `~~~`) are as in CommonMark. lines reads the info
 
 - The first word names the language, for syntax highlighting: ` ```sql `, ` ```ts `, ` ```python `. Any language in CodeMirror's language data works, by name or alias.
 - A block with no language whose text starts with `{` or `[` is treated as JSON, so it can be tidied.
-- ` ```mermaid ` is a diagram, ` ```csv ` a spreadsheet, and ` ```http ` (or ` ```rest `) requests to an API (below).
+- ` ```mermaid ` is a diagram, ` ```csv ` a spreadsheet, and ` ```http ` (or ` ```rest `) requests to an API, and ` ```hurl ` requests with checks of their responses (below).
 
 ## Spreadsheets
 
@@ -128,7 +129,7 @@ A code block with the language `mermaid` is drawn as its [Mermaid](https://merma
 
 ## API requests
 
-A code block with the language `http` (or `rest`) holds requests in the `.http` format, highlighted, with Send and Copy as curl in its top right corner, beside Copy, by the API Requests [plugin](plugins.md) (with it off, it's a code block). Requests are separated by `###` lines; `@name = value` lines are variables, used as `{{name}}` in any `http` block of the note. A response shows under its block while the note's open, and isn't written into the note. The format, variables and sending are in [requests.md](requests.md). Other apps show the block as code; editors that read `.http` files read its text as requests too.
+A code block with the language `http` (or `rest`) holds requests in the `.http` format, highlighted, with Send and Copy as curl in its top right corner, beside Copy, by the API Requests [plugin](plugins.md) (with it off, it's a code block). Requests are separated by `###` lines; `@name = value` lines are variables, used as `{{name}}` in any `http` block of the note. A response shows under its block while the note's open, and isn't written into the note. A code block with the language `hurl` holds [Hurl](https://hurl.dev) entries, each a request and checks of its response, the same way. The formats, variables and sending are in [requests.md](requests.md). Other apps show the block as code; editors that read `.http` files read its text as requests too.
 
 ## Secrets
 

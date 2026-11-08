@@ -1,7 +1,7 @@
 import { isApple } from "../lib/platform";
 import type { Plugin } from "../lib/plugins/types";
 import { giphy } from "./giphy";
-import { http } from "./http";
+import { requests } from "./http";
 import { ironcalc } from "./ironcalc";
 import { katex } from "./katex";
 import { latex } from "./latex";
@@ -24,7 +24,7 @@ export const builtIn = (): Plugin[] => [
   markdown(),
   latex(),
   spreadsheet(),
-  http(),
+  requests(),
   secrets(),
   katex(),
   mermaid(),

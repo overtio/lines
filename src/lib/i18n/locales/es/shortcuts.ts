@@ -50,6 +50,7 @@ export default {
   "shortcuts.inMenu": "En un menú",
   "shortcuts.todo": "Crear una tarea, o marcarla",
   "shortcuts.sendRequest": "Enviar una solicitud a una API",
+  "shortcuts.sendAllRequests": "Enviar cada solicitud del bloque o la nota, por orden",
   "shortcuts.inRequest": "En una solicitud",
   "shortcuts.nest": "Anidar un elemento de lista, o sacarlo",
   "shortcuts.inListItem": "En un elemento de lista",

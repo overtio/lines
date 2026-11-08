@@ -48,6 +48,7 @@ export default {
   "shortcuts.inMenu": "In a menu",
   "shortcuts.todo": "Make a todo, or tick it",
   "shortcuts.sendRequest": "Send an API request",
+  "shortcuts.sendAllRequests": "Send every request of the block or note, in turn",
   "shortcuts.inRequest": "In a request",
   "shortcuts.nest": "Nest a list item, or move it back out",
   "shortcuts.inListItem": "In a list item",
