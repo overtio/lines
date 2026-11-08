@@ -6,8 +6,7 @@ on:
   pull_request:
   push:
     branches: [main]
-  # The release pull request's checks: release-pr.yml starts them, as a pull request its own
-  # token opens starts no workflows.
+  # To run them by hand on any branch, from the Actions tab.
   workflow_dispatch:
 
 permissions:
