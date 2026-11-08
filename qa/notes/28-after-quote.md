@@ -348,13 +348,19 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 > two lines.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Quote, then Missing file
+#### 37. Quote, then Terminal recording (.cast file)
+
+> A quote that runs over
+> two lines.
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Quote, then Missing file
 
 > A quote that runs over
 > two lines.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Quote, then Card
+#### 39. Quote, then Card
 
 > A quote that runs over
 > two lines.
@@ -362,7 +368,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 39. Quote, then Callout (info)
+#### 40. Quote, then Callout (info)
 
 > A quote that runs over
 > two lines.
@@ -370,7 +376,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 40. Quote, then Callout (warning, chosen icon)
+#### 41. Quote, then Callout (warning, chosen icon)
 
 > A quote that runs over
 > two lines.
@@ -378,7 +384,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Quote, then Callout (decision, no icon)
+#### 42. Quote, then Callout (decision, no icon)
 
 > A quote that runs over
 > two lines.

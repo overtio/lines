@@ -312,33 +312,38 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 [Budget.csv](attachment:budget.csv)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. File, then Missing file
+#### 37. File, then Terminal recording (.cast file)
+
+[Budget.csv](attachment:budget.csv)
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. File, then Missing file
 
 [Budget.csv](attachment:budget.csv)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. File, then Card
+#### 39. File, then Card
 
 [Budget.csv](attachment:budget.csv)
 ::: card
 Text in a card.
 :::
 
-#### 39. File, then Callout (info)
+#### 40. File, then Callout (info)
 
 [Budget.csv](attachment:budget.csv)
 :::i
 Text in an info callout.
 :::
 
-#### 40. File, then Callout (warning, chosen icon)
+#### 41. File, then Callout (warning, chosen icon)
 
 [Budget.csv](attachment:budget.csv)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. File, then Callout (decision, no icon)
+#### 42. File, then Callout (decision, no icon)
 
 [Budget.csv](attachment:budget.csv)
 :::^ icon=none

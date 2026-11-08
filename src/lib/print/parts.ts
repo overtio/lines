@@ -190,7 +190,7 @@ export class Parts {
     const dom = el("div", "doc-figure", named);
     this.#later(
       getAttachment(name)
-        .then((data) => (data ? viewer.print({ name, label: label || name, data }) : null))
+        .then((data) => (data && viewer.print ? viewer.print({ name, label: label || name, data }) : null))
         .then((picture) => picture && dom.prepend(picture))
         .catch(() => {}),
     );

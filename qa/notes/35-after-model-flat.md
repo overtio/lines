@@ -420,7 +420,15 @@ translate([30, 10]) circle(8);
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Flat model (openscad block), then Missing file
+#### 37. Flat model (openscad block), then Terminal recording (.cast file)
+
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Flat model (openscad block), then Missing file
 
 ```openscad
 square(20);
@@ -428,7 +436,7 @@ translate([30, 10]) circle(8);
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Flat model (openscad block), then Card
+#### 39. Flat model (openscad block), then Card
 
 ```openscad
 square(20);
@@ -438,7 +446,7 @@ translate([30, 10]) circle(8);
 Text in a card.
 :::
 
-#### 39. Flat model (openscad block), then Callout (info)
+#### 40. Flat model (openscad block), then Callout (info)
 
 ```openscad
 square(20);
@@ -448,7 +456,7 @@ translate([30, 10]) circle(8);
 Text in an info callout.
 :::
 
-#### 40. Flat model (openscad block), then Callout (warning, chosen icon)
+#### 41. Flat model (openscad block), then Callout (warning, chosen icon)
 
 ```openscad
 square(20);
@@ -458,7 +466,7 @@ translate([30, 10]) circle(8);
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Flat model (openscad block), then Callout (decision, no icon)
+#### 42. Flat model (openscad block), then Callout (decision, no icon)
 
 ```openscad
 square(20);

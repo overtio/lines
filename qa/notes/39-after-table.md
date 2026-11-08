@@ -420,7 +420,15 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Table, then Missing file
+#### 37. Table, then Terminal recording (.cast file)
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Table, then Missing file
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -428,7 +436,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Table, then Card
+#### 39. Table, then Card
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -438,7 +446,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 39. Table, then Callout (info)
+#### 40. Table, then Callout (info)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -448,7 +456,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 40. Table, then Callout (warning, chosen icon)
+#### 41. Table, then Callout (warning, chosen icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -458,7 +466,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Table, then Callout (decision, no icon)
+#### 42. Table, then Callout (decision, no icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |

@@ -25,6 +25,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Attachment | `![](../attachments/<hash>.png)`, `[Name.pdf](../attachments/<hash>.pdf)` | Yes (relative links) |
 | Copyable value | `Key: Value` lines | Yes (plain text, read specially) |
 | GitHub link | `https://github.com/owner/repo/issues/12` | Yes (an ordinary link, drawn short) |
+| Terminal recording | `[![asciicast](https://asciinema.org/a/<id>.svg)](https://asciinema.org/a/<id>)`, `[demo.cast](../attachments/<hash>.cast)` | Yes (asciinema's embed code: a linked image; a link) |
 | Properties | `key: value` lines between `---` lines at the top | YAML front matter (Obsidian, Jekyll, Pandoc) |
 | Mention | `@Oleks`, `@[Two Words]`, `@Oleks.fullname`, `[[Two Words]]` | Wiki links: Obsidian, Logseq, Foam |
 | Type table | `@type.recipe`, `@type.recipe(time, servings)` on a line of its own | No |
@@ -188,6 +189,24 @@ Images and other files added to a note are stored by lines and linked with ordin
 - Images from the web (`![](https://…)`) show too. Links to anything else are ordinary links.
 - An image whose address is a photo's page on [Unsplash](https://unsplash.com) shows that photo: `![Snow-covered mountain peak illuminated by sunset light](https://unsplash.com/photos/snow-covered-mountain-peak-illuminated-by-sunset-light-mevyYnC5xCo)`. Pasting such a link (or the picture's own address) on an empty line adds it this way, described by the words in the link, and so does choosing a photo with `/unsplash`. Other Markdown apps don't know these links and show a broken image.
 - `/giphy` adds a GIF from [GIPHY](https://giphy.com) as an image from the web: `![Happy dance](https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif)`, which any Markdown app shows. With reduced motion, lines shows GIPHY's GIFs still.
+
+## Terminal recordings
+
+A recording of a terminal from [asciinema](https://asciinema.org) plays in the note, by the asciinema [plugin](plugins.md): asciinema's embed code on a line of its own is drawn as the recording's player, and an attached `.cast` file shows its player above the card naming it, as a 3D model does. With the plugin off, they're the picture and the file card they're written as.
+
+```markdown
+[![asciicast](https://asciinema.org/a/1271559.svg)](https://asciinema.org/a/1271559)
+
+[demo.cast](../attachments/9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e.cast)
+```
+
+- **On asciinema.org:** asciinema's own embed code, its preview of the recording linked to the recording's page, as its Share button gives it. Other Markdown apps (GitHub among them) show the preview, which opens the recording. The preview alone, `![asciicast](https://asciinema.org/a/1271559.svg)` (or `.png`), plays too. Pasting the link to a recording on an empty line writes its embed code; undo turns it back into the link. The recording loads from asciinema.org.
+- **A .cast file:** an asciicast file (`.cast`, as `asciinema rec` writes) attached to the note, dropped or pasted in or added with `/file`, plays above its card, and without the internet. Double-clicking the card opens the file, as any file's does.
+- The page's address can say where to start and how fast, as asciinema.org's do: `https://asciinema.org/a/1271559?t=1:23&speed=2`. Before it plays, a recording shows its middle, as asciinema.org does (or where it starts).
+- It's drawn in the theme's colors, with the note's code font, and is never bigger than the note's code: a narrow terminal is drawn narrower than the note. Programs' colors are the theme's (red is its red); 256 colors and true color work too.
+- Clicking it plays it, and it's selected, moved and deleted as an image is: ↑ and ↓ stop on it, and Backspace after it selects it. With it selected, Enter plays it. In the player Space pauses, ← and → skip 5 seconds, a number jumps to that tenth of it, F is full screen, and Esc goes back to the note's text with it selected.
+- Like images, recordings are drawn at the top level and in cards. Within a line of text, in a list or in a quote, they're the picture or link they're written as. A link to an asciinema.org page is a link: only the embed code plays.
+- Printed, a recording from asciinema.org is its preview, linked to it; a `.cast` file is its name.
 
 ## GitHub links
 

@@ -1932,7 +1932,57 @@ endsolid pyramid
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. 3D model (stl block), then Missing file
+#### 37. 3D model (stl block), then Terminal recording (.cast file)
+
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. 3D model (stl block), then Missing file
 
 ```stl
 solid pyramid
@@ -1982,7 +2032,7 @@ endsolid pyramid
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. 3D model (stl block), then Card
+#### 39. 3D model (stl block), then Card
 
 ```stl
 solid pyramid
@@ -2034,7 +2084,7 @@ endsolid pyramid
 Text in a card.
 :::
 
-#### 39. 3D model (stl block), then Callout (info)
+#### 40. 3D model (stl block), then Callout (info)
 
 ```stl
 solid pyramid
@@ -2086,7 +2136,7 @@ endsolid pyramid
 Text in an info callout.
 :::
 
-#### 40. 3D model (stl block), then Callout (warning, chosen icon)
+#### 41. 3D model (stl block), then Callout (warning, chosen icon)
 
 ```stl
 solid pyramid
@@ -2138,7 +2188,7 @@ endsolid pyramid
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. 3D model (stl block), then Callout (decision, no icon)
+#### 42. 3D model (stl block), then Callout (decision, no icon)
 
 ```stl
 solid pyramid

@@ -312,33 +312,38 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 **Wi-Fi password:** correct-horse-battery
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Key: Value line, then Missing file
+#### 37. Key: Value line, then Terminal recording (.cast file)
+
+**Wi-Fi password:** correct-horse-battery
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Key: Value line, then Missing file
 
 **Wi-Fi password:** correct-horse-battery
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Key: Value line, then Card
+#### 39. Key: Value line, then Card
 
 **Wi-Fi password:** correct-horse-battery
 ::: card
 Text in a card.
 :::
 
-#### 39. Key: Value line, then Callout (info)
+#### 40. Key: Value line, then Callout (info)
 
 **Wi-Fi password:** correct-horse-battery
 :::i
 Text in an info callout.
 :::
 
-#### 40. Key: Value line, then Callout (warning, chosen icon)
+#### 41. Key: Value line, then Callout (warning, chosen icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Key: Value line, then Callout (decision, no icon)
+#### 42. Key: Value line, then Callout (decision, no icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::^ icon=none

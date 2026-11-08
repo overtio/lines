@@ -312,33 +312,38 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Wiki link, then Missing file
+#### 37. Wiki link, then Terminal recording (.cast file)
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Wiki link, then Missing file
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Wiki link, then Card
+#### 39. Wiki link, then Card
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ::: card
 Text in a card.
 :::
 
-#### 39. Wiki link, then Callout (info)
+#### 40. Wiki link, then Callout (info)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::i
 Text in an info callout.
 :::
 
-#### 40. Wiki link, then Callout (warning, chosen icon)
+#### 41. Wiki link, then Callout (warning, chosen icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Wiki link, then Callout (decision, no icon)
+#### 42. Wiki link, then Callout (decision, no icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::^ icon=none

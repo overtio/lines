@@ -312,33 +312,38 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Symbols, then Missing file
+#### 37. Symbols, then Terminal recording (.cast file)
+
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Symbols, then Missing file
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Symbols, then Card
+#### 39. Symbols, then Card
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ::: card
 Text in a card.
 :::
 
-#### 39. Symbols, then Callout (info)
+#### 40. Symbols, then Callout (info)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::i
 Text in an info callout.
 :::
 
-#### 40. Symbols, then Callout (warning, chosen icon)
+#### 41. Symbols, then Callout (warning, chosen icon)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Symbols, then Callout (decision, no icon)
+#### 42. Symbols, then Callout (decision, no icon)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::^ icon=none

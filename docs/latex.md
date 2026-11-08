@@ -72,6 +72,7 @@ The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.
   - Rows copied from a spreadsheet, pgAdmin or a web page become a `tabular`, lined up in the LaTeX, with the first row over a `\hline` and number columns right-aligned. Special characters in cells are escaped (`well_id` → `well\_id`). Undo once for the text as copied.
   - An image becomes `\includegraphics[width=\linewidth]{../attachments/…}`; any other file `\href{../attachments/…}{Name.pdf}`. `/image` and `/file` choose them from the device.
   - The link to an Unsplash photo, pasted on an empty line, becomes `\includegraphics{…}` showing the photo.
+  - A terminal recording's link (asciinema) stays a link, and a `.cast` file is a file's `\href`: recordings play in Markdown notes only, as a paper can't hold one.
   - A web address pasted over selected text links it: `\href{https://…}{text}`.
   - In verbatim, math, a table or a comment, a paste stays as it is.
 - `/` at the start of a line opens LaTeX commands: sections, lists, quote, math, equations, code, table, image, file, footnote, link and today's date.

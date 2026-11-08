@@ -13,7 +13,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Start from a fresh profile (a new browser profile; in a development build of the app, Settings → Data → Reset Notes to Defaults…), so first-launch behaviour can be checked
 - [ ] A fresh start shows one note, **Welcome to lines** (the demo website: the feature tour instead), and everything in it renders
 - [ ] Settings → Data → **Add QA Notes**: the QA notes are added, tagged qa, and the list switches to that tag
-- [ ] Settings → Data → **Add Feature Tour**: the tour notes are added in order, with the picture and the CSV file working, and **Trip budget** a spreadsheet note with its formulas worked out
+- [ ] Settings → Data → **Add Feature Tour**: the tour notes are added in order, with the picture, the CSV file and the terminal recording working, and **Trip budget** a spreadsheet note with its formulas worked out
 - [ ] Look through every QA note (qa tag in the sidebar) in light and dark, and at phone width; each says what to check at the top
 
 ## 1. Typing and live Markdown
@@ -272,6 +272,18 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Scrolling to the end of the pictures loads more. A search that finds nothing says so; with no connection (or a bad key) it says it couldn't reach Unsplash or GIPHY, with Try Again. The credit under the pictures ("Photos from Unsplash", "Powered by GIPHY") opens their site
 - [ ] With reduced motion on in the system, GIFs in the picker and GIPHY GIFs in notes are still
 
+### Terminal recordings (asciinema)
+
+- [ ] asciinema's embed code on a line of its own (`[![asciicast](https://asciinema.org/a/1271559.svg)](https://asciinema.org/a/1271559)`) shows the recording's player, with the frame from its middle and a round play button; while it loads, an empty box about its size. The terminal is the theme's code-block background, text and colors (try light and dark, and a few themes), in the code font, no bigger than code: a narrow `.cast` is narrower than the note
+- [ ] Pasting a recording's link (`https://asciinema.org/a/…`) on an empty line writes its embed code and plays; ⌘Z turns it back into the link. Pasted within text it stays a link. `?t=1:23` in the link starts it (and its first frame) there
+- [ ] Dropping or pasting a `.cast` file (from `asciinema rec`) adds it on its own line, its player above its card, as a 3D model's is; it plays offline; on another device before it syncs, the card says it isn't there yet and the player appears when it arrives. Double-clicking the card opens the file
+- [ ] Clicking the play button (or anywhere on it) plays; hovering shows the controls (play/pause, time, progress bar to seek, full screen), with no shortcuts button or tooltips. Space pauses, ← and → skip 5 seconds, F goes full screen
+- [ ] ↑ and ↓ stop on a recording, selecting it with a ring in the accent; Enter then plays it with focus in it; Esc goes back to the note with it selected; Backspace after it selects it, and again deletes it. Clicking beside a narrow one selects it. A click in the player never moves the note's cursor or shows its Markdown
+- [ ] With the cursor on its line the embed code shows, with the player below it, still playing if it was
+- [ ] Changing the theme or light/dark redraws it in the new colors
+- [ ] A recording from asciinema.org that can't load (no connection) says "This recording couldn't be loaded" in a dashed box, which a click selects
+- [ ] In the PDF preview, a recording from asciinema.org prints as asciinema's preview of it; a `.cast` file as its name
+
 ## 8. Lists, todos and moving
 
 - [ ] Tab nests a list item with its sub-items under the one above; Tab on the first item does nothing
@@ -365,7 +377,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 13a. Plugins
 
-- [ ] Settings → Plugins lists Secrets under More; Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams (Pele), Diagrams (Mermaid), 3D Models, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
+- [ ] Settings → Plugins lists Secrets under More; Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams (Pele), Diagrams (Mermaid), 3D Models, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY, asciinema), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
 - [ ] Clicking a plugin's name (or its switch) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
 - [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On, and its format switch offers only Markdown and Spreadsheet; Turn On draws it as LaTeX again at once
 - [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
@@ -378,6 +390,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] TeX Typesetting off: a LaTeX note's PDF preview has no "Typeset with" switch
 - [ ] Formulas off: formulas in tables and spreadsheets show as written, and a spreadsheet's share menu has no Download Values or Excel Workbook; on again, worked out
 - [ ] Unsplash or GIPHY off: `/unsplash` or `/giphy` is gone from the "/" menu, and photos and GIFs already in notes still show. In a build without their keys they have no switch and say they need an API key
+- [ ] asciinema off: a recording's embed code shows asciinema's preview image (inline, as any linked image), an attached `.cast` file is only its card, and pasting a recording's link on an empty line pastes the link; on again, they play
 - [ ] Choices are remembered after reloading, and turning a plugin on or off in one window changes every window at once (the Settings window, floating notes [Desktop], other browser tabs [Web])
 
 ## 13b. Layout and tabs

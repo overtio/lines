@@ -1220,7 +1220,119 @@
   box-shadow: 0 0 0 1px var(--accent);
 }
 
-.cm-lp-image-missing {
+/* A link a plugin draws on a line of its own (attachments.ts), like asciinema's embed code as the recording's player. */
+.cm-lp-embed-block {
+  padding: 0.35em 0;
+  line-height: normal;
+  cursor: default;
+}
+
+.cm-lp-embed-block.is-preview {
+  padding-bottom: 0.75em;
+}
+
+.cm-lp-embed {
+  border-radius: 8px;
+}
+
+/* A message in its place (it couldn't load, say), which a click selects, as it does a file's card. */
+.cm-lp-embed:has(.cm-lp-embed-message),
+.cm-lp-recording:has(> .cm-lp-embed-message) {
+  width: fit-content;
+}
+
+.cm-focused .cm-lp-embed-block.is-selected .cm-lp-embed {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/*
+ * A terminal recording (the asciinema plugin), from asciinema.org or an attached .cast file above its
+ * card, in the code font and no bigger than the note's code. Its colors are the theme's, which the
+ * plugin sets on it as the hex its player needs.
+ */
+.cm-lp-recording {
+  max-width: calc(var(--recording-cols, 80) * 1ch + 1.5em);
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+}
+
+/* Loading: an empty terminal, about the shape most are, so the note doesn't jump when it shows. */
+.cm-lp-recording:empty {
+  aspect-ratio: 3 / 2;
+  background: var(--code-bg);
+}
+
+.cm-lp-recording div.ap-wrapper div.ap-player {
+  --term-color-foreground: inherit;
+  --term-color-background: inherit;
+  --term-color-0: inherit;
+  --term-color-1: inherit;
+  --term-color-2: inherit;
+  --term-color-3: inherit;
+  --term-color-4: inherit;
+  --term-color-5: inherit;
+  --term-color-6: inherit;
+  --term-color-7: inherit;
+  --term-color-8: inherit;
+  --term-color-15: inherit;
+  border-radius: 8px;
+}
+
+.cm-lp-recording div.ap-wrapper:is(:focus-visible, :has(:focus-visible)) div.ap-player {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Its controls show while one has the keyboard, not only on hover. */
+.cm-lp-recording div.ap-player div.ap-control-bar:focus-within {
+  opacity: 1;
+}
+
+.cm-lp-recording div.ap-control-bar button.ap-button:focus-visible {
+  border-radius: 6px;
+  outline: 2px solid var(--accent);
+  outline-offset: -4px;
+}
+
+/* Its play button, round like the note's other buttons, in place of asciinema's mark. */
+.cm-lp-recording .ap-overlay-start .ap-play-button {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  box-shadow: var(--card-shadow);
+  color: var(--text);
+  transition: transform 0.12s var(--ease-pop);
+}
+
+.cm-lp-recording .ap-overlay-start:hover .ap-play-button {
+  transform: scale(1.06);
+}
+
+.cm-lp-recording .ap-overlay-start .ap-play-button > div {
+  display: none;
+}
+
+.cm-lp-recording .ap-overlay-start .ap-play-button::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  margin-left: 3px;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M4 2.6v12.8a1 1 0 0 0 1.5.86l10.6-6.4a1 1 0 0 0 0-1.72L5.5 1.74A1 1 0 0 0 4 2.6Z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+/* Quiet: no tooltips or shortcuts button, which the player has only in English. Its keys still work. */
+.cm-lp-recording span.ap-tooltip,
+.cm-lp-recording div.ap-control-bar button.ap-kbd-button {
+  display: none;
+}
+
+.cm-lp-image-missing,
+.cm-lp-embed-message {
   display: inline-flex;
   align-items: center;
   justify-content: center;

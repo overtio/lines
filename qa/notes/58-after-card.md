@@ -384,14 +384,21 @@ Text in a card.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Card, then Missing file
+#### 37. Card, then Terminal recording (.cast file)
+
+::: card
+Text in a card.
+:::
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Card, then Missing file
 
 ::: card
 Text in a card.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Card, then Card
+#### 39. Card, then Card
 
 ::: card
 Text in a card.
@@ -400,7 +407,7 @@ Text in a card.
 Text in a card.
 :::
 
-#### 39. Card, then Callout (info)
+#### 40. Card, then Callout (info)
 
 ::: card
 Text in a card.
@@ -409,7 +416,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 40. Card, then Callout (warning, chosen icon)
+#### 41. Card, then Callout (warning, chosen icon)
 
 ::: card
 Text in a card.
@@ -418,7 +425,7 @@ Text in a card.
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Card, then Callout (decision, no icon)
+#### 42. Card, then Callout (decision, no icon)
 
 ::: card
 Text in a card.

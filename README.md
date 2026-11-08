@@ -48,6 +48,7 @@ The [demo website](https://overtio.github.io/lines/) opens with a tour: one shor
 - **Images and files.** Paste or drop them in. Drag an image's corner to resize it.
 - **Photos and GIFs from the web.** `/unsplash` searches Unsplash's free photos and `/giphy` GIPHY's GIFs, and puts the one you pick in the note.
 - **API requests.** Write requests in an ` ```http ` block (`/request`) and send them from the note, a lighter Postman or Bruno: variables, one request using another's response, curl commands pasted in or copied out. The `.http` format JetBrains' IDEs, VS Code and Visual Studio read, so a whole note of requests opens there too, or [Hurl](https://hurl.dev)'s, whose captures and asserts check each response. See [docs/requests.md](docs/requests.md).
+- **Terminal recordings** from [asciinema](https://asciinema.org) play right in the note, in your theme's colors. Paste a recording's link, or drop in a `.cast` file.
 - **GitHub links** read short, like `overtio/lines#12`, with GitHub's mark.
 
 ### LaTeX notes

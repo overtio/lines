@@ -312,33 +312,38 @@ The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Secret ({{name}}, kept in a locked secrets note), then Missing file
+#### 37. Secret ({{name}}, kept in a locked secrets note), then Terminal recording (.cast file)
+
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Secret ({{name}}, kept in a locked secrets note), then Missing file
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Secret ({{name}}, kept in a locked secrets note), then Card
+#### 39. Secret ({{name}}, kept in a locked secrets note), then Card
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ::: card
 Text in a card.
 :::
 
-#### 39. Secret ({{name}}, kept in a locked secrets note), then Callout (info)
+#### 40. Secret ({{name}}, kept in a locked secrets note), then Callout (info)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::i
 Text in an info callout.
 :::
 
-#### 40. Secret ({{name}}, kept in a locked secrets note), then Callout (warning, chosen icon)
+#### 41. Secret ({{name}}, kept in a locked secrets note), then Callout (warning, chosen icon)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Secret ({{name}}, kept in a locked secrets note), then Callout (decision, no icon)
+#### 42. Secret ({{name}}, kept in a locked secrets note), then Callout (decision, no icon)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::^ icon=none

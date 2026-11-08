@@ -389,7 +389,9 @@ function build(view: EditorView): DecorationSet {
         case "Link": {
           const url = node.getChild("URL");
           const marks = node.getChildren("LinkMark");
-          if (!url || marks.length < 2 || drawnAsBlock(state, node.node)) return;
+          if (!url || marks.length < 2) return;
+          // Drawn as a block (attachments.ts), it shows its Markdown as written, an image in it too.
+          if (drawnAsBlock(state, node.node)) return false;
           const textFrom = marks[0].to;
           const textTo = marks[1].from;
           const href = doc.sliceString(url.from, url.to);

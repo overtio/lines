@@ -23,14 +23,14 @@ import {
 import { coarsePointer } from "../platform";
 import { locale, type MessageKey, t } from "../i18n/index.svelte";
 import { plugins } from "../plugins/registry.svelte";
-import type { FileView, Renderer } from "../plugins/types";
+import type { Embed, EmbedLink, FileView, Renderer, Shown } from "../plugins/types";
 import { actionBar, dropBar, resizeHandle } from "./actions";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { editDrawing, isDrawing, knownDrawing } from "./drawings";
 import { giphyStill } from "./giphy";
 import { addActions, fencedBlock, removeActions } from "./rendered";
 import { isUnsplashPhoto, unsplashImage, unsplashPhoto } from "./unsplash";
-import { ancestors, blockPos, drawnBlock, drawnBlocks, focused, INTERACTIVE, isEditing, whenClicked } from "./util";
+import { ancestors, blockPos, drawnBlock, drawnBlocks, focused, INTERACTIVE, isEditing, OWN_INPUT, whenClicked } from "./util";
 
 /*
  * Images and files in notes. One on a line of its own is drawn as a block in its place (the image,
@@ -39,6 +39,7 @@ import { ancestors, blockPos, drawnBlock, drawnBlocks, focused, INTERACTIVE, isE
  * corner that resizes it, written into its label as Obsidian does (`![Lake|400](…)`), and a
  * drawing (drawings.ts) a button to edit it. A file that a renderer plugin makes blocks from
  * (`Renderer.fromFiles`) has a button that puts its block in its place: a CSV file's spreadsheet.
+ * A link a plugin draws (an embed: asciinema's embed code as the recording's player) is a block too.
  * Images within text are drawn inline by livePreview.ts, and files within text are links.
  * Pasting or dropping files, or the /image and /file commands, saves them on the device (see
  * notes/attachments.ts) and puts each on its own line.
@@ -117,6 +118,7 @@ const ICONS: [RegExp, IconName][] = [
   [/^(mp3|m4a|wav|aac|flac|ogg|aiff?)$/, "music"],
   [/^(zip|gz|tgz|tar|7z|rar|dmg)$/, "archive"],
   [/^(png|jpg|gif|webp|avif|heic|svg)$/, "image"],
+  [/^cast$/, "terminal"],
 ];
 
 const oneDecimal = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -170,15 +172,15 @@ function fileElement(name: string, label: string, onChange: () => void): { dom: 
   };
 }
 
-/** A file a plugin shows (`FileView`: a 3D model), above the card naming it, once it's on this device. */
-function viewedFile(viewer: FileView, name: string, label: string, onChange: () => void): { dom: HTMLElement; destroy: () => void } {
+/** A file a plugin shows (`FileView`: a 3D model, a recording), above the card naming it, once it's on this device. */
+function viewedFile(viewer: FileView, name: string, label: string, onChange: () => void): { dom: HTMLElement; destroy: () => void; shown: () => Shown | null } {
   const card = fileElement(name, label, onChange);
   const view = document.createElement("span");
   view.className = "cm-lp-file-view";
   const dom = document.createElement("span");
   dom.className = "cm-lp-viewed-file";
   dom.append(view, card.dom);
-  let shown: { destroy(): void } | null = null;
+  let shown: Shown | null = null;
   let cancel = () => {};
   let gone = false;
   const show = () =>
@@ -191,6 +193,7 @@ function viewedFile(viewer: FileView, name: string, label: string, onChange: () 
   show();
   return {
     dom,
+    shown: () => shown,
     destroy: () => {
       gone = true;
       cancel();
@@ -201,6 +204,11 @@ function viewedFile(viewer: FileView, name: string, label: string, onChange: () 
 }
 
 const cleanups = new WeakMap<HTMLElement, () => void>();
+/** What plugins show in blocks (a recording's player), by the block's element, to give it the keyboard. */
+const shownBy = new WeakMap<HTMLElement, () => Shown | null>();
+
+/** What a block draws: two blocks with the same draw the same thing. */
+const blockKey = (block: Block) => [block.kind, block.src, block.label, block.embed?.link.image ?? ""].join("\n");
 
 class BlockWidget extends WidgetType {
   constructor(
@@ -218,9 +226,7 @@ class BlockWidget extends WidgetType {
   }
   eq(other: BlockWidget) {
     return (
-      other.block.kind === this.block.kind &&
-      other.block.src === this.block.src &&
-      other.block.label === this.block.label &&
+      blockKey(other.block) === blockKey(this.block) &&
       sameInset(other.inset, this.inset) &&
       other.preview === this.preview &&
       other.selected === this.selected &&
@@ -239,13 +245,18 @@ class BlockWidget extends WidgetType {
     const dom = document.createElement("div");
     dom.dataset.src = src;
     dom.dataset.label = label;
+    dom.dataset.key = blockKey(this.block);
     this.#classes(dom);
+    dom.addEventListener("keydown", (event) => backToNote(view, dom, event), true);
+    if (kind === "embed") {
+      drawEmbed(view, dom, this.block);
+      return dom;
+    }
     const onChange = () => view.requestMeasure();
     const viewer = kind === "file" ? plugins.fileView(src) : undefined;
-    const content =
-      kind === "image" ? imageElement(src, label, onChange)
-      : viewer ? viewedFile(viewer, attachmentName(src)!, label, onChange)
-      : fileElement(attachmentName(src)!, label, onChange);
+    const viewed = viewer && viewedFile(viewer, attachmentName(src)!, label, onChange);
+    if (viewed) shownBy.set(dom, viewed.shown);
+    const content = kind === "image" ? imageElement(src, label, onChange) : (viewed ?? fileElement(attachmentName(src)!, label, onChange));
     let destroy = content.destroy;
     // An image sits in a frame with its resize handle on its corner (and a drawing's edit button beside it).
     const frame = document.createElement("span");
@@ -305,7 +316,7 @@ class BlockWidget extends WidgetType {
   }
   /** Moving the cursor onto or off the block keeps it as it is. */
   updateDOM(dom: HTMLElement) {
-    if (dom.dataset.src !== this.block.src || dom.dataset.label !== this.block.label || dom.dataset.converter !== this.converter?.id) return false;
+    if (dom.dataset.key !== blockKey(this.block) || dom.dataset.converter !== this.converter?.id) return false;
     this.#classes(dom);
     return true;
   }
@@ -315,12 +326,37 @@ class BlockWidget extends WidgetType {
     removeActions(dom);
   }
   get estimatedHeight() {
-    if (this.block.kind === "image") return heights.get(`${this.block.src}\n${this.block.label}`) ?? 200;
+    if (this.block.kind !== "file") return heights.get(`${this.block.src}\n${this.block.label}`) ?? (this.block.kind === "image" ? 200 : 420);
     return plugins.fileView(this.block.src) ? 420 : 60;
   }
-  ignoreEvent() {
-    return false;
+  /** What takes its own clicks and keys (a recording's player) has them; the rest selects the block. */
+  ignoreEvent(event: Event) {
+    return event.target instanceof Element && !!event.target.closest(OWN_INPUT);
   }
+}
+
+/** Esc in what takes its own keys (a recording's player) goes back to the note, with its block selected. */
+function backToNote(view: EditorView, dom: HTMLElement, event: KeyboardEvent) {
+  if (event.key !== "Escape" || !(event.target instanceof Element) || !event.target.closest(OWN_INPUT)) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const own = blockOnLine(view.state, view.state.doc.lineAt(blockPos(view, dom)).number);
+  view.focus();
+  if (own) selectBlock(view, own, true);
+}
+
+/** What a plugin draws for a link (embeds). */
+function drawEmbed(view: EditorView, dom: HTMLElement, block: Block) {
+  const { link, by } = block.embed!;
+  const frame = document.createElement("div");
+  frame.className = "cm-lp-embed";
+  dom.append(frame);
+  const drawn = by.draw(frame, link, () => {
+    heights.set(`${block.src}\n${block.label}`, frame.offsetHeight);
+    view.requestMeasure();
+  });
+  shownBy.set(dom, () => drawn);
+  cleanups.set(dom, () => drawn.destroy());
 }
 
 /* Resizing images. */
@@ -367,28 +403,50 @@ async function convertFile(view: EditorView, pos: number, renderer: Renderer) {
   view.focus();
 }
 
-/** An image or file drawn as a block, and where its Markdown is. */
+/** An image or file drawn as a block, or a link a plugin draws (an embed), and where its Markdown is. */
 interface Block {
-  kind: "image" | "file";
+  kind: "image" | "file" | "embed";
   from: number;
   to: number;
+  /** The image's address, the file's, or the embed's link's (its image's, if it doesn't link). */
   src: string;
-  /** The image's alt text, or the file's name. */
+  /** The image's alt text, the file's name, or the embed's text. */
   label: string;
+  embed?: { link: EmbedLink; by: Embed };
 }
 
-/** The image an `Image` node shows, or the attachment a `Link` node links to. */
-function blockOf(state: EditorState, node: SyntaxNode): Block | null {
+/** An `Image` or `Link` node's address and text (the alt text, for an image), and where its text is. */
+function linkParts(state: EditorState, node: SyntaxNode) {
   const url = node.getChild("URL");
   const marks = node.getChildren("LinkMark");
   if (!url || marks.length < 2) return null;
-  const src = state.sliceDoc(url.from, url.to);
-  const label = state.sliceDoc(marks[0].to, marks[1].from);
-  if (node.name === "Image") return { kind: "image", from: node.from, to: node.to, src, label };
-  if (node.name === "Link" && attachmentName(src)) {
-    return { kind: "file", from: node.from, to: node.to, src, label: label.replace(/\\(.)/g, "$1") };
+  return { src: state.sliceDoc(url.from, url.to), label: state.sliceDoc(marks[0].to, marks[1].from), from: marks[0].to, to: marks[1].from };
+}
+
+/** An embed's block, if a plugin draws `link`. */
+function embedBlock(node: SyntaxNode, link: EmbedLink): Block | null {
+  const by = plugins.embed(link);
+  return by ? { kind: "embed", from: node.from, to: node.to, src: link.href ?? link.image!, label: link.label, embed: { link, by } } : null;
+}
+
+/**
+ * The image an `Image` node shows, or the attachment a `Link` node links to, or what a plugin draws
+ * either as: an image that links somewhere too, as embed codes write a recording's (`[![…](picture)](address)`).
+ */
+function blockOf(state: EditorState, node: SyntaxNode): Block | null {
+  const parts = linkParts(state, node);
+  if (!parts) return null;
+  const { src, label } = parts;
+  if (node.name === "Image") {
+    return embedBlock(node, { href: null, image: src, label }) ?? { kind: "image", from: node.from, to: node.to, src, label };
   }
-  return null;
+  if (node.name !== "Link") return null;
+  const image = node.getChild("Image");
+  const shown = image?.from === parts.from && image.to === parts.to ? linkParts(state, image) : null;
+  const text = label.replace(/\\(.)/g, "$1");
+  const embed = embedBlock(node, { href: src, image: shown?.src ?? null, label: shown?.label ?? text });
+  if (embed) return embed;
+  return attachmentName(src) ? { kind: "file", from: node.from, to: node.to, src, label: text } : null;
 }
 
 /**
@@ -485,10 +543,21 @@ function backspace(view: EditorView) {
   return above ? selectBlock(view, above, false) : false;
 }
 
-/** Enter on a selected drawing opens it, rather than replacing it with a new line. */
-function openDrawing(view: EditorView) {
+/**
+ * Enter on a selected drawing opens it, and on what a plugin shows that takes the keyboard (a
+ * recording) gives it the keyboard, rather than replacing it with a new line.
+ */
+function openBlock(view: EditorView) {
   const block = selectedBlock(view.state);
-  if (!block || block.kind !== "image" || !knownDrawing(block.src) || view.state.readOnly) return false;
+  if (!block) return false;
+  const line = view.state.doc.lineAt(block.from).number;
+  const dom = [...view.contentDOM.querySelectorAll<HTMLElement>(".cm-lp-block")].find((each) => view.state.doc.lineAt(blockPos(view, each)).number === line);
+  const shown = dom && shownBy.get(dom)?.();
+  if (shown?.focus) {
+    shown.focus();
+    return true;
+  }
+  if (block.kind !== "image" || !knownDrawing(block.src) || view.state.readOnly) return false;
   void editDrawing(view, block.src, block.from);
   return true;
 }
@@ -498,7 +567,7 @@ const blockKeymap = Prec.high(
     { key: "ArrowUp", run: arrow(false) },
     { key: "ArrowDown", run: arrow(true) },
     { key: "Backspace", run: backspace },
-    { key: "Enter", run: openDrawing },
+    { key: "Enter", run: openBlock },
   ]),
 );
 
@@ -656,17 +725,29 @@ export function insertWebImage(view: EditorView, src: string, alt: string) {
 /** Text copied along with a file that's only its name or address, as Finder and browsers add. */
 const FILE_LABEL = /^(?:\S+\.[a-z0-9]{1,10}|https?:\/\/\S+)$/i;
 
+/** What a plugin writes a link pasted on an empty line as, if it draws it (an asciinema recording's embed code). */
+function pastedEmbed(link: string) {
+  for (const embed of plugins.embeds) {
+    const markdown = embed.paste?.(link);
+    if (markdown) return markdown;
+  }
+  return null;
+}
+
 /**
- * Pasting the link to an Unsplash photo (its page, or the picture) on an empty line puts the photo
- * there. The link goes in as text first, so undo turns the photo back into the link.
+ * Pasting a link on an empty line can put what it links to there: an Unsplash photo (its page, or
+ * the picture), or with `embeds` what a plugin draws (an asciinema recording). The link goes in as
+ * text first, so undo turns it back into the link.
  */
-const pastePhoto = (writer: AttachmentWriter) => EditorView.domEventHandlers({
+const pasteLink = (writer: AttachmentWriter, embeds: boolean) => EditorView.domEventHandlers({
   paste(event, view) {
     const { state } = view;
     const link = event.clipboardData?.getData("text/plain").trim() ?? "";
     const range = state.selection.main;
-    if (!isUnsplashPhoto(link) || state.selection.ranges.length > 1 || !range.empty) return false;
+    if (!/^https?:\/\/\S+$/i.test(link) || state.selection.ranges.length > 1 || !range.empty) return false;
     if (state.doc.lineAt(range.from).text.trim() || !allowed(writer, state, range.from)) return false;
+    const markdown = isUnsplashPhoto(link) ? writer.image(link, unsplashPhoto(link)?.alt ?? "") : embeds ? pastedEmbed(link) : null;
+    if (!markdown) return false;
     event.preventDefault();
     const { from } = range;
     view.dispatch({
@@ -675,10 +756,10 @@ const pastePhoto = (writer: AttachmentWriter) => EditorView.domEventHandlers({
       userEvent: "input.paste",
       scrollIntoView: true,
     });
-    const insert = `${writer.image(link, unsplashPhoto(link)?.alt ?? "")}\n`;
+    const insert = `${markdown}\n`;
     view.dispatch({
       changes: { from, to: from + link.length, insert },
-      // On the line below, so the photo shows.
+      // On the line below, so what it links to shows.
       selection: { anchor: from + insert.length },
       annotations: isolateHistory.of("before"),
       userEvent: "input.paste",
@@ -744,7 +825,13 @@ export function choose(accept: string, writer = markdownWriter) {
 export const chooseImages = choose("image/*");
 export const chooseFiles = choose("");
 
-/** Pasting and dropping files, and pasting Unsplash links, written by `writer`. */
-export const attachmentPasting = (writer: AttachmentWriter): Extension => [dropAndPaste(writer), pastePhoto(writer)];
+/** Pasting and dropping files, and pasting links to Unsplash photos (and with `embeds` what plugins draw), written by `writer`. */
+export const attachmentPasting = (writer: AttachmentWriter, { embeds = false } = {}): Extension => [dropAndPaste(writer), pasteLink(writer, embeds)];
 
-export const attachmentBlocks: Extension = [focused, drawnBlocks(drawBlock, { inside: ["Document", "Card", "Paragraph"] }), blockKeymap, clickToSelect, attachmentPasting(markdownWriter)];
+export const attachmentBlocks: Extension = [
+  focused,
+  drawnBlocks(drawBlock, { inside: ["Document", "Card", "Paragraph"] }),
+  blockKeymap,
+  clickToSelect,
+  attachmentPasting(markdownWriter, { embeds: true }),
+];

@@ -384,14 +384,21 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
   - [ ] Nested open todo
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Todo list, then Missing file
+#### 37. Todo list, then Terminal recording (.cast file)
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Todo list, then Missing file
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Todo list, then Card
+#### 39. Todo list, then Card
 
 - [x] Done todo
 - [ ] Open todo
@@ -400,7 +407,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 39. Todo list, then Callout (info)
+#### 40. Todo list, then Callout (info)
 
 - [x] Done todo
 - [ ] Open todo
@@ -409,7 +416,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 40. Todo list, then Callout (warning, chosen icon)
+#### 41. Todo list, then Callout (warning, chosen icon)
 
 - [x] Done todo
 - [ ] Open todo
@@ -418,7 +425,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Todo list, then Callout (decision, no icon)
+#### 42. Todo list, then Callout (decision, no icon)
 
 - [x] Done todo
 - [ ] Open todo

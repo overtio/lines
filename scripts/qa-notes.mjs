@@ -101,6 +101,7 @@ const ELEMENTS = [
   { id: "drawing", name: "Drawing", md: "![A sample drawing](attachment:drawing.svg)" },
   { id: "file", name: "File", md: "[Budget.csv](attachment:budget.csv)" },
   { id: "model-file", name: "Attached 3D model (STL)", md: "[Bracket.stl](attachment:bracket.stl)" },
+  { id: "recording", name: "Terminal recording (.cast file)", md: "[terminal.cast](attachment:terminal.cast)" },
   { id: "missing-file", name: "Missing file", md: "[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)" },
   { id: "card", name: "Card", md: "::: card\nText in a card.\n:::" },
   { id: "callout", name: "Callout (info)", md: ":::i\nText in an info callout.\n:::" },
@@ -264,6 +265,10 @@ note(
     `${label(21, "Math code block")}\n\n\`\`\`math\n\\begin{aligned}\na &= b + c \\\\\nd &= e\n\\end{aligned}\n\`\`\``,
     `${label(22, "Empty math block")}\n\n$$\n$$`,
     `${label(23, "A line of only #")}\n\n#\n\nThe # above is text, not an empty heading; a tag is typed this way.`,
+    `${label(24, "Recording from asciinema.org, by its embed code")}\n\n[![asciicast](https://asciinema.org/a/1271559.svg)](https://asciinema.org/a/1271559)`,
+    `${label(25, "asciinema's preview alone plays too")}\n\n![asciicast](https://asciinema.org/a/1271559.png)`,
+    `${label(26, "Starting at 0:10, twice as fast")}\n\n[![asciicast](https://asciinema.org/a/1271559.svg)](https://asciinema.org/a/1271559?t=0:10&speed=2)`,
+    `${label(27, "Recordings that stay links")}\n\n[A recording's page](https://asciinema.org/a/1271559) and [terminal.cast](attachment:terminal.cast) within a line of text are links.`,
   ],
   "edge-cases",
 );

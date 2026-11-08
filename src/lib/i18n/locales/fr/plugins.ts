@@ -38,5 +38,6 @@ export default {
   "plugins.unsplash.description": "Ajoute /unsplash, pour chercher parmi les photos gratuites d’Unsplash et en mettre une dans une note. Ce que vous cherchez est envoyé à Unsplash.",
   "plugins.unsplash.credit": "Photos d’Unsplash",
   "plugins.giphy.description": "Ajoute /giphy, pour chercher des GIF sur GIPHY et en mettre un dans une note. Ce que vous cherchez est envoyé à GIPHY.",
+  "plugins.asciinema.description": "Lit les enregistrements de terminal dans les notes : le code d’intégration d’asciinema.org et les fichiers .cast que vous ajoutez. Ceux d’asciinema.org se chargent depuis le site.",
   "plugins.noKey": "Nécessite une clé d’API {name}, avec laquelle cette copie de lines n’a pas été compilée.",
 } satisfies Translation<typeof en>;

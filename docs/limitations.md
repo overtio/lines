@@ -45,6 +45,17 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - A GIF is kept as its address on GIPHY, like an Unsplash photo: it needs the internet to show, and isn't in exports or sync as a picture. With reduced motion, GIFs from GIPHY show still, but other animated images in notes still play.
 - They're in Markdown notes only. A LaTeX note can't compile a picture from the web anyway.
 
+## Terminal recordings (asciinema)
+
+- A recording on asciinema.org is kept as its embed code, not as a file: it needs the internet to play, and isn't in exports or sync as a recording. A `.cast` file dropped into a note is an attachment like any other, and plays offline.
+- Printed, a recording from asciinema.org is asciinema's preview of it (dark, with its play mark), not a frame of it in black on white; a `.cast` file prints as its name.
+- A recording from another asciinema server than asciinema.org, or a link to a `.cast` file on the web, is a picture or link like any other: only asciinema.org's embed code and attached `.cast` files play.
+- The player is asciinema's, so its buttons are named in English for screen readers ("Play", "Toggle fullscreen mode"), and its list of keys (`?`) is English. lines hides its tooltips and the button for that list.
+- Recordings play only in Markdown notes. In a LaTeX note, a link to one is a link.
+- A recording plays again from its start, at the preview, when the theme changes or it's scrolled far out of view and back.
+- The player (about 185 KB, 65 KB compressed) loads the first time a note has a recording.
+- Not tried in the Mac app yet: loading recordings through the app's own fetch, and the player under its content security policy.
+
 ## Math
 
 - Math is drawn by KaTeX, which covers most of LaTeX's math mode but not all of it (no `\newcommand` shared between blocks, no TikZ or other packages), and not whole LaTeX documents.
@@ -163,7 +174,7 @@ How plugins work is in [plugins.md](plugins.md).
 - A note in a format whose plugin is off shows as plain text: no live preview, and its title is its first line as written. Exports and downloads still write it in its format.
 - Turning a plugin on or off isn't synced: each device keeps its own.
 - Drawings (Excalidraw), highlighting code blocks, GitHub links, symbols, and objects and mentions are still part of the core and Markdown, not plugins.
-- Only Markdown notes take additions from plugins; a renderer plugin draws code blocks in Markdown notes, not in LaTeX ones.
+- Only Markdown notes take additions from plugins; a renderer plugin draws code blocks in Markdown notes, not in LaTeX ones, and an embed (asciinema's recordings) draws links in Markdown notes only.
 - Turning a plugin off or on in the Mac app's Settings window hasn't been tried there yet, nor in floating notes (each window should follow at once).
 
 ## 3D models

@@ -420,7 +420,15 @@ flowchart LR
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Diagram (240 px wide), then Missing file
+#### 37. Diagram (240 px wide), then Terminal recording (.cast file)
+
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Diagram (240 px wide), then Missing file
 
 ```mermaid |240
 flowchart LR
@@ -428,7 +436,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Diagram (240 px wide), then Card
+#### 39. Diagram (240 px wide), then Card
 
 ```mermaid |240
 flowchart LR
@@ -438,7 +446,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 39. Diagram (240 px wide), then Callout (info)
+#### 40. Diagram (240 px wide), then Callout (info)
 
 ```mermaid |240
 flowchart LR
@@ -448,7 +456,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 40. Diagram (240 px wide), then Callout (warning, chosen icon)
+#### 41. Diagram (240 px wide), then Callout (warning, chosen icon)
 
 ```mermaid |240
 flowchart LR
@@ -458,7 +466,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Diagram (240 px wide), then Callout (decision, no icon)
+#### 42. Diagram (240 px wide), then Callout (decision, no icon)
 
 ```mermaid |240
 flowchart LR

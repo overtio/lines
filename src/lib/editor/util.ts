@@ -269,6 +269,12 @@ export function showCode(view: EditorView, pos: number) {
 /** What's drawn in a block that takes drags of its own (a 3D model, turned around): pressing it is a click only if it isn't dragged. */
 export const INTERACTIVE = ".cm-lp-interactive";
 
+/**
+ * What's drawn in a block that takes clicks and keys of its own (a recording's player): the editor
+ * leaves them alone, and Esc in it goes back to the note's text.
+ */
+export const OWN_INPUT = ".cm-lp-own-input";
+
 /** Runs `click` once the button that went down in `event` comes up in the same place: unless it was a drag. */
 export function whenClicked(event: MouseEvent, click: () => void) {
   const { clientX, clientY } = event;

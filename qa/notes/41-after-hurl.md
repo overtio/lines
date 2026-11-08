@@ -816,7 +816,26 @@ jsonpath "$.name" isString
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Missing file
+#### 37. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Terminal recording (.cast file)
+
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Missing file
 
 ```hurl
 # A todo
@@ -835,7 +854,7 @@ jsonpath "$.name" isString
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Card
+#### 39. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Card
 
 ```hurl
 # A todo
@@ -856,7 +875,7 @@ jsonpath "$.name" isString
 Text in a card.
 :::
 
-#### 39. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (info)
+#### 40. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (info)
 
 ```hurl
 # A todo
@@ -877,7 +896,7 @@ jsonpath "$.name" isString
 Text in an info callout.
 :::
 
-#### 40. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (warning, chosen icon)
+#### 41. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (warning, chosen icon)
 
 ```hurl
 # A todo
@@ -898,7 +917,7 @@ jsonpath "$.name" isString
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (decision, no icon)
+#### 42. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (decision, no icon)
 
 ```hurl
 # A todo

@@ -420,7 +420,15 @@ sphere(3;
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Broken model (openscad block), then Missing file
+#### 37. Broken model (openscad block), then Terminal recording (.cast file)
+
+```openscad
+cube(10)
+sphere(3;
+```
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Broken model (openscad block), then Missing file
 
 ```openscad
 cube(10)
@@ -428,7 +436,7 @@ sphere(3;
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Broken model (openscad block), then Card
+#### 39. Broken model (openscad block), then Card
 
 ```openscad
 cube(10)
@@ -438,7 +446,7 @@ sphere(3;
 Text in a card.
 :::
 
-#### 39. Broken model (openscad block), then Callout (info)
+#### 40. Broken model (openscad block), then Callout (info)
 
 ```openscad
 cube(10)
@@ -448,7 +456,7 @@ sphere(3;
 Text in an info callout.
 :::
 
-#### 40. Broken model (openscad block), then Callout (warning, chosen icon)
+#### 41. Broken model (openscad block), then Callout (warning, chosen icon)
 
 ```openscad
 cube(10)
@@ -458,7 +466,7 @@ sphere(3;
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Broken model (openscad block), then Callout (decision, no icon)
+#### 42. Broken model (openscad block), then Callout (decision, no icon)
 
 ```openscad
 cube(10)

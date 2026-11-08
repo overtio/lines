@@ -40,5 +40,7 @@ export default {
   "plugins.unsplash.description": "Adds /unsplash, to search Unsplash’s free photos and put one in a note. What you search for goes to Unsplash.",
   "plugins.unsplash.credit": "Photos from Unsplash",
   "plugins.giphy.description": "Adds /giphy, to search GIPHY’s GIFs and put one in a note. What you search for goes to GIPHY.",
+  // asciinema is a name, not translated.
+  "plugins.asciinema.description": "Plays terminal recordings in notes: asciinema.org’s embed code, and .cast files you add. Recordings on asciinema.org load from there.",
   "plugins.noKey": "Needs an API key from {name}, which this copy of lines wasn’t built with.",
 };

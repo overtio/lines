@@ -276,29 +276,33 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 
 > [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Missing file in a quote (stays Markdown here)
+#### 37. Terminal recording (.cast file) in a quote
+
+> [terminal.cast](attachment:terminal.cast)
+
+#### 38. Missing file in a quote (stays Markdown here)
 
 > [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Card in a quote
+#### 39. Card in a quote
 
 > ::: card
 > Text in a card.
 > :::
 
-#### 39. Callout (info) in a quote
+#### 40. Callout (info) in a quote
 
 > :::i
 > Text in an info callout.
 > :::
 
-#### 40. Callout (warning, chosen icon) in a quote
+#### 41. Callout (warning, chosen icon) in a quote
 
 > :::! icon=flag
 > Text in a warning callout with the flag icon.
 > :::
 
-#### 41. Callout (decision, no icon) in a quote
+#### 42. Callout (decision, no icon) in a quote
 
 > :::^ icon=none
 > Text in a decision callout with no icon.

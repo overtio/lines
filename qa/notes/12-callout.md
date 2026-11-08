@@ -348,13 +348,19 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 37. Missing file in a callout
+#### 37. Terminal recording (.cast file) in a callout
+
+:::i
+[terminal.cast](attachment:terminal.cast)
+:::
+
+#### 38. Missing file in a callout
 
 :::i
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 38. Card in a callout
+#### 39. Card in a callout
 
 :::i
 ::: card
@@ -362,7 +368,7 @@ Text in a card.
 :::
 :::
 
-#### 39. Callout (info) in a callout
+#### 40. Callout (info) in a callout
 
 :::i
 :::i
@@ -370,7 +376,7 @@ Text in an info callout.
 :::
 :::
 
-#### 40. Callout (warning, chosen icon) in a callout
+#### 41. Callout (warning, chosen icon) in a callout
 
 :::i
 :::! icon=flag
@@ -378,7 +384,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 41. Callout (decision, no icon) in a callout
+#### 42. Callout (decision, no icon) in a callout
 
 :::i
 :::^ icon=none
