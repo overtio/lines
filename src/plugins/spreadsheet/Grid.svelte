@@ -28,7 +28,7 @@
   import Icon from "../../lib/icons/Icon.svelte";
   import { FormulaHelp, type Suggestion } from "./help.svelte";
   import { type Point, pointing as pointers, type Writer } from "./pointing.svelte";
-  import { sheetLook, showCell, spokenCell } from "./sheet";
+  import { blockNameText, sheetLook, showCell, spokenCell } from "./sheet";
   import { ColumnWidths, textWidth } from "./widths";
 
   /*
@@ -1043,7 +1043,7 @@
   function endNaming(save: boolean, back = true) {
     if (!naming) return;
     naming = false;
-    if (save && nameInput) sheet.rename?.(nameInput.value.replace(/[/'"![\]]/g, "").trim() || null);
+    if (save && nameInput) sheet.rename?.(blockNameText(nameInput.value));
     if (back) focusInput();
   }
 

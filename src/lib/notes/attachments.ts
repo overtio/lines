@@ -116,7 +116,10 @@ export async function saveAttachment(file: Blob): Promise<string> {
   return name;
 }
 
-const typeOf = (name: string) => TYPES[name.slice(name.lastIndexOf(".") + 1)] ?? "application/octet-stream";
+/** An attachment's extension: `csv` for `3b8a….csv`. */
+export const extensionOf = (name: string) => name.slice(name.lastIndexOf(".") + 1);
+
+const typeOf = (name: string) => TYPES[extensionOf(name)] ?? "application/octet-stream";
 
 /** Stores an attachment (one saved here, or downloaded by sync) and tells every window. */
 export async function putAttachment(name: string, data: Blob) {
@@ -192,10 +195,7 @@ export function arrived(name: string) {
 export async function openAttachment(name: string, label: string) {
   const data = await getAttachment(name);
   if (!data) return;
-  const ext = name.slice(name.lastIndexOf(".") + 1);
-  // oxlint-disable-next-line no-control-regex -- control characters are what it takes out
-  label = label.replace(/[/\\:\u0000-\u001f]/g, "-").trim().replace(/^\.+/, "") || name;
-  const fileName = label.toLowerCase().endsWith(`.${ext}`) ? label : `${label}.${ext}`;
+  const fileName = attachmentFileName(name, label);
   if (isDesktopApp) {
     const { invoke } = await import("@tauri-apps/api/core");
     const bytes = new Uint8Array(await data.arrayBuffer());
@@ -209,6 +209,14 @@ export async function openAttachment(name: string, label: string) {
   } else {
     download(fileName, data, data.type);
   }
+}
+
+/** What an attachment is called as a file: what the note calls it (`label`), made safe, with its extension. */
+export function attachmentFileName(name: string, label: string) {
+  const ext = extensionOf(name);
+  // oxlint-disable-next-line no-control-regex -- control characters are what it takes out
+  label = label.replace(/[/\\:\u0000-\u001f]/g, "-").trim().replace(/^\.+/, "") || name;
+  return label.toLowerCase().endsWith(`.${ext}`) ? label : `${label}.${ext}`;
 }
 
 /** Held by every tab lines is open in, so one can tell whether it's the only one. */

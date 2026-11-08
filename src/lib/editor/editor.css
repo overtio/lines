@@ -781,8 +781,8 @@
   color: var(--text);
 }
 
-:is(.cm-lp-diagram, .cm-lp-editable, .cm-lp-table-wrap, .cm-lp-image-block):hover .cm-lp-actions,
-.cm-lp-image-block:is(.is-preview, .is-selected) .cm-lp-actions,
+:is(.cm-lp-diagram, .cm-lp-editable, .cm-lp-table-wrap, .cm-lp-image-block, .cm-lp-file-block):hover .cm-lp-actions,
+:is(.cm-lp-image-block, .cm-lp-file-block):is(.is-preview, .is-selected) .cm-lp-actions,
 .cm-lp-actions:focus-within {
   opacity: 1;
 }
@@ -1150,6 +1150,9 @@
 }
 
 .cm-lp-file {
+  /* Its button (a CSV file's Convert to Spreadsheet) level with its middle. */
+  --actions-top: calc(50% - 15px);
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.7em;
@@ -1160,6 +1163,20 @@
   background: var(--card-bg);
   font-family: var(--font-ui);
   vertical-align: bottom;
+}
+
+/* Where there's no room beside the card, its button goes inside its right end, as far in as its icon. */
+.cm-lp-file > .cm-lp-actions.is-inside {
+  top: var(--actions-top);
+  left: calc(100% - 30px - 0.7em);
+}
+
+.cm-content:not([contenteditable="false"]) .cm-lp-file:not(.is-missing):has(> .cm-lp-actions.is-inside) {
+  padding-right: calc(1.4em + 30px);
+}
+
+.cm-lp-file.is-missing > .cm-lp-actions {
+  display: none;
 }
 
 .cm-lp-file-icon {

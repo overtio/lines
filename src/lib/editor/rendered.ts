@@ -39,6 +39,10 @@ export function blockName(info: string): string | null {
 const infoText = (language: string, name: string | null, width: number | null) =>
   language + (name ? ` name=${/[\s"]/.test(name) ? `"${name.replaceAll('"', "")}"` : name}` : "") + (width ? ` |${width}` : "");
 
+/** A code block of `language`, with a name if it has one: a ```csv block from its CSV, say. */
+export const fencedBlock = (language: string, code: string, name: string | null = null) =>
+  `\`\`\`${infoText(language, name, null)}\n${code ? `${code}\n` : ""}\`\`\``;
+
 /**
  * The renderer for a code block's info string, and the width it's shown at, if it gives one. The
  * language stays a word of its own, so other apps still see what it is.
@@ -177,10 +181,11 @@ function writeWidth(view: EditorView, dom: HTMLElement, width: number | null) {
 
 /**
  * A block's buttons, from its renderer's actions, beside `target` (actions.ts). Each is given where
- * the block is in the note when it's clicked.
+ * the block is in the note when it's clicked. Returns their bar, put in `dom`, to move into
+ * `target` where that's narrower than the block.
  */
 export function addActions(view: EditorView, dom: HTMLElement, actions: BlockAction[] = [], target: Element = dom) {
-  if (!actions.length) return;
+  if (!actions.length) return null;
   const bar = actionBar(dom, target);
   const icons = actions.map((action) => {
     const button = document.createElement("button");
@@ -194,6 +199,7 @@ export function addActions(view: EditorView, dom: HTMLElement, actions: BlockAct
   });
   actionBars.set(dom, { bar, icons });
   dom.append(bar);
+  return bar;
 }
 
 /** Takes down a block's buttons. */

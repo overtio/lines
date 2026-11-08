@@ -90,6 +90,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Formulas are in English with commas, and numbers and dates are read as in US English, whatever the app's language: `1.200,50` is text, not a number.
 - Find in a note (⌘F) doesn't search a spreadsheet's cells. The note list's search does. In a Markdown note, it finds text in a ` ```csv ` block but can't show it in the grid; the cells' Edit as CSV shows the block's text.
 - A ` ```csv ` block is comma-separated only; a ` ```tsv ` block is code. Empty rows at the end of a one-column block aren't kept.
+- Only a CSV or TSV file in a note can be turned into a spreadsheet there; an Excel workbook can't yet, though Settings → Data imports it as notes.
 - A screen reader hears each cell as it's reached, but can't browse the grid's rows and columns as a table: the grid is inside the editor's text box (docs/accessibility.md).
 - Filling by dragging scrolls the grid only as the pointer moves, not while it's held still past the edge. Dates go on only written as `2026-01-31`; days and months by name only in English and the app's language. There are no lists of your own to fill from, and double-clicking the corner fills down, not across.
 - Every row is kept in memory and worked out again on each change, so very large sheets (tens of thousands of rows) are slow to change, though only the rows in view are drawn.

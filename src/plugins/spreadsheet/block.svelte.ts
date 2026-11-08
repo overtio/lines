@@ -14,7 +14,7 @@ import Grid from "./Grid.svelte";
 import { plugins } from "../../lib/plugins/registry.svelte";
 import { blockNames, sheetChoices, sheetFinder } from "./links";
 import { settle } from "./renames.svelte";
-import { printedCell, printedCells } from "./sheet";
+import { blockNameText, fileCells, fileTitle, printedCell, printedCells } from "./sheet";
 import type { Sheet } from "./state.svelte";
 
 /*
@@ -161,6 +161,13 @@ export const sheetBlock = (): Renderer => ({
   render,
   editor,
   actions: [{ label: t("sheet.toTable"), icon: "table", run: toTable }],
+  // A CSV file attached in a note, named after the file.
+  fromFiles: {
+    extensions: ["csv", "tsv"],
+    label: t("editor.toSpreadsheet"),
+    icon: "sheet",
+    read: (file) => ({ code: writeCsv(fileCells(file)), name: blockNameText(fileTitle(file.name)) }),
+  },
 });
 
 /** "/Spreadsheet", which puts an empty one in. */

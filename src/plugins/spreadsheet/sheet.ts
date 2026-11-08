@@ -3,7 +3,7 @@ import { extractTags } from "../../lib/notes/parse";
 import { prefs } from "../../lib/prefs.svelte";
 import type { Cells } from "../../lib/plugins/types";
 import { el } from "../../lib/print/parts";
-import { parseCsv, trimCells, writeCsv } from "../../lib/sheets/csv";
+import { parseCsv, sniffDelimiter, trimCells, writeCsv } from "../../lib/sheets/csv";
 import { type CellLook, cellShown, displayed } from "../../lib/sheets/display";
 
 /*
@@ -52,6 +52,21 @@ export const sheetCsv = (body: string) => {
 
 /** Its cells without the empty rows and columns at the end. */
 export const sheetCells = (body: string) => trimCells(readSheet(body).cells);
+
+/** A file's name without its extension, for the note or block made from it. */
+export function fileTitle(name: string) {
+  const dot = name.lastIndexOf(".");
+  return (dot > 0 ? name.slice(0, dot) : name).replace(/\s+/g, " ").trim();
+}
+
+/** A CSV or TSV file's cells, its delimiter (`;` in much of Europe) found from its first lines. */
+export function fileCells({ name, data }: { name: string; data: Uint8Array }): Cells {
+  const text = new TextDecoder().decode(data);
+  return parseCsv(text, name.toLowerCase().endsWith(".tsv") ? "\t" : sniffDelimiter(text));
+}
+
+/** A block's name without what formulas write sheets' names with (`/`, quotes, `!`, brackets); null if nothing's left. */
+export const blockNameText = (text: string) => text.replace(/[/'"![\]]/g, "").trim() || null;
 
 /** Numbers, money and dates, which line up on the right. */
 const NUMBER = /^(?:[-+]?[$€£¥]?\s*[\d.,]+%?|\d{4}-\d{2}-\d{2})$/;

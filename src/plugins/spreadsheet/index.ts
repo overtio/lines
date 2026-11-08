@@ -5,13 +5,13 @@ import { plugins } from "../../lib/plugins/registry.svelte";
 import type { Cells, NoteExport, Plugin } from "../../lib/plugins/types";
 import { el, type Parts } from "../../lib/print/parts";
 import { isFormula } from "../../lib/sheets/cells";
-import { parseCsv, sniffDelimiter, writeCsv } from "../../lib/sheets/csv";
+import { parseCsv, writeCsv } from "../../lib/sheets/csv";
 import { calculate, loadFormulas, loadedFormulas } from "../../lib/sheets/formulas";
 import { sheetBlock, sheetCommand } from "./block.svelte";
 import { sheetEditing } from "./editor";
 import { sheetFinder } from "./links";
 import "./preload.svelte";
-import { headOf, printedCell, printedCells, readSheet, sheetBody, sheetCells, sheetCsv, tagsOf, titleOf } from "./sheet";
+import { fileCells, fileTitle, headOf, printedCell, printedCells, readSheet, sheetBody, sheetCells, sheetCsv, tagsOf, titleOf } from "./sheet";
 
 /*
  * Spreadsheet notes: cells and formulas, kept as CSV under the note's title (sheet.ts), and drawn
@@ -100,18 +100,15 @@ const downloads = (): NoteExport[] => [
 ];
 
 /** A spreadsheet note for each sheet of a workbook, or one for a CSV file, titled by the file's name. */
-async function read({ name, data }: { name: string; data: Uint8Array }) {
-  const dot = name.lastIndexOf(".");
-  const title = (dot > 0 ? name.slice(0, dot) : name).replace(/\s+/g, " ").trim();
-  if (name.toLowerCase().endsWith(".xlsx")) {
+async function read(file: { name: string; data: Uint8Array }) {
+  const title = fileTitle(file.name);
+  if (file.name.toLowerCase().endsWith(".xlsx")) {
     const engine = await loadFormulas();
     if (!engine?.readWorkbook) throw new Error(t("sheet.noEngine"));
-    const sheets = engine.readWorkbook(data);
+    const sheets = engine.readWorkbook(file.data);
     return sheets.map((sheet) => sheetBody(sheets.length > 1 ? `${title} – ${sheet.name}` : title, sheet.cells));
   }
-  const text = new TextDecoder().decode(data);
-  const delimiter = name.toLowerCase().endsWith(".tsv") ? "\t" : sniffDelimiter(text);
-  return [sheetBody(title, parseCsv(text, delimiter))];
+  return [sheetBody(title, fileCells(file))];
 }
 
 export const spreadsheet = (): Plugin => ({

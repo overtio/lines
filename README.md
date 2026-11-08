@@ -63,7 +63,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 - **Money, dates and numbers below zero** shown your way, accounting style too, and the sum and average of what's selected.
 - **Formulas across notes.** `=Budget!B4` uses another note's spreadsheet, and follows it when it's renamed.
 - **Plain CSV underneath**, so it syncs and searches like any note. A block turns into a Markdown table, and back, with a button.
-- **CSV and Excel files.** Import them from Settings → Data; download a spreadsheet as CSV (formulas or values) or as an Excel workbook.
+- **CSV and Excel files.** Import them from Settings → Data, or turn a CSV file in a note into a spreadsheet there with its button; download a spreadsheet as CSV (formulas or values) or as an Excel workbook.
 
 ### Organizing
 

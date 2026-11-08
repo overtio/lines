@@ -8,8 +8,10 @@ import Icon from "../icons/Icon.svelte";
 import type { IconName } from "../icons/icons";
 import {
   ATTACHMENT_PATH,
+  attachmentFileName,
   attachmentName,
   attachmentURL,
+  extensionOf,
   getAttachment,
   imageSize,
   isImage,
@@ -21,11 +23,12 @@ import {
 import { coarsePointer } from "../platform";
 import { locale, type MessageKey, t } from "../i18n/index.svelte";
 import { plugins } from "../plugins/registry.svelte";
-import type { FileView } from "../plugins/types";
+import type { FileView, Renderer } from "../plugins/types";
 import { actionBar, dropBar, resizeHandle } from "./actions";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { editDrawing, isDrawing, knownDrawing } from "./drawings";
 import { giphyStill } from "./giphy";
+import { addActions, fencedBlock, removeActions } from "./rendered";
 import { isUnsplashPhoto, unsplashImage, unsplashPhoto } from "./unsplash";
 import { ancestors, blockPos, drawnBlock, drawnBlocks, focused, INTERACTIVE, isEditing, whenClicked } from "./util";
 
@@ -34,7 +37,9 @@ import { ancestors, blockPos, drawnBlock, drawnBlocks, focused, INTERACTIVE, isE
  * or a card naming the file, below what a plugin shows of it: a 3D model to turn); with the cursor
  * on that line its Markdown shows, with the block below it. Such an image has a handle on its
  * corner that resizes it, written into its label as Obsidian does (`![Lake|400](…)`), and a
- * drawing (drawings.ts) a button to edit it. Images within text are drawn inline by livePreview.ts, and files within text are links.
+ * drawing (drawings.ts) a button to edit it. A file that a renderer plugin makes blocks from
+ * (`Renderer.fromFiles`) has a button that puts its block in its place: a CSV file's spreadsheet.
+ * Images within text are drawn inline by livePreview.ts, and files within text are links.
  * Pasting or dropping files, or the /image and /file commands, saves them on the device (see
  * notes/attachments.ts) and puts each on its own line.
  */
@@ -127,7 +132,7 @@ export function formatSize(bytes: number) {
 
 /** A card for an attached file: its kind, name and size, or a note that it hasn't arrived yet. */
 function fileElement(name: string, label: string, onChange: () => void): { dom: HTMLElement; destroy: () => void } {
-  const ext = name.slice(name.lastIndexOf(".") + 1);
+  const ext = extensionOf(name);
   const dom = document.createElement("span");
   dom.className = "cm-lp-file";
   dom.title = coarsePointer.matches ? "" : t("editor.file.open");
@@ -206,6 +211,8 @@ class BlockWidget extends WidgetType {
     readonly preview: boolean,
     /** Its Markdown is selected, so typing or Delete would replace it. */
     readonly selected = false,
+    /** What makes a block from the file, for its button, so turning that plugin on or off draws it again. */
+    readonly converter = block.kind === "file" ? plugins.blockFromFile(block.src) : undefined,
   ) {
     super();
   }
@@ -216,7 +223,8 @@ class BlockWidget extends WidgetType {
       other.block.label === this.block.label &&
       sameInset(other.inset, this.inset) &&
       other.preview === this.preview &&
-      other.selected === this.selected
+      other.selected === this.selected &&
+      other.converter === this.converter
     );
   }
   #classes(dom: HTMLElement) {
@@ -244,6 +252,15 @@ class BlockWidget extends WidgetType {
     frame.className = "cm-lp-image-frame";
     frame.append(content.dom);
     dom.append(kind === "image" ? frame : content.dom);
+    const { converter } = this;
+    if (converter?.fromFiles) {
+      const { label, icon } = converter.fromFiles;
+      dom.dataset.converter = converter.id;
+      const run = (view: EditorView, pos: number) => void convertFile(view, pos, converter).catch((error) => console.error("lines: couldn't convert", error));
+      // Beside the card, not the whole line.
+      const bar = addActions(view, dom, [{ label, icon, run }], content.dom);
+      if (bar) content.dom.append(bar);
+    }
     if (kind === "image") {
       const handle = resizeHandle(view, dom, "cm-lp-image-resize", {
         target: () => dom.querySelector<HTMLImageElement>(".cm-lp-image"),
@@ -288,13 +305,14 @@ class BlockWidget extends WidgetType {
   }
   /** Moving the cursor onto or off the block keeps it as it is. */
   updateDOM(dom: HTMLElement) {
-    if (dom.dataset.src !== this.block.src || dom.dataset.label !== this.block.label) return false;
+    if (dom.dataset.src !== this.block.src || dom.dataset.label !== this.block.label || dom.dataset.converter !== this.converter?.id) return false;
     this.#classes(dom);
     return true;
   }
   destroy(dom: HTMLElement) {
     cleanups.get(dom)?.();
     cleanups.delete(dom);
+    removeActions(dom);
   }
   get estimatedHeight() {
     if (this.block.kind === "image") return heights.get(`${this.block.src}\n${this.block.label}`) ?? 200;
@@ -322,6 +340,31 @@ function writeWidth(view: EditorView, dom: HTMLElement, width: number | null) {
   // After "![".
   const from = block.from + 2;
   view.dispatch({ changes: { from, to: from + block.label.length, insert: label }, userEvent: "input.resize" });
+}
+
+/**
+ * Puts the block `renderer` makes from the file on the line at `pos` in the file's place (a CSV
+ * file's spreadsheet), with the cursor on the line after it, so it shows. Undo brings the file back.
+ */
+async function convertFile(view: EditorView, pos: number, renderer: Renderer) {
+  const file = blockOnLine(view.state, view.state.doc.lineAt(pos).number);
+  const name = file && attachmentName(file.src);
+  const data = name && (await getAttachment(name));
+  if (!file || !name || !data || !renderer.fromFiles) return;
+  const { code, name: blockName } = await renderer.fromFiles.read({ name: attachmentFileName(name, file.label), data: new Uint8Array(await data.arrayBuffer()) });
+  // The note may have changed while the file was read.
+  const { state } = view;
+  const line = state.doc.lineAt(Math.min(pos, state.doc.length));
+  if (state.readOnly || !view.dom.isConnected || blockOnLine(state, line.number)?.src !== file.src) return;
+  const insert = fencedBlock(renderer.languages[0], code, blockName);
+  view.dispatch({
+    // A line after it, for the cursor, if it ends the note.
+    changes: { from: line.from, to: line.to, insert: line.to === state.doc.length ? `${insert}\n` : insert },
+    selection: { anchor: line.from + insert.length + 1 },
+    userEvent: "input",
+    annotations: isolateHistory.of("full"),
+  });
+  view.focus();
 }
 
 /** An image or file drawn as a block, and where its Markdown is. */
@@ -482,6 +525,8 @@ const clickToSelect = EditorView.domEventHandlers({
       void editDrawing(view, src, view.state.doc.lineAt(blockPos(view, dom)).from);
       return true;
     }
+    // Its other buttons (addActions') act on click.
+    if ((event.target as HTMLElement).closest(".cm-lp-actions")) return true;
     if (name && event.button === 0 && opens) {
       void openAttachment(name, dom.dataset.label || name).catch((error) => console.error("lines: couldn't open", error));
       return true;
