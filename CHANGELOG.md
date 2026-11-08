@@ -2,6 +2,12 @@
 
 What changed in each release of lines. Written by `bun scripts/release.mjs prepare` from the commits since the release before (docs/releasing.md).
 
+## [0.2.0](https://github.com/overtio/lines/compare/v0.1.0...v0.2.0) (2026-11-08)
+
+### Features
+
+- API requests in notes (.http and Hurl), and secrets kept in a locked note ([#169](https://github.com/overtio/lines/pull/169))
+
 ## [0.1.0](https://github.com/overtio/lines/releases/tag/v0.1.0) (2026-11-07)
 
 ### Features
