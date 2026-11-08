@@ -16,6 +16,8 @@ Any other file works the same way, or type `/file`. It shows as a card with its 
 
 [Budget.csv](attachment:budget.csv)
 
+Hover a CSV file for a button that turns it into a spreadsheet in the note.
+
 A 3D model (STL, OBJ, 3MF, glTF, or a STEP or IGES file from CAD) shows above its card, to turn around:
 
 [Bracket.stl](attachment:bracket.stl)

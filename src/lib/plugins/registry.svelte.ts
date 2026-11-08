@@ -17,6 +17,9 @@ export const DEFAULT_LANGUAGE = "markdown";
 const DEFAULT_THEME = "lines";
 const DEFAULT_ICONS = "lucide";
 
+/** A file name's extension, in lowercase: `stl` for `Bracket.STL`. */
+const extension = (name: string) => name.slice(name.lastIndexOf(".") + 1).toLowerCase();
+
 /** The plugins turned on or off by choice, by id; the rest are as they are by default. */
 function read(): Record<string, boolean> {
   try {
@@ -150,8 +153,12 @@ class Plugins {
 
   /** What shows an attached file of this name (`….stl`) in a note, if anything does. */
   fileView(name: string) {
-    const extension = name.slice(name.lastIndexOf(".") + 1).toLowerCase();
-    return this.fileViews.find((view) => view.extensions.includes(extension));
+    return this.fileViews.find((view) => view.extensions.includes(extension(name)));
+  }
+
+  /** What makes a block from an attached file of this name (a `.csv` file's spreadsheet), if anything does. */
+  blockFromFile(name: string) {
+    return this.renderers.find((renderer) => renderer.fromFiles?.extensions.includes(extension(name)));
   }
 
   /** What draws math, if anything does. */

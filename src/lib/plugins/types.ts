@@ -189,6 +189,11 @@ export interface Renderer {
   /** Buttons on what it draws, like a diagram's "Copy and Edit as Drawing". */
   actions?: BlockAction[];
   /**
+   * Attached files it makes one of its blocks from, as a CSV file makes a ```csv block: a button on
+   * the file's card in a note puts the block in the file's place.
+   */
+  fromFiles?: BlockFromFile;
+  /**
    * Draws its blocks in the editor as something to work in, instead of `render`'s picture, which
    * still prints: a ```csv block as a spreadsheet's grid. It's put into `dom`, in place of the
    * block's code, and writes what's changed back through `block`.
@@ -255,6 +260,19 @@ export interface BlockAction {
   /** `pos` is in the code block. */
   run(view: EditorView, pos: number): void;
 }
+
+/** How a renderer makes one of its blocks from an attached file (`Renderer.fromFiles`). */
+export interface BlockFromFile {
+  /** The files' extensions, in lowercase: ["csv", "tsv"]. */
+  extensions: string[];
+  /** What the file card's button says: "Convert to Spreadsheet". */
+  label: string;
+  icon: IconName;
+  /** The block's code, and its name (from the file's, `name` being what the note calls it, with its extension), if it takes one. */
+  read(file: { name: string; data: Uint8Array }): FileBlock | Promise<FileBlock>;
+}
+
+export type FileBlock = { code: string; name: string | null };
 
 export type TypesetProgress = { phase: "download" | "compile"; percent?: number };
 

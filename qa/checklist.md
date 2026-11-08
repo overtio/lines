@@ -247,6 +247,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] `/image` and `/file` open the file picker
 - [ ] Nothing can be attached in code, tables or trashed notes
 - [ ] Files show as a card with an icon, name and kind · size
+- [ ] A `.csv` or `.tsv` file's card shows Convert to Spreadsheet 6px beside it on hover (always on touch), level with its middle; in a window or card too narrow for it, inside the card's right end, its name cut with "…" before it. Clicking it puts the file's cells in its place as ` ```csv name="<file name>" ` (a semicolon- or tab-separated file read right), the grid drawn and the cursor on the line after it; one ⌘Z brings the file back. Reached with Esc, then Tab. No button on other files, on a file not on this device yet, in the Trash, or with Spreadsheets off
 - [ ] An image or file that hasn't synced yet says so, and appears when it arrives
 - [ ] Clicking an image or file selects it; Delete removes it; ↑ and ↓ stop on it first
 - [ ] An image or drawing on its own line shows a round handle with a corner mark just past its bottom right corner on hover (always on touch), the same as a diagram's and a spreadsheet block's; dragging it resizes the image, keeping its shape, between 48 px and the note's width, and writes the width into its Markdown (`![Lake|400](…)`); ⌘Z undoes it; double-clicking the handle goes back to the image's own size. No handle in the Trash

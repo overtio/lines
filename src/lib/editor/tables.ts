@@ -17,7 +17,7 @@ import { symbolsChanged } from "./symbols";
 import { withSymbols } from "../notes/symbols";
 import { prefs } from "../prefs.svelte";
 import { t } from "../i18n/index.svelte";
-import { addActions, removeActions } from "./rendered";
+import { addActions, fencedBlock, removeActions } from "./rendered";
 import { ancestors, arrowsInto, drawnBlock, drawnBlocks, focused, hasText, isEditing } from "./util";
 
 /*
@@ -458,7 +458,7 @@ const cellsOf = (model: TableModel): Cells =>
 function toSpreadsheet(view: EditorView, pos: number) {
   const table = tableAt(view.state, pos);
   if (!table || view.state.readOnly) return;
-  const insert = `\`\`\`csv\n${writeCsv(cellsOf(modelOf(view.state, table)))}\n\`\`\``;
+  const insert = fencedBlock("csv", writeCsv(cellsOf(modelOf(view.state, table))));
   view.dispatch({ changes: { from: table.from, to: table.to, insert }, userEvent: "input", annotations: isolateHistory.of("full") });
 }
 
