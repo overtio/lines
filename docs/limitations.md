@@ -167,6 +167,15 @@ What isn't done yet is in [requests.md](requests.md#not-yet): environments, asse
 - Requests in a code block inside a list or a quote, indented, aren't read as requests.
 - Sending from the Windows and Linux apps hasn't been tried yet.
 
+## Secrets
+
+What isn't done yet is in [secrets.md](secrets.md#not-yet).
+
+- A secrets note's values show in its properties while it's open, as any locked note's text does.
+- A response can echo a secret back (an echo service, a token in a redirect), and **+** writes the body into the note as it came.
+- Copy as curl writes `${NAME}` for every name it can't fill in, a secret or not.
+- Secrets are as safe as locked notes: see Locked notes below.
+
 ## Accessibility and languages
 
 - With Contrast on Standard, faint text (dates, counts, the sidebar's headings, hints) is below WCAG AA's 4.5:1 in every theme but the three accessibility ones, and secondary text is too in a few light themes (Solarized, Everforest, Ayu). Contrast → Increased, or the system's Increase Contrast, meets AA (docs/accessibility.md).

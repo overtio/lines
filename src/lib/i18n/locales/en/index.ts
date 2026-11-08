@@ -11,6 +11,7 @@ import lock from "./lock";
 import picker from "./picker";
 import plugins from "./plugins";
 import print from "./print";
+import secrets from "./secrets";
 import settings from "./settings";
 import sheet from "./sheet";
 import shortcuts from "./shortcuts";
@@ -27,6 +28,7 @@ export default {
   ...picker,
   ...plugins,
   ...print,
+  ...secrets,
   ...settings,
   ...sheet,
   ...shortcuts,

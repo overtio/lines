@@ -112,6 +112,9 @@ export default {
   "lock.dialog.setHint": "Si vous l’oubliez, les notes verrouillées avec ce mot de passe ne pourront pas être ouvertes, pas même par lines.",
   "lock.dialog.openTitle": "Saisissez le mot de passe des notes verrouillées",
   "lock.dialog.openIntro": "Vos notes verrouillées s’ouvrent aussi, jusqu’à ce que vous les verrouilliez de nouveau.",
+  "lock.dialog.secretIntro": "Vos secrets sont gardés dans une note verrouillée. Vos autres notes verrouillées s’ouvrent aussi, jusqu’à ce que vous les verrouilliez à nouveau.",
+  "lock.dialog.open": "Ouvrir",
+  "lock.dialog.opening": "Ouverture…",
   "lock.dialog.lockNote": "Verrouiller la note",
   "lock.dialog.locking": "Verrouillage…",
 

@@ -201,6 +201,15 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] [Web] An API without CORS says it didn't answer, and why
 - [ ] VoiceOver reads Send, the response's status as it arrives, and its buttons
 
+## 6b. Secrets
+
+- [ ] A locked note with properties `type: secrets` and `token: …` is a secrets note; one that isn't locked isn't read
+- [ ] `{{token}}` in a Markdown note shows a key, `token` and dots; Show reveals it (and hides it after 15 seconds, or when locked notes close); Copy copies it; with the cursor in it, it shows as written. `{{nope}}` has an outline and says there's no such secret. In code it's text. `/secret` writes `{{}}`
+- [ ] With locked notes closed, Show or Copy asks for their password ("Your secrets are kept in a locked note"), with Touch ID [Mac]; Cancel does nothing
+- [ ] `Authorization: Bearer {{token}}` in a request sends the value (`https://httpbin.org/headers` echoes it); a secret in the address shows as `••••` in the response; Copy as curl writes `"${TOKEN}"`; with locked notes closed Send asks first, and Cancel says why in the response
+- [ ] Printing and the PDF show `token ••••••`; Copy, Download and Export keep `{{token}}`
+- [ ] Secrets off: `{{token}}` is text, `/secret` is gone; requests still use it
+
 ## 7. Images and files
 
 - [ ] Pasting an image, or dropping one onto a note, adds it on its own line; the cursor moves past it
@@ -325,7 +334,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 13a. Plugins
 
-- [ ] Settings → Plugins lists Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
+- [ ] Settings → Plugins lists Secrets under More; Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
 - [ ] Clicking a plugin's name (or its switch) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
 - [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On, and its format switch offers only Markdown and Spreadsheet; Turn On draws it as LaTeX again at once
 - [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)

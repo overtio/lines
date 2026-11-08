@@ -209,7 +209,17 @@ Total, =SUM(B2:B3)
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Spreadsheet (csv block), then API requests (http block): a variable, a named request and one using its response
+#### 18. Spreadsheet (csv block), then Secret ({{name}}, kept in a locked secrets note)
+
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 19. Spreadsheet (csv block), then API requests (http block): a variable, a named request and one using its response
 
 ```csv
 Item, Cost
@@ -228,7 +238,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 19. Spreadsheet (csv block), then Spreadsheet (csv block)
+#### 20. Spreadsheet (csv block), then Spreadsheet (csv block)
 
 ```csv
 Item, Cost
@@ -243,7 +253,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 20. Spreadsheet (csv block), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 21. Spreadsheet (csv block), then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```csv
 Item, Cost
@@ -260,7 +270,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 21. Spreadsheet (csv block), then Divider
+#### 22. Spreadsheet (csv block), then Divider
 
 ```csv
 Item, Cost
@@ -270,7 +280,7 @@ Total, =SUM(B2:B3)
 ```
 ---
 
-#### 22. Spreadsheet (csv block), then Key: Value line
+#### 23. Spreadsheet (csv block), then Key: Value line
 
 ```csv
 Item, Cost
@@ -280,7 +290,7 @@ Total, =SUM(B2:B3)
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 23. Spreadsheet (csv block), then Mention
+#### 24. Spreadsheet (csv block), then Mention
 
 ```csv
 Item, Cost
@@ -290,7 +300,7 @@ Total, =SUM(B2:B3)
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 24. Spreadsheet (csv block), then Wiki link
+#### 25. Spreadsheet (csv block), then Wiki link
 
 ```csv
 Item, Cost
@@ -300,7 +310,7 @@ Total, =SUM(B2:B3)
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 25. Spreadsheet (csv block), then Symbols
+#### 26. Spreadsheet (csv block), then Symbols
 
 ```csv
 Item, Cost
@@ -310,7 +320,7 @@ Total, =SUM(B2:B3)
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 26. Spreadsheet (csv block), then GitHub links
+#### 27. Spreadsheet (csv block), then GitHub links
 
 ```csv
 Item, Cost
@@ -320,7 +330,7 @@ Total, =SUM(B2:B3)
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 27. Spreadsheet (csv block), then Image
+#### 28. Spreadsheet (csv block), then Image
 
 ```csv
 Item, Cost
@@ -330,7 +340,7 @@ Total, =SUM(B2:B3)
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 28. Spreadsheet (csv block), then Drawing
+#### 29. Spreadsheet (csv block), then Drawing
 
 ```csv
 Item, Cost
@@ -340,7 +350,7 @@ Total, =SUM(B2:B3)
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 29. Spreadsheet (csv block), then File
+#### 30. Spreadsheet (csv block), then File
 
 ```csv
 Item, Cost
@@ -350,7 +360,7 @@ Total, =SUM(B2:B3)
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 30. Spreadsheet (csv block), then Missing file
+#### 31. Spreadsheet (csv block), then Missing file
 
 ```csv
 Item, Cost
@@ -360,7 +370,7 @@ Total, =SUM(B2:B3)
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 31. Spreadsheet (csv block), then Card
+#### 32. Spreadsheet (csv block), then Card
 
 ```csv
 Item, Cost
@@ -372,7 +382,7 @@ Total, =SUM(B2:B3)
 Text in a card.
 :::
 
-#### 32. Spreadsheet (csv block), then Callout (info)
+#### 33. Spreadsheet (csv block), then Callout (info)
 
 ```csv
 Item, Cost
@@ -384,7 +394,7 @@ Total, =SUM(B2:B3)
 Text in an info callout.
 :::
 
-#### 33. Spreadsheet (csv block), then Callout (warning, chosen icon)
+#### 34. Spreadsheet (csv block), then Callout (warning, chosen icon)
 
 ```csv
 Item, Cost
@@ -396,7 +406,7 @@ Total, =SUM(B2:B3)
 Text in a warning callout with the flag icon.
 :::
 
-#### 34. Spreadsheet (csv block), then Callout (decision, no icon)
+#### 35. Spreadsheet (csv block), then Callout (decision, no icon)
 
 ```csv
 Item, Cost

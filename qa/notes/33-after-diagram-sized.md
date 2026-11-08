@@ -175,7 +175,15 @@ flowchart LR
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Diagram (240 px wide), then API requests (http block): a variable, a named request and one using its response
+#### 18. Diagram (240 px wide), then Secret ({{name}}, kept in a locked secrets note)
+
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 19. Diagram (240 px wide), then API requests (http block): a variable, a named request and one using its response
 
 ```mermaid |240
 flowchart LR
@@ -192,7 +200,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 19. Diagram (240 px wide), then Spreadsheet (csv block)
+#### 20. Diagram (240 px wide), then Spreadsheet (csv block)
 
 ```mermaid |240
 flowchart LR
@@ -205,7 +213,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 20. Diagram (240 px wide), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 21. Diagram (240 px wide), then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```mermaid |240
 flowchart LR
@@ -220,7 +228,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 21. Diagram (240 px wide), then Divider
+#### 22. Diagram (240 px wide), then Divider
 
 ```mermaid |240
 flowchart LR
@@ -228,7 +236,7 @@ flowchart LR
 ```
 ---
 
-#### 22. Diagram (240 px wide), then Key: Value line
+#### 23. Diagram (240 px wide), then Key: Value line
 
 ```mermaid |240
 flowchart LR
@@ -236,7 +244,7 @@ flowchart LR
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 23. Diagram (240 px wide), then Mention
+#### 24. Diagram (240 px wide), then Mention
 
 ```mermaid |240
 flowchart LR
@@ -244,7 +252,7 @@ flowchart LR
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 24. Diagram (240 px wide), then Wiki link
+#### 25. Diagram (240 px wide), then Wiki link
 
 ```mermaid |240
 flowchart LR
@@ -252,7 +260,7 @@ flowchart LR
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 25. Diagram (240 px wide), then Symbols
+#### 26. Diagram (240 px wide), then Symbols
 
 ```mermaid |240
 flowchart LR
@@ -260,7 +268,7 @@ flowchart LR
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 26. Diagram (240 px wide), then GitHub links
+#### 27. Diagram (240 px wide), then GitHub links
 
 ```mermaid |240
 flowchart LR
@@ -268,7 +276,7 @@ flowchart LR
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 27. Diagram (240 px wide), then Image
+#### 28. Diagram (240 px wide), then Image
 
 ```mermaid |240
 flowchart LR
@@ -276,7 +284,7 @@ flowchart LR
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 28. Diagram (240 px wide), then Drawing
+#### 29. Diagram (240 px wide), then Drawing
 
 ```mermaid |240
 flowchart LR
@@ -284,7 +292,7 @@ flowchart LR
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 29. Diagram (240 px wide), then File
+#### 30. Diagram (240 px wide), then File
 
 ```mermaid |240
 flowchart LR
@@ -292,7 +300,7 @@ flowchart LR
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 30. Diagram (240 px wide), then Missing file
+#### 31. Diagram (240 px wide), then Missing file
 
 ```mermaid |240
 flowchart LR
@@ -300,7 +308,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 31. Diagram (240 px wide), then Card
+#### 32. Diagram (240 px wide), then Card
 
 ```mermaid |240
 flowchart LR
@@ -310,7 +318,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 32. Diagram (240 px wide), then Callout (info)
+#### 33. Diagram (240 px wide), then Callout (info)
 
 ```mermaid |240
 flowchart LR
@@ -320,7 +328,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 33. Diagram (240 px wide), then Callout (warning, chosen icon)
+#### 34. Diagram (240 px wide), then Callout (warning, chosen icon)
 
 ```mermaid |240
 flowchart LR
@@ -330,7 +338,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 34. Diagram (240 px wide), then Callout (decision, no icon)
+#### 35. Diagram (240 px wide), then Callout (decision, no icon)
 
 ```mermaid |240
 flowchart LR

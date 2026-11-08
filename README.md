@@ -90,6 +90,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 - **Sync with your own storage**: any S3-compatible bucket, such as Cloudflare R2, Backblaze B2, Amazon S3 or MinIO. Conflicts never lose an edit. See [docs/sync.md](docs/sync.md).
 - **End-to-end encryption** (optional). Notes are encrypted on your device before they reach the bucket or drive.
 - **Locked notes**, like in Apple Notes: one password (or Touch ID on the Mac) opens them.
+- **Secrets.** Keep API keys and passwords in a locked note, and use them by name, `{{github}}`, in requests and other notes, which show the name and dots, to reveal or copy. See [docs/secrets.md](docs/secrets.md).
 - **App lock** (optional). lines asks for your passphrase or Touch ID when it opens, and after a while without use.
 
 ### Make it yours

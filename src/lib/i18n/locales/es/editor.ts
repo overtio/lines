@@ -30,6 +30,8 @@ export default {
   "editor.slash.diagram.keywords": "mermaid flujo gráfico esquema secuencia",
   "editor.slash.request": "Solicitud a una API",
   "editor.slash.request.keywords": "http rest api solicitud petición curl get post endpoint",
+  "editor.slash.secret": "Secreto",
+  "editor.slash.secret.keywords": "contraseña token clave api credencial",
   "editor.slash.math": "Fórmula",
   "editor.slash.math.keywords": "matemáticas ecuación latex",
   "editor.slash.card": "Tarjeta",

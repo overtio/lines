@@ -124,7 +124,12 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Heading 3, then API requests (http block): a variable, a named request and one using its response
+#### 18. Heading 3, then Secret ({{name}}, kept in a locked secrets note)
+
+### Heading three
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 19. Heading 3, then API requests (http block): a variable, a named request and one using its response
 
 ### Heading three
 ```http
@@ -138,7 +143,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 19. Heading 3, then Spreadsheet (csv block)
+#### 20. Heading 3, then Spreadsheet (csv block)
 
 ### Heading three
 ```csv
@@ -148,7 +153,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 20. Heading 3, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 21. Heading 3, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ### Heading three
 ```csv name=costs
@@ -160,78 +165,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 21. Heading 3, then Divider
+#### 22. Heading 3, then Divider
 
 ### Heading three
 ---
 
-#### 22. Heading 3, then Key: Value line
+#### 23. Heading 3, then Key: Value line
 
 ### Heading three
 **Wi-Fi password:** correct-horse-battery
 
-#### 23. Heading 3, then Mention
+#### 24. Heading 3, then Mention
 
 ### Heading three
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 24. Heading 3, then Wiki link
+#### 25. Heading 3, then Wiki link
 
 ### Heading three
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 25. Heading 3, then Symbols
+#### 26. Heading 3, then Symbols
 
 ### Heading three
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 26. Heading 3, then GitHub links
+#### 27. Heading 3, then GitHub links
 
 ### Heading three
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 27. Heading 3, then Image
+#### 28. Heading 3, then Image
 
 ### Heading three
 ![A sample picture](attachment:photo.png)
 
-#### 28. Heading 3, then Drawing
+#### 29. Heading 3, then Drawing
 
 ### Heading three
 ![A sample drawing](attachment:drawing.svg)
 
-#### 29. Heading 3, then File
+#### 30. Heading 3, then File
 
 ### Heading three
 [Budget.csv](attachment:budget.csv)
 
-#### 30. Heading 3, then Missing file
+#### 31. Heading 3, then Missing file
 
 ### Heading three
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 31. Heading 3, then Card
+#### 32. Heading 3, then Card
 
 ### Heading three
 ::: card
 Text in a card.
 :::
 
-#### 32. Heading 3, then Callout (info)
+#### 33. Heading 3, then Callout (info)
 
 ### Heading three
 :::i
 Text in an info callout.
 :::
 
-#### 33. Heading 3, then Callout (warning, chosen icon)
+#### 34. Heading 3, then Callout (warning, chosen icon)
 
 ### Heading three
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 34. Heading 3, then Callout (decision, no icon)
+#### 35. Heading 3, then Callout (decision, no icon)
 
 ### Heading three
 :::^ icon=none

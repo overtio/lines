@@ -8,6 +8,7 @@ import { latex } from "./latex";
 import { lucide } from "./lucide";
 import { markdown } from "./markdown";
 import { mermaid } from "./mermaid";
+import { secrets } from "./secrets";
 import { sfSymbols } from "./sf-symbols";
 import { spreadsheet } from "./spreadsheet";
 import { tex } from "./tex";
@@ -24,6 +25,7 @@ export const builtIn = (): Plugin[] => [
   latex(),
   spreadsheet(),
   http(),
+  secrets(),
   katex(),
   mermaid(),
   ironcalc(),

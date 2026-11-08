@@ -243,7 +243,19 @@ Total, =costs!B2*2
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Named spreadsheet (csv name=), and a formula in another block using it, then API requests (http block): a variable, a named request and one using its response
+#### 18. Named spreadsheet (csv name=), and a formula in another block using it, then Secret ({{name}}, kept in a locked secrets note)
+
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 19. Named spreadsheet (csv name=), and a formula in another block using it, then API requests (http block): a variable, a named request and one using its response
 
 ```csv name=costs
 Item, Cost, Day
@@ -264,7 +276,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 19. Named spreadsheet (csv name=), and a formula in another block using it, then Spreadsheet (csv block)
+#### 20. Named spreadsheet (csv name=), and a formula in another block using it, then Spreadsheet (csv block)
 
 ```csv name=costs
 Item, Cost, Day
@@ -281,7 +293,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 20. Named spreadsheet (csv name=), and a formula in another block using it, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 21. Named spreadsheet (csv name=), and a formula in another block using it, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```csv name=costs
 Item, Cost, Day
@@ -300,7 +312,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 21. Named spreadsheet (csv name=), and a formula in another block using it, then Divider
+#### 22. Named spreadsheet (csv name=), and a formula in another block using it, then Divider
 
 ```csv name=costs
 Item, Cost, Day
@@ -312,7 +324,7 @@ Total, =costs!B2*2
 ```
 ---
 
-#### 22. Named spreadsheet (csv name=), and a formula in another block using it, then Key: Value line
+#### 23. Named spreadsheet (csv name=), and a formula in another block using it, then Key: Value line
 
 ```csv name=costs
 Item, Cost, Day
@@ -324,7 +336,7 @@ Total, =costs!B2*2
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 23. Named spreadsheet (csv name=), and a formula in another block using it, then Mention
+#### 24. Named spreadsheet (csv name=), and a formula in another block using it, then Mention
 
 ```csv name=costs
 Item, Cost, Day
@@ -336,7 +348,7 @@ Total, =costs!B2*2
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 24. Named spreadsheet (csv name=), and a formula in another block using it, then Wiki link
+#### 25. Named spreadsheet (csv name=), and a formula in another block using it, then Wiki link
 
 ```csv name=costs
 Item, Cost, Day
@@ -348,7 +360,7 @@ Total, =costs!B2*2
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 25. Named spreadsheet (csv name=), and a formula in another block using it, then Symbols
+#### 26. Named spreadsheet (csv name=), and a formula in another block using it, then Symbols
 
 ```csv name=costs
 Item, Cost, Day
@@ -360,7 +372,7 @@ Total, =costs!B2*2
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 26. Named spreadsheet (csv name=), and a formula in another block using it, then GitHub links
+#### 27. Named spreadsheet (csv name=), and a formula in another block using it, then GitHub links
 
 ```csv name=costs
 Item, Cost, Day
@@ -372,7 +384,7 @@ Total, =costs!B2*2
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 27. Named spreadsheet (csv name=), and a formula in another block using it, then Image
+#### 28. Named spreadsheet (csv name=), and a formula in another block using it, then Image
 
 ```csv name=costs
 Item, Cost, Day
@@ -384,7 +396,7 @@ Total, =costs!B2*2
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 28. Named spreadsheet (csv name=), and a formula in another block using it, then Drawing
+#### 29. Named spreadsheet (csv name=), and a formula in another block using it, then Drawing
 
 ```csv name=costs
 Item, Cost, Day
@@ -396,7 +408,7 @@ Total, =costs!B2*2
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 29. Named spreadsheet (csv name=), and a formula in another block using it, then File
+#### 30. Named spreadsheet (csv name=), and a formula in another block using it, then File
 
 ```csv name=costs
 Item, Cost, Day
@@ -408,7 +420,7 @@ Total, =costs!B2*2
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 30. Named spreadsheet (csv name=), and a formula in another block using it, then Missing file
+#### 31. Named spreadsheet (csv name=), and a formula in another block using it, then Missing file
 
 ```csv name=costs
 Item, Cost, Day
@@ -420,7 +432,7 @@ Total, =costs!B2*2
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 31. Named spreadsheet (csv name=), and a formula in another block using it, then Card
+#### 32. Named spreadsheet (csv name=), and a formula in another block using it, then Card
 
 ```csv name=costs
 Item, Cost, Day
@@ -434,7 +446,7 @@ Total, =costs!B2*2
 Text in a card.
 :::
 
-#### 32. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (info)
+#### 33. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (info)
 
 ```csv name=costs
 Item, Cost, Day
@@ -448,7 +460,7 @@ Total, =costs!B2*2
 Text in an info callout.
 :::
 
-#### 33. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (warning, chosen icon)
+#### 34. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (warning, chosen icon)
 
 ```csv name=costs
 Item, Cost, Day
@@ -462,7 +474,7 @@ Total, =costs!B2*2
 Text in a warning callout with the flag icon.
 :::
 
-#### 34. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (decision, no icon)
+#### 35. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (decision, no icon)
 
 ```csv name=costs
 Item, Cost, Day

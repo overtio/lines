@@ -9,8 +9,9 @@ import { copyButton, destroyCopyButton } from "../../lib/editor/keyValue";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
 import Icon from "../../lib/icons/Icon.svelte";
 import { t } from "../../lib/i18n/index.svelte";
+import { secrets } from "../../lib/notes/secrets.svelte";
 import { modKey } from "../../lib/platform";
-import { type Asked, fromCurl, toCurl } from "./curl";
+import { type Asked, fromCurl, shellVariable, toCurl } from "./curl";
 import { httpLanguage } from "./language";
 import { type HttpRequest, type HttpText, parseHttp } from "./parse";
 import Response from "./Response.svelte";
@@ -222,7 +223,8 @@ const LOCAL = /^(?:localhost|127\.\d+\.\d+\.\d+|\[::1\])(?::\d+)?(?:[/?#]|$)/;
 
 /** A full address: one written without its scheme gets http:// on this computer, else https://. */
 function address(url: string) {
-  if (url.startsWith("/") || /^[a-z][\w+.-]*:\/\//i.test(url)) return url;
+  // Relative, with its scheme, or starting with a shell variable (copied as curl).
+  if (url.startsWith("/") || url.startsWith("\uE000") || /^[a-z][\w+.-]*:\/\//i.test(url)) return url;
   return `${LOCAL.test(url) ? "http" : "https"}://${url}`;
 }
 
@@ -244,6 +246,7 @@ function variableProblem(error: VariableError) {
   if (error.reason === "unsent") return t("http.error.unsent", { name: error.variable });
   if (error.reason === "path") return t("http.error.path", { variable: error.variable });
   if (error.reason === "loop") return t("http.error.loop", { name: error.variable });
+  if (error.reason === "locked") return t("http.error.locked", { name: error.variable });
   return t("http.error.variable", { name: error.variable });
 }
 
@@ -259,13 +262,14 @@ function filledIn(request: HttpRequest, scope: Scope, fill: (text: string, scope
   };
 }
 
-function scopeOf(state: EditorState, field: StateField<Responses>, variables: Map<string, string>): Scope {
+/** What a request's `{{names}}` stand for: variables, earlier responses, and `secret`. */
+function scopeOf(state: EditorState, field: StateField<Responses>, variables: Map<string, string>, secret?: Scope["secret"]): Scope {
   const { sent } = state.field(field);
   const response = (name: string) => {
     for (let i = sent.length - 1; i >= 0; i--) if (sent[i].name === name && sent[i].received) return sent[i].received!;
     return undefined;
   };
-  return { variables, response };
+  return { variables, response, secret };
 }
 
 /** The request whose line `pos` is on. */
@@ -280,9 +284,25 @@ async function send(view: EditorView, where: Where, field: StateField<Responses>
   const request = requests.find((each) => each.line === line);
   if (!request) return;
   let exchange: Exchange;
+  // The secrets it's sent with, to show as dots.
+  const used: string[] = [];
+  const secret = (name: string) => {
+    const value = secrets.get(name);
+    if (value !== undefined) used.push(value);
+    return value;
+  };
+  const fill = () => filledIn(request, scopeOf(view.state, field, variables, secret), fillIn);
   try {
-    const asked = filledIn(request, scopeOf(state, field, variables), fillIn);
-    exchange = new Exchange(asked, request.name);
+    let asked: Asked;
+    try {
+      asked = fill();
+    } catch (error) {
+      // A name no variable has may be a secret in a locked note that's closed: open them and try again.
+      if (!(error instanceof VariableError) || error.reason !== "unknown" || !secrets.closed) throw error;
+      if (!(await secrets.open())) throw new VariableError("locked", error.variable);
+      asked = fill();
+    }
+    exchange = new Exchange(asked, request.name, used);
     const wrong = problem(asked, request);
     if (wrong) exchange.fail(wrong);
   } catch (error) {
@@ -332,19 +352,19 @@ async function followAddress(view: EditorView, where: Where, field: StateField<R
   await send(view, where, field, line);
 }
 
-/** A request as a curl command, with what variables can be filled in filled in. */
+/** A request as a curl command, with what variables can be filled in filled in, and secrets (and other names) as shell variables. */
 function curlOf(state: EditorState, where: Where, field: StateField<Responses>, pos: number) {
   const request = requestOnLine(state, where, pos);
   if (!request) return "";
   const { variables } = requestsIn(state, where);
-  return toCurl(filledIn(request, scopeOf(state, field, variables), (text, scope) => fillInWhatCan(text, scope)));
+  return toCurl(filledIn(request, scopeOf(state, field, variables, shellVariable), (text, scope) => fillInWhatCan(text, scope)));
 }
 
 /** Every request in the ```http block at `pos`, as curl commands. */
 function blockCurl(state: EditorState, field: StateField<Responses>, pos: number) {
   const block = fenceAt(state, pos);
   if (!block) return "";
-  const scope = scopeOf(state, field, requestsIn(state, httpBlocks).variables);
+  const scope = scopeOf(state, field, requestsIn(state, httpBlocks).variables, shellVariable);
   return requestsIn(state, httpBlocks, block.from, block.to)
     .requests.map((request) => toCurl(filledIn(request, scope, (text, each) => fillInWhatCan(text, each))))
     .join("\n\n");

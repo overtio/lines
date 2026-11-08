@@ -39,6 +39,8 @@ Authorization: Bearer {{login.response.body.$.token}}
 - `{{$uuid}}` is a new UUID each time, `{{$timestamp}}` the time in seconds, `{{$isoTimestamp}}` and `{{$datetime iso8601}}` the time as ISO 8601 (`{{$datetime rfc1123}}` as HTTP writes it), and `{{$randomInt}}` a whole number from 0 to 999 (`{{$randomInt 1 7}}`, from 1 to 6).
 - A request named with `# @name login` (above its request line) can be used by the requests after it, once it's been sent: `{{login.response.body.$.token}}` is a field of its JSON body, by [JSONPath](https://goessner.net/articles/JsonPath/) (`$.items[0].id`, `$['a key']`), `{{login.response.body.*}}` its whole body, and `{{login.response.headers.Location}}` a header. No scripts run: this is the same syntax VS Code's REST Client and Visual Studio use.
 
+- A name that no `@name = value` line has is a **secret**, kept in a locked secrets note rather than the note: `Authorization: Bearer {{github}}`. If locked notes are closed, Send asks for their password first. The response shows a secret in the address as `••••`, and Copy as curl writes it as a shell variable, `${GITHUB}`. See [secrets.md](secrets.md).
+
 A request that uses a variable that isn't there, or a response that hasn't come yet, isn't sent: its response says which.
 
 ## Sending
@@ -62,7 +64,7 @@ The response shows under the request (under the code block, in a Markdown note):
 
 ## Not yet
 
-- Environments (`http-client.env.json` and its private twin), to switch between a test and a live API.
+- Environments (`http-client.env.json` and its private twin), to switch between a test and a live API. Secrets cover the private part ([secrets.md](secrets.md)).
 - Assertions and tests, and sending every request in a note as a test run.
 - JetBrains' JavaScript response handlers (`> {% … %}`): kept in the text, not run. Saving a response to a file (`>> file`) isn't done either.
 - A body read from a file (`< ./body.json`), forms with files, GraphQL and WebSocket requests.

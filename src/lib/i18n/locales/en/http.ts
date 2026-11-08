@@ -42,5 +42,6 @@ export default {
   "http.error.unsent": "Send the {name} request first: this one uses its response.",
   "http.error.path": "{variable} isn’t in that response.",
   "http.error.loop": "The variable {name} is made of itself.",
-  "http.error.variable": "There’s no variable named {name}. Add a line like @{name} = value.",
+  "http.error.variable": "There’s no variable or secret named {name}. Add a line like @{name} = value, or put it in your secrets note.",
+  "http.error.locked": "{name} isn’t a variable here, and may be a secret: open your locked notes to send this.",
 };

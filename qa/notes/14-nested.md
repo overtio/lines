@@ -175,7 +175,15 @@ $$
 :::
 :::
 
-#### 18. API requests (http block): a variable, a named request and one using its response in a callout in a card
+#### 18. Secret ({{name}}, kept in a locked secrets note) in a callout in a card
+
+::: card
+:::!
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+:::
+:::
+
+#### 19. API requests (http block): a variable, a named request and one using its response in a callout in a card
 
 ::: card
 :::!
@@ -192,7 +200,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 :::
 :::
 
-#### 19. Spreadsheet (csv block) in a callout in a card
+#### 20. Spreadsheet (csv block) in a callout in a card
 
 ::: card
 :::!
@@ -205,7 +213,7 @@ Total, =SUM(B2:B3)
 :::
 :::
 
-#### 20. Named spreadsheet (csv name=), and a formula in another block using it in a callout in a card
+#### 21. Named spreadsheet (csv name=), and a formula in another block using it in a callout in a card
 
 ::: card
 :::!
@@ -220,7 +228,7 @@ Total, =costs!B2*2
 :::
 :::
 
-#### 21. Divider in a callout in a card
+#### 22. Divider in a callout in a card
 
 ::: card
 :::!
@@ -228,7 +236,7 @@ Total, =costs!B2*2
 :::
 :::
 
-#### 22. Key: Value line in a callout in a card
+#### 23. Key: Value line in a callout in a card
 
 ::: card
 :::!
@@ -236,7 +244,7 @@ Total, =costs!B2*2
 :::
 :::
 
-#### 23. Mention in a callout in a card
+#### 24. Mention in a callout in a card
 
 ::: card
 :::!
@@ -244,7 +252,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 :::
 
-#### 24. Wiki link in a callout in a card
+#### 25. Wiki link in a callout in a card
 
 ::: card
 :::!
@@ -252,7 +260,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 :::
 
-#### 25. Symbols in a callout in a card
+#### 26. Symbols in a callout in a card
 
 ::: card
 :::!
@@ -260,7 +268,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 :::
 :::
 
-#### 26. GitHub links in a callout in a card
+#### 27. GitHub links in a callout in a card
 
 ::: card
 :::!
@@ -268,7 +276,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 27. Image in a callout in a card
+#### 28. Image in a callout in a card
 
 ::: card
 :::!
@@ -276,7 +284,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 28. Drawing in a callout in a card
+#### 29. Drawing in a callout in a card
 
 ::: card
 :::!
@@ -284,7 +292,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 29. File in a callout in a card
+#### 30. File in a callout in a card
 
 ::: card
 :::!
@@ -292,7 +300,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 30. Missing file in a callout in a card
+#### 31. Missing file in a callout in a card
 
 ::: card
 :::!
@@ -300,7 +308,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 31. Card in a callout in a card
+#### 32. Card in a callout in a card
 
 ::: card
 :::!
@@ -310,7 +318,7 @@ Text in a card.
 :::
 :::
 
-#### 32. Callout (info) in a callout in a card
+#### 33. Callout (info) in a callout in a card
 
 ::: card
 :::!
@@ -320,7 +328,7 @@ Text in an info callout.
 :::
 :::
 
-#### 33. Callout (warning, chosen icon) in a callout in a card
+#### 34. Callout (warning, chosen icon) in a callout in a card
 
 ::: card
 :::!
@@ -330,7 +338,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 34. Callout (decision, no icon) in a callout in a card
+#### 35. Callout (decision, no icon) in a callout in a card
 
 ::: card
 :::!

@@ -39,5 +39,6 @@ export default {
   "http.error.unsent": "Envía primero la solicitud {name}: esta usa su respuesta.",
   "http.error.path": "{variable} no está en esa respuesta.",
   "http.error.loop": "La variable {name} está hecha de sí misma.",
-  "http.error.variable": "No hay ninguna variable llamada {name}. Añade una línea como @{name} = valor.",
+  "http.error.variable": "No hay ninguna variable ni secreto llamado {name}. Añade una línea como @{name} = valor, o ponlo en tu nota de secretos.",
+  "http.error.locked": "{name} no es una variable aquí, y puede ser un secreto: abre tus notas bloqueadas para enviar esto.",
 } satisfies Translation<typeof en>;

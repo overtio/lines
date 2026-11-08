@@ -76,7 +76,14 @@ export class Exchange {
     readonly asked: Asked,
     /** Its `# @name`, by which the requests after it use its response. */
     readonly name: string | null,
+    /** The secrets' values it was sent with, shown as dots. */
+    readonly hidden: readonly string[] = [],
   ) {}
+
+  /** Its address as shown: with any secret in it as dots. */
+  get shownUrl() {
+    return this.hidden.reduce((url, value) => (value ? url.replaceAll(value, "••••") : url), this.asked.url);
+  }
 
   /** Sent no further: it couldn't be, for `reason`. */
   fail(reason: string) {

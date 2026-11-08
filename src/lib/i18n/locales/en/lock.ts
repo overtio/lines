@@ -120,6 +120,9 @@ export default {
   "lock.dialog.setHint": "If you forget it, the notes you lock with it can’t be opened, not even by lines.",
   "lock.dialog.openTitle": "Enter the password for locked notes",
   "lock.dialog.openIntro": "Your locked notes open too, until you lock them again.",
+  "lock.dialog.secretIntro": "Your secrets are kept in a locked note. Your other locked notes open too, until you lock them again.",
+  "lock.dialog.open": "Open",
+  "lock.dialog.opening": "Opening…",
   "lock.dialog.lockNote": "Lock Note",
   "lock.dialog.locking": "Locking…",
 

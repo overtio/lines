@@ -107,7 +107,11 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > | Total | =SUM(B2:B3) |
 > | Broken | =B2/0 |
 
-#### 18. API requests (http block): a variable, a named request and one using its response in a quote
+#### 18. Secret ({{name}}, kept in a locked secrets note) in a quote
+
+> The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 19. API requests (http block): a variable, a named request and one using its response in a quote
 
 > ```http
 > @api = https://jsonplaceholder.typicode.com
@@ -120,7 +124,7 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > GET {{api}}/users/{{todo.response.body.$.userId}}
 > ```
 
-#### 19. Spreadsheet (csv block) in a quote (stays Markdown here)
+#### 20. Spreadsheet (csv block) in a quote (stays Markdown here)
 
 > ```csv
 > Item, Cost
@@ -129,7 +133,7 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > Total, =SUM(B2:B3)
 > ```
 
-#### 20. Named spreadsheet (csv name=), and a formula in another block using it in a quote (stays Markdown here)
+#### 21. Named spreadsheet (csv name=), and a formula in another block using it in a quote (stays Markdown here)
 
 > ```csv name=costs
 > Item, Cost, Day
@@ -140,65 +144,65 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > Total, =costs!B2*2
 > ```
 
-#### 21. Divider in a quote
+#### 22. Divider in a quote
 
 > ---
 
-#### 22. Key: Value line in a quote
+#### 23. Key: Value line in a quote
 
 > **Wi-Fi password:** correct-horse-battery
 
-#### 23. Mention in a quote
+#### 24. Mention in a quote
 
 > Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 24. Wiki link in a quote
+#### 25. Wiki link in a quote
 
 > Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 25. Symbols in a quote
+#### 26. Symbols in a quote
 
 > Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 26. GitHub links in a quote
+#### 27. GitHub links in a quote
 
 > Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 27. Image in a quote (stays Markdown here)
+#### 28. Image in a quote (stays Markdown here)
 
 > ![A sample picture](attachment:photo.png)
 
-#### 28. Drawing in a quote (stays Markdown here)
+#### 29. Drawing in a quote (stays Markdown here)
 
 > ![A sample drawing](attachment:drawing.svg)
 
-#### 29. File in a quote (stays Markdown here)
+#### 30. File in a quote (stays Markdown here)
 
 > [Budget.csv](attachment:budget.csv)
 
-#### 30. Missing file in a quote (stays Markdown here)
+#### 31. Missing file in a quote (stays Markdown here)
 
 > [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 31. Card in a quote
+#### 32. Card in a quote
 
 > ::: card
 > Text in a card.
 > :::
 
-#### 32. Callout (info) in a quote
+#### 33. Callout (info) in a quote
 
 > :::i
 > Text in an info callout.
 > :::
 
-#### 33. Callout (warning, chosen icon) in a quote
+#### 34. Callout (warning, chosen icon) in a quote
 
 > :::! icon=flag
 > Text in a warning callout with the flag icon.
 > :::
 
-#### 34. Callout (decision, no icon) in a quote
+#### 35. Callout (decision, no icon) in a quote
 
 > :::^ icon=none
 > Text in a decision callout with no icon.

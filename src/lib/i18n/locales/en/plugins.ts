@@ -18,6 +18,8 @@ export default {
   "plugins.spreadsheet.description": "Notes that are spreadsheets: cells and formulas, kept as CSV. Opens CSV and Excel files, and downloads as either. In Markdown notes, ```csv blocks are spreadsheets too.",
   "plugins.http": "API Requests",
   "plugins.http.description": "Sends requests written in the .http format, from .http notes and ```http blocks in Markdown notes, and shows their responses. Adds /request; a curl command pasted into a request becomes one.",
+  "plugins.secrets": "Secrets",
+  "plugins.secrets.description": "Shows {{name}} in Markdown notes as a secret kept in a locked note of type secrets, to show for a moment or copy, and adds /secret. Requests use secrets the same way.",
   "plugins.katex": "Math (KaTeX)",
   "plugins.katex.description": "Draws math in notes of any format, on screen and on paper.",
   "plugins.mermaid": "Diagrams (Mermaid)",

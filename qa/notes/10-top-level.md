@@ -107,7 +107,11 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. API requests (http block): a variable, a named request and one using its response at the top level
+#### 18. Secret ({{name}}, kept in a locked secrets note) at the top level
+
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 19. API requests (http block): a variable, a named request and one using its response at the top level
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -120,7 +124,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 19. Spreadsheet (csv block) at the top level
+#### 20. Spreadsheet (csv block) at the top level
 
 ```csv
 Item, Cost
@@ -129,7 +133,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 20. Named spreadsheet (csv name=), and a formula in another block using it at the top level
+#### 21. Named spreadsheet (csv name=), and a formula in another block using it at the top level
 
 ```csv name=costs
 Item, Cost, Day
@@ -140,65 +144,65 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 21. Divider at the top level
+#### 22. Divider at the top level
 
 ---
 
-#### 22. Key: Value line at the top level
+#### 23. Key: Value line at the top level
 
 **Wi-Fi password:** correct-horse-battery
 
-#### 23. Mention at the top level
+#### 24. Mention at the top level
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 24. Wiki link at the top level
+#### 25. Wiki link at the top level
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 25. Symbols at the top level
+#### 26. Symbols at the top level
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 26. GitHub links at the top level
+#### 27. GitHub links at the top level
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 27. Image at the top level
+#### 28. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 28. Drawing at the top level
+#### 29. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 29. File at the top level
+#### 30. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 30. Missing file at the top level
+#### 31. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 31. Card at the top level
+#### 32. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 32. Callout (info) at the top level
+#### 33. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 33. Callout (warning, chosen icon) at the top level
+#### 34. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 34. Callout (decision, no icon) at the top level
+#### 35. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

@@ -11,8 +11,19 @@ export interface Asked {
   body: string | null;
 }
 
-/** Quoted for a POSIX shell. */
-const quote = (text: string) => (/^[\w@%+=:,./-]+$/.test(text) ? text : `'${text.replaceAll("'", `'\\''`)}'`);
+/**
+ * Marks a name in a request as a shell variable, for a secret (or anything else not filled in):
+ * `{{github}}` copies as `${GITHUB}`, so the value comes from the shell rather than the clipboard.
+ */
+export const shellVariable = (name: string) => `\uE000${name}\uE000`;
+const SHELL_VARIABLE = /\uE000([^\uE000]*)\uE000/g;
+const variableName = (name: string) => name.toUpperCase().replace(/[^A-Z0-9_]/g, "_").replace(/^(?=\d)/, "_");
+
+/** Quoted for a POSIX shell: in single quotes, or in double quotes around shell variables. */
+function quote(text: string) {
+  if (text.includes("\uE000")) return `"${text.replace(/[\\"$`]/g, "\\$&").replace(SHELL_VARIABLE, (_, name: string) => `\${${variableName(name)}}`)}"`;
+  return /^[\w@%+=:,./-]+$/.test(text) ? text : `'${text.replaceAll("'", `'\\''`)}'`;
+}
 
 /** The command, an option to a line as API docs write them. */
 export function toCurl({ method, url, headers, body }: Asked): string {

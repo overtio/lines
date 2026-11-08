@@ -18,6 +18,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 - Paste a curl command into a block and it becomes a request; the terminal icon beside Copy, in the block's corner, copies its requests as curl commands
 - A response's **+** adds its body to the note as a code block
 - In a response, the icon after an address sends a request to it, written into the note; hover a value's line to copy it
+- Keep tokens out of notes: put them in a locked note of type `secrets`, and write `{{github}}` where one goes, in a request or anywhere else
 
 ```http
 ### Make something (this API only pretends to)

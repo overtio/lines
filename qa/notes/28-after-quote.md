@@ -141,7 +141,13 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Quote, then API requests (http block): a variable, a named request and one using its response
+#### 18. Quote, then Secret ({{name}}, kept in a locked secrets note)
+
+> A quote that runs over
+> two lines.
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 19. Quote, then API requests (http block): a variable, a named request and one using its response
 
 > A quote that runs over
 > two lines.
@@ -156,7 +162,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 19. Quote, then Spreadsheet (csv block)
+#### 20. Quote, then Spreadsheet (csv block)
 
 > A quote that runs over
 > two lines.
@@ -167,7 +173,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 20. Quote, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 21. Quote, then Named spreadsheet (csv name=), and a formula in another block using it
 
 > A quote that runs over
 > two lines.
@@ -180,67 +186,67 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 21. Quote, then Divider
+#### 22. Quote, then Divider
 
 > A quote that runs over
 > two lines.
 ---
 
-#### 22. Quote, then Key: Value line
+#### 23. Quote, then Key: Value line
 
 > A quote that runs over
 > two lines.
 **Wi-Fi password:** correct-horse-battery
 
-#### 23. Quote, then Mention
+#### 24. Quote, then Mention
 
 > A quote that runs over
 > two lines.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 24. Quote, then Wiki link
+#### 25. Quote, then Wiki link
 
 > A quote that runs over
 > two lines.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 25. Quote, then Symbols
+#### 26. Quote, then Symbols
 
 > A quote that runs over
 > two lines.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 26. Quote, then GitHub links
+#### 27. Quote, then GitHub links
 
 > A quote that runs over
 > two lines.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 27. Quote, then Image
+#### 28. Quote, then Image
 
 > A quote that runs over
 > two lines.
 ![A sample picture](attachment:photo.png)
 
-#### 28. Quote, then Drawing
+#### 29. Quote, then Drawing
 
 > A quote that runs over
 > two lines.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 29. Quote, then File
+#### 30. Quote, then File
 
 > A quote that runs over
 > two lines.
 [Budget.csv](attachment:budget.csv)
 
-#### 30. Quote, then Missing file
+#### 31. Quote, then Missing file
 
 > A quote that runs over
 > two lines.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 31. Quote, then Card
+#### 32. Quote, then Card
 
 > A quote that runs over
 > two lines.
@@ -248,7 +254,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 32. Quote, then Callout (info)
+#### 33. Quote, then Callout (info)
 
 > A quote that runs over
 > two lines.
@@ -256,7 +262,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 33. Quote, then Callout (warning, chosen icon)
+#### 34. Quote, then Callout (warning, chosen icon)
 
 > A quote that runs over
 > two lines.
@@ -264,7 +270,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 34. Quote, then Callout (decision, no icon)
+#### 35. Quote, then Callout (decision, no icon)
 
 > A quote that runs over
 > two lines.

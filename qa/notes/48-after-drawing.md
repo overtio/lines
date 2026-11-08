@@ -124,7 +124,12 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Drawing, then API requests (http block): a variable, a named request and one using its response
+#### 18. Drawing, then Secret ({{name}}, kept in a locked secrets note)
+
+![A sample drawing](attachment:drawing.svg)
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 19. Drawing, then API requests (http block): a variable, a named request and one using its response
 
 ![A sample drawing](attachment:drawing.svg)
 ```http
@@ -138,7 +143,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 19. Drawing, then Spreadsheet (csv block)
+#### 20. Drawing, then Spreadsheet (csv block)
 
 ![A sample drawing](attachment:drawing.svg)
 ```csv
@@ -148,7 +153,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 20. Drawing, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 21. Drawing, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ![A sample drawing](attachment:drawing.svg)
 ```csv name=costs
@@ -160,78 +165,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 21. Drawing, then Divider
+#### 22. Drawing, then Divider
 
 ![A sample drawing](attachment:drawing.svg)
 ---
 
-#### 22. Drawing, then Key: Value line
+#### 23. Drawing, then Key: Value line
 
 ![A sample drawing](attachment:drawing.svg)
 **Wi-Fi password:** correct-horse-battery
 
-#### 23. Drawing, then Mention
+#### 24. Drawing, then Mention
 
 ![A sample drawing](attachment:drawing.svg)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 24. Drawing, then Wiki link
+#### 25. Drawing, then Wiki link
 
 ![A sample drawing](attachment:drawing.svg)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 25. Drawing, then Symbols
+#### 26. Drawing, then Symbols
 
 ![A sample drawing](attachment:drawing.svg)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 26. Drawing, then GitHub links
+#### 27. Drawing, then GitHub links
 
 ![A sample drawing](attachment:drawing.svg)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 27. Drawing, then Image
+#### 28. Drawing, then Image
 
 ![A sample drawing](attachment:drawing.svg)
 ![A sample picture](attachment:photo.png)
 
-#### 28. Drawing, then Drawing
+#### 29. Drawing, then Drawing
 
 ![A sample drawing](attachment:drawing.svg)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 29. Drawing, then File
+#### 30. Drawing, then File
 
 ![A sample drawing](attachment:drawing.svg)
 [Budget.csv](attachment:budget.csv)
 
-#### 30. Drawing, then Missing file
+#### 31. Drawing, then Missing file
 
 ![A sample drawing](attachment:drawing.svg)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 31. Drawing, then Card
+#### 32. Drawing, then Card
 
 ![A sample drawing](attachment:drawing.svg)
 ::: card
 Text in a card.
 :::
 
-#### 32. Drawing, then Callout (info)
+#### 33. Drawing, then Callout (info)
 
 ![A sample drawing](attachment:drawing.svg)
 :::i
 Text in an info callout.
 :::
 
-#### 33. Drawing, then Callout (warning, chosen icon)
+#### 34. Drawing, then Callout (warning, chosen icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 34. Drawing, then Callout (decision, no icon)
+#### 35. Drawing, then Callout (decision, no icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::^ icon=none

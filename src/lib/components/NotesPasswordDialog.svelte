@@ -47,6 +47,15 @@
     after?.();
   }
 
+  function cancel() {
+    const cancelled = request?.cancelled;
+    lockedNotes.asking = null;
+    cancelled?.();
+  }
+
+  /** Asked for a secret, it opens notes rather than locking one. */
+  const forSecret = $derived(request?.reason === "secret");
+
   async function useTouchId() {
     touchIdError = null;
     try {
@@ -57,7 +66,7 @@
   }
 </script>
 
-<Dialog.Root open={!!request} onOpenChange={(open) => !open && (lockedNotes.asking = null)}>
+<Dialog.Root open={!!request} onOpenChange={(open) => !open && cancel()}>
   <Dialog.Portal>
     <Dialog.Overlay class="fixed inset-0 z-40 bg-scrim" />
     <!-- A click outside leaves it open, as a password half typed would be lost. -->
@@ -76,7 +85,7 @@
           {request.purpose === "set" ? t("lock.dialog.setTitle") : t("lock.dialog.openTitle")}
         </Dialog.Title>
         <Dialog.Description class="m-0 mt-1.5 mb-4 text-sm leading-normal text-muted">
-          {request.purpose === "set" ? t("lock.dialog.setIntro") : t("lock.dialog.openIntro")}
+          {request.purpose === "set" ? t("lock.dialog.setIntro") : forSecret ? t("lock.dialog.secretIntro") : t("lock.dialog.openIntro")}
         </Dialog.Description>
         {#if request.purpose === "set"}
           <PassphraseForm
@@ -85,7 +94,7 @@
             submit={t("lock.dialog.lockNote")}
             busyLabel={t("lock.dialog.locking")}
             describedby="notes-password-forget"
-            oncancel={() => (lockedNotes.asking = null)}
+            oncancel={cancel}
             onsubmit={async (password) => {
               await lockedNotes.setUp(password);
               done();
@@ -96,9 +105,9 @@
           <PassphraseForm
             kind="current"
             noun="password"
-            submit={t("lock.dialog.lockNote")}
-            busyLabel={t("lock.dialog.locking")}
-            oncancel={() => (lockedNotes.asking = null)}
+            submit={forSecret ? t("lock.dialog.open") : t("lock.dialog.lockNote")}
+            busyLabel={forSecret ? t("lock.dialog.opening") : t("lock.dialog.locking")}
+            oncancel={cancel}
             onsubmit={async (password) => {
               await lockedNotes.unlock(password, noteKeys.settings?.key.id);
               done();

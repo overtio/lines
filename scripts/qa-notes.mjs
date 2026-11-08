@@ -54,6 +54,7 @@ const ELEMENTS = [
     name: "Table with formulas",
     md: "| Item | Cost |\n| --- | ---: |\n| Rent | 1200 |\n| Food | 450.50 |\n| Total | =SUM(B2:B3) |\n| Broken | =B2/0 |",
   },
+  { id: "secret", name: "Secret ({{name}}, kept in a locked secrets note)", md: "The token is {{qa-token}}, and {{no-such-secret}} isn't one." },
   {
     id: "requests",
     name: "API requests (http block): a variable, a named request and one using its response",

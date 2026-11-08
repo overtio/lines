@@ -18,6 +18,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Diagram | ` ```mermaid ` code block | GitHub, GitLab, Obsidian |
 | Spreadsheet | ` ```csv ` code block | Yes (a code block of CSV) |
 | API requests | ` ```http ` code block | JetBrains IDEs, VS Code (REST Client, httpYac), Visual Studio |
+| Secret | `{{github}}` | No (shown as written; the value is in a locked note) |
 | Math | `$x^2$`, `$$` … `$$`, ` ```math ` code block | GitHub, GitLab, Obsidian, Pandoc |
 | Attachment | `![](../attachments/<hash>.png)`, `[Name.pdf](../attachments/<hash>.pdf)` | Yes (relative links) |
 | Copyable value | `Key: Value` lines | Yes (plain text, read specially) |
@@ -128,6 +129,10 @@ A code block with the language `mermaid` is drawn as its [Mermaid](https://merma
 ## API requests
 
 A code block with the language `http` (or `rest`) holds requests in the `.http` format, highlighted, with Send and Copy as curl in its top right corner, beside Copy, by the API Requests [plugin](plugins.md) (with it off, it's a code block). Requests are separated by `###` lines; `@name = value` lines are variables, used as `{{name}}` in any `http` block of the note. A response shows under its block while the note's open, and isn't written into the note. The format, variables and sending are in [requests.md](requests.md). Other apps show the block as code; editors that read `.http` files read its text as requests too.
+
+## Secrets
+
+`{{name}}` outside code, a name being a letter or `_` and then letters, digits, `_`, `.` or `-`, is a secret kept in a locked note of type `secrets`, by the Secrets [plugin](plugins.md) (with it off, it's text). It's drawn as a key, the name and dots, with buttons to show it for a moment and to copy it; with the cursor in it, as written. The note keeps only the name, so other apps, exports and copies show `{{name}}`, and printing shows the name and dots. In ` ```http ` blocks, `{{name}}` is a variable or a secret (as above). More in [secrets.md](secrets.md).
 
 ## Math
 

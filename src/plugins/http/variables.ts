@@ -2,7 +2,8 @@
  * `{{name}}` in a request: a variable from an `@name = value` line, one lines makes up
  * (`{{$uuid}}`, `{{$timestamp}}`, `{{$randomInt 1 100}}`), or part of a named request's last
  * response (`{{login.response.body.$.token}}`, `{{login.response.headers.Location}}`), as VS Code's
- * REST Client and Visual Studio write them. No scripts run.
+ * REST Client and Visual Studio write them; or, when no variable has the name, a secret
+ * (notes/secrets.svelte.ts). No scripts run.
  */
 
 /** A response as variables read it. */
@@ -15,12 +16,15 @@ export interface Scope {
   variables: ReadonlyMap<string, string>;
   /** The last response of the request named `name`, if it's been sent. */
   response(name: string): ResponseValues | undefined;
+  /** What a name no variable has stands for: a secret, if there's one by that name. */
+  secret?(name: string): string | undefined;
 }
 
 /** Why a variable couldn't be filled in, for the response to say. */
 export class VariableError extends Error {
   constructor(
-    readonly reason: "unknown" | "unsent" | "path" | "loop",
+    /** `locked`: it may be a secret, in a locked note that stayed closed. */
+    readonly reason: "unknown" | "unsent" | "path" | "loop" | "locked",
     readonly variable: string,
   ) {
     super(`${reason}: ${variable}`);
@@ -107,7 +111,12 @@ export function fillIn(text: string, scope: Scope, depth = 0): string {
       return part(response, expression, reference[2]);
     }
     const value = scope.variables.get(expression);
-    if (value === undefined) throw new VariableError("unknown", expression);
+    if (value === undefined) {
+      // A secret is its value as it is, not filled in further.
+      const secret = scope.secret?.(expression);
+      if (secret === undefined) throw new VariableError("unknown", expression);
+      return secret;
+    }
     if (depth >= DEPTH) throw new VariableError("loop", expression);
     return fillIn(value, scope, depth + 1);
   });

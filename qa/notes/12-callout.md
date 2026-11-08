@@ -141,7 +141,13 @@ $$
 | Broken | =B2/0 |
 :::
 
-#### 18. API requests (http block): a variable, a named request and one using its response in a callout
+#### 18. Secret ({{name}}, kept in a locked secrets note) in a callout
+
+:::i
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+:::
+
+#### 19. API requests (http block): a variable, a named request and one using its response in a callout
 
 :::i
 ```http
@@ -156,7 +162,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 :::
 
-#### 19. Spreadsheet (csv block) in a callout
+#### 20. Spreadsheet (csv block) in a callout
 
 :::i
 ```csv
@@ -167,7 +173,7 @@ Total, =SUM(B2:B3)
 ```
 :::
 
-#### 20. Named spreadsheet (csv name=), and a formula in another block using it in a callout
+#### 21. Named spreadsheet (csv name=), and a formula in another block using it in a callout
 
 :::i
 ```csv name=costs
@@ -180,67 +186,67 @@ Total, =costs!B2*2
 ```
 :::
 
-#### 21. Divider in a callout
+#### 22. Divider in a callout
 
 :::i
 ---
 :::
 
-#### 22. Key: Value line in a callout
+#### 23. Key: Value line in a callout
 
 :::i
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 23. Mention in a callout
+#### 24. Mention in a callout
 
 :::i
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 24. Wiki link in a callout
+#### 25. Wiki link in a callout
 
 :::i
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 25. Symbols in a callout
+#### 26. Symbols in a callout
 
 :::i
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 26. GitHub links in a callout
+#### 27. GitHub links in a callout
 
 :::i
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 27. Image in a callout
+#### 28. Image in a callout
 
 :::i
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 28. Drawing in a callout
+#### 29. Drawing in a callout
 
 :::i
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 29. File in a callout
+#### 30. File in a callout
 
 :::i
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 30. Missing file in a callout
+#### 31. Missing file in a callout
 
 :::i
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 31. Card in a callout
+#### 32. Card in a callout
 
 :::i
 ::: card
@@ -248,7 +254,7 @@ Text in a card.
 :::
 :::
 
-#### 32. Callout (info) in a callout
+#### 33. Callout (info) in a callout
 
 :::i
 :::i
@@ -256,7 +262,7 @@ Text in an info callout.
 :::
 :::
 
-#### 33. Callout (warning, chosen icon) in a callout
+#### 34. Callout (warning, chosen icon) in a callout
 
 :::i
 :::! icon=flag
@@ -264,7 +270,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 34. Callout (decision, no icon) in a callout
+#### 35. Callout (decision, no icon) in a callout
 
 :::i
 :::^ icon=none

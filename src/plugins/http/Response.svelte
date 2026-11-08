@@ -82,7 +82,7 @@
         <span class="shrink-0 text-muted tabular-nums">{duration(received.time)}</span>
         <span class="shrink-0 text-muted tabular-nums">{formatSize(received.bytes.length)}</span>
       {/if}
-      <span class="min-w-0 truncate font-mono text-[12px] text-faint" title={exchange.asked.url}>{exchange.asked.method} {exchange.asked.url}</span>
+      <span class="min-w-0 truncate font-mono text-[12px] text-faint" title={exchange.shownUrl}>{exchange.asked.method} {exchange.shownUrl}</span>
     </div>
     {#if received}
       <Segmented
