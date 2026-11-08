@@ -57,7 +57,7 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - Pele doesn't read Mermaid's themes or `themeVariables`, except the colors of charts' series: diagrams take the theme's colors. Colors set in a diagram (`style`, `classDef`) stay as written.
 - Links in diagrams (`click A href "…"`) aren't drawn as links, as one followed would open in lines' own window. HTML in labels shows as text, and icons (`fa:fa-car`) aren't drawn. ZenUML and Mermaid's other add-ons aren't drawn.
 - Math in a label (`$$x^2$$`) is drawn by the math plugin, KaTeX, and shows as written with it off.
-- Copy and Edit as Drawing still converts with Mermaid, inside Excalidraw's converter ([Drawings](#drawings)), so the drawing comes from Mermaid's layout. Mermaid stays in the app for that, so Pele doesn't make the download smaller yet.
+- Mermaid itself (about 5 MB) is still in the app, for the Diagrams (Mermaid) plugin, though it's off unless chosen. It can leave the download once plugins can be installed on their own ([#158](https://github.com/overtio/lines/issues/158)).
 
 ## LaTeX notes
 
@@ -124,7 +124,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Drawings are Excalidraw's: what it can draw is what there is. Its shape library (and its browser, libraries.excalidraw.com), its help, its links, its image tool (pictures go in the note instead), live collaboration and AI features aren't part of lines. Its ? key still opens its list of shortcuts.
 - Its fonts come with lines, except Xiaolai, its 12 MB Chinese and Japanese hand: on the web Excalidraw fetches that from its CDN when it's needed, and in the apps (which don't allow that) such text is in a system font.
 - In dark themes a drawing is drawn inverted, as Excalidraw does, so a photo inside a drawing shows inverted too.
-- A Mermaid diagram copied into a drawing is a copy: changing the code afterwards doesn't change the drawing, nor the other way round. Flowcharts become shapes; sequence and class diagrams come out simpler than Mermaid draws them; other kinds (pie, Gantt, mindmap, timeline…) come in as one picture that can be moved and drawn around but not taken apart. The conversion uses its own Mermaid (11, inside Excalidraw's converter), which loads the first time a diagram is copied.
+- A Mermaid diagram copied into a drawing is a copy: changing the code afterwards doesn't change the drawing, nor the other way round. Flowcharts, sequence, class, ER and state diagrams become shapes; other kinds (pie, Gantt, mindmap, timeline…) come in as one picture that can be moved and drawn around but not taken apart. The conversion lays the diagram out with Pele, its own copy inside Excalidraw's converter (which loads the first time a diagram is copied), so the shapes follow Pele's layout even when diagrams are drawn by Mermaid. Pasting Mermaid code onto a drawing, and Excalidraw's Mermaid to Excalidraw, convert the same way.
 - Excalidraw takes the theme's colors for its toolbars, menus and canvas, but not for what's drawn: its pens are its own colors (black, red, green…), as they are in any other app that opens the drawing. Changing the theme while a drawing is open shows in Excalidraw once it's opened again.
 - Only a drawing on a line of its own (in a note, or in a card) can be opened; one inside text, a list or a quote is an ordinary image, and in dark themes isn't inverted.
 - LaTeX notes show drawings as images but can't open them, and pdfLaTeX can't include an SVG, so TeX's PDF stops at one.

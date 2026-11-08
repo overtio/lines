@@ -197,8 +197,9 @@
   class DiagramError extends Error {}
 
   /**
-   * A Mermaid diagram as Excalidraw shapes: flowcharts as boxes and arrows to move and restyle,
-   * sequence and class diagrams more simply, and other kinds as a picture of the diagram.
+   * A Mermaid diagram as Excalidraw shapes, laid out by Pele (inside Excalidraw's converter):
+   * flowcharts, sequence, class, ER and state diagrams as boxes and arrows to move and restyle,
+   * and other kinds as a picture of the diagram.
    */
   async function fromMermaid(excalidraw: Excalidraw, source: string) {
     const { parseMermaidToExcalidraw } = await import("@excalidraw/mermaid-to-excalidraw");
@@ -206,7 +207,7 @@
     try {
       parsed = await parseMermaidToExcalidraw(source, { themeVariables: { fontSize: "20px" } });
     } catch (cause) {
-      // Where the error is, without Mermaid's list of every token it would have accepted.
+      // Where the error is, without the list of every token that would have done there.
       throw new DiagramError(String(cause instanceof Error ? cause.message : cause).split("\n")[0]);
     }
     const { elements, files } = parsed;
