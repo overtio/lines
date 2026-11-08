@@ -1,48 +1,48 @@
-# QA · Right after: Callout (info)
+# QA · Right after: Card
 
-Callout (info) followed straight away, with no blank line, by each element. Check: nothing overlaps, nothing is cut off, and the space between is even. Markdown joins some pairs without a blank line (text followed by --- is a heading, and a line of text can carry on into the next), so check that what's drawn matches the Markdown.
+Card followed straight away, with no blank line, by each element. Check: nothing overlaps, nothing is cut off, and the space between is even. Markdown joins some pairs without a blank line (text followed by --- is a heading, and a line of text can carry on into the next), so check that what's drawn matches the Markdown.
 
 #qa/adjacent
 
-#### 1. Callout (info), then Paragraph
+#### 1. Card, then Paragraph
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 
-#### 2. Callout (info), then Long paragraph
+#### 2. Card, then Long paragraph
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 
-#### 3. Callout (info), then Heading 1
+#### 3. Card, then Heading 1
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 # Heading one
 
-#### 4. Callout (info), then Heading 2
+#### 4. Card, then Heading 2
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ## Heading two
 
-#### 5. Callout (info), then Heading 3
+#### 5. Card, then Heading 3
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ### Heading three
 
-#### 6. Callout (info), then Bullet list
+#### 6. Card, then Bullet list
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 - First item
 - Second item
@@ -50,66 +50,66 @@ Text in an info callout.
     - Third level
 - Last item
 
-#### 7. Callout (info), then Numbered list
+#### 7. Card, then Numbered list
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 1. First
 2. Second
    1. Nested
 3. Third
 
-#### 8. Callout (info), then Todo list
+#### 8. Card, then Todo list
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 
-#### 9. Callout (info), then Quote
+#### 9. Card, then Quote
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 > A quote that runs over
 > two lines.
 
-#### 10. Callout (info), then Code block
+#### 10. Card, then Code block
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```
 plain code
   indented line
 ```
 
-#### 11. Callout (info), then Code block (TypeScript)
+#### 11. Card, then Code block (TypeScript)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```ts
 const greeting: string = "hello";
 console.log(greeting);
 ```
 
-#### 12. Callout (info), then JSON block (no language)
+#### 12. Card, then JSON block (no language)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 
-#### 13. Callout (info), then Diagram
+#### 13. Card, then Diagram
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```mermaid
 flowchart LR
@@ -117,20 +117,20 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Callout (info), then Diagram (240 px wide)
+#### 14. Card, then Diagram (240 px wide)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```mermaid |240
 flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Callout (info), then 3D model (openscad block), a colored part, an echo
+#### 15. Card, then 3D model (openscad block), a colored part, an echo
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```openscad
 difference() {
@@ -141,30 +141,30 @@ translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
 echo("made");
 ```
 
-#### 16. Callout (info), then Flat model (openscad block)
+#### 16. Card, then Flat model (openscad block)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```openscad
 square(20);
 translate([30, 10]) circle(8);
 ```
 
-#### 17. Callout (info), then Broken model (openscad block)
+#### 17. Card, then Broken model (openscad block)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```openscad
 cube(10)
 sphere(3;
 ```
 
-#### 18. Callout (info), then 3D model (stl block)
+#### 18. Card, then 3D model (stl block)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```stl
 solid pyramid
@@ -213,10 +213,10 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Callout (info), then Timing diagram (wavedrom block)
+#### 19. Card, then Timing diagram (wavedrom block)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```wavedrom
 { signal: [
@@ -227,29 +227,29 @@ Text in an info callout.
 ], edge: ["a~>b t1"] }
 ```
 
-#### 20. Callout (info), then Math block
+#### 20. Card, then Math block
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 21. Callout (info), then Table
+#### 21. Card, then Table
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 | Left | Center | Right |
 | :--- | :----: | ----: |
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 22. Callout (info), then Table with formulas
+#### 22. Card, then Table with formulas
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 | Item | Cost |
 | --- | ---: |
@@ -258,10 +258,10 @@ Text in an info callout.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 23. Callout (info), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Card, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```hurl
 # A todo
@@ -279,17 +279,17 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 24. Callout (info), then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Card, then Secret ({{name}}, kept in a locked secrets note)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 25. Callout (info), then API requests (http block): a variable, a named request and one using its response
+#### 25. Card, then API requests (http block): a variable, a named request and one using its response
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -302,10 +302,10 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 26. Callout (info), then Spreadsheet (csv block)
+#### 26. Card, then Spreadsheet (csv block)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```csv
 Item, Cost
@@ -314,10 +314,10 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 27. Callout (info), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Card, then Named spreadsheet (csv name=), and a formula in another block using it
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ```csv name=costs
 Item, Cost, Day
@@ -328,128 +328,142 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 28. Callout (info), then Divider
+#### 28. Card, then Divider
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ---
 
-#### 29. Callout (info), then Key: Value line
+#### 29. Card, then Key: Value line
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 30. Callout (info), then Mention
+#### 30. Card, then Mention
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 31. Callout (info), then Wiki link
+#### 31. Card, then Wiki link
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 32. Callout (info), then Symbols
+#### 32. Card, then Symbols
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 33. Callout (info), then GitHub links
+#### 33. Card, then GitHub links
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 34. Callout (info), then arXiv links
+#### 34. Card, then arXiv links
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 35. Callout (info), then Image
+#### 35. Card, then Image
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 36. Callout (info), then Drawing
+#### 36. Card, then Drawing
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 37. Callout (info), then File
+#### 37. Card, then File
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 38. Callout (info), then Attached 3D model (STL)
+#### 38. Card, then Attached 3D model (STL)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 39. Callout (info), then Terminal recording (.cast file)
+#### 39. Card, then Terminal recording (.cast file)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Callout (info), then Missing file
+#### 40. Card, then Audio
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
+:::
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Card, then Video
+
+::: card
+Text in a card.
+:::
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Card, then Missing file
+
+::: card
+Text in a card.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Callout (info), then Card
+#### 43. Card, then Card
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 ::: card
 Text in a card.
 :::
 
-#### 42. Callout (info), then Callout (info)
+#### 44. Card, then Callout (info)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 :::i
 Text in an info callout.
 :::
 
-#### 43. Callout (info), then Callout (warning, chosen icon)
+#### 45. Card, then Callout (warning, chosen icon)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Callout (info), then Callout (decision, no icon)
+#### 46. Card, then Callout (decision, no icon)
 
-:::i
-Text in an info callout.
+::: card
+Text in a card.
 :::
 :::^ icon=none
 Text in a decision callout with no icon.

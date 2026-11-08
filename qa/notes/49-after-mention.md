@@ -334,33 +334,43 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 Ask @[QA · Ada] at @[QA · Ada].email.
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Mention, then Missing file
+#### 40. Mention, then Audio
+
+Ask @[QA · Ada] at @[QA · Ada].email.
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Mention, then Video
+
+Ask @[QA · Ada] at @[QA · Ada].email.
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Mention, then Missing file
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Mention, then Card
+#### 43. Mention, then Card
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ::: card
 Text in a card.
 :::
 
-#### 42. Mention, then Callout (info)
+#### 44. Mention, then Callout (info)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::i
 Text in an info callout.
 :::
 
-#### 43. Mention, then Callout (warning, chosen icon)
+#### 45. Mention, then Callout (warning, chosen icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Mention, then Callout (decision, no icon)
+#### 46. Mention, then Callout (decision, no icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::^ icon=none

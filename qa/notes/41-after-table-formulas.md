@@ -529,7 +529,27 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Table with formulas, then Missing file
+#### 40. Table with formulas, then Audio
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Table with formulas, then Video
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Table with formulas, then Missing file
 
 | Item | Cost |
 | --- | ---: |
@@ -539,7 +559,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Table with formulas, then Card
+#### 43. Table with formulas, then Card
 
 | Item | Cost |
 | --- | ---: |
@@ -551,7 +571,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 42. Table with formulas, then Callout (info)
+#### 44. Table with formulas, then Callout (info)
 
 | Item | Cost |
 | --- | ---: |
@@ -563,7 +583,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 43. Table with formulas, then Callout (warning, chosen icon)
+#### 45. Table with formulas, then Callout (warning, chosen icon)
 
 | Item | Cost |
 | --- | ---: |
@@ -575,7 +595,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Table with formulas, then Callout (decision, no icon)
+#### 46. Table with formulas, then Callout (decision, no icon)
 
 | Item | Cost |
 | --- | ---: |

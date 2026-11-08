@@ -1,5 +1,5 @@
 <script lang="ts">
-  // A number picked along a line, with its value written after it.
+  // A number picked along a line, with its value written after it (when there's `format`).
   import { Slider } from "bits-ui";
 
   type Props = {
@@ -8,8 +8,8 @@
     max: number;
     step?: number;
     label: string;
-    /** How the value is written, and read out unless `spoken` says otherwise. */
-    format: (value: number) => string;
+    /** How the value is written after it, and read out unless `spoken` says otherwise. */
+    format?: (value: number) => string;
     spoken?: (value: number) => string;
     oninput?: (value: number) => void;
     disabled?: boolean;
@@ -36,10 +36,12 @@
     <Slider.Thumb
       index={0}
       aria-label={label}
-      aria-valuetext={(spoken ?? format)(value)}
+      aria-valuetext={(spoken ?? format)?.(value)}
       class="block size-4 cursor-pointer rounded-full border border-line bg-[#fff] shadow-segment transition-[scale] active:scale-110 coarse:size-6"
     />
   </Slider.Root>
-  <!-- Hidden from screen readers, which hear the value from the slider (and would otherwise hear it twice). -->
-  <output aria-hidden="true" class="tabular w-12 shrink-0 text-right text-xs text-muted">{format(value)}</output>
+  {#if format}
+    <!-- Hidden from screen readers, which hear the value from the slider (and would otherwise hear it twice). -->
+    <output aria-hidden="true" class="tabular w-12 shrink-0 text-right text-xs text-muted">{format(value)}</output>
+  {/if}
 </div>

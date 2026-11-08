@@ -43,7 +43,7 @@ The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.
 | `quote`, `quotation`, `abstract`, `verse` | A quote |
 | `center`, `flushright` | Centered or right-aligned lines |
 | `verbatim`, `lstlisting`, `minted` | A code block |
-| `\href{url}{text}`, `\url{…}` | Links (⌘-click to open). Links to GitHub and arXiv are drawn short, as in Markdown notes ([linedown.md](linedown.md#links-drawn-short)): `\url{https://arxiv.org/abs/1706.03762}` as `arXiv:1706.03762`, an `\href` with the mark before its text |
+| `\href{url}{text}`, `\url{…}` | Links (⌘-click to open). Links to GitHub and arXiv are drawn short, as in Markdown notes ([linedown.md](linedown.md#links-drawn-short)): `\url{https://arxiv.org/abs/1706.03762}` as `arXiv:1706.03762`, an `\href` with the mark before its text. An attached audio or video file linked on a line of its own plays there, as in a Markdown note |
 | `\footnote{…}` | A small number, then the footnote's text, smaller |
 | `\includegraphics{…}` | The image, if it's an attachment (`../attachments/…`) or on the web |
 | `\%`, `\&`, `\$`, `\#`, `\_`, `\{`, `\}`, `~`, `--`, `---`, ` `` `, `''`, `\ldots`, `\LaTeX` | The characters they stand for |

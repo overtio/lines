@@ -334,33 +334,43 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. arXiv links, then Missing file
+#### 40. arXiv links, then Audio
+
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. arXiv links, then Video
+
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. arXiv links, then Missing file
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. arXiv links, then Card
+#### 43. arXiv links, then Card
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 ::: card
 Text in a card.
 :::
 
-#### 42. arXiv links, then Callout (info)
+#### 44. arXiv links, then Callout (info)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::i
 Text in an info callout.
 :::
 
-#### 43. arXiv links, then Callout (warning, chosen icon)
+#### 45. arXiv links, then Callout (warning, chosen icon)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. arXiv links, then Callout (decision, no icon)
+#### 46. arXiv links, then Callout (decision, no icon)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::^ icon=none

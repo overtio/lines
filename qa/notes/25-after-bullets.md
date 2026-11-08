@@ -490,7 +490,25 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Bullet list, then Missing file
+#### 40. Bullet list, then Audio
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Bullet list, then Video
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Bullet list, then Missing file
 
 - First item
 - Second item
@@ -499,7 +517,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Bullet list, then Card
+#### 43. Bullet list, then Card
 
 - First item
 - Second item
@@ -510,7 +528,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 42. Bullet list, then Callout (info)
+#### 44. Bullet list, then Callout (info)
 
 - First item
 - Second item
@@ -521,7 +539,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 43. Bullet list, then Callout (warning, chosen icon)
+#### 45. Bullet list, then Callout (warning, chosen icon)
 
 - First item
 - Second item
@@ -532,7 +550,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Bullet list, then Callout (decision, no icon)
+#### 46. Bullet list, then Callout (decision, no icon)
 
 - First item
 - Second item

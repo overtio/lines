@@ -2089,7 +2089,107 @@ endsolid pyramid
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. 3D model (stl block), then Missing file
+#### 40. 3D model (stl block), then Audio
+
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. 3D model (stl block), then Video
+
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. 3D model (stl block), then Missing file
 
 ```stl
 solid pyramid
@@ -2139,7 +2239,7 @@ endsolid pyramid
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. 3D model (stl block), then Card
+#### 43. 3D model (stl block), then Card
 
 ```stl
 solid pyramid
@@ -2191,7 +2291,7 @@ endsolid pyramid
 Text in a card.
 :::
 
-#### 42. 3D model (stl block), then Callout (info)
+#### 44. 3D model (stl block), then Callout (info)
 
 ```stl
 solid pyramid
@@ -2243,7 +2343,7 @@ endsolid pyramid
 Text in an info callout.
 :::
 
-#### 43. 3D model (stl block), then Callout (warning, chosen icon)
+#### 45. 3D model (stl block), then Callout (warning, chosen icon)
 
 ```stl
 solid pyramid
@@ -2295,7 +2395,7 @@ endsolid pyramid
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. 3D model (stl block), then Callout (decision, no icon)
+#### 46. 3D model (stl block), then Callout (decision, no icon)
 
 ```stl
 solid pyramid

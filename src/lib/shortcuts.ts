@@ -83,9 +83,10 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.editDrawing", keys: ["Enter"], note: "shortcuts.drawingSelected" },
       { action: "shortcuts.saveDrawing", keys: ["Mod-s"], note: "shortcuts.inDrawing" },
       { action: "shortcuts.playRecording", keys: ["Enter"], note: "shortcuts.recordingSelected" },
-      { action: "shortcuts.pauseRecording", keys: ["Space"], note: "shortcuts.inRecording" },
-      { action: "shortcuts.skipRecording", keys: ["ArrowLeft", "ArrowRight"], note: "shortcuts.inRecording" },
-      { action: "shortcuts.leaveRecording", keys: ["Escape"], note: "shortcuts.inRecording" },
+      { action: "shortcuts.playMedia", keys: ["Enter"], note: "shortcuts.mediaSelected" },
+      { action: "shortcuts.pauseRecording", keys: ["Space"], note: "shortcuts.inPlayer" },
+      { action: "shortcuts.skipRecording", keys: ["ArrowLeft", "ArrowRight"], note: "shortcuts.inPlayer" },
+      { action: "shortcuts.leaveRecording", keys: ["Escape"], note: "shortcuts.inPlayer" },
     ],
   },
   {

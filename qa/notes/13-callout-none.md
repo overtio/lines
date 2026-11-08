@@ -373,13 +373,25 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 40. Missing file in a callout with no icon
+#### 40. Audio in a callout with no icon
+
+:::^ icon=none
+[Chime.mp3](attachment:chime.mp3)
+:::
+
+#### 41. Video in a callout with no icon
+
+:::^ icon=none
+[Sky.mp4](attachment:sky.mp4)
+:::
+
+#### 42. Missing file in a callout with no icon
 
 :::^ icon=none
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 41. Card in a callout with no icon
+#### 43. Card in a callout with no icon
 
 :::^ icon=none
 ::: card
@@ -387,7 +399,7 @@ Text in a card.
 :::
 :::
 
-#### 42. Callout (info) in a callout with no icon
+#### 44. Callout (info) in a callout with no icon
 
 :::^ icon=none
 :::i
@@ -395,7 +407,7 @@ Text in an info callout.
 :::
 :::
 
-#### 43. Callout (warning, chosen icon) in a callout with no icon
+#### 45. Callout (warning, chosen icon) in a callout with no icon
 
 :::^ icon=none
 :::! icon=flag
@@ -403,7 +415,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 44. Callout (decision, no icon) in a callout with no icon
+#### 46. Callout (decision, no icon) in a callout with no icon
 
 :::^ icon=none
 :::^ icon=none

@@ -1,0 +1,378 @@
+# QA · Right after: Audio
+
+Audio followed straight away, with no blank line, by each element. Check: nothing overlaps, nothing is cut off, and the space between is even. Markdown joins some pairs without a blank line (text followed by --- is a heading, and a line of text can carry on into the next), so check that what's drawn matches the Markdown.
+
+#qa/adjacent
+
+#### 1. Audio, then Paragraph
+
+[Chime.mp3](attachment:chime.mp3)
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+
+#### 2. Audio, then Long paragraph
+
+[Chime.mp3](attachment:chime.mp3)
+A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
+
+#### 3. Audio, then Heading 1
+
+[Chime.mp3](attachment:chime.mp3)
+# Heading one
+
+#### 4. Audio, then Heading 2
+
+[Chime.mp3](attachment:chime.mp3)
+## Heading two
+
+#### 5. Audio, then Heading 3
+
+[Chime.mp3](attachment:chime.mp3)
+### Heading three
+
+#### 6. Audio, then Bullet list
+
+[Chime.mp3](attachment:chime.mp3)
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+
+#### 7. Audio, then Numbered list
+
+[Chime.mp3](attachment:chime.mp3)
+1. First
+2. Second
+   1. Nested
+3. Third
+
+#### 8. Audio, then Todo list
+
+[Chime.mp3](attachment:chime.mp3)
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+
+#### 9. Audio, then Quote
+
+[Chime.mp3](attachment:chime.mp3)
+> A quote that runs over
+> two lines.
+
+#### 10. Audio, then Code block
+
+[Chime.mp3](attachment:chime.mp3)
+```
+plain code
+  indented line
+```
+
+#### 11. Audio, then Code block (TypeScript)
+
+[Chime.mp3](attachment:chime.mp3)
+```ts
+const greeting: string = "hello";
+console.log(greeting);
+```
+
+#### 12. Audio, then JSON block (no language)
+
+[Chime.mp3](attachment:chime.mp3)
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+
+#### 13. Audio, then Diagram
+
+[Chime.mp3](attachment:chime.mp3)
+```mermaid
+flowchart LR
+  A[Start] --> B{Choice}
+  B --> C[Done]
+```
+
+#### 14. Audio, then Diagram (240 px wide)
+
+[Chime.mp3](attachment:chime.mp3)
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+
+#### 15. Audio, then 3D model (openscad block), a colored part, an echo
+
+[Chime.mp3](attachment:chime.mp3)
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Audio, then Flat model (openscad block)
+
+[Chime.mp3](attachment:chime.mp3)
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Audio, then Broken model (openscad block)
+
+[Chime.mp3](attachment:chime.mp3)
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Audio, then 3D model (stl block)
+
+[Chime.mp3](attachment:chime.mp3)
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Audio, then Timing diagram (wavedrom block)
+
+[Chime.mp3](attachment:chime.mp3)
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Audio, then Math block
+
+[Chime.mp3](attachment:chime.mp3)
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+
+#### 21. Audio, then Table
+
+[Chime.mp3](attachment:chime.mp3)
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+
+#### 22. Audio, then Table with formulas
+
+[Chime.mp3](attachment:chime.mp3)
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+
+#### 23. Audio, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+[Chime.mp3](attachment:chime.mp3)
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 24. Audio, then Secret ({{name}}, kept in a locked secrets note)
+
+[Chime.mp3](attachment:chime.mp3)
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 25. Audio, then API requests (http block): a variable, a named request and one using its response
+
+[Chime.mp3](attachment:chime.mp3)
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 26. Audio, then Spreadsheet (csv block)
+
+[Chime.mp3](attachment:chime.mp3)
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+
+#### 27. Audio, then Named spreadsheet (csv name=), and a formula in another block using it
+
+[Chime.mp3](attachment:chime.mp3)
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+
+#### 28. Audio, then Divider
+
+[Chime.mp3](attachment:chime.mp3)
+---
+
+#### 29. Audio, then Key: Value line
+
+[Chime.mp3](attachment:chime.mp3)
+**Wi-Fi password:** correct-horse-battery
+
+#### 30. Audio, then Mention
+
+[Chime.mp3](attachment:chime.mp3)
+Ask @[QA · Ada] at @[QA · Ada].email.
+
+#### 31. Audio, then Wiki link
+
+[Chime.mp3](attachment:chime.mp3)
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+
+#### 32. Audio, then Symbols
+
+[Chime.mp3](attachment:chime.mp3)
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+
+#### 33. Audio, then GitHub links
+
+[Chime.mp3](attachment:chime.mp3)
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+
+#### 34. Audio, then arXiv links
+
+[Chime.mp3](attachment:chime.mp3)
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 35. Audio, then Image
+
+[Chime.mp3](attachment:chime.mp3)
+![A sample picture](attachment:photo.png)
+
+#### 36. Audio, then Drawing
+
+[Chime.mp3](attachment:chime.mp3)
+![A sample drawing](attachment:drawing.svg)
+
+#### 37. Audio, then File
+
+[Chime.mp3](attachment:chime.mp3)
+[Budget.csv](attachment:budget.csv)
+
+#### 38. Audio, then Attached 3D model (STL)
+
+[Chime.mp3](attachment:chime.mp3)
+[Bracket.stl](attachment:bracket.stl)
+
+#### 39. Audio, then Terminal recording (.cast file)
+
+[Chime.mp3](attachment:chime.mp3)
+[terminal.cast](attachment:terminal.cast)
+
+#### 40. Audio, then Audio
+
+[Chime.mp3](attachment:chime.mp3)
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Audio, then Video
+
+[Chime.mp3](attachment:chime.mp3)
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Audio, then Missing file
+
+[Chime.mp3](attachment:chime.mp3)
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+
+#### 43. Audio, then Card
+
+[Chime.mp3](attachment:chime.mp3)
+::: card
+Text in a card.
+:::
+
+#### 44. Audio, then Callout (info)
+
+[Chime.mp3](attachment:chime.mp3)
+:::i
+Text in an info callout.
+:::
+
+#### 45. Audio, then Callout (warning, chosen icon)
+
+[Chime.mp3](attachment:chime.mp3)
+:::! icon=flag
+Text in a warning callout with the flag icon.
+:::
+
+#### 46. Audio, then Callout (decision, no icon)
+
+[Chime.mp3](attachment:chime.mp3)
+:::^ icon=none
+Text in a decision callout with no icon.
+:::

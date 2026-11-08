@@ -83,7 +83,7 @@ Hover the value in a "Key: Value" line to copy it:
 
 ## Images and files
 
-Paste or drop an image or any other file into a note, or type \`/image\` or \`/file\`. Type \`/unsplash\` for a photo from Unsplash, or \`/giphy\` for a GIF. Type \`/drawing\` to sketch in Excalidraw; double-click a drawing to change it. Paste the link to a terminal recording on asciinema.org, or drop in a \`.cast\` file, and it plays in the note.
+Paste or drop an image or any other file into a note, or type \`/image\` or \`/file\`. Audio and video play right in the note. Type \`/unsplash\` for a photo from Unsplash, or \`/giphy\` for a GIF. Type \`/drawing\` to sketch in Excalidraw; double-click a drawing to change it. Paste the link to a terminal recording on asciinema.org, or drop in a \`.cast\` file, and it plays in the note.
 
 ## Private by design
 

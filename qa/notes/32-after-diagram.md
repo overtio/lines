@@ -490,7 +490,25 @@ flowchart LR
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Diagram, then Missing file
+#### 40. Diagram, then Audio
+
+```mermaid
+flowchart LR
+  A[Start] --> B{Choice}
+  B --> C[Done]
+```
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Diagram, then Video
+
+```mermaid
+flowchart LR
+  A[Start] --> B{Choice}
+  B --> C[Done]
+```
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Diagram, then Missing file
 
 ```mermaid
 flowchart LR
@@ -499,7 +517,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Diagram, then Card
+#### 43. Diagram, then Card
 
 ```mermaid
 flowchart LR
@@ -510,7 +528,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 42. Diagram, then Callout (info)
+#### 44. Diagram, then Callout (info)
 
 ```mermaid
 flowchart LR
@@ -521,7 +539,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 43. Diagram, then Callout (warning, chosen icon)
+#### 45. Diagram, then Callout (warning, chosen icon)
 
 ```mermaid
 flowchart LR
@@ -532,7 +550,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Diagram, then Callout (decision, no icon)
+#### 46. Diagram, then Callout (decision, no icon)
 
 ```mermaid
 flowchart LR

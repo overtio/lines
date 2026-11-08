@@ -412,14 +412,28 @@ $$
 $$
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Math block, then Missing file
+#### 40. Math block, then Audio
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Math block, then Video
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Math block, then Missing file
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Math block, then Card
+#### 43. Math block, then Card
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -428,7 +442,7 @@ $$
 Text in a card.
 :::
 
-#### 42. Math block, then Callout (info)
+#### 44. Math block, then Callout (info)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -437,7 +451,7 @@ $$
 Text in an info callout.
 :::
 
-#### 43. Math block, then Callout (warning, chosen icon)
+#### 45. Math block, then Callout (warning, chosen icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -446,7 +460,7 @@ $$
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Math block, then Callout (decision, no icon)
+#### 46. Math block, then Callout (decision, no icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}

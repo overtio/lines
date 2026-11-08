@@ -607,7 +607,31 @@ echo("made");
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. 3D model (openscad block), a colored part, an echo, then Missing file
+#### 40. 3D model (openscad block), a colored part, an echo, then Audio
+
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. 3D model (openscad block), a colored part, an echo, then Video
+
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. 3D model (openscad block), a colored part, an echo, then Missing file
 
 ```openscad
 difference() {
@@ -619,7 +643,7 @@ echo("made");
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. 3D model (openscad block), a colored part, an echo, then Card
+#### 43. 3D model (openscad block), a colored part, an echo, then Card
 
 ```openscad
 difference() {
@@ -633,7 +657,7 @@ echo("made");
 Text in a card.
 :::
 
-#### 42. 3D model (openscad block), a colored part, an echo, then Callout (info)
+#### 44. 3D model (openscad block), a colored part, an echo, then Callout (info)
 
 ```openscad
 difference() {
@@ -647,7 +671,7 @@ echo("made");
 Text in an info callout.
 :::
 
-#### 43. 3D model (openscad block), a colored part, an echo, then Callout (warning, chosen icon)
+#### 45. 3D model (openscad block), a colored part, an echo, then Callout (warning, chosen icon)
 
 ```openscad
 difference() {
@@ -661,7 +685,7 @@ echo("made");
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. 3D model (openscad block), a colored part, an echo, then Callout (decision, no icon)
+#### 46. 3D model (openscad block), a colored part, an echo, then Callout (decision, no icon)
 
 ```openscad
 difference() {

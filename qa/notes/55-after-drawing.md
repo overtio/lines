@@ -334,33 +334,43 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ![A sample drawing](attachment:drawing.svg)
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Drawing, then Missing file
+#### 40. Drawing, then Audio
+
+![A sample drawing](attachment:drawing.svg)
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Drawing, then Video
+
+![A sample drawing](attachment:drawing.svg)
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Drawing, then Missing file
 
 ![A sample drawing](attachment:drawing.svg)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Drawing, then Card
+#### 43. Drawing, then Card
 
 ![A sample drawing](attachment:drawing.svg)
 ::: card
 Text in a card.
 :::
 
-#### 42. Drawing, then Callout (info)
+#### 44. Drawing, then Callout (info)
 
 ![A sample drawing](attachment:drawing.svg)
 :::i
 Text in an info callout.
 :::
 
-#### 43. Drawing, then Callout (warning, chosen icon)
+#### 45. Drawing, then Callout (warning, chosen icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Drawing, then Callout (decision, no icon)
+#### 46. Drawing, then Callout (decision, no icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::^ icon=none

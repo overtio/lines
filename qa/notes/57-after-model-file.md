@@ -334,33 +334,43 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 [Bracket.stl](attachment:bracket.stl)
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Attached 3D model (STL), then Missing file
+#### 40. Attached 3D model (STL), then Audio
+
+[Bracket.stl](attachment:bracket.stl)
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Attached 3D model (STL), then Video
+
+[Bracket.stl](attachment:bracket.stl)
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Attached 3D model (STL), then Missing file
 
 [Bracket.stl](attachment:bracket.stl)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Attached 3D model (STL), then Card
+#### 43. Attached 3D model (STL), then Card
 
 [Bracket.stl](attachment:bracket.stl)
 ::: card
 Text in a card.
 :::
 
-#### 42. Attached 3D model (STL), then Callout (info)
+#### 44. Attached 3D model (STL), then Callout (info)
 
 [Bracket.stl](attachment:bracket.stl)
 :::i
 Text in an info callout.
 :::
 
-#### 43. Attached 3D model (STL), then Callout (warning, chosen icon)
+#### 45. Attached 3D model (STL), then Callout (warning, chosen icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Attached 3D model (STL), then Callout (decision, no icon)
+#### 46. Attached 3D model (STL), then Callout (decision, no icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::^ icon=none

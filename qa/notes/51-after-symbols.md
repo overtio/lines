@@ -334,33 +334,43 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Symbols, then Missing file
+#### 40. Symbols, then Audio
+
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Symbols, then Video
+
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Symbols, then Missing file
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Symbols, then Card
+#### 43. Symbols, then Card
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ::: card
 Text in a card.
 :::
 
-#### 42. Symbols, then Callout (info)
+#### 44. Symbols, then Callout (info)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::i
 Text in an info callout.
 :::
 
-#### 43. Symbols, then Callout (warning, chosen icon)
+#### 45. Symbols, then Callout (warning, chosen icon)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Symbols, then Callout (decision, no icon)
+#### 46. Symbols, then Callout (decision, no icon)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::^ icon=none

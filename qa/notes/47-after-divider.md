@@ -334,33 +334,43 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ---
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Divider, then Missing file
+#### 40. Divider, then Audio
+
+---
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Divider, then Video
+
+---
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Divider, then Missing file
 
 ---
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Divider, then Card
+#### 43. Divider, then Card
 
 ---
 ::: card
 Text in a card.
 :::
 
-#### 42. Divider, then Callout (info)
+#### 44. Divider, then Callout (info)
 
 ---
 :::i
 Text in an info callout.
 :::
 
-#### 43. Divider, then Callout (warning, chosen icon)
+#### 45. Divider, then Callout (warning, chosen icon)
 
 ---
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Divider, then Callout (decision, no icon)
+#### 46. Divider, then Callout (decision, no icon)
 
 ---
 :::^ icon=none

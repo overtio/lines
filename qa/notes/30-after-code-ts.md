@@ -451,7 +451,23 @@ console.log(greeting);
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Code block (TypeScript), then Missing file
+#### 40. Code block (TypeScript), then Audio
+
+```ts
+const greeting: string = "hello";
+console.log(greeting);
+```
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Code block (TypeScript), then Video
+
+```ts
+const greeting: string = "hello";
+console.log(greeting);
+```
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Code block (TypeScript), then Missing file
 
 ```ts
 const greeting: string = "hello";
@@ -459,7 +475,7 @@ console.log(greeting);
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Code block (TypeScript), then Card
+#### 43. Code block (TypeScript), then Card
 
 ```ts
 const greeting: string = "hello";
@@ -469,7 +485,7 @@ console.log(greeting);
 Text in a card.
 :::
 
-#### 42. Code block (TypeScript), then Callout (info)
+#### 44. Code block (TypeScript), then Callout (info)
 
 ```ts
 const greeting: string = "hello";
@@ -479,7 +495,7 @@ console.log(greeting);
 Text in an info callout.
 :::
 
-#### 43. Code block (TypeScript), then Callout (warning, chosen icon)
+#### 45. Code block (TypeScript), then Callout (warning, chosen icon)
 
 ```ts
 const greeting: string = "hello";
@@ -489,7 +505,7 @@ console.log(greeting);
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Code block (TypeScript), then Callout (decision, no icon)
+#### 46. Code block (TypeScript), then Callout (decision, no icon)
 
 ```ts
 const greeting: string = "hello";

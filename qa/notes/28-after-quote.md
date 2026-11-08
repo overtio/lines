@@ -373,13 +373,25 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 > two lines.
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Quote, then Missing file
+#### 40. Quote, then Audio
+
+> A quote that runs over
+> two lines.
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Quote, then Video
+
+> A quote that runs over
+> two lines.
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Quote, then Missing file
 
 > A quote that runs over
 > two lines.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Quote, then Card
+#### 43. Quote, then Card
 
 > A quote that runs over
 > two lines.
@@ -387,7 +399,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 42. Quote, then Callout (info)
+#### 44. Quote, then Callout (info)
 
 > A quote that runs over
 > two lines.
@@ -395,7 +407,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 43. Quote, then Callout (warning, chosen icon)
+#### 45. Quote, then Callout (warning, chosen icon)
 
 > A quote that runs over
 > two lines.
@@ -403,7 +415,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Quote, then Callout (decision, no icon)
+#### 46. Quote, then Callout (decision, no icon)
 
 > A quote that runs over
 > two lines.

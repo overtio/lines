@@ -412,14 +412,28 @@ Text in a warning callout with the flag icon.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Callout (warning, chosen icon), then Missing file
+#### 40. Callout (warning, chosen icon), then Audio
+
+:::! icon=flag
+Text in a warning callout with the flag icon.
+:::
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Callout (warning, chosen icon), then Video
+
+:::! icon=flag
+Text in a warning callout with the flag icon.
+:::
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Callout (warning, chosen icon), then Missing file
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Callout (warning, chosen icon), then Card
+#### 43. Callout (warning, chosen icon), then Card
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -428,7 +442,7 @@ Text in a warning callout with the flag icon.
 Text in a card.
 :::
 
-#### 42. Callout (warning, chosen icon), then Callout (info)
+#### 44. Callout (warning, chosen icon), then Callout (info)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -437,7 +451,7 @@ Text in a warning callout with the flag icon.
 Text in an info callout.
 :::
 
-#### 43. Callout (warning, chosen icon), then Callout (warning, chosen icon)
+#### 45. Callout (warning, chosen icon), then Callout (warning, chosen icon)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
@@ -446,7 +460,7 @@ Text in a warning callout with the flag icon.
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Callout (warning, chosen icon), then Callout (decision, no icon)
+#### 46. Callout (warning, chosen icon), then Callout (decision, no icon)
 
 :::! icon=flag
 Text in a warning callout with the flag icon.

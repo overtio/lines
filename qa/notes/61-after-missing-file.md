@@ -334,33 +334,43 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Missing file, then Missing file
+#### 40. Missing file, then Audio
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Missing file, then Video
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Missing file, then Missing file
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Missing file, then Card
+#### 43. Missing file, then Card
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ::: card
 Text in a card.
 :::
 
-#### 42. Missing file, then Callout (info)
+#### 44. Missing file, then Callout (info)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::i
 Text in an info callout.
 :::
 
-#### 43. Missing file, then Callout (warning, chosen icon)
+#### 45. Missing file, then Callout (warning, chosen icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Missing file, then Callout (decision, no icon)
+#### 46. Missing file, then Callout (decision, no icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::^ icon=none

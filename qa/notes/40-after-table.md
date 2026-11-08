@@ -451,7 +451,23 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Table, then Missing file
+#### 40. Table, then Audio
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Table, then Video
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Table, then Missing file
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -459,7 +475,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Table, then Card
+#### 43. Table, then Card
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -469,7 +485,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 42. Table, then Callout (info)
+#### 44. Table, then Callout (info)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -479,7 +495,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 43. Table, then Callout (warning, chosen icon)
+#### 45. Table, then Callout (warning, chosen icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -489,7 +505,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Table, then Callout (decision, no icon)
+#### 46. Table, then Callout (decision, no icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |

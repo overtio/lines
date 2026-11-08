@@ -152,6 +152,12 @@ export default {
   "editor.file.meta": "{kind} · {size}",
   // The name an attached file gets when it has none.
   "editor.file.name": "File",
+  // Audio and video in a note: its play button, and the slider for how far it's played ("1:02 of 3:15" read aloud, "1:02 / 3:15" shown).
+  "editor.media.play": "Play",
+  "editor.media.pause": "Pause",
+  "editor.media.position": "Position",
+  "editor.media.time": "{time} of {duration}",
+  "editor.media.elapsed": "{time} / {duration}",
   // A terminal recording (asciinema) played in a note, named for screen readers, and what shows when it can't load.
   "editor.recording": "Terminal recording",
   "editor.recording.failed": "This recording couldn’t be loaded",

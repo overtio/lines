@@ -607,7 +607,31 @@ Total, =costs!B2*2
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Named spreadsheet (csv name=), and a formula in another block using it, then Missing file
+#### 40. Named spreadsheet (csv name=), and a formula in another block using it, then Audio
+
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. Named spreadsheet (csv name=), and a formula in another block using it, then Video
+
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. Named spreadsheet (csv name=), and a formula in another block using it, then Missing file
 
 ```csv name=costs
 Item, Cost, Day
@@ -619,7 +643,7 @@ Total, =costs!B2*2
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. Named spreadsheet (csv name=), and a formula in another block using it, then Card
+#### 43. Named spreadsheet (csv name=), and a formula in another block using it, then Card
 
 ```csv name=costs
 Item, Cost, Day
@@ -633,7 +657,7 @@ Total, =costs!B2*2
 Text in a card.
 :::
 
-#### 42. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (info)
+#### 44. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (info)
 
 ```csv name=costs
 Item, Cost, Day
@@ -647,7 +671,7 @@ Total, =costs!B2*2
 Text in an info callout.
 :::
 
-#### 43. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (warning, chosen icon)
+#### 45. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (warning, chosen icon)
 
 ```csv name=costs
 Item, Cost, Day
@@ -661,7 +685,7 @@ Total, =costs!B2*2
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (decision, no icon)
+#### 46. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (decision, no icon)
 
 ```csv name=costs
 Item, Cost, Day

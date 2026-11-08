@@ -412,14 +412,28 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. JSON block (no language), then Missing file
+#### 40. JSON block (no language), then Audio
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+[Chime.mp3](attachment:chime.mp3)
+
+#### 41. JSON block (no language), then Video
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+[Sky.mp4](attachment:sky.mp4)
+
+#### 42. JSON block (no language), then Missing file
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 41. JSON block (no language), then Card
+#### 43. JSON block (no language), then Card
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -428,7 +442,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 42. JSON block (no language), then Callout (info)
+#### 44. JSON block (no language), then Callout (info)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -437,7 +451,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 43. JSON block (no language), then Callout (warning, chosen icon)
+#### 45. JSON block (no language), then Callout (warning, chosen icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -446,7 +460,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 44. JSON block (no language), then Callout (decision, no icon)
+#### 46. JSON block (no language), then Callout (decision, no icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}

@@ -86,7 +86,7 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - In the editor, equation, section and theorem numbers aren't used for references: `\ref{sec:intro}` shows `sec:intro`, not "1", and equations aren't numbered at all. The PDF preview numbers them (see below).
 - A paragraph hard-wrapped in the source shows on several lines, where LaTeX would join them.
 - `\input` and `\include` don't pull in other files: a paper made of several files has to be pasted in as one.
-- There's no format toolbar over selected text, no todos, and no drag handles in LaTeX notes. An attached file is a plain `\href` link, not a card with its size.
+- There's no format toolbar over selected text, no todos, and no drag handles in LaTeX notes. An attached file is a plain `\href` link, not a card with its size; audio and video on a line of their own play there, but Enter doesn't play them.
 - A photo pasted from Unsplash, or any other `\includegraphics{https://…}`, shows in lines but doesn't compile: LaTeX can only include files.
 - A synced LaTeX note's file still ends in `.md`, with `format: latex` in its front matter. Export writes `.tex` files.
 - Switching a note's format doesn't convert its text.
@@ -133,6 +133,13 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 
 - Only an image on a line of its own (in a note or a card) has a resize handle; one within text, a list or a quote takes a width written in its Markdown but can't be dragged. Images in LaTeX notes can't be resized yet (`\includegraphics[width=…]` is shown at the image's own size).
 - A width is in pixels and a height is ignored, so an image always keeps its shape.
+
+## Audio and video
+
+- Which files play is the browser's choice: AIFF plays only in Safari and the Mac app, a `.mov` from an iPhone only where the browser can decode HEVC, and MKV and AVI aren't played at all. Those show as a file's card, to open in another app.
+- A video is as wide as the note at most, and 480 px tall at most until it's given a width. Its width is written in its link text (`[Sky.mp4|400]`), which other Markdown apps show as part of the link. Videos in LaTeX notes can't be resized, as images there can't.
+- Audio stops when another note opens: there's no player that carries on across notes.
+- Not tried yet on iPhone, iPad or Android.
 
 ## Symbols
 
