@@ -1,6 +1,6 @@
 # API requests
 
-An `http` code block holds requests to try an API with, like a lighter Postman or Bruno. Press **Send** at the end of a request's line, or ⌘↵ with the cursor in it, and the response shows under the block. Type `/request` to start one.
+An `http` code block holds requests to try an API with, like a lighter Postman or Bruno. Press **Send** in the block's corner, or ⌘↵ with the cursor in a request, and the response shows under the block. A block of several requests sends them all, in order. Type `/request` to start one.
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -14,8 +14,8 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
 - An `@api = …` line is a variable, used as `{{api}}` in any block of the note
-- `# @name todo` names a request, so the ones after it can use its response: send **A todo**, then **The person it belongs to**
-- Paste a curl command into a block and it becomes a request; **curl** after **Send** copies a request as a curl command
+- `# @name todo` names a request, so the ones after it can use its response: **Send all** sends **A todo**, then **The person it belongs to** with its answer
+- Paste a curl command into a block and it becomes a request; the terminal icon beside Copy, in the block's corner, copies its requests as curl commands
 - A response's **+** adds its body to the note as a code block
 
 ```http

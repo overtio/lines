@@ -2,6 +2,8 @@
 export default {
   "http.format": "HTTP Requests",
   "http.send": "Send",
+  "http.sendAll": "Send all",
+  "http.sendAllTitle": "Send each request in the block, in order ({key} sends the one the cursor is in)",
   "http.copyCurl": "Copy as curl",
   // A response, under its request.
   "http.response": "Response",

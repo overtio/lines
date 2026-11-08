@@ -127,7 +127,7 @@ A code block with the language `mermaid` is drawn as its [Mermaid](https://merma
 
 ## API requests
 
-A code block with the language `http` (or `rest`) holds requests in the `.http` format, highlighted, with a Send button at the end of each request line, by the API Requests [plugin](plugins.md) (with it off, it's a code block). Requests are separated by `###` lines; `@name = value` lines are variables, used as `{{name}}` in any `http` block of the note. A response shows under its block while the note's open, and isn't written into the note. The format, variables and sending are in [requests.md](requests.md). Other apps show the block as code; editors that read `.http` files read its text as requests too.
+A code block with the language `http` (or `rest`) holds requests in the `.http` format, highlighted, with Send and Copy as curl in its top right corner, beside Copy, by the API Requests [plugin](plugins.md) (with it off, it's a code block). Requests are separated by `###` lines; `@name = value` lines are variables, used as `{{name}}` in any `http` block of the note. A response shows under its block while the note's open, and isn't written into the note. The format, variables and sending are in [requests.md](requests.md). Other apps show the block as code; editors that read `.http` files read its text as requests too.
 
 ## Math
 

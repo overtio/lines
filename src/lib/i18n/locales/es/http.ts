@@ -4,6 +4,8 @@ import type en from "../en/http";
 export default {
   "http.format": "Solicitudes HTTP",
   "http.send": "Enviar",
+  "http.sendAll": "Enviar todas",
+  "http.sendAllTitle": "Envía cada solicitud del bloque, en orden ({key} envía aquella en la que está el cursor)",
   "http.copyCurl": "Copiar como curl",
   "http.response": "Respuesta",
   "http.noResponse": "Sin respuesta",

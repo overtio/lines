@@ -43,7 +43,7 @@ A request that uses a variable that isn't there, or a response that hasn't come 
 
 ## Sending
 
-**Send**, at the end of a request's line, sends it; so does <kbd>⌘↵</kbd> (<kbd>Ctrl+Enter</kbd>) anywhere in the request. Requests are only ever sent by one of those: opening a note sends nothing.
+In an `http` block, **Send** in its top right corner sends its request; a block of several says **Send all**, and sends each in turn, so later ones can use earlier ones' responses. In a `.http` note, **Send** is at the end of each request's line. <kbd>⌘↵</kbd> (<kbd>Ctrl+Enter</kbd>) anywhere in a request sends just that one. Requests are only ever sent by one of those: opening a note sends nothing.
 
 The response shows under the request (under the code block, in a Markdown note): its status, how long it took, its size, and its body, formatted and highlighted when it's JSON, XML or HTML (JSON's objects and arrays fold from the margin), shown when it's an image. Its headers are a tab away. Copy copies the body or the headers; in a Markdown note, **+** adds the body to the note as a code block. Responses last while lines is open, and aren't saved in the note.
 
@@ -52,7 +52,7 @@ The response shows under the request (under the code block, in a Markdown note):
 
 ## curl
 
-- **curl**, after **Send** (shown while the line's hovered), copies the request as a curl command, with what variables can be filled in filled in. The Copy button in a block's corner copies the block's text as written.
+- **Copy as curl** (Terminal's icon) copies requests as curl commands, with what variables can be filled in filled in: in an `http` block it's in the corner, between Send and Copy, and copies each request in the block; in a `.http` note it's after a request's **Send**, while the line's hovered, and copies that request. Copy copies the block's text as written.
 - A curl command pasted into a request (in a `.http` note, or an `http` block), as browsers' "Copy as cURL" and API docs give them, is written as the request it makes: its method, address, headers (`-H`, `-u` as `Authorization`, `-A`, `-b`, `-e`) and body (`-d`, `--data-raw`, `--json`; `-G` puts it in the address). Forms with files (`-F`) aren't.
 
 ## Not yet

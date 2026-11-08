@@ -5,11 +5,11 @@ import { tags } from "@lezer/highlight";
 import { mount, unmount } from "svelte";
 import { speak } from "../../lib/a11y";
 import { fenceAt, fenceLanguage } from "../../lib/editor/rendered";
+import { copyButton, destroyCopyButton } from "../../lib/editor/keyValue";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
 import Icon from "../../lib/icons/Icon.svelte";
-import type { IconName } from "../../lib/icons/icons";
 import { t } from "../../lib/i18n/index.svelte";
-import { copyText, modKey } from "../../lib/platform";
+import { modKey } from "../../lib/platform";
 import { type Asked, fromCurl, toCurl } from "./curl";
 import { httpLanguage } from "./language";
 import { type HttpRequest, type HttpText, parseHttp } from "./parse";
@@ -269,7 +269,7 @@ function requestOnLine(state: EditorState, where: Where, pos: number) {
   return requestsIn(state, where, line.from, line.to).requests.find((request) => request.line <= pos && pos <= request.lineEnd) ?? null;
 }
 
-function send(view: EditorView, where: Where, field: StateField<Responses>, line: number) {
+async function send(view: EditorView, where: Where, field: StateField<Responses>, line: number) {
   const { state } = view;
   const { requests, variables } = requestsIn(state, where);
   const request = requests.find((each) => each.line === line);
@@ -287,10 +287,21 @@ function send(view: EditorView, where: Where, field: StateField<Responses>, line
   }
   view.dispatch({ effects: show.of({ line, exchange }) });
   if (exchange.state === "failed") return speak(exchange.error);
-  void exchange.send().then(() => {
-    const { received } = exchange;
-    speak(received ? t("http.received", { status: `${received.status} ${received.statusText}`.trim() }) : exchange.error);
-  });
+  await exchange.send();
+  const { received } = exchange;
+  speak(received ? t("http.received", { status: `${received.status} ${received.statusText}`.trim() }) : exchange.error);
+}
+
+/** Each request in the ```http block at `at()`, one after another, so later ones can use earlier ones' responses. */
+async function sendBlock(view: EditorView, field: StateField<Responses>, at: () => number | null) {
+  for (let index = 0; ; index++) {
+    // Found again each time: the note can change while one is on its way.
+    const pos = at();
+    const block = pos === null ? null : fenceAt(view.state, pos);
+    const requests = block ? requestsIn(view.state, httpBlocks, block.from, block.to).requests : [];
+    if (index >= requests.length) return;
+    await send(view, httpBlocks, field, requests[index].line);
+  }
 }
 
 /** A request as a curl command, with what variables can be filled in filled in. */
@@ -301,79 +312,134 @@ function curlOf(state: EditorState, where: Where, field: StateField<Responses>, 
   return toCurl(filledIn(request, scopeOf(state, field, variables), (text, scope) => fillInWhatCan(text, scope)));
 }
 
-/* The buttons on each request's line. */
+/** Every request in the ```http block at `pos`, as curl commands. */
+function blockCurl(state: EditorState, field: StateField<Responses>, pos: number) {
+  const block = fenceAt(state, pos);
+  if (!block) return "";
+  const scope = scopeOf(state, field, requestsIn(state, httpBlocks).variables);
+  return requestsIn(state, httpBlocks, block.from, block.to)
+    .requests.map((request) => toCurl(filledIn(request, scope, (text, each) => fillInWhatCan(text, each))))
+    .join("\n\n");
+}
 
-const icons = new WeakMap<HTMLElement, Record<string, unknown>[]>();
+/*
+ * The buttons. An http block's are in its top right corner, left of its Copy: Send, which sends
+ * each of its requests in turn, and Copy as curl (Terminal's icon). In a .http note, each request's
+ * are at the end of its line.
+ */
 
-/** A small button on a request's line: an icon and a word. */
-function lineButton(className: string, word: string, icon: IconName, run: (button: HTMLButtonElement) => void) {
+const copyAsCurl = (text: () => string, className: string) => {
+  const button = copyButton(text, t("http.copyCurl"), className, "terminal");
+  button.title = t("http.copyCurl");
+  return button;
+};
+
+const sendIcons = new WeakMap<HTMLElement, Record<string, unknown>>();
+
+/** A Send button, which runs `run` with itself. */
+function sendButton(className: string, label: string, title: string, run: (button: HTMLButtonElement) => void) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = className;
-  const spot = document.createElement("span");
-  spot.className = "cm-http-icon";
+  button.title = title;
+  const icon = document.createElement("span");
   const text = document.createElement("span");
-  text.textContent = word;
-  button.append(spot, text);
+  text.textContent = label;
+  button.append(icon, text);
   // Keep the click from moving the cursor.
   button.addEventListener("mousedown", (event) => event.preventDefault());
   button.addEventListener("click", () => run(button));
-  return { button, icon: mount(Icon, { target: spot, props: { name: icon, size: 12, strokeWidth: 2.25 } }) };
+  sendIcons.set(button, mount(Icon, { target: icon, props: { name: "send", size: 12, strokeWidth: 2.25 } }));
+  return button;
 }
 
-/** Send, and curl: the request as a curl command, copied (a check shows for a moment). */
-class SendWidget extends WidgetType {
-  constructor(
-    readonly where: Where,
-    readonly field: StateField<Responses>,
-  ) {
+function destroySendButton(button: HTMLElement) {
+  const icon = sendIcons.get(button);
+  if (icon) void unmount(icon);
+  sendIcons.delete(button);
+}
+
+/** Where a widget's button is in the note, while it's there. */
+const placeOf = (view: EditorView, dom: HTMLElement) => (dom.isConnected ? view.posAtDOM(dom) : null);
+
+/** Send and Copy as curl, at the end of a request's line in a .http note. */
+class RequestButtons extends WidgetType {
+  constructor(readonly field: StateField<Responses>) {
     super();
   }
-  eq(other: SendWidget) {
-    return other.where === this.where;
+  eq(other: RequestButtons) {
+    return other.field === this.field;
   }
   toDOM(view: EditorView) {
-    const { where, field } = this;
     const dom = document.createElement("span");
     dom.className = "cm-http-actions";
-    const sending = lineButton("cm-http-send", t("http.send"), "send", () => {
-      const request = requestOnLine(view.state, where, view.posAtDOM(dom));
-      if (request) send(view, where, field, request.line);
+    const sending = sendButton("cm-http-send", t("http.send"), `${t("http.send")} (${modKey}↵)`, () => {
+      const request = requestOnLine(view.state, wholeNote, view.posAtDOM(dom));
+      if (request) void send(view, wholeNote, this.field, request.line);
     });
-    sending.button.title = `${t("http.send")} (${modKey}↵)`;
-    let copied: ReturnType<typeof setTimeout> | undefined;
-    const curl = lineButton("cm-http-curl", "curl", "check", (button) => {
-      void copyText(curlOf(view.state, where, field, view.posAtDOM(dom)));
-      speak(t("editor.copied"));
-      button.classList.add("is-copied");
-      clearTimeout(copied);
-      copied = setTimeout(() => button.classList.remove("is-copied"), 1200);
-    });
-    curl.button.title = t("http.copyCurl");
-    curl.button.setAttribute("aria-label", t("http.copyCurl"));
-    dom.append(sending.button, curl.button);
-    icons.set(dom, [sending.icon, curl.icon]);
+    dom.append(sending, copyAsCurl(() => curlOf(view.state, wholeNote, this.field, view.posAtDOM(dom)), "cm-lp-copy cm-http-curl"));
     return dom;
   }
   destroy(dom: HTMLElement) {
-    for (const icon of icons.get(dom) ?? []) void unmount(icon);
-    icons.delete(dom);
+    destroySendButton(dom.firstElementChild as HTMLElement);
+    destroyCopyButton(dom.lastElementChild as HTMLElement);
   }
   ignoreEvent() {
     return true;
   }
 }
 
-function sendButtons(where: Where, field: StateField<Responses>) {
-  const widget = Decoration.widget({ widget: new SendWidget(where, field), side: 1 });
+/** Send and Copy as curl, in an http block's top right corner. */
+class BlockButtons extends WidgetType {
+  constructor(
+    readonly field: StateField<Responses>,
+    /** How many requests the block has: Send says "Send all" for more than one. */
+    readonly count: number,
+  ) {
+    super();
+  }
+  eq(other: BlockButtons) {
+    return other.field === this.field && other.count === this.count;
+  }
+  toDOM(view: EditorView) {
+    const dom = document.createElement("span");
+    dom.className = "cm-http-block-actions";
+    const all = this.count > 1;
+    const sending = sendButton("cm-http-send", all ? t("http.sendAll") : t("http.send"), all ? t("http.sendAllTitle", { key: `${modKey}↵` }) : `${t("http.send")} (${modKey}↵)`, () => {
+      void sendBlock(view, this.field, () => placeOf(view, dom));
+    });
+    dom.append(sending, copyAsCurl(() => blockCurl(view.state, this.field, view.posAtDOM(dom)), "cm-lp-copy cm-http-curl"));
+    return dom;
+  }
+  destroy(dom: HTMLElement) {
+    destroySendButton(dom.firstElementChild as HTMLElement);
+    destroyCopyButton(dom.lastElementChild as HTMLElement);
+  }
+  ignoreEvent() {
+    return true;
+  }
+}
+
+function buttons(where: Where, field: StateField<Responses>) {
+  const onLine = Decoration.widget({ widget: new RequestButtons(field), side: 1 });
   const draw = (view: EditorView) => {
-    const ends = new Set<number>();
+    const { state } = view;
+    const ranges = new Map<number, ReturnType<typeof onLine.range>>();
     for (const { from, to } of view.visibleRanges) {
-      for (const request of requestsIn(view.state, where, from, to).requests) {
-        if (request.lineEnd >= from && request.lineEnd <= to) ends.add(request.lineEnd);
+      if (!where.markdown) {
+        for (const request of requestsIn(state, where, from, to).requests) {
+          if (request.lineEnd >= from && request.lineEnd <= to) ranges.set(request.lineEnd, onLine.range(request.lineEnd));
+        }
+        continue;
+      }
+      for (const section of where.sections(state, from, to)) {
+        // At the end of the block's first line, its opening fence, after its Copy (side 1) and any Format button (side 2).
+        const fence = state.doc.lineAt(Math.max(0, section.from - 1)).to;
+        const count = parsed(state.sliceDoc(section.from, section.to)).requests.length;
+        if (count && fence >= from && fence <= to) ranges.set(fence, Decoration.widget({ widget: new BlockButtons(field, count), side: 3 }).range(fence));
       }
     }
-    return Decoration.set([...ends].map((end) => widget.range(end)), true);
+    return Decoration.set([...ranges.values()], true);
   };
   return ViewPlugin.fromClass(
     class {
@@ -400,7 +466,7 @@ function requestEditing(where: Where): Extension {
   const field = responsesField(where);
   return [
     field,
-    sendButtons(where, field),
+    buttons(where, field),
     Prec.high(
       keymap.of([
         {
@@ -410,7 +476,7 @@ function requestEditing(where: Where): Extension {
             if (!inRequests(view.state, where, pos)) return false;
             const request = requestsIn(view.state, where, pos, pos).requests.find((each) => each.from <= pos && pos <= each.end);
             if (!request) return false;
-            send(view, where, field, request.line);
+            void send(view, where, field, request.line);
             return true;
           },
         },

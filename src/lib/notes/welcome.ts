@@ -69,7 +69,7 @@ flowchart LR
 
 Math is LaTeX between dollar signs: $e^{i\\pi} + 1 = 0$. To write a whole note in LaTeX, switch it in the ⓘ panel.
 
-An \`http\` code block holds requests to an API, with a Send button on each: type \`/request\`.
+An \`http\` code block holds requests to an API, with a Send button in its corner: type \`/request\`.
 
 Press ⌘P to see a note on pages, ready to print or save as a PDF.
 
