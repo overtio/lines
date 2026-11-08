@@ -41,7 +41,7 @@ The [demo website](https://overtio.github.io/lines/) opens with a tour: one shor
 - **Tables** that look like tables. <kbd>Tab</kbd> moves between cells, and rows pasted from a spreadsheet become one. A cell like `=SUM(B2:B4)` shows what it works out to.
 - **Cards and callouts.** Group a section into a card, or make it an info, question, warning, error or decision callout: `:::info` … `:::`.
 - **Code blocks** with syntax highlighting in your theme's colors, a copy button, and a wand that tidies JSON, SQL, JavaScript, CSS and more.
-- **Diagrams** from [Mermaid](https://mermaid.js.org) code: flowcharts, sequence diagrams, Gantt charts and more, drawn as you type.
+- **Diagrams** from [Mermaid](https://mermaid.js.org) code: flowcharts, sequence diagrams, Gantt charts and more, drawn as you type by [Pele](https://pele.run) in your theme's colors, or by Mermaid itself.
 - **Math** with [KaTeX](https://katex.org): `$…$` in a line, `$$` for a block.
 - **Drawings** with [Excalidraw](https://excalidraw.com), saved in the note as an SVG any Markdown app can show.
 - **Images and files.** Paste or drop them in. Drag an image's corner to resize it.
@@ -244,7 +244,8 @@ src/
     ironcalc/                The formula engine (IronCalc in WebAssembly), and reading and writing Excel workbooks
     tex/                     Typesets a LaTeX note with TeX (BusyTeX's pdfLaTeX in WebAssembly)
     katex/                   The math engine (KaTeX)
-    mermaid/                 Mermaid diagrams: the renderer, its colors, /diagram
+    pele/                    Mermaid diagrams drawn by Pele (the default): the renderer and its colors
+    mermaid/                 Mermaid diagrams drawn by Mermaid itself, and what both add (blocks.ts): /diagram, Copy and Edit as Drawing
     unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
     themes/                  The sixteen themes, as their colors
     lucide/  sf-symbols/     Icon sets
@@ -425,6 +426,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [x] Any file as an attachment
 - [x] Drawings with Excalidraw, kept as SVG images
 - [x] Mermaid diagrams copied into drawings, to edit by hand
+- [x] Diagrams drawn by Pele, faster and in the theme's colors, with Mermaid itself as the alternative
 - [x] Note links: mentions (`@Note`), and properties of notes (`@Note.key`)
 - [x] Wiki links (`[[Note]]`, `[[Note|text]]`) as mentions
 - [x] Math (KaTeX), and notes written in LaTeX

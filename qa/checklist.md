@@ -169,7 +169,8 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] The copy button copies the code without its fences
 - [ ] The wand tidies JSON (long numbers keep every digit), SQL and Prettier languages, in one undo step
 - [ ] A bad block shows "Couldn't format: …" for a few seconds; editing while it formats doesn't get overwritten
-- [ ] A mermaid block draws as a diagram in the theme's colors; clicking it shows the code with the diagram below, redrawn as you type
+- [ ] A mermaid block draws as a diagram (by Pele) in the theme's colors; clicking it shows the code with the diagram below, redrawn as you type
+- [ ] Flowcharts, sequence, class, state, ER, Gantt, pie, mindmap and timeline diagrams all draw; a label with `$$x^2$$` shows the math drawn; `click A href "…"` draws no link
 - [ ] Hovering a diagram (or its preview while editing) shows a shapes button, Copy and Edit as Drawing: it opens the diagram in Excalidraw, a flowchart as boxes and arrows to move, a pie or Gantt chart as a picture of it; Save puts the drawing on its own line below the code block, which stays, with the cursor where it was; Cancel adds nothing; ⌘Z takes the drawing out. No button on a broken or empty diagram, nor in the Trash
 - [ ] Hovering a diagram shows a handle on its bottom right corner, as an image's (always on touch): dragging it resizes the diagram, keeping its shape and no wider than the note, and writes the width after the language (` ```mermaid |300 `); double-clicking it takes the width out. A width typed by hand works the same; the PDF preview and PNGs use it. No handle on a broken or empty diagram, nor in the Trash
 - [ ] A broken diagram shows a short error; an empty one shows "Empty diagram"
@@ -349,7 +350,8 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
 - [ ] Turning TeX Typesetting on while LaTeX is off turns LaTeX on too
 - [ ] API Requests off: ```http and ```hurl blocks show as plain code with no Send buttons, `/request` and `/hurl` are gone, and HTTP Requests and Hurl notes show as plain text; on again, all back
-- [ ] Diagrams off: ```mermaid blocks show as code, `/diagram` is gone from the "/" menu, and the PDF prints them as code; on again, they're drawn again, and Diagram is right after Code block in the menu
+- [ ] Diagrams (Pele) is on and Diagrams (Mermaid) off at first. Turning Mermaid on turns Pele off, and diagrams are drawn again by Mermaid, on screen and in the PDF; turning Pele on turns Mermaid off
+- [ ] Both Diagrams plugins off: ```mermaid blocks show as code, `/diagram` is gone from the "/" menu, and the PDF prints them as code; either on again, they're drawn again, and Diagram is right after Code block in the menu
 - [ ] Math off: `$…$`, `$$` blocks and LaTeX notes' math show as written, on screen and in the PDF; on again, drawn
 - [ ] TeX Typesetting off: a LaTeX note's PDF preview has no "Typeset with" switch
 - [ ] Formulas off: formulas in tables and spreadsheets show as written, and a spreadsheet's share menu has no Download Values or Excel Workbook; on again, worked out

@@ -51,6 +51,14 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - Other Markdown apps without math support show the LaTeX as written, dollar signs included.
 - The note list shows a note's LaTeX as text, not drawn.
 
+## Diagrams
+
+- Diagrams are drawn by [Pele](https://pele.run), which reads Mermaid's syntax (up to Mermaid 12.1) but lays diagrams out its own way: they look different from GitHub's and other Mermaid apps'. Settings → Plugins → Diagrams (Mermaid) draws them with Mermaid itself instead.
+- Pele doesn't read Mermaid's themes or `themeVariables`, except the colors of charts' series: diagrams take the theme's colors. Colors set in a diagram (`style`, `classDef`) stay as written.
+- Links in diagrams (`click A href "…"`) aren't drawn as links, as one followed would open in lines' own window. HTML in labels shows as text, and icons (`fa:fa-car`) aren't drawn. ZenUML and Mermaid's other add-ons aren't drawn.
+- Math in a label (`$$x^2$$`) is drawn by the math plugin, KaTeX, and shows as written with it off.
+- Copy and Edit as Drawing still converts with Mermaid, inside Excalidraw's converter ([Drawings](#drawings)), so the drawing comes from Mermaid's layout. Mermaid stays in the app for that, so Pele doesn't make the download smaller yet.
+
 ## LaTeX notes
 
 - lines draws a common part of LaTeX ([latex.md](latex.md)), not what a TeX engine typesets: no packages, text macros (`\newcommand` only works in math), floats' placement or page layout. What it doesn't know stays as written, faint.

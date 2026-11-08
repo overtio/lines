@@ -14,7 +14,8 @@ Settings → Plugins lists them. A plugin that isn't needed can be turned off, a
 | API Requests | Sends requests written in the `.http` format or Hurl's, from `.http` and `.hurl` notes and ` ```http ` and ` ```hurl ` code blocks in Markdown notes, shows their responses and checks Hurl's asserts; adds `/request` and `/hurl` ([requests.md](requests.md)) | Yes | `src/plugins/http/` |
 | Secrets | Draws `{{name}}` in Markdown notes as a secret kept in a locked note, to show or copy; adds `/secret` ([secrets.md](secrets.md)) | Yes | `src/plugins/secrets/`, with the store in `src/lib/notes/secrets.svelte.ts` |
 | Math (KaTeX) | The math engine, for math in notes of any format | Yes | `src/plugins/katex/` |
-| Diagrams (Mermaid) | Draws ` ```mermaid ` code blocks, and adds `/diagram` | Yes | `src/plugins/mermaid/` |
+| Diagrams (Pele) | Draws ` ```mermaid ` code blocks with [Pele](https://pele.run), and adds `/diagram` | Yes | `src/plugins/pele/` |
+| Diagrams (Mermaid) | Draws ` ```mermaid ` code blocks with [Mermaid](https://mermaid.js.org) itself, instead of Pele, and adds `/diagram` | No | `src/plugins/mermaid/` |
 | Formulas (IronCalc) | The formula engine, for formulas in tables and spreadsheets, and Excel workbooks | Yes | `src/plugins/ironcalc/` |
 | TeX Typesetting | Makes a LaTeX note's PDF with TeX. Needs LaTeX. | Yes | `src/plugins/tex/` |
 | Unsplash | `/unsplash`: search Unsplash's free photos and put one in a note. Needs an API key when lines is built ([README](../README.md#development)) | Yes | `src/plugins/unsplash/` |
@@ -28,9 +29,11 @@ Settings → Plugins lists them. A plugin that isn't needed can be turned off, a
 Nothing is lost. A plugin turned off stops adding what it adds, at once, in every window:
 
 - **A format.** Its notes keep their format and show as plain text, which can still be read and changed. Their ⓘ panel says so, with a button that turns the plugin back on. Export, Copy and Download still write them as what they are (a LaTeX note as a `.tex` file that compiles). With Spreadsheets off, a ` ```csv ` block in a Markdown note is a code block too, `/spreadsheet` is gone from the "/" menu, and tables have no Convert to Spreadsheet button. With API Requests off, ` ```http ` and ` ```hurl ` blocks are code blocks with no Send buttons, and `/request` and `/hurl` are gone. With Secrets off, `{{name}}` is text and `/secret` is gone; requests still use secrets.
-- **An engine.** With Math off, math shows as it's written. With Diagrams off, a ` ```mermaid ` block is a code block and `/diagram` is gone from the "/" menu. With Formulas off, formulas show as written, and spreadsheets don't download as values or Excel workbooks. Without TeX, a LaTeX note's PDF is laid out by lines.
+- **An engine.** With Math off, math shows as it's written. With both Diagrams plugins off, a ` ```mermaid ` block is a code block and `/diagram` is gone from the "/" menu. With Formulas off, formulas show as written, and spreadsheets don't download as values or Excel workbooks. Without TeX, a LaTeX note's PDF is laid out by lines.
 - **A theme or an icon set.** What was chosen is kept, and lines shows its own (Lines, Lucide) until the plugin is on again.
 - **A plugin others need** (TeX needs LaTeX): those wait, and say what they need. Turning one on turns on what it needs too.
+
+Pele and Mermaid draw the same blocks, so only one of them is on: turning one on turns the other off. Pele is on to begin with. Mermaid is larger and slower to load, and lays diagrams out as GitHub and other Mermaid apps do, where Pele has its own layout.
 
 Which plugins are on is kept on each device, like the rest of Settings. A note in a format this device doesn't have, synced from another, shows as plain text and keeps its format when it syncs back.
 
@@ -64,11 +67,11 @@ export const graphviz = (): Plugin => ({
 
 That's all a new renderer needs: ` ```dot ` blocks in Markdown notes are then drawn on screen and on paper, with the resize handle and the width after the language (` ```dot |400 `) that Mermaid's diagrams have.
 
-Load anything big the first time it's needed (`import()`), as KaTeX, Mermaid and TeX do, so lines starts as fast with the plugin as without it. A stylesheet is the exception: added once the page is drawn, it restyles all of it, a stall that shows while scrolling, so import it with the plugin, as KaTeX does.
+Load anything big the first time it's needed (`import()`), as KaTeX, Pele, Mermaid and TeX do, so lines starts as fast with the plugin as without it. A stylesheet is the exception: added once the page is drawn, it restyles all of it, a stall that shows while scrolling, so import it with the plugin, as KaTeX does.
 
 ### What a plugin can add
 
-Every part of `contributes` is optional, and a plugin can add several kinds of things (Mermaid adds a renderer and a "/" command; API Requests a format, a code language, and editing and a "/" command for Markdown).
+Every part of `contributes` is optional, and a plugin can add several kinds of things (Pele adds a renderer and a "/" command; API Requests a format, a code language, and editing and a "/" command for Markdown).
 
 **`languages`**: formats notes can be written in (`NoteLanguage`). A language says everything lines needs to know about notes written in it, so nothing outside its plugin knows how it reads:
 
@@ -99,7 +102,7 @@ Every part of `contributes` is optional, and a plugin can add several kinds of t
 
 ### Plugins built on plugins
 
-A plugin can need others (`requires`): it runs only while they do, and turning it on turns them on. TeX needs LaTeX, and imports its code. Otherwise plugins meet only through what they add: a renderer draws the code blocks of any format whose editor asks for it, and any format's math is drawn by whichever math engine is on.
+A plugin can need others (`requires`): it runs only while they do, and turning it on turns them on. TeX needs LaTeX, and imports its code. Plugins that do the same work name each other as `alternatives`, and turning one on turns the others off: Pele and Mermaid both draw ` ```mermaid ` blocks, with what they add besides from `src/plugins/mermaid/blocks.ts`. Otherwise plugins meet only through what they add: a renderer draws the code blocks of any format whose editor asks for it, and any format's math is drawn by whichever math engine is on.
 
 ## Not yet
 

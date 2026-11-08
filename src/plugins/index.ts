@@ -8,6 +8,7 @@ import { latex } from "./latex";
 import { lucide } from "./lucide";
 import { markdown } from "./markdown";
 import { mermaid } from "./mermaid";
+import { pele } from "./pele";
 import { secrets } from "./secrets";
 import { sfSymbols } from "./sf-symbols";
 import { spreadsheet } from "./spreadsheet";
@@ -27,6 +28,8 @@ export const builtIn = (): Plugin[] => [
   requests(),
   secrets(),
   katex(),
+  // Before Mermaid: if both were on, Pele would draw the diagrams.
+  pele(),
   mermaid(),
   ironcalc(),
   tex(),
