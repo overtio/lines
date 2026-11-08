@@ -356,49 +356,56 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
   - [ ] Nested open todo
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Todo list, then Image
+#### 33. Todo list, then arXiv links
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Todo list, then Image
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample picture](attachment:photo.png)
 
-#### 34. Todo list, then Drawing
+#### 35. Todo list, then Drawing
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Todo list, then File
+#### 36. Todo list, then File
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Todo list, then Attached 3D model (STL)
+#### 37. Todo list, then Attached 3D model (STL)
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Todo list, then Terminal recording (.cast file)
+#### 38. Todo list, then Terminal recording (.cast file)
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Todo list, then Missing file
+#### 39. Todo list, then Missing file
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Todo list, then Card
+#### 40. Todo list, then Card
 
 - [x] Done todo
 - [ ] Open todo
@@ -407,7 +414,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 40. Todo list, then Callout (info)
+#### 41. Todo list, then Callout (info)
 
 - [x] Done todo
 - [ ] Open todo
@@ -416,7 +423,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 41. Todo list, then Callout (warning, chosen icon)
+#### 42. Todo list, then Callout (warning, chosen icon)
 
 - [x] Done todo
 - [ ] Open todo
@@ -425,7 +432,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Todo list, then Callout (decision, no icon)
+#### 43. Todo list, then Callout (decision, no icon)
 
 - [x] Done todo
 - [ ] Open todo

@@ -57,7 +57,7 @@ const library: ImageLibrary = {
     if (!response.ok) throw new Error(`GIPHY answered ${response.status}`);
     const { data, pagination }: Found = await response.json();
     const end = Math.min(pagination.total_count, query ? MOST.search : MOST.trending);
-    return { images: data.map(found), more: offset + pagination.count < end };
+    return { items: data.map(found), more: offset + pagination.count < end };
   },
 };
 

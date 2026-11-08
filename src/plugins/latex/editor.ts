@@ -13,6 +13,10 @@ import { insert, SECTIONS, type SlashCommand, slashMenu } from "../../lib/editor
 import { inOpenMath, MATH_COMMANDS, paragraphBefore, searchWords, TEXT_COMMANDS } from "../../lib/editor/texCommands";
 import { arrowsInto, focusChanged, focused, isEditing } from "../../lib/editor/util";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
+import { type PaperLink, paperCommands } from "../../lib/editor/papers";
+import { shortLink, ShortLinkWidget } from "../../lib/editor/shortLinks";
+import { plugins } from "../../lib/plugins/registry.svelte";
+import type { PaperSource } from "../../lib/plugins/types";
 
 /*
  * Live preview for notes written in LaTeX (docs/latex.md), the way livePreview.ts draws Markdown:
@@ -460,10 +464,18 @@ function build(state: EditorState, visible?: { from: number; to: number }): Deco
         markup(lineActive(span.from), [span.from, span.open], [span.close, span.to]);
         break;
 
-      case "link":
+      case "link": {
+        // A link to a site a plugin reads short (GitHub, arXiv): \url{…} as that, \href{…}{text} with the mark in front.
+        const short = !touches(span.from, span.to) && shortLink(span.href);
+        if (short && doc.sliceString(span.textFrom, span.textTo) === span.href) {
+          add(Decoration.replace({ widget: new ShortLinkWidget(span.href, short.mark, short.text) }).range(span.from, span.to));
+          break;
+        }
+        if (short) add(Decoration.widget({ widget: new ShortLinkWidget(span.href, short.mark, ""), side: -1 }).range(span.textFrom));
         mark(span.textFrom, span.textTo, "cm-lp-link", { "data-href": span.href });
         markup(touches(span.from, span.to), [span.from, span.textFrom], [span.textTo, span.to]);
         break;
+      }
 
       case "image":
         if (touches(span.from, span.to)) mark(span.from, span.to, "cm-lt-command", noSpellcheck);
@@ -731,6 +743,12 @@ function literalAt(state: EditorState, pos: number) {
 /** An address in a LaTeX argument, where `%` would start a comment. */
 const address = (url: string) => url.replace(/%/g, "\\%");
 
+/**
+ * A paper as an \href link named by its title, which is TeX already (arXiv's are written in it):
+ * only the characters that would break it are escaped.
+ */
+const latexPaperLink: PaperLink = (paper) => `\\href{${address(paper.url)}}{${paper.title.replace(/(?<!\\)[&%#]/g, "\\$&")}}`;
+
 /** Pasted and dropped images as \includegraphics, other files as \href links named after them. */
 const latexWriter: AttachmentWriter = {
   image: (src) => `\\includegraphics[width=\\linewidth]{${address(src)}}`,
@@ -902,8 +920,20 @@ const outline = outlineHeadings.of((state) =>
   ),
 );
 
-/** What a LaTeX note's editor adds to the shared ones (setup.ts), in place of the Markdown ones. */
-export const latexEditing: Extension = [
+/** Its "/" commands, with "/paper" after Link for each source of papers. */
+const slashCommands = (papers: readonly PaperSource[]) =>
+  COMMANDS.flatMap((command) => (command.id === "link" ? [command, ...paperCommands(papers, latexPaperLink)] : [command]));
+
+let built: { papers: readonly PaperSource[]; editing: Extension } | undefined;
+
+/** What a LaTeX note's editor adds to the shared ones (setup.ts), in place of the Markdown ones; made again when sources of papers change. */
+export function latexEditing(): Extension {
+  const { papers } = plugins;
+  if (built?.papers !== papers) built = { papers, editing: editing(papers) };
+  return built.editing;
+}
+
+const editing = (papers: readonly PaperSource[]): Extension => [
   focused,
   parsed,
   blocks,
@@ -912,7 +942,7 @@ export const latexEditing: Extension = [
   preloadMath,
   events,
   latexKeymap,
-  slashMenu(COMMANDS, backslashCommands),
+  slashMenu(slashCommands(papers), backslashCommands),
   Prec.high(tablePasting(tabular, literalAt)),
   attachmentPasting(latexWriter),
   pasteLink,

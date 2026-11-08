@@ -1,7 +1,8 @@
 import type { EditorView } from "@codemirror/view";
-import { mount, unmount } from "svelte";
+import type { SearchPage } from "../plugins/types";
 import { insertWebImage } from "./attachments";
 import WebImagePicker from "./WebImagePicker.svelte";
+import { openPicker } from "./webSearch";
 
 /*
  * Pictures from a library on the web, found by searching and put in a Markdown note: /unsplash and
@@ -31,30 +32,17 @@ export interface ImageLibrary {
    * One page (1 for the first) of what `query` finds, or with no query what's featured, and
    * whether there are more pages.
    */
-  search(query: string, page: number, signal: AbortSignal): Promise<{ images: FoundImage[]; more: boolean }>;
+  search(query: string, page: number, signal: AbortSignal): Promise<SearchPage<FoundImage>>;
   /** Told which picture went in the note, for libraries that count them (Unsplash). */
   chosen?(image: FoundImage): void;
 }
 
 /** A "/" command's work: takes the typed command out, and opens a picker of `library`'s pictures at the cursor. */
-export const pickWebImage = (library: ImageLibrary) => (view: EditorView, from: number, to: number) => {
-  view.dispatch({ changes: { from, to }, userEvent: "delete" });
-  const at = view.coordsAtPos(from) ?? view.contentDOM.getBoundingClientRect();
-  const picker = mount(WebImagePicker, {
-    target: document.body,
-    props: {
-      library,
-      x: at.left,
-      y: at.bottom,
-      onchoose(image: FoundImage) {
-        library.chosen?.(image);
-        insertWebImage(view, image.src, image.alt);
-      },
-      onclose() {
-        if (view.dom.isConnected) view.focus();
-        // Once the picker has finished closing.
-        setTimeout(() => void unmount(picker));
-      },
+export const pickWebImage = (library: ImageLibrary) => (view: EditorView, from: number, to: number) =>
+  openPicker(view, from, to, WebImagePicker, {
+    library,
+    onchoose(image: FoundImage) {
+      library.chosen?.(image);
+      insertWebImage(view, image.src, image.alt);
     },
   });
-};

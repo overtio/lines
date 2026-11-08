@@ -260,49 +260,53 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 
 > Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Image in a quote (stays Markdown here)
+#### 33. arXiv links in a quote
+
+> Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Image in a quote (stays Markdown here)
 
 > ![A sample picture](attachment:photo.png)
 
-#### 34. Drawing in a quote (stays Markdown here)
+#### 35. Drawing in a quote (stays Markdown here)
 
 > ![A sample drawing](attachment:drawing.svg)
 
-#### 35. File in a quote (stays Markdown here)
+#### 36. File in a quote (stays Markdown here)
 
 > [Budget.csv](attachment:budget.csv)
 
-#### 36. Attached 3D model (STL) in a quote
+#### 37. Attached 3D model (STL) in a quote
 
 > [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Terminal recording (.cast file) in a quote
+#### 38. Terminal recording (.cast file) in a quote
 
 > [terminal.cast](attachment:terminal.cast)
 
-#### 38. Missing file in a quote (stays Markdown here)
+#### 39. Missing file in a quote (stays Markdown here)
 
 > [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Card in a quote
+#### 40. Card in a quote
 
 > ::: card
 > Text in a card.
 > :::
 
-#### 40. Callout (info) in a quote
+#### 41. Callout (info) in a quote
 
 > :::i
 > Text in an info callout.
 > :::
 
-#### 41. Callout (warning, chosen icon) in a quote
+#### 42. Callout (warning, chosen icon) in a quote
 
 > :::! icon=flag
 > Text in a warning callout with the flag icon.
 > :::
 
-#### 42. Callout (decision, no icon) in a quote
+#### 43. Callout (decision, no icon) in a quote
 
 > :::^ icon=none
 > Text in a decision callout with no icon.

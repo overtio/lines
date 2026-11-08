@@ -3,7 +3,7 @@ import type { SyntaxNode } from "@lezer/common";
 import type { MarkdownParser } from "@lezer/markdown";
 import { t } from "../i18n/index.svelte";
 import { CALLOUTS, calloutOf } from "../editor/cards";
-import { githubText } from "../editor/github";
+import { shortLink } from "../editor/shortLinks";
 import { valueText } from "../editor/objects";
 import { Card, Highlight, Mention, Tag, TexMath, Underline } from "../editor/syntax";
 import { tableData } from "../editor/typeTables";
@@ -160,7 +160,7 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
       case "URL": {
         const url = name === "URL" ? node : node.getChild("URL");
         const href = url ? slice(url.from, url.to) : slice(node.from, node.to);
-        return void into.appendChild(link(/^www\./i.test(href) ? `https://${href}` : href, githubText(href) ?? href));
+        return void into.appendChild(link(/^www\./i.test(href) ? `https://${href}` : href, shortLink(href)?.text ?? href));
       }
       case "Image": {
         const url = node.getChild("URL");

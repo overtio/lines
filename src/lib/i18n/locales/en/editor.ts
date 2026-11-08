@@ -67,6 +67,9 @@ export default {
   "editor.slash.link.keywords": "url web href",
   // Put in place of the link's text, selected, ready to type over.
   "editor.slash.link.text": "link text",
+  // A link to a research paper, found by searching a source of them (arXiv).
+  "editor.slash.paper": "Paper",
+  "editor.slash.paper.keywords": "research article study science preprint citation reference academic arxiv",
   // A #tag.
   "editor.slash.tag": "Tag",
   "editor.slash.tag.keywords": "hashtag label",
@@ -217,15 +220,18 @@ export default {
   "editor.find.showReplace": "Replace",
   "editor.find.replace": "Replace",
   "editor.find.replaceAll": "Replace All",
-  // The picker /unsplash and /giphy open, where {name} is Unsplash or GIPHY.
-  "editor.images.search": "Search {name}",
+  // The picker /unsplash, /giphy and /paper open, where {name} is what's searched: Unsplash, GIPHY, arXiv.
+  "editor.web.search": "Search {name}",
+  "editor.web.searching": "Searching…",
+  "editor.web.found": "{count, plural, one {# result} other {# results}}",
+  "editor.web.none": "Nothing found for “{query}”.",
+  "editor.web.failed": "Couldn’t reach {name}.",
+  "editor.web.retry": "Try Again",
   // A picture in the picker, and who made it.
   "editor.images.by": "{image}, by {name}",
-  "editor.images.searching": "Searching…",
-  "editor.images.found": "{count, plural, one {# result} other {# results}}",
-  "editor.images.none": "Nothing found for “{query}”.",
-  "editor.images.failed": "Couldn’t reach {name}.",
-  "editor.images.retry": "Try Again",
+  // Papers in the picker: what it says before anything's typed, and a paper's authors when there are more than two.
+  "editor.papers.hint": "Search by title, author or topic, or paste a link to a paper.",
+  "editor.papers.etAl": "{name} et al.",
 
   // CodeMirror's own words: what it says to screen readers, and its go-to-line box. `$` is a number
   // CodeMirror fills in; keep it.

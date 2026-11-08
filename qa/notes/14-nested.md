@@ -388,7 +388,15 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 33. Image in a callout in a card
+#### 33. arXiv links in a callout in a card
+
+::: card
+:::!
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+:::
+:::
+
+#### 34. Image in a callout in a card
 
 ::: card
 :::!
@@ -396,7 +404,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 34. Drawing in a callout in a card
+#### 35. Drawing in a callout in a card
 
 ::: card
 :::!
@@ -404,7 +412,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 35. File in a callout in a card
+#### 36. File in a callout in a card
 
 ::: card
 :::!
@@ -412,7 +420,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 36. Attached 3D model (STL) in a callout in a card
+#### 37. Attached 3D model (STL) in a callout in a card
 
 ::: card
 :::!
@@ -420,7 +428,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 37. Terminal recording (.cast file) in a callout in a card
+#### 38. Terminal recording (.cast file) in a callout in a card
 
 ::: card
 :::!
@@ -428,7 +436,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 38. Missing file in a callout in a card
+#### 39. Missing file in a callout in a card
 
 ::: card
 :::!
@@ -436,7 +444,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 39. Card in a callout in a card
+#### 40. Card in a callout in a card
 
 ::: card
 :::!
@@ -446,7 +454,7 @@ Text in a card.
 :::
 :::
 
-#### 40. Callout (info) in a callout in a card
+#### 41. Callout (info) in a callout in a card
 
 ::: card
 :::!
@@ -456,7 +464,7 @@ Text in an info callout.
 :::
 :::
 
-#### 41. Callout (warning, chosen icon) in a callout in a card
+#### 42. Callout (warning, chosen icon) in a callout in a card
 
 ::: card
 :::!
@@ -466,7 +474,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 42. Callout (decision, no icon) in a callout in a card
+#### 43. Callout (decision, no icon) in a callout in a card
 
 ::: card
 :::!

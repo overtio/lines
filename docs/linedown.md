@@ -26,6 +26,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Copyable value | `Key: Value` lines | Yes (plain text, read specially) |
 | GitHub link | `https://github.com/owner/repo/issues/12` | Yes (an ordinary link, drawn short) |
 | Terminal recording | `[![asciicast](https://asciinema.org/a/<id>.svg)](https://asciinema.org/a/<id>)`, `[demo.cast](../attachments/<hash>.cast)` | Yes (asciinema's embed code: a linked image; a link) |
+| arXiv link | `https://arxiv.org/abs/1706.03762` | Yes (an ordinary link, drawn short) |
 | Properties | `key: value` lines between `---` lines at the top | YAML front matter (Obsidian, Jekyll, Pandoc) |
 | Mention | `@Oleks`, `@[Two Words]`, `@Oleks.fullname`, `[[Two Words]]` | Wiki links: Obsidian, Logseq, Foam |
 | Type table | `@type.recipe`, `@type.recipe(time, servings)` on a line of its own | No |
@@ -208,9 +209,19 @@ A recording of a terminal from [asciinema](https://asciinema.org) plays in the n
 - Like images, recordings are drawn at the top level and in cards. Within a line of text, in a list or in a quote, they're the picture or link they're written as. A link to an asciinema.org page is a link: only the embed code plays.
 - Printed, a recording from asciinema.org is its preview, linked to it; a `.cast` file is its name.
 
-## GitHub links
+## Links drawn short
 
-A link to GitHub is drawn short, the way GitHub writes references, with GitHub's mark in front. The note keeps the full URL, which shows again while the cursor is on the link.
+Links to some sites are drawn short, the way the site writes them, with a mark in front: GitHub's and arXiv's, each from its [plugin](plugins.md). The note keeps the full URL, which shows again while the cursor is on the link.
+
+- This applies to bare URLs, `<https://…>` autolinks, and `[…](…)` links whose text is the URL. A link with text of its own, `[the parser bug](https://github.com/…)`, keeps its text with the mark in front.
+- Tables draw them the same way, and so do LaTeX notes (`\url{…}`, and `\href{…}{…}` with the mark in front). Printed from a Markdown note, a bare link reads short too.
+- With the site's plugin off, its links are ordinary links.
+
+This changes nothing about the Markdown; it's only how lines draws the link.
+
+### GitHub
+
+GitHub's mark, then the reference as GitHub writes it:
 
 | URL | Drawn as |
 |---|---|
@@ -222,11 +233,22 @@ A link to GitHub is drawn short, the way GitHub writes references, with GitHub's
 | `…/blob/main/src/app.ts#L10-L20` | `overtio/lines › app.ts:10-20` |
 | Anything else in a repository, like `…/actions` | `overtio/lines › actions` |
 
-- This applies to bare URLs, `<https://…>` autolinks, and `[…](…)` links whose text is the URL. A link with text of its own, `[the parser bug](https://github.com/…)`, keeps its text with the mark in front.
 - Only `github.com` (and `www.github.com`). GitHub's own pages (`github.com/settings`, `/orgs`, `/marketplace`…), `gist.github.com` and links inside code stay as they are.
-- Tables draw them the same way.
 
-This changes nothing about the Markdown; it's only how lines draws the link.
+### arXiv
+
+A paper on [arXiv](https://arxiv.org) reads the way arXiv says to cite it, after a graduation cap (lines' own mark: arXiv's logo is only for crediting its API):
+
+| URL | Drawn as |
+|---|---|
+| `https://arxiv.org/abs/1706.03762` | `arXiv:1706.03762` |
+| `…/abs/1706.03762v7`, `…/pdf/1706.03762v7`, `…/pdf/1706.03762v7.pdf` | `arXiv:1706.03762v7` |
+| `…/html/2401.00001v1` | `arXiv:2401.00001v1` |
+| `…/abs/hep-th/9901001` (an id from before 2007) | `arXiv:hep-th/9901001` |
+| `https://doi.org/10.48550/arXiv.1706.03762` (the DOI arXiv gives each paper) | `arXiv:1706.03762` |
+
+- A paper's abstract, PDF and HTML pages, on `arxiv.org`, `www.arxiv.org` or `export.arxiv.org`. arXiv's other pages (`arxiv.org/list/cs.LG/recent`, an author's) stay as they are.
+- `/paper` (in the apps) searches arXiv and puts the paper chosen in the note as a link named by its title, `[Attention Is All You Need](https://arxiv.org/abs/1706.03762)`: the mark, then its title. In a LaTeX note it's `\href{https://arxiv.org/abs/1706.03762}{Attention Is All You Need}`.
 
 ## Key: Value lines
 

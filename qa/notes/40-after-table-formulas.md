@@ -452,7 +452,17 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | Broken | =B2/0 |
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Table with formulas, then Image
+#### 33. Table with formulas, then arXiv links
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Table with formulas, then Image
 
 | Item | Cost |
 | --- | ---: |
@@ -462,7 +472,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 ![A sample picture](attachment:photo.png)
 
-#### 34. Table with formulas, then Drawing
+#### 35. Table with formulas, then Drawing
 
 | Item | Cost |
 | --- | ---: |
@@ -472,7 +482,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Table with formulas, then File
+#### 36. Table with formulas, then File
 
 | Item | Cost |
 | --- | ---: |
@@ -482,7 +492,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Table with formulas, then Attached 3D model (STL)
+#### 37. Table with formulas, then Attached 3D model (STL)
 
 | Item | Cost |
 | --- | ---: |
@@ -492,7 +502,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Table with formulas, then Terminal recording (.cast file)
+#### 38. Table with formulas, then Terminal recording (.cast file)
 
 | Item | Cost |
 | --- | ---: |
@@ -502,7 +512,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Table with formulas, then Missing file
+#### 39. Table with formulas, then Missing file
 
 | Item | Cost |
 | --- | ---: |
@@ -512,7 +522,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Table with formulas, then Card
+#### 40. Table with formulas, then Card
 
 | Item | Cost |
 | --- | ---: |
@@ -524,7 +534,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 40. Table with formulas, then Callout (info)
+#### 41. Table with formulas, then Callout (info)
 
 | Item | Cost |
 | --- | ---: |
@@ -536,7 +546,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 41. Table with formulas, then Callout (warning, chosen icon)
+#### 42. Table with formulas, then Callout (warning, chosen icon)
 
 | Item | Cost |
 | --- | ---: |
@@ -548,7 +558,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Table with formulas, then Callout (decision, no icon)
+#### 43. Table with formulas, then Callout (decision, no icon)
 
 | Item | Cost |
 | --- | ---: |

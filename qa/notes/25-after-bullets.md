@@ -420,7 +420,16 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 - Last item
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Bullet list, then Image
+#### 33. Bullet list, then arXiv links
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Bullet list, then Image
 
 - First item
 - Second item
@@ -429,7 +438,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 ![A sample picture](attachment:photo.png)
 
-#### 34. Bullet list, then Drawing
+#### 35. Bullet list, then Drawing
 
 - First item
 - Second item
@@ -438,7 +447,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Bullet list, then File
+#### 36. Bullet list, then File
 
 - First item
 - Second item
@@ -447,7 +456,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Bullet list, then Attached 3D model (STL)
+#### 37. Bullet list, then Attached 3D model (STL)
 
 - First item
 - Second item
@@ -456,7 +465,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Bullet list, then Terminal recording (.cast file)
+#### 38. Bullet list, then Terminal recording (.cast file)
 
 - First item
 - Second item
@@ -465,7 +474,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Bullet list, then Missing file
+#### 39. Bullet list, then Missing file
 
 - First item
 - Second item
@@ -474,7 +483,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Bullet list, then Card
+#### 40. Bullet list, then Card
 
 - First item
 - Second item
@@ -485,7 +494,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 40. Bullet list, then Callout (info)
+#### 41. Bullet list, then Callout (info)
 
 - First item
 - Second item
@@ -496,7 +505,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 41. Bullet list, then Callout (warning, chosen icon)
+#### 42. Bullet list, then Callout (warning, chosen icon)
 
 - First item
 - Second item
@@ -507,7 +516,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Bullet list, then Callout (decision, no icon)
+#### 43. Bullet list, then Callout (decision, no icon)
 
 - First item
 - Second item

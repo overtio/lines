@@ -388,7 +388,15 @@ plain code
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Code block, then Image
+#### 33. Code block, then arXiv links
+
+```
+plain code
+  indented line
+```
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Code block, then Image
 
 ```
 plain code
@@ -396,7 +404,7 @@ plain code
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 34. Code block, then Drawing
+#### 35. Code block, then Drawing
 
 ```
 plain code
@@ -404,7 +412,7 @@ plain code
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Code block, then File
+#### 36. Code block, then File
 
 ```
 plain code
@@ -412,7 +420,7 @@ plain code
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Code block, then Attached 3D model (STL)
+#### 37. Code block, then Attached 3D model (STL)
 
 ```
 plain code
@@ -420,7 +428,7 @@ plain code
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Code block, then Terminal recording (.cast file)
+#### 38. Code block, then Terminal recording (.cast file)
 
 ```
 plain code
@@ -428,7 +436,7 @@ plain code
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Code block, then Missing file
+#### 39. Code block, then Missing file
 
 ```
 plain code
@@ -436,7 +444,7 @@ plain code
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Code block, then Card
+#### 40. Code block, then Card
 
 ```
 plain code
@@ -446,7 +454,7 @@ plain code
 Text in a card.
 :::
 
-#### 40. Code block, then Callout (info)
+#### 41. Code block, then Callout (info)
 
 ```
 plain code
@@ -456,7 +464,7 @@ plain code
 Text in an info callout.
 :::
 
-#### 41. Code block, then Callout (warning, chosen icon)
+#### 42. Code block, then Callout (warning, chosen icon)
 
 ```
 plain code
@@ -466,7 +474,7 @@ plain code
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Code block, then Callout (decision, no icon)
+#### 43. Code block, then Callout (decision, no icon)
 
 ```
 plain code

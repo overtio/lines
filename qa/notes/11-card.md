@@ -324,43 +324,49 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 33. Image in a card
+#### 33. arXiv links in a card
+
+::: card
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+:::
+
+#### 34. Image in a card
 
 ::: card
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 34. Drawing in a card
+#### 35. Drawing in a card
 
 ::: card
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 35. File in a card
+#### 36. File in a card
 
 ::: card
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 36. Attached 3D model (STL) in a card
+#### 37. Attached 3D model (STL) in a card
 
 ::: card
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 37. Terminal recording (.cast file) in a card
+#### 38. Terminal recording (.cast file) in a card
 
 ::: card
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 38. Missing file in a card
+#### 39. Missing file in a card
 
 ::: card
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 39. Card in a card
+#### 40. Card in a card
 
 ::: card
 ::: card
@@ -368,7 +374,7 @@ Text in a card.
 :::
 :::
 
-#### 40. Callout (info) in a card
+#### 41. Callout (info) in a card
 
 ::: card
 :::i
@@ -376,7 +382,7 @@ Text in an info callout.
 :::
 :::
 
-#### 41. Callout (warning, chosen icon) in a card
+#### 42. Callout (warning, chosen icon) in a card
 
 ::: card
 :::! icon=flag
@@ -384,7 +390,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 42. Callout (decision, no icon) in a card
+#### 43. Callout (decision, no icon) in a card
 
 ::: card
 :::^ icon=none

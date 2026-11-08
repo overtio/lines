@@ -3,7 +3,7 @@
 Go through this before every release, on each platform you ship: the Mac app, the web app (Chrome and Safari), and a phone width (or the phone apps). Tick items as you go. If something's wrong, note it under the item.
 
 :::i
-Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Web]** web only, **[Touch]** phones and tablets, **[Chromium]** Chrome and Edge. Everything else applies everywhere. ⌘ is Ctrl and ⌥ is Alt on Windows and Linux.
+Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Apps]** the desktop and phone apps, **[Web]** web only, **[Touch]** phones and tablets, **[Chromium]** Chrome and Edge. Everything else applies everywhere. ⌘ is Ctrl and ⌥ is Alt on Windows and Linux.
 :::
 
 #qa/checklist
@@ -37,7 +37,8 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Mentions with tabs on: Open in new tab adds a kept tab after the open one and shows it; Open in background tab adds it and stays; with tabs off both open the note. Open in floating window [Desktop] floats the note (the choice isn't offered on the web)
 - [ ] ⇧-click alone extends the selection on any link; a tap while not typing opens whatever Click is set to; ⌥↵ opens what the cursor is on; Ctrl-click on a Mac shows the context menu rather than following the link
 - [ ] Pasting a URL over selected text makes a link
-- [ ] GitHub links show short with GitHub's mark (`owner/repo#12`, `owner/repo@1a2b3c4`), in text and in table cells; the URL shows while the cursor is on one; ⌘-click opens it; a named GitHub link keeps its text with the mark in front (see the QA note "GitHub links")
+- [ ] GitHub links show short with GitHub's mark (`owner/repo#12`, `owner/repo@1a2b3c4`), in text and in table cells; the URL shows while the cursor is on one; ⌘-click opens it; a named GitHub link keeps its text with the mark in front (see the QA note "Links drawn short")
+- [ ] arXiv links show short with a graduation cap, as arXiv cites them (`arXiv:1706.03762`, `arXiv:1706.03762v7` for a version or PDF, `arXiv:hep-th/9901001`), in text, table cells and LaTeX notes (`\url`, `\href`); a named one keeps its text with the cap in front; arXiv's other pages stay plain links (see the QA note "Links drawn short")
 - [ ] Symbols (QA note "Symbols"): `->` `<-` `<->` `=>` `<=>` `<=` `>=` `!=` show as → ← ↔ ⇒ ⇔ ≤ ≥ ≠ in text, code spans, code blocks (as wide as the two or three characters, so columns line up) and table cells; `-->`, `!==`, `\->`, addresses, HTML comments and a quote's `>=` stay as typed; a code span or link with one inside stays one chip or one underline; the cursor touching one shows the characters; copying copies the characters
 - [ ] Typing ``` or ::: at the end of a line adds the closing fence below; not when it closes a block above
 - [ ] Selecting lines and typing ` makes a code block; within one line it makes inline code
@@ -269,6 +270,9 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Pasting an Unsplash photo's link (its page, or the picture) on an empty line adds the photo, described by the words in the link; ⌘Z turns it back into the link. Pasted within text, or over selected text, it stays a link. An Unsplash+ photo says it couldn't be shown
 - [ ] `/unsplash` (Photo) and `/giphy` (GIF) are right after Image in the "/" menu; each takes out what was typed and opens a picker at the cursor (above it near the window's bottom), focused in its search field, showing Unsplash's picks or GIPHY's trending GIFs, three across, each in its color while it loads. Typing searches after a pause; ↵ searches at once, or takes the first picture once the ones shown are for what's typed
 - [ ] In the picker, ↓ goes into the pictures, the arrow keys, Home and End move between them (↑ from the top row goes back to the field), and ↵ or a click puts one in on a line of its own, as `![description](https://unsplash.com/photos/…)` or `![description](https://media.giphy.com/media/…/giphy.gif)`, with the cursor on the line after it. Pointing at or focusing a picture shows who made it. Esc or a click outside closes it, with focus back in the note
+- [ ] [Apps] `/paper` (Paper, "arXiv" beside it; `/arxiv` finds it too) is right after Link in the "/" menu, in Markdown and LaTeX notes; it takes out what was typed and opens a picker at the cursor, focused in its search field, saying what can be searched for, with arXiv's thanks below. Typing searches after a pause, a search right after another waits up to three seconds, and the same search again answers at once; "attention is all you need" finds the paper by Vaswani et al. near the top, each paper with its title, then its first author ("et al." for more than two), year and subject
+- [ ] [Apps] In the paper picker, ↓ and ↑ move between papers, ↵ or a click puts the paper in at the cursor, `[Title](https://arxiv.org/abs/…)` in Markdown or `\href{https://arxiv.org/abs/…}{Title}` in LaTeX, drawn with the cap. Pasting `1706.03762`, `arXiv:1706.03762v5` or an arXiv link finds that paper (its version kept); `au:hinton AND ti:distilling` goes to arXiv as typed; words found in no title or author are looked for in abstracts. Offline, it says it couldn't reach arXiv, with Try Again
+- [ ] [Web] `/paper` isn't in the "/" menu (arXiv doesn't take requests from web pages), and arXiv links still show short
 - [ ] Scrolling to the end of the pictures loads more. A search that finds nothing says so; with no connection (or a bad key) it says it couldn't reach Unsplash or GIPHY, with Try Again. The credit under the pictures ("Photos from Unsplash", "Powered by GIPHY") opens their site
 - [ ] With reduced motion on in the system, GIFs in the picker and GIPHY GIFs in notes are still
 
@@ -377,7 +381,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 13a. Plugins
 
-- [ ] Settings → Plugins lists Secrets under More; Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams (Pele), Diagrams (Mermaid), 3D Models, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY, asciinema), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
+- [ ] Settings → Plugins lists Secrets under More; Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams (Pele), Diagrams (Mermaid), 3D Models, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY, asciinema, GitHub, arXiv), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
 - [ ] Clicking a plugin's name (or its switch) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
 - [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On, and its format switch offers only Markdown and Spreadsheet; Turn On draws it as LaTeX again at once
 - [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
@@ -391,6 +395,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Formulas off: formulas in tables and spreadsheets show as written, and a spreadsheet's share menu has no Download Values or Excel Workbook; on again, worked out
 - [ ] Unsplash or GIPHY off: `/unsplash` or `/giphy` is gone from the "/" menu, and photos and GIFs already in notes still show. In a build without their keys they have no switch and say they need an API key
 - [ ] asciinema off: a recording's embed code shows asciinema's preview image (inline, as any linked image), an attached `.cast` file is only its card, and pasting a recording's link on an empty line pastes the link; on again, they play
+- [ ] GitHub or arXiv off: its links show as ordinary links at once, in text, tables and LaTeX notes, and short again when it's back on; with arXiv off, `/paper` is gone [Apps]
 - [ ] Choices are remembered after reloading, and turning a plugin on or off in one window changes every window at once (the Settings window, floating notes [Desktop], other browser tabs [Web])
 
 ## 13b. Layout and tabs

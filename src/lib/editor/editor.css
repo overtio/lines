@@ -98,8 +98,8 @@
   cursor: pointer;
 }
 
-/* A GitHub link drawn short (github.ts): the mark and owner/repo#123, in a pill like a tag's. */
-.cm-lp-github {
+/* A link drawn short (shortLinks.ts): the site's mark and owner/repo#123 or arXiv:1706.03762, in a pill like a tag's. */
+.cm-lp-short-link {
   text-decoration: none;
   white-space: nowrap;
   background: var(--code-bg);
@@ -109,17 +109,17 @@
   font-weight: 500;
 }
 
-.cm-lp-github svg,
-.cm-lp-github-mark svg {
+/* The mark is drawn in the text's color by its own SVG (`currentColor`), filled or stroked. */
+.cm-lp-short-link svg,
+.cm-lp-short-link-mark svg {
   width: 1em;
   height: 1em;
   margin-right: 0.3em;
   vertical-align: -0.125em;
-  fill: currentColor;
 }
 
-/* Only the mark, in front of a GitHub link with text of its own. */
-.cm-lp-github-mark {
+/* Only the mark, in front of a link with text of its own. */
+.cm-lp-short-link-mark {
   text-decoration: none;
 }
 
@@ -1895,7 +1895,7 @@
 
   .cm-lp-mention,
   .cm-lp-link,
-  .cm-lp-github {
+  .cm-lp-short-link {
     color: LinkText;
   }
 
@@ -1905,7 +1905,7 @@
 
   /* Chips keep their shape as an outline, which (unlike a border) doesn't move the text. */
   .cm-lp-mention,
-  .cm-lp-github,
+  .cm-lp-short-link,
   .cm-lp-tag,
   .cm-lp-code {
     outline: 1px solid;

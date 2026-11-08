@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 **Wi-Fi password:** correct-horse-battery
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Key: Value line, then Image
+#### 33. Key: Value line, then arXiv links
+
+**Wi-Fi password:** correct-horse-battery
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Key: Value line, then Image
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample picture](attachment:photo.png)
 
-#### 34. Key: Value line, then Drawing
+#### 35. Key: Value line, then Drawing
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Key: Value line, then File
+#### 36. Key: Value line, then File
 
 **Wi-Fi password:** correct-horse-battery
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Key: Value line, then Attached 3D model (STL)
+#### 37. Key: Value line, then Attached 3D model (STL)
 
 **Wi-Fi password:** correct-horse-battery
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Key: Value line, then Terminal recording (.cast file)
+#### 38. Key: Value line, then Terminal recording (.cast file)
 
 **Wi-Fi password:** correct-horse-battery
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Key: Value line, then Missing file
+#### 39. Key: Value line, then Missing file
 
 **Wi-Fi password:** correct-horse-battery
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Key: Value line, then Card
+#### 40. Key: Value line, then Card
 
 **Wi-Fi password:** correct-horse-battery
 ::: card
 Text in a card.
 :::
 
-#### 40. Key: Value line, then Callout (info)
+#### 41. Key: Value line, then Callout (info)
 
 **Wi-Fi password:** correct-horse-battery
 :::i
 Text in an info callout.
 :::
 
-#### 41. Key: Value line, then Callout (warning, chosen icon)
+#### 42. Key: Value line, then Callout (warning, chosen icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Key: Value line, then Callout (decision, no icon)
+#### 43. Key: Value line, then Callout (decision, no icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::^ icon=none

@@ -388,7 +388,15 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | longer cell text | `code` | 22 |
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Table, then Image
+#### 33. Table, then arXiv links
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Table, then Image
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -396,7 +404,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 ![A sample picture](attachment:photo.png)
 
-#### 34. Table, then Drawing
+#### 35. Table, then Drawing
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -404,7 +412,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Table, then File
+#### 36. Table, then File
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -412,7 +420,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Table, then Attached 3D model (STL)
+#### 37. Table, then Attached 3D model (STL)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -420,7 +428,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Table, then Terminal recording (.cast file)
+#### 38. Table, then Terminal recording (.cast file)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -428,7 +436,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Table, then Missing file
+#### 39. Table, then Missing file
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -436,7 +444,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Table, then Card
+#### 40. Table, then Card
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -446,7 +454,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 40. Table, then Callout (info)
+#### 41. Table, then Callout (info)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -456,7 +464,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 41. Table, then Callout (warning, chosen icon)
+#### 42. Table, then Callout (warning, chosen icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -466,7 +474,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Table, then Callout (decision, no icon)
+#### 43. Table, then Callout (decision, no icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |

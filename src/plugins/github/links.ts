@@ -1,10 +1,6 @@
-import { WidgetType } from "@codemirror/view";
-import { GITHUB_MARK } from "../release";
-
 /*
- * Links to GitHub are drawn short, the way GitHub writes them: owner/repo, owner/repo#123,
- * owner/repo@1a2b3c4, with GitHub's mark in front. The note keeps the full URL; it shows again
- * while the cursor is on the link.
+ * How links to GitHub read in short, the way GitHub writes them: owner/repo, owner/repo#123,
+ * owner/repo@1a2b3c4.
  */
 
 /** The first part of github.com paths that are GitHub's own pages rather than a user or organization. */
@@ -16,14 +12,8 @@ const RESERVED = new Set([
 ]);
 
 /** How a GitHub URL reads in short, or null for anything else. */
-export function githubText(href: string): string | null {
-  let url: URL;
-  try {
-    url = new URL(/^www\./i.test(href) ? `https://${href}` : href);
-  } catch {
-    return null;
-  }
-  if (!/^https?:$/.test(url.protocol) || !/^(www\.)?github\.com$/i.test(url.hostname)) return null;
+export function githubText(url: URL): string | null {
+  if (!/^(www\.)?github\.com$/i.test(url.hostname)) return null;
   let parts: string[];
   try {
     parts = url.pathname.split("/").filter(Boolean).map(decodeURIComponent);
@@ -52,35 +42,4 @@ export function githubText(href: string): string | null {
     return `${repo} › ${rest[rest.length - 1]}${at}`;
   }
   return `${repo} › ${[section, ...rest].join("/")}`;
-}
-
-
-/**
- * A GitHub link drawn short, as a link like any other (⌘-click opens it). With `text` empty it's
- * only the mark, put in front of a link that has text of its own.
- */
-export function githubLink(href: string, text: string) {
-  const el = document.createElement("span");
-  el.className = text ? "cm-lp-link cm-lp-github" : "cm-lp-link cm-lp-github-mark";
-  el.dataset.href = href;
-  el.title = href;
-  el.innerHTML = GITHUB_MARK;
-  if (text) el.append(text);
-  return el;
-}
-
-export class GitHubWidget extends WidgetType {
-  constructor(readonly href: string, readonly text: string) {
-    super();
-  }
-  eq(other: GitHubWidget) {
-    return other.href === this.href && other.text === this.text;
-  }
-  toDOM() {
-    return githubLink(this.href, this.text);
-  }
-  // A click puts the cursor here, which shows the URL; ⌘-click opens it.
-  ignoreEvent() {
-    return false;
-  }
 }

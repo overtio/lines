@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 ### Heading three
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Heading 3, then Image
+#### 33. Heading 3, then arXiv links
+
+### Heading three
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Heading 3, then Image
 
 ### Heading three
 ![A sample picture](attachment:photo.png)
 
-#### 34. Heading 3, then Drawing
+#### 35. Heading 3, then Drawing
 
 ### Heading three
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Heading 3, then File
+#### 36. Heading 3, then File
 
 ### Heading three
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Heading 3, then Attached 3D model (STL)
+#### 37. Heading 3, then Attached 3D model (STL)
 
 ### Heading three
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Heading 3, then Terminal recording (.cast file)
+#### 38. Heading 3, then Terminal recording (.cast file)
 
 ### Heading three
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Heading 3, then Missing file
+#### 39. Heading 3, then Missing file
 
 ### Heading three
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Heading 3, then Card
+#### 40. Heading 3, then Card
 
 ### Heading three
 ::: card
 Text in a card.
 :::
 
-#### 40. Heading 3, then Callout (info)
+#### 41. Heading 3, then Callout (info)
 
 ### Heading three
 :::i
 Text in an info callout.
 :::
 
-#### 41. Heading 3, then Callout (warning, chosen icon)
+#### 42. Heading 3, then Callout (warning, chosen icon)
 
 ### Heading three
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Heading 3, then Callout (decision, no icon)
+#### 43. Heading 3, then Callout (decision, no icon)
 
 ### Heading three
 :::^ icon=none

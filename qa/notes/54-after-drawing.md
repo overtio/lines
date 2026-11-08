@@ -292,58 +292,63 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 ![A sample drawing](attachment:drawing.svg)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Drawing, then Image
+#### 33. Drawing, then arXiv links
+
+![A sample drawing](attachment:drawing.svg)
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+
+#### 34. Drawing, then Image
 
 ![A sample drawing](attachment:drawing.svg)
 ![A sample picture](attachment:photo.png)
 
-#### 34. Drawing, then Drawing
+#### 35. Drawing, then Drawing
 
 ![A sample drawing](attachment:drawing.svg)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 35. Drawing, then File
+#### 36. Drawing, then File
 
 ![A sample drawing](attachment:drawing.svg)
 [Budget.csv](attachment:budget.csv)
 
-#### 36. Drawing, then Attached 3D model (STL)
+#### 37. Drawing, then Attached 3D model (STL)
 
 ![A sample drawing](attachment:drawing.svg)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Drawing, then Terminal recording (.cast file)
+#### 38. Drawing, then Terminal recording (.cast file)
 
 ![A sample drawing](attachment:drawing.svg)
 [terminal.cast](attachment:terminal.cast)
 
-#### 38. Drawing, then Missing file
+#### 39. Drawing, then Missing file
 
 ![A sample drawing](attachment:drawing.svg)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 39. Drawing, then Card
+#### 40. Drawing, then Card
 
 ![A sample drawing](attachment:drawing.svg)
 ::: card
 Text in a card.
 :::
 
-#### 40. Drawing, then Callout (info)
+#### 41. Drawing, then Callout (info)
 
 ![A sample drawing](attachment:drawing.svg)
 :::i
 Text in an info callout.
 :::
 
-#### 41. Drawing, then Callout (warning, chosen icon)
+#### 42. Drawing, then Callout (warning, chosen icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 42. Drawing, then Callout (decision, no icon)
+#### 43. Drawing, then Callout (decision, no icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::^ icon=none

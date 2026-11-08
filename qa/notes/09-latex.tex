@@ -82,17 +82,21 @@ raw \textbf{not bold} $not math$
 
 A \href{https://example.com}{named link}, a bare \url{https://example.com}, and a footnote.\footnote{The footnote's text.}
 
-\paragraph{11. Comments and other commands}
+\paragraph{11. Links drawn short}
+
+\url{https://arxiv.org/abs/1706.03762} reads arXiv:1706.03762 and \url{https://github.com/overtio/lines/issues/12} overtio/lines\#12, each with its mark; \href{https://arxiv.org/abs/2006.11239}{a named one} keeps its text with the mark in front.
+
+\paragraph{12. Comments and other commands}
 
 Text % a comment with #qa/latex-tag
 \maketitle \vspace{1em} \label{x} stay faint.
 
-\paragraph{12. Line break}
+\paragraph{13. Line break}
 
 First line\\
 second line.
 
-\paragraph{13. Theorems}
+\paragraph{14. Theorems}
 
 \newtheorem{lem}[theorem]{Lemma}
 
@@ -109,22 +113,22 @@ Theorem 2, with math in its frame:
 Italic Proof., and a box at the end.
 \end{proof}
 
-\paragraph{14. Citations and references}
+\paragraph{15. Citations and references}
 
 As shown in \cite{knuth1984, lamport1994} and Section~\ref{sec:intro}, see \eqref{eq:one}. \label{qa:hidden} The label before this is hidden.
 
-\paragraph{15. Own math commands}
+\paragraph{16. Own math commands}
 
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
 \DeclareMathOperator{\sinc}{sinc}
 Drawn with the note's commands: $\abs{x} \in \R$ and $\sinc x$.
 
-\paragraph{16. Accents, letters, verb}
+\paragraph{17. Accents, letters, verb}
 
 Gödel, Erdős, Łukasiewicz, façade: G\"odel, Erd\H{o}s, \L ukasiewicz, fa\c{c}ade. Code: \verb|x = {a & b}|.
 
-\paragraph{17. Nested numbering}
+\paragraph{18. Nested numbering}
 
 \begin{enumerate}
   \item One
@@ -136,13 +140,13 @@ Gödel, Erdős, Łukasiewicz, façade: G\"odel, Erd\H{o}s, \L ukasiewicz, fa\c{c
   \end{enumerate}
 \end{enumerate}
 
-\paragraph{18. Bibliography}
+\paragraph{19. Bibliography}
 
 \begin{thebibliography}{9}
 \bibitem{knuth1984} D. Knuth, \emph{The \TeX book}, 1984.
 \bibitem{lamport1994} L. Lamport, \emph{\LaTeX: A Document Preparation System}, 1994.
 \end{thebibliography}
 
-\paragraph{19. Not closed}
+\paragraph{20. Not closed}
 
 \textbf{never closed, and \begin{itemize} with no end: shown as written.
