@@ -17,6 +17,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 - `# @name todo` names a request, so the ones after it can use its response: **Send all** sends **A todo**, then **The person it belongs to** with its answer
 - Paste a curl command into a block and it becomes a request; the terminal icon beside Copy, in the block's corner, copies its requests as curl commands
 - A response's **+** adds its body to the note as a code block
+- In a response, the icon after an address sends a request to it, written into the note; hover a value's line to copy it
 
 ```http
 ### Make something (this API only pretends to)

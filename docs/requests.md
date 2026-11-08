@@ -45,7 +45,12 @@ A request that uses a variable that isn't there, or a response that hasn't come 
 
 In an `http` block, **Send** in its top right corner sends its request; a block of several says **Send all**, and sends each in turn, so later ones can use earlier ones' responses. In a `.http` note, **Send** is at the end of each request's line. <kbd>⌘↵</kbd> (<kbd>Ctrl+Enter</kbd>) anywhere in a request sends just that one. Requests are only ever sent by one of those: opening a note sends nothing.
 
-The response shows under the request (under the code block, in a Markdown note): its status, how long it took, its size, and its body, formatted and highlighted when it's JSON, XML or HTML (JSON's objects and arrays fold from the margin), shown when it's an image. Its headers are a tab away. Copy copies the body or the headers; in a Markdown note, **+** adds the body to the note as a code block. Responses last while lines is open, and aren't saved in the note.
+The response shows under the request (under the code block, in a Markdown note): its status, how long it took, its size, and its body, formatted and highlighted when it's JSON, XML or HTML (JSON's objects and arrays fold from the margin), shown when it's an image. Its headers are a tab away. Copy copies the body or the headers; in a Markdown note, **+** adds the body to the note as a code block. In the body:
+
+- **A web address** has Send's icon after it: clicking it adds `GET` and the address to the note as a request, after the one it came from (at the end of its block, in a Markdown note), with that one's headers (its `Authorization`, say), and sends it. Following an API's links this way leaves the trail in the note.
+- **A JSON value's line** has a copy button while it's hovered: a string copies without its quotes, an object or array as indented JSON.
+
+ Responses last while lines is open, and aren't saved in the note.
 
 - **In the apps**, requests go through lines' native code, so any API answers, with every header as written, `Cookie` and `Origin` included.
 - **In the browser** (the demo website), they're ordinary web requests, so only APIs that allow requests from other sites (CORS) answer, and the browser leaves out headers it doesn't let pages set, such as `Cookie`.

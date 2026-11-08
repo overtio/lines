@@ -127,6 +127,7 @@ class ResponseWidget extends WidgetType {
   constructor(
     readonly exchange: Exchange,
     readonly where: Where,
+    readonly field: StateField<Responses>,
   ) {
     super();
   }
@@ -136,10 +137,12 @@ class ResponseWidget extends WidgetType {
   toDOM(view: EditorView) {
     const dom = document.createElement("div");
     dom.className = "cm-http-response";
-    const { exchange, where } = this;
+    const { exchange, where, field } = this;
     const close = () => view.dispatch({ effects: hide.of(exchange) });
-    const addToNote = where.markdown && !view.state.readOnly ? (text: string, language: string) => writeIntoNote(view, dom, exchange, text, language) : undefined;
-    const component = mount(Response, { target: dom, props: { exchange, close, addToNote } });
+    const writable = !view.state.readOnly;
+    const addToNote = where.markdown && writable ? (text: string, language: string) => writeIntoNote(view, dom, exchange, text, language) : undefined;
+    const follow = writable ? (url: string) => void followAddress(view, where, field, exchange, url) : undefined;
+    const component = mount(Response, { target: dom, props: { exchange, close, addToNote, follow } });
     // Its height changes as the response arrives, or another tab is chosen.
     const watch = new ResizeObserver(() => view.requestMeasure());
     watch.observe(dom);
@@ -176,17 +179,17 @@ function writeIntoNote(view: EditorView, dom: HTMLElement, exchange: Exchange, t
   speak(t("http.added"));
 }
 
-function drawResponses(state: EditorState, where: Where, shown: readonly Shown[]) {
+function drawResponses(state: EditorState, where: Where, field: StateField<Responses>, shown: readonly Shown[]) {
   const ranges = [];
   for (const each of [...shown].sort((a, b) => a.line - b.line)) {
     const at = where.responseAt(state, each.line);
-    if (at !== null) ranges.push(Decoration.widget({ widget: new ResponseWidget(each.exchange, where), block: true, side: 1 }).range(at));
+    if (at !== null) ranges.push(Decoration.widget({ widget: new ResponseWidget(each.exchange, where, field), block: true, side: 1 }).range(at));
   }
   return Decoration.set(ranges, true);
 }
 
-const responsesField = (where: Where) =>
-  StateField.define<Responses>({
+function responsesField(where: Where) {
+  const field: StateField<Responses> = StateField.define<Responses>({
     create: () => ({ shown: [], sent: [], decorations: Decoration.none }),
     update(value, tr) {
       let { shown, sent } = value;
@@ -205,10 +208,12 @@ const responsesField = (where: Where) =>
         }
       }
       if (shown === value.shown && sent === value.sent && !tr.docChanged) return value;
-      return { shown, sent, decorations: shown.length ? drawResponses(tr.state, where, shown) : Decoration.none };
+      return { shown, sent, decorations: shown.length ? drawResponses(tr.state, where, field, shown) : Decoration.none };
     },
-    provide: (field) => EditorView.decorations.from(field, (value) => value.decorations),
+    provide: (self) => EditorView.decorations.from(self, (value) => value.decorations),
   });
+  return field;
+}
 
 /* Sending. */
 
@@ -302,6 +307,29 @@ async function sendBlock(view: EditorView, field: StateField<Responses>, at: () 
     if (index >= requests.length) return;
     await send(view, httpBlocks, field, requests[index].line);
   }
+}
+
+/** Headers a request with no body has no use for. */
+const BODY_HEADERS = /^content-(?:type|length|encoding)$/i;
+
+/**
+ * An address in a response, as a GET request in the note after the one it came from (at the end of
+ * its block, in a Markdown note), with that one's headers (its Authorization, say), then sent.
+ */
+async function followAddress(view: EditorView, where: Where, field: StateField<Responses>, exchange: Exchange, url: string) {
+  const { state } = view;
+  const from = state.field(field).shown.find((each) => each.exchange === exchange);
+  const request = from && requestsIn(state, where).requests.find((each) => each.line === from.line);
+  if (!request) return;
+  const section = where.sections(state, request.line, request.line).find((each) => each.from <= request.line && request.line <= each.to);
+  // After its last line: the blank lines before the next request stay between them.
+  const at = where.markdown ? section?.to : request.to;
+  if (at === undefined) return;
+  const lines = ["###", `GET ${url}`, ...request.headers.filter(([name]) => !BODY_HEADERS.test(name)).map(([name, value]) => `${name}: ${value}`)];
+  const insert = `\n\n${lines.join("\n")}`;
+  const line = at + insert.indexOf("GET ");
+  view.dispatch({ changes: { from: at, insert }, userEvent: "input" });
+  await send(view, where, field, line);
 }
 
 /** A request as a curl command, with what variables can be filled in filled in. */

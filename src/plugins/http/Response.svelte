@@ -14,11 +14,14 @@
     exchange,
     close,
     addToNote,
+    follow,
   }: {
     exchange: Exchange;
     close: () => void;
     /** Writes the body into the note as a code block, where that's possible (Markdown notes). */
     addToNote?: (text: string, language: string) => void;
+    /** Adds a request to an address in the body to the note, and sends it, where that's possible. */
+    follow?: (url: string) => void;
   } = $props();
 
   /** As much of a body as can be added to the note: more would make a note too slow to work in. */
@@ -119,7 +122,7 @@
       </div>
     {:else if body}
       {#if body.text}
-        <div class="cm-http-body" use:bodyView={body}></div>
+        <div class="cm-http-body" use:bodyView={{ ...body, follow }}></div>
       {:else}
         <p class="px-3 py-2.5 text-muted">{t("http.empty")}</p>
       {/if}

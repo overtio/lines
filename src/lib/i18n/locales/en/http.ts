@@ -15,6 +15,10 @@ export default {
   "http.show": "Show",
   "http.body": "Body",
   "http.headers": "Headers ({count})",
+  // Buttons in a response's body: after a web address, and on a value's line.
+  "http.follow": "Send a request to this address",
+  "http.followUrl": "Send a request to {url}",
+  "http.copyValue": "Copy value",
   "http.copyBody": "Copy body",
   "http.copyHeaders": "Copy headers",
   "http.addToNote": "Add to note as a code block",
