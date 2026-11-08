@@ -29,6 +29,8 @@ export interface Plugin {
   required?: boolean;
   /** The plugins it needs, by id; it's off while any of them is. */
   requires?: string[];
+  /** Plugins that do the same work, by id (two engines for the same blocks): turning it on turns them off. */
+  alternatives?: string[];
   /** Whether it can work here (SF Symbols, only in the Apple apps), and if not, where it does. */
   available?: boolean;
   availability?: string;

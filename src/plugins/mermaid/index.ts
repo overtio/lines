@@ -1,14 +1,13 @@
 import type { Mermaid } from "mermaid";
-import { drawingFromDiagram } from "../../lib/editor/drawings";
 import { lookKey } from "../../lib/editor/rendered";
-import { insert, named, SECTIONS } from "../../lib/editor/slashCommands";
 import { t } from "../../lib/i18n/index.svelte";
 import type { Plugin } from "../../lib/plugins/types";
+import { diagramError, mermaidBlocks } from "./blocks";
 
 /*
- * Mermaid diagrams: a ```mermaid code block drawn as its diagram, in the theme's colors on screen
- * and in black and white on paper. Mermaid is large, so it loads the first time a note has one.
- * A diagram's button opens a copy of it in Excalidraw, to draw on by hand.
+ * Mermaid diagrams drawn by Mermaid itself, for those who choose it over Pele (plugins/pele): a
+ * ```mermaid code block drawn as its diagram, in the theme's colors on screen and in black and
+ * white on paper, as GitHub draws it. Mermaid is large, so it loads the first time a note has one.
  */
 
 let loading: Promise<Mermaid> | undefined;
@@ -130,9 +129,7 @@ async function render(source: string, { paper }: { paper: boolean }) {
     // What Mermaid leaves in the page when it fails.
     document.getElementById(id)?.remove();
     document.getElementById(`d${id}`)?.remove();
-    const text = error instanceof Error ? error.message : String(error);
-    // Where the error is, without Mermaid's list of every token it would have accepted.
-    throw new Error(text.replace(/\nExpecting [^]*$/, ""), { cause: error });
+    throw diagramError(error);
   }
 }
 
@@ -141,31 +138,7 @@ export const mermaid = (): Plugin => ({
   name: t("plugins.mermaid"),
   description: t("plugins.mermaid.description"),
   icon: "workflow",
-  enabledByDefault: true,
-  contributes: {
-    renderers: [
-      {
-        id: "mermaid",
-        name: "Mermaid",
-        languages: ["mermaid"],
-        label: t("editor.diagram"),
-        render,
-        actions: [{ label: t("editor.drawing.fromDiagram"), icon: "shapes", run: drawingFromDiagram }],
-      },
-    ],
-    markdown: [
-      {
-        commands: [
-          {
-            ...named("editor.slash.diagram"),
-            after: "codeBlock",
-            hint: "mermaid",
-            icon: "workflow",
-            section: SECTIONS.insert,
-            apply: insert("```mermaid\nflowchart LR\n  A[Idea] --> B[Note]|\n```", true),
-          },
-        ],
-      },
-    ],
-  },
+  enabledByDefault: false,
+  alternatives: ["pele"],
+  contributes: mermaidBlocks({ id: "mermaid", name: "Mermaid", render }),
 });

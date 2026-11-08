@@ -83,11 +83,14 @@ class Plugins {
     return this.all.find((plugin) => plugin.id === id);
   }
 
-  /** Turns a plugin on or off, here and in every window. Turned on, so are the plugins it needs. */
+  /**
+   * Turns a plugin on or off, here and in every window. Turned on, so are the plugins it needs, and
+   * its alternatives are turned off.
+   */
   setOn(plugin: Plugin, on: boolean) {
     const choices = { ...this.#choices };
     const seen = new Set<Plugin>();
-    const set = (each: Plugin | undefined) => {
+    const set = (each: Plugin | undefined, on: boolean) => {
       if (!each || seen.has(each)) return;
       seen.add(each);
       if (!each.required && this.isOn(each) !== on) {
@@ -95,9 +98,11 @@ class Plugins {
         if (on === each.enabledByDefault) delete choices[each.id];
         else choices[each.id] = on;
       }
-      if (on) for (const id of each.requires ?? []) set(this.get(id));
+      if (!on) return;
+      for (const id of each.requires ?? []) set(this.get(id), true);
+      for (const id of each.alternatives ?? []) set(this.get(id), false);
     };
-    set(plugin);
+    set(plugin, on);
     if (JSON.stringify(choices) === JSON.stringify(this.#choices)) return;
     this.#choices = choices;
     try {

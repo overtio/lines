@@ -144,8 +144,9 @@ function message(text: string, error = false) {
 
 /** Puts a drawing in a frame with its resize handle, at its width. */
 function frame(dom: HTMLElement, svg: SVGSVGElement, view: EditorView) {
-  // Its own width, from its style (Mermaid draws it as wide as the note, up to that) or its view box.
-  svg.dataset.width = String(parseFloat(svg.style.maxWidth) || svg.viewBox.baseVal?.width || "");
+  // Its own width: Mermaid's in its style's max-width (it draws it as wide as the note, up to that), others' in its view box.
+  const maxWidth = svg.style.maxWidth.endsWith("px") ? parseFloat(svg.style.maxWidth) : 0;
+  svg.dataset.width = String(maxWidth || svg.viewBox.baseVal?.width || "");
   const frame = document.createElement("span");
   frame.className = "cm-lp-diagram-frame";
   svg.replaceWith(frame);
@@ -233,7 +234,7 @@ class RenderedWidget extends WidgetType {
   toDOM(view: EditorView) {
     const dom = document.createElement("div");
     dom.className = "cm-lp-diagram" + (this.preview ? " is-preview" : "");
-    // In place of its code. Mermaid's drawings keep their labels as text, which screen readers read.
+    // In place of its code. Diagrams keep their labels as text, which screen readers read.
     dom.setAttribute("role", "figure");
     dom.setAttribute("aria-label", this.renderer.label);
     setInset(dom, this.inset);
