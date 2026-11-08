@@ -42,6 +42,7 @@ The [demo website](https://overtio.github.io/lines/) opens with a tour: one shor
 - **Cards and callouts.** Group a section into a card, or make it an info, question, warning, error or decision callout: `:::info` … `:::`.
 - **Code blocks** with syntax highlighting in your theme's colors, a copy button, and a wand that tidies JSON, SQL, JavaScript, CSS and more.
 - **Diagrams** from [Mermaid](https://mermaid.js.org) code: flowcharts, sequence diagrams, Gantt charts and more, drawn as you type by [Pele](https://pele.run) in your theme's colors, or by Mermaid itself.
+- **Timing diagrams** for electronics, from [WaveDrom](https://wavedrom.com) code: clocks, signals and buses over time, a register's bit fields, and logic circuits (`/timing`).
 - **3D models** to turn around and zoom into: [OpenSCAD](https://openscad.org) code in an ` ```openscad ` block (`/model`), made into its model as you type and downloaded as STL for 3D printing, and attached OpenSCAD, STL, OBJ, 3MF, glTF, STEP and IGES files. See [docs/linedown.md](docs/linedown.md#3d-models).
 - **Math** with [KaTeX](https://katex.org): `$…$` in a line, `$$` for a block.
 - **Drawings** with [Excalidraw](https://excalidraw.com), saved in the note as an SVG any Markdown app can show.
@@ -256,6 +257,7 @@ src/
     katex/                   The math engine (KaTeX)
     pele/                    Mermaid diagrams drawn by Pele (the default): the renderer and its colors
     mermaid/                 Mermaid diagrams drawn by Mermaid itself, and what both add (blocks.ts): /diagram, Copy and Edit as Drawing
+    wavedrom/                WaveDrom's timing diagrams, register fields and logic circuits, in the theme's colors; /timing
     unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
     github/                  Links to GitHub drawn short
     arxiv/                   Links to arXiv's papers drawn short, and searching arXiv for /paper (pacing requests as arXiv asks)
@@ -382,6 +384,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] Plugins made by others: a plugin format, installing one from Settings → Plugins, and running its code safely (the apps only run lines' own scripts now)
 - [ ] Themes and icon sets from a file, which need no code
 - [ ] More renderers for code blocks: Graphviz, PlantUML, D2, Vega-Lite charts, music in ABC
+- [ ] Circuit schematics written in [CircuiTikZ](https://ctan.org/pkg/circuitikz), drawn as you type: ` ```circuitikz ` blocks in Markdown notes, and `circuitikz` in LaTeX notes
 - [ ] Drawings (Excalidraw), code highlighting and symbols as plugins
 - [ ] Choose the format new notes start in
 - [ ] Plugins that add to LaTeX notes, as they can to Markdown ones
@@ -449,6 +452,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [x] Drawings with Excalidraw, kept as SVG images
 - [x] Mermaid diagrams copied into drawings, to edit by hand
 - [x] Diagrams drawn by Pele, faster and in the theme's colors, with Mermaid itself as the alternative
+- [x] Timing diagrams, register bit fields and logic circuits (WaveDrom)
 - [x] Note links: mentions (`@Note`), and properties of notes (`@Note.key`)
 - [x] Wiki links (`[[Note]]`, `[[Note|text]]`) as mentions
 - [x] Math (KaTeX), and notes written in LaTeX

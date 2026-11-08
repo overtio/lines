@@ -213,7 +213,21 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Callout (info), then Math block
+#### 19. Callout (info), then Timing diagram (wavedrom block)
+
+:::i
+Text in an info callout.
+:::
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Callout (info), then Math block
 
 :::i
 Text in an info callout.
@@ -222,7 +236,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Callout (info), then Table
+#### 21. Callout (info), then Table
 
 :::i
 Text in an info callout.
@@ -232,7 +246,7 @@ Text in an info callout.
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Callout (info), then Table with formulas
+#### 22. Callout (info), then Table with formulas
 
 :::i
 Text in an info callout.
@@ -244,7 +258,7 @@ Text in an info callout.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Callout (info), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Callout (info), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 :::i
 Text in an info callout.
@@ -265,14 +279,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Callout (info), then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Callout (info), then Secret ({{name}}, kept in a locked secrets note)
 
 :::i
 Text in an info callout.
 :::
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Callout (info), then API requests (http block): a variable, a named request and one using its response
+#### 25. Callout (info), then API requests (http block): a variable, a named request and one using its response
 
 :::i
 Text in an info callout.
@@ -288,7 +302,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Callout (info), then Spreadsheet (csv block)
+#### 26. Callout (info), then Spreadsheet (csv block)
 
 :::i
 Text in an info callout.
@@ -300,7 +314,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Callout (info), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Callout (info), then Named spreadsheet (csv name=), and a formula in another block using it
 
 :::i
 Text in an info callout.
@@ -314,98 +328,98 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Callout (info), then Divider
+#### 28. Callout (info), then Divider
 
 :::i
 Text in an info callout.
 :::
 ---
 
-#### 28. Callout (info), then Key: Value line
+#### 29. Callout (info), then Key: Value line
 
 :::i
 Text in an info callout.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Callout (info), then Mention
+#### 30. Callout (info), then Mention
 
 :::i
 Text in an info callout.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Callout (info), then Wiki link
+#### 31. Callout (info), then Wiki link
 
 :::i
 Text in an info callout.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Callout (info), then Symbols
+#### 32. Callout (info), then Symbols
 
 :::i
 Text in an info callout.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Callout (info), then GitHub links
+#### 33. Callout (info), then GitHub links
 
 :::i
 Text in an info callout.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Callout (info), then arXiv links
+#### 34. Callout (info), then arXiv links
 
 :::i
 Text in an info callout.
 :::
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Callout (info), then Image
+#### 35. Callout (info), then Image
 
 :::i
 Text in an info callout.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 35. Callout (info), then Drawing
+#### 36. Callout (info), then Drawing
 
 :::i
 Text in an info callout.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Callout (info), then File
+#### 37. Callout (info), then File
 
 :::i
 Text in an info callout.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Callout (info), then Attached 3D model (STL)
+#### 38. Callout (info), then Attached 3D model (STL)
 
 :::i
 Text in an info callout.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Callout (info), then Terminal recording (.cast file)
+#### 39. Callout (info), then Terminal recording (.cast file)
 
 :::i
 Text in an info callout.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Callout (info), then Missing file
+#### 40. Callout (info), then Missing file
 
 :::i
 Text in an info callout.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Callout (info), then Card
+#### 41. Callout (info), then Card
 
 :::i
 Text in an info callout.
@@ -414,7 +428,7 @@ Text in an info callout.
 Text in a card.
 :::
 
-#### 41. Callout (info), then Callout (info)
+#### 42. Callout (info), then Callout (info)
 
 :::i
 Text in an info callout.
@@ -423,7 +437,7 @@ Text in an info callout.
 Text in an info callout.
 :::
 
-#### 42. Callout (info), then Callout (warning, chosen icon)
+#### 43. Callout (info), then Callout (warning, chosen icon)
 
 :::i
 Text in an info callout.
@@ -432,7 +446,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Callout (info), then Callout (decision, no icon)
+#### 44. Callout (info), then Callout (decision, no icon)
 
 :::i
 Text in an info callout.

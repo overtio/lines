@@ -175,8 +175,10 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Hovering a diagram (or its preview while editing) shows a shapes button, Copy and Edit as Drawing: it opens the diagram in Excalidraw, a flowchart, sequence, class, ER or state diagram as boxes and arrows to move, a pie or Gantt chart as a picture of it; Save puts the drawing on its own line below the code block, which stays, with the cursor where it was; Cancel adds nothing; ⌘Z takes the drawing out. No button on a broken or empty diagram, nor in the Trash
 - [ ] Hovering a diagram shows a handle on its bottom right corner, as an image's (always on touch): dragging it resizes the diagram, keeping its shape and no wider than the note, and writes the width after the language (` ```mermaid |300 `); double-clicking it takes the width out. A width typed by hand works the same; the PDF preview and PNGs use it. No handle on a broken or empty diagram, nor in the Trash
 - [ ] A broken diagram shows a short error; an empty one shows "Empty diagram"
+- [ ] A wavedrom block draws as a timing diagram (`signal`), a register's bit fields (`reg`) or a logic circuit (`assign`), looking like the Mermaid diagrams beside it in any theme, light and dark, and font: names and labels in the text color and the note's font, waves and outlines muted, plain data, gates and inputs in accent-tinted boxes, colored data and fields in soft theme colors, arrows in the accent, and no white box behind it (in a card too). Clicking it shows the code with the diagram below, redrawn as you type; its resize handle and width (` ```wavedrom |300 `) work as a Mermaid diagram's; the PDF preview draws it black on white with light fills, as it does Mermaid diagrams
+- [ ] A wavedrom block with a mistake says where (`JSON5: invalid character … at 2:5`); one without `signal`, `reg` or `assign` says it needs one; a name with `<b>`, `<sub>` or `<o>` is styled, and one holding other markup (`["foreignObject", {}, ["img", {…}]]`) draws without it, running nothing; every name shows whole, a long one in the serif font too
 - [ ] Changing theme, light/dark or font redraws diagrams
-- [ ] `/code` and `/diagram` insert their templates
+- [ ] `/code`, `/diagram` and `/timing` insert their templates; Timing diagram comes right after Diagram in the "/" menu
 - [ ] `$x^2$` draws as math, and shows its LaTeX while the cursor is on it; `$5 and $10` stays text
 - [ ] A `$$` block (or ```` ```math ````) draws centered; clicking it shows the LaTeX with the math below, redrawn as you type
 - [ ] Enter after a new `$$` adds the closing `$$` with the cursor between; Enter on a block's closing `$$` just starts a new line
@@ -382,7 +384,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 
 ## 13a. Plugins
 
-- [ ] Settings → Plugins lists Secrets under More; Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams (Pele), Diagrams (Mermaid), 3D Models, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY, asciinema, GitHub, arXiv), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
+- [ ] Settings → Plugins lists Secrets under More; Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams (Pele), Diagrams (Mermaid), Timing Diagrams, 3D Models, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY, asciinema, GitHub, arXiv), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
 - [ ] Clicking a plugin's name (or its switch) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
 - [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On, and its format switch offers only Markdown and Spreadsheet; Turn On draws it as LaTeX again at once
 - [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
@@ -391,6 +393,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] 3D Models off: ```openscad and ```stl blocks show as code, `/model` is gone, attached models show as file cards, and the PDF prints the blocks as code; on again, drawn again
 - [ ] Diagrams (Pele) is on and Diagrams (Mermaid) off at first. Turning Mermaid on turns Pele off, and diagrams are drawn again by Mermaid, on screen and in the PDF; turning Pele on turns Mermaid off
 - [ ] Both Diagrams plugins off: ```mermaid blocks show as code, `/diagram` is gone from the "/" menu, and the PDF prints them as code; either on again, they're drawn again, and Diagram is right after Code block in the menu
+- [ ] Timing Diagrams off: ```wavedrom blocks show as code, `/timing` is gone from the "/" menu, and the PDF prints them as code; on again, they're drawn again
 - [ ] Math off: `$…$`, `$$` blocks and LaTeX notes' math show as written, on screen and in the PDF; on again, drawn
 - [ ] TeX Typesetting off: a LaTeX note's PDF preview has no "Typeset with" switch
 - [ ] Formulas off: formulas in tables and spreadsheets show as written, and a spreadsheet's share menu has no Download Values or Excel Workbook; on again, worked out

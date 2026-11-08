@@ -159,20 +159,31 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > endsolid pyramid
 > ```
 
-#### 19. Math block in a quote (stays Markdown here)
+#### 19. Timing diagram (wavedrom block) in a quote (stays Markdown here)
+
+> ```wavedrom
+> { signal: [
+>   { name: "clk", wave: "p.....|..." },
+>   { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+>   {},
+>   { name: "ack", wave: "1.....|01.", node: ".a......b" }
+> ], edge: ["a~>b t1"] }
+> ```
+
+#### 20. Math block in a quote (stays Markdown here)
 
 > $$
 > \int_0^1 x^2\,dx = \frac{1}{3}
 > $$
 
-#### 20. Table in a quote (stays Markdown here)
+#### 21. Table in a quote (stays Markdown here)
 
 > | Left | Center | Right |
 > | :--- | :----: | ----: |
 > | a | **b** | 1 |
 > | longer cell text | `code` | 22 |
 
-#### 21. Table with formulas in a quote (stays Markdown here)
+#### 22. Table with formulas in a quote (stays Markdown here)
 
 > | Item | Cost |
 > | --- | ---: |
@@ -181,7 +192,7 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > | Total | =SUM(B2:B3) |
 > | Broken | =B2/0 |
 
-#### 22. Hurl entries (hurl block): a capture used by the next entry, and asserts in a quote
+#### 23. Hurl entries (hurl block): a capture used by the next entry, and asserts in a quote
 
 > ```hurl
 > # A todo
@@ -199,11 +210,11 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > jsonpath "$.name" isString
 > ```
 
-#### 23. Secret ({{name}}, kept in a locked secrets note) in a quote
+#### 24. Secret ({{name}}, kept in a locked secrets note) in a quote
 
 > The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. API requests (http block): a variable, a named request and one using its response in a quote
+#### 25. API requests (http block): a variable, a named request and one using its response in a quote
 
 > ```http
 > @api = https://jsonplaceholder.typicode.com
@@ -216,7 +227,7 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > GET {{api}}/users/{{todo.response.body.$.userId}}
 > ```
 
-#### 25. Spreadsheet (csv block) in a quote (stays Markdown here)
+#### 26. Spreadsheet (csv block) in a quote (stays Markdown here)
 
 > ```csv
 > Item, Cost
@@ -225,7 +236,7 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > Total, =SUM(B2:B3)
 > ```
 
-#### 26. Named spreadsheet (csv name=), and a formula in another block using it in a quote (stays Markdown here)
+#### 27. Named spreadsheet (csv name=), and a formula in another block using it in a quote (stays Markdown here)
 
 > ```csv name=costs
 > Item, Cost, Day
@@ -236,77 +247,77 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 > Total, =costs!B2*2
 > ```
 
-#### 27. Divider in a quote
+#### 28. Divider in a quote
 
 > ---
 
-#### 28. Key: Value line in a quote
+#### 29. Key: Value line in a quote
 
 > **Wi-Fi password:** correct-horse-battery
 
-#### 29. Mention in a quote
+#### 30. Mention in a quote
 
 > Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Wiki link in a quote
+#### 31. Wiki link in a quote
 
 > Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Symbols in a quote
+#### 32. Symbols in a quote
 
 > Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. GitHub links in a quote
+#### 33. GitHub links in a quote
 
 > Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. arXiv links in a quote
+#### 34. arXiv links in a quote
 
 > Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Image in a quote (stays Markdown here)
+#### 35. Image in a quote (stays Markdown here)
 
 > ![A sample picture](attachment:photo.png)
 
-#### 35. Drawing in a quote (stays Markdown here)
+#### 36. Drawing in a quote (stays Markdown here)
 
 > ![A sample drawing](attachment:drawing.svg)
 
-#### 36. File in a quote (stays Markdown here)
+#### 37. File in a quote (stays Markdown here)
 
 > [Budget.csv](attachment:budget.csv)
 
-#### 37. Attached 3D model (STL) in a quote
+#### 38. Attached 3D model (STL) in a quote
 
 > [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Terminal recording (.cast file) in a quote
+#### 39. Terminal recording (.cast file) in a quote
 
 > [terminal.cast](attachment:terminal.cast)
 
-#### 39. Missing file in a quote (stays Markdown here)
+#### 40. Missing file in a quote (stays Markdown here)
 
 > [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Card in a quote
+#### 41. Card in a quote
 
 > ::: card
 > Text in a card.
 > :::
 
-#### 41. Callout (info) in a quote
+#### 42. Callout (info) in a quote
 
 > :::i
 > Text in an info callout.
 > :::
 
-#### 42. Callout (warning, chosen icon) in a quote
+#### 43. Callout (warning, chosen icon) in a quote
 
 > :::! icon=flag
 > Text in a warning callout with the flag icon.
 > :::
 
-#### 43. Callout (decision, no icon) in a quote
+#### 44. Callout (decision, no icon) in a quote
 
 > :::^ icon=none
 > Text in a decision callout with no icon.

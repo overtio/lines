@@ -177,14 +177,26 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Mention, then Math block
+#### 19. Mention, then Timing diagram (wavedrom block)
+
+Ask @[QA · Ada] at @[QA · Ada].email.
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Mention, then Math block
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Mention, then Table
+#### 21. Mention, then Table
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 | Left | Center | Right |
@@ -192,7 +204,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Mention, then Table with formulas
+#### 22. Mention, then Table with formulas
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 | Item | Cost |
@@ -202,7 +214,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Mention, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Mention, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ```hurl
@@ -221,12 +233,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Mention, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Mention, then Secret ({{name}}, kept in a locked secrets note)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Mention, then API requests (http block): a variable, a named request and one using its response
+#### 25. Mention, then API requests (http block): a variable, a named request and one using its response
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ```http
@@ -240,7 +252,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Mention, then Spreadsheet (csv block)
+#### 26. Mention, then Spreadsheet (csv block)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ```csv
@@ -250,7 +262,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Mention, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Mention, then Named spreadsheet (csv name=), and a formula in another block using it
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ```csv name=costs
@@ -262,93 +274,93 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Mention, then Divider
+#### 28. Mention, then Divider
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ---
 
-#### 28. Mention, then Key: Value line
+#### 29. Mention, then Key: Value line
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Mention, then Mention
+#### 30. Mention, then Mention
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Mention, then Wiki link
+#### 31. Mention, then Wiki link
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Mention, then Symbols
+#### 32. Mention, then Symbols
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Mention, then GitHub links
+#### 33. Mention, then GitHub links
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Mention, then arXiv links
+#### 34. Mention, then arXiv links
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Mention, then Image
+#### 35. Mention, then Image
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ![A sample picture](attachment:photo.png)
 
-#### 35. Mention, then Drawing
+#### 36. Mention, then Drawing
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Mention, then File
+#### 37. Mention, then File
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Mention, then Attached 3D model (STL)
+#### 38. Mention, then Attached 3D model (STL)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Mention, then Terminal recording (.cast file)
+#### 39. Mention, then Terminal recording (.cast file)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Mention, then Missing file
+#### 40. Mention, then Missing file
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Mention, then Card
+#### 41. Mention, then Card
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ::: card
 Text in a card.
 :::
 
-#### 41. Mention, then Callout (info)
+#### 42. Mention, then Callout (info)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::i
 Text in an info callout.
 :::
 
-#### 42. Mention, then Callout (warning, chosen icon)
+#### 43. Mention, then Callout (warning, chosen icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Mention, then Callout (decision, no icon)
+#### 44. Mention, then Callout (decision, no icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::^ icon=none

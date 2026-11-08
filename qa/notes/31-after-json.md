@@ -213,7 +213,21 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. JSON block (no language), then Math block
+#### 19. JSON block (no language), then Timing diagram (wavedrom block)
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. JSON block (no language), then Math block
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -222,7 +236,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. JSON block (no language), then Table
+#### 21. JSON block (no language), then Table
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -232,7 +246,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. JSON block (no language), then Table with formulas
+#### 22. JSON block (no language), then Table with formulas
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -244,7 +258,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. JSON block (no language), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. JSON block (no language), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -265,14 +279,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. JSON block (no language), then Secret ({{name}}, kept in a locked secrets note)
+#### 24. JSON block (no language), then Secret ({{name}}, kept in a locked secrets note)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. JSON block (no language), then API requests (http block): a variable, a named request and one using its response
+#### 25. JSON block (no language), then API requests (http block): a variable, a named request and one using its response
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -288,7 +302,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. JSON block (no language), then Spreadsheet (csv block)
+#### 26. JSON block (no language), then Spreadsheet (csv block)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -300,7 +314,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. JSON block (no language), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. JSON block (no language), then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -314,98 +328,98 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. JSON block (no language), then Divider
+#### 28. JSON block (no language), then Divider
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ---
 
-#### 28. JSON block (no language), then Key: Value line
+#### 29. JSON block (no language), then Key: Value line
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. JSON block (no language), then Mention
+#### 30. JSON block (no language), then Mention
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. JSON block (no language), then Wiki link
+#### 31. JSON block (no language), then Wiki link
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. JSON block (no language), then Symbols
+#### 32. JSON block (no language), then Symbols
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. JSON block (no language), then GitHub links
+#### 33. JSON block (no language), then GitHub links
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. JSON block (no language), then arXiv links
+#### 34. JSON block (no language), then arXiv links
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. JSON block (no language), then Image
+#### 35. JSON block (no language), then Image
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 35. JSON block (no language), then Drawing
+#### 36. JSON block (no language), then Drawing
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. JSON block (no language), then File
+#### 37. JSON block (no language), then File
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 37. JSON block (no language), then Attached 3D model (STL)
+#### 38. JSON block (no language), then Attached 3D model (STL)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. JSON block (no language), then Terminal recording (.cast file)
+#### 39. JSON block (no language), then Terminal recording (.cast file)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. JSON block (no language), then Missing file
+#### 40. JSON block (no language), then Missing file
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. JSON block (no language), then Card
+#### 41. JSON block (no language), then Card
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -414,7 +428,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 41. JSON block (no language), then Callout (info)
+#### 42. JSON block (no language), then Callout (info)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -423,7 +437,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 42. JSON block (no language), then Callout (warning, chosen icon)
+#### 43. JSON block (no language), then Callout (warning, chosen icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -432,7 +446,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. JSON block (no language), then Callout (decision, no icon)
+#### 44. JSON block (no language), then Callout (decision, no icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}

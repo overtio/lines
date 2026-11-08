@@ -177,14 +177,26 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. GitHub links, then Math block
+#### 19. GitHub links, then Timing diagram (wavedrom block)
+
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. GitHub links, then Math block
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. GitHub links, then Table
+#### 21. GitHub links, then Table
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 | Left | Center | Right |
@@ -192,7 +204,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. GitHub links, then Table with formulas
+#### 22. GitHub links, then Table with formulas
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 | Item | Cost |
@@ -202,7 +214,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. GitHub links, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. GitHub links, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ```hurl
@@ -221,12 +233,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. GitHub links, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. GitHub links, then Secret ({{name}}, kept in a locked secrets note)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. GitHub links, then API requests (http block): a variable, a named request and one using its response
+#### 25. GitHub links, then API requests (http block): a variable, a named request and one using its response
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ```http
@@ -240,7 +252,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. GitHub links, then Spreadsheet (csv block)
+#### 26. GitHub links, then Spreadsheet (csv block)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ```csv
@@ -250,7 +262,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. GitHub links, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. GitHub links, then Named spreadsheet (csv name=), and a formula in another block using it
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ```csv name=costs
@@ -262,93 +274,93 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. GitHub links, then Divider
+#### 28. GitHub links, then Divider
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ---
 
-#### 28. GitHub links, then Key: Value line
+#### 29. GitHub links, then Key: Value line
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. GitHub links, then Mention
+#### 30. GitHub links, then Mention
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. GitHub links, then Wiki link
+#### 31. GitHub links, then Wiki link
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. GitHub links, then Symbols
+#### 32. GitHub links, then Symbols
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. GitHub links, then GitHub links
+#### 33. GitHub links, then GitHub links
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. GitHub links, then arXiv links
+#### 34. GitHub links, then arXiv links
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. GitHub links, then Image
+#### 35. GitHub links, then Image
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ![A sample picture](attachment:photo.png)
 
-#### 35. GitHub links, then Drawing
+#### 36. GitHub links, then Drawing
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. GitHub links, then File
+#### 37. GitHub links, then File
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Budget.csv](attachment:budget.csv)
 
-#### 37. GitHub links, then Attached 3D model (STL)
+#### 38. GitHub links, then Attached 3D model (STL)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. GitHub links, then Terminal recording (.cast file)
+#### 39. GitHub links, then Terminal recording (.cast file)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. GitHub links, then Missing file
+#### 40. GitHub links, then Missing file
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. GitHub links, then Card
+#### 41. GitHub links, then Card
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ::: card
 Text in a card.
 :::
 
-#### 41. GitHub links, then Callout (info)
+#### 42. GitHub links, then Callout (info)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::i
 Text in an info callout.
 :::
 
-#### 42. GitHub links, then Callout (warning, chosen icon)
+#### 43. GitHub links, then Callout (warning, chosen icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. GitHub links, then Callout (decision, no icon)
+#### 44. GitHub links, then Callout (decision, no icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::^ icon=none

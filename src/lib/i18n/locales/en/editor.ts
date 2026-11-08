@@ -33,6 +33,9 @@ export default {
   "editor.slash.diagram.keywords": "mermaid flowchart chart graph sequence",
   "editor.slash.model": "3D model",
   "editor.slash.model.keywords": "openscad scad cad 3d model stl mesh print solid",
+  // A WaveDrom diagram: signals over time, as in digital electronics.
+  "editor.slash.timing": "Timing diagram",
+  "editor.slash.timing.keywords": "wavedrom waveform signal clock bus register bitfield logic gate digital electronics",
   "editor.slash.request": "API request",
   "editor.slash.request.keywords": "http rest api request curl get post fetch endpoint",
   "editor.slash.hurl": "Hurl test",
@@ -171,6 +174,8 @@ export default {
   // A Mermaid diagram, as screen readers name it.
   "editor.diagram": "Diagram",
   "editor.emptyDiagram": "Empty diagram",
+  // WaveJSON with nothing WaveDrom draws. signal, reg and assign are written as they are.
+  "editor.wavedrom.what": "A WaveDrom diagram needs signals (signal: […]), a register’s fields (reg: […]) or logic (assign: […]).",
 
   // The grip left of a line, for dragging it elsewhere.
   "editor.dragHandle": "Drag to move, click to select",

@@ -67,6 +67,8 @@ flowchart LR
   Idea --> Note --> Done
 \`\`\`
 
+For electronics, a \`wavedrom\` block draws signals over time: type \`/timing\`.
+
 Math is LaTeX between dollar signs: $e^{i\\pi} + 1 = 0$. To write a whole note in LaTeX, switch it in the ⓘ panel.
 
 An \`openscad\` code block is a 3D model, made from its code as you type, to turn around and print: type \`/model\`.

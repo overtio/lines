@@ -195,7 +195,20 @@ endsolid pyramid
 ```
 :::
 
-#### 19. Math block in a callout
+#### 19. Timing diagram (wavedrom block) in a callout
+
+:::i
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+:::
+
+#### 20. Math block in a callout
 
 :::i
 $$
@@ -203,7 +216,7 @@ $$
 $$
 :::
 
-#### 20. Table in a callout
+#### 21. Table in a callout
 
 :::i
 | Left | Center | Right |
@@ -212,7 +225,7 @@ $$
 | longer cell text | `code` | 22 |
 :::
 
-#### 21. Table with formulas in a callout
+#### 22. Table with formulas in a callout
 
 :::i
 | Item | Cost |
@@ -223,7 +236,7 @@ $$
 | Broken | =B2/0 |
 :::
 
-#### 22. Hurl entries (hurl block): a capture used by the next entry, and asserts in a callout
+#### 23. Hurl entries (hurl block): a capture used by the next entry, and asserts in a callout
 
 :::i
 ```hurl
@@ -243,13 +256,13 @@ jsonpath "$.name" isString
 ```
 :::
 
-#### 23. Secret ({{name}}, kept in a locked secrets note) in a callout
+#### 24. Secret ({{name}}, kept in a locked secrets note) in a callout
 
 :::i
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::
 
-#### 24. API requests (http block): a variable, a named request and one using its response in a callout
+#### 25. API requests (http block): a variable, a named request and one using its response in a callout
 
 :::i
 ```http
@@ -264,7 +277,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 :::
 
-#### 25. Spreadsheet (csv block) in a callout
+#### 26. Spreadsheet (csv block) in a callout
 
 :::i
 ```csv
@@ -275,7 +288,7 @@ Total, =SUM(B2:B3)
 ```
 :::
 
-#### 26. Named spreadsheet (csv name=), and a formula in another block using it in a callout
+#### 27. Named spreadsheet (csv name=), and a formula in another block using it in a callout
 
 :::i
 ```csv name=costs
@@ -288,85 +301,85 @@ Total, =costs!B2*2
 ```
 :::
 
-#### 27. Divider in a callout
+#### 28. Divider in a callout
 
 :::i
 ---
 :::
 
-#### 28. Key: Value line in a callout
+#### 29. Key: Value line in a callout
 
 :::i
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 29. Mention in a callout
+#### 30. Mention in a callout
 
 :::i
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 30. Wiki link in a callout
+#### 31. Wiki link in a callout
 
 :::i
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 31. Symbols in a callout
+#### 32. Symbols in a callout
 
 :::i
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 32. GitHub links in a callout
+#### 33. GitHub links in a callout
 
 :::i
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 33. arXiv links in a callout
+#### 34. arXiv links in a callout
 
 :::i
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::
 
-#### 34. Image in a callout
+#### 35. Image in a callout
 
 :::i
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 35. Drawing in a callout
+#### 36. Drawing in a callout
 
 :::i
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 36. File in a callout
+#### 37. File in a callout
 
 :::i
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 37. Attached 3D model (STL) in a callout
+#### 38. Attached 3D model (STL) in a callout
 
 :::i
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 38. Terminal recording (.cast file) in a callout
+#### 39. Terminal recording (.cast file) in a callout
 
 :::i
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 39. Missing file in a callout
+#### 40. Missing file in a callout
 
 :::i
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 40. Card in a callout
+#### 41. Card in a callout
 
 :::i
 ::: card
@@ -374,7 +387,7 @@ Text in a card.
 :::
 :::
 
-#### 41. Callout (info) in a callout
+#### 42. Callout (info) in a callout
 
 :::i
 :::i
@@ -382,7 +395,7 @@ Text in an info callout.
 :::
 :::
 
-#### 42. Callout (warning, chosen icon) in a callout
+#### 43. Callout (warning, chosen icon) in a callout
 
 :::i
 :::! icon=flag
@@ -390,7 +403,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 43. Callout (decision, no icon) in a callout
+#### 44. Callout (decision, no icon) in a callout
 
 :::i
 :::^ icon=none

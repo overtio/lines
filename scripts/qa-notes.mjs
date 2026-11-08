@@ -55,6 +55,11 @@ const ELEMENTS = [
     name: "3D model (stl block)",
     md: "```stl\nsolid pyramid\nfacet normal 0 0 -1\nouter loop\nvertex 0 0 0\nvertex 10 10 0\nvertex 10 0 0\nendloop\nendfacet\nfacet normal 0 0 -1\nouter loop\nvertex 0 0 0\nvertex 0 10 0\nvertex 10 10 0\nendloop\nendfacet\nfacet normal 0 -1 1\nouter loop\nvertex 0 0 0\nvertex 10 0 0\nvertex 5 5 8\nendloop\nendfacet\nfacet normal 1 0 1\nouter loop\nvertex 10 0 0\nvertex 10 10 0\nvertex 5 5 8\nendloop\nendfacet\nfacet normal 0 1 1\nouter loop\nvertex 10 10 0\nvertex 0 10 0\nvertex 5 5 8\nendloop\nendfacet\nfacet normal -1 0 1\nouter loop\nvertex 0 10 0\nvertex 0 0 0\nvertex 5 5 8\nendloop\nendfacet\nendsolid pyramid\n```",
   },
+  {
+    id: "timing",
+    name: "Timing diagram (wavedrom block)",
+    md: '```wavedrom\n{ signal: [\n  { name: "clk", wave: "p.....|..." },\n  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },\n  {},\n  { name: "ack", wave: "1.....|01.", node: ".a......b" }\n], edge: ["a~>b t1"] }\n```',
+  },
   { id: "math", name: "Math block", md: "$$\n\\int_0^1 x^2\\,dx = \\frac{1}{3}\n$$" },
   {
     id: "table",
@@ -126,7 +131,7 @@ const CONTAINERS = [
 ];
 
 /** Some things are only drawn at the top level and in cards; elsewhere they stay Markdown. */
-const DRAWN = new Set(["diagram", "diagram-sized", "math", "table", "table-formulas", "spreadsheet", "spreadsheet-named", "image", "drawing", "file", "missing-file"]);
+const DRAWN = new Set(["diagram", "diagram-sized", "timing", "math", "table", "table-formulas", "spreadsheet", "spreadsheet-named", "image", "drawing", "file", "missing-file"]);
 const DRAWN_ONLY_IN = new Set(["top-level", "card", "callout", "callout-none", "nested"]);
 
 const notes = [];

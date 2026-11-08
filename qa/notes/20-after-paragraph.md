@@ -177,14 +177,26 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Paragraph, then Math block
+#### 19. Paragraph, then Timing diagram (wavedrom block)
+
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Paragraph, then Math block
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Paragraph, then Table
+#### 21. Paragraph, then Table
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 | Left | Center | Right |
@@ -192,7 +204,7 @@ A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighte
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Paragraph, then Table with formulas
+#### 22. Paragraph, then Table with formulas
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 | Item | Cost |
@@ -202,7 +214,7 @@ A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighte
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Paragraph, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Paragraph, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ```hurl
@@ -221,12 +233,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Paragraph, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Paragraph, then Secret ({{name}}, kept in a locked secrets note)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Paragraph, then API requests (http block): a variable, a named request and one using its response
+#### 25. Paragraph, then API requests (http block): a variable, a named request and one using its response
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ```http
@@ -240,7 +252,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Paragraph, then Spreadsheet (csv block)
+#### 26. Paragraph, then Spreadsheet (csv block)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ```csv
@@ -250,7 +262,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Paragraph, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Paragraph, then Named spreadsheet (csv name=), and a formula in another block using it
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ```csv name=costs
@@ -262,93 +274,93 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Paragraph, then Divider
+#### 28. Paragraph, then Divider
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ---
 
-#### 28. Paragraph, then Key: Value line
+#### 29. Paragraph, then Key: Value line
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Paragraph, then Mention
+#### 30. Paragraph, then Mention
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Paragraph, then Wiki link
+#### 31. Paragraph, then Wiki link
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Paragraph, then Symbols
+#### 32. Paragraph, then Symbols
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Paragraph, then GitHub links
+#### 33. Paragraph, then GitHub links
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Paragraph, then arXiv links
+#### 34. Paragraph, then arXiv links
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Paragraph, then Image
+#### 35. Paragraph, then Image
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ![A sample picture](attachment:photo.png)
 
-#### 35. Paragraph, then Drawing
+#### 36. Paragraph, then Drawing
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Paragraph, then File
+#### 37. Paragraph, then File
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Paragraph, then Attached 3D model (STL)
+#### 38. Paragraph, then Attached 3D model (STL)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Paragraph, then Terminal recording (.cast file)
+#### 39. Paragraph, then Terminal recording (.cast file)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Paragraph, then Missing file
+#### 40. Paragraph, then Missing file
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Paragraph, then Card
+#### 41. Paragraph, then Card
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ::: card
 Text in a card.
 :::
 
-#### 41. Paragraph, then Callout (info)
+#### 42. Paragraph, then Callout (info)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::i
 Text in an info callout.
 :::
 
-#### 42. Paragraph, then Callout (warning, chosen icon)
+#### 43. Paragraph, then Callout (warning, chosen icon)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Paragraph, then Callout (decision, no icon)
+#### 44. Paragraph, then Callout (decision, no icon)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::^ icon=none

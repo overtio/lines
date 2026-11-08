@@ -177,14 +177,26 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Attached 3D model (STL), then Math block
+#### 19. Attached 3D model (STL), then Timing diagram (wavedrom block)
+
+[Bracket.stl](attachment:bracket.stl)
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Attached 3D model (STL), then Math block
 
 [Bracket.stl](attachment:bracket.stl)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Attached 3D model (STL), then Table
+#### 21. Attached 3D model (STL), then Table
 
 [Bracket.stl](attachment:bracket.stl)
 | Left | Center | Right |
@@ -192,7 +204,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Attached 3D model (STL), then Table with formulas
+#### 22. Attached 3D model (STL), then Table with formulas
 
 [Bracket.stl](attachment:bracket.stl)
 | Item | Cost |
@@ -202,7 +214,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Attached 3D model (STL), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Attached 3D model (STL), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 [Bracket.stl](attachment:bracket.stl)
 ```hurl
@@ -221,12 +233,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Attached 3D model (STL), then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Attached 3D model (STL), then Secret ({{name}}, kept in a locked secrets note)
 
 [Bracket.stl](attachment:bracket.stl)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Attached 3D model (STL), then API requests (http block): a variable, a named request and one using its response
+#### 25. Attached 3D model (STL), then API requests (http block): a variable, a named request and one using its response
 
 [Bracket.stl](attachment:bracket.stl)
 ```http
@@ -240,7 +252,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Attached 3D model (STL), then Spreadsheet (csv block)
+#### 26. Attached 3D model (STL), then Spreadsheet (csv block)
 
 [Bracket.stl](attachment:bracket.stl)
 ```csv
@@ -250,7 +262,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Attached 3D model (STL), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Attached 3D model (STL), then Named spreadsheet (csv name=), and a formula in another block using it
 
 [Bracket.stl](attachment:bracket.stl)
 ```csv name=costs
@@ -262,93 +274,93 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Attached 3D model (STL), then Divider
+#### 28. Attached 3D model (STL), then Divider
 
 [Bracket.stl](attachment:bracket.stl)
 ---
 
-#### 28. Attached 3D model (STL), then Key: Value line
+#### 29. Attached 3D model (STL), then Key: Value line
 
 [Bracket.stl](attachment:bracket.stl)
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Attached 3D model (STL), then Mention
+#### 30. Attached 3D model (STL), then Mention
 
 [Bracket.stl](attachment:bracket.stl)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Attached 3D model (STL), then Wiki link
+#### 31. Attached 3D model (STL), then Wiki link
 
 [Bracket.stl](attachment:bracket.stl)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Attached 3D model (STL), then Symbols
+#### 32. Attached 3D model (STL), then Symbols
 
 [Bracket.stl](attachment:bracket.stl)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Attached 3D model (STL), then GitHub links
+#### 33. Attached 3D model (STL), then GitHub links
 
 [Bracket.stl](attachment:bracket.stl)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Attached 3D model (STL), then arXiv links
+#### 34. Attached 3D model (STL), then arXiv links
 
 [Bracket.stl](attachment:bracket.stl)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Attached 3D model (STL), then Image
+#### 35. Attached 3D model (STL), then Image
 
 [Bracket.stl](attachment:bracket.stl)
 ![A sample picture](attachment:photo.png)
 
-#### 35. Attached 3D model (STL), then Drawing
+#### 36. Attached 3D model (STL), then Drawing
 
 [Bracket.stl](attachment:bracket.stl)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Attached 3D model (STL), then File
+#### 37. Attached 3D model (STL), then File
 
 [Bracket.stl](attachment:bracket.stl)
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Attached 3D model (STL), then Attached 3D model (STL)
+#### 38. Attached 3D model (STL), then Attached 3D model (STL)
 
 [Bracket.stl](attachment:bracket.stl)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Attached 3D model (STL), then Terminal recording (.cast file)
+#### 39. Attached 3D model (STL), then Terminal recording (.cast file)
 
 [Bracket.stl](attachment:bracket.stl)
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Attached 3D model (STL), then Missing file
+#### 40. Attached 3D model (STL), then Missing file
 
 [Bracket.stl](attachment:bracket.stl)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Attached 3D model (STL), then Card
+#### 41. Attached 3D model (STL), then Card
 
 [Bracket.stl](attachment:bracket.stl)
 ::: card
 Text in a card.
 :::
 
-#### 41. Attached 3D model (STL), then Callout (info)
+#### 42. Attached 3D model (STL), then Callout (info)
 
 [Bracket.stl](attachment:bracket.stl)
 :::i
 Text in an info callout.
 :::
 
-#### 42. Attached 3D model (STL), then Callout (warning, chosen icon)
+#### 43. Attached 3D model (STL), then Callout (warning, chosen icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Attached 3D model (STL), then Callout (decision, no icon)
+#### 44. Attached 3D model (STL), then Callout (decision, no icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::^ icon=none

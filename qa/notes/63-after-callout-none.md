@@ -213,7 +213,21 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Callout (decision, no icon), then Math block
+#### 19. Callout (decision, no icon), then Timing diagram (wavedrom block)
+
+:::^ icon=none
+Text in a decision callout with no icon.
+:::
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Callout (decision, no icon), then Math block
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -222,7 +236,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Callout (decision, no icon), then Table
+#### 21. Callout (decision, no icon), then Table
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -232,7 +246,7 @@ Text in a decision callout with no icon.
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Callout (decision, no icon), then Table with formulas
+#### 22. Callout (decision, no icon), then Table with formulas
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -244,7 +258,7 @@ Text in a decision callout with no icon.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Callout (decision, no icon), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Callout (decision, no icon), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -265,14 +279,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Callout (decision, no icon), then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Callout (decision, no icon), then Secret ({{name}}, kept in a locked secrets note)
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Callout (decision, no icon), then API requests (http block): a variable, a named request and one using its response
+#### 25. Callout (decision, no icon), then API requests (http block): a variable, a named request and one using its response
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -288,7 +302,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Callout (decision, no icon), then Spreadsheet (csv block)
+#### 26. Callout (decision, no icon), then Spreadsheet (csv block)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -300,7 +314,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Callout (decision, no icon), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Callout (decision, no icon), then Named spreadsheet (csv name=), and a formula in another block using it
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -314,98 +328,98 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Callout (decision, no icon), then Divider
+#### 28. Callout (decision, no icon), then Divider
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 ---
 
-#### 28. Callout (decision, no icon), then Key: Value line
+#### 29. Callout (decision, no icon), then Key: Value line
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Callout (decision, no icon), then Mention
+#### 30. Callout (decision, no icon), then Mention
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Callout (decision, no icon), then Wiki link
+#### 31. Callout (decision, no icon), then Wiki link
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Callout (decision, no icon), then Symbols
+#### 32. Callout (decision, no icon), then Symbols
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Callout (decision, no icon), then GitHub links
+#### 33. Callout (decision, no icon), then GitHub links
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Callout (decision, no icon), then arXiv links
+#### 34. Callout (decision, no icon), then arXiv links
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Callout (decision, no icon), then Image
+#### 35. Callout (decision, no icon), then Image
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 35. Callout (decision, no icon), then Drawing
+#### 36. Callout (decision, no icon), then Drawing
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Callout (decision, no icon), then File
+#### 37. Callout (decision, no icon), then File
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Callout (decision, no icon), then Attached 3D model (STL)
+#### 38. Callout (decision, no icon), then Attached 3D model (STL)
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Callout (decision, no icon), then Terminal recording (.cast file)
+#### 39. Callout (decision, no icon), then Terminal recording (.cast file)
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Callout (decision, no icon), then Missing file
+#### 40. Callout (decision, no icon), then Missing file
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Callout (decision, no icon), then Card
+#### 41. Callout (decision, no icon), then Card
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -414,7 +428,7 @@ Text in a decision callout with no icon.
 Text in a card.
 :::
 
-#### 41. Callout (decision, no icon), then Callout (info)
+#### 42. Callout (decision, no icon), then Callout (info)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -423,7 +437,7 @@ Text in a decision callout with no icon.
 Text in an info callout.
 :::
 
-#### 42. Callout (decision, no icon), then Callout (warning, chosen icon)
+#### 43. Callout (decision, no icon), then Callout (warning, chosen icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -432,7 +446,7 @@ Text in a decision callout with no icon.
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Callout (decision, no icon), then Callout (decision, no icon)
+#### 44. Callout (decision, no icon), then Callout (decision, no icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.

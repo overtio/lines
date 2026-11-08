@@ -177,14 +177,26 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Image, then Math block
+#### 19. Image, then Timing diagram (wavedrom block)
+
+![A sample picture](attachment:photo.png)
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Image, then Math block
 
 ![A sample picture](attachment:photo.png)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Image, then Table
+#### 21. Image, then Table
 
 ![A sample picture](attachment:photo.png)
 | Left | Center | Right |
@@ -192,7 +204,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Image, then Table with formulas
+#### 22. Image, then Table with formulas
 
 ![A sample picture](attachment:photo.png)
 | Item | Cost |
@@ -202,7 +214,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Image, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Image, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ![A sample picture](attachment:photo.png)
 ```hurl
@@ -221,12 +233,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Image, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Image, then Secret ({{name}}, kept in a locked secrets note)
 
 ![A sample picture](attachment:photo.png)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Image, then API requests (http block): a variable, a named request and one using its response
+#### 25. Image, then API requests (http block): a variable, a named request and one using its response
 
 ![A sample picture](attachment:photo.png)
 ```http
@@ -240,7 +252,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Image, then Spreadsheet (csv block)
+#### 26. Image, then Spreadsheet (csv block)
 
 ![A sample picture](attachment:photo.png)
 ```csv
@@ -250,7 +262,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Image, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Image, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ![A sample picture](attachment:photo.png)
 ```csv name=costs
@@ -262,93 +274,93 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Image, then Divider
+#### 28. Image, then Divider
 
 ![A sample picture](attachment:photo.png)
 ---
 
-#### 28. Image, then Key: Value line
+#### 29. Image, then Key: Value line
 
 ![A sample picture](attachment:photo.png)
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Image, then Mention
+#### 30. Image, then Mention
 
 ![A sample picture](attachment:photo.png)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Image, then Wiki link
+#### 31. Image, then Wiki link
 
 ![A sample picture](attachment:photo.png)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Image, then Symbols
+#### 32. Image, then Symbols
 
 ![A sample picture](attachment:photo.png)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Image, then GitHub links
+#### 33. Image, then GitHub links
 
 ![A sample picture](attachment:photo.png)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Image, then arXiv links
+#### 34. Image, then arXiv links
 
 ![A sample picture](attachment:photo.png)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Image, then Image
+#### 35. Image, then Image
 
 ![A sample picture](attachment:photo.png)
 ![A sample picture](attachment:photo.png)
 
-#### 35. Image, then Drawing
+#### 36. Image, then Drawing
 
 ![A sample picture](attachment:photo.png)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Image, then File
+#### 37. Image, then File
 
 ![A sample picture](attachment:photo.png)
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Image, then Attached 3D model (STL)
+#### 38. Image, then Attached 3D model (STL)
 
 ![A sample picture](attachment:photo.png)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Image, then Terminal recording (.cast file)
+#### 39. Image, then Terminal recording (.cast file)
 
 ![A sample picture](attachment:photo.png)
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Image, then Missing file
+#### 40. Image, then Missing file
 
 ![A sample picture](attachment:photo.png)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Image, then Card
+#### 41. Image, then Card
 
 ![A sample picture](attachment:photo.png)
 ::: card
 Text in a card.
 :::
 
-#### 41. Image, then Callout (info)
+#### 42. Image, then Callout (info)
 
 ![A sample picture](attachment:photo.png)
 :::i
 Text in an info callout.
 :::
 
-#### 42. Image, then Callout (warning, chosen icon)
+#### 43. Image, then Callout (warning, chosen icon)
 
 ![A sample picture](attachment:photo.png)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Image, then Callout (decision, no icon)
+#### 44. Image, then Callout (decision, no icon)
 
 ![A sample picture](attachment:photo.png)
 :::^ icon=none

@@ -177,14 +177,26 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Drawing, then Math block
+#### 19. Drawing, then Timing diagram (wavedrom block)
+
+![A sample drawing](attachment:drawing.svg)
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+
+#### 20. Drawing, then Math block
 
 ![A sample drawing](attachment:drawing.svg)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 20. Drawing, then Table
+#### 21. Drawing, then Table
 
 ![A sample drawing](attachment:drawing.svg)
 | Left | Center | Right |
@@ -192,7 +204,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 21. Drawing, then Table with formulas
+#### 22. Drawing, then Table with formulas
 
 ![A sample drawing](attachment:drawing.svg)
 | Item | Cost |
@@ -202,7 +214,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 22. Drawing, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 23. Drawing, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ![A sample drawing](attachment:drawing.svg)
 ```hurl
@@ -221,12 +233,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 23. Drawing, then Secret ({{name}}, kept in a locked secrets note)
+#### 24. Drawing, then Secret ({{name}}, kept in a locked secrets note)
 
 ![A sample drawing](attachment:drawing.svg)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 24. Drawing, then API requests (http block): a variable, a named request and one using its response
+#### 25. Drawing, then API requests (http block): a variable, a named request and one using its response
 
 ![A sample drawing](attachment:drawing.svg)
 ```http
@@ -240,7 +252,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 25. Drawing, then Spreadsheet (csv block)
+#### 26. Drawing, then Spreadsheet (csv block)
 
 ![A sample drawing](attachment:drawing.svg)
 ```csv
@@ -250,7 +262,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 26. Drawing, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 27. Drawing, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ![A sample drawing](attachment:drawing.svg)
 ```csv name=costs
@@ -262,93 +274,93 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 27. Drawing, then Divider
+#### 28. Drawing, then Divider
 
 ![A sample drawing](attachment:drawing.svg)
 ---
 
-#### 28. Drawing, then Key: Value line
+#### 29. Drawing, then Key: Value line
 
 ![A sample drawing](attachment:drawing.svg)
 **Wi-Fi password:** correct-horse-battery
 
-#### 29. Drawing, then Mention
+#### 30. Drawing, then Mention
 
 ![A sample drawing](attachment:drawing.svg)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 30. Drawing, then Wiki link
+#### 31. Drawing, then Wiki link
 
 ![A sample drawing](attachment:drawing.svg)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 31. Drawing, then Symbols
+#### 32. Drawing, then Symbols
 
 ![A sample drawing](attachment:drawing.svg)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 32. Drawing, then GitHub links
+#### 33. Drawing, then GitHub links
 
 ![A sample drawing](attachment:drawing.svg)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 33. Drawing, then arXiv links
+#### 34. Drawing, then arXiv links
 
 ![A sample drawing](attachment:drawing.svg)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 34. Drawing, then Image
+#### 35. Drawing, then Image
 
 ![A sample drawing](attachment:drawing.svg)
 ![A sample picture](attachment:photo.png)
 
-#### 35. Drawing, then Drawing
+#### 36. Drawing, then Drawing
 
 ![A sample drawing](attachment:drawing.svg)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 36. Drawing, then File
+#### 37. Drawing, then File
 
 ![A sample drawing](attachment:drawing.svg)
 [Budget.csv](attachment:budget.csv)
 
-#### 37. Drawing, then Attached 3D model (STL)
+#### 38. Drawing, then Attached 3D model (STL)
 
 ![A sample drawing](attachment:drawing.svg)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 38. Drawing, then Terminal recording (.cast file)
+#### 39. Drawing, then Terminal recording (.cast file)
 
 ![A sample drawing](attachment:drawing.svg)
 [terminal.cast](attachment:terminal.cast)
 
-#### 39. Drawing, then Missing file
+#### 40. Drawing, then Missing file
 
 ![A sample drawing](attachment:drawing.svg)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 40. Drawing, then Card
+#### 41. Drawing, then Card
 
 ![A sample drawing](attachment:drawing.svg)
 ::: card
 Text in a card.
 :::
 
-#### 41. Drawing, then Callout (info)
+#### 42. Drawing, then Callout (info)
 
 ![A sample drawing](attachment:drawing.svg)
 :::i
 Text in an info callout.
 :::
 
-#### 42. Drawing, then Callout (warning, chosen icon)
+#### 43. Drawing, then Callout (warning, chosen icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 43. Drawing, then Callout (decision, no icon)
+#### 44. Drawing, then Callout (decision, no icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::^ icon=none
