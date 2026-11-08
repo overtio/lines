@@ -28,6 +28,8 @@ export default {
   "editor.slash.codeBlock.keywords": "code extrait",
   "editor.slash.diagram": "Diagramme",
   "editor.slash.diagram.keywords": "mermaid organigramme graphique schéma séquence",
+  "editor.slash.model": "Modèle 3D",
+  "editor.slash.model.keywords": "openscad scad cao 3d modèle stl maillage imprimer solide",
   "editor.slash.request": "Requête d’API",
   "editor.slash.request.keywords": "http rest api requête curl get post endpoint",
   "editor.slash.hurl": "Test Hurl",

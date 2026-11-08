@@ -20,6 +20,7 @@ import {
   Book,
   BookOpen,
   Bookmark,
+  Box,
   Brain,
   Briefcase,
   Bug,
@@ -228,6 +229,7 @@ export const ICONS = {
   "between-vertical-end": [BetweenVerticalEnd, "arrow.right.to.line"],
   "between-vertical-start": [BetweenVerticalStart, "arrow.left.to.line"],
   bike: [Bike, "bicycle"],
+  box: [Box, "cube"],
   bird: [Bird, "bird"],
   bold: [Bold, "bold"],
   book: [Book, "book.closed"],
@@ -439,7 +441,7 @@ export const TAG_ICON_GROUPS: { name: string; icons: IconName[] }[] = [
   },
   {
     name: t("picker.groupTech"),
-    icons: ["code", "terminal", "cpu", "bug", "puzzle", "server", "laptop", "smartphone", "wifi", "tv", "gamepad-2"],
+    icons: ["code", "terminal", "cpu", "bug", "puzzle", "box", "server", "laptop", "smartphone", "wifi", "tv", "gamepad-2"],
   },
   {
     name: t("picker.groupHome"),

@@ -99,14 +99,92 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. File, then Math block
+#### 15. File, then 3D model (openscad block), a colored part, an echo
+
+[Budget.csv](attachment:budget.csv)
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. File, then Flat model (openscad block)
+
+[Budget.csv](attachment:budget.csv)
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. File, then Broken model (openscad block)
+
+[Budget.csv](attachment:budget.csv)
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. File, then 3D model (stl block)
+
+[Budget.csv](attachment:budget.csv)
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. File, then Math block
 
 [Budget.csv](attachment:budget.csv)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. File, then Table
+#### 20. File, then Table
 
 [Budget.csv](attachment:budget.csv)
 | Left | Center | Right |
@@ -114,7 +192,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. File, then Table with formulas
+#### 21. File, then Table with formulas
 
 [Budget.csv](attachment:budget.csv)
 | Item | Cost |
@@ -124,7 +202,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. File, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. File, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 [Budget.csv](attachment:budget.csv)
 ```hurl
@@ -143,12 +221,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. File, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. File, then Secret ({{name}}, kept in a locked secrets note)
 
 [Budget.csv](attachment:budget.csv)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. File, then API requests (http block): a variable, a named request and one using its response
+#### 24. File, then API requests (http block): a variable, a named request and one using its response
 
 [Budget.csv](attachment:budget.csv)
 ```http
@@ -162,7 +240,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. File, then Spreadsheet (csv block)
+#### 25. File, then Spreadsheet (csv block)
 
 [Budget.csv](attachment:budget.csv)
 ```csv
@@ -172,7 +250,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. File, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. File, then Named spreadsheet (csv name=), and a formula in another block using it
 
 [Budget.csv](attachment:budget.csv)
 ```csv name=costs
@@ -184,78 +262,83 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. File, then Divider
+#### 27. File, then Divider
 
 [Budget.csv](attachment:budget.csv)
 ---
 
-#### 24. File, then Key: Value line
+#### 28. File, then Key: Value line
 
 [Budget.csv](attachment:budget.csv)
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. File, then Mention
+#### 29. File, then Mention
 
 [Budget.csv](attachment:budget.csv)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. File, then Wiki link
+#### 30. File, then Wiki link
 
 [Budget.csv](attachment:budget.csv)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. File, then Symbols
+#### 31. File, then Symbols
 
 [Budget.csv](attachment:budget.csv)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. File, then GitHub links
+#### 32. File, then GitHub links
 
 [Budget.csv](attachment:budget.csv)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. File, then Image
+#### 33. File, then Image
 
 [Budget.csv](attachment:budget.csv)
 ![A sample picture](attachment:photo.png)
 
-#### 30. File, then Drawing
+#### 34. File, then Drawing
 
 [Budget.csv](attachment:budget.csv)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. File, then File
+#### 35. File, then File
 
 [Budget.csv](attachment:budget.csv)
 [Budget.csv](attachment:budget.csv)
 
-#### 32. File, then Missing file
+#### 36. File, then Attached 3D model (STL)
+
+[Budget.csv](attachment:budget.csv)
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. File, then Missing file
 
 [Budget.csv](attachment:budget.csv)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. File, then Card
+#### 38. File, then Card
 
 [Budget.csv](attachment:budget.csv)
 ::: card
 Text in a card.
 :::
 
-#### 34. File, then Callout (info)
+#### 39. File, then Callout (info)
 
 [Budget.csv](attachment:budget.csv)
 :::i
 Text in an info callout.
 :::
 
-#### 35. File, then Callout (warning, chosen icon)
+#### 40. File, then Callout (warning, chosen icon)
 
 [Budget.csv](attachment:budget.csv)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. File, then Callout (decision, no icon)
+#### 41. File, then Callout (decision, no icon)
 
 [Budget.csv](attachment:budget.csv)
 :::^ icon=none

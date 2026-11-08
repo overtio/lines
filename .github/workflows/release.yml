@@ -90,6 +90,8 @@ jobs:
       - run: bun install --frozen-lockfile
       - name: TeX, which the desktop apps include for LaTeX notes' PDFs
         run: bun run tex-assets
+      - name: OpenSCAD, which the apps include for 3D models made from code
+        run: bun run openscad-assets
       - name: Build
         run: bun run tauri build ${{ matrix.args }}
         env:

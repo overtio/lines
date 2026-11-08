@@ -126,6 +126,15 @@ export const SHORTCUTS: ShortcutGroup[] = [
     ],
   },
   {
+    name: "shortcuts.group.models",
+    shortcuts: [
+      { action: "shortcuts.modelTurn", keys: ["drag", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"], note: "shortcuts.onModel" },
+      { action: "shortcuts.modelMove", keys: ["Shift-drag", "Shift-ArrowLeft", "Shift-ArrowUp"], note: "shortcuts.onModel" },
+      { action: "shortcuts.modelZoom", keys: ["Mod-scroll", "+", "-"], note: "shortcuts.onModel" },
+      { action: "shortcuts.modelReset", keys: ["0"], note: "shortcuts.onModel" },
+    ],
+  },
+  {
     name: "shortcuts.group.find",
     shortcuts: [
       { action: "shortcuts.find", keys: ["Mod-f"], note: "shortcuts.inNote" },
@@ -160,6 +169,7 @@ const ARROWS: Record<string, string> = { ArrowUp: "↑", ArrowDown: "↓", Arrow
 function keyName(key: string, on: System): string {
   if (key === "click") return t("shortcuts.key.click");
   if (key === "drag") return t("shortcuts.key.drag");
+  if (key === "scroll") return t("shortcuts.key.scroll");
   if (on === "mac" && MAC_KEYS[key]) return MAC_KEYS[key];
   if (ARROWS[key]) return ARROWS[key];
   const named: Record<string, MessageKey> = {
@@ -183,8 +193,8 @@ export function formatKeys(keys: Keys, on: System): string {
   const modifiers = new Set(parts);
   if (on === "mac") {
     const symbols = MAC_ORDER.filter((m) => modifiers.has(m)).map((m) => MAC_SYMBOLS[m]).join("");
-    // A click or drag reads as words after the symbols: ⌘-click.
-    return (key === "click" || key === "drag") && symbols ? `${symbols}-${keyName(key, on)}` : symbols + keyName(key, on);
+    // A click, drag or scroll reads as words after the symbols: ⌘-click.
+    return (key === "click" || key === "drag" || key === "scroll") && symbols ? `${symbols}-${keyName(key, on)}` : symbols + keyName(key, on);
   }
   const names: Record<string, string> = { Mod: t("shortcuts.key.ctrl"), Ctrl: t("shortcuts.key.ctrl"), Alt: t("shortcuts.key.alt"), Shift: t("shortcuts.key.shift") };
   return [...OTHER_ORDER.filter((m) => modifiers.has(m)).map((m) => names[m]), keyName(key, on)].join("+");
@@ -217,6 +227,7 @@ export function speakKeys(keys: Keys, on: System): string {
     Backspace: "shortcuts.key.backspace",
     click: "shortcuts.key.click",
     drag: "shortcuts.key.drag",
+    scroll: "shortcuts.key.scroll",
     "/": "shortcuts.key.slash",
     "\\": "shortcuts.key.backslash",
     "@": "shortcuts.key.at",

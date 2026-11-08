@@ -295,7 +295,141 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Math block
+#### 15. Hurl entries (hurl block): a capture used by the next entry, and asserts, then 3D model (openscad block), a colored part, an echo
+
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Flat model (openscad block)
+
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Broken model (openscad block)
+
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Hurl entries (hurl block): a capture used by the next entry, and asserts, then 3D model (stl block)
+
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Math block
 
 ```hurl
 # A todo
@@ -316,7 +450,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Table
+#### 20. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Table
 
 ```hurl
 # A todo
@@ -338,7 +472,7 @@ jsonpath "$.name" isString
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Table with formulas
+#### 21. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Table with formulas
 
 ```hurl
 # A todo
@@ -362,7 +496,7 @@ jsonpath "$.name" isString
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ```hurl
 # A todo
@@ -395,7 +529,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Secret ({{name}}, kept in a locked secrets note)
 
 ```hurl
 # A todo
@@ -414,7 +548,7 @@ jsonpath "$.name" isString
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Hurl entries (hurl block): a capture used by the next entry, and asserts, then API requests (http block): a variable, a named request and one using its response
+#### 24. Hurl entries (hurl block): a capture used by the next entry, and asserts, then API requests (http block): a variable, a named request and one using its response
 
 ```hurl
 # A todo
@@ -442,7 +576,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Spreadsheet (csv block)
+#### 25. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Spreadsheet (csv block)
 
 ```hurl
 # A todo
@@ -466,7 +600,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```hurl
 # A todo
@@ -492,7 +626,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Divider
+#### 27. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Divider
 
 ```hurl
 # A todo
@@ -511,7 +645,7 @@ jsonpath "$.name" isString
 ```
 ---
 
-#### 24. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Key: Value line
+#### 28. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Key: Value line
 
 ```hurl
 # A todo
@@ -530,7 +664,7 @@ jsonpath "$.name" isString
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Mention
+#### 29. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Mention
 
 ```hurl
 # A todo
@@ -549,7 +683,7 @@ jsonpath "$.name" isString
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Wiki link
+#### 30. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Wiki link
 
 ```hurl
 # A todo
@@ -568,7 +702,7 @@ jsonpath "$.name" isString
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Symbols
+#### 31. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Symbols
 
 ```hurl
 # A todo
@@ -587,7 +721,7 @@ jsonpath "$.name" isString
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Hurl entries (hurl block): a capture used by the next entry, and asserts, then GitHub links
+#### 32. Hurl entries (hurl block): a capture used by the next entry, and asserts, then GitHub links
 
 ```hurl
 # A todo
@@ -606,7 +740,7 @@ jsonpath "$.name" isString
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Image
+#### 33. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Image
 
 ```hurl
 # A todo
@@ -625,7 +759,7 @@ jsonpath "$.name" isString
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 30. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Drawing
+#### 34. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Drawing
 
 ```hurl
 # A todo
@@ -644,7 +778,7 @@ jsonpath "$.name" isString
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Hurl entries (hurl block): a capture used by the next entry, and asserts, then File
+#### 35. Hurl entries (hurl block): a capture used by the next entry, and asserts, then File
 
 ```hurl
 # A todo
@@ -663,7 +797,26 @@ jsonpath "$.name" isString
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Missing file
+#### 36. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Attached 3D model (STL)
+
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Missing file
 
 ```hurl
 # A todo
@@ -682,7 +835,7 @@ jsonpath "$.name" isString
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Card
+#### 38. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Card
 
 ```hurl
 # A todo
@@ -703,7 +856,7 @@ jsonpath "$.name" isString
 Text in a card.
 :::
 
-#### 34. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (info)
+#### 39. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (info)
 
 ```hurl
 # A todo
@@ -724,7 +877,7 @@ jsonpath "$.name" isString
 Text in an info callout.
 :::
 
-#### 35. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (warning, chosen icon)
+#### 40. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (warning, chosen icon)
 
 ```hurl
 # A todo
@@ -745,7 +898,7 @@ jsonpath "$.name" isString
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (decision, no icon)
+#### 41. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (decision, no icon)
 
 ```hurl
 # A todo

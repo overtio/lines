@@ -141,7 +141,97 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Numbered list, then Math block
+#### 15. Numbered list, then 3D model (openscad block), a colored part, an echo
+
+1. First
+2. Second
+   1. Nested
+3. Third
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Numbered list, then Flat model (openscad block)
+
+1. First
+2. Second
+   1. Nested
+3. Third
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Numbered list, then Broken model (openscad block)
+
+1. First
+2. Second
+   1. Nested
+3. Third
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Numbered list, then 3D model (stl block)
+
+1. First
+2. Second
+   1. Nested
+3. Third
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Numbered list, then Math block
 
 1. First
 2. Second
@@ -151,7 +241,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Numbered list, then Table
+#### 20. Numbered list, then Table
 
 1. First
 2. Second
@@ -162,7 +252,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Numbered list, then Table with formulas
+#### 21. Numbered list, then Table with formulas
 
 1. First
 2. Second
@@ -175,7 +265,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Numbered list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Numbered list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 1. First
 2. Second
@@ -197,7 +287,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Numbered list, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Numbered list, then Secret ({{name}}, kept in a locked secrets note)
 
 1. First
 2. Second
@@ -205,7 +295,7 @@ jsonpath "$.name" isString
 3. Third
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Numbered list, then API requests (http block): a variable, a named request and one using its response
+#### 24. Numbered list, then API requests (http block): a variable, a named request and one using its response
 
 1. First
 2. Second
@@ -222,7 +312,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Numbered list, then Spreadsheet (csv block)
+#### 25. Numbered list, then Spreadsheet (csv block)
 
 1. First
 2. Second
@@ -235,7 +325,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Numbered list, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Numbered list, then Named spreadsheet (csv name=), and a formula in another block using it
 
 1. First
 2. Second
@@ -250,7 +340,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Numbered list, then Divider
+#### 27. Numbered list, then Divider
 
 1. First
 2. Second
@@ -258,7 +348,7 @@ Total, =costs!B2*2
 3. Third
 ---
 
-#### 24. Numbered list, then Key: Value line
+#### 28. Numbered list, then Key: Value line
 
 1. First
 2. Second
@@ -266,7 +356,7 @@ Total, =costs!B2*2
 3. Third
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Numbered list, then Mention
+#### 29. Numbered list, then Mention
 
 1. First
 2. Second
@@ -274,7 +364,7 @@ Total, =costs!B2*2
 3. Third
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Numbered list, then Wiki link
+#### 30. Numbered list, then Wiki link
 
 1. First
 2. Second
@@ -282,7 +372,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 3. Third
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Numbered list, then Symbols
+#### 31. Numbered list, then Symbols
 
 1. First
 2. Second
@@ -290,7 +380,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 3. Third
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Numbered list, then GitHub links
+#### 32. Numbered list, then GitHub links
 
 1. First
 2. Second
@@ -298,7 +388,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 3. Third
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Numbered list, then Image
+#### 33. Numbered list, then Image
 
 1. First
 2. Second
@@ -306,7 +396,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 ![A sample picture](attachment:photo.png)
 
-#### 30. Numbered list, then Drawing
+#### 34. Numbered list, then Drawing
 
 1. First
 2. Second
@@ -314,7 +404,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Numbered list, then File
+#### 35. Numbered list, then File
 
 1. First
 2. Second
@@ -322,7 +412,15 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Numbered list, then Missing file
+#### 36. Numbered list, then Attached 3D model (STL)
+
+1. First
+2. Second
+   1. Nested
+3. Third
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Numbered list, then Missing file
 
 1. First
 2. Second
@@ -330,7 +428,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Numbered list, then Card
+#### 38. Numbered list, then Card
 
 1. First
 2. Second
@@ -340,7 +438,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 34. Numbered list, then Callout (info)
+#### 39. Numbered list, then Callout (info)
 
 1. First
 2. Second
@@ -350,7 +448,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 35. Numbered list, then Callout (warning, chosen icon)
+#### 40. Numbered list, then Callout (warning, chosen icon)
 
 1. First
 2. Second
@@ -360,7 +458,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Numbered list, then Callout (decision, no icon)
+#### 41. Numbered list, then Callout (decision, no icon)
 
 1. First
 2. Second

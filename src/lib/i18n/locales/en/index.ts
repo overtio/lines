@@ -9,6 +9,7 @@ import hurl from "./hurl";
 import latex from "./latex";
 import list from "./list";
 import lock from "./lock";
+import models from "./models";
 import picker from "./picker";
 import plugins from "./plugins";
 import print from "./print";
@@ -27,6 +28,7 @@ export default {
   ...latex,
   ...list,
   ...lock,
+  ...models,
   ...picker,
   ...plugins,
   ...print,

@@ -6,9 +6,9 @@ import { t } from "../i18n/index.svelte";
 import { codeLanguage } from "../editor/codeLanguages";
 import { loadMath, type Macros, NO_MACROS } from "../editor/math";
 import { unsplashImage } from "../editor/unsplash";
-import { attachmentName, attachmentURL, imageSize } from "../notes/attachments";
+import { attachmentName, attachmentURL, getAttachment, imageSize } from "../notes/attachments";
 import { symbolPieces } from "../notes/symbols";
-import type { Cells, FindSheet, MathEngine, Renderer } from "../plugins/types";
+import type { Cells, FileView, FindSheet, MathEngine, Renderer } from "../plugins/types";
 import { showFormulas } from "../sheets/formulas";
 
 /*
@@ -179,6 +179,22 @@ export class Parts {
       );
     } else this.#later(loaded(unsplashImage(src) ?? src));
     return img;
+  }
+
+  /**
+   * An attached file a plugin shows (a 3D model): its picture, with its name below. One that isn't
+   * on this device, or that can't be drawn, prints as its name.
+   */
+  viewedFile(viewer: FileView, name: string, label: string): HTMLElement {
+    const named = el("div", "doc-file", this.icon("paperclip", 13), label || name);
+    const dom = el("div", "doc-figure", named);
+    this.#later(
+      getAttachment(name)
+        .then((data) => (data ? viewer.print({ name, label: label || name, data }) : null))
+        .then((picture) => picture && dom.prepend(picture))
+        .catch(() => {}),
+    );
+    return dom;
   }
 
   /** An icon, as the app draws it (Lucide, so it prints the same everywhere). */

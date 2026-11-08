@@ -127,7 +127,93 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Callout (info), then Math block
+#### 15. Callout (info), then 3D model (openscad block), a colored part, an echo
+
+:::i
+Text in an info callout.
+:::
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Callout (info), then Flat model (openscad block)
+
+:::i
+Text in an info callout.
+:::
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Callout (info), then Broken model (openscad block)
+
+:::i
+Text in an info callout.
+:::
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Callout (info), then 3D model (stl block)
+
+:::i
+Text in an info callout.
+:::
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Callout (info), then Math block
 
 :::i
 Text in an info callout.
@@ -136,7 +222,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Callout (info), then Table
+#### 20. Callout (info), then Table
 
 :::i
 Text in an info callout.
@@ -146,7 +232,7 @@ Text in an info callout.
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Callout (info), then Table with formulas
+#### 21. Callout (info), then Table with formulas
 
 :::i
 Text in an info callout.
@@ -158,7 +244,7 @@ Text in an info callout.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Callout (info), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Callout (info), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 :::i
 Text in an info callout.
@@ -179,14 +265,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Callout (info), then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Callout (info), then Secret ({{name}}, kept in a locked secrets note)
 
 :::i
 Text in an info callout.
 :::
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Callout (info), then API requests (http block): a variable, a named request and one using its response
+#### 24. Callout (info), then API requests (http block): a variable, a named request and one using its response
 
 :::i
 Text in an info callout.
@@ -202,7 +288,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Callout (info), then Spreadsheet (csv block)
+#### 25. Callout (info), then Spreadsheet (csv block)
 
 :::i
 Text in an info callout.
@@ -214,7 +300,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Callout (info), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Callout (info), then Named spreadsheet (csv name=), and a formula in another block using it
 
 :::i
 Text in an info callout.
@@ -228,77 +314,84 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Callout (info), then Divider
+#### 27. Callout (info), then Divider
 
 :::i
 Text in an info callout.
 :::
 ---
 
-#### 24. Callout (info), then Key: Value line
+#### 28. Callout (info), then Key: Value line
 
 :::i
 Text in an info callout.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Callout (info), then Mention
+#### 29. Callout (info), then Mention
 
 :::i
 Text in an info callout.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Callout (info), then Wiki link
+#### 30. Callout (info), then Wiki link
 
 :::i
 Text in an info callout.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Callout (info), then Symbols
+#### 31. Callout (info), then Symbols
 
 :::i
 Text in an info callout.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Callout (info), then GitHub links
+#### 32. Callout (info), then GitHub links
 
 :::i
 Text in an info callout.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Callout (info), then Image
+#### 33. Callout (info), then Image
 
 :::i
 Text in an info callout.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 30. Callout (info), then Drawing
+#### 34. Callout (info), then Drawing
 
 :::i
 Text in an info callout.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Callout (info), then File
+#### 35. Callout (info), then File
 
 :::i
 Text in an info callout.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Callout (info), then Missing file
+#### 36. Callout (info), then Attached 3D model (STL)
+
+:::i
+Text in an info callout.
+:::
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Callout (info), then Missing file
 
 :::i
 Text in an info callout.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Callout (info), then Card
+#### 38. Callout (info), then Card
 
 :::i
 Text in an info callout.
@@ -307,7 +400,7 @@ Text in an info callout.
 Text in a card.
 :::
 
-#### 34. Callout (info), then Callout (info)
+#### 39. Callout (info), then Callout (info)
 
 :::i
 Text in an info callout.
@@ -316,7 +409,7 @@ Text in an info callout.
 Text in an info callout.
 :::
 
-#### 35. Callout (info), then Callout (warning, chosen icon)
+#### 40. Callout (info), then Callout (warning, chosen icon)
 
 :::i
 Text in an info callout.
@@ -325,7 +418,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Callout (info), then Callout (decision, no icon)
+#### 41. Callout (info), then Callout (decision, no icon)
 
 :::i
 Text in an info callout.

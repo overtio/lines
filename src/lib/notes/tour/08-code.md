@@ -1,4 +1,4 @@
-# Code, diagrams and math
+# Code, diagrams, models and math
 
 Write the language after the three backticks for syntax highlighting in your theme's colors:
 
@@ -33,6 +33,26 @@ pie title Where the time goes
   "Writing" : 55
   "Thinking" : 35
   "Formatting" : 10
+```
+
+## 3D models
+
+An `openscad` code block is [OpenSCAD](https://openscad.org) code, drawn as the model it makes. Drag it to turn it around, pinch (or hold ⌘ and scroll) to zoom, and click it to change its numbers: the model follows as you type. Its button downloads it as an STL file, ready for a 3D printer. Type `/model` to start one.
+
+```openscad
+// A pencil cup: try a taller one, or more holes.
+height = 40;
+radius = 18;
+holes = 10;
+
+difference() {
+  cylinder(h = height, r = radius, $fn = 64);
+  translate([0, 0, 2]) cylinder(h = height, r = radius - 2, $fn = 64);
+  for (i = [0 : holes - 1])
+    rotate([0, 0, i * 360 / holes])
+      translate([radius, 0, height / 2])
+        rotate([0, 90, 0]) cylinder(h = 6, r = 4, center = true, $fn = 24);
+}
 ```
 
 ## Drawings

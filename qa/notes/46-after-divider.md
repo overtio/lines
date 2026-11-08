@@ -99,14 +99,92 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Divider, then Math block
+#### 15. Divider, then 3D model (openscad block), a colored part, an echo
+
+---
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Divider, then Flat model (openscad block)
+
+---
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Divider, then Broken model (openscad block)
+
+---
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Divider, then 3D model (stl block)
+
+---
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Divider, then Math block
 
 ---
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Divider, then Table
+#### 20. Divider, then Table
 
 ---
 | Left | Center | Right |
@@ -114,7 +192,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Divider, then Table with formulas
+#### 21. Divider, then Table with formulas
 
 ---
 | Item | Cost |
@@ -124,7 +202,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Divider, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Divider, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ---
 ```hurl
@@ -143,12 +221,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Divider, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Divider, then Secret ({{name}}, kept in a locked secrets note)
 
 ---
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Divider, then API requests (http block): a variable, a named request and one using its response
+#### 24. Divider, then API requests (http block): a variable, a named request and one using its response
 
 ---
 ```http
@@ -162,7 +240,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Divider, then Spreadsheet (csv block)
+#### 25. Divider, then Spreadsheet (csv block)
 
 ---
 ```csv
@@ -172,7 +250,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Divider, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Divider, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ---
 ```csv name=costs
@@ -184,78 +262,83 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Divider, then Divider
+#### 27. Divider, then Divider
 
 ---
 ---
 
-#### 24. Divider, then Key: Value line
+#### 28. Divider, then Key: Value line
 
 ---
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Divider, then Mention
+#### 29. Divider, then Mention
 
 ---
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Divider, then Wiki link
+#### 30. Divider, then Wiki link
 
 ---
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Divider, then Symbols
+#### 31. Divider, then Symbols
 
 ---
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Divider, then GitHub links
+#### 32. Divider, then GitHub links
 
 ---
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Divider, then Image
+#### 33. Divider, then Image
 
 ---
 ![A sample picture](attachment:photo.png)
 
-#### 30. Divider, then Drawing
+#### 34. Divider, then Drawing
 
 ---
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Divider, then File
+#### 35. Divider, then File
 
 ---
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Divider, then Missing file
+#### 36. Divider, then Attached 3D model (STL)
+
+---
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Divider, then Missing file
 
 ---
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Divider, then Card
+#### 38. Divider, then Card
 
 ---
 ::: card
 Text in a card.
 :::
 
-#### 34. Divider, then Callout (info)
+#### 39. Divider, then Callout (info)
 
 ---
 :::i
 Text in an info callout.
 :::
 
-#### 35. Divider, then Callout (warning, chosen icon)
+#### 40. Divider, then Callout (warning, chosen icon)
 
 ---
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Divider, then Callout (decision, no icon)
+#### 41. Divider, then Callout (decision, no icon)
 
 ---
 :::^ icon=none

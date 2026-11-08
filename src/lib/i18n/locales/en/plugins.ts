@@ -26,6 +26,8 @@ export default {
   "plugins.pele.description": "Draws mermaid code blocks as flowcharts, sequence diagrams and more, quickly and in the theme’s colors, and adds /diagram.",
   "plugins.mermaid": "Diagrams (Mermaid)",
   "plugins.mermaid.description": "Draws mermaid code blocks with Mermaid itself, instead of Pele: slower to load, with diagrams laid out as GitHub lays them out. Adds /diagram.",
+  "plugins.models": "3D Models",
+  "plugins.models.description": "Draws 3D models to turn around and zoom into: openscad blocks, made from their code by OpenSCAD as you type, stl blocks, and attached OpenSCAD, STL, OBJ, 3MF, glTF, STEP and IGES files. Adds /model.",
   "plugins.ironcalc": "Formulas (IronCalc)",
   "plugins.ironcalc.description": "Works out formulas like =SUM(B2:B4) in tables and spreadsheets, and reads and writes Excel workbooks.",
   "plugins.tex": "TeX Typesetting",

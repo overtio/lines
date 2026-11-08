@@ -127,7 +127,93 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Callout (decision, no icon), then Math block
+#### 15. Callout (decision, no icon), then 3D model (openscad block), a colored part, an echo
+
+:::^ icon=none
+Text in a decision callout with no icon.
+:::
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Callout (decision, no icon), then Flat model (openscad block)
+
+:::^ icon=none
+Text in a decision callout with no icon.
+:::
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Callout (decision, no icon), then Broken model (openscad block)
+
+:::^ icon=none
+Text in a decision callout with no icon.
+:::
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Callout (decision, no icon), then 3D model (stl block)
+
+:::^ icon=none
+Text in a decision callout with no icon.
+:::
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Callout (decision, no icon), then Math block
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -136,7 +222,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Callout (decision, no icon), then Table
+#### 20. Callout (decision, no icon), then Table
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -146,7 +232,7 @@ Text in a decision callout with no icon.
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Callout (decision, no icon), then Table with formulas
+#### 21. Callout (decision, no icon), then Table with formulas
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -158,7 +244,7 @@ Text in a decision callout with no icon.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Callout (decision, no icon), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Callout (decision, no icon), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -179,14 +265,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Callout (decision, no icon), then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Callout (decision, no icon), then Secret ({{name}}, kept in a locked secrets note)
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Callout (decision, no icon), then API requests (http block): a variable, a named request and one using its response
+#### 24. Callout (decision, no icon), then API requests (http block): a variable, a named request and one using its response
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -202,7 +288,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Callout (decision, no icon), then Spreadsheet (csv block)
+#### 25. Callout (decision, no icon), then Spreadsheet (csv block)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -214,7 +300,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Callout (decision, no icon), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Callout (decision, no icon), then Named spreadsheet (csv name=), and a formula in another block using it
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -228,77 +314,84 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Callout (decision, no icon), then Divider
+#### 27. Callout (decision, no icon), then Divider
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 ---
 
-#### 24. Callout (decision, no icon), then Key: Value line
+#### 28. Callout (decision, no icon), then Key: Value line
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Callout (decision, no icon), then Mention
+#### 29. Callout (decision, no icon), then Mention
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Callout (decision, no icon), then Wiki link
+#### 30. Callout (decision, no icon), then Wiki link
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Callout (decision, no icon), then Symbols
+#### 31. Callout (decision, no icon), then Symbols
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Callout (decision, no icon), then GitHub links
+#### 32. Callout (decision, no icon), then GitHub links
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Callout (decision, no icon), then Image
+#### 33. Callout (decision, no icon), then Image
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 30. Callout (decision, no icon), then Drawing
+#### 34. Callout (decision, no icon), then Drawing
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Callout (decision, no icon), then File
+#### 35. Callout (decision, no icon), then File
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Callout (decision, no icon), then Missing file
+#### 36. Callout (decision, no icon), then Attached 3D model (STL)
+
+:::^ icon=none
+Text in a decision callout with no icon.
+:::
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Callout (decision, no icon), then Missing file
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Callout (decision, no icon), then Card
+#### 38. Callout (decision, no icon), then Card
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -307,7 +400,7 @@ Text in a decision callout with no icon.
 Text in a card.
 :::
 
-#### 34. Callout (decision, no icon), then Callout (info)
+#### 39. Callout (decision, no icon), then Callout (info)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -316,7 +409,7 @@ Text in a decision callout with no icon.
 Text in an info callout.
 :::
 
-#### 35. Callout (decision, no icon), then Callout (warning, chosen icon)
+#### 40. Callout (decision, no icon), then Callout (warning, chosen icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -325,7 +418,7 @@ Text in a decision callout with no icon.
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Callout (decision, no icon), then Callout (decision, no icon)
+#### 41. Callout (decision, no icon), then Callout (decision, no icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.

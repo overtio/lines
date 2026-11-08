@@ -127,7 +127,93 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Math block, then Math block
+#### 15. Math block, then 3D model (openscad block), a colored part, an echo
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Math block, then Flat model (openscad block)
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Math block, then Broken model (openscad block)
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Math block, then 3D model (stl block)
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Math block, then Math block
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -136,7 +222,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Math block, then Table
+#### 20. Math block, then Table
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -146,7 +232,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Math block, then Table with formulas
+#### 21. Math block, then Table with formulas
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -158,7 +244,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Math block, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Math block, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -179,14 +265,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Math block, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Math block, then Secret ({{name}}, kept in a locked secrets note)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Math block, then API requests (http block): a variable, a named request and one using its response
+#### 24. Math block, then API requests (http block): a variable, a named request and one using its response
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -202,7 +288,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Math block, then Spreadsheet (csv block)
+#### 25. Math block, then Spreadsheet (csv block)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -214,7 +300,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Math block, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Math block, then Named spreadsheet (csv name=), and a formula in another block using it
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -228,77 +314,84 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Math block, then Divider
+#### 27. Math block, then Divider
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 ---
 
-#### 24. Math block, then Key: Value line
+#### 28. Math block, then Key: Value line
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Math block, then Mention
+#### 29. Math block, then Mention
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Math block, then Wiki link
+#### 30. Math block, then Wiki link
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Math block, then Symbols
+#### 31. Math block, then Symbols
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Math block, then GitHub links
+#### 32. Math block, then GitHub links
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Math block, then Image
+#### 33. Math block, then Image
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 ![A sample picture](attachment:photo.png)
 
-#### 30. Math block, then Drawing
+#### 34. Math block, then Drawing
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Math block, then File
+#### 35. Math block, then File
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Math block, then Missing file
+#### 36. Math block, then Attached 3D model (STL)
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Math block, then Missing file
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Math block, then Card
+#### 38. Math block, then Card
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -307,7 +400,7 @@ $$
 Text in a card.
 :::
 
-#### 34. Math block, then Callout (info)
+#### 39. Math block, then Callout (info)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -316,7 +409,7 @@ $$
 Text in an info callout.
 :::
 
-#### 35. Math block, then Callout (warning, chosen icon)
+#### 40. Math block, then Callout (warning, chosen icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -325,7 +418,7 @@ $$
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Math block, then Callout (decision, no icon)
+#### 41. Math block, then Callout (decision, no icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}

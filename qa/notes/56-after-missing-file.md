@@ -99,14 +99,92 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Missing file, then Math block
+#### 15. Missing file, then 3D model (openscad block), a colored part, an echo
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Missing file, then Flat model (openscad block)
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Missing file, then Broken model (openscad block)
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Missing file, then 3D model (stl block)
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Missing file, then Math block
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Missing file, then Table
+#### 20. Missing file, then Table
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 | Left | Center | Right |
@@ -114,7 +192,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Missing file, then Table with formulas
+#### 21. Missing file, then Table with formulas
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 | Item | Cost |
@@ -124,7 +202,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Missing file, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Missing file, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ```hurl
@@ -143,12 +221,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Missing file, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Missing file, then Secret ({{name}}, kept in a locked secrets note)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Missing file, then API requests (http block): a variable, a named request and one using its response
+#### 24. Missing file, then API requests (http block): a variable, a named request and one using its response
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ```http
@@ -162,7 +240,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Missing file, then Spreadsheet (csv block)
+#### 25. Missing file, then Spreadsheet (csv block)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ```csv
@@ -172,7 +250,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Missing file, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Missing file, then Named spreadsheet (csv name=), and a formula in another block using it
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ```csv name=costs
@@ -184,78 +262,83 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Missing file, then Divider
+#### 27. Missing file, then Divider
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ---
 
-#### 24. Missing file, then Key: Value line
+#### 28. Missing file, then Key: Value line
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Missing file, then Mention
+#### 29. Missing file, then Mention
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Missing file, then Wiki link
+#### 30. Missing file, then Wiki link
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Missing file, then Symbols
+#### 31. Missing file, then Symbols
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Missing file, then GitHub links
+#### 32. Missing file, then GitHub links
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Missing file, then Image
+#### 33. Missing file, then Image
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ![A sample picture](attachment:photo.png)
 
-#### 30. Missing file, then Drawing
+#### 34. Missing file, then Drawing
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Missing file, then File
+#### 35. Missing file, then File
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Missing file, then Missing file
+#### 36. Missing file, then Attached 3D model (STL)
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Missing file, then Missing file
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Missing file, then Card
+#### 38. Missing file, then Card
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ::: card
 Text in a card.
 :::
 
-#### 34. Missing file, then Callout (info)
+#### 39. Missing file, then Callout (info)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::i
 Text in an info callout.
 :::
 
-#### 35. Missing file, then Callout (warning, chosen icon)
+#### 40. Missing file, then Callout (warning, chosen icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Missing file, then Callout (decision, no icon)
+#### 41. Missing file, then Callout (decision, no icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::^ icon=none

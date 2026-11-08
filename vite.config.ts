@@ -82,8 +82,11 @@ export default defineConfig({
     watch: { ignored: ["**/src-tauri/**"] },
   },
   envPrefix: ["VITE_", "TAURI_ENV_"],
+  // Workers as modules, as in development: OpenSCAD's worker imports OpenSCAD's own module (plugins/models/).
+  worker: { format: "es" },
   // IronCalc's WebAssembly loads from its own package (plugins/ironcalc/calc.ts), not pre-bundled.
-  optimizeDeps: { exclude: ["@ironcalc/wasm-xlsx"] },
+  // OpenCascade's reader is found only once a STEP file is shown, which would reload the page.
+  optimizeDeps: { exclude: ["@ironcalc/wasm-xlsx"], include: ["occt-import-js"] },
   build: {
     target: "es2022",
     sourcemap: !!process.env.TAURI_ENV_DEBUG,

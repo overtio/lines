@@ -165,6 +165,16 @@ How plugins work is in [plugins.md](plugins.md).
 - Only Markdown notes take additions from plugins; a renderer plugin draws code blocks in Markdown notes, not in LaTeX ones.
 - Turning a plugin off or on in the Mac app's Settings window hasn't been tried there yet, nor in floating notes (each window should follow at once).
 
+## 3D models
+
+- OpenSCAD has no fonts here, so `text()` makes nothing (with a warning), and no libraries (MCAD, BOSL2): `include` and `use` find only what's in the block or file. `import()` can't reach attached files either, and an attached `.scad` file can't use another.
+- OpenSCAD runs one model at a time, and stops one that takes more than a minute. While you type, a slow model is made again at each pause.
+- OpenSCAD is only there when the build includes it (`bun run openscad-assets`, see the README); a build without it says so in the block.
+- A glTF file is read only as `.glb`, or a `.gltf` with everything inside it: one whose parts are in other files, or compressed with Draco or meshopt, can't be read. An OBJ file shows without its materials (its `.mtl` isn't attached with it). A STEP or IGES file is drawn in one color per part, not per face, and a part it makes black is drawn in the theme's colors, as one with no color.
+- Models aren't measured or cut through, and there's no exploded view of an assembly; the size shown is the box around the whole model.
+- Very large meshes (over 300,000 triangles) are drawn without their edges, and a large STEP file can take some seconds to read the first time.
+- The models haven't been tried in the Mac, Windows, Linux or phone apps yet, nor turned with a finger on a real touch screen.
+
 ## API requests
 
 What isn't done yet is in [requests.md](requests.md#not-yet): environments, assertions and tests, bodies from files, forms with files, GraphQL and WebSocket, plain `http://` beyond this computer, and importing a Bruno or Postman collection.

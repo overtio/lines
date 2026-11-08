@@ -113,7 +113,89 @@ flowchart LR
 ```
 :::
 
-#### 15. Math block in a callout
+#### 15. 3D model (openscad block), a colored part, an echo in a callout
+
+:::i
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+:::
+
+#### 16. Flat model (openscad block) in a callout
+
+:::i
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+:::
+
+#### 17. Broken model (openscad block) in a callout
+
+:::i
+```openscad
+cube(10)
+sphere(3;
+```
+:::
+
+#### 18. 3D model (stl block) in a callout
+
+:::i
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+:::
+
+#### 19. Math block in a callout
 
 :::i
 $$
@@ -121,7 +203,7 @@ $$
 $$
 :::
 
-#### 16. Table in a callout
+#### 20. Table in a callout
 
 :::i
 | Left | Center | Right |
@@ -130,7 +212,7 @@ $$
 | longer cell text | `code` | 22 |
 :::
 
-#### 17. Table with formulas in a callout
+#### 21. Table with formulas in a callout
 
 :::i
 | Item | Cost |
@@ -141,7 +223,7 @@ $$
 | Broken | =B2/0 |
 :::
 
-#### 18. Hurl entries (hurl block): a capture used by the next entry, and asserts in a callout
+#### 22. Hurl entries (hurl block): a capture used by the next entry, and asserts in a callout
 
 :::i
 ```hurl
@@ -161,13 +243,13 @@ jsonpath "$.name" isString
 ```
 :::
 
-#### 19. Secret ({{name}}, kept in a locked secrets note) in a callout
+#### 23. Secret ({{name}}, kept in a locked secrets note) in a callout
 
 :::i
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::
 
-#### 20. API requests (http block): a variable, a named request and one using its response in a callout
+#### 24. API requests (http block): a variable, a named request and one using its response in a callout
 
 :::i
 ```http
@@ -182,7 +264,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 :::
 
-#### 21. Spreadsheet (csv block) in a callout
+#### 25. Spreadsheet (csv block) in a callout
 
 :::i
 ```csv
@@ -193,7 +275,7 @@ Total, =SUM(B2:B3)
 ```
 :::
 
-#### 22. Named spreadsheet (csv name=), and a formula in another block using it in a callout
+#### 26. Named spreadsheet (csv name=), and a formula in another block using it in a callout
 
 :::i
 ```csv name=costs
@@ -206,67 +288,73 @@ Total, =costs!B2*2
 ```
 :::
 
-#### 23. Divider in a callout
+#### 27. Divider in a callout
 
 :::i
 ---
 :::
 
-#### 24. Key: Value line in a callout
+#### 28. Key: Value line in a callout
 
 :::i
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 25. Mention in a callout
+#### 29. Mention in a callout
 
 :::i
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 26. Wiki link in a callout
+#### 30. Wiki link in a callout
 
 :::i
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 27. Symbols in a callout
+#### 31. Symbols in a callout
 
 :::i
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 28. GitHub links in a callout
+#### 32. GitHub links in a callout
 
 :::i
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 29. Image in a callout
+#### 33. Image in a callout
 
 :::i
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 30. Drawing in a callout
+#### 34. Drawing in a callout
 
 :::i
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 31. File in a callout
+#### 35. File in a callout
 
 :::i
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 32. Missing file in a callout
+#### 36. Attached 3D model (STL) in a callout
+
+:::i
+[Bracket.stl](attachment:bracket.stl)
+:::
+
+#### 37. Missing file in a callout
 
 :::i
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 33. Card in a callout
+#### 38. Card in a callout
 
 :::i
 ::: card
@@ -274,7 +362,7 @@ Text in a card.
 :::
 :::
 
-#### 34. Callout (info) in a callout
+#### 39. Callout (info) in a callout
 
 :::i
 :::i
@@ -282,7 +370,7 @@ Text in an info callout.
 :::
 :::
 
-#### 35. Callout (warning, chosen icon) in a callout
+#### 40. Callout (warning, chosen icon) in a callout
 
 :::i
 :::! icon=flag
@@ -290,7 +378,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 36. Callout (decision, no icon) in a callout
+#### 41. Callout (decision, no icon) in a callout
 
 :::i
 :::^ icon=none

@@ -141,7 +141,97 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Code block, then Math block
+#### 15. Code block, then 3D model (openscad block), a colored part, an echo
+
+```
+plain code
+  indented line
+```
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Code block, then Flat model (openscad block)
+
+```
+plain code
+  indented line
+```
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Code block, then Broken model (openscad block)
+
+```
+plain code
+  indented line
+```
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Code block, then 3D model (stl block)
+
+```
+plain code
+  indented line
+```
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Code block, then Math block
 
 ```
 plain code
@@ -151,7 +241,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Code block, then Table
+#### 20. Code block, then Table
 
 ```
 plain code
@@ -162,7 +252,7 @@ plain code
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Code block, then Table with formulas
+#### 21. Code block, then Table with formulas
 
 ```
 plain code
@@ -175,7 +265,7 @@ plain code
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Code block, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Code block, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ```
 plain code
@@ -197,7 +287,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Code block, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Code block, then Secret ({{name}}, kept in a locked secrets note)
 
 ```
 plain code
@@ -205,7 +295,7 @@ plain code
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Code block, then API requests (http block): a variable, a named request and one using its response
+#### 24. Code block, then API requests (http block): a variable, a named request and one using its response
 
 ```
 plain code
@@ -222,7 +312,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Code block, then Spreadsheet (csv block)
+#### 25. Code block, then Spreadsheet (csv block)
 
 ```
 plain code
@@ -235,7 +325,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Code block, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Code block, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```
 plain code
@@ -250,7 +340,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Code block, then Divider
+#### 27. Code block, then Divider
 
 ```
 plain code
@@ -258,7 +348,7 @@ plain code
 ```
 ---
 
-#### 24. Code block, then Key: Value line
+#### 28. Code block, then Key: Value line
 
 ```
 plain code
@@ -266,7 +356,7 @@ plain code
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Code block, then Mention
+#### 29. Code block, then Mention
 
 ```
 plain code
@@ -274,7 +364,7 @@ plain code
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Code block, then Wiki link
+#### 30. Code block, then Wiki link
 
 ```
 plain code
@@ -282,7 +372,7 @@ plain code
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Code block, then Symbols
+#### 31. Code block, then Symbols
 
 ```
 plain code
@@ -290,7 +380,7 @@ plain code
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Code block, then GitHub links
+#### 32. Code block, then GitHub links
 
 ```
 plain code
@@ -298,7 +388,7 @@ plain code
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Code block, then Image
+#### 33. Code block, then Image
 
 ```
 plain code
@@ -306,7 +396,7 @@ plain code
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 30. Code block, then Drawing
+#### 34. Code block, then Drawing
 
 ```
 plain code
@@ -314,7 +404,7 @@ plain code
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Code block, then File
+#### 35. Code block, then File
 
 ```
 plain code
@@ -322,7 +412,15 @@ plain code
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Code block, then Missing file
+#### 36. Code block, then Attached 3D model (STL)
+
+```
+plain code
+  indented line
+```
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Code block, then Missing file
 
 ```
 plain code
@@ -330,7 +428,7 @@ plain code
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Code block, then Card
+#### 38. Code block, then Card
 
 ```
 plain code
@@ -340,7 +438,7 @@ plain code
 Text in a card.
 :::
 
-#### 34. Code block, then Callout (info)
+#### 39. Code block, then Callout (info)
 
 ```
 plain code
@@ -350,7 +448,7 @@ plain code
 Text in an info callout.
 :::
 
-#### 35. Code block, then Callout (warning, chosen icon)
+#### 40. Code block, then Callout (warning, chosen icon)
 
 ```
 plain code
@@ -360,7 +458,7 @@ plain code
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Code block, then Callout (decision, no icon)
+#### 41. Code block, then Callout (decision, no icon)
 
 ```
 plain code

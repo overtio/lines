@@ -99,14 +99,92 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Heading 2, then Math block
+#### 15. Heading 2, then 3D model (openscad block), a colored part, an echo
+
+## Heading two
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Heading 2, then Flat model (openscad block)
+
+## Heading two
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Heading 2, then Broken model (openscad block)
+
+## Heading two
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Heading 2, then 3D model (stl block)
+
+## Heading two
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Heading 2, then Math block
 
 ## Heading two
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Heading 2, then Table
+#### 20. Heading 2, then Table
 
 ## Heading two
 | Left | Center | Right |
@@ -114,7 +192,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Heading 2, then Table with formulas
+#### 21. Heading 2, then Table with formulas
 
 ## Heading two
 | Item | Cost |
@@ -124,7 +202,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Heading 2, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Heading 2, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ## Heading two
 ```hurl
@@ -143,12 +221,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Heading 2, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Heading 2, then Secret ({{name}}, kept in a locked secrets note)
 
 ## Heading two
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Heading 2, then API requests (http block): a variable, a named request and one using its response
+#### 24. Heading 2, then API requests (http block): a variable, a named request and one using its response
 
 ## Heading two
 ```http
@@ -162,7 +240,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Heading 2, then Spreadsheet (csv block)
+#### 25. Heading 2, then Spreadsheet (csv block)
 
 ## Heading two
 ```csv
@@ -172,7 +250,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Heading 2, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Heading 2, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ## Heading two
 ```csv name=costs
@@ -184,78 +262,83 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Heading 2, then Divider
+#### 27. Heading 2, then Divider
 
 ## Heading two
 ---
 
-#### 24. Heading 2, then Key: Value line
+#### 28. Heading 2, then Key: Value line
 
 ## Heading two
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Heading 2, then Mention
+#### 29. Heading 2, then Mention
 
 ## Heading two
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Heading 2, then Wiki link
+#### 30. Heading 2, then Wiki link
 
 ## Heading two
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Heading 2, then Symbols
+#### 31. Heading 2, then Symbols
 
 ## Heading two
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Heading 2, then GitHub links
+#### 32. Heading 2, then GitHub links
 
 ## Heading two
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Heading 2, then Image
+#### 33. Heading 2, then Image
 
 ## Heading two
 ![A sample picture](attachment:photo.png)
 
-#### 30. Heading 2, then Drawing
+#### 34. Heading 2, then Drawing
 
 ## Heading two
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Heading 2, then File
+#### 35. Heading 2, then File
 
 ## Heading two
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Heading 2, then Missing file
+#### 36. Heading 2, then Attached 3D model (STL)
+
+## Heading two
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Heading 2, then Missing file
 
 ## Heading two
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Heading 2, then Card
+#### 38. Heading 2, then Card
 
 ## Heading two
 ::: card
 Text in a card.
 :::
 
-#### 34. Heading 2, then Callout (info)
+#### 39. Heading 2, then Callout (info)
 
 ## Heading two
 :::i
 Text in an info callout.
 :::
 
-#### 35. Heading 2, then Callout (warning, chosen icon)
+#### 40. Heading 2, then Callout (warning, chosen icon)
 
 ## Heading two
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Heading 2, then Callout (decision, no icon)
+#### 41. Heading 2, then Callout (decision, no icon)
 
 ## Heading two
 :::^ icon=none
