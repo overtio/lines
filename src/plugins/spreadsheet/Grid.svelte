@@ -1763,7 +1763,7 @@
               tabindex="-1"
               aria-selected={i === help.picked}
               data-highlighted={i === help.picked ? "" : undefined}
-              class="flex cursor-default flex-col gap-1 rounded-sm px-2.5 py-1.5 data-highlighted:bg-active"
+              class="flex cursor-pointer flex-col gap-1 rounded-sm px-2.5 py-1.5 data-highlighted:bg-active"
               onpointerdown={(event) => {
                 // The cell keeps the keyboard.
                 event.preventDefault();

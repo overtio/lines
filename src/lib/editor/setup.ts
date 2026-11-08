@@ -178,6 +178,7 @@ const theme = EditorView.theme({
     padding: "0 10px",
     borderRadius: "6px",
     color: "var(--text)",
+    cursor: "pointer",
   },
   ".cm-tooltip.cm-tooltip-autocomplete > ul > li[aria-selected]": {
     backgroundColor: "var(--active) !important",
