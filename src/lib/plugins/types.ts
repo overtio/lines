@@ -49,6 +49,8 @@ export interface Contributions {
   math?: MathEngine[];
   /** Engines that draw a code block of their language as a picture: ```mermaid as a diagram. */
   renderers?: Renderer[];
+  /** Ways to show attached files of some kinds in a note, rather than as a card naming them: a 3D model to turn. */
+  files?: FileView[];
   /** Ways to make a note's PDF other than lines' own pages, like TeX for LaTeX notes. */
   typesetters?: Typesetter[];
   /** Engines that work out formulas (`=SUM(B2:B4)`) in tables and spreadsheets. */
@@ -223,6 +225,28 @@ export interface BlockEditor {
   /** The editor's size or text size changed. */
   layout?(): void;
   destroy(): void;
+}
+
+/**
+ * Shows attached files of some kinds in a note, above the card naming them (a 3D model to turn), and
+ * on paper. An attached file is one on a line of its own, a link to it: `[Bracket.stl](../attachments/…)`.
+ */
+export interface FileView {
+  id: string;
+  /** The extensions of the files it shows, in lowercase: ["stl", "obj"]. */
+  extensions: string[];
+  /** Shows a file in `dom`, and gives back what takes it down. */
+  show(dom: HTMLElement, file: ViewedFile): { destroy(): void };
+  /** A picture of the file, for paper; rejects, with what's wrong, on a file it can't read. */
+  print(file: ViewedFile): Promise<Element>;
+}
+
+export interface ViewedFile {
+  /** The name it's attached as, which ends in its extension. */
+  name: string;
+  /** What it's called in the note, its link's text. */
+  label: string;
+  data: Blob;
 }
 
 export interface BlockAction {

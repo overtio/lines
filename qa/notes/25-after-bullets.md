@@ -155,7 +155,101 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Bullet list, then Math block
+#### 15. Bullet list, then 3D model (openscad block), a colored part, an echo
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Bullet list, then Flat model (openscad block)
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Bullet list, then Broken model (openscad block)
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Bullet list, then 3D model (stl block)
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Bullet list, then Math block
 
 - First item
 - Second item
@@ -166,7 +260,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Bullet list, then Table
+#### 20. Bullet list, then Table
 
 - First item
 - Second item
@@ -178,7 +272,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Bullet list, then Table with formulas
+#### 21. Bullet list, then Table with formulas
 
 - First item
 - Second item
@@ -192,7 +286,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Bullet list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Bullet list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 - First item
 - Second item
@@ -215,7 +309,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Bullet list, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Bullet list, then Secret ({{name}}, kept in a locked secrets note)
 
 - First item
 - Second item
@@ -224,7 +318,7 @@ jsonpath "$.name" isString
 - Last item
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Bullet list, then API requests (http block): a variable, a named request and one using its response
+#### 24. Bullet list, then API requests (http block): a variable, a named request and one using its response
 
 - First item
 - Second item
@@ -242,7 +336,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Bullet list, then Spreadsheet (csv block)
+#### 25. Bullet list, then Spreadsheet (csv block)
 
 - First item
 - Second item
@@ -256,7 +350,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Bullet list, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Bullet list, then Named spreadsheet (csv name=), and a formula in another block using it
 
 - First item
 - Second item
@@ -272,7 +366,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Bullet list, then Divider
+#### 27. Bullet list, then Divider
 
 - First item
 - Second item
@@ -281,7 +375,7 @@ Total, =costs!B2*2
 - Last item
 ---
 
-#### 24. Bullet list, then Key: Value line
+#### 28. Bullet list, then Key: Value line
 
 - First item
 - Second item
@@ -290,7 +384,7 @@ Total, =costs!B2*2
 - Last item
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Bullet list, then Mention
+#### 29. Bullet list, then Mention
 
 - First item
 - Second item
@@ -299,7 +393,7 @@ Total, =costs!B2*2
 - Last item
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Bullet list, then Wiki link
+#### 30. Bullet list, then Wiki link
 
 - First item
 - Second item
@@ -308,7 +402,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 - Last item
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Bullet list, then Symbols
+#### 31. Bullet list, then Symbols
 
 - First item
 - Second item
@@ -317,7 +411,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 - Last item
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Bullet list, then GitHub links
+#### 32. Bullet list, then GitHub links
 
 - First item
 - Second item
@@ -326,7 +420,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 - Last item
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Bullet list, then Image
+#### 33. Bullet list, then Image
 
 - First item
 - Second item
@@ -335,7 +429,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 ![A sample picture](attachment:photo.png)
 
-#### 30. Bullet list, then Drawing
+#### 34. Bullet list, then Drawing
 
 - First item
 - Second item
@@ -344,7 +438,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Bullet list, then File
+#### 35. Bullet list, then File
 
 - First item
 - Second item
@@ -353,7 +447,16 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Bullet list, then Missing file
+#### 36. Bullet list, then Attached 3D model (STL)
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Bullet list, then Missing file
 
 - First item
 - Second item
@@ -362,7 +465,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Bullet list, then Card
+#### 38. Bullet list, then Card
 
 - First item
 - Second item
@@ -373,7 +476,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 34. Bullet list, then Callout (info)
+#### 39. Bullet list, then Callout (info)
 
 - First item
 - Second item
@@ -384,7 +487,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 35. Bullet list, then Callout (warning, chosen icon)
+#### 40. Bullet list, then Callout (warning, chosen icon)
 
 - First item
 - Second item
@@ -395,7 +498,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Bullet list, then Callout (decision, no icon)
+#### 41. Bullet list, then Callout (decision, no icon)
 
 - First item
 - Second item

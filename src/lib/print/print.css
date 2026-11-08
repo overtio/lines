@@ -290,6 +290,19 @@
   height: auto;
 }
 
+/* A 3D model's picture (plugins/models/). */
+.doc .doc-model {
+  display: block;
+  width: 100%;
+  max-width: 150mm;
+  margin: 0 auto 0.3em;
+}
+
+.doc .doc-model-drawing svg {
+  width: 100%;
+  height: auto;
+}
+
 .doc .doc-math.is-display {
   margin: 0.5em 0 0.8em;
   overflow: hidden;

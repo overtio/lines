@@ -25,7 +25,8 @@
   import { lockedNotes } from "./lib/notes/locked.svelte";
   import { isClosed, notes } from "./lib/notes/store.svelte";
   import { plugins } from "./lib/plugins/registry.svelte";
-  import { copyText, isApple, isDesktopApp, isNewNoteShortcut, newNoteKey, revealFile, saveFile } from "./lib/platform";
+  import { copyText, isApple, isNewNoteShortcut, newNoteKey } from "./lib/platform";
+  import { saveAndShow } from "./lib/save";
   import { NOTE_MIN, ui, type MenuItem } from "./lib/ui.svelte";
   import { openSettings } from "./lib/windows/settings.svelte";
   import { PANE_WIDTHS, prefs } from "./lib/prefs.svelte";
@@ -271,13 +272,13 @@
       {
         label: t("app.downloadSource", { language: source }),
         icon: "download",
-        run: () => void save(`${filename}.${language.extensions[0]}`, async () => new TextEncoder().encode(language.file(body)), `${language.mimeType};charset=utf-8`),
+        run: () => void saveAndShow(`${filename}.${language.extensions[0]}`, async () => new TextEncoder().encode(language.file(body)), `${language.mimeType};charset=utf-8`),
       },
       // Other files it can be, like a spreadsheet's Excel workbook.
       ...(language.exports ?? []).map((download) => ({
         label: download.label,
         icon: download.icon,
-        run: () => void save(`${filename}.${download.extension}`, () => download.write(body), download.mimeType),
+        run: () => void saveAndShow(`${filename}.${download.extension}`, () => download.write(body), download.mimeType),
       })),
     );
     const id = selected.note.id;
@@ -291,21 +292,6 @@
     const rect = anchor.getBoundingClientRect();
     shareOpen = true;
     ui.openMenu({ x: rect.right, y: rect.bottom + 6, align: "end", anchor, label: t("app.share"), items, onclose: () => (shareOpen = false) });
-  }
-
-  /**
-   * Saves a note as a file: downloaded on the web, into Downloads in the apps, and shown in Finder
-   * (or the file manager) on a computer, since nothing else shows it happened.
-   */
-  async function save(filename: string, write: () => Promise<Uint8Array<ArrayBuffer>>, type: string) {
-    try {
-      const path = await saveFile(filename, await write(), type);
-      speak(path ? t("print.savedTo", { path }) : t("print.downloaded", { filename }));
-      if (path && isDesktopApp) await revealFile(path);
-    } catch (error) {
-      console.error("lines: couldn't save the note as a file", error);
-      speak(t("app.saveFailed", { filename }));
-    }
   }
 
   /** Copying shows nothing, so screen readers are told it happened. */

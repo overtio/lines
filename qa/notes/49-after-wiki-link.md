@@ -99,14 +99,92 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Wiki link, then Math block
+#### 15. Wiki link, then 3D model (openscad block), a colored part, an echo
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Wiki link, then Flat model (openscad block)
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Wiki link, then Broken model (openscad block)
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Wiki link, then 3D model (stl block)
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Wiki link, then Math block
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Wiki link, then Table
+#### 20. Wiki link, then Table
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 | Left | Center | Right |
@@ -114,7 +192,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Wiki link, then Table with formulas
+#### 21. Wiki link, then Table with formulas
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 | Item | Cost |
@@ -124,7 +202,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Wiki link, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Wiki link, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ```hurl
@@ -143,12 +221,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Wiki link, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Wiki link, then Secret ({{name}}, kept in a locked secrets note)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Wiki link, then API requests (http block): a variable, a named request and one using its response
+#### 24. Wiki link, then API requests (http block): a variable, a named request and one using its response
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ```http
@@ -162,7 +240,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Wiki link, then Spreadsheet (csv block)
+#### 25. Wiki link, then Spreadsheet (csv block)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ```csv
@@ -172,7 +250,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Wiki link, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Wiki link, then Named spreadsheet (csv name=), and a formula in another block using it
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ```csv name=costs
@@ -184,78 +262,83 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Wiki link, then Divider
+#### 27. Wiki link, then Divider
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ---
 
-#### 24. Wiki link, then Key: Value line
+#### 28. Wiki link, then Key: Value line
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Wiki link, then Mention
+#### 29. Wiki link, then Mention
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Wiki link, then Wiki link
+#### 30. Wiki link, then Wiki link
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Wiki link, then Symbols
+#### 31. Wiki link, then Symbols
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Wiki link, then GitHub links
+#### 32. Wiki link, then GitHub links
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Wiki link, then Image
+#### 33. Wiki link, then Image
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ![A sample picture](attachment:photo.png)
 
-#### 30. Wiki link, then Drawing
+#### 34. Wiki link, then Drawing
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Wiki link, then File
+#### 35. Wiki link, then File
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Wiki link, then Missing file
+#### 36. Wiki link, then Attached 3D model (STL)
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Wiki link, then Missing file
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Wiki link, then Card
+#### 38. Wiki link, then Card
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ::: card
 Text in a card.
 :::
 
-#### 34. Wiki link, then Callout (info)
+#### 39. Wiki link, then Callout (info)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::i
 Text in an info callout.
 :::
 
-#### 35. Wiki link, then Callout (warning, chosen icon)
+#### 40. Wiki link, then Callout (warning, chosen icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Wiki link, then Callout (decision, no icon)
+#### 41. Wiki link, then Callout (decision, no icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::^ icon=none

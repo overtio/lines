@@ -99,14 +99,92 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Image, then Math block
+#### 15. Image, then 3D model (openscad block), a colored part, an echo
+
+![A sample picture](attachment:photo.png)
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Image, then Flat model (openscad block)
+
+![A sample picture](attachment:photo.png)
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Image, then Broken model (openscad block)
+
+![A sample picture](attachment:photo.png)
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Image, then 3D model (stl block)
+
+![A sample picture](attachment:photo.png)
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Image, then Math block
 
 ![A sample picture](attachment:photo.png)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Image, then Table
+#### 20. Image, then Table
 
 ![A sample picture](attachment:photo.png)
 | Left | Center | Right |
@@ -114,7 +192,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Image, then Table with formulas
+#### 21. Image, then Table with formulas
 
 ![A sample picture](attachment:photo.png)
 | Item | Cost |
@@ -124,7 +202,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Image, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Image, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ![A sample picture](attachment:photo.png)
 ```hurl
@@ -143,12 +221,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Image, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Image, then Secret ({{name}}, kept in a locked secrets note)
 
 ![A sample picture](attachment:photo.png)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Image, then API requests (http block): a variable, a named request and one using its response
+#### 24. Image, then API requests (http block): a variable, a named request and one using its response
 
 ![A sample picture](attachment:photo.png)
 ```http
@@ -162,7 +240,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Image, then Spreadsheet (csv block)
+#### 25. Image, then Spreadsheet (csv block)
 
 ![A sample picture](attachment:photo.png)
 ```csv
@@ -172,7 +250,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Image, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Image, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ![A sample picture](attachment:photo.png)
 ```csv name=costs
@@ -184,78 +262,83 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Image, then Divider
+#### 27. Image, then Divider
 
 ![A sample picture](attachment:photo.png)
 ---
 
-#### 24. Image, then Key: Value line
+#### 28. Image, then Key: Value line
 
 ![A sample picture](attachment:photo.png)
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Image, then Mention
+#### 29. Image, then Mention
 
 ![A sample picture](attachment:photo.png)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Image, then Wiki link
+#### 30. Image, then Wiki link
 
 ![A sample picture](attachment:photo.png)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Image, then Symbols
+#### 31. Image, then Symbols
 
 ![A sample picture](attachment:photo.png)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Image, then GitHub links
+#### 32. Image, then GitHub links
 
 ![A sample picture](attachment:photo.png)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Image, then Image
+#### 33. Image, then Image
 
 ![A sample picture](attachment:photo.png)
 ![A sample picture](attachment:photo.png)
 
-#### 30. Image, then Drawing
+#### 34. Image, then Drawing
 
 ![A sample picture](attachment:photo.png)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Image, then File
+#### 35. Image, then File
 
 ![A sample picture](attachment:photo.png)
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Image, then Missing file
+#### 36. Image, then Attached 3D model (STL)
+
+![A sample picture](attachment:photo.png)
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Image, then Missing file
 
 ![A sample picture](attachment:photo.png)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Image, then Card
+#### 38. Image, then Card
 
 ![A sample picture](attachment:photo.png)
 ::: card
 Text in a card.
 :::
 
-#### 34. Image, then Callout (info)
+#### 39. Image, then Callout (info)
 
 ![A sample picture](attachment:photo.png)
 :::i
 Text in an info callout.
 :::
 
-#### 35. Image, then Callout (warning, chosen icon)
+#### 40. Image, then Callout (warning, chosen icon)
 
 ![A sample picture](attachment:photo.png)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Image, then Callout (decision, no icon)
+#### 41. Image, then Callout (decision, no icon)
 
 ![A sample picture](attachment:photo.png)
 :::^ icon=none

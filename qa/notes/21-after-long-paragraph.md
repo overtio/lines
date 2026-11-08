@@ -99,14 +99,92 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Long paragraph, then Math block
+#### 15. Long paragraph, then 3D model (openscad block), a colored part, an echo
+
+A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Long paragraph, then Flat model (openscad block)
+
+A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Long paragraph, then Broken model (openscad block)
+
+A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Long paragraph, then 3D model (stl block)
+
+A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Long paragraph, then Math block
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Long paragraph, then Table
+#### 20. Long paragraph, then Table
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 | Left | Center | Right |
@@ -114,7 +192,7 @@ A long paragraph that wraps onto several lines at the usual width, so the space 
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Long paragraph, then Table with formulas
+#### 21. Long paragraph, then Table with formulas
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 | Item | Cost |
@@ -124,7 +202,7 @@ A long paragraph that wraps onto several lines at the usual width, so the space 
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Long paragraph, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Long paragraph, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ```hurl
@@ -143,12 +221,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Long paragraph, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Long paragraph, then Secret ({{name}}, kept in a locked secrets note)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Long paragraph, then API requests (http block): a variable, a named request and one using its response
+#### 24. Long paragraph, then API requests (http block): a variable, a named request and one using its response
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ```http
@@ -162,7 +240,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Long paragraph, then Spreadsheet (csv block)
+#### 25. Long paragraph, then Spreadsheet (csv block)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ```csv
@@ -172,7 +250,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Long paragraph, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Long paragraph, then Named spreadsheet (csv name=), and a formula in another block using it
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ```csv name=costs
@@ -184,78 +262,83 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Long paragraph, then Divider
+#### 27. Long paragraph, then Divider
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ---
 
-#### 24. Long paragraph, then Key: Value line
+#### 28. Long paragraph, then Key: Value line
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Long paragraph, then Mention
+#### 29. Long paragraph, then Mention
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Long paragraph, then Wiki link
+#### 30. Long paragraph, then Wiki link
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Long paragraph, then Symbols
+#### 31. Long paragraph, then Symbols
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Long paragraph, then GitHub links
+#### 32. Long paragraph, then GitHub links
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Long paragraph, then Image
+#### 33. Long paragraph, then Image
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ![A sample picture](attachment:photo.png)
 
-#### 30. Long paragraph, then Drawing
+#### 34. Long paragraph, then Drawing
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Long paragraph, then File
+#### 35. Long paragraph, then File
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Long paragraph, then Missing file
+#### 36. Long paragraph, then Attached 3D model (STL)
+
+A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Long paragraph, then Missing file
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Long paragraph, then Card
+#### 38. Long paragraph, then Card
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ::: card
 Text in a card.
 :::
 
-#### 34. Long paragraph, then Callout (info)
+#### 39. Long paragraph, then Callout (info)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 :::i
 Text in an info callout.
 :::
 
-#### 35. Long paragraph, then Callout (warning, chosen icon)
+#### 40. Long paragraph, then Callout (warning, chosen icon)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Long paragraph, then Callout (decision, no icon)
+#### 41. Long paragraph, then Callout (decision, no icon)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 :::^ icon=none

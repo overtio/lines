@@ -31,6 +31,8 @@ export default {
   // A Mermaid diagram.
   "editor.slash.diagram": "Diagram",
   "editor.slash.diagram.keywords": "mermaid flowchart chart graph sequence",
+  "editor.slash.model": "3D model",
+  "editor.slash.model.keywords": "openscad scad cad 3d model stl mesh print solid",
   "editor.slash.request": "API request",
   "editor.slash.request.keywords": "http rest api request curl get post fetch endpoint",
   "editor.slash.hurl": "Hurl test",

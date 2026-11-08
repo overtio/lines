@@ -136,6 +136,12 @@ Montoreano, Assistant (c) The Assistant Project Authors, Cascadia Code (c)
 Microsoft, Liberation Sans (c) Red Hat, all under the SIL Open Font License
 1.1; Comic Shanns (c) Shannon Miwa, MIT.
 
+OpenSCAD, which makes 3D models from their code (the OpenSCAD project's own
+WebAssembly build, from files.openscad.org): (c) Clifford Wolf, Marius Kintel
+and the OpenSCAD contributors, under the GNU General Public License. Its source,
+and the libraries it's built with (CGAL, Manifold and others), are at
+https://github.com/openscad/openscad.
+
 `;
 
 const text =

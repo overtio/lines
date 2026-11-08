@@ -189,7 +189,7 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
     }
   }
 
-  /** The one thing a paragraph holds, if it holds nothing else: an image, or a type table's line. */
+  /** The one thing a paragraph holds, if it holds nothing else: an image, a file a plugin shows, or a type table's line. */
   function lone(node: SyntaxNode): HTMLElement | null {
     const written = slice(node.from, node.to).trim();
     const ref = readTypeRef(written);
@@ -200,6 +200,13 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
       const figure = el("div", "doc-figure");
       inlineNode(only, figure);
       return figure;
+    }
+    const url = only.name === "Link" ? only.getChild("URL") : null;
+    const name = url && attachmentName(slice(url.from, url.to));
+    const viewer = name && plugins.fileView(name);
+    if (name && viewer) {
+      const marks = only.getChildren("LinkMark");
+      return parts.viewedFile(viewer, name, slice(marks[0]?.to ?? only.from, marks[1]?.from ?? only.from).replace(/\\(.)/g, "$1"));
     }
     if (only.name === "URL" && isUnsplashPhoto(written)) return el("div", "doc-figure", parts.image(written, ""));
     return null;

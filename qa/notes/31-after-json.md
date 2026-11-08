@@ -127,7 +127,93 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. JSON block (no language), then Math block
+#### 15. JSON block (no language), then 3D model (openscad block), a colored part, an echo
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. JSON block (no language), then Flat model (openscad block)
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. JSON block (no language), then Broken model (openscad block)
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. JSON block (no language), then 3D model (stl block)
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. JSON block (no language), then Math block
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -136,7 +222,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. JSON block (no language), then Table
+#### 20. JSON block (no language), then Table
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -146,7 +232,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. JSON block (no language), then Table with formulas
+#### 21. JSON block (no language), then Table with formulas
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -158,7 +244,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. JSON block (no language), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. JSON block (no language), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -179,14 +265,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. JSON block (no language), then Secret ({{name}}, kept in a locked secrets note)
+#### 23. JSON block (no language), then Secret ({{name}}, kept in a locked secrets note)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. JSON block (no language), then API requests (http block): a variable, a named request and one using its response
+#### 24. JSON block (no language), then API requests (http block): a variable, a named request and one using its response
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -202,7 +288,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. JSON block (no language), then Spreadsheet (csv block)
+#### 25. JSON block (no language), then Spreadsheet (csv block)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -214,7 +300,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. JSON block (no language), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. JSON block (no language), then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -228,77 +314,84 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. JSON block (no language), then Divider
+#### 27. JSON block (no language), then Divider
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ---
 
-#### 24. JSON block (no language), then Key: Value line
+#### 28. JSON block (no language), then Key: Value line
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. JSON block (no language), then Mention
+#### 29. JSON block (no language), then Mention
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. JSON block (no language), then Wiki link
+#### 30. JSON block (no language), then Wiki link
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. JSON block (no language), then Symbols
+#### 31. JSON block (no language), then Symbols
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. JSON block (no language), then GitHub links
+#### 32. JSON block (no language), then GitHub links
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. JSON block (no language), then Image
+#### 33. JSON block (no language), then Image
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 30. JSON block (no language), then Drawing
+#### 34. JSON block (no language), then Drawing
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. JSON block (no language), then File
+#### 35. JSON block (no language), then File
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 32. JSON block (no language), then Missing file
+#### 36. JSON block (no language), then Attached 3D model (STL)
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. JSON block (no language), then Missing file
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. JSON block (no language), then Card
+#### 38. JSON block (no language), then Card
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -307,7 +400,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 34. JSON block (no language), then Callout (info)
+#### 39. JSON block (no language), then Callout (info)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -316,7 +409,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 35. JSON block (no language), then Callout (warning, chosen icon)
+#### 40. JSON block (no language), then Callout (warning, chosen icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -325,7 +418,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. JSON block (no language), then Callout (decision, no icon)
+#### 41. JSON block (no language), then Callout (decision, no icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}

@@ -169,7 +169,105 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Table with formulas, then Math block
+#### 15. Table with formulas, then 3D model (openscad block), a colored part, an echo
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Table with formulas, then Flat model (openscad block)
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Table with formulas, then Broken model (openscad block)
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Table with formulas, then 3D model (stl block)
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Table with formulas, then Math block
 
 | Item | Cost |
 | --- | ---: |
@@ -181,7 +279,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Table with formulas, then Table
+#### 20. Table with formulas, then Table
 
 | Item | Cost |
 | --- | ---: |
@@ -194,7 +292,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Table with formulas, then Table with formulas
+#### 21. Table with formulas, then Table with formulas
 
 | Item | Cost |
 | --- | ---: |
@@ -209,7 +307,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Table with formulas, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Table with formulas, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 | Item | Cost |
 | --- | ---: |
@@ -233,7 +331,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Table with formulas, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Table with formulas, then Secret ({{name}}, kept in a locked secrets note)
 
 | Item | Cost |
 | --- | ---: |
@@ -243,7 +341,7 @@ jsonpath "$.name" isString
 | Broken | =B2/0 |
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Table with formulas, then API requests (http block): a variable, a named request and one using its response
+#### 24. Table with formulas, then API requests (http block): a variable, a named request and one using its response
 
 | Item | Cost |
 | --- | ---: |
@@ -262,7 +360,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Table with formulas, then Spreadsheet (csv block)
+#### 25. Table with formulas, then Spreadsheet (csv block)
 
 | Item | Cost |
 | --- | ---: |
@@ -277,7 +375,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Table with formulas, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Table with formulas, then Named spreadsheet (csv name=), and a formula in another block using it
 
 | Item | Cost |
 | --- | ---: |
@@ -294,7 +392,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Table with formulas, then Divider
+#### 27. Table with formulas, then Divider
 
 | Item | Cost |
 | --- | ---: |
@@ -304,7 +402,7 @@ Total, =costs!B2*2
 | Broken | =B2/0 |
 ---
 
-#### 24. Table with formulas, then Key: Value line
+#### 28. Table with formulas, then Key: Value line
 
 | Item | Cost |
 | --- | ---: |
@@ -314,7 +412,7 @@ Total, =costs!B2*2
 | Broken | =B2/0 |
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Table with formulas, then Mention
+#### 29. Table with formulas, then Mention
 
 | Item | Cost |
 | --- | ---: |
@@ -324,7 +422,7 @@ Total, =costs!B2*2
 | Broken | =B2/0 |
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Table with formulas, then Wiki link
+#### 30. Table with formulas, then Wiki link
 
 | Item | Cost |
 | --- | ---: |
@@ -334,7 +432,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 | Broken | =B2/0 |
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Table with formulas, then Symbols
+#### 31. Table with formulas, then Symbols
 
 | Item | Cost |
 | --- | ---: |
@@ -344,7 +442,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | Broken | =B2/0 |
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Table with formulas, then GitHub links
+#### 32. Table with formulas, then GitHub links
 
 | Item | Cost |
 | --- | ---: |
@@ -354,7 +452,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | Broken | =B2/0 |
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Table with formulas, then Image
+#### 33. Table with formulas, then Image
 
 | Item | Cost |
 | --- | ---: |
@@ -364,7 +462,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 ![A sample picture](attachment:photo.png)
 
-#### 30. Table with formulas, then Drawing
+#### 34. Table with formulas, then Drawing
 
 | Item | Cost |
 | --- | ---: |
@@ -374,7 +472,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Table with formulas, then File
+#### 35. Table with formulas, then File
 
 | Item | Cost |
 | --- | ---: |
@@ -384,7 +482,17 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Table with formulas, then Missing file
+#### 36. Table with formulas, then Attached 3D model (STL)
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Table with formulas, then Missing file
 
 | Item | Cost |
 | --- | ---: |
@@ -394,7 +502,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Table with formulas, then Card
+#### 38. Table with formulas, then Card
 
 | Item | Cost |
 | --- | ---: |
@@ -406,7 +514,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 34. Table with formulas, then Callout (info)
+#### 39. Table with formulas, then Callout (info)
 
 | Item | Cost |
 | --- | ---: |
@@ -418,7 +526,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 35. Table with formulas, then Callout (warning, chosen icon)
+#### 40. Table with formulas, then Callout (warning, chosen icon)
 
 | Item | Cost |
 | --- | ---: |
@@ -430,7 +538,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Table with formulas, then Callout (decision, no icon)
+#### 41. Table with formulas, then Callout (decision, no icon)
 
 | Item | Cost |
 | --- | ---: |

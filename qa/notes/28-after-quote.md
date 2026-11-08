@@ -113,7 +113,89 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Quote, then Math block
+#### 15. Quote, then 3D model (openscad block), a colored part, an echo
+
+> A quote that runs over
+> two lines.
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Quote, then Flat model (openscad block)
+
+> A quote that runs over
+> two lines.
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Quote, then Broken model (openscad block)
+
+> A quote that runs over
+> two lines.
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. Quote, then 3D model (stl block)
+
+> A quote that runs over
+> two lines.
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Quote, then Math block
 
 > A quote that runs over
 > two lines.
@@ -121,7 +203,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Quote, then Table
+#### 20. Quote, then Table
 
 > A quote that runs over
 > two lines.
@@ -130,7 +212,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Quote, then Table with formulas
+#### 21. Quote, then Table with formulas
 
 > A quote that runs over
 > two lines.
@@ -141,7 +223,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Quote, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 22. Quote, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 > A quote that runs over
 > two lines.
@@ -161,13 +243,13 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Quote, then Secret ({{name}}, kept in a locked secrets note)
+#### 23. Quote, then Secret ({{name}}, kept in a locked secrets note)
 
 > A quote that runs over
 > two lines.
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. Quote, then API requests (http block): a variable, a named request and one using its response
+#### 24. Quote, then API requests (http block): a variable, a named request and one using its response
 
 > A quote that runs over
 > two lines.
@@ -182,7 +264,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Quote, then Spreadsheet (csv block)
+#### 25. Quote, then Spreadsheet (csv block)
 
 > A quote that runs over
 > two lines.
@@ -193,7 +275,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Quote, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 26. Quote, then Named spreadsheet (csv name=), and a formula in another block using it
 
 > A quote that runs over
 > two lines.
@@ -206,67 +288,73 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Quote, then Divider
+#### 27. Quote, then Divider
 
 > A quote that runs over
 > two lines.
 ---
 
-#### 24. Quote, then Key: Value line
+#### 28. Quote, then Key: Value line
 
 > A quote that runs over
 > two lines.
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Quote, then Mention
+#### 29. Quote, then Mention
 
 > A quote that runs over
 > two lines.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Quote, then Wiki link
+#### 30. Quote, then Wiki link
 
 > A quote that runs over
 > two lines.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Quote, then Symbols
+#### 31. Quote, then Symbols
 
 > A quote that runs over
 > two lines.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. Quote, then GitHub links
+#### 32. Quote, then GitHub links
 
 > A quote that runs over
 > two lines.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Quote, then Image
+#### 33. Quote, then Image
 
 > A quote that runs over
 > two lines.
 ![A sample picture](attachment:photo.png)
 
-#### 30. Quote, then Drawing
+#### 34. Quote, then Drawing
 
 > A quote that runs over
 > two lines.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. Quote, then File
+#### 35. Quote, then File
 
 > A quote that runs over
 > two lines.
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Quote, then Missing file
+#### 36. Quote, then Attached 3D model (STL)
+
+> A quote that runs over
+> two lines.
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Quote, then Missing file
 
 > A quote that runs over
 > two lines.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Quote, then Card
+#### 38. Quote, then Card
 
 > A quote that runs over
 > two lines.
@@ -274,7 +362,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 34. Quote, then Callout (info)
+#### 39. Quote, then Callout (info)
 
 > A quote that runs over
 > two lines.
@@ -282,7 +370,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 35. Quote, then Callout (warning, chosen icon)
+#### 40. Quote, then Callout (warning, chosen icon)
 
 > A quote that runs over
 > two lines.
@@ -290,7 +378,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Quote, then Callout (decision, no icon)
+#### 41. Quote, then Callout (decision, no icon)
 
 > A quote that runs over
 > two lines.

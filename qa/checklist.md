@@ -220,6 +220,24 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] A note switched to Hurl: Send at the end of each request line, ⌘⇧↵ sends all, the comment above each request is in the outline; importing a `.hurl` file makes a Hurl note
 - [ ] [Desktop] An entry without `location: true` shows a redirect's own status (`HTTP 302`); with it, the page it leads to
 
+## 6d. 3D models
+
+- [ ] `/model` (right after Diagram in the "/" menu) puts in an ` ```openscad ` block with a cube that has a sphere cut out of it, the cursor in its code, and the model drawn below as you type
+- [ ] An ` ```openscad ` block draws its model in a light tint of the accent, lit from the top left, with its edges drawn and its size (X × Y × Z) in the bottom right corner; ` ```scad ` too. Parts with `color("tomato")` keep their color; faces `difference()` cut are in the model's own color, not OpenSCAD's green
+- [ ] Dragging a model turns it, without moving the cursor or showing the code; a right drag, ⇧ drag or two-finger drag moves it; pinching (or ⌘ or Ctrl with the scroll wheel) zooms; the wheel alone scrolls the note. On a phone, swiping up or down over a model scrolls the note, and across turns it
+- [ ] Once moved, a round-arrow button in its top left corner puts it back; clicking it doesn't show the code
+- [ ] Clicking a model (without dragging) shows its code with the model below it, as it was turned; typing makes it again after a pause, keeping the view; a broken one shows OpenSCAD's error with its line (`Parser error: syntax error, line 2`) in red, and fixing it brings the model back
+- [ ] `echo()` and warnings show in small text under the model
+- [ ] A flat model (`square(20); circle(8);`) draws as a drawing in the accent, with a resize handle, as a diagram's
+- [ ] Hovering a model shows a download button: it saves the model as an STL file named after the block (` ```openscad name=bracket `) or the note, into Downloads [Desktop] (shown in Finder) or as a download [Web]; a flat model downloads as SVG. No button on a broken model
+- [ ] An ` ```stl ` block of text STL (`solid … endsolid`) draws as a model
+- [ ] Tab to a model (Esc, then Tab, from the text): it shows a focus ring; ← → ↑ ↓ turn it, with ⇧ they move it, + and − zoom, 0 puts it back, and none of these move the cursor in the note. VoiceOver reads "3D model, 20 × 20 × 20" and how to turn it
+- [ ] Attaching an STL, OBJ, PLY, OFF, 3MF, GLB, STEP or IGES file shows it as a model above its file card, and a `.scad` file as the model its code makes (a flat one as its drawing; broken code as OpenSCAD's error) ("Reading the model…" while it's read; a big STEP file can take a few seconds); STEP and 3MF files keep their colors; a part with no color, or black (`Cube.igs` from occt-import-js's tests), is in the theme's tint. Dragging turns it, a click selects its line, a double-click opens the file. A file that can't be read says so, with the card still there
+- [ ] Changing theme or light/dark recolors every model, in blocks and attached; the views stay as turned
+- [ ] The PDF preview and PNGs show each model as a picture, light grey with black edges (colored parts in their colors), from where it's first seen; an attached one has its file's name below it
+- [ ] In a build without OpenSCAD (`public/openscad` missing), an ` ```openscad ` block says so; attached files and ` ```stl ` blocks still draw
+- [ ] A note with ten models scrolls smoothly, and they draw as they come into view
+
 ## 7. Images and files
 
 - [ ] Pasting an image, or dropping one onto a note, adds it on its own line; the cursor moves past it
@@ -345,12 +363,13 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 13a. Plugins
 
-- [ ] Settings → Plugins lists Secrets under More; Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
+- [ ] Settings → Plugins lists Secrets under More; Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams (Pele), Diagrams (Mermaid), 3D Models, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
 - [ ] Clicking a plugin's name (or its switch) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
 - [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On, and its format switch offers only Markdown and Spreadsheet; Turn On draws it as LaTeX again at once
 - [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
 - [ ] Turning TeX Typesetting on while LaTeX is off turns LaTeX on too
 - [ ] API Requests off: ```http and ```hurl blocks show as plain code with no Send buttons, `/request` and `/hurl` are gone, and HTTP Requests and Hurl notes show as plain text; on again, all back
+- [ ] 3D Models off: ```openscad and ```stl blocks show as code, `/model` is gone, attached models show as file cards, and the PDF prints the blocks as code; on again, drawn again
 - [ ] Diagrams (Pele) is on and Diagrams (Mermaid) off at first. Turning Mermaid on turns Pele off, and diagrams are drawn again by Mermaid, on screen and in the PDF; turning Pele on turns Mermaid off
 - [ ] Both Diagrams plugins off: ```mermaid blocks show as code, `/diagram` is gone from the "/" menu, and the PDF prints them as code; either on again, they're drawn again, and Diagram is right after Code block in the menu
 - [ ] Math off: `$…$`, `$$` blocks and LaTeX notes' math show as written, on screen and in the PDF; on again, drawn

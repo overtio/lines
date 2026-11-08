@@ -16,6 +16,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Card | `::: card` … `:::` | Pandoc fenced div |
 | Callout | `:::!` … `:::`, `:::info icon=flag` … `:::` | Pandoc fenced div |
 | Diagram | ` ```mermaid ` code block | GitHub, GitLab, Obsidian |
+| 3D model | ` ```openscad ` code block, ` ```stl ` code block | OpenSCAD (its code); GitHub (` ```stl `) |
 | Spreadsheet | ` ```csv ` code block | Yes (a code block of CSV) |
 | API requests | ` ```http ` code block | JetBrains IDEs, VS Code (REST Client, httpYac), Visual Studio |
 | API tests | ` ```hurl ` code block | Hurl |
@@ -115,7 +116,7 @@ Fenced code blocks (` ``` ` or `~~~`) are as in CommonMark. lines reads the info
 
 - The first word names the language, for syntax highlighting: ` ```sql `, ` ```ts `, ` ```python `. Any language in CodeMirror's language data works, by name or alias.
 - A block with no language whose text starts with `{` or `[` is treated as JSON, so it can be tidied.
-- ` ```mermaid ` is a diagram, ` ```csv ` a spreadsheet, and ` ```http ` (or ` ```rest `) requests to an API, and ` ```hurl ` requests with checks of their responses (below).
+- ` ```mermaid ` is a diagram, ` ```openscad ` (or ` ```scad `) and ` ```stl ` 3D models, ` ```csv ` a spreadsheet, and ` ```http ` (or ` ```rest `) requests to an API, and ` ```hurl ` requests with checks of their responses (below).
 
 ## Spreadsheets
 
@@ -126,6 +127,14 @@ A code block with the language `csv` is drawn as a spreadsheet's grid of cells, 
 A code block with the language `mermaid` is drawn as its [Mermaid](https://mermaid.js.org) diagram, in the theme's colors, by the Diagrams [plugin](plugins.md): [Pele](https://pele.run), or Mermaid itself if it's turned on instead (with both off, it's a code block). With the cursor in it, the code shows with the diagram below. Diagrams are drawn at the top level and in cards; in quotes and lists they stay code. This is the same syntax GitHub, GitLab and Obsidian use.
 
 - A width after a bar, following the language, sets the size a diagram is shown at, in pixels, as an image's does: ` ```mermaid |400 `. The diagram keeps its shape and is never wider than the note. Dragging the handle on its corner writes this width; double-clicking the handle takes it out. Printed notes and PNGs use it too. Other apps read only the first word as the language, so they still draw the diagram, at their own size.
+
+## 3D models
+
+A code block with the language `openscad` (or `scad`) is [OpenSCAD](https://openscad.org) code, drawn as the model it makes, by the 3D Models [plugin](plugins.md) (with it off, it's a code block). It's drawn as diagrams are: at the top level and in cards, and with the cursor in it, the code shows with the model below, made again as you type. What OpenSCAD can't make shows as it says it, with the line (`Parser error: syntax error, line 2`), and its warnings and `echo()`s show below the model. A flat model (`square()`, `circle()`, `polygon()`) is drawn as a drawing. Parts given a color (`color("tomato")`) keep it; the rest are in the theme's colors. Its button downloads the model as an STL file, for 3D printing, or a flat one as SVG. Other apps show the code; OpenSCAD opens it as it is.
+
+A code block with the language `stl` holds an STL model in its text form (`solid … endsolid`), drawn the same way, as GitHub draws them.
+
+A model can be turned around (drag it), moved (drag with the right button, or with ⇧, or with two fingers) and zoomed (pinch, or ⌘ or Ctrl with the scroll wheel; the wheel alone still scrolls the note). Its size along its X, Y and Z axes shows in a corner, in its own units (OpenSCAD's and STL's are usually millimeters). Clicking it, rather than dragging, shows its code, as with a diagram. Printed notes show a picture of each model, from where it's first seen.
 
 ## API requests
 
@@ -173,6 +182,7 @@ Images and other files added to a note are stored by lines and linked with ordin
 - An image or attachment link **on a line of its own** is drawn as a block: the picture, or a card with the file's name, kind and size. One within a line of text is drawn inline (images) or stays a link (files).
 - The link text of a file is the name shown on its card. An image's alt text is its description.
 - A width after a bar in the alt text sets the size an image is shown at, in pixels, as in Obsidian: `![Lake at dawn|400](../attachments/….jpg)`. The image keeps its shape (a height, `|400x300`, is read but not used) and is never wider than the note. Dragging the handle on the corner of an image on a line of its own writes this width; double-clicking the handle takes it out. Printed notes and PNGs use it too. Other Markdown apps that don't know it show the image at its own size, with the bar in its description.
+- A **3D model** attached on a line of its own (STL, OBJ, PLY, OFF, 3MF, glTF as `.glb`, and the CAD formats STEP and IGES) is drawn above its card as a model to turn around, as ` ```openscad ` blocks are (above): `[Bracket.step](../attachments/….step)`. So is an OpenSCAD file (`.scad`), as the model its code makes, or its drawing if it's flat. Clicking it, rather than dragging, selects its line. STL, 3MF, OFF, STEP and IGES files have Z up, as CAD and 3D printing do; the rest have Y up. A part a CAD file gives no color (or black, which is how many say so) is in the theme's colors. On paper, it's a picture of the model above the file's name.
 - An SVG image that holds its [Excalidraw](https://excalidraw.com) scene is a **drawing**: `/drawing` makes one, and excalidraw.com's exports with *Embed scene* are too. It's drawn like any image (clear behind it, and light on dark in dark themes), with a button that opens it in Excalidraw; so do double-clicking it and Enter while it's selected. Save puts the drawing in as a new SVG attachment and changes the link to it, so undo brings back the one before. Other Markdown apps show it as the picture it is.
 - Images from the web (`![](https://…)`) show too. Links to anything else are ordinary links.
 - An image whose address is a photo's page on [Unsplash](https://unsplash.com) shows that photo: `![Snow-covered mountain peak illuminated by sunset light](https://unsplash.com/photos/snow-covered-mountain-peak-illuminated-by-sunset-light-mevyYnC5xCo)`. Pasting such a link (or the picture's own address) on an empty line adds it this way, described by the words in the link, and so does choosing a photo with `/unsplash`. Other Markdown apps don't know these links and show a broken image.

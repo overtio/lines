@@ -55,6 +55,7 @@ class Plugins {
   readonly iconSets = $derived(this.#from("iconSets"));
   readonly mathEngines = $derived(this.#from("math"));
   readonly renderers = $derived(this.#from("renderers"));
+  readonly fileViews = $derived(this.#from("files"));
   readonly typesetters = $derived(this.#from("typesetters"));
   readonly formulaEngines = $derived(this.#from("formulas"));
   readonly markdown = $derived(this.#from("markdown"));
@@ -145,6 +146,12 @@ class Plugins {
   renderer(language: string) {
     const name = language.toLowerCase();
     return this.renderers.find((renderer) => renderer.languages.includes(name));
+  }
+
+  /** What shows an attached file of this name (`….stl`) in a note, if anything does. */
+  fileView(name: string) {
+    const extension = name.slice(name.lastIndexOf(".") + 1).toLowerCase();
+    return this.fileViews.find((view) => view.extensions.includes(extension));
   }
 
   /** What draws math, if anything does. */

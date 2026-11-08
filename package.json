@@ -18,6 +18,7 @@
     "qa-notes": "bun scripts/qa-notes.mjs",
     "i18n": "bun scripts/i18n-check.mjs",
     "tex-assets": "bun scripts/tex-assets.mjs",
+    "openscad-assets": "bun scripts/openscad-assets.mjs",
     "tauri": "tauri"
   },
   "dependencies": {
@@ -44,12 +45,14 @@
     "katex": "0.19.1",
     "mermaid": "12.2.0",
     "modern-screenshot": "4.7.0",
+    "occt-import-js": "0.0.23",
     "pele": "1.12.0",
     "prettier": "3.9.10",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "sql-formatter": "15.9.0",
-    "texlyre-busytex": "1.4.1"
+    "texlyre-busytex": "1.4.1",
+    "three": "0.186.1"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
@@ -59,6 +62,7 @@
     "@types/node": "^26.6.5",
     "@types/react": "~19.3.0",
     "@types/react-dom": "~19.3.0",
+    "@types/three": "~0.186.0",
     "oxlint": "^1.90.0",
     "playwright": "^1.64.1",
     "svelte": "^5.57.3",

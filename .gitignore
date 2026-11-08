@@ -12,3 +12,6 @@ src-tauri/gen/schemas
 
 # The TeX engine (bun run tex-assets): too big for git
 public/busytex
+
+# OpenSCAD's WebAssembly build (bun run openscad-assets): too big for git
+public/openscad

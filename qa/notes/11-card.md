@@ -113,7 +113,89 @@ flowchart LR
 ```
 :::
 
-#### 15. Math block in a card
+#### 15. 3D model (openscad block), a colored part, an echo in a card
+
+::: card
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+:::
+
+#### 16. Flat model (openscad block) in a card
+
+::: card
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+:::
+
+#### 17. Broken model (openscad block) in a card
+
+::: card
+```openscad
+cube(10)
+sphere(3;
+```
+:::
+
+#### 18. 3D model (stl block) in a card
+
+::: card
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+:::
+
+#### 19. Math block in a card
 
 ::: card
 $$
@@ -121,7 +203,7 @@ $$
 $$
 :::
 
-#### 16. Table in a card
+#### 20. Table in a card
 
 ::: card
 | Left | Center | Right |
@@ -130,7 +212,7 @@ $$
 | longer cell text | `code` | 22 |
 :::
 
-#### 17. Table with formulas in a card
+#### 21. Table with formulas in a card
 
 ::: card
 | Item | Cost |
@@ -141,7 +223,7 @@ $$
 | Broken | =B2/0 |
 :::
 
-#### 18. Hurl entries (hurl block): a capture used by the next entry, and asserts in a card
+#### 22. Hurl entries (hurl block): a capture used by the next entry, and asserts in a card
 
 ::: card
 ```hurl
@@ -161,13 +243,13 @@ jsonpath "$.name" isString
 ```
 :::
 
-#### 19. Secret ({{name}}, kept in a locked secrets note) in a card
+#### 23. Secret ({{name}}, kept in a locked secrets note) in a card
 
 ::: card
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::
 
-#### 20. API requests (http block): a variable, a named request and one using its response in a card
+#### 24. API requests (http block): a variable, a named request and one using its response in a card
 
 ::: card
 ```http
@@ -182,7 +264,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 :::
 
-#### 21. Spreadsheet (csv block) in a card
+#### 25. Spreadsheet (csv block) in a card
 
 ::: card
 ```csv
@@ -193,7 +275,7 @@ Total, =SUM(B2:B3)
 ```
 :::
 
-#### 22. Named spreadsheet (csv name=), and a formula in another block using it in a card
+#### 26. Named spreadsheet (csv name=), and a formula in another block using it in a card
 
 ::: card
 ```csv name=costs
@@ -206,67 +288,73 @@ Total, =costs!B2*2
 ```
 :::
 
-#### 23. Divider in a card
+#### 27. Divider in a card
 
 ::: card
 ---
 :::
 
-#### 24. Key: Value line in a card
+#### 28. Key: Value line in a card
 
 ::: card
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 25. Mention in a card
+#### 29. Mention in a card
 
 ::: card
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 26. Wiki link in a card
+#### 30. Wiki link in a card
 
 ::: card
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 27. Symbols in a card
+#### 31. Symbols in a card
 
 ::: card
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 28. GitHub links in a card
+#### 32. GitHub links in a card
 
 ::: card
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 29. Image in a card
+#### 33. Image in a card
 
 ::: card
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 30. Drawing in a card
+#### 34. Drawing in a card
 
 ::: card
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 31. File in a card
+#### 35. File in a card
 
 ::: card
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 32. Missing file in a card
+#### 36. Attached 3D model (STL) in a card
+
+::: card
+[Bracket.stl](attachment:bracket.stl)
+:::
+
+#### 37. Missing file in a card
 
 ::: card
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 33. Card in a card
+#### 38. Card in a card
 
 ::: card
 ::: card
@@ -274,7 +362,7 @@ Text in a card.
 :::
 :::
 
-#### 34. Callout (info) in a card
+#### 39. Callout (info) in a card
 
 ::: card
 :::i
@@ -282,7 +370,7 @@ Text in an info callout.
 :::
 :::
 
-#### 35. Callout (warning, chosen icon) in a card
+#### 40. Callout (warning, chosen icon) in a card
 
 ::: card
 :::! icon=flag
@@ -290,7 +378,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 36. Callout (decision, no icon) in a card
+#### 41. Callout (decision, no icon) in a card
 
 ::: card
 :::^ icon=none

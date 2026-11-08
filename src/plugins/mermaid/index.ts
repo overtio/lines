@@ -1,4 +1,5 @@
 import type { Mermaid } from "mermaid";
+import { solid } from "../../lib/colors";
 import { lookKey } from "../../lib/editor/rendered";
 import { t } from "../../lib/i18n/index.svelte";
 import type { Plugin } from "../../lib/plugins/types";
@@ -14,34 +15,7 @@ let loading: Promise<Mermaid> | undefined;
 /** Loads Mermaid, once. */
 const loadMermaid = () => (loading ??= import("mermaid").then((module) => module.default));
 
-/* The theme's colors, as the solid hex colors Mermaid needs. */
-
-let probe: HTMLElement | undefined;
-let canvas: CanvasRenderingContext2D | undefined;
-
-/** `css` (any color, `var()` and `color-mix()` included) drawn over the note's background. */
-function solid(css: string) {
-  if (!probe || !canvas) {
-    probe = document.createElement("span");
-    probe.hidden = true;
-    document.body.append(probe);
-    const element = document.createElement("canvas");
-    element.width = element.height = 1;
-    canvas = element.getContext("2d", { willReadFrequently: true })!;
-  }
-  const computed = (value: string) => {
-    probe!.style.color = value;
-    return getComputedStyle(probe!).color;
-  };
-  canvas.fillStyle = computed("var(--bg)");
-  canvas.fillRect(0, 0, 1, 1);
-  canvas.fillStyle = computed(css);
-  canvas.fillRect(0, 0, 1, 1);
-  const [r, g, b] = canvas.getImageData(0, 0, 1, 1).data;
-  return `#${[r, g, b].map((c) => c.toString(16).padStart(2, "0")).join("")}`;
-}
-
-/** Reading the colors forces style recalculations, so it's done once per look. */
+/* The theme's colors, as the solid hex colors Mermaid needs. Reading them forces style recalculations, so it's done once per look. */
 let screen: { look: string; config: ReturnType<typeof readTheme> } | undefined;
 
 function screenTheme() {
@@ -51,9 +25,7 @@ function screenTheme() {
 }
 
 function readTheme() {
-  solid("var(--bg)");
-  probe!.style.fontFamily = "var(--font-text)";
-  const fontFamily = getComputedStyle(probe!).fontFamily;
+  const fontFamily = getComputedStyle(document.documentElement).getPropertyValue("--font-text").trim();
   const mix = (color: string, amount: number) => solid(`color-mix(in srgb, ${color} ${amount}%, var(--bg))`);
   const text = solid("var(--text)");
   const background = solid("var(--bg)");

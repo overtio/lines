@@ -266,6 +266,15 @@ export function showCode(view: EditorView, pos: number) {
   view.focus();
 }
 
+/** What's drawn in a block that takes drags of its own (a 3D model, turned around): pressing it is a click only if it isn't dragged. */
+export const INTERACTIVE = ".cm-lp-interactive";
+
+/** Runs `click` once the button that went down in `event` comes up in the same place: unless it was a drag. */
+export function whenClicked(event: MouseEvent, click: () => void) {
+  const { clientX, clientY } = event;
+  addEventListener("mouseup", (up) => Math.hypot(up.clientX - clientX, up.clientY - clientY) < 4 && click(), { once: true, capture: true });
+}
+
 /**
  * Clicking a block drawn from code (`selector`: math, a diagram) shows its code, but not a click on
  * its own controls (`controls`), or on one drawn below its code, which shows already.
@@ -278,7 +287,10 @@ export const clickToShowCode = (selector: string, controls?: string) =>
       if (!dom) return false;
       event.preventDefault();
       if (controls && target.closest(controls)) return true;
-      if (event.button === 0 && !view.state.readOnly && !dom.classList.contains("is-preview")) showCode(view, view.posAtDOM(dom));
+      if (event.button !== 0 || view.state.readOnly || dom.classList.contains("is-preview")) return true;
+      const show = () => dom.isConnected && showCode(view, view.posAtDOM(dom));
+      if (target.closest(INTERACTIVE)) whenClicked(event, show);
+      else show();
       return true;
     },
   });

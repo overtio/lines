@@ -20,18 +20,21 @@ import {
 } from "../notes/attachments";
 import { coarsePointer } from "../platform";
 import { locale, type MessageKey, t } from "../i18n/index.svelte";
+import { plugins } from "../plugins/registry.svelte";
+import type { FileView } from "../plugins/types";
 import { actionBar, dropBar, resizeHandle } from "./actions";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { editDrawing, isDrawing, knownDrawing } from "./drawings";
 import { giphyStill } from "./giphy";
 import { isUnsplashPhoto, unsplashImage, unsplashPhoto } from "./unsplash";
-import { ancestors, blockPos, drawnBlock, drawnBlocks, focused, isEditing } from "./util";
+import { ancestors, blockPos, drawnBlock, drawnBlocks, focused, INTERACTIVE, isEditing, whenClicked } from "./util";
 
 /*
  * Images and files in notes. One on a line of its own is drawn as a block in its place (the image,
- * or a card naming the file); with the cursor on that line its Markdown shows, with the block
- * below it. Such an image has a handle on its corner that resizes it, written into its label as
- * Obsidian does (`![Lake|400](…)`), and a drawing (drawings.ts) a button to edit it. Images within text are drawn inline by livePreview.ts, and files within text are links.
+ * or a card naming the file, below what a plugin shows of it: a 3D model to turn); with the cursor
+ * on that line its Markdown shows, with the block below it. Such an image has a handle on its
+ * corner that resizes it, written into its label as Obsidian does (`![Lake|400](…)`), and a
+ * drawing (drawings.ts) a button to edit it. Images within text are drawn inline by livePreview.ts, and files within text are links.
  * Pasting or dropping files, or the /image and /file commands, saves them on the device (see
  * notes/attachments.ts) and puts each on its own line.
  */
@@ -162,6 +165,36 @@ function fileElement(name: string, label: string, onChange: () => void): { dom: 
   };
 }
 
+/** A file a plugin shows (`FileView`: a 3D model), above the card naming it, once it's on this device. */
+function viewedFile(viewer: FileView, name: string, label: string, onChange: () => void): { dom: HTMLElement; destroy: () => void } {
+  const card = fileElement(name, label, onChange);
+  const view = document.createElement("span");
+  view.className = "cm-lp-file-view";
+  const dom = document.createElement("span");
+  dom.className = "cm-lp-viewed-file";
+  dom.append(view, card.dom);
+  let shown: { destroy(): void } | null = null;
+  let cancel = () => {};
+  let gone = false;
+  const show = () =>
+    void getAttachment(name).then((data) => {
+      if (gone) return;
+      if (!data) return void (cancel = whenArrived(name, show));
+      shown = viewer.show(view, { name, label: label || name, data });
+      onChange();
+    });
+  show();
+  return {
+    dom,
+    destroy: () => {
+      gone = true;
+      cancel();
+      shown?.destroy();
+      card.destroy();
+    },
+  };
+}
+
 const cleanups = new WeakMap<HTMLElement, () => void>();
 
 class BlockWidget extends WidgetType {
@@ -200,7 +233,11 @@ class BlockWidget extends WidgetType {
     dom.dataset.label = label;
     this.#classes(dom);
     const onChange = () => view.requestMeasure();
-    const content = kind === "image" ? imageElement(src, label, onChange) : fileElement(attachmentName(src)!, label, onChange);
+    const viewer = kind === "file" ? plugins.fileView(src) : undefined;
+    const content =
+      kind === "image" ? imageElement(src, label, onChange)
+      : viewer ? viewedFile(viewer, attachmentName(src)!, label, onChange)
+      : fileElement(attachmentName(src)!, label, onChange);
     let destroy = content.destroy;
     // An image sits in a frame with its resize handle on its corner (and a drawing's edit button beside it).
     const frame = document.createElement("span");
@@ -260,7 +297,8 @@ class BlockWidget extends WidgetType {
     cleanups.delete(dom);
   }
   get estimatedHeight() {
-    return this.block.kind === "file" ? 60 : (heights.get(`${this.block.src}\n${this.block.label}`) ?? 200);
+    if (this.block.kind === "image") return heights.get(`${this.block.src}\n${this.block.label}`) ?? 200;
+    return plugins.fileView(this.block.src) ? 420 : 60;
   }
   ignoreEvent() {
     return false;
@@ -422,9 +460,10 @@ const blockKeymap = Prec.high(
 );
 
 /**
- * Clicking a block selects its Markdown, so it can be deleted, cut or typed over. Double-clicking
- * (or ⌘-clicking, or tapping while not editing) opens an attachment, or edits a drawing, as its
- * button does.
+ * Clicking a block selects its Markdown, so it can be deleted, cut or typed over; one drawn to work
+ * with (a 3D model) is dragged instead, and only a click that isn't a drag selects it.
+ * Double-clicking (or ⌘-clicking, or tapping while not editing) opens an attachment, or edits a
+ * drawing, as its button does.
  */
 const clickToSelect = EditorView.domEventHandlers({
   mousedown(event, view) {
@@ -435,7 +474,9 @@ const clickToSelect = EditorView.domEventHandlers({
     if ((event.target as HTMLElement).closest(".cm-lp-image-resize")) return true;
     const src = dom.dataset.src ?? "";
     const name = attachmentName(src);
-    const opens = event.detail === 2 || event.metaKey || event.ctrlKey || (coarsePointer.matches && !view.hasFocus);
+    // A tap opens a file when not editing, but not on what's drawn of it to work with (a 3D model).
+    const interactive = !!(event.target as HTMLElement).closest(INTERACTIVE);
+    const opens = event.detail === 2 || event.metaKey || event.ctrlKey || (coarsePointer.matches && !view.hasFocus && !interactive);
     const button = !!(event.target as HTMLElement).closest(".cm-lp-drawing-edit");
     if ("drawing" in dom.dataset && event.button === 0 && (opens || button) && !view.state.readOnly) {
       void editDrawing(view, src, view.state.doc.lineAt(blockPos(view, dom)).from);
@@ -446,10 +487,15 @@ const clickToSelect = EditorView.domEventHandlers({
       return true;
     }
     if (event.button !== 0 || view.state.readOnly) return true;
-    const line = view.state.doc.lineAt(blockPos(view, dom));
-    const from = line.from + (/^\s*/.exec(line.text)?.[0].length ?? 0);
-    view.dispatch({ selection: { anchor: from, head: line.to } });
-    view.focus();
+    const select = () => {
+      if (!dom.isConnected) return;
+      const line = view.state.doc.lineAt(blockPos(view, dom));
+      const from = line.from + (/^\s*/.exec(line.text)?.[0].length ?? 0);
+      view.dispatch({ selection: { anchor: from, head: line.to } });
+      view.focus();
+    };
+    if (interactive) whenClicked(event, select);
+    else select();
     return true;
   },
 });

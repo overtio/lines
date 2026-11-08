@@ -69,6 +69,8 @@ flowchart LR
 
 Math is LaTeX between dollar signs: $e^{i\\pi} + 1 = 0$. To write a whole note in LaTeX, switch it in the ⓘ panel.
 
+An \`openscad\` code block is a 3D model, made from its code as you type, to turn around and print: type \`/model\`.
+
 An \`http\` code block holds requests to an API, with a Send button in its corner: type \`/request\`.
 
 Press ⌘P to see a note on pages, ready to print or save as a PDF.

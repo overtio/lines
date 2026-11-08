@@ -42,6 +42,7 @@ The [demo website](https://overtio.github.io/lines/) opens with a tour: one shor
 - **Cards and callouts.** Group a section into a card, or make it an info, question, warning, error or decision callout: `:::info` … `:::`.
 - **Code blocks** with syntax highlighting in your theme's colors, a copy button, and a wand that tidies JSON, SQL, JavaScript, CSS and more.
 - **Diagrams** from [Mermaid](https://mermaid.js.org) code: flowcharts, sequence diagrams, Gantt charts and more, drawn as you type by [Pele](https://pele.run) in your theme's colors, or by Mermaid itself.
+- **3D models** to turn around and zoom into: [OpenSCAD](https://openscad.org) code in an ` ```openscad ` block (`/model`), made into its model as you type and downloaded as STL for 3D printing, and attached OpenSCAD, STL, OBJ, 3MF, glTF, STEP and IGES files. See [docs/linedown.md](docs/linedown.md#3d-models).
 - **Math** with [KaTeX](https://katex.org): `$…$` in a line, `$$` for a block.
 - **Drawings** with [Excalidraw](https://excalidraw.com), saved in the note as an SVG any Markdown app can show.
 - **Images and files.** Paste or drop them in. Drag an image's corner to resize it.
@@ -181,6 +182,13 @@ bun run tauri android dev
 <summary><b>TeX, for typesetting LaTeX notes</b></summary>
 
 TeX itself (BusyTeX's engine and TeX Live's basic packages, about 125 MB) isn't in git. `bun run tex-assets` downloads it into `public/busytex/`, so `bun run dev` and builds include it. Without it everything else works, and the PDF preview says TeX isn't included. To keep the 125 MB out of a build (the desktop app embeds it), serve it from elsewhere and set `VITE_TEX_ASSETS` to that address when building.
+
+</details>
+
+<details>
+<summary><b>OpenSCAD, for 3D models</b></summary>
+
+OpenSCAD, which makes ` ```openscad ` blocks into models, isn't in git either (about 11 MB). `bun run openscad-assets` downloads the OpenSCAD project's own WebAssembly build, a dated snapshot pinned by its SHA-256 in `scripts/openscad-assets.mjs`, into `public/openscad/`, so `bun run dev` and builds include it. Without it, those blocks say OpenSCAD isn't included; everything else, attached 3D files too, works. To move to a newer snapshot, pick one from [files.openscad.org/snapshots](https://files.openscad.org/snapshots/) at least 10 days old and change its name and hash there.
 
 </details>
 
@@ -373,6 +381,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] Sync which plugins are on
 - [ ] [HyperFormula](https://github.com/overtio/lines/issues/1) as a formula engine to choose instead of IronCalc
 - [ ] [SQLite files](https://github.com/overtio/lines/issues/2): their tables, and SQL query blocks, read-only
+- [ ] 3D models: OpenSCAD's customizer (sliders for a model's numbers), measuring, section views, fonts for `text()` and libraries such as BOSL2
 - [ ] [API requests](https://github.com/overtio/lines/issues/165): environments, test runs with a report, and Bruno, Postman and OpenAPI import; [Hurl](https://github.com/overtio/lines/issues/167) with the `hurl` program where it's installed
 
 **Spreadsheets**

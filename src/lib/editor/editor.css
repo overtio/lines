@@ -825,6 +825,123 @@
   color: var(--danger);
 }
 
+/*
+ * A 3D model (plugins/models/view.ts): a canvas to turn it around in, on the code blocks' shade, its
+ * size in a corner, a button that puts it back once it's moved, and OpenSCAD's warnings below. A
+ * swipe up or down still scrolls the note; across, it turns the model.
+ */
+/* Its block's buttons start at its top, below the block's padding (.cm-lp-diagram). */
+.cm-lp-diagram:has(> .cm-lp-model) {
+  --actions-top: 0.75em;
+}
+
+.cm-lp-model {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--code-bg);
+  text-align: left;
+  outline: none;
+}
+
+.cm-lp-model:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.cm-lp-model-stage {
+  position: relative;
+}
+
+.cm-lp-model-canvas {
+  display: block;
+  width: 100%;
+  max-height: 26rem;
+  aspect-ratio: 16 / 10;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.cm-lp-model-canvas:active {
+  cursor: grabbing;
+}
+
+.cm-lp-model-size {
+  position: absolute;
+  right: 0.8em;
+  bottom: 0.6em;
+  color: var(--text-faint);
+  font-family: var(--font-ui);
+  font-size: 0.72em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.cm-lp-model-reset {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+}
+
+.cm-lp-model-reset[hidden] {
+  display: none;
+}
+
+.cm-lp-model-notes {
+  margin: 0;
+  padding: 0.5em 0.9em 0.6em;
+  border-top: 1px solid var(--border);
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 0.78em;
+  white-space: pre-wrap;
+}
+
+/* An attached model (attachments.ts): above the card naming its file, and the same size while it's read. */
+.cm-lp-viewed-file {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.cm-lp-file-view {
+  display: block;
+}
+
+.cm-lp-model-slot {
+  display: grid;
+  place-items: center;
+  max-height: 26rem;
+  aspect-ratio: 16 / 10;
+  border-radius: 8px;
+  background: var(--code-bg);
+  color: var(--text-faint);
+  font-family: var(--font-ui);
+  font-size: 0.8em;
+}
+
+/* An attached OpenSCAD file whose model is flat: its drawing. */
+.cm-lp-model-drawing {
+  padding: 0.75em 0;
+  text-align: center;
+}
+
+.cm-lp-model-drawing > svg {
+  width: 100%;
+  height: auto;
+}
+
+.cm-lp-model-message {
+  display: block;
+  padding: 0.6em 0.9em;
+  border-radius: 8px;
+  background: var(--code-bg);
+  color: var(--text-faint);
+  font-family: var(--font-ui);
+  font-size: 0.8em;
+}
+
 /* LaTeX math (math.ts): within text, and in blocks drawn like diagrams. */
 .cm-lp-math.is-pending,
 .cm-lp-math.is-error {

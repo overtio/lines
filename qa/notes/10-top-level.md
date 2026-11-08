@@ -85,20 +85,94 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Math block at the top level
+#### 15. 3D model (openscad block), a colored part, an echo at the top level
+
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+
+#### 16. Flat model (openscad block) at the top level
+
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+
+#### 17. Broken model (openscad block) at the top level
+
+```openscad
+cube(10)
+sphere(3;
+```
+
+#### 18. 3D model (stl block) at the top level
+
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+
+#### 19. Math block at the top level
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 16. Table at the top level
+#### 20. Table at the top level
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 17. Table with formulas at the top level
+#### 21. Table with formulas at the top level
 
 | Item | Cost |
 | --- | ---: |
@@ -107,7 +181,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Hurl entries (hurl block): a capture used by the next entry, and asserts at the top level
+#### 22. Hurl entries (hurl block): a capture used by the next entry, and asserts at the top level
 
 ```hurl
 # A todo
@@ -125,11 +199,11 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 19. Secret ({{name}}, kept in a locked secrets note) at the top level
+#### 23. Secret ({{name}}, kept in a locked secrets note) at the top level
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 20. API requests (http block): a variable, a named request and one using its response at the top level
+#### 24. API requests (http block): a variable, a named request and one using its response at the top level
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -142,7 +216,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 21. Spreadsheet (csv block) at the top level
+#### 25. Spreadsheet (csv block) at the top level
 
 ```csv
 Item, Cost
@@ -151,7 +225,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 22. Named spreadsheet (csv name=), and a formula in another block using it at the top level
+#### 26. Named spreadsheet (csv name=), and a formula in another block using it at the top level
 
 ```csv name=costs
 Item, Cost, Day
@@ -162,65 +236,69 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 23. Divider at the top level
+#### 27. Divider at the top level
 
 ---
 
-#### 24. Key: Value line at the top level
+#### 28. Key: Value line at the top level
 
 **Wi-Fi password:** correct-horse-battery
 
-#### 25. Mention at the top level
+#### 29. Mention at the top level
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 26. Wiki link at the top level
+#### 30. Wiki link at the top level
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 27. Symbols at the top level
+#### 31. Symbols at the top level
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 28. GitHub links at the top level
+#### 32. GitHub links at the top level
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 29. Image at the top level
+#### 33. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 30. Drawing at the top level
+#### 34. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 31. File at the top level
+#### 35. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 32. Missing file at the top level
+#### 36. Attached 3D model (STL) at the top level
+
+[Bracket.stl](attachment:bracket.stl)
+
+#### 37. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 33. Card at the top level
+#### 38. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 34. Callout (info) at the top level
+#### 39. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 35. Callout (warning, chosen icon) at the top level
+#### 40. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 36. Callout (decision, no icon) at the top level
+#### 41. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

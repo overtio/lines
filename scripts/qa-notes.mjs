@@ -43,6 +43,18 @@ const ELEMENTS = [
   { id: "json", name: "JSON block (no language)", md: '```\n{"name":"lines","tags":["a","b"],"id":12345678901234567890}\n```' },
   { id: "diagram", name: "Diagram", md: "```mermaid\nflowchart LR\n  A[Start] --> B{Choice}\n  B --> C[Done]\n```" },
   { id: "diagram-sized", name: "Diagram (240 px wide)", md: "```mermaid |240\nflowchart LR\n  A[Small] --> B[Diagram]\n```" },
+  {
+    id: "model",
+    name: "3D model (openscad block), a colored part, an echo",
+    md: "```openscad\ndifference() {\n  cube(20, center = true);\n  sphere(r = 13);\n}\ntranslate([25, 0, 0]) color(\"tomato\") cylinder(h = 10, r = 5);\necho(\"made\");\n```",
+  },
+  { id: "model-flat", name: "Flat model (openscad block)", md: "```openscad\nsquare(20);\ntranslate([30, 10]) circle(8);\n```" },
+  { id: "model-broken", name: "Broken model (openscad block)", md: "```openscad\ncube(10)\nsphere(3;\n```" },
+  {
+    id: "model-stl",
+    name: "3D model (stl block)",
+    md: "```stl\nsolid pyramid\nfacet normal 0 0 -1\nouter loop\nvertex 0 0 0\nvertex 10 10 0\nvertex 10 0 0\nendloop\nendfacet\nfacet normal 0 0 -1\nouter loop\nvertex 0 0 0\nvertex 0 10 0\nvertex 10 10 0\nendloop\nendfacet\nfacet normal 0 -1 1\nouter loop\nvertex 0 0 0\nvertex 10 0 0\nvertex 5 5 8\nendloop\nendfacet\nfacet normal 1 0 1\nouter loop\nvertex 10 0 0\nvertex 10 10 0\nvertex 5 5 8\nendloop\nendfacet\nfacet normal 0 1 1\nouter loop\nvertex 10 10 0\nvertex 0 10 0\nvertex 5 5 8\nendloop\nendfacet\nfacet normal -1 0 1\nouter loop\nvertex 0 10 0\nvertex 0 0 0\nvertex 5 5 8\nendloop\nendfacet\nendsolid pyramid\n```",
+  },
   { id: "math", name: "Math block", md: "$$\n\\int_0^1 x^2\\,dx = \\frac{1}{3}\n$$" },
   {
     id: "table",
@@ -88,6 +100,7 @@ const ELEMENTS = [
   { id: "image", name: "Image", md: "![A sample picture](attachment:photo.png)" },
   { id: "drawing", name: "Drawing", md: "![A sample drawing](attachment:drawing.svg)" },
   { id: "file", name: "File", md: "[Budget.csv](attachment:budget.csv)" },
+  { id: "model-file", name: "Attached 3D model (STL)", md: "[Bracket.stl](attachment:bracket.stl)" },
   { id: "missing-file", name: "Missing file", md: "[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)" },
   { id: "card", name: "Card", md: "::: card\nText in a card.\n:::" },
   { id: "callout", name: "Callout (info)", md: ":::i\nText in an info callout.\n:::" },

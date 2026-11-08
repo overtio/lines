@@ -16,6 +16,10 @@ Any other file works the same way, or type `/file`. It shows as a card with its 
 
 [Budget.csv](attachment:budget.csv)
 
+A 3D model (STL, OBJ, 3MF, glTF, or a STEP or IGES file from CAD) shows above its card, to turn around:
+
+[Bracket.stl](attachment:bracket.stl)
+
 ## Copy values
 
 A line like a label and a value gets a copy button when you hover the value:
