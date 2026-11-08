@@ -298,7 +298,7 @@
       escapeKeydownBehavior="ignore"
       onCloseAutoFocus={(event) => event.preventDefault()}
       {onkeydowncapture}
-      class="drawing-editor fixed inset-0 z-50 flex flex-col bg-bg text-fg outline-none"
+      class="drawing-editor fixed inset-0 z-50 flex flex-col bg-bg text-fg outline-none {compact ? 'compact' : ''}"
     >
       <Dialog.Title class="sr-only">{t("editor.drawing.title")}</Dialog.Title>
       <Dialog.Description class="sr-only">{t("editor.drawing.hint", { keys: formatKeys(SAVE_KEYS, system) })}</Dialog.Description>
@@ -307,7 +307,7 @@
            canvas until Excalidraw is shown, then in its top right; on a phone, a row above it. -->
       <div
         class={compact
-          ? "relative border-b border-line bg-panel px-2.5 pt-[max(6px,env(safe-area-inset-top))] pb-1.5"
+          ? "actions-row relative border-b border-line bg-panel px-2.5 pt-[max(6px,env(safe-area-inset-top))] pb-1.5"
           : slot
             ? "relative"
             : "absolute top-[max(16px,env(safe-area-inset-top))] right-4 z-1"}
@@ -417,5 +417,18 @@
   .canvas :global(.excalidraw .help-icon),
   .canvas :global(.excalidraw .default-sidebar-trigger) {
     display: none;
+  }
+
+  /*
+   * In the Mac app the window's traffic lights are over the top left corner, so what's there starts
+   * past them, where the app's own title bars do (app.css): Excalidraw's menu, or Cancel in the row
+   * above the canvas in a narrow window.
+   */
+  :global(:root[data-platform="mac-app"] .drawing-editor:not(.compact)) .canvas :global(.excalidraw .App-menu_top__left) {
+    margin-left: 76px;
+  }
+
+  :global(:root[data-platform="mac-app"]) .actions-row {
+    padding-left: 92px;
   }
 </style>
