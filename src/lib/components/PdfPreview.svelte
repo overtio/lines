@@ -5,7 +5,7 @@
   import { t } from "../i18n/index.svelte";
   import { fileName } from "../notes/export";
   import type { Entry } from "../notes/store.svelte";
-  import { isApple, isDesktopApp, isTauri, revealFile, saveFile } from "../platform";
+  import { canPrint, isApple, revealFile, saveFile } from "../platform";
   import { plugins } from "../plugins/registry.svelte";
   import type { TypesetResult } from "../plugins/types";
   import { prefs, type Paper } from "../prefs.svelte";
@@ -29,10 +29,14 @@
 
   let {
     entry,
-    save = false,
-    png = false,
+    action,
     onclose,
-  }: { entry: Entry; save?: boolean; png?: boolean; onclose: () => void } = $props();
+  }: {
+    entry: Entry;
+    /** What to go straight on to once it's ready: printing, exporting the PDF, or offering PNG images. */
+    action?: "print" | "export" | "png";
+    onclose: () => void;
+  } = $props();
 
   let measure = $state<HTMLElement>();
   let pagesEl = $state<HTMLElement>();
@@ -46,11 +50,9 @@
   /** Typesetters for its language, besides lines' own pages. */
   const typesetters = untrack(() => plugins.typesettersFor(language.id));
   const filename = fileName(title);
-  /** The system print dialog: in browsers, and in the desktop apps (not on iPhone or iPad). */
-  const canPrint = !isTauri || isDesktopApp;
 
-  // Images are lines' pages, so asking for them starts there.
-  let typesetter = $state(untrack(() => (png ? "lines" : prefs.typesetter)));
+  // Printing and images use lines' pages, so asking for either starts there.
+  let typesetter = $state(untrack(() => (action === "print" || action === "png" ? "lines" : prefs.typesetter)));
   /** The typesetter making the PDF, if it isn't lines. */
   const external = $derived(typesetters.find((each) => each.id === typesetter));
   const using = $derived(external?.id ?? "lines");
@@ -121,7 +123,7 @@
     pageStyle.textContent = `@page { size: ${width}mm ${height}mm; margin: 0; }`;
   });
 
-  let saveWhenReady = untrack(() => save);
+  let exportWhenReady = untrack(() => action === "print" || action === "export");
 
   async function layOut(paper: Paper) {
     if (!measure || !pagesEl) return;
@@ -144,11 +146,11 @@
     laidOut = true;
     fit();
     if (first) speak(t("print.ready", { count }));
-    if (first && saveWhenReady) {
-      saveWhenReady = false;
+    if (first && exportWhenReady) {
+      exportWhenReady = false;
       exportPdf();
     }
-    if (first && png) pngMenu = true;
+    if (first && action === "png") pngMenu = true;
   }
 
   async function typeset() {
@@ -168,8 +170,8 @@
     const pdf = new Uint8Array(result.pdf);
     typesetting = { state: "done", pdf, url: URL.createObjectURL(new Blob([pdf], { type: "application/pdf" })) };
     speak(t("print.typesetReady", { name }));
-    if (saveWhenReady) {
-      saveWhenReady = false;
+    if (exportWhenReady) {
+      exportWhenReady = false;
       exportPdf();
     }
   }

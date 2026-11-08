@@ -480,7 +480,8 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] LaTeX (lines): the paper example has its title block, abstract, numbered sections, theorems and equations, "Section 2" and "(1)" where it \ref's them, a numbered table, references and its footnote at the end; lines join into paragraphs
 - [ ] Print… opens the print dialog showing the same pages, one per sheet, with nothing of the app; Save as PDF there names the file after the note
 - [ ] [iOS] There's no Print… button
-- [ ] Export as PDF… opens the preview and goes straight on to print (lines) or save (TeX)
+- [ ] Share → Print… (the last item) opens the preview on lines' pages (a LaTeX note too, even with TeX chosen) and goes straight on to the print dialog; [iOS] the share menu has no Print…
+- [ ] Share → Export as PDF… opens the preview and goes straight on to print (lines) or save (TeX)
 - [ ] Save PNG (lines' pages) offers One Image (the whole note as one tall picture, no page numbers) and One per Page ("3 images, in a ZIP"; a one-page note saves a single PNG). [Web] It downloads "<title>.png" or "<title>.zip"; [Desktop] it saves to Downloads with Show in Finder. The images are twice the page's size, with bullets, numbers, callout icons, code colors, diagrams, math and images as on the pages
 - [ ] Share → Export as PNG… opens the preview on lines' pages (a LaTeX note too, even with TeX chosen) with the PNG choices showing
 - [ ] LaTeX (TeX): Typeset with → TeX downloads TeX the first time with a progress bar ("Downloading TeX… 40%"), then shows the PDF; the next note typesets in a second or two, offline too
