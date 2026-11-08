@@ -456,7 +456,16 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Bullet list, then Missing file
+#### 37. Bullet list, then Terminal recording (.cast file)
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Bullet list, then Missing file
 
 - First item
 - Second item
@@ -465,7 +474,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Bullet list, then Card
+#### 39. Bullet list, then Card
 
 - First item
 - Second item
@@ -476,7 +485,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 39. Bullet list, then Callout (info)
+#### 40. Bullet list, then Callout (info)
 
 - First item
 - Second item
@@ -487,7 +496,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 40. Bullet list, then Callout (warning, chosen icon)
+#### 41. Bullet list, then Callout (warning, chosen icon)
 
 - First item
 - Second item
@@ -498,7 +507,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Bullet list, then Callout (decision, no icon)
+#### 42. Bullet list, then Callout (decision, no icon)
 
 - First item
 - Second item

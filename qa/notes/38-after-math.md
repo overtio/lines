@@ -384,14 +384,21 @@ $$
 $$
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Math block, then Missing file
+#### 37. Math block, then Terminal recording (.cast file)
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Math block, then Missing file
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Math block, then Card
+#### 39. Math block, then Card
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -400,7 +407,7 @@ $$
 Text in a card.
 :::
 
-#### 39. Math block, then Callout (info)
+#### 40. Math block, then Callout (info)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -409,7 +416,7 @@ $$
 Text in an info callout.
 :::
 
-#### 40. Math block, then Callout (warning, chosen icon)
+#### 41. Math block, then Callout (warning, chosen icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -418,7 +425,7 @@ $$
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Math block, then Callout (decision, no icon)
+#### 42. Math block, then Callout (decision, no icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}

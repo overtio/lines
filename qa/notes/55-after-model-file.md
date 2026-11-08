@@ -312,33 +312,38 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 [Bracket.stl](attachment:bracket.stl)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Attached 3D model (STL), then Missing file
+#### 37. Attached 3D model (STL), then Terminal recording (.cast file)
+
+[Bracket.stl](attachment:bracket.stl)
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Attached 3D model (STL), then Missing file
 
 [Bracket.stl](attachment:bracket.stl)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Attached 3D model (STL), then Card
+#### 39. Attached 3D model (STL), then Card
 
 [Bracket.stl](attachment:bracket.stl)
 ::: card
 Text in a card.
 :::
 
-#### 39. Attached 3D model (STL), then Callout (info)
+#### 40. Attached 3D model (STL), then Callout (info)
 
 [Bracket.stl](attachment:bracket.stl)
 :::i
 Text in an info callout.
 :::
 
-#### 40. Attached 3D model (STL), then Callout (warning, chosen icon)
+#### 41. Attached 3D model (STL), then Callout (warning, chosen icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Attached 3D model (STL), then Callout (decision, no icon)
+#### 42. Attached 3D model (STL), then Callout (decision, no icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::^ icon=none

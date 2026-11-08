@@ -312,33 +312,38 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 ![A sample drawing](attachment:drawing.svg)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Drawing, then Missing file
+#### 37. Drawing, then Terminal recording (.cast file)
+
+![A sample drawing](attachment:drawing.svg)
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Drawing, then Missing file
 
 ![A sample drawing](attachment:drawing.svg)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Drawing, then Card
+#### 39. Drawing, then Card
 
 ![A sample drawing](attachment:drawing.svg)
 ::: card
 Text in a card.
 :::
 
-#### 39. Drawing, then Callout (info)
+#### 40. Drawing, then Callout (info)
 
 ![A sample drawing](attachment:drawing.svg)
 :::i
 Text in an info callout.
 :::
 
-#### 40. Drawing, then Callout (warning, chosen icon)
+#### 41. Drawing, then Callout (warning, chosen icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Drawing, then Callout (decision, no icon)
+#### 42. Drawing, then Callout (decision, no icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::^ icon=none

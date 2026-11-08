@@ -456,7 +456,16 @@ flowchart LR
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Diagram, then Missing file
+#### 37. Diagram, then Terminal recording (.cast file)
+
+```mermaid
+flowchart LR
+  A[Start] --> B{Choice}
+  B --> C[Done]
+```
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Diagram, then Missing file
 
 ```mermaid
 flowchart LR
@@ -465,7 +474,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Diagram, then Card
+#### 39. Diagram, then Card
 
 ```mermaid
 flowchart LR
@@ -476,7 +485,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 39. Diagram, then Callout (info)
+#### 40. Diagram, then Callout (info)
 
 ```mermaid
 flowchart LR
@@ -487,7 +496,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 40. Diagram, then Callout (warning, chosen icon)
+#### 41. Diagram, then Callout (warning, chosen icon)
 
 ```mermaid
 flowchart LR
@@ -498,7 +507,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Diagram, then Callout (decision, no icon)
+#### 42. Diagram, then Callout (decision, no icon)
 
 ```mermaid
 flowchart LR

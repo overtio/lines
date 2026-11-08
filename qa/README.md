@@ -8,7 +8,7 @@ What to check before a release, and the notes to check it with.
   - `09-latex.tex`: a note written in LaTeX ([docs/latex.md](../docs/latex.md)), with everything lines draws in one.
   - `10`–`16`: every element inside every container (top level, card, callout, callout with no icon, callout in a card, quote, list item).
   - `17`–`19`: objects: two notes with properties and a type (a person and a company), mentions of them, and tables of a type.
-  - `20`–`60`: every element followed straight away by every other, with no blank line between.
+  - `20`–`61`: every element followed straight away by every other, with no blank line between.
 
 ## Before a release
 

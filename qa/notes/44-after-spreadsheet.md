@@ -492,7 +492,17 @@ Total, =SUM(B2:B3)
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Spreadsheet (csv block), then Missing file
+#### 37. Spreadsheet (csv block), then Terminal recording (.cast file)
+
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Spreadsheet (csv block), then Missing file
 
 ```csv
 Item, Cost
@@ -502,7 +512,7 @@ Total, =SUM(B2:B3)
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Spreadsheet (csv block), then Card
+#### 39. Spreadsheet (csv block), then Card
 
 ```csv
 Item, Cost
@@ -514,7 +524,7 @@ Total, =SUM(B2:B3)
 Text in a card.
 :::
 
-#### 39. Spreadsheet (csv block), then Callout (info)
+#### 40. Spreadsheet (csv block), then Callout (info)
 
 ```csv
 Item, Cost
@@ -526,7 +536,7 @@ Total, =SUM(B2:B3)
 Text in an info callout.
 :::
 
-#### 40. Spreadsheet (csv block), then Callout (warning, chosen icon)
+#### 41. Spreadsheet (csv block), then Callout (warning, chosen icon)
 
 ```csv
 Item, Cost
@@ -538,7 +548,7 @@ Total, =SUM(B2:B3)
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Spreadsheet (csv block), then Callout (decision, no icon)
+#### 42. Spreadsheet (csv block), then Callout (decision, no icon)
 
 ```csv
 Item, Cost

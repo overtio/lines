@@ -420,7 +420,15 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Numbered list, then Missing file
+#### 37. Numbered list, then Terminal recording (.cast file)
+
+1. First
+2. Second
+   1. Nested
+3. Third
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Numbered list, then Missing file
 
 1. First
 2. Second
@@ -428,7 +436,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Numbered list, then Card
+#### 39. Numbered list, then Card
 
 1. First
 2. Second
@@ -438,7 +446,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 39. Numbered list, then Callout (info)
+#### 40. Numbered list, then Callout (info)
 
 1. First
 2. Second
@@ -448,7 +456,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 40. Numbered list, then Callout (warning, chosen icon)
+#### 41. Numbered list, then Callout (warning, chosen icon)
 
 1. First
 2. Second
@@ -458,7 +466,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Numbered list, then Callout (decision, no icon)
+#### 42. Numbered list, then Callout (decision, no icon)
 
 1. First
 2. Second

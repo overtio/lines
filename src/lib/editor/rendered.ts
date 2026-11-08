@@ -77,6 +77,11 @@ export const lookKey = () => {
   return `${theme} ${scheme} ${font} ${contrast ?? ""}`;
 };
 
+/** Calls `callback` whenever the look changes, for what draws in the theme's colors without CSS. */
+export function onLookChange(callback: () => void) {
+  new MutationObserver(callback).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-scheme", "data-font", "data-contrast"] });
+}
+
 /* Drawing. */
 
 /** Drawings by look, renderer and source, so drawing a block again (scrolling back to it) is instant. */
@@ -211,9 +216,9 @@ export function removeActions(dom: HTMLElement) {
   actionBars.delete(dom);
 }
 
-new MutationObserver(() => {
+onLookChange(() => {
   for (const [dom, { view }] of live) void draw(dom, view);
-}).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-scheme", "data-font", "data-contrast"] });
+});
 
 class RenderedWidget extends WidgetType {
   constructor(

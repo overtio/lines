@@ -420,7 +420,15 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 37. Missing file in a callout in a card
+#### 37. Terminal recording (.cast file) in a callout in a card
+
+::: card
+:::!
+[terminal.cast](attachment:terminal.cast)
+:::
+:::
+
+#### 38. Missing file in a callout in a card
 
 ::: card
 :::!
@@ -428,7 +436,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 38. Card in a callout in a card
+#### 39. Card in a callout in a card
 
 ::: card
 :::!
@@ -438,7 +446,7 @@ Text in a card.
 :::
 :::
 
-#### 39. Callout (info) in a callout in a card
+#### 40. Callout (info) in a callout in a card
 
 ::: card
 :::!
@@ -448,7 +456,7 @@ Text in an info callout.
 :::
 :::
 
-#### 40. Callout (warning, chosen icon) in a callout in a card
+#### 41. Callout (warning, chosen icon) in a callout in a card
 
 ::: card
 :::!
@@ -458,7 +466,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 41. Callout (decision, no icon) in a callout in a card
+#### 42. Callout (decision, no icon) in a callout in a card
 
 ::: card
 :::!

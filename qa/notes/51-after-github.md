@@ -312,33 +312,38 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. GitHub links, then Missing file
+#### 37. GitHub links, then Terminal recording (.cast file)
+
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. GitHub links, then Missing file
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. GitHub links, then Card
+#### 39. GitHub links, then Card
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ::: card
 Text in a card.
 :::
 
-#### 39. GitHub links, then Callout (info)
+#### 40. GitHub links, then Callout (info)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::i
 Text in an info callout.
 :::
 
-#### 40. GitHub links, then Callout (warning, chosen icon)
+#### 41. GitHub links, then Callout (warning, chosen icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. GitHub links, then Callout (decision, no icon)
+#### 42. GitHub links, then Callout (decision, no icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::^ icon=none

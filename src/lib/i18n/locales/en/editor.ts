@@ -146,6 +146,9 @@ export default {
   "editor.file.meta": "{kind} · {size}",
   // The name an attached file gets when it has none.
   "editor.file.name": "File",
+  // A terminal recording (asciinema) played in a note, named for screen readers, and what shows when it can't load.
+  "editor.recording": "Terminal recording",
+  "editor.recording.failed": "This recording couldn’t be loaded",
   "editor.size.bytes": "{count, plural, one {# byte} other {# bytes}}",
   "editor.size.kb": "{size} KB",
   "editor.size.mb": "{size} MB",

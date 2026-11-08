@@ -492,7 +492,17 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Table with formulas, then Missing file
+#### 37. Table with formulas, then Terminal recording (.cast file)
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Table with formulas, then Missing file
 
 | Item | Cost |
 | --- | ---: |
@@ -502,7 +512,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Table with formulas, then Card
+#### 39. Table with formulas, then Card
 
 | Item | Cost |
 | --- | ---: |
@@ -514,7 +524,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 39. Table with formulas, then Callout (info)
+#### 40. Table with formulas, then Callout (info)
 
 | Item | Cost |
 | --- | ---: |
@@ -526,7 +536,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 40. Table with formulas, then Callout (warning, chosen icon)
+#### 41. Table with formulas, then Callout (warning, chosen icon)
 
 | Item | Cost |
 | --- | ---: |
@@ -538,7 +548,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Table with formulas, then Callout (decision, no icon)
+#### 42. Table with formulas, then Callout (decision, no icon)
 
 | Item | Cost |
 | --- | ---: |

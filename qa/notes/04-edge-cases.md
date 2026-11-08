@@ -144,3 +144,19 @@ $$
 #
 
 The # above is text, not an empty heading; a tag is typed this way.
+
+#### 24. Recording from asciinema.org, by its embed code
+
+[![asciicast](https://asciinema.org/a/1271559.svg)](https://asciinema.org/a/1271559)
+
+#### 25. asciinema's preview alone plays too
+
+![asciicast](https://asciinema.org/a/1271559.png)
+
+#### 26. Starting at 0:10, twice as fast
+
+[![asciicast](https://asciinema.org/a/1271559.svg)](https://asciinema.org/a/1271559?t=0:10&speed=2)
+
+#### 27. Recordings that stay links
+
+[A recording's page](https://asciinema.org/a/1271559) and [terminal.cast](attachment:terminal.cast) within a line of text are links.

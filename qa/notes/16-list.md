@@ -348,13 +348,19 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
 
   [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Missing file in a list item (stays Markdown here)
+#### 37. Terminal recording (.cast file) in a list item
+
+- List item
+
+  [terminal.cast](attachment:terminal.cast)
+
+#### 38. Missing file in a list item (stays Markdown here)
 
 - List item
 
   [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Card in a list item
+#### 39. Card in a list item
 
 - List item
 
@@ -362,7 +368,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a card.
   :::
 
-#### 39. Callout (info) in a list item
+#### 40. Callout (info) in a list item
 
 - List item
 
@@ -370,7 +376,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in an info callout.
   :::
 
-#### 40. Callout (warning, chosen icon) in a list item
+#### 41. Callout (warning, chosen icon) in a list item
 
 - List item
 
@@ -378,7 +384,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a warning callout with the flag icon.
   :::
 
-#### 41. Callout (decision, no icon) in a list item
+#### 42. Callout (decision, no icon) in a list item
 
 - List item
 

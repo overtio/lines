@@ -384,14 +384,21 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. JSON block (no language), then Missing file
+#### 37. JSON block (no language), then Terminal recording (.cast file)
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. JSON block (no language), then Missing file
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. JSON block (no language), then Card
+#### 39. JSON block (no language), then Card
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -400,7 +407,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 39. JSON block (no language), then Callout (info)
+#### 40. JSON block (no language), then Callout (info)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -409,7 +416,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 40. JSON block (no language), then Callout (warning, chosen icon)
+#### 41. JSON block (no language), then Callout (warning, chosen icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -418,7 +425,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. JSON block (no language), then Callout (decision, no icon)
+#### 42. JSON block (no language), then Callout (decision, no icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}

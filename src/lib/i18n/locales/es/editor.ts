@@ -121,6 +121,8 @@ export default {
   "editor.file.notHere": "Aún no está en este dispositivo",
   "editor.file.meta": "{kind} · {size}",
   "editor.file.name": "Archivo",
+  "editor.recording": "Grabación de terminal",
+  "editor.recording.failed": "No se ha podido cargar esta grabación",
   "editor.size.bytes": "{count, plural, one {# byte} other {# bytes}}",
   "editor.size.kb": "{size} KB",
   "editor.size.mb": "{size} MB",

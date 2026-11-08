@@ -312,33 +312,38 @@ A long paragraph that wraps onto several lines at the usual width, so the space 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Long paragraph, then Missing file
+#### 37. Long paragraph, then Terminal recording (.cast file)
+
+A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Long paragraph, then Missing file
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Long paragraph, then Card
+#### 39. Long paragraph, then Card
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ::: card
 Text in a card.
 :::
 
-#### 39. Long paragraph, then Callout (info)
+#### 40. Long paragraph, then Callout (info)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 :::i
 Text in an info callout.
 :::
 
-#### 40. Long paragraph, then Callout (warning, chosen icon)
+#### 41. Long paragraph, then Callout (warning, chosen icon)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Long paragraph, then Callout (decision, no icon)
+#### 42. Long paragraph, then Callout (decision, no icon)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 :::^ icon=none

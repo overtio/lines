@@ -384,14 +384,21 @@ Text in a decision callout with no icon.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Callout (decision, no icon), then Missing file
+#### 37. Callout (decision, no icon), then Terminal recording (.cast file)
+
+:::^ icon=none
+Text in a decision callout with no icon.
+:::
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Callout (decision, no icon), then Missing file
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Callout (decision, no icon), then Card
+#### 39. Callout (decision, no icon), then Card
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -400,7 +407,7 @@ Text in a decision callout with no icon.
 Text in a card.
 :::
 
-#### 39. Callout (decision, no icon), then Callout (info)
+#### 40. Callout (decision, no icon), then Callout (info)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -409,7 +416,7 @@ Text in a decision callout with no icon.
 Text in an info callout.
 :::
 
-#### 40. Callout (decision, no icon), then Callout (warning, chosen icon)
+#### 41. Callout (decision, no icon), then Callout (warning, chosen icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -418,7 +425,7 @@ Text in a decision callout with no icon.
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Callout (decision, no icon), then Callout (decision, no icon)
+#### 42. Callout (decision, no icon), then Callout (decision, no icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.

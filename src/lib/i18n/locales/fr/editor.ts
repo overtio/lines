@@ -121,6 +121,8 @@ export default {
   "editor.file.notHere": "Pas encore sur cet appareil",
   "editor.file.meta": "{kind} · {size}",
   "editor.file.name": "Fichier",
+  "editor.recording": "Enregistrement de terminal",
+  "editor.recording.failed": "Impossible de charger cet enregistrement",
   "editor.size.bytes": "{count, plural, one {# octet} other {# octets}}",
   "editor.size.kb": "{size} Ko",
   "editor.size.mb": "{size} Mo",

@@ -1,7 +1,7 @@
 import { builtIn } from "../../plugins";
 import { announce, onAnnounce } from "../windows/channel";
 import { plainTextLanguage } from "./plainText";
-import type { Contributions, IconSet, NoteLanguage, Plugin, Theme } from "./types";
+import type { Contributions, EmbedLink, IconSet, NoteLanguage, Plugin, Theme } from "./types";
 
 /*
  * The plugins lines has, which of them are on, and what the ones on add. Everything that asks for a
@@ -62,6 +62,7 @@ class Plugins {
   readonly typesetters = $derived(this.#from("typesetters"));
   readonly formulaEngines = $derived(this.#from("formulas"));
   readonly markdown = $derived(this.#from("markdown"));
+  readonly embeds = $derived(this.markdown.flatMap((addition) => addition.embeds ?? []));
   readonly codeLanguages = $derived(this.#from("codeLanguages"));
 
   constructor() {
@@ -159,6 +160,11 @@ class Plugins {
   /** What makes a block from an attached file of this name (a `.csv` file's spreadsheet), if anything does. */
   blockFromFile(name: string) {
     return this.renderers.find((renderer) => renderer.fromFiles?.extensions.includes(extension(name)));
+  }
+
+  /** What draws a link on a line of its own (an asciinema recording as its player), if anything does. */
+  embed(link: EmbedLink) {
+    return this.embeds.find((embed) => embed.draws(link));
   }
 
   /** What draws math, if anything does. */

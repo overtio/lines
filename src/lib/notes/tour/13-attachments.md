@@ -22,6 +22,10 @@ A 3D model (STL, OBJ, 3MF, glTF, or a STEP or IGES file from CAD) shows above it
 
 [Bracket.stl](attachment:bracket.stl)
 
+A terminal recording you made with `asciinema rec` plays above its card, in your theme's colors. Paste the link to one on [asciinema.org](https://asciinema.org) on an empty line and it plays too. Click it to play; Space pauses, ← and → skip.
+
+[terminal.cast](attachment:terminal.cast)
+
 ## Copy values
 
 A line like a label and a value gets a copy button when you hover the value:

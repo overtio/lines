@@ -384,14 +384,21 @@ Text in an info callout.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Callout (info), then Missing file
+#### 37. Callout (info), then Terminal recording (.cast file)
+
+:::i
+Text in an info callout.
+:::
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Callout (info), then Missing file
 
 :::i
 Text in an info callout.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Callout (info), then Card
+#### 39. Callout (info), then Card
 
 :::i
 Text in an info callout.
@@ -400,7 +407,7 @@ Text in an info callout.
 Text in a card.
 :::
 
-#### 39. Callout (info), then Callout (info)
+#### 40. Callout (info), then Callout (info)
 
 :::i
 Text in an info callout.
@@ -409,7 +416,7 @@ Text in an info callout.
 Text in an info callout.
 :::
 
-#### 40. Callout (info), then Callout (warning, chosen icon)
+#### 41. Callout (info), then Callout (warning, chosen icon)
 
 :::i
 Text in an info callout.
@@ -418,7 +425,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Callout (info), then Callout (decision, no icon)
+#### 42. Callout (info), then Callout (decision, no icon)
 
 :::i
 Text in an info callout.

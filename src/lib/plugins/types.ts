@@ -233,17 +233,18 @@ export interface BlockEditor {
 }
 
 /**
- * Shows attached files of some kinds in a note, above the card naming them (a 3D model to turn), and
- * on paper. An attached file is one on a line of its own, a link to it: `[Bracket.stl](../attachments/…)`.
+ * Shows attached files of some kinds in a note, above the card naming them (a 3D model to turn, a
+ * terminal recording to play), and on paper. An attached file is one on a line of its own, a link
+ * to it: `[Bracket.stl](../attachments/…)`.
  */
 export interface FileView {
   id: string;
   /** The extensions of the files it shows, in lowercase: ["stl", "obj"]. */
   extensions: string[];
-  /** Shows a file in `dom`, and gives back what takes it down. */
-  show(dom: HTMLElement, file: ViewedFile): { destroy(): void };
-  /** A picture of the file, for paper; rejects, with what's wrong, on a file it can't read. */
-  print(file: ViewedFile): Promise<Element>;
+  /** Shows a file in `dom`. */
+  show(dom: HTMLElement, file: ViewedFile): Shown;
+  /** A picture of the file, for paper; rejects, with what's wrong, on a file it can't read. Without it, the file prints as its name. */
+  print?(file: ViewedFile): Promise<Element>;
 }
 
 export interface ViewedFile {
@@ -252,6 +253,16 @@ export interface ViewedFile {
   /** What it's called in the note, its link's text. */
   label: string;
   data: Blob;
+}
+
+/**
+ * What a plugin shows of a file, or draws of a link, while it's in the note. Inside an element with
+ * the class `cm-lp-own-input` (editor/util.ts), clicks and keys are its own, as a player's are.
+ */
+export interface Shown {
+  /** Takes the keyboard, as Enter on it does while it's selected: a recording starts playing. */
+  focus?(): void;
+  destroy(): void;
 }
 
 export interface BlockAction {
@@ -396,6 +407,33 @@ export interface MarkdownAddition {
   commands?: SlashCommand[];
   /** How it prints: for each node its syntax adds, by name, what it prints as. */
   print?: Record<string, MarkdownPrinter>;
+  /** Links on a line of their own drawn as something to watch or use: an asciinema recording as its player. */
+  embeds?: Embed[];
+}
+
+/**
+ * A link on a line of its own, drawn as something to watch or use in place of the link: a
+ * recording's player, say. It's drawn where images and files are (attachments.ts), and is
+ * selected, moved and deleted as they are.
+ */
+export interface Embed {
+  id: string;
+  /** Whether it draws this link. */
+  draws(link: EmbedLink): boolean;
+  /** Draws a link it draws into `dom`, calling `changed` whenever its size may have changed. */
+  draw(dom: HTMLElement, link: EmbedLink, changed: () => void): Shown;
+  /** What a link pasted on an empty line is written as, if it's one to draw: an address as its embed code. */
+  paste?(href: string): string | null;
+}
+
+/** A link as Markdown writes it: `[text](href)`, an image `![label](image)`, or an image that links somewhere. */
+export interface EmbedLink {
+  /** Where it links; null for an image that doesn't. */
+  href: string | null;
+  /** The image it shows, if it's one. */
+  image: string | null;
+  /** Its text, or the image's description. */
+  label: string;
 }
 
 /** Prints a node of the note; null prints nothing. */

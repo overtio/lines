@@ -312,33 +312,38 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Mention, then Missing file
+#### 37. Mention, then Terminal recording (.cast file)
+
+Ask @[QA · Ada] at @[QA · Ada].email.
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Mention, then Missing file
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Mention, then Card
+#### 39. Mention, then Card
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ::: card
 Text in a card.
 :::
 
-#### 39. Mention, then Callout (info)
+#### 40. Mention, then Callout (info)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::i
 Text in an info callout.
 :::
 
-#### 40. Mention, then Callout (warning, chosen icon)
+#### 41. Mention, then Callout (warning, chosen icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Mention, then Callout (decision, no icon)
+#### 42. Mention, then Callout (decision, no icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::^ icon=none

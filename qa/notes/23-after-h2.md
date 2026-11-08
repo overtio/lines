@@ -312,33 +312,38 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 ## Heading two
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Heading 2, then Missing file
+#### 37. Heading 2, then Terminal recording (.cast file)
+
+## Heading two
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Heading 2, then Missing file
 
 ## Heading two
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Heading 2, then Card
+#### 39. Heading 2, then Card
 
 ## Heading two
 ::: card
 Text in a card.
 :::
 
-#### 39. Heading 2, then Callout (info)
+#### 40. Heading 2, then Callout (info)
 
 ## Heading two
 :::i
 Text in an info callout.
 :::
 
-#### 40. Heading 2, then Callout (warning, chosen icon)
+#### 41. Heading 2, then Callout (warning, chosen icon)
 
 ## Heading two
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Heading 2, then Callout (decision, no icon)
+#### 42. Heading 2, then Callout (decision, no icon)
 
 ## Heading two
 :::^ icon=none

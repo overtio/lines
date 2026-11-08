@@ -69,6 +69,13 @@ A spreadsheet's grid (`src/plugins/spreadsheet/Grid.svelte`, [spreadsheets.md](s
 - `/unsplash` and `/giphy` open a dialog named "Search Unsplash" ("Search GIPHY") with focus in its search field. The pictures are a listbox of options, one Tab stop: ↓ from the field goes into them, the arrow keys, Home and End move between them, ↑ from the top row goes back to the field, and ↵ puts the focused one in the note. Each is named by its description and who made it ("Snowy peak, by Jane Doe"). A status says when it's searching, how many it found, that nothing was found, or that the service couldn't be reached. Esc closes it and puts focus back in the note.
 - With reduced motion, GIFs show still: in the picker, and GIPHY's GIFs in notes (their first frame, which GIPHY serves).
 
+## Terminal recordings
+
+- A recording (asciinema) is a group named "Terminal recording". ↑ and ↓ stop on it, as on an image; with it selected, Enter plays it and puts focus in the player. There Space pauses and plays, ← and → skip 5 seconds, a number from 0 to 9 jumps to that tenth of it, F is full screen, and Tab reaches its play and full-screen buttons. Esc puts focus back in the note with the recording selected. These are in Settings → Shortcuts.
+- The terminal's text is real text, which a screen reader can read when the player has focus; asciinema's player doesn't announce it as it changes.
+- The player's buttons are named in English ("Play", "Pause", "Toggle fullscreen mode"); that's asciinema's, which lines doesn't translate. A recording that can't load says so in words, in its place.
+- Its focus ring is the accent color, around the terminal.
+
 ## Settings
 
 - On the web and on phones and tablets, a modal dialog: Tab stays inside, Esc (or a click outside it) closes it, and focus goes back to what opened it. In the desktop apps, a window of its own: Esc or ⌘W closes it, and the window's own buttons work as in any app.

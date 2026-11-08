@@ -276,29 +276,33 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Missing file at the top level
+#### 37. Terminal recording (.cast file) at the top level
+
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Card at the top level
+#### 39. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 39. Callout (info) at the top level
+#### 40. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 40. Callout (warning, chosen icon) at the top level
+#### 41. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Callout (decision, no icon) at the top level
+#### 42. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

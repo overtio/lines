@@ -312,33 +312,38 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 37. Missing file, then Missing file
+#### 37. Missing file, then Terminal recording (.cast file)
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+[terminal.cast](attachment:terminal.cast)
+
+#### 38. Missing file, then Missing file
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 38. Missing file, then Card
+#### 39. Missing file, then Card
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ::: card
 Text in a card.
 :::
 
-#### 39. Missing file, then Callout (info)
+#### 40. Missing file, then Callout (info)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::i
 Text in an info callout.
 :::
 
-#### 40. Missing file, then Callout (warning, chosen icon)
+#### 41. Missing file, then Callout (warning, chosen icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 41. Missing file, then Callout (decision, no icon)
+#### 42. Missing file, then Callout (decision, no icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::^ icon=none
