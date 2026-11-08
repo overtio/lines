@@ -5,7 +5,7 @@ import type { Note } from "./types";
 /*
  * Sets of notes lines can add: the feature tour (the demo website starts with it), example notes
  * written in LaTeX, and the QA notes a tester goes through before a release (qa/README.md). Each
- * is files in the formats notes are written in (.md, .tex, .csv), loaded only when they're added.
+ * is files in the formats notes are written in (.md, .tex, .csv, .http), loaded only when they're added.
  * `attachment:<file>` links in them point at files in ./samples/, which are saved as attachments as
  * the notes are added.
  */
@@ -15,7 +15,7 @@ export type SampleSet = "tour" | "examples" | "qa";
 type Files = Record<string, () => Promise<string>>;
 
 const SETS: Record<SampleSet, Files> = {
-  tour: import.meta.glob<string>("./tour/*.{md,tex,csv}", { query: "?raw", import: "default" }),
+  tour: import.meta.glob<string>("./tour/*.{md,tex,csv,http}", { query: "?raw", import: "default" }),
   examples: import.meta.glob<string>("./examples/*.{md,tex}", { query: "?raw", import: "default" }),
   qa: import.meta.glob<string>(["/qa/checklist.md", "/qa/notes/*.{md,tex}"], { query: "?raw", import: "default" }),
 };

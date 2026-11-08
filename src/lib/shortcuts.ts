@@ -73,6 +73,8 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.mathCommands", keys: ["\\"], note: "shortcuts.inMath" },
       { action: "shortcuts.complete", keys: ["Tab"], note: "shortcuts.inMenu" },
       { action: "shortcuts.todo", keys: ["Mod-Enter"] },
+      { action: "shortcuts.sendRequest", keys: ["Mod-Enter"], note: "shortcuts.inRequest" },
+      { action: "shortcuts.sendAllRequests", keys: ["Mod-Shift-Enter"], note: "shortcuts.inRequest" },
       { action: "shortcuts.nest", keys: ["Tab", "Shift-Tab"], note: "shortcuts.inListItem" },
       { action: "shortcuts.moveLines", keys: ["Alt-ArrowUp", "Alt-ArrowDown"] },
       { action: "shortcuts.undo", keys: ["Mod-z"] },

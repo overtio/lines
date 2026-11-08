@@ -1735,3 +1735,181 @@
   color: var(--text-faint);
   pointer-events: none;
 }
+
+/*
+ * API requests (plugins/http): a Send button at the end of each request's line, Copy as curl after
+ * it while the line's hovered, and the response under the request (Response.svelte).
+ */
+.cm-http-actions {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.6em;
+  vertical-align: middle;
+  position: relative;
+  top: -0.08em;
+  font-family: var(--font-ui);
+}
+
+.cm-http-send {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 7px 0 6px;
+  border: none;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.cm-http-send:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.cm-http-send:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* An http block's Send and Copy as curl, in its top right corner, just left of its Copy. */
+.cm-http-block-actions {
+  position: absolute;
+  top: 5px;
+  right: 36px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-ui);
+  line-height: 1;
+}
+
+.cm-http-block-actions .cm-lp-copy {
+  position: static;
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.75;
+}
+
+.cm-http-block-actions .cm-lp-copy:hover,
+.cm-http-block-actions .cm-lp-copy.is-copied {
+  opacity: 1;
+}
+
+/* In a .http note, after Send, while the line's hovered. */
+.cm-line:hover .cm-http-actions .cm-http-curl {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .cm-http-send {
+    height: 28px;
+    padding: 0 10px 0 9px;
+  }
+
+  .cm-http-curl {
+    opacity: 1;
+  }
+}
+
+/* As wide as the note, whatever it holds: a long address or line in it would otherwise widen the note. */
+.cm-http-response {
+  contain: inline-size;
+  font-size: 1rem;
+  cursor: auto;
+}
+
+/*
+ * A secret, `{{github}}` (plugins/secrets): a key, its name and dots, with Show and Copy. It never
+ * holds its value but for the moment it's shown.
+ */
+.cm-secret {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  max-width: 100%;
+  padding: 0 2px 0 6px;
+  border-radius: 6px;
+  background: var(--tag-bg);
+  color: var(--text);
+  font-size: 0.92em;
+  line-height: 1.5;
+  vertical-align: baseline;
+}
+
+.cm-secret-icon {
+  display: flex;
+  color: var(--accent);
+}
+
+.cm-secret-name {
+  font-weight: 500;
+}
+
+.cm-secret-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  letter-spacing: 0.04em;
+}
+
+.cm-secret.is-shown .cm-secret-value {
+  color: var(--text);
+  letter-spacing: normal;
+  user-select: text;
+}
+
+.cm-secret.is-missing {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.cm-secret.is-missing .cm-secret-icon {
+  color: var(--text-faint);
+}
+
+.cm-secret-button {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.cm-secret-button:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.cm-secret-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.cm-secret-button.is-copied {
+  color: var(--success);
+}
+
+/* While the cursor's in it: as written, in the code font. */
+.cm-secret-source {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--accent);
+}

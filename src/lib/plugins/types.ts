@@ -1,3 +1,4 @@
+import type { LanguageDescription } from "@codemirror/language";
 import type { Extension } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";
@@ -52,6 +53,8 @@ export interface Contributions {
   formulas?: FormulaEngine[];
   /** New syntax for Markdown notes: block types and marks within text, and their "/" commands. */
   markdown?: MarkdownAddition[];
+  /** How code blocks in more languages are highlighted, in the editor and on paper: ```http. */
+  codeLanguages?: LanguageDescription[];
 }
 
 /** A markup language notes can be written in. Nothing in lines outside its plugin knows how it reads. */

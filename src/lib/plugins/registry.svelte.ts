@@ -58,6 +58,7 @@ class Plugins {
   readonly typesetters = $derived(this.#from("typesetters"));
   readonly formulaEngines = $derived(this.#from("formulas"));
   readonly markdown = $derived(this.#from("markdown"));
+  readonly codeLanguages = $derived(this.#from("codeLanguages"));
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).

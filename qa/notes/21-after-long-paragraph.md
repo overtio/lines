@@ -124,7 +124,45 @@ A long paragraph that wraps onto several lines at the usual width, so the space 
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Long paragraph, then Spreadsheet (csv block)
+#### 18. Long paragraph, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Long paragraph, then Secret ({{name}}, kept in a locked secrets note)
+
+A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 20. Long paragraph, then API requests (http block): a variable, a named request and one using its response
+
+A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 21. Long paragraph, then Spreadsheet (csv block)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ```csv
@@ -134,7 +172,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Long paragraph, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Long paragraph, then Named spreadsheet (csv name=), and a formula in another block using it
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ```csv name=costs
@@ -146,78 +184,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Long paragraph, then Divider
+#### 23. Long paragraph, then Divider
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ---
 
-#### 21. Long paragraph, then Key: Value line
+#### 24. Long paragraph, then Key: Value line
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Long paragraph, then Mention
+#### 25. Long paragraph, then Mention
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Long paragraph, then Wiki link
+#### 26. Long paragraph, then Wiki link
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Long paragraph, then Symbols
+#### 27. Long paragraph, then Symbols
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Long paragraph, then GitHub links
+#### 28. Long paragraph, then GitHub links
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Long paragraph, then Image
+#### 29. Long paragraph, then Image
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ![A sample picture](attachment:photo.png)
 
-#### 27. Long paragraph, then Drawing
+#### 30. Long paragraph, then Drawing
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Long paragraph, then File
+#### 31. Long paragraph, then File
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Long paragraph, then Missing file
+#### 32. Long paragraph, then Missing file
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Long paragraph, then Card
+#### 33. Long paragraph, then Card
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 ::: card
 Text in a card.
 :::
 
-#### 31. Long paragraph, then Callout (info)
+#### 34. Long paragraph, then Callout (info)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 :::i
 Text in an info callout.
 :::
 
-#### 32. Long paragraph, then Callout (warning, chosen icon)
+#### 35. Long paragraph, then Callout (warning, chosen icon)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Long paragraph, then Callout (decision, no icon)
+#### 36. Long paragraph, then Callout (decision, no icon)
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 :::^ icon=none

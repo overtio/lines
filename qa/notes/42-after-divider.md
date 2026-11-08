@@ -124,7 +124,45 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Divider, then Spreadsheet (csv block)
+#### 18. Divider, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+---
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Divider, then Secret ({{name}}, kept in a locked secrets note)
+
+---
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 20. Divider, then API requests (http block): a variable, a named request and one using its response
+
+---
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 21. Divider, then Spreadsheet (csv block)
 
 ---
 ```csv
@@ -134,7 +172,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Divider, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Divider, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ---
 ```csv name=costs
@@ -146,78 +184,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Divider, then Divider
+#### 23. Divider, then Divider
 
 ---
 ---
 
-#### 21. Divider, then Key: Value line
+#### 24. Divider, then Key: Value line
 
 ---
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Divider, then Mention
+#### 25. Divider, then Mention
 
 ---
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Divider, then Wiki link
+#### 26. Divider, then Wiki link
 
 ---
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Divider, then Symbols
+#### 27. Divider, then Symbols
 
 ---
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Divider, then GitHub links
+#### 28. Divider, then GitHub links
 
 ---
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Divider, then Image
+#### 29. Divider, then Image
 
 ---
 ![A sample picture](attachment:photo.png)
 
-#### 27. Divider, then Drawing
+#### 30. Divider, then Drawing
 
 ---
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Divider, then File
+#### 31. Divider, then File
 
 ---
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Divider, then Missing file
+#### 32. Divider, then Missing file
 
 ---
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Divider, then Card
+#### 33. Divider, then Card
 
 ---
 ::: card
 Text in a card.
 :::
 
-#### 31. Divider, then Callout (info)
+#### 34. Divider, then Callout (info)
 
 ---
 :::i
 Text in an info callout.
 :::
 
-#### 32. Divider, then Callout (warning, chosen icon)
+#### 35. Divider, then Callout (warning, chosen icon)
 
 ---
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Divider, then Callout (decision, no icon)
+#### 36. Divider, then Callout (decision, no icon)
 
 ---
 :::^ icon=none

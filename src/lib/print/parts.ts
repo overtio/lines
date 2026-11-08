@@ -1,10 +1,9 @@
-import { LanguageDescription } from "@codemirror/language";
-import { languages } from "@codemirror/language-data";
 import { highlightCode, tagHighlighter, tags } from "@lezer/highlight";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
 import type { IconName } from "../icons/icons";
 import { t } from "../i18n/index.svelte";
+import { codeLanguage } from "../editor/codeLanguages";
 import { loadMath, type Macros, NO_MACROS } from "../editor/math";
 import { unsplashImage } from "../editor/unsplash";
 import { attachmentName, attachmentURL, imageSize } from "../notes/attachments";
@@ -99,7 +98,7 @@ export class Parts {
     const shown = symbols ? symbolPieces(source) : (from: number, to: number) => source.slice(from, to);
     const code = el("code", "", shown(0, source.length));
     const pre = el("pre", "doc-code", code);
-    const found = language ? LanguageDescription.matchLanguageName(languages, language, true) : null;
+    const found = language ? codeLanguage(language) : null;
     if (found) {
       this.#later(
         found.load().then((support) => {

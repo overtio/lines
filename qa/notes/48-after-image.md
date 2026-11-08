@@ -124,7 +124,45 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Image, then Spreadsheet (csv block)
+#### 18. Image, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+![A sample picture](attachment:photo.png)
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Image, then Secret ({{name}}, kept in a locked secrets note)
+
+![A sample picture](attachment:photo.png)
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 20. Image, then API requests (http block): a variable, a named request and one using its response
+
+![A sample picture](attachment:photo.png)
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 21. Image, then Spreadsheet (csv block)
 
 ![A sample picture](attachment:photo.png)
 ```csv
@@ -134,7 +172,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Image, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Image, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ![A sample picture](attachment:photo.png)
 ```csv name=costs
@@ -146,78 +184,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Image, then Divider
+#### 23. Image, then Divider
 
 ![A sample picture](attachment:photo.png)
 ---
 
-#### 21. Image, then Key: Value line
+#### 24. Image, then Key: Value line
 
 ![A sample picture](attachment:photo.png)
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Image, then Mention
+#### 25. Image, then Mention
 
 ![A sample picture](attachment:photo.png)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Image, then Wiki link
+#### 26. Image, then Wiki link
 
 ![A sample picture](attachment:photo.png)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Image, then Symbols
+#### 27. Image, then Symbols
 
 ![A sample picture](attachment:photo.png)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Image, then GitHub links
+#### 28. Image, then GitHub links
 
 ![A sample picture](attachment:photo.png)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Image, then Image
+#### 29. Image, then Image
 
 ![A sample picture](attachment:photo.png)
 ![A sample picture](attachment:photo.png)
 
-#### 27. Image, then Drawing
+#### 30. Image, then Drawing
 
 ![A sample picture](attachment:photo.png)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Image, then File
+#### 31. Image, then File
 
 ![A sample picture](attachment:photo.png)
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Image, then Missing file
+#### 32. Image, then Missing file
 
 ![A sample picture](attachment:photo.png)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Image, then Card
+#### 33. Image, then Card
 
 ![A sample picture](attachment:photo.png)
 ::: card
 Text in a card.
 :::
 
-#### 31. Image, then Callout (info)
+#### 34. Image, then Callout (info)
 
 ![A sample picture](attachment:photo.png)
 :::i
 Text in an info callout.
 :::
 
-#### 32. Image, then Callout (warning, chosen icon)
+#### 35. Image, then Callout (warning, chosen icon)
 
 ![A sample picture](attachment:photo.png)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Image, then Callout (decision, no icon)
+#### 36. Image, then Callout (decision, no icon)
 
 ![A sample picture](attachment:photo.png)
 :::^ icon=none

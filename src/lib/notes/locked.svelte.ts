@@ -28,7 +28,11 @@ export class WrongPassword extends Error {
 /** What the password dialog asks for: a new password, or the one there is; then what happens next. */
 export interface PasswordRequest {
   purpose: "set" | "open";
+  /** Why it's asked: to lock a note (the default), or for a secret kept in one (notes/secrets.svelte.ts). */
+  reason?: "lock" | "secret";
   after: () => void;
+  /** It was closed without a password. */
+  cancelled?: () => void;
 }
 
 class LockedNotes {

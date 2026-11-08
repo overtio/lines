@@ -1,12 +1,14 @@
 import { isApple } from "../lib/platform";
 import type { Plugin } from "../lib/plugins/types";
 import { giphy } from "./giphy";
+import { requests } from "./http";
 import { ironcalc } from "./ironcalc";
 import { katex } from "./katex";
 import { latex } from "./latex";
 import { lucide } from "./lucide";
 import { markdown } from "./markdown";
 import { mermaid } from "./mermaid";
+import { secrets } from "./secrets";
 import { sfSymbols } from "./sf-symbols";
 import { spreadsheet } from "./spreadsheet";
 import { tex } from "./tex";
@@ -22,6 +24,8 @@ export const builtIn = (): Plugin[] => [
   markdown(),
   latex(),
   spreadsheet(),
+  requests(),
+  secrets(),
   katex(),
   mermaid(),
   ironcalc(),

@@ -158,7 +158,51 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Todo list, then Spreadsheet (csv block)
+#### 18. Todo list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Todo list, then Secret ({{name}}, kept in a locked secrets note)
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 20. Todo list, then API requests (http block): a variable, a named request and one using its response
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 21. Todo list, then Spreadsheet (csv block)
 
 - [x] Done todo
 - [ ] Open todo
@@ -170,7 +214,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Todo list, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Todo list, then Named spreadsheet (csv name=), and a formula in another block using it
 
 - [x] Done todo
 - [ ] Open todo
@@ -184,77 +228,77 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Todo list, then Divider
+#### 23. Todo list, then Divider
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ---
 
-#### 21. Todo list, then Key: Value line
+#### 24. Todo list, then Key: Value line
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Todo list, then Mention
+#### 25. Todo list, then Mention
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Todo list, then Wiki link
+#### 26. Todo list, then Wiki link
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Todo list, then Symbols
+#### 27. Todo list, then Symbols
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Todo list, then GitHub links
+#### 28. Todo list, then GitHub links
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Todo list, then Image
+#### 29. Todo list, then Image
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample picture](attachment:photo.png)
 
-#### 27. Todo list, then Drawing
+#### 30. Todo list, then Drawing
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Todo list, then File
+#### 31. Todo list, then File
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Todo list, then Missing file
+#### 32. Todo list, then Missing file
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Todo list, then Card
+#### 33. Todo list, then Card
 
 - [x] Done todo
 - [ ] Open todo
@@ -263,7 +307,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Text in a card.
 :::
 
-#### 31. Todo list, then Callout (info)
+#### 34. Todo list, then Callout (info)
 
 - [x] Done todo
 - [ ] Open todo
@@ -272,7 +316,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 32. Todo list, then Callout (warning, chosen icon)
+#### 35. Todo list, then Callout (warning, chosen icon)
 
 - [x] Done todo
 - [ ] Open todo
@@ -281,7 +325,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Todo list, then Callout (decision, no icon)
+#### 36. Todo list, then Callout (decision, no icon)
 
 - [x] Done todo
 - [ ] Open todo

@@ -124,7 +124,45 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Wiki link, then Spreadsheet (csv block)
+#### 18. Wiki link, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Wiki link, then Secret ({{name}}, kept in a locked secrets note)
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 20. Wiki link, then API requests (http block): a variable, a named request and one using its response
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 21. Wiki link, then Spreadsheet (csv block)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ```csv
@@ -134,7 +172,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Wiki link, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Wiki link, then Named spreadsheet (csv name=), and a formula in another block using it
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ```csv name=costs
@@ -146,78 +184,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Wiki link, then Divider
+#### 23. Wiki link, then Divider
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ---
 
-#### 21. Wiki link, then Key: Value line
+#### 24. Wiki link, then Key: Value line
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Wiki link, then Mention
+#### 25. Wiki link, then Mention
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Wiki link, then Wiki link
+#### 26. Wiki link, then Wiki link
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Wiki link, then Symbols
+#### 27. Wiki link, then Symbols
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Wiki link, then GitHub links
+#### 28. Wiki link, then GitHub links
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Wiki link, then Image
+#### 29. Wiki link, then Image
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ![A sample picture](attachment:photo.png)
 
-#### 27. Wiki link, then Drawing
+#### 30. Wiki link, then Drawing
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Wiki link, then File
+#### 31. Wiki link, then File
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Wiki link, then Missing file
+#### 32. Wiki link, then Missing file
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Wiki link, then Card
+#### 33. Wiki link, then Card
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ::: card
 Text in a card.
 :::
 
-#### 31. Wiki link, then Callout (info)
+#### 34. Wiki link, then Callout (info)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::i
 Text in an info callout.
 :::
 
-#### 32. Wiki link, then Callout (warning, chosen icon)
+#### 35. Wiki link, then Callout (warning, chosen icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Wiki link, then Callout (decision, no icon)
+#### 36. Wiki link, then Callout (decision, no icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::^ icon=none

@@ -31,6 +31,12 @@ export default {
   // A Mermaid diagram.
   "editor.slash.diagram": "Diagram",
   "editor.slash.diagram.keywords": "mermaid flowchart chart graph sequence",
+  "editor.slash.request": "API request",
+  "editor.slash.request.keywords": "http rest api request curl get post fetch endpoint",
+  "editor.slash.hurl": "Hurl test",
+  "editor.slash.hurl.keywords": "hurl test assert api request check http",
+  "editor.slash.secret": "Secret",
+  "editor.slash.secret.keywords": "password token key api credential",
   // A block of LaTeX math.
   "editor.slash.math": "Math",
   "editor.slash.math.keywords": "latex tex katex equation formula",

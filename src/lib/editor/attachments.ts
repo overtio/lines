@@ -114,7 +114,8 @@ const ICONS: [RegExp, IconName][] = [
 const oneDecimal = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const whole = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 });
 
-function formatSize(bytes: number) {
+/** A size in bytes as people read it: 820 bytes, 1.2 KB, 14 MB. */
+export function formatSize(bytes: number) {
   if (bytes < 1000) return t("editor.size.bytes", { count: bytes });
   const [value, unit]: [number, MessageKey] =
     bytes < 1e6 ? [bytes / 1e3, "editor.size.kb"] : bytes < 1e9 ? [bytes / 1e6, "editor.size.mb"] : [bytes / 1e9, "editor.size.gb"];

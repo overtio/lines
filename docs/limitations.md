@@ -157,6 +157,26 @@ How plugins work is in [plugins.md](plugins.md).
 - Only Markdown notes take additions from plugins; a renderer plugin draws code blocks in Markdown notes, not in LaTeX ones.
 - Turning a plugin off or on in the Mac app's Settings window hasn't been tried there yet, nor in floating notes (each window should follow at once).
 
+## API requests
+
+What isn't done yet is in [requests.md](requests.md#not-yet): environments, assertions and tests, bodies from files, forms with files, GraphQL and WebSocket, plain `http://` beyond this computer, and importing a Bruno or Postman collection.
+
+- In the browser, only APIs that allow requests from other sites (CORS) answer, and headers the browser keeps from pages (`Cookie`) aren't sent.
+- Responses aren't saved in the note: once lines quits they're gone, and a request using an earlier one's response needs that one sent again.
+- **+** adds a response's body to the note only up to 200 KB.
+- Hurl: what lines doesn't read or check of a Hurl file is in [requests.md](requests.md#hurl): the HTTP version, certificates, cookies shared between entries, `[Multipart]`, `md5`, and the options that tune curl or repeat entries. Not following redirects works in the apps only. Dates in `toDate` are read as ISO 8601.
+- Requests in a code block inside a list or a quote, indented, aren't read as requests.
+- Sending from the Windows and Linux apps hasn't been tried yet.
+
+## Secrets
+
+What isn't done yet is in [secrets.md](secrets.md#not-yet).
+
+- A secrets note's values show in its properties while it's open, as any locked note's text does.
+- A response can echo a secret back (an echo service, a token in a redirect), and **+** writes the body into the note as it came.
+- Copy as curl writes `${NAME}` for every name it can't fill in, a secret or not.
+- Secrets are as safe as locked notes: see Locked notes below.
+
 ## Accessibility and languages
 
 - With Contrast on Standard, faint text (dates, counts, the sidebar's headings, hints) is below WCAG AA's 4.5:1 in every theme but the three accessibility ones, and secondary text is too in a few light themes (Solarized, Everforest, Ayu). Contrast → Increased, or the system's Increase Contrast, meets AA (docs/accessibility.md).

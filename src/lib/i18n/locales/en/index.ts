@@ -4,12 +4,15 @@
  */
 import app from "./app";
 import editor from "./editor";
+import http from "./http";
+import hurl from "./hurl";
 import latex from "./latex";
 import list from "./list";
 import lock from "./lock";
 import picker from "./picker";
 import plugins from "./plugins";
 import print from "./print";
+import secrets from "./secrets";
 import settings from "./settings";
 import sheet from "./sheet";
 import shortcuts from "./shortcuts";
@@ -19,12 +22,15 @@ import sync from "./sync";
 export default {
   ...app,
   ...editor,
+  ...http,
+  ...hurl,
   ...latex,
   ...list,
   ...lock,
   ...picker,
   ...plugins,
   ...print,
+  ...secrets,
   ...settings,
   ...sheet,
   ...shortcuts,

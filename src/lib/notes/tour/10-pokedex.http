@@ -1,0 +1,26 @@
+# Pokédex
+# A whole note of requests, kept as a .http file. Send one with the button at the end of its
+# line, or ⌘↵ anywhere in it; its response shows under it. The ### titles are the outline.
+# #tour
+
+@api = https://pokeapi.co/api/v2
+
+### A Pokémon
+# @name pokemon
+GET {{api}}/pokemon/pikachu
+Accept: application/json
+
+### Its species, at an address the first response gives
+# @name species
+GET {{pokemon.response.body.$.species.url}}
+
+### How it evolves, from the species
+GET {{species.response.body.$.evolution_chain.url}}
+
+### A page of them, the address going on over the lines below it
+GET {{api}}/pokemon
+    ?limit=5
+    &offset=20
+
+### One that isn't there: a 404
+GET {{api}}/pokemon/missingno

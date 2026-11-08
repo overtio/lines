@@ -11,6 +11,8 @@ Settings → Plugins lists them. A plugin that isn't needed can be turned off, a
 | Markdown | The Markdown notes are written in ([Linedown](linedown.md)). Always on. | Yes | `src/plugins/markdown/`, with the editor in `src/lib/editor/` and printing in `src/lib/print/markdown.ts` |
 | LaTeX | Notes written in LaTeX ([latex.md](latex.md)) | Yes | `src/plugins/latex/` |
 | Spreadsheets | Notes that are spreadsheets, kept as CSV, and opening CSV and Excel files; draws ` ```csv ` code blocks in Markdown notes as spreadsheets, and adds `/spreadsheet` ([spreadsheets.md](spreadsheets.md)) | Yes | `src/plugins/spreadsheet/` |
+| API Requests | Sends requests written in the `.http` format or Hurl's, from `.http` and `.hurl` notes and ` ```http ` and ` ```hurl ` code blocks in Markdown notes, shows their responses and checks Hurl's asserts; adds `/request` and `/hurl` ([requests.md](requests.md)) | Yes | `src/plugins/http/` |
+| Secrets | Draws `{{name}}` in Markdown notes as a secret kept in a locked note, to show or copy; adds `/secret` ([secrets.md](secrets.md)) | Yes | `src/plugins/secrets/`, with the store in `src/lib/notes/secrets.svelte.ts` |
 | Math (KaTeX) | The math engine, for math in notes of any format | Yes | `src/plugins/katex/` |
 | Diagrams (Mermaid) | Draws ` ```mermaid ` code blocks, and adds `/diagram` | Yes | `src/plugins/mermaid/` |
 | Formulas (IronCalc) | The formula engine, for formulas in tables and spreadsheets, and Excel workbooks | Yes | `src/plugins/ironcalc/` |
@@ -25,7 +27,7 @@ Settings → Plugins lists them. A plugin that isn't needed can be turned off, a
 
 Nothing is lost. A plugin turned off stops adding what it adds, at once, in every window:
 
-- **A format.** Its notes keep their format and show as plain text, which can still be read and changed. Their ⓘ panel says so, with a button that turns the plugin back on. Export, Copy and Download still write them as what they are (a LaTeX note as a `.tex` file that compiles). With Spreadsheets off, a ` ```csv ` block in a Markdown note is a code block too, `/spreadsheet` is gone from the "/" menu, and tables have no Convert to Spreadsheet button.
+- **A format.** Its notes keep their format and show as plain text, which can still be read and changed. Their ⓘ panel says so, with a button that turns the plugin back on. Export, Copy and Download still write them as what they are (a LaTeX note as a `.tex` file that compiles). With Spreadsheets off, a ` ```csv ` block in a Markdown note is a code block too, `/spreadsheet` is gone from the "/" menu, and tables have no Convert to Spreadsheet button. With API Requests off, ` ```http ` and ` ```hurl ` blocks are code blocks with no Send buttons, and `/request` and `/hurl` are gone. With Secrets off, `{{name}}` is text and `/secret` is gone; requests still use secrets.
 - **An engine.** With Math off, math shows as it's written. With Diagrams off, a ` ```mermaid ` block is a code block and `/diagram` is gone from the "/" menu. With Formulas off, formulas show as written, and spreadsheets don't download as values or Excel workbooks. Without TeX, a LaTeX note's PDF is laid out by lines.
 - **A theme or an icon set.** What was chosen is kept, and lines shows its own (Lines, Lucide) until the plugin is on again.
 - **A plugin others need** (TeX needs LaTeX): those wait, and say what they need. Turning one on turns on what it needs too.
@@ -66,7 +68,7 @@ Load anything big the first time it's needed (`import()`), as KaTeX, Mermaid and
 
 ### What a plugin can add
 
-Every part of `contributes` is optional, and a plugin can add several kinds of things (Mermaid adds a renderer and a "/" command).
+Every part of `contributes` is optional, and a plugin can add several kinds of things (Mermaid adds a renderer and a "/" command; API Requests a format, a code language, and editing and a "/" command for Markdown).
 
 **`languages`**: formats notes can be written in (`NoteLanguage`). A language says everything lines needs to know about notes written in it, so nothing outside its plugin knows how it reads:
 
@@ -88,6 +90,8 @@ Every part of `contributes` is optional, and a plugin can add several kinds of t
 **`formulas`**: an engine that works out formulas (`FormulaEngine`), for tables in Markdown notes and for spreadsheets. It keeps a sheet that works its cells out again as they change (`sheet(find)`, `find` finding the other sheets its formulas name: `Budget!B4`), moves a formula's relative references as copying does (`move`), renames the other sheets a formula names, as renaming a sheet does (`renameSheets`), moves cells with formulas pointing at them following, as cutting and pasting does (`moveCells`), puts in and takes out rows and columns with formulas still pointing at the same cells (`shift`), says what can go at the cursor in a formula being written (`complete`), where its references are (`references`) and which functions it knows (`functions`, for suggesting them), and can read and write Excel workbooks. Formulas are in Excel's English, with commas, so they work the same everywhere. Only the first engine on is used; IronCalc's is lines' own, and [HyperFormula is being considered](https://github.com/overtio/lines/issues/1) as another.
 
 **`renderers`**: engines that draw a code block of their languages, on screen in the theme's colors or for paper in black on white, as SVG markup or an element. `actions` are buttons beside what they draw, down its right side. A renderer with an `editor` draws its blocks on screen as something to work in instead, which `render` still prints: the Spreadsheets plugin's draws a ` ```csv ` block as a grid. `editor(dom, block)` puts what it draws into `dom` and gives back what the editor calls as things change (`BlockEditor`: `update` when the block's code or name, the note around it or its read-only state changes, `focus` when ↓ or ↑ moves into it from the text around it, `layout`, `destroy`). Through `block` (`EditableBlock`) it reads the block's code (`source`), where it starts (`from`) and its name (`name`, written after the language: ` ```csv name=costs `), writes its code back as one step to undo (`write`) and its name (`rename`), and moves the cursor out into the text (`leave`) or into its code (`showCode`), which shows in its place while the cursor's in it (`src/lib/editor/rendered.ts`). Its `actions` sit beside it too: an editor that draws something narrower than the block, or below a caption, sets `--actions-left` and `--actions-top` on `dom` to where that ends and starts. `render` is given the whole note's text (`note`) when it's known, for what depends on the rest of the note: a ` ```csv ` block's formulas use other blocks in it.
+
+**`codeLanguages`**: how code blocks in more languages are highlighted, in the editor and on paper, as CodeMirror [`LanguageDescription`](https://codemirror.net/docs/ref/#language.LanguageDescription)s: API Requests' highlights ` ```http `. A plugin's language comes before the ones CodeMirror knows by the same name.
 
 **`typesetters`**: ways to make a PDF for notes in some languages, offered beside lines' own pages in the PDF preview.
 

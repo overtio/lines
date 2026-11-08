@@ -141,7 +141,48 @@ $$
 | Broken | =B2/0 |
 :::
 
-#### 18. Spreadsheet (csv block) in a card
+#### 18. Hurl entries (hurl block): a capture used by the next entry, and asserts in a card
+
+::: card
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+:::
+
+#### 19. Secret ({{name}}, kept in a locked secrets note) in a card
+
+::: card
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+:::
+
+#### 20. API requests (http block): a variable, a named request and one using its response in a card
+
+::: card
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+:::
+
+#### 21. Spreadsheet (csv block) in a card
 
 ::: card
 ```csv
@@ -152,7 +193,7 @@ Total, =SUM(B2:B3)
 ```
 :::
 
-#### 19. Named spreadsheet (csv name=), and a formula in another block using it in a card
+#### 22. Named spreadsheet (csv name=), and a formula in another block using it in a card
 
 ::: card
 ```csv name=costs
@@ -165,67 +206,67 @@ Total, =costs!B2*2
 ```
 :::
 
-#### 20. Divider in a card
+#### 23. Divider in a card
 
 ::: card
 ---
 :::
 
-#### 21. Key: Value line in a card
+#### 24. Key: Value line in a card
 
 ::: card
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 22. Mention in a card
+#### 25. Mention in a card
 
 ::: card
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 23. Wiki link in a card
+#### 26. Wiki link in a card
 
 ::: card
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 24. Symbols in a card
+#### 27. Symbols in a card
 
 ::: card
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 25. GitHub links in a card
+#### 28. GitHub links in a card
 
 ::: card
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 26. Image in a card
+#### 29. Image in a card
 
 ::: card
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 27. Drawing in a card
+#### 30. Drawing in a card
 
 ::: card
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 28. File in a card
+#### 31. File in a card
 
 ::: card
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 29. Missing file in a card
+#### 32. Missing file in a card
 
 ::: card
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 30. Card in a card
+#### 33. Card in a card
 
 ::: card
 ::: card
@@ -233,7 +274,7 @@ Text in a card.
 :::
 :::
 
-#### 31. Callout (info) in a card
+#### 34. Callout (info) in a card
 
 ::: card
 :::i
@@ -241,7 +282,7 @@ Text in an info callout.
 :::
 :::
 
-#### 32. Callout (warning, chosen icon) in a card
+#### 35. Callout (warning, chosen icon) in a card
 
 ::: card
 :::! icon=flag
@@ -249,7 +290,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 33. Callout (decision, no icon) in a card
+#### 36. Callout (decision, no icon) in a card
 
 ::: card
 :::^ icon=none

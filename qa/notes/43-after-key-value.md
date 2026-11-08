@@ -124,7 +124,45 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Key: Value line, then Spreadsheet (csv block)
+#### 18. Key: Value line, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+**Wi-Fi password:** correct-horse-battery
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Key: Value line, then Secret ({{name}}, kept in a locked secrets note)
+
+**Wi-Fi password:** correct-horse-battery
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 20. Key: Value line, then API requests (http block): a variable, a named request and one using its response
+
+**Wi-Fi password:** correct-horse-battery
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 21. Key: Value line, then Spreadsheet (csv block)
 
 **Wi-Fi password:** correct-horse-battery
 ```csv
@@ -134,7 +172,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Key: Value line, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Key: Value line, then Named spreadsheet (csv name=), and a formula in another block using it
 
 **Wi-Fi password:** correct-horse-battery
 ```csv name=costs
@@ -146,78 +184,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Key: Value line, then Divider
+#### 23. Key: Value line, then Divider
 
 **Wi-Fi password:** correct-horse-battery
 ---
 
-#### 21. Key: Value line, then Key: Value line
+#### 24. Key: Value line, then Key: Value line
 
 **Wi-Fi password:** correct-horse-battery
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Key: Value line, then Mention
+#### 25. Key: Value line, then Mention
 
 **Wi-Fi password:** correct-horse-battery
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Key: Value line, then Wiki link
+#### 26. Key: Value line, then Wiki link
 
 **Wi-Fi password:** correct-horse-battery
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Key: Value line, then Symbols
+#### 27. Key: Value line, then Symbols
 
 **Wi-Fi password:** correct-horse-battery
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Key: Value line, then GitHub links
+#### 28. Key: Value line, then GitHub links
 
 **Wi-Fi password:** correct-horse-battery
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Key: Value line, then Image
+#### 29. Key: Value line, then Image
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample picture](attachment:photo.png)
 
-#### 27. Key: Value line, then Drawing
+#### 30. Key: Value line, then Drawing
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Key: Value line, then File
+#### 31. Key: Value line, then File
 
 **Wi-Fi password:** correct-horse-battery
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Key: Value line, then Missing file
+#### 32. Key: Value line, then Missing file
 
 **Wi-Fi password:** correct-horse-battery
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Key: Value line, then Card
+#### 33. Key: Value line, then Card
 
 **Wi-Fi password:** correct-horse-battery
 ::: card
 Text in a card.
 :::
 
-#### 31. Key: Value line, then Callout (info)
+#### 34. Key: Value line, then Callout (info)
 
 **Wi-Fi password:** correct-horse-battery
 :::i
 Text in an info callout.
 :::
 
-#### 32. Key: Value line, then Callout (warning, chosen icon)
+#### 35. Key: Value line, then Callout (warning, chosen icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Key: Value line, then Callout (decision, no icon)
+#### 36. Key: Value line, then Callout (decision, no icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::^ icon=none

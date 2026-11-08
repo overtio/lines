@@ -184,6 +184,41 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 - [ ] Picking `\frac` writes `\frac{}{}` with the cursor in the first braces; Tab goes to the second, then past it; Tab in the menu completes (`\al` → `\alpha`)
 - [ ] Smart quotes stay straight in math (`f'(x)`)
 
+## 6a. API requests
+
+- [ ] `/request` adds an ` ```http ` block with the cursor after `https://`; the block's methods, header names, `{{variables}}`, comments and JSON in bodies highlight in the theme's colors
+- [ ] An `http` block's top right corner has Send, Copy as curl (a terminal icon) and Copy; Send sends its request, or for several says Send all and sends each in turn (a later one using an earlier one's response works); ⌘↵ with the cursor anywhere in a request sends just it. The response shows under the block: status (green for 2xx, red for 4xx and 5xx), time, size, and the body, JSON indented and highlighted however long (a 1 MB one too, typing in the note staying quick), its objects folding from the margin, an image shown. ⌘↵ outside a request still makes a todo
+- [ ] In a body, a web address has Send's icon after it: clicking it adds `###` and `GET` the address after the request it came from (at the end of the block in a Markdown note; after the request in a `.http` note), with its headers but Content-Type, and sends it, its response showing below; not in a locked note or the Trash
+- [ ] Hovering a JSON value's line shows a copy button at its end: a string copies without quotes, a number as written, an object or array (on the line it opens on) as indented JSON
+- [ ] Headers shows the response's headers; Copy copies the body or the headers; × closes it; while sending, × cancels and says Cancelled
+- [ ] `@api = …` in one block works in another block of the note; a request using `{{todo.response.body.$.userId}}` before `# @name todo` was sent says to send that first, and after, sends with the value; an unknown `{{name}}` says there's no such variable and sends nothing
+- [ ] Pasting a curl command (Chrome's Copy as cURL, with `$'…'` and `\` continued lines) into an `http` block writes it as a request, JSON bodies indented; pasted anywhere else it stays as written
+- [ ] Copy as curl copies each of the block's requests as a curl command, variables filled in, and shows a check for a moment; Copy still copies the text as written. In a `.http` note, Send and the terminal icon are at the end of each request's line (the icon while the line's hovered, always on touch), for that request
+- [ ] **+** on a response adds its body as a code block after the requests' block, and closes the response; ⌘Z takes it out
+- [ ] A note switched to HTTP Requests in its ⓘ panel shows in a monospace font, `###` titles bold and in the outline, Send at the end of each request's line, and responses under each request; its title in the list is its first line, its excerpt its requests; `# #tag` tags it
+- [ ] Importing a `.http` file makes an HTTP Requests note; Download and Export write it as `.http`; ⌘P prints it highlighted
+- [ ] [Desktop] An API without CORS (`GET https://example.com`) answers; `Cookie` and `Origin` headers reach the server as written (`GET https://httpbin.org/headers`); `GET http://localhost:…` works, `GET http://example.com` says the apps only send to https:// and localhost
+- [ ] [Web] An API without CORS says it didn't answer, and why
+- [ ] VoiceOver reads Send, the response's status as it arrives, and its buttons
+
+## 6b. Secrets
+
+- [ ] A locked note with properties `type: secrets` and `token: …` is a secrets note; one that isn't locked isn't read
+- [ ] `{{token}}` in a Markdown note shows a key, `token` and dots; Show reveals it (and hides it after 15 seconds, or when locked notes close); Copy copies it; with the cursor in it, it shows as written. `{{nope}}` has an outline and says there's no such secret. In code it's text. `/secret` writes `{{}}`
+- [ ] With locked notes closed, Show or Copy asks for their password ("Your secrets are kept in a locked note"), with Touch ID [Mac]; Cancel does nothing
+- [ ] `Authorization: Bearer {{token}}` in a request sends the value (`https://httpbin.org/headers` echoes it); a secret in the address shows as `••••` in the response; Copy as curl writes `"${TOKEN}"`; with locked notes closed Send asks first, and Cancel says why in the response
+- [ ] Printing and the PDF show `token ••••••`; Copy, Download and Export keep `{{token}}`
+- [ ] Secrets off: `{{token}}` is text, `/secret` is gone; requests still use it
+
+## 6c. Hurl
+
+- [ ] `/hurl` adds a ` ```hurl ` block; methods, `HTTP 200`, `[Sections]`, names, queries, filters, predicates, strings, regular expressions and `{{templates}}` highlight
+- [ ] Send all runs the entries in order: a `[Captures]` value (`owner: jsonpath "$.userId"`) is used by the next entry's `{{owner}}`; `[Query]`, `[Form]`, `[BasicAuth]` and `[Cookies]` are sent (`https://httpbin.org/anything` echoes them); a JSON body is sent as JSON
+- [ ] A response shows "3 passed" in green or "1 failed" in red beside its status; Checks lists each check with ✓ or ✗, and what the response had for a failed one; it opens on Checks when one failed. Send all stops at the first entry that fails
+- [ ] Asserts with jsonpath (wildcards, filters `[?@.price < 10]`), header, regex, xpath on HTML, duration, sha256 `== hex,…;`, `count`, `nth`, `toInt`, `not`, `exists`, `isString`, `matches /…/` and `== {{variable}}` work; one lines can't do (`certificate`, `version`) says so in its check
+- [ ] A note switched to Hurl: Send at the end of each request line, ⌘⇧↵ sends all, the comment above each request is in the outline; importing a `.hurl` file makes a Hurl note
+- [ ] [Desktop] An entry without `location: true` shows a redirect's own status (`HTTP 302`); with it, the page it leads to
+
 ## 7. Images and files
 
 - [ ] Pasting an image, or dropping one onto a note, adds it on its own line; the cursor moves past it
@@ -308,11 +343,12 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[We
 
 ## 13a. Plugins
 
-- [ ] Settings → Plugins lists Formats (Markdown, LaTeX, Spreadsheets), Engines (Math, Diagrams, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
+- [ ] Settings → Plugins lists Secrets under More; Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
 - [ ] Clicking a plugin's name (or its switch) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
 - [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On, and its format switch offers only Markdown and Spreadsheet; Turn On draws it as LaTeX again at once
 - [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Data → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
 - [ ] Turning TeX Typesetting on while LaTeX is off turns LaTeX on too
+- [ ] API Requests off: ```http and ```hurl blocks show as plain code with no Send buttons, `/request` and `/hurl` are gone, and HTTP Requests and Hurl notes show as plain text; on again, all back
 - [ ] Diagrams off: ```mermaid blocks show as code, `/diagram` is gone from the "/" menu, and the PDF prints them as code; on again, they're drawn again, and Diagram is right after Code block in the menu
 - [ ] Math off: `$…$`, `$$` blocks and LaTeX notes' math show as written, on screen and in the PDF; on again, drawn
 - [ ] TeX Typesetting off: a LaTeX note's PDF preview has no "Typeset with" switch

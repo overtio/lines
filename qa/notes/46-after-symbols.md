@@ -124,7 +124,45 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 18. Symbols, then Spreadsheet (csv block)
+#### 18. Symbols, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+
+#### 19. Symbols, then Secret ({{name}}, kept in a locked secrets note)
+
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+
+#### 20. Symbols, then API requests (http block): a variable, a named request and one using its response
+
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+
+#### 21. Symbols, then Spreadsheet (csv block)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ```csv
@@ -134,7 +172,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 19. Symbols, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 22. Symbols, then Named spreadsheet (csv name=), and a formula in another block using it
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ```csv name=costs
@@ -146,78 +184,78 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 20. Symbols, then Divider
+#### 23. Symbols, then Divider
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ---
 
-#### 21. Symbols, then Key: Value line
+#### 24. Symbols, then Key: Value line
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 **Wi-Fi password:** correct-horse-battery
 
-#### 22. Symbols, then Mention
+#### 25. Symbols, then Mention
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 23. Symbols, then Wiki link
+#### 26. Symbols, then Wiki link
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 24. Symbols, then Symbols
+#### 27. Symbols, then Symbols
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 25. Symbols, then GitHub links
+#### 28. Symbols, then GitHub links
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 26. Symbols, then Image
+#### 29. Symbols, then Image
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ![A sample picture](attachment:photo.png)
 
-#### 27. Symbols, then Drawing
+#### 30. Symbols, then Drawing
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 28. Symbols, then File
+#### 31. Symbols, then File
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Budget.csv](attachment:budget.csv)
 
-#### 29. Symbols, then Missing file
+#### 32. Symbols, then Missing file
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 30. Symbols, then Card
+#### 33. Symbols, then Card
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ::: card
 Text in a card.
 :::
 
-#### 31. Symbols, then Callout (info)
+#### 34. Symbols, then Callout (info)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::i
 Text in an info callout.
 :::
 
-#### 32. Symbols, then Callout (warning, chosen icon)
+#### 35. Symbols, then Callout (warning, chosen icon)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 33. Symbols, then Callout (decision, no icon)
+#### 36. Symbols, then Callout (decision, no icon)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::^ icon=none

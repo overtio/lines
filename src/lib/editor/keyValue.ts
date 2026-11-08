@@ -1,6 +1,7 @@
 import { WidgetType } from "@codemirror/view";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
+import type { IconName } from "../icons/icons";
 import { speak } from "../a11y";
 import { t } from "../i18n/index.svelte";
 import { copyText } from "../platform";
@@ -26,17 +27,17 @@ export function keyValue(text: string): { from: number; to: number } | null {
 
 const mounted = new WeakMap<HTMLElement, Record<string, unknown>[]>();
 
-/** A copy button. `text` gives what it copies, when it's clicked. */
-export function copyButton(text: () => string, label: string, className = "cm-lp-copy") {
+/** A copy button, with `icon` (a check for a moment once it's copied). `text` gives what it copies, when it's clicked. */
+export function copyButton(text: () => string, label: string, className = "cm-lp-copy", icon: IconName = "copy") {
   const button = document.createElement("button");
   button.type = "button";
   button.className = className;
   button.title = t("editor.copy");
   button.setAttribute("aria-label", label);
   // Both icons stay mounted; a copy swaps which one shows for a moment.
-  const icons = (["copy", "check"] as const).map((name) => {
+  const icons = ([icon, "check"] as const).map((name, index) => {
     const target = document.createElement("span");
-    target.className = `cm-lp-copy-${name}`;
+    target.className = index ? "cm-lp-copy-check" : "cm-lp-copy-copy";
     button.append(target);
     return mount(Icon, { target, props: { name, size: 14, strokeWidth: 2 } });
   });
