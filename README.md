@@ -112,7 +112,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 - **Fits any screen**: three columns on a desktop, a drawer on a tablet, a stack on a phone. Drag the columns to resize them.
 - **Your layout.** Put the sidebar and the note list on the left or the right, each its own way, and turn on tabs for the notes you open, as in a code editor (Settings → Layout). Scroll bars can be turned off everywhere.
 - **Outline.** Turn on short lines beside the note, on its right or left, one for each heading, darker for the part you're reading. Point at them to see the headings by name, and click one to glide there. Markdown and LaTeX notes both have it.
-- **Native touches**: SF Symbols on Apple devices, see-through windows on the Mac, and Settings in its own window.
+- **Native touches**: SF Symbols on Apple devices, see-through windows on the Mac (all of the window, or only its sidebar, or its sidebar and note list), and Settings in its own window.
 - **Updates itself** (desktop apps). A new version downloads in the background once it's been out a week, and installs when you quit lines, or straight away with Restart to update. Choose how long to wait, or turn it off, in Settings → About.
 - **English, Spanish and French**, following your system or chosen in Settings. See [docs/translations.md](docs/translations.md) to add a language.
 - **Accessible.** Everything works from the keyboard and with a screen reader, at large text sizes, with reduced motion and with increased contrast. See [docs/accessibility.md](docs/accessibility.md).
