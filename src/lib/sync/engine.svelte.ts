@@ -130,7 +130,7 @@ const TITLE_LINES = 110;
  * title from: not a properties line, nor a spreadsheet's cells. Failing that, its first line with text.
  */
 function markConflicted({ body, format }: Note): string {
-  const { meta } = plugins.language(format);
+  const meta = (text: string) => plugins.meta(format, text);
   const plain = (text: string) => text.replace(/\s+/g, " ").trim();
   const lines = body.split("\n");
   const marked = (i: number) => [...lines.slice(0, i), t("sync.conflicted", { title: lines[i] }), ...lines.slice(i + 1)].join("\n");

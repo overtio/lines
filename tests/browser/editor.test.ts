@@ -210,6 +210,25 @@ describe("fixed", () => {
     expect(await app.page.evaluate(() => navigator.clipboard.readText())).toBe("before");
   });
 
+  test("a note its format can't read is still saved, and listed as plain text", async () => {
+    const id = await app.open("# Requests\nGET https://example.com", "hurl");
+    await app.page.evaluate(() => {
+      window.testing.plugins.language("hurl").meta = () => {
+        throw new Error("unreadable");
+      };
+      const view = window.testing.editor()!;
+      view.dispatch({ changes: { from: view.state.doc.length, insert: "\nAccept: text/plain" } });
+    });
+    await app.page.evaluate(() => window.testing.notes.flush());
+    expect(await app.page.evaluate((id) => window.testing.notes.get(id)!.meta.title, id)).toBe("# Requests");
+    await app.page.reload();
+    await app.page.waitForFunction(() => window.testing?.notes.ready);
+    expect(await app.page.evaluate((id) => window.testing.notes.get(id)!.note.body, id)).toBe("# Requests\nGET https://example.com\nAccept: text/plain");
+    expect(app.errors.length).toBeGreaterThan(0);
+    expect(app.errors.filter((error) => !error.includes("couldn't read a note"))).toEqual([]);
+    app.errors.length = 0;
+  });
+
   test("a Python note downloads as .py", async () => {
     expect(await app.page.evaluate(() => window.testing.plugins.language("code-python").extensions[0])).toBe("py");
   });
