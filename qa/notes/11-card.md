@@ -68,7 +68,17 @@ A long paragraph that wraps onto several lines at the usual width, so the space 
 > two lines.
 :::
 
-#### 10. Code block in a card
+#### 10. Line marks in a card
+
+::: card
+Marked as the accent. <!-- mark -->
+Two lines marked green, one bar. <!-- mark green: ready -->
+The second of them. <!-- mark green: ready -->
+Red, with a label to point at. <!-- mark red: to fix -->
+- A list item, marked purple. <!-- mark purple -->
+:::
+
+#### 11. Code block in a card
 
 ::: card
 ```
@@ -77,7 +87,7 @@ plain code
 ```
 :::
 
-#### 11. Code block (TypeScript) in a card
+#### 12. Code block (TypeScript) in a card
 
 ::: card
 ```ts
@@ -86,7 +96,7 @@ console.log(greeting);
 ```
 :::
 
-#### 12. JSON block (no language) in a card
+#### 13. JSON block (no language) in a card
 
 ::: card
 ```
@@ -94,7 +104,7 @@ console.log(greeting);
 ```
 :::
 
-#### 13. Diagram in a card
+#### 14. Diagram in a card
 
 ::: card
 ```mermaid
@@ -104,7 +114,7 @@ flowchart LR
 ```
 :::
 
-#### 14. Diagram (240 px wide) in a card
+#### 15. Diagram (240 px wide) in a card
 
 ::: card
 ```mermaid |240
@@ -113,7 +123,7 @@ flowchart LR
 ```
 :::
 
-#### 15. 3D model (openscad block), a colored part, an echo in a card
+#### 16. 3D model (openscad block), a colored part, an echo in a card
 
 ::: card
 ```openscad
@@ -126,7 +136,7 @@ echo("made");
 ```
 :::
 
-#### 16. Flat model (openscad block) in a card
+#### 17. Flat model (openscad block) in a card
 
 ::: card
 ```openscad
@@ -135,7 +145,7 @@ translate([30, 10]) circle(8);
 ```
 :::
 
-#### 17. Broken model (openscad block) in a card
+#### 18. Broken model (openscad block) in a card
 
 ::: card
 ```openscad
@@ -144,7 +154,7 @@ sphere(3;
 ```
 :::
 
-#### 18. 3D model (stl block) in a card
+#### 19. 3D model (stl block) in a card
 
 ::: card
 ```stl
@@ -195,7 +205,7 @@ endsolid pyramid
 ```
 :::
 
-#### 19. Timing diagram (wavedrom block) in a card
+#### 20. Timing diagram (wavedrom block) in a card
 
 ::: card
 ```wavedrom
@@ -208,7 +218,7 @@ endsolid pyramid
 ```
 :::
 
-#### 20. Math block in a card
+#### 21. Math block in a card
 
 ::: card
 $$
@@ -216,7 +226,7 @@ $$
 $$
 :::
 
-#### 21. Table in a card
+#### 22. Table in a card
 
 ::: card
 | Left | Center | Right |
@@ -225,7 +235,7 @@ $$
 | longer cell text | `code` | 22 |
 :::
 
-#### 22. Table with formulas in a card
+#### 23. Table with formulas in a card
 
 ::: card
 | Item | Cost |
@@ -236,7 +246,7 @@ $$
 | Broken | =B2/0 |
 :::
 
-#### 23. Hurl entries (hurl block): a capture used by the next entry, and asserts in a card
+#### 24. Hurl entries (hurl block): a capture used by the next entry, and asserts in a card
 
 ::: card
 ```hurl
@@ -256,13 +266,13 @@ jsonpath "$.name" isString
 ```
 :::
 
-#### 24. Secret ({{name}}, kept in a locked secrets note) in a card
+#### 25. Secret ({{name}}, kept in a locked secrets note) in a card
 
 ::: card
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::
 
-#### 25. API requests (http block): a variable, a named request and one using its response in a card
+#### 26. API requests (http block): a variable, a named request and one using its response in a card
 
 ::: card
 ```http
@@ -277,7 +287,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 :::
 
-#### 26. Spreadsheet (csv block) in a card
+#### 27. Spreadsheet (csv block) in a card
 
 ::: card
 ```csv
@@ -288,7 +298,7 @@ Total, =SUM(B2:B3)
 ```
 :::
 
-#### 27. Named spreadsheet (csv name=), and a formula in another block using it in a card
+#### 28. Named spreadsheet (csv name=), and a formula in another block using it in a card
 
 ::: card
 ```csv name=costs
@@ -301,97 +311,97 @@ Total, =costs!B2*2
 ```
 :::
 
-#### 28. Divider in a card
+#### 29. Divider in a card
 
 ::: card
 ---
 :::
 
-#### 29. Key: Value line in a card
+#### 30. Key: Value line in a card
 
 ::: card
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 30. Mention in a card
+#### 31. Mention in a card
 
 ::: card
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 31. Wiki link in a card
+#### 32. Wiki link in a card
 
 ::: card
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 32. Symbols in a card
+#### 33. Symbols in a card
 
 ::: card
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 33. GitHub links in a card
+#### 34. GitHub links in a card
 
 ::: card
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 34. arXiv links in a card
+#### 35. arXiv links in a card
 
 ::: card
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::
 
-#### 35. Image in a card
+#### 36. Image in a card
 
 ::: card
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 36. Drawing in a card
+#### 37. Drawing in a card
 
 ::: card
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 37. File in a card
+#### 38. File in a card
 
 ::: card
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 38. Attached 3D model (STL) in a card
+#### 39. Attached 3D model (STL) in a card
 
 ::: card
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 39. Terminal recording (.cast file) in a card
+#### 40. Terminal recording (.cast file) in a card
 
 ::: card
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 40. Audio in a card
+#### 41. Audio in a card
 
 ::: card
 [Chime.mp3](attachment:chime.mp3)
 :::
 
-#### 41. Video in a card
+#### 42. Video in a card
 
 ::: card
 [Sky.mp4](attachment:sky.mp4)
 :::
 
-#### 42. Missing file in a card
+#### 43. Missing file in a card
 
 ::: card
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 43. Card in a card
+#### 44. Card in a card
 
 ::: card
 ::: card
@@ -399,7 +409,7 @@ Text in a card.
 :::
 :::
 
-#### 44. Callout (info) in a card
+#### 45. Callout (info) in a card
 
 ::: card
 :::i
@@ -407,7 +417,7 @@ Text in an info callout.
 :::
 :::
 
-#### 45. Callout (warning, chosen icon) in a card
+#### 46. Callout (warning, chosen icon) in a card
 
 ::: card
 :::! icon=flag
@@ -415,7 +425,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 46. Callout (decision, no icon) in a card
+#### 47. Callout (decision, no icon) in a card
 
 ::: card
 :::^ icon=none

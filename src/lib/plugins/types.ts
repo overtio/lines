@@ -1,5 +1,5 @@
 import type { LanguageDescription } from "@codemirror/language";
-import type { Extension } from "@codemirror/state";
+import type { EditorState, Extension, Line } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";
 import type { MarkdownConfig } from "@lezer/markdown";
@@ -67,6 +67,40 @@ export interface Contributions {
   papers?: PaperSource[];
   /** Paper to write on: patterns drawn behind a note (ruled lines, dots, squares), textures under them, and backdrops behind the page. */
   paperStyles?: PaperStyle[];
+  /** What marks lines in a note's margin, as a code editor marks the lines changed. */
+  markers?: MarkerSource[];
+}
+
+/** The colors a line can be marked in: the theme's accent, or one of its status and callout colors. */
+export type MarkerColor = "accent" | "red" | "orange" | "yellow" | "green" | "blue" | "purple" | "gray";
+
+/** Lines marked in the margin beside a note. */
+export interface LineMarker {
+  /** The first line marked, from 1, and the last (the same, if left out). */
+  from: number;
+  to?: number;
+  color: MarkerColor;
+  /** What the mark means, shown on pointing at it. */
+  label?: string;
+  /** A small wedge at the top of `from` instead of a bar beside it: where lines were taken out. */
+  between?: boolean;
+}
+
+/**
+ * Marks lines in a note's margin, beside the note's own marks (each source in a lane of its own).
+ * Asked as the note changes, with its text then and as it was when it was opened, so it has to be
+ * quick: it runs on every change.
+ */
+export interface MarkerSource {
+  id: string;
+  markers(note: { text: string; opened: string; format: string }): LineMarker[];
+}
+
+/** A mark written in a note, at the end of a line: where it starts in the line, its color and what it says. */
+export interface WrittenMark {
+  at: number;
+  color: MarkerColor;
+  label?: string;
 }
 
 /** One background layer, as CSS's `background` takes them: an image, its size and where it starts. */
@@ -186,6 +220,15 @@ export interface NoteLanguage {
   copyAs?: { name: string; text(body: string): string };
   /** Other files its notes can be downloaded as, besides their own: a spreadsheet as an Excel workbook. */
   exports?: NoteExport[];
+  /**
+   * How a line is marked in its notes by whoever writes them (Mark Lines, ⌥⌘M): something at the
+   * line's end that other apps don't show, like a comment. `read` finds one on a line, if it has one
+   * (in its text, not in code), and `write` makes one.
+   */
+  lineMarks?: {
+    read(state: EditorState, line: Line): WrittenMark | null;
+    write(color?: MarkerColor, label?: string): string;
+  };
   /** Other extensions it can make notes from (an Excel workbook's), besides its own. */
   opens?: string[];
   /** The notes a file of its extensions makes, if not one with the file's text as it is. */

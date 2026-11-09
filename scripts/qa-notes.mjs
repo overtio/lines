@@ -38,6 +38,11 @@ const ELEMENTS = [
   { id: "numbers", name: "Numbered list", md: "1. First\n2. Second\n   1. Nested\n3. Third" },
   { id: "todos", name: "Todo list", md: "- [x] Done todo\n- [ ] Open todo\n  - [ ] Nested open todo" },
   { id: "quote", name: "Quote", md: "> A quote that runs over\n> two lines." },
+  {
+    id: "marks",
+    name: "Line marks",
+    md: "Marked as the accent. <!-- mark -->\nTwo lines marked green, one bar. <!-- mark green: ready -->\nThe second of them. <!-- mark green: ready -->\nRed, with a label to point at. <!-- mark red: to fix -->\n- A list item, marked purple. <!-- mark purple -->",
+  },
   { id: "code", name: "Code block", md: "```\nplain code\n  indented line\n```" },
   { id: "code-ts", name: "Code block (TypeScript)", md: '```ts\nconst greeting: string = "hello";\nconsole.log(greeting);\n```' },
   { id: "json", name: "JSON block (no language)", md: '```\n{"name":"lines","tags":["a","b"],"id":12345678901234567890}\n```' },

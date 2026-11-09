@@ -14,6 +14,11 @@ Type Markdown and it's formatted as you go. The text stays exactly what you type
 
 Type `-` and then `>` and it shows as an arrow: Home -> cabin. The same goes for <-, <->, =>, <=>, <=, >= and !=, in code too. The note keeps the characters you typed: move the cursor onto one to see them. Settings → Editor turns symbols off.
 
+## Marks in the margin
+
+Mark a line with ⌘⇧M (Ctrl+Shift+M) for a bar beside it, as a code editor marks the lines changed. <!-- mark green: done -->
+It's a comment at the line's end, `<!-- mark orange: to check -->`, which other apps don't show; move the cursor onto this line to see it. <!-- mark orange: to check -->
+
 ## Headings
 
 Start a line with `#`, `##` or `###`. The first line of a note is its title in the list.

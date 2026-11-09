@@ -7,6 +7,7 @@ import type { Plugin } from "../../lib/plugins/types";
 import { latexEditing } from "./editor";
 import { printDocument } from "./print";
 import { latexContent, latexDocument, latexLine, latexLines, latexPlainText } from "./text";
+import { commentMarks } from "../../lib/editor/markers";
 
 /*
  * Notes written in LaTeX (docs/latex.md): drawn as you type them (editor.ts, reading the note with
@@ -61,6 +62,8 @@ export const latex = (): Plugin => ({
         // A document that compiles on its own, its images' \includegraphics pointing into `attachments`.
         file: (body, attachments) => latexDocument(attachments ? body.replaceAll(`{${ATTACHMENT_PATH}`, `{${attachments}`) : body),
         print: printDocument,
+        // A comment, which LaTeX ignores.
+        lineMarks: commentMarks("%", "", { notAfter: "\\" }),
       },
     ],
   },

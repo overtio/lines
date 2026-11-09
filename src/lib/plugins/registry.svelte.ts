@@ -70,6 +70,7 @@ class Plugins {
   readonly links = $derived(this.#from("links"));
   readonly papers = $derived(this.#from("papers"));
   readonly paperStyles = $derived(this.#from("paperStyles"));
+  readonly markerSources = $derived(this.#from("markers"));
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).

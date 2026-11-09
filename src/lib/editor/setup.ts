@@ -30,6 +30,7 @@ import { Card, Highlight, Mention, Tag, TexMath, Underline } from "./syntax";
 import { t as message } from "../i18n/index.svelte";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
 import type { MarkdownAddition, PaperSource } from "../plugins/types";
+import { lineMarkers } from "./markers";
 
 /**
  * The parser for a code block's language (```sql, ```ts…). Each language is loaded the first time
@@ -272,7 +273,11 @@ export function markdownEditing(): Extension {
 
 /** The editing for a note's language: Markdown, LaTeX… (each its plugin's), or none for plain text. */
 export const formatCompartment = new Compartment();
-export const formatEditing = (format = DEFAULT_LANGUAGE) => plugins.language(format).editor();
+/** A language's own editing, and the marks in the margin every language has (markers.ts). */
+export const formatEditing = (format = DEFAULT_LANGUAGE) => {
+  const language = plugins.language(format);
+  return [language.editor(), lineMarkers(language)];
+};
 
 export const readOnlyCompartment = new Compartment();
 

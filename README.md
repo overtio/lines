@@ -34,6 +34,7 @@ The [web app](https://overtio.github.io/lines/app/) opens with a tour: one short
 - **Drag to move.** Grab the grip beside any line, list item, heading, table or card to move it, or use <kbd>⌥↑</kbd> / <kbd>⌥↓</kbd>.
 - **Arrows and symbols.** `->` shows as →, `!=` as ≠, and so on, on screen only. The note keeps what you typed.
 - **Copy buttons** on values in `Key: Value` lines and on table cells.
+- **Marks in the margin.** <kbd>⌘⇧M</kbd> puts a colored bar beside lines, with what it means on pointing at it, as a code editor marks changed lines; it's an HTML comment other apps don't show. Plugins mark lines too: Changes marks what you've changed since opening a note.
 - **Find and replace** in a note (<kbd>⌘F</kbd>), matching case, whole words or a regular expression.
 
 ### More than text
@@ -126,6 +127,7 @@ Press <kbd>⌘/</kbd> to see them all. On Windows and Linux, use <kbd>Ctrl</kbd>
 | <kbd>⌘B</kbd> <kbd>⌘I</kbd> <kbd>⌘U</kbd> <kbd>⌘E</kbd> | Bold, italic, underline, inline code |
 | <kbd>⌘⇧X</kbd> <kbd>⌘⇧H</kbd> | Strikethrough, highlight |
 | <kbd>⌘↵</kbd> | Make a todo, or tick it |
+| <kbd>⌘⇧M</kbd> | Mark lines in the margin, or take their marks off |
 | <kbd>Tab</kbd> <kbd>⇧Tab</kbd> | Nest or un-nest a list item; next or previous table cell |
 | <kbd>⌘-click</kbd> or <kbd>⌥↵</kbd> | Open a link, mention, tag or file (Settings → Editor → Links sets what click, ⌘-click and ⇧⌘-click do) |
 | <kbd>⌘-click</kbd> <kbd>⇧-click</kbd> <kbd>⌘A</kbd> | Select several notes in the list (<kbd>⌫</kbd> moves them to the Trash) |
@@ -279,6 +281,7 @@ src/
     unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
     github/                  Links to GitHub drawn short
     arxiv/                   Links to arXiv's papers drawn short, and searching arXiv for /paper (pacing requests as arXiv asks)
+    changes/                 Marks the lines changed since a note was opened (a line diff, diff.ts)
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
     themes/                  The seventeen themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
     lucide/  sf-symbols/     Icon sets
@@ -295,6 +298,7 @@ src/
       symbols.ts             Shows -> as →, != as ≠ and the like (the table is notes/symbols.ts)
       tables.ts              Rendered tables (formulas worked out), cell navigation, column alignment, pasting tables
       cards.ts               Draws ::: card blocks and callouts behind their text; /card, leaving a card
+      markers.ts             Marks in the margin: a note's own (written by its language) and plugins', in lanes; ⌘⇧M
       formatCode.ts          Tidies code blocks (JSON, SQL, Prettier languages)
       formatting.ts          Bold, italic, underline, code… toggles and the toolbar over selected text
       links.ts               Following links, tags and mentions as Settings → Editor → Links says for each click

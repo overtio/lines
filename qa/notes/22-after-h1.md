@@ -59,7 +59,16 @@ A long paragraph that wraps onto several lines at the usual width, so the space 
 > A quote that runs over
 > two lines.
 
-#### 10. Heading 1, then Code block
+#### 10. Heading 1, then Line marks
+
+# Heading one
+Marked as the accent. <!-- mark -->
+Two lines marked green, one bar. <!-- mark green: ready -->
+The second of them. <!-- mark green: ready -->
+Red, with a label to point at. <!-- mark red: to fix -->
+- A list item, marked purple. <!-- mark purple -->
+
+#### 11. Heading 1, then Code block
 
 # Heading one
 ```
@@ -67,7 +76,7 @@ plain code
   indented line
 ```
 
-#### 11. Heading 1, then Code block (TypeScript)
+#### 12. Heading 1, then Code block (TypeScript)
 
 # Heading one
 ```ts
@@ -75,14 +84,14 @@ const greeting: string = "hello";
 console.log(greeting);
 ```
 
-#### 12. Heading 1, then JSON block (no language)
+#### 13. Heading 1, then JSON block (no language)
 
 # Heading one
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 
-#### 13. Heading 1, then Diagram
+#### 14. Heading 1, then Diagram
 
 # Heading one
 ```mermaid
@@ -91,7 +100,7 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Heading 1, then Diagram (240 px wide)
+#### 15. Heading 1, then Diagram (240 px wide)
 
 # Heading one
 ```mermaid |240
@@ -99,7 +108,7 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Heading 1, then 3D model (openscad block), a colored part, an echo
+#### 16. Heading 1, then 3D model (openscad block), a colored part, an echo
 
 # Heading one
 ```openscad
@@ -111,7 +120,7 @@ translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
 echo("made");
 ```
 
-#### 16. Heading 1, then Flat model (openscad block)
+#### 17. Heading 1, then Flat model (openscad block)
 
 # Heading one
 ```openscad
@@ -119,7 +128,7 @@ square(20);
 translate([30, 10]) circle(8);
 ```
 
-#### 17. Heading 1, then Broken model (openscad block)
+#### 18. Heading 1, then Broken model (openscad block)
 
 # Heading one
 ```openscad
@@ -127,7 +136,7 @@ cube(10)
 sphere(3;
 ```
 
-#### 18. Heading 1, then 3D model (stl block)
+#### 19. Heading 1, then 3D model (stl block)
 
 # Heading one
 ```stl
@@ -177,7 +186,7 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Heading 1, then Timing diagram (wavedrom block)
+#### 20. Heading 1, then Timing diagram (wavedrom block)
 
 # Heading one
 ```wavedrom
@@ -189,14 +198,14 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 20. Heading 1, then Math block
+#### 21. Heading 1, then Math block
 
 # Heading one
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 21. Heading 1, then Table
+#### 22. Heading 1, then Table
 
 # Heading one
 | Left | Center | Right |
@@ -204,7 +213,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 22. Heading 1, then Table with formulas
+#### 23. Heading 1, then Table with formulas
 
 # Heading one
 | Item | Cost |
@@ -214,7 +223,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 23. Heading 1, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 24. Heading 1, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 # Heading one
 ```hurl
@@ -233,12 +242,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 24. Heading 1, then Secret ({{name}}, kept in a locked secrets note)
+#### 25. Heading 1, then Secret ({{name}}, kept in a locked secrets note)
 
 # Heading one
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 25. Heading 1, then API requests (http block): a variable, a named request and one using its response
+#### 26. Heading 1, then API requests (http block): a variable, a named request and one using its response
 
 # Heading one
 ```http
@@ -252,7 +261,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 26. Heading 1, then Spreadsheet (csv block)
+#### 27. Heading 1, then Spreadsheet (csv block)
 
 # Heading one
 ```csv
@@ -262,7 +271,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 27. Heading 1, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 28. Heading 1, then Named spreadsheet (csv name=), and a formula in another block using it
 
 # Heading one
 ```csv name=costs
@@ -274,103 +283,103 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 28. Heading 1, then Divider
+#### 29. Heading 1, then Divider
 
 # Heading one
 ---
 
-#### 29. Heading 1, then Key: Value line
+#### 30. Heading 1, then Key: Value line
 
 # Heading one
 **Wi-Fi password:** correct-horse-battery
 
-#### 30. Heading 1, then Mention
+#### 31. Heading 1, then Mention
 
 # Heading one
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 31. Heading 1, then Wiki link
+#### 32. Heading 1, then Wiki link
 
 # Heading one
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 32. Heading 1, then Symbols
+#### 33. Heading 1, then Symbols
 
 # Heading one
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 33. Heading 1, then GitHub links
+#### 34. Heading 1, then GitHub links
 
 # Heading one
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 34. Heading 1, then arXiv links
+#### 35. Heading 1, then arXiv links
 
 # Heading one
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 35. Heading 1, then Image
+#### 36. Heading 1, then Image
 
 # Heading one
 ![A sample picture](attachment:photo.png)
 
-#### 36. Heading 1, then Drawing
+#### 37. Heading 1, then Drawing
 
 # Heading one
 ![A sample drawing](attachment:drawing.svg)
 
-#### 37. Heading 1, then File
+#### 38. Heading 1, then File
 
 # Heading one
 [Budget.csv](attachment:budget.csv)
 
-#### 38. Heading 1, then Attached 3D model (STL)
+#### 39. Heading 1, then Attached 3D model (STL)
 
 # Heading one
 [Bracket.stl](attachment:bracket.stl)
 
-#### 39. Heading 1, then Terminal recording (.cast file)
+#### 40. Heading 1, then Terminal recording (.cast file)
 
 # Heading one
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Heading 1, then Audio
+#### 41. Heading 1, then Audio
 
 # Heading one
 [Chime.mp3](attachment:chime.mp3)
 
-#### 41. Heading 1, then Video
+#### 42. Heading 1, then Video
 
 # Heading one
 [Sky.mp4](attachment:sky.mp4)
 
-#### 42. Heading 1, then Missing file
+#### 43. Heading 1, then Missing file
 
 # Heading one
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 43. Heading 1, then Card
+#### 44. Heading 1, then Card
 
 # Heading one
 ::: card
 Text in a card.
 :::
 
-#### 44. Heading 1, then Callout (info)
+#### 45. Heading 1, then Callout (info)
 
 # Heading one
 :::i
 Text in an info callout.
 :::
 
-#### 45. Heading 1, then Callout (warning, chosen icon)
+#### 46. Heading 1, then Callout (warning, chosen icon)
 
 # Heading one
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 46. Heading 1, then Callout (decision, no icon)
+#### 47. Heading 1, then Callout (decision, no icon)
 
 # Heading one
 :::^ icon=none

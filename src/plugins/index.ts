@@ -2,6 +2,7 @@ import { isApple } from "../lib/platform";
 import type { Plugin } from "../lib/plugins/types";
 import { arxiv } from "./arxiv";
 import { asciinema } from "./asciinema";
+import { changesPlugin } from "./changes";
 import { giphy } from "./giphy";
 import { github } from "./github";
 import { requests } from "./http";
@@ -46,6 +47,7 @@ export const builtIn = (): Plugin[] => [
   asciinema(),
   github(),
   arxiv(),
+  changesPlugin(),
   themes(),
   paper(),
   lucide(),

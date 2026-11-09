@@ -18,6 +18,8 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 
 ## 1. Typing and live Markdown
 
+- [ ] Line marks: `<!-- mark -->`, `<!-- mark green: ready -->` and each other color at a line's end draw a bar in the margin beside it in the theme's colors, the comment hidden but on the line being edited; lines next to each other marked alike make one bar; pointing at it shows its label; in a code block it's text; ⌘⇧M marks the selected lines, again takes the marks off; in a LaTeX note `% mark red: cite` works the same and `50\%` doesn't; the bars stay clear of the drag grip, and at a phone's width stay in the margin
+- [ ] Changes plugin (turned on in Settings → Plugins): editing a note marks changed lines blue, added ones green and a red wedge where lines were taken out, in a lane outside the note's own marks; opening the note again starts with none; with it off, none
 - [ ] Bold, italic, underline, code, strikethrough and highlight shortcuts (⌘B, ⌘I, ⌘U, ⌘E, ⌘⇧X, ⌘⇧H) wrap the selection; again unwraps it; with no selection they insert a pair with the cursor between (`<u></u>` for underline)
 - [ ] Underline: `<u>text</u>` shows underlined with its tags hidden until the cursor is in it, in text, table cells and properties; mixed with bold or highlight both show; a lone `<u>` stays as typed; it prints and exports as underlined, and the note list and word count read it without its tags
 - [ ] In a LaTeX note, ⌘U wraps the selection in `\underline{…}` and again unwraps it

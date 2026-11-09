@@ -142,4 +142,5 @@ export default {
   "shortcuts.key.at": "Arobase",
   "shortcuts.key.plus": "Plus",
   "shortcuts.key.minus": "Moins",
+  "shortcuts.markLines": "Marquer des lignes dans la marge, ou leur retirer la marque",
 } satisfies Translation<typeof en>;
