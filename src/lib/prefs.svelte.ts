@@ -220,6 +220,8 @@ interface Stored {
   dragBlocks: boolean;
   /** The system checks notes' spelling, and corrects it as you type (code and math never). */
   spellcheck: boolean;
+  /** Text selected in a note with the pointer is copied when it's let go, as in a terminal (editor/copyOnSelect.ts). */
+  copyOnSelect: boolean;
   /** A keyboard's sound as you type (sounds/typing.svelte.ts): on, which (a plugin's or a sound pack's, by id), and how loud. */
   typingSounds: boolean;
   keyboardSound: string;
@@ -348,6 +350,7 @@ const DEFAULTS: Stored = {
   markdownMode: "live",
   dragBlocks: true,
   spellcheck: true,
+  copyOnSelect: false,
   typingSounds: false,
   keyboardSound: "creamy",
   typingVolume: 0.5,
@@ -482,6 +485,7 @@ function read(json?: string): Stored {
     markdownMode: oneOf(raw.markdownMode, MARKDOWN_MODES, DEFAULTS.markdownMode),
     dragBlocks: flag(raw.dragBlocks, DEFAULTS.dragBlocks),
     spellcheck: flag(raw.spellcheck, DEFAULTS.spellcheck),
+    copyOnSelect: flag(raw.copyOnSelect, DEFAULTS.copyOnSelect),
     typingSounds: flag(raw.typingSounds, DEFAULTS.typingSounds),
     keyboardSound: id(raw.keyboardSound, DEFAULTS.keyboardSound),
     typingVolume: clamp(raw.typingVolume, TYPING_VOLUME.min, TYPING_VOLUME.max, DEFAULTS.typingVolume),
@@ -566,6 +570,7 @@ class Prefs {
   markdownMode = $state(this.#initial.markdownMode);
   dragBlocks = $state(this.#initial.dragBlocks);
   spellcheck = $state(this.#initial.spellcheck);
+  copyOnSelect = $state(this.#initial.copyOnSelect);
   typingSounds = $state(this.#initial.typingSounds);
   keyboardSound = $state(this.#initial.keyboardSound);
   typingVolume = $state(this.#initial.typingVolume);
@@ -751,6 +756,7 @@ class Prefs {
       markdownMode: this.markdownMode,
       dragBlocks: this.dragBlocks,
       spellcheck: this.spellcheck,
+      copyOnSelect: this.copyOnSelect,
       typingSounds: this.typingSounds,
       keyboardSound: this.keyboardSound,
       typingVolume: this.typingVolume,
@@ -846,6 +852,7 @@ class Prefs {
     this.markdownMode = next.markdownMode;
     this.dragBlocks = next.dragBlocks;
     this.spellcheck = next.spellcheck;
+    this.copyOnSelect = next.copyOnSelect;
     this.typingSounds = next.typingSounds;
     this.keyboardSound = next.keyboardSound;
     this.typingVolume = next.typingVolume;

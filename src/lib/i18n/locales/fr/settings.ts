@@ -291,6 +291,8 @@ export default {
   "settings.markdownHiddenNote": "Dessiné, sans jamais montrer les marques : tapez ** autour d’un mot et il est en gras, # et une espace et c’est un titre.",
   "settings.spellcheck": "Vérifier l’orthographe",
   "settings.spellcheckNote": "Souligne les mots mal orthographiés dans les notes et laisse le système les corriger pendant la saisie. Le code et les maths ne sont jamais vérifiés.",
+  "settings.copyOnSelect": "Copier ce que vous sélectionnez",
+  "settings.copyOnSelectNote": "Le texte que vous sélectionnez dans une note à la souris est copié quand vous relâchez, comme dans un terminal : en glissant, ou d’un double-clic sur un mot.",
   "settings.dragBlocks": "Glisser pour déplacer les lignes",
   "settings.dragBlocksNote": "Une poignée à côté de la ligne ou du bloc que vous pointez, pour le faire glisser ailleurs dans la note.",
   "settings.typingSounds": "Sons de frappe",

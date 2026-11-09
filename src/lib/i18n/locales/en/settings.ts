@@ -327,6 +327,8 @@ export default {
   "settings.markdownHiddenNote": "Drawn, with marks never shown: type ** around a word and it's bold, # and a space and it's a heading.",
   "settings.spellcheck": "Check spelling",
   "settings.spellcheckNote": "Underlines misspelled words in notes, and lets the system correct them as you type. Code and math are never checked.",
+  "settings.copyOnSelect": "Copy what you select",
+  "settings.copyOnSelectNote": "Text you select in a note with the mouse is copied when you let go, as in a terminal: dragged over, or a word double-clicked.",
   "settings.dragBlocks": "Drag to move lines",
   "settings.dragBlocksNote": "A grip beside the line or block you point at, which drags it somewhere else in the note.",
   "settings.typingSounds": "Typing sounds",
