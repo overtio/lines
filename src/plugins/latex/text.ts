@@ -1,6 +1,9 @@
+import { extractTags } from "../../lib/notes/parse";
+import { scanLatex } from "./syntax";
+
 /*
  * Notes written in LaTeX (docs/latex.md): their text as it reads, for the note list, search and
- * counts, and the whole document an export writes.
+ * counts, its tags, and the whole document an export writes.
  */
 
 /** Commands whose argument is text that reads as part of the note. */
@@ -115,6 +118,13 @@ export function latexPlainText(body: string): string {
     .join("\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+/** A LaTeX note's tags, in its comments as the editor draws them (`% #work`): not in verbatim or a code listing, where they're text. */
+export function latexTags(body: string): string[] {
+  if (!/%.*#/.test(body)) return [];
+  const comments = scanLatex(body).spans.filter((span) => span.type === "comment");
+  return extractTags(comments.map((span) => body.slice(span.from, span.to).replace(/^%+/, "")).join("\n"));
 }
 
 /**
