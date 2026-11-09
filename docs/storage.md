@@ -1,6 +1,6 @@
 # Where lines keeps your data on the web
 
-This covers the web app, including the demo website at https://overtio.github.io/lines/. Everything stays in the browser, on the visitor's computer. The site's host (GitHub Pages) only serves the app's files, and the app never sends notes anywhere. The exception is sync, when someone sets it up: to a folder they choose, or to their own S3 bucket (not offered on the demo website).
+This covers the web app, including the demo at https://overtio.github.io/lines/app/. Everything stays in the browser, on the visitor's computer. The site's host (GitHub Pages) only serves the app's files, and the app never sends notes anywhere. The exception is sync, when someone sets it up: to a folder they choose, or to their own S3 bucket (not offered on the demo website).
 
 All of it can be inspected in the browser's developer tools (in Chrome: Application â†’ Storage).
 
@@ -58,7 +58,7 @@ For notes that should last, use **Save to a folder**, or export them (Settings â
 
 ## Shared with other sites on the same domain
 
-Browsers keep storage apart by domain, not by path. The demo website is at `overtio.github.io/lines/`, so its storage belongs to `overtio.github.io` and is shared with every other GitHub Pages site under the overtio account: any of them could read the `lines` database and the `lines.*` keys. That's fine for a demo. Before hosting anything else there, or encouraging people to keep real notes on the demo site, move it to a domain of its own (for example a custom domain for the Pages site).
+Browsers keep storage apart by domain, not by path. The demo is at `overtio.github.io/lines/app/`, so its storage belongs to `overtio.github.io` and is shared with every other GitHub Pages site under the overtio account: any of them could read the `lines` database and the `lines.*` keys. That's fine for a demo. Before hosting anything else there, or encouraging people to keep real notes on the demo site, move it to a domain of its own (for example a custom domain for the Pages site).
 
 ## What the host sees
 

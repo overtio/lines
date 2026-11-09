@@ -1,6 +1,6 @@
 # Themes
 
-lines comes with sixteen themes, each light and dark. You can also make your own, share them as a file, and import themes made for other apps: VS Code, Zed, Base16, your terminal or your Linux desktop.
+lines comes with seventeen themes, each light and dark. You can also make your own, share them as a file, and import themes made for other apps: VS Code, Zed, Base16, your terminal or your Linux desktop.
 
 Everything here is in Settings → Theme.
 

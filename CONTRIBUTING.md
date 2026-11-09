@@ -25,7 +25,7 @@ bun run tauri dev    # the desktop app
    bun run i18n     # every message translated
    ```
 
-   And, when they apply: `bun run qa-notes` after changing how Markdown is read (commit the notes it writes), `bun run bench` before and after anything that could make lines slower ([docs/performance.md](docs/performance.md)), and `cargo clippy` and `cargo test` in `src-tauri/` after changing Rust.
+   And, when they apply: `bun run qa-notes` after changing how Markdown is read (commit the notes it writes), `bun site/build.mjs` after changing the docs or the README (it builds the website's pages into `dist-site/` and fails on a link that leads nowhere; `bunx vite preview --outDir dist-site` shows them), `bun run bench` before and after anything that could make lines slower ([docs/performance.md](docs/performance.md)), and `cargo clippy` and `cargo test` in `src-tauri/` after changing Rust.
 4. Try it where people will use it. A change to what people see or do is tried in WebKit (Safari, or the Mac app) as well as Chrome, as they differ; say in the pull request where it wasn't tried.
 5. Open a pull request (below).
 
@@ -74,7 +74,7 @@ Every pull request runs [`.github/workflows/checks.yml`](.github/workflows/check
 
 - `conventions`: the title
 - `cla`: everyone who contributed to it has agreed to the [contributor agreement](CLA.md)
-- `web`: types, lint, translations, QA notes up to date, the build
+- `web`: types, lint, translations, QA notes up to date, the website's links, the build
 - `rust (macos-latest)`, `rust (windows-latest)`, `rust (ubuntu-22.04)`: Clippy (warnings fail) and the tests, for each desktop system
 
 ### Coding agents

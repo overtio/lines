@@ -34,7 +34,7 @@ export default {
   "plugins.tex": "Composición con TeX",
   "plugins.tex.description": "Compone el PDF de una nota LaTeX con el propio TeX, en lugar de las páginas de lines.",
   "plugins.themes": "Temas",
-  "plugins.themes.description": "Lines y quince más, entre ellos Alto contraste y dos para el daltonismo. También lee temas hechos para VS Code, Zed, Base16, terminales y escritorios Linux.",
+  "plugins.themes.description": "Lines y dieciséis más, entre ellos Alto contraste y dos para el daltonismo. También lee temas hechos para VS Code, Zed, Base16, terminales y escritorios Linux.",
   "plugins.lucide.description": "Los iconos de lines, de Lucide.",
   "plugins.sfSymbols.description": "Los iconos de Apple, dibujados por tu Mac, iPhone o iPad.",
   "plugins.unsplash.description": "Añade /unsplash, para buscar entre las fotos gratuitas de Unsplash y poner una en una nota. Lo que buscas se envía a Unsplash.",

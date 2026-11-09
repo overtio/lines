@@ -25,7 +25,7 @@ Settings → Plugins lists them. A plugin that isn't needed can be turned off, a
 | asciinema | Plays terminal recordings in Markdown notes: asciinema.org's embed code, and attached `.cast` files ([linedown.md](linedown.md#terminal-recordings)) | Yes | `src/plugins/asciinema/` |
 | GitHub | Draws links to GitHub short, with GitHub's mark: `overtio/lines#12` ([linedown.md](linedown.md#github)) | Yes | `src/plugins/github/` |
 | arXiv | Draws links to arXiv's papers as arXiv cites them, `arXiv:1706.03762`, and in the apps is a source of papers for `/paper` ([linedown.md](linedown.md#arxiv)) | Yes | `src/plugins/arxiv/` |
-| Themes | The sixteen themes, and reading themes made for other apps: VS Code, Zed, TextMate, Base16, terminals, KDE and GTK ([themes.md](themes.md)). Always on. | Yes | `src/plugins/themes/`, with your own themes in `src/lib/themes/` |
+| Themes | The seventeen themes, and reading themes made for other apps: VS Code, Zed, TextMate, Base16, terminals, KDE and GTK ([themes.md](themes.md)). Always on. | Yes | `src/plugins/themes/`, with your own themes in `src/lib/themes/` |
 | Lucide | lines' icons. Always on. | Yes | `src/plugins/lucide/` |
 | SF Symbols | Apple's icons, in the Mac and iPhone apps | Yes | `src/plugins/sf-symbols/` |
 

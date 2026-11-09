@@ -20,7 +20,7 @@ The Mac app (and the iPhone app, coming) adds:
 
 ## Make it yours
 
-- **Look:** Settings → Theme has sixteen themes, each light and dark (High Contrast and two for color blindness among them), and Contrast → Increased darkens grey text in any of them. **New** makes a theme of your own from one to change color by color, which you can share as a file; **Import** reads themes made for VS Code, Zed, Base16, iTerm2, Ghostty and other terminals. Settings → Typography has four fonts, and a note width and spacing to tune.
+- **Look:** Settings → Theme has seventeen themes, each light and dark (High Contrast and two for color blindness among them), and Contrast → Increased darkens grey text in any of them. **New** makes a theme of your own from one to change color by color, which you can share as a file; **Import** reads themes made for VS Code, Zed, Base16, iTerm2, Ghostty and other terminals. Settings → Typography has four fonts, and a note width and spacing to tune.
 - **Layout:** under Appearance → Layout, put the sidebar and the note list on either side, open notes in tabs, or show an outline of the note's headings beside it.
 - **Two notes at once:** ⌥-click a note in the list, or right-click it and choose Open to the Side, to read it beside the one you're writing.
 - **Links:** Settings → Editor → Links chooses what a click, ⌘-click and ⇧⌘-click do on links, tags and mentions.

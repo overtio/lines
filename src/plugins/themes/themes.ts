@@ -1,5 +1,6 @@
 import { t } from "../../lib/i18n/index.svelte";
 import type { Theme } from "../../lib/plugins/types";
+import { lines } from "./lines";
 
 /*
  * lines' themes. Each sets a handful of base colors for light and dark, and app.css works out the
@@ -14,9 +15,10 @@ import type { Theme } from "../../lib/plugins/types";
  */
 
 export const themes = (): Theme[] => [
+  lines,
   {
-    id: "lines",
-    name: "Lines",
+    id: "ember",
+    name: "Ember",
     light: {
       bg: "#ffffff",
       "bg-list": "#fbfaf8",
