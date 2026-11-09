@@ -34,7 +34,7 @@ A theme is colors. A style is the rest of the look: how round the corners are, t
 
 - **Lines**: soft corners, quiet shadows and your system's font, as lines has always looked.
 - **Classic**: a desktop of the late 90s. Raised and sunken bevels lit from the top left, a title bar with a gradient over the note list, the selection in the accent, square corners, Tahoma, scroll bars with arrow buttons.
-- **Pixel**: one-bit and minimal. A pixel font (Pixelify Sans, with VT323 for code), 2px lines, hard shadows a pressed button drops, what's chosen turned around, square everything, and no easing.
+- **Pixel**: one-bit and minimal. A pixel font (Pixelify Sans, with VT323 for code), 2px lines, hard shadows a pressed button drops, what's chosen turned around, square everything, and things changing at once rather than easing.
 - **Neon**: a city at night. Lines and text that glow in the accent and the tags' color, a faint grid behind the note and scan lines over everything, headings in a wide display face (Orbitron), buttons with their corners cut.
 
 Each but Lines comes with a color theme made for it (Classic, Pixel and Neon, in the Themes list too), chosen with it. Any other theme can be chosen after, and the style keeps its shapes in those colors: its bevels, lines and glows are made from the theme's own colors. Choosing another style while a style's colors still show goes back to Lines' colors. A style that has its own font is notes' first font in Settings → Typography too, in place of the system's; the other fonts there still work with it.

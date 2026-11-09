@@ -118,13 +118,11 @@ function trail(into: HTMLElement, from: Box, to: Box) {
 /** A few sparks fly up from the cursor, at a key typed. */
 function sparks(into: HTMLElement, at: Box) {
   if (into.childElementCount > 60) return;
-  const rainbow = root.caretEffect === "rainbow";
   for (let i = 0; i < 5; i++) {
     const spark = document.createElement("div");
     spark.className = "cm-caret-spark";
     spark.style.left = `${(at.left + at.right) / 2}px`;
     spark.style.top = `${at.top + (at.bottom - at.top) * 0.55}px`;
-    if (rainbow) spark.style.background = `oklch(0.75 0.19 ${Math.random() * 360})`;
     into.append(spark);
     const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.3;
     const distance = 12 + Math.random() * 24;
@@ -209,55 +207,67 @@ export interface CaretPlace {
 }
 
 /**
- * Says where the cursor is as it moves, while a mascot is out (`data-mascot`): a window event,
- * `lines:caret`, with its place, or none once the editor loses focus.
+ * Says where the cursor is as it moves, or the note scrolls, while a mascot is out (`data-mascot`):
+ * a window event, `lines:caret`, with its place, or none once the editor loses focus. An editor
+ * without the keyboard (a note open beside, Settings' preview) says nothing.
  */
-const report = ViewPlugin.define((view) => {
-  const send = (place: CaretPlace | null) => dispatchEvent(new CustomEvent("lines:caret", { detail: place }));
-  const measure = () =>
-    view.requestMeasure({
-      key: report,
-      read: (): CaretPlace | null => {
-        const { main } = view.state.selection;
-        if (!view.hasFocus || !main.empty) return null;
-        const at = view.coordsAtPos(main.head, main.assoc || 1) ?? view.coordsAtPos(main.head, -1);
-        const end = view.coordsAtPos(view.moveToLineBoundary(main, true, true).head, -1);
-        if (!at) return null;
-        const above: CaretPlace["above"] = [];
-        for (let from = main, n = 0; n < 3; n++) {
-          const up = view.moveVertically(from, false);
-          if (up.head === from.head) break;
-          const end = view.coordsAtPos(view.moveToLineBoundary(up, true, true).head, -1);
-          if (end) above.push({ end: end.right, top: end.top });
-          from = up;
-        }
-        const content = view.contentDOM.getBoundingClientRect();
-        const style = getComputedStyle(view.contentDOM);
-        const shown = view.scrollDOM.getBoundingClientRect();
-        return {
-          x: at.left,
-          top: at.top,
-          bottom: at.bottom,
-          lineEnd: Math.max(end?.right ?? at.left, at.left),
-          above,
-          textLeft: content.left + parseFloat(style.paddingLeft),
-          textRight: content.right - parseFloat(style.paddingRight),
-          left: shown.left,
-          right: shown.right,
-          viewTop: shown.top,
-          viewBottom: shown.bottom,
-        };
+const report = ViewPlugin.define(
+  (view) => {
+    const send = (place: CaretPlace | null) => dispatchEvent(new CustomEvent("lines:caret", { detail: place }));
+    const measure = () =>
+      view.requestMeasure({
+        key: report,
+        read: (): CaretPlace | null | undefined => {
+          if (!view.hasFocus) return undefined;
+          const { main } = view.state.selection;
+          if (!main.empty) return null;
+          const at = view.coordsAtPos(main.head, main.assoc || 1) ?? view.coordsAtPos(main.head, -1);
+          const end = view.coordsAtPos(view.moveToLineBoundary(main, true, true).head, -1);
+          if (!at) return null;
+          const above: CaretPlace["above"] = [];
+          for (let from = main, n = 0; n < 3; n++) {
+            const up = view.moveVertically(from, false);
+            if (up.head === from.head) break;
+            const end = view.coordsAtPos(view.moveToLineBoundary(up, true, true).head, -1);
+            if (end) above.push({ end: end.right, top: end.top });
+            from = up;
+          }
+          const content = view.contentDOM.getBoundingClientRect();
+          const style = getComputedStyle(view.contentDOM);
+          const shown = view.scrollDOM.getBoundingClientRect();
+          return {
+            x: at.left,
+            top: at.top,
+            bottom: at.bottom,
+            lineEnd: Math.max(end?.right ?? at.left, at.left),
+            above,
+            textLeft: content.left + parseFloat(style.paddingLeft),
+            textRight: content.right - parseFloat(style.paddingRight),
+            left: shown.left,
+            right: shown.right,
+            viewTop: shown.top,
+            viewBottom: shown.bottom,
+          };
+        },
+        write: (place) => place !== undefined && send(place),
+      });
+    return {
+      measure,
+      update(update: ViewUpdate) {
+        if (!("mascot" in root)) return;
+        if (update.focusChanged && !update.view.hasFocus) send(null);
+        else if (update.selectionSet || update.docChanged || update.geometryChanged || update.focusChanged) measure();
       },
-      write: send,
-    });
-  return {
-    update(update: ViewUpdate) {
-      if (!("mascot" in root)) return;
-      if (update.focusChanged && !update.view.hasFocus) send(null);
-      else if (update.selectionSet || update.docChanged || update.geometryChanged || update.focusChanged) measure();
+    };
+  },
+  {
+    eventObservers: {
+      scroll() {
+        if ("mascot" in root) this.measure();
+      },
     },
-  };
-});
+  },
+);
 
 export const cursor = [
   cursorLayer,

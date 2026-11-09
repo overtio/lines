@@ -160,6 +160,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 ## Page breaks
 
 - Only at a note's top level: in a card, a callout, a list or a quote a page break stays as written, and doesn't break the PDF's page.
+- In a LaTeX note, `\newpage` inside an environment (`center`, a list) is drawn as a page break, but the PDF breaks only at those outside any environment but the document; one in the middle of a line breaks the PDF but isn't drawn.
 - Other apps don't break pages at `<!-- pagebreak -->`; for their PDFs, `<div style="page-break-after: always"></div>` (which lines reads too) does in Obsidian, Typora and VS Code, with a blank line after it.
 - A picture of a note (PNG) is one long page, without its breaks.
 - With a pattern drawn in columns (squares, graph) over a backdrop, each page's columns run its full height, past the last line's row.
@@ -199,7 +200,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - A style can't be made in Settings yet, only added by a plugin; a theme of your own can be used with any style.
 - Pixel's and Neon's fonts cover Latin (and Pixel's Cyrillic, Neon's Thai and Vietnamese); other writing shows in the fallback font. Classic uses Tahoma, which Linux usually lacks, so it falls back to Verdana or the system's sans.
 - Classic's scroll bars with arrow buttons show where the system draws scroll bars that stay (Windows, Linux, or macOS set to show them always); overlay scroll bars stay the system's.
-- Printed pages and PDFs look the same in every style.
+- Printed pages and PDFs are black on white in every style, but in a style's own font while it's the first font (Settings → Typography).
 - Not tried in the Mac app yet, nor on phones.
 
 ## Symbols
@@ -251,7 +252,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - The paper and the backdrop are the same for every note, not chosen for each.
 - A backdrop is the main window's: floating notes and the Settings window are plain.
 - A picture chosen for the backdrop stays on the device it was chosen on (made no larger than 2400 pixels across), and doesn't sync or export.
-- Ruled lines need the `lh` unit: Safari 16.4 and macOS 13.3 or later, Chrome 109 or later. Earlier ones show the other patterns, and Lines as plain.
+- Ruled lines, and grids following the text, need the `lh` unit: Safari 16.4 and macOS 13.3 or later, Chrome 109 or later. Earlier ones show Lines as plain, dots not at all and grids' columns only; at a Custom size, grids don't need it.
 
 ## Code notes
 
@@ -285,6 +286,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - GTK themes are read only as named colors (`@define-color`, or libadwaita's custom properties); colors made with GTK's functions (`mix()`, `shade()`, `alpha()`) are left out.
 - Monochrome and Invert change lines' colors, not pictures or drawings' pen colors; a color a theme writes in a way lines can't read itself (`oklch()`) is left as it is. Inverted, menus and cards (lighter than the note in a dark theme) are darker than the note, as in a negative.
 - The color picker is the system's (`<input type="color">`), which picks colors without transparency.
+- Dark panes: the theme's editor (Your themes) previews each scheme as it is, without them; on a phone, the strip under the status bar keeps the note's color over a dark note list.
 
 ## Plugins
 

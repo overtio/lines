@@ -629,7 +629,7 @@ class Prefs {
     theme: this.floatingTheme === "same" ? this.theme : this.floatingTheme,
     dark: this.floatingAppearance === "same" ? this.dark : this.#isDark(this.floatingAppearance),
   });
-  /** This window's theme (by id; themes.svelte.ts shows it) and whether it's dark: a floating note can have its own. */
+  /** This window's theme (by id; themes/show.svelte.ts shows it) and whether it's dark: a floating note can have its own. */
   readonly windowLook = $derived(isFloating ? this.floatingLook : { theme: this.theme, dark: this.dark });
 
   // This window's native look; the effect below re-runs only when one of these flips.

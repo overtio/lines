@@ -4,11 +4,12 @@ import "./app.css";
 import { prefs } from "./lib/prefs.svelte";
 import "./lib/themes/show.svelte";
 import "./lib/paper.svelte";
+// Before the styles, whose rules come after it in the page and outrank it.
+import "./lib/editor/editor.css";
 import "./lib/themes/styles.svelte";
 import "./lib/sounds/typing.svelte";
 import "./lib/cursors.svelte";
 import "./lib/mascot/pet.svelte";
-import "./lib/editor/editor.css";
 import FloatingNote from "./lib/components/FloatingNote.svelte";
 import Settings from "./lib/components/settings/Settings.svelte";
 import LockedNote from "./lib/components/LockedNote.svelte";
@@ -49,8 +50,9 @@ if (isTauri) {
 }
 
 if (import.meta.env.DEV) Object.assign(window, { lines: { notes, sync, lock, lockedNotes, noteKeys, plugins, updates } });
-// The benchmarks' helpers (scripts/bench.mjs), only in builds made for them.
+// The benchmarks' helpers (scripts/bench.mjs) and the browser tests' (tests/browser/), only in builds made for them.
 if (import.meta.env.MODE === "bench") await import("./bench/harness");
+if (import.meta.env.MODE === "test") await import("./test/harness");
 
 /** A floating note's window is labelled "note-<id>", Settings' "settings"; the main window "main". */
 const label = windowLabel();

@@ -73,7 +73,11 @@ const keyboards = (): KeyboardSound[] =>
     id,
     name: t(NAMES[id][0]),
     description: t(NAMES[id][1]),
-    load: async (context) => sounds(of, context, index + 1),
+    // Made after the frame that asked for them, which a typewriter's take long enough to hold up.
+    load: async (context) => {
+      await new Promise((resolve) => setTimeout(resolve));
+      return sounds(of, context, index + 1);
+    },
   }));
 
 export const keyboardSounds = (): Plugin => ({

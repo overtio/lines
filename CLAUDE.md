@@ -31,7 +31,11 @@ Follow [CONTRIBUTING.md](CONTRIBUTING.md): main is protected, so every change co
 ```sh
 bun run check
 bun run lint
+bun run test           # unit tests
+bun run test:browser   # browser tests (BROWSER=webkit too, for what WebKit could draw differently)
 bun run build
 ```
+
+A change to what lines does adds or updates its tests (`tests/unit/`, `tests/browser/`; CONTRIBUTING.md says which). A change people can see takes the QA pictures again (`bun run qa-shots`) and gets looked at in them, light and dark.
 
 For changes that could make lines slower (the note list, the notes store, the editor, spreadsheets), run `bun run bench` before and after; see `docs/performance.md`.

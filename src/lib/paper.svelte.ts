@@ -1,3 +1,4 @@
+import { committed, request } from "./notes/storage";
 import { plugins } from "./plugins/registry.svelte";
 import type { PaperStyle } from "./plugins/types";
 import { prefs } from "./prefs.svelte";
@@ -14,8 +15,7 @@ import { announce, onAnnounce } from "./windows/channel";
 
 /** Papers as CSS's background properties, the first over the next: across the page, under each line, or down the text column. */
 export function paperBackground(styles: (PaperStyle | undefined)[], scheme: "light" | "dark", where: "page" | "line" | "column" = "page") {
-  const drawn = { page: "layers", line: "lineLayers", column: "columnLayers" } as const;
-  const layers = styles.flatMap((style) => style?.[drawn[where]]?.(scheme) ?? []);
+  const layers = styles.flatMap((style) => (where === "line" ? style?.lineLayers?.() : where === "column" ? style?.columnLayers?.() : style?.layers?.(scheme)) ?? []);
   if (!layers.length) return undefined;
   return {
     image: layers.map((layer) => layer.image).join(", "),
@@ -27,45 +27,67 @@ export function paperBackground(styles: (PaperStyle | undefined)[], scheme: "lig
 /** Whether a pattern is drawn under each line: while Spacing follows the text, or if it can't be drawn across the page. */
 export const drawnPerLine = (style: PaperStyle | undefined) => !!style?.lineLayers && (prefs.paperSpacing === "text" || !style.layers);
 
-const IMAGE_KEY = "lines.backdrop-image";
 /** The longest side a backdrop picture is kept at: sharp on a large screen, and small enough to keep. */
 const IMAGE_SIZE = 2400;
 
-/** A picture kept as a data: URL, as an address to show it at. */
-function urlOf(data: string | null) {
-  if (!data) return null;
-  const [head, body] = data.split(",");
-  const bytes = Uint8Array.from(atob(body), (char) => char.charCodeAt(0));
-  return URL.createObjectURL(new Blob([bytes], { type: head.slice(5, head.indexOf(";")) }));
+/*
+ * Your own backdrop picture, kept on this device in a database of its own, apart from Settings (it's
+ * far too big for them) and from the notes (which erasing them leaves).
+ */
+let db: Promise<IDBDatabase> | undefined;
+function pictures(mode: IDBTransactionMode) {
+  db ??= new Promise((resolve, reject) => {
+    const open = indexedDB.open("lines-pictures", 1);
+    open.onupgradeneeded = () => open.result.createObjectStore("pictures");
+    open.onsuccess = () => resolve(open.result);
+    open.onerror = () => reject(open.error);
+  });
+  return db.then((database) => database.transaction("pictures", mode));
 }
 
-function storedImage() {
+/** A picture as kept: its bytes and their type, which every browser's database takes (Safari's private windows take no Blob). */
+interface Kept {
+  type: string;
+  data: ArrayBuffer;
+}
+
+async function keep(picture: Blob | null) {
+  const kept: Kept | null = picture && { type: picture.type, data: await picture.arrayBuffer() };
+  const tx = await pictures("readwrite");
+  const store = tx.objectStore("pictures");
+  if (kept) store.put(kept, "backdrop");
+  else store.delete("backdrop");
+  await committed(tx);
+}
+
+/** Your own picture behind the page, if there is one, as an address to show it at. */
+export const backdrop = $state({ image: null as string | null });
+
+function showImage(picture: Blob | null) {
+  if (backdrop.image) URL.revokeObjectURL(backdrop.image);
+  backdrop.image = picture && URL.createObjectURL(picture);
+}
+
+/** The picture as kept; and, once, one kept before in Settings' storage, moved here. */
+async function loadImage() {
   try {
-    return localStorage.getItem(IMAGE_KEY);
+    const OLD = "lines.backdrop-image";
+    const old = localStorage.getItem(OLD);
+    if (old) {
+      await keep(await (await fetch(old)).blob());
+      localStorage.removeItem(OLD);
+    }
+    const tx = await pictures("readonly");
+    const kept = await request(tx.objectStore("pictures").get("backdrop") as IDBRequest<Kept | undefined>);
+    showImage(kept ? new Blob([kept.data], { type: kept.type }) : null);
   } catch {
-    return null;
+    // Not kept (no database here, as in private browsing): no picture.
   }
 }
 
-/** Your own picture behind the page, if there is one. */
-export const backdrop = $state({ image: urlOf(storedImage()) });
-
-function showImage(data: string | null) {
-  if (backdrop.image) URL.revokeObjectURL(backdrop.image);
-  backdrop.image = urlOf(data);
-}
-
-const dataUrl = (blob: Blob) =>
-  new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(blob);
-  });
-
 /**
- * Makes `file`, a picture, the backdrop: no larger than it needs to be, kept on this device apart from
- * Settings (it's big), and shown in every window. Throws when it isn't a picture or there's no room.
+ * Makes `file`, a picture, the backdrop: no larger than it needs to be, kept on this device, and
+ * shown in every window. Throws when it isn't a picture or there's no room.
  */
 export async function chooseBackdropImage(file: File) {
   const bitmap = await createImageBitmap(file);
@@ -73,14 +95,23 @@ export async function chooseBackdropImage(file: File) {
   const canvas = new OffscreenCanvas(Math.round(bitmap.width * scale), Math.round(bitmap.height * scale));
   canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
   bitmap.close();
-  const data = await dataUrl(await canvas.convertToBlob({ type: "image/jpeg", quality: 0.85 }));
-  localStorage.setItem(IMAGE_KEY, data);
-  showImage(data);
+  const picture = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.85 });
+  await keep(picture);
+  showImage(picture);
   prefs.paperBackdrop = "image";
-  void announce({ type: "backdrop-image", image: data });
+  void announce({ type: "backdrop-image" });
 }
 
-void onAnnounce((message) => message.type === "backdrop-image" && showImage(message.image));
+/** Takes the picture away, and the backdrop with it if it's the one shown. */
+export async function removeBackdropImage() {
+  await keep(null);
+  showImage(null);
+  if (prefs.paperBackdrop === "image") prefs.paperBackdrop = "none";
+  void announce({ type: "backdrop-image" });
+}
+
+if (typeof indexedDB !== "undefined") void loadImage();
+void onAnnounce((message) => message.type === "backdrop-image" && void loadImage());
 
 /** The backdrop chosen, as CSS's background properties, in the scheme shown; none without one. */
 function backdropBackground(scheme: "light" | "dark") {

@@ -1,4 +1,5 @@
 import type { Theme, ThemeColors } from "../plugins/types";
+import { moreContrast, otherScheme, type Scheme } from "./palette";
 
 const ink = (percent: number) => `color-mix(in srgb, var(--ink) ${percent}%, transparent)`;
 
@@ -7,6 +8,20 @@ export const MORE_CONTRAST = {
   light: { "text-sidebar": "var(--text)", border: ink(42), "card-border": ink(42) },
   dark: { "text-sidebar": "var(--text)", border: ink(36), "card-border": ink(36) },
 };
+
+export const other = (scheme: Scheme): Scheme => (scheme === "dark" ? "light" : "dark");
+
+/**
+ * A pane's colors while it's dark and the window's light (Settings → Theme → Dark panes): the
+ * theme's for its other scheme (worked out from the one it has, for a theme with only one), with
+ * Increased contrast's if `more`.
+ */
+export function paneColors(theme: Theme, own: Scheme, more: boolean): Partial<ThemeColors> {
+  const scheme = other(own);
+  const colors = theme.scheme ? otherScheme(theme[own]) : theme[scheme];
+  if (!more) return colors;
+  return { ...colors, ...MORE_CONTRAST[scheme], ...(theme.scheme ? moreContrast(colors) : theme.moreContrast?.[scheme]) };
+}
 
 /** A theme's id or a custom property's name, and a value that can't end the rule it's in. */
 const NAME = /^[a-z][a-z0-9-]*$/;
@@ -21,7 +36,7 @@ export function rule(selector: string, properties: Partial<ThemeColors> | Record
 }
 
 /**
- * The themes' colors as CSS, for the app (themes.svelte.ts) and the website (site/). With the theme
+ * The themes' colors as CSS, for the app (show.svelte.ts) and the website (site/). With the theme
  * and scheme in their selectors, Increased contrast's colors outrank the theme's own, and each
  * theme's outrank those every theme shares.
  */

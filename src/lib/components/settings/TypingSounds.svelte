@@ -7,7 +7,8 @@
   import Icon from "../../icons/Icon.svelte";
   import { plugins } from "../../plugins/registry.svelte";
   import { formatPercent, prefs, TYPING_VOLUME } from "../../prefs.svelte";
-  import { type PackFiles, soundPacks } from "../../sounds/packs.svelte";
+  import type { PackFiles } from "../../sounds/mechvibes";
+  import { soundPacks } from "../../sounds/packs.svelte";
   import { typing } from "../../sounds/typing.svelte";
   import { unzip } from "../../zip";
   import Button from "../ui/Button.svelte";
@@ -82,6 +83,9 @@
     <FieldRow label={t("settings.typingTry")}>
       <TextField class="w-60" placeholder={t("settings.typingTryPlaceholder")} aria-label={t("settings.typingTry")} autocomplete="off" spellcheck="false" />
     </FieldRow>
+  {/if}
+  <!-- Packs can be added with the Keyboards plugin off, which leaves no keyboard to choose until one is. -->
+  {#if prefs.typingSounds}
     <FieldRow label={t("settings.soundPacks")} note={t("settings.soundPacksNote")}>
       <DropdownMenu.Root>
         <DropdownMenu.Trigger>

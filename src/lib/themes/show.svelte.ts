@@ -2,8 +2,8 @@ import { plugins } from "../plugins/registry.svelte";
 import type { Theme, ThemeColors } from "../plugins/types";
 import { prefs } from "../prefs.svelte";
 import { css, grey, inverted, parse, type Rgb } from "./color";
-import { MORE_CONTRAST, rule, themeCss } from "./css";
-import { BASE_COLORS, moreContrast, otherScheme, type Scheme } from "./palette";
+import { other, paneColors, rule, themeCss } from "./css";
+import { BASE_COLORS, type Scheme } from "./palette";
 
 /*
  * Themes come from plugins (lines' own are in plugins/themes), and your own (custom.svelte.ts). This
@@ -30,29 +30,21 @@ function showThemes() {
 /** Which of a theme's schemes shows when Settings asks for dark (or not): the one it has, if it has one. */
 export const schemeShown = (theme: Theme, dark: boolean) => theme.scheme ?? (dark ? "dark" : "light");
 
-const other = (scheme: Scheme): Scheme => (scheme === "dark" ? "light" : "dark");
-
-/** The window's theme, the scheme of its colors, and the scheme it shows: that one, or turned around by Invert. */
-function look() {
-  const { theme: id, dark } = prefs.windowLook;
-  const theme = plugins.theme(id);
+/** The scheme a window shows `theme` in: its colors' (`own`), or that turned around by Invert. */
+export function shownScheme(theme: Theme, dark = prefs.windowLook.dark) {
   const own = schemeShown(theme, dark);
-  return { theme, own, shown: prefs.invert ? other(own) : own };
+  return { own, shown: prefs.invert ? other(own) : own };
 }
 
-/** Whether `pane` shows in the theme's dark colors: if Settings → Theme → Dark panes says, while the window's light. */
-export const isDarkPane = (pane: "sidebar" | "list") => (prefs.darkPanes === pane || prefs.darkPanes === "both") && look().shown === "light";
-
-/**
- * A pane's colors while it's dark and the window's light: the theme's for its other scheme (worked
- * out from the one it has, for a theme with only one), with Increased contrast's if `more`.
- */
-export function paneColors(theme: Theme, own: Scheme, more: boolean): Partial<ThemeColors> {
-  const scheme = other(own);
-  const colors = theme.scheme ? otherScheme(theme[own]) : theme[scheme];
-  if (!more) return colors;
-  return { ...colors, ...MORE_CONTRAST[scheme], ...(theme.scheme ? moreContrast(colors) : theme.moreContrast?.[scheme]) };
+/** The window's theme, the scheme of its colors, and the scheme it shows. */
+function look() {
+  const theme = plugins.theme(prefs.windowLook.theme);
+  return { theme, ...shownScheme(theme) };
 }
+
+/** Whether Settings → Theme → Dark panes darkens `pane`, if the window shows `theme` (its own, if left out): only while that's light. */
+export const isDarkPane = (pane: "sidebar" | "list", theme = plugins.theme(prefs.windowLook.theme)) =>
+  (prefs.darkPanes === pane || prefs.darkPanes === "both") && shownScheme(theme).shown === "light";
 
 /**
  * The colors Monochrome and Invert change: each theme's, and app.css's own. Those app.css mixes from

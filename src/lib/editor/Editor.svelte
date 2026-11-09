@@ -10,6 +10,7 @@
   import { prefs } from "../prefs.svelte";
   import { objectsChanged } from "./objects";
   import { outline, outlineCompartment } from "./outline.svelte";
+  import { reopened } from "./markers";
   import { copyOnSelectCompartment, createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment, spelling, spellingCompartment } from "./setup";
   import { copyOnSelect } from "./copyOnSelect";
   import { symbolsChanged } from "./symbols";
@@ -87,6 +88,8 @@
     currentId = id;
     const { state, scroll } = cachedFor(id);
     view.setState(state);
+    // What's changed since it was opened starts again (the Changes plugin).
+    view.dispatch({ effects: reopened.of(null) });
     applyFormat();
     if (scroll) view.dispatch({ effects: scroll });
     else view.scrollDOM.scrollTop = 0;

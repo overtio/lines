@@ -1,5 +1,5 @@
 import type { LanguageDescription } from "@codemirror/language";
-import type { EditorState, Extension, Line } from "@codemirror/state";
+import type { EditorState, Extension } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";
 import type { MarkdownConfig } from "@lezer/markdown";
@@ -187,11 +187,12 @@ export interface PaperStyle {
   /**
    * Drawn under each line of the note instead, in tiles `1lh` high (the line's own height) and
    * `--paper-step` wide: rows the text sits in, one per line, headings and wrapped lines too. Used
-   * while Spacing follows the text, and always by a pattern without `layers` (ruled lines).
+   * while Spacing follows the text, and always by a pattern without `layers` (ruled lines). In
+   * `--paper-color`, so the same in light and dark.
    */
-  lineLayers?(scheme: "light" | "dark"): PaperLayer[];
+  lineLayers?(): PaperLayer[];
   /** With `lineLayers`, what's drawn down the whole text column from its left edge, unbroken by lines: a grid's columns. */
-  columnLayers?(scheme: "light" | "dark"): PaperLayer[];
+  columnLayers?(): PaperLayer[];
 }
 
 /**
@@ -284,12 +285,14 @@ export interface NoteLanguage {
   /** Other files its notes can be downloaded as, besides their own: a spreadsheet as an Excel workbook. */
   exports?: NoteExport[];
   /**
-   * How a line is marked in its notes by whoever writes them (Mark Lines, ⌥⌘M): something at the
-   * line's end that other apps don't show, like a comment. `read` finds one on a line, if it has one
-   * (in its text, not in code), and `write` makes one.
+   * How a line is marked in its notes by whoever writes them (Mark Lines, ⌘⇧M): something at the
+   * line's end that other apps don't show, like a comment. `read` finds one in a line's text, if it
+   * has one; `skip` says where one isn't a mark after all (in code), asked again as the note changes
+   * around it; and `write` makes one.
    */
   lineMarks?: {
-    read(state: EditorState, line: Line): WrittenMark | null;
+    read(text: string): WrittenMark | null;
+    skip?(state: EditorState, pos: number): boolean;
     write(color?: MarkerColor, label?: string): string;
   };
   /**

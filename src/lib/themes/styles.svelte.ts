@@ -21,8 +21,9 @@ function showStyles() {
     .flatMap((style) => {
       const root = `:root[data-style="${style.id}"]`;
       const properties = { ...style.properties, ...(style.font && { "font-system": style.font.family }) };
-      // Again in a part with colors of its own (a pane shown dark), which works out its shadows anew.
-      return [rule(`${root}, ${root} [data-scheme]`, properties), style.css ?? ""];
+      // With the scheme, to outrank a theme's colors in dark as in light; and again in a part with
+      // colors of its own (a pane shown dark), which works out its shadows anew.
+      return [rule(`${root}[data-scheme], ${root} [data-scheme]`, properties), style.css ?? ""];
     })
     .filter(Boolean)
     .join("\n\n");

@@ -1,6 +1,7 @@
 import { t } from "../i18n/index.svelte";
 import { addTagIn, extractTags } from "../notes/parse";
 import { countLines } from "../notes/stats";
+import type { Extension } from "@codemirror/state";
 import type { NoteLanguage } from "./types";
 
 /*
@@ -14,12 +15,15 @@ const lines = (body: string) =>
     .map((line) => line.replace(/\s+/g, " ").trim())
     .filter(Boolean);
 
+/** Nothing of its own: the same nothing each time, so it isn't taken for a change of editing. */
+const none: Extension = [];
+
 export const plainTextLanguage: NoteLanguage = {
   id: "text",
   name: t("plugins.plainText"),
   extensions: ["txt"],
   mimeType: "text/plain",
-  editor: () => [],
+  editor: () => none,
   meta: (body) => {
     const [title = "", ...rest] = lines(body);
     return {

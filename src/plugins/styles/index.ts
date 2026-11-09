@@ -47,7 +47,7 @@ const neonColors: ThemeColors = {
   ink: "#9fdcff",
 };
 
-/** Their colors, which are themes like any other. Increased contrast's as palette.ts works them out. */
+/** Their colors, which are themes like any other, with Increased contrast's written in. */
 const themes = (): Theme[] => [
   {
     id: "classic",

@@ -1,5 +1,6 @@
 import { syntaxTree } from "@codemirror/language";
 import { commentMarks } from "../../lib/editor/markers";
+import { frontMatterField } from "../../lib/editor/objects";
 import { markdownEditing } from "../../lib/editor/setup";
 import { t } from "../../lib/i18n/index.svelte";
 import { ATTACHMENT_PATH } from "../../lib/notes/attachments";
@@ -16,12 +17,22 @@ import { markdownDocument } from "../../lib/print/markdown";
  * Its code is the editor's (lib/editor), which other languages build on too, and lib/print/markdown.ts.
  */
 
-/** In code, where `<!-- … -->` is text, not a comment. */
-function inCode(state: EditorState, pos: number) {
-  for (let node: SyntaxNode | null = syntaxTree(state).resolveInner(pos, 1); node; node = node.parent) {
-    if (node.name === "FencedCode" || node.name === "CodeBlock" || node.name === "InlineCode") return true;
+/** What a line mark's comment would be part of, or break, rather than follow: code, math, tables, raw HTML. */
+const NOT_TEXT = new Set(["FencedCode", "CodeBlock", "InlineCode", "InlineMath", "MathBlock", "Table", "HTMLBlock", "CommentBlock", "SetextHeading1", "SetextHeading2"]);
+
+/**
+ * Where `<!-- … -->` isn't a line mark: anywhere but the end of a paragraph's or a heading's text
+ * (in a list or a quote too). In code it's text; after a fence, `$$`, a table's row, a divider or
+ * the properties it would change what they are.
+ */
+function notMarkable(state: EditorState, pos: number) {
+  const front = state.field(frontMatterField, false);
+  if (front && state.doc.lineAt(pos).number <= front.lines) return true;
+  for (let node: SyntaxNode | null = syntaxTree(state).resolveInner(pos, -1); node; node = node.parent) {
+    if (NOT_TEXT.has(node.name)) return true;
+    if (node.name === "Paragraph" || node.name.startsWith("ATXHeading")) return false;
   }
-  return false;
+  return true;
 }
 
 export const markdown = (): Plugin => ({
@@ -48,7 +59,7 @@ export const markdown = (): Plugin => ({
         file: (body, attachments) => (attachments ? body.replaceAll(`](${ATTACHMENT_PATH}`, `](${attachments}`) : body),
         print: markdownDocument,
         // An HTML comment, which Markdown apps don't show.
-        lineMarks: commentMarks("<!--", "-->", { skip: inCode }),
+        lineMarks: commentMarks("<!--", "-->", { skip: notMarkable }),
       },
     ],
   },

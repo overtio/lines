@@ -276,7 +276,7 @@ class Pet {
         break;
       case "fall": {
         this.#vy += this.scale * 1.6;
-        this.#y = Math.min(floor.y, this.#y + this.#vy);
+        this.#y = still ? floor.y : Math.min(floor.y, this.#y + this.#vy);
         this.#x = Math.min(floor.right, Math.max(floor.left, this.#x));
         this.#pose = "cheer";
         if (this.#y >= floor.y) {
@@ -362,12 +362,20 @@ class Pet {
     this.#draw();
   }
 
+  /** What's drawn now, and where: drawn again only when that changes, not at every tick. */
+  #drawn = "";
+  #placed = "";
+
   #draw() {
     const blink = this.#mode !== "sleep" && this.#tick % 40 >= 38;
-    const art = frame(this.mascot, this.#pose, { blink, left: this.#left, accent: this.#accent, accentDark: this.#accentDark });
-    const context = this.#sprite.getContext("2d")!;
-    context.clearRect(0, 0, this.#sprite.width, this.#sprite.height);
-    context.drawImage(art, 0, 0);
+    const look = [this.#pose, blink, this.#left, this.#accent, this.#accentDark].join(" ");
+    if (look !== this.#drawn) {
+      this.#drawn = look;
+      const art = frame(this.mascot, this.#pose, { blink, left: this.#left, accent: this.#accent, accentDark: this.#accentDark });
+      const context = this.#sprite.getContext("2d")!;
+      context.clearRect(0, 0, this.#sprite.width, this.#sprite.height);
+      context.drawImage(art, 0, 0);
+    }
     // How it moves: floating bobs, hopping bounces with its walk, and every key a little bounce.
     let lift = 0;
     if (!reducedMotion.matches) {
@@ -376,19 +384,21 @@ class Pet {
       if (this.#bounce) lift += this.scale;
     }
     this.#bounce = 0;
-    const x = Math.round(this.#x - this.#width / 2);
-    const y = Math.round(this.#y - this.#height - lift);
-    this.#host.style.transform = `translate(${x}px, ${y}px)`;
+    const place = `translate(${Math.round(this.#x - this.#width / 2)}px, ${Math.round(this.#y - this.#height - lift)}px)`;
+    if (place !== this.#placed) this.#host.style.transform = this.#placed = place;
   }
 }
 
 /** Only the main window has one: not Settings', nor a floating note's. */
 const main = !isSettingsWindow && !windowLabel().startsWith("note-");
 
+/** The mascot chosen: the same one while other plugins are turned on and off, so it isn't made again. */
+const chosen = $derived(main ? plugins.mascots.find((each) => each.id === prefs.mascot) : undefined);
+
 $effect.root(() => {
   $effect(() => {
-    const mascot = plugins.mascots.find((each) => each.id === prefs.mascot);
-    if (!mascot || !main) return;
+    const mascot = chosen;
+    if (!mascot) return;
     const scale = SCALE[prefs.mascotSize];
     // Made untracked: what it reads as it goes (whether it talks) doesn't make it again.
     const pet = untrack(() => new Pet(mascot, scale));

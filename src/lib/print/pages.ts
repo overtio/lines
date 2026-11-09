@@ -19,8 +19,11 @@ export const PAPERS: Record<PaperId, { width: number; height: number; side: numb
 /** Parts of a document that a page can't cut through. Text is cut between its lines (see `solids`). */
 const WHOLE = "img, svg, .katex, .doc-math, tr, hr, .doc-box, .doc-mark, .doc-li-mark, .doc-image-missing, .doc-icon, .doc-title, .doc-theorem-label";
 
-/** Where everything that can't be cut is, top to bottom, merged where they overlap: [top, bottom] from the column's top. */
-function solids(doc: HTMLElement): [number, number][] {
+/**
+ * Where everything that can't be cut is, top to bottom, merged where they overlap: [top, bottom]
+ * from the column's top. `forced` are the page breaks, which nothing holds across.
+ */
+function solids(doc: HTMLElement, forced: number[]): [number, number][] {
   const origin = doc.getBoundingClientRect().top;
   const found: [number, number][] = [];
   const add = (rect: DOMRect) => {
@@ -36,12 +39,12 @@ function solids(doc: HTMLElement): [number, number][] {
   }
   for (const element of doc.querySelectorAll(WHOLE)) add(element.getBoundingClientRect());
   found.sort((a, b) => a[0] - b[0]);
-  // A heading holds on to the first line after it.
+  // A heading holds on to the first line after it, but not across a page break.
   for (const heading of doc.querySelectorAll("h1, h2, h3, h4, h5, h6, .doc-abstract-title, .doc-caption")) {
     const rect = heading.getBoundingClientRect();
     const bottom = rect.bottom - origin;
     const next = found.find(([top]) => top >= bottom - 1);
-    if (next) found.push([rect.top - origin, next[1]]);
+    if (next && !forced.some((at) => at >= bottom - 1 && at <= next[0])) found.push([rect.top - origin, next[1]]);
   }
   found.sort((a, b) => a[0] - b[0]);
   const merged: [number, number][] = [];
@@ -116,7 +119,7 @@ export function paginate(doc: HTMLElement, measure: HTMLElement, paper: PaperId,
     return { block, top: rect.top - origin.top, bottom: rect.bottom - origin.top, left: rect.left - origin.left, width: rect.width };
   });
   const forced = [...doc.querySelectorAll(":scope > .doc-page-break")].map((block) => block.getBoundingClientRect().top - origin.top);
-  const cuts = whole ? [[0, Math.ceil(origin.height)] as [number, number]] : breaks(solids(doc), height, forced);
+  const cuts = whole ? [[0, Math.ceil(origin.height)] as [number, number]] : breaks(solids(doc, forced), height, forced);
   return cuts.map(([start, end], index) => {
     const page = el("div", "print-page");
     page.style.width = `${size.width}mm`;

@@ -83,12 +83,12 @@ ${body}
 `;
 }
 
-/** The docs' list, by group, with the page that's open marked. */
-function docsNav(groups, page) {
+/** The docs' list, by group, with the page that's open marked; `prefix` keeps its ids apart from another copy's on the page. */
+function docsNav(groups, page, prefix = "") {
   return groups
     .map(
-      (group, i) => `<p id="docs-group-${i}" class="mt-6 mb-1.5 px-2.5 text-xs font-semibold text-faint first:mt-0">${esc(group.title)}</p>
-          <ul aria-labelledby="docs-group-${i}">
+      (group, i) => `<p id="${prefix}docs-group-${i}" class="mt-6 mb-1.5 px-2.5 text-xs font-semibold text-faint first:mt-0">${esc(group.title)}</p>
+          <ul aria-labelledby="${prefix}docs-group-${i}">
             ${group.pages
               .map(
                 (entry) =>
@@ -126,7 +126,7 @@ function docsLayout({ page, title, description, groups, content, outline = [] })
         <details class="docs-menu mb-8 lg:hidden">
           <summary>All docs</summary>
           <nav aria-label="Docs" class="mt-2">
-          ${docsNav(groups, page)}
+          ${docsNav(groups, page, "menu-")}
           </nav>
         </details>
         ${content}

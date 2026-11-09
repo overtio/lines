@@ -72,6 +72,8 @@
   }
 
   function keydown(event: KeyboardEvent) {
+    // An input method's keys (Esc to cancel, arrows through its choices) are its own; WebKit marks them 229.
+    if (event.isComposing || composing || event.keyCode === 229) return;
     const fresh = drill.started === null;
     const done = drill.finished !== null;
     const leave = (up: boolean) => {
@@ -103,14 +105,26 @@
     field?.focus();
   }
 
+  const LOOKS = { right: "text-fg", missed: "rounded-[2px] bg-danger/15 text-danger", rest: "text-muted", break: "text-faint" };
   const CARET = "relative before:absolute before:inset-y-[0.15em] before:-left-px before:w-0.5 before:rounded-full before:bg-[var(--caret-color,var(--accent))]";
 
-  /** How the character at `i` shows: typed right, missed, or still to type, and the cursor before the next. */
-  function look(char: string, i: number) {
-    const typed = i < drill.typed.length;
-    const missed = typed && !drill.right(i);
-    return [missed ? "rounded-[2px] bg-danger/15 text-danger" : char === "\n" ? "text-faint" : typed ? "text-fg" : "text-muted", i === drill.typed.length && focused && CARET];
-  }
+  /**
+   * The passage as runs of characters that look alike (typed right, missed, still to type, a line
+   * break) and the one the cursor is before on its own: a few elements, however long it is.
+   */
+  const runs = $derived.by(() => {
+    const found: { text: string; look: keyof typeof LOOKS; caret: boolean }[] = [];
+    drill.wanted.forEach((char, i) => {
+      const typed = i < drill.typed.length;
+      const look = typed && !drill.right(i) ? "missed" : char === "\n" ? "break" : typed ? "right" : "rest";
+      const caret = i === drill.typed.length && focused;
+      const text = char === "\n" ? "↵\n" : char;
+      const last = found.at(-1);
+      if (last && last.look === look && !last.caret && !caret) last.text += text;
+      else found.push({ text, look, caret });
+    });
+    return found;
+  });
 
   const status = $derived(
     drill.started !== null
@@ -133,7 +147,7 @@
   </div>
   {#if drill.wanted.length}
     <div class="relative px-4 pt-1 pb-4">
-      <p class="m-0 font-text text-(length:--editor-size) leading-(--editor-line-height) break-words whitespace-pre-wrap" aria-hidden="true">{#each drill.wanted as char, i (i)}<span class={look(char, i)}>{char === "\n" ? "↵\n" : char}</span>{/each}</p>
+      <p class="m-0 font-text text-(length:--editor-size) leading-(--editor-line-height) break-words whitespace-pre-wrap" aria-hidden="true">{#each runs as run, i (i)}<span class={[LOOKS[run.look], run.caret && CARET]}>{run.text}</span>{/each}</p>
       <p id="{id}-text" class="sr-only">{drill.passage}</p>
       <textarea
         bind:this={field}

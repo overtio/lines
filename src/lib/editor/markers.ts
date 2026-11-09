@@ -1,8 +1,10 @@
-import { type ChangeSpec, type EditorState, type Extension, RangeSetBuilder, StateField } from "@codemirror/state";
+import { syntaxTree } from "@codemirror/language";
+import { type ChangeSpec, type EditorState, type Extension, RangeSetBuilder, StateEffect, StateField, type Text } from "@codemirror/state";
 import { Decoration, type DecorationSet, EditorView, keymap, layer, type LayerMarker, ViewPlugin, type ViewUpdate } from "@codemirror/view";
 import { plugins } from "../plugins/registry.svelte";
 import type { LineMarker, MarkerColor, NoteLanguage } from "../plugins/types";
 import { markupMode } from "./markupMode";
+import { selectedLines } from "./util";
 
 /*
  * Marks in a note's margin, as a code editor marks the lines changed: the note's own, written at the
@@ -38,13 +40,11 @@ export function commentMarks(open: string, close: string, { notAfter, skip }: { 
   const label = close ? `((?:(?!${escape(close)}).)*?)` : "(.*?)";
   const pattern = new RegExp(`\\s*${before}${escape(open)}${last}\\s*mark\\b(?:\\s+(${names}))?\\s*(?::\\s*${label})?\\s*${escape(close)}\\s*$`, "i");
   return {
-    read(state, line) {
-      const found = pattern.exec(line.text);
-      if (!found) return null;
-      const start = line.from + found.index + found[0].length - found[0].trimStart().length;
-      if (skip?.(state, start)) return null;
-      return { at: found.index, color: (found[1]?.toLowerCase() ?? "accent") as MarkerColor, label: found[2] || undefined };
+    read(text) {
+      const found = pattern.exec(text);
+      return found && { at: found.index, color: (found[1]?.toLowerCase() ?? "accent") as MarkerColor, label: found[2] || undefined };
     },
+    skip,
     write: (color, label) => [open, `mark${color && color !== "accent" ? ` ${color}` : ""}${label ? `: ${label}` : ""}`, close].filter(Boolean).join(" "),
   };
 }
@@ -53,31 +53,61 @@ export function commentMarks(open: string, close: string, { notAfter, skip }: { 
 const OFFSET = 30;
 const LANE = 6;
 
-/** The note's text when it was opened, for plugins that compare with it. */
-const opened = StateField.define<string>({ create: (state) => state.doc.toString(), update: (text) => text });
+/** The note was opened again (Editor.svelte): what it's compared with starts from now. */
+export const reopened = StateEffect.define<null>();
 
-interface Marks {
-  /** The note's own marks, then each plugin's. */
-  lanes: LineMarker[][];
-  /** Where each of the note's own marks is written, by line number: from there to the line's end. */
-  written: Map<number, number>;
+/**
+ * The note's text when it was opened (kept as it is, which costs nothing), for plugins that compare
+ * with it: in every note's editor, outside its format's, so setting that up again doesn't reset it.
+ */
+export const openedText = StateField.define<Text>({
+  create: (state) => state.doc,
+  update: (text, tr) => (tr.effects.some((effect) => effect.is(reopened)) ? tr.state.doc : text),
+});
+
+/** One of the note's own marks: its line, from its start to its end, where on it it's written, and where its comment starts. */
+interface OwnMark {
+  line: number;
+  end: number;
+  at: number;
+  start: number;
+  color: MarkerColor;
+  label?: string;
 }
 
-function marksOf(state: EditorState, language: NoteLanguage): Marks {
-  const written = new Map<number, number>();
-  const own: LineMarker[] = [];
+interface Marks {
+  /** The note's own marks, in order. */
+  own: OwnMark[];
+  /** Each plugin's marks, a lane each. */
+  theirs: LineMarker[][];
+}
+
+/** The note's own marks on the lines `ranges` cover, added to `into` (a line once, however many ranges cover it). */
+function readMarks(state: EditorState, language: NoteLanguage, ranges: [number, number][], into: OwnMark[]) {
   const read = language.lineMarks?.read;
-  if (read) {
-    for (let n = 1; n <= state.doc.lines; n++) {
-      const line = state.doc.line(n);
-      const mark = read(state, line);
+  if (!read) return;
+  const seen = new Set<number>();
+  for (const [from, to] of ranges) {
+    for (let pos = from; pos <= to; ) {
+      const line = state.doc.lineAt(pos);
+      pos = line.to + 1;
+      if (seen.has(line.from)) continue;
+      seen.add(line.from);
+      const mark = read(line.text);
       if (!mark) continue;
-      written.set(n, line.from + mark.at);
-      own.push({ from: n, color: mark.color, label: mark.label });
+      const at = line.from + mark.at;
+      const start = at + line.text.slice(mark.at).length - line.text.slice(mark.at).trimStart().length;
+      into.push({ line: line.from, end: line.to, at, start, color: mark.color, label: mark.label });
     }
   }
-  const note = { text: state.doc.toString(), opened: state.field(opened), format: language.id };
-  const theirs = plugins.markerSources.map((source) => {
+}
+
+/** The plugins' marks, which are asked with the note's whole text: only when there are any. */
+function theirMarks(state: EditorState, language: NoteLanguage) {
+  const sources = plugins.markerSources;
+  if (!sources.length) return [];
+  const note = { text: state.doc.toString(), opened: (state.field(openedText, false) ?? state.doc).toString(), format: language.id };
+  return sources.map((source) => {
     try {
       return source.markers(note);
     } catch (error) {
@@ -85,7 +115,6 @@ function marksOf(state: EditorState, language: NoteLanguage): Marks {
       return [];
     }
   });
-  return { lanes: [own, ...theirs], written };
 }
 
 /** A lane's marks in order, those next to each other alike joined into one. */
@@ -147,12 +176,41 @@ class Bar implements LayerMarker {
   }
 }
 
+/** The note's been read further (what's code may have changed), with or without a change. */
+const parsedFurther = (update: ViewUpdate) => syntaxTree(update.startState) !== syntaxTree(update.state);
+
 /** Marks in the margin, and Mark Lines, for notes in `language`. */
 export function lineMarkers(language: NoteLanguage): Extension {
   const marks = StateField.define<Marks>({
-    create: (state) => marksOf(state, language),
-    update: (value, transaction) => (transaction.docChanged ? marksOf(transaction.state, language) : value),
+    create(state) {
+      const own: OwnMark[] = [];
+      readMarks(state, language, [[0, state.doc.length]], own);
+      return { own, theirs: theirMarks(state, language) };
+    },
+    // Only the lines a change touched are read again; the rest of the note's marks move with it.
+    update(value, { docChanged, changes, state, startState }) {
+      if (!docChanged) return startState.field(openedText, false) === state.field(openedText, false) ? value : { ...value, theirs: theirMarks(state, language) };
+      const before: [number, number][] = [];
+      const after: [number, number][] = [];
+      changes.iterChangedRanges((fromA, toA, fromB, toB) => {
+        before.push([fromA, toA]);
+        after.push([fromB, toB]);
+      });
+      const own = value.own
+        .filter((mark) => !before.some(([from, to]) => from <= mark.end && to >= mark.line))
+        .map((mark) => ({ ...mark, line: changes.mapPos(mark.line), end: changes.mapPos(mark.end), at: changes.mapPos(mark.at), start: changes.mapPos(mark.start) }));
+      readMarks(state, language, after, own);
+      return { own: own.sort((a, b) => a.line - b.line), theirs: theirMarks(state, language) };
+    },
   });
+
+  /**
+   * The note's own marks, but those that aren't (in code, as the note is now). None while the note's
+   * format is being set up again, when what draws them may still measure once without them.
+   */
+  const ownMarks = (state: EditorState) => (state.field(marks, false)?.own ?? []).filter((mark) => !language.lineMarks?.skip?.(state, mark.start));
+  /** Where each is written, by its line's start. */
+  const writtenOn = (state: EditorState) => new Map(ownMarks(state).map((mark) => [mark.line, mark.at]));
 
   const hidden = Decoration.replace({});
   /** The note's own marks, hidden but where the cursor is (or anywhere, while the note isn't being edited). */
@@ -163,20 +221,20 @@ export function lineMarkers(language: NoteLanguage): Extension {
         this.decorations = this.build(view);
       }
       update(update: ViewUpdate) {
-        if (update.docChanged || update.selectionSet || update.focusChanged || update.viewportChanged) this.decorations = this.build(update.view);
+        if (update.docChanged || update.selectionSet || update.focusChanged || update.viewportChanged || parsedFurther(update)) this.decorations = this.build(update.view);
       }
       build(view: EditorView) {
         // With the note's markup in sight, they are too.
         const mode = view.state.facet(markupMode);
         if (mode === "source" || mode === "visible") return Decoration.none;
-        const { written } = view.state.field(marks);
+        const written = writtenOn(view.state);
         const { doc } = view.state;
         const selection = view.hasFocus ? view.state.selection.ranges : [];
         const builder = new RangeSetBuilder<Decoration>();
         for (const { from, to } of view.visibleRanges) {
           for (let pos = from; pos <= to; ) {
             const line = doc.lineAt(pos);
-            const at = written.get(line.number);
+            const at = written.get(line.from);
             if (at !== undefined && at < line.to && !selection.some((range) => range.from <= line.to && range.to >= line.from)) builder.add(at, line.to, hidden);
             pos = line.to + 1;
           }
@@ -190,10 +248,11 @@ export function lineMarkers(language: NoteLanguage): Extension {
   const bars = layer({
     above: true,
     class: "cm-markers",
-    update: (update) => update.docChanged || update.viewportChanged || update.geometryChanged,
+    update: (update) => update.docChanged || update.viewportChanged || update.geometryChanged || parsedFurther(update),
     markers(view) {
-      const { lanes } = view.state.field(marks);
+      const theirs = view.state.field(marks, false)?.theirs ?? [];
       const { doc } = view.state;
+      const lanes = [ownMarks(view.state).map((mark) => ({ from: doc.lineAt(mark.line).number, color: mark.color, label: mark.label })), ...theirs];
       const content = view.contentDOM;
       const scroller = view.scrollDOM.getBoundingClientRect();
       const pad = parseFloat(getComputedStyle(content).paddingLeft);
@@ -232,20 +291,19 @@ export function lineMarkers(language: NoteLanguage): Extension {
     const write = language.lineMarks?.write;
     if (!write || view.state.readOnly) return false;
     const { state } = view;
-    const { written } = state.field(marks);
-    const lines = new Set<number>();
-    for (const range of state.selection.ranges) {
-      for (let n = state.doc.lineAt(range.from).number; n <= state.doc.lineAt(range.to).number; n++) lines.add(n);
-    }
-    const unmark = [...lines].every((n) => written.has(n));
-    const changes = [...lines].flatMap((n): ChangeSpec[] => {
-      const line = state.doc.line(n);
-      if (unmark) return [{ from: written.get(n)!, to: line.to }];
-      return written.has(n) ? [] : [{ from: line.to, insert: (line.length ? " " : "") + write() }];
+    const written = writtenOn(state);
+    // Lines with text, where a mark would follow it rather than change what the line is (a code fence, a table's row).
+    const lines = selectedLines(state).filter((line) => written.has(line.from) || (line.text.trim() && !language.lineMarks?.skip?.(state, line.to)));
+    if (!lines.length) return true;
+    const unmark = lines.every((line) => written.has(line.from));
+    const changes = lines.flatMap((line): ChangeSpec[] => {
+      const at = written.get(line.from);
+      if (unmark) return [{ from: at!, to: line.to }];
+      return at !== undefined ? [] : [{ from: line.to, insert: ` ${write()}` }];
     });
     view.dispatch({ changes, userEvent: unmark ? "delete.mark" : "input.mark" });
     return true;
   }
 
-  return [opened, marks, hiding, bars, keymap.of([{ key: "Mod-Shift-m", run: markLines }])];
+  return [marks, hiding, bars, keymap.of([{ key: "Mod-Shift-m", run: markLines }])];
 }
