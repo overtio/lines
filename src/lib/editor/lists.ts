@@ -1,4 +1,4 @@
-import { type EditorState, Prec, type Text } from "@codemirror/state";
+import { type ChangeSpec, type EditorState, Prec, type Text } from "@codemirror/state";
 import { type EditorView, keymap } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";
 import { ancestors } from "./util";
@@ -7,6 +7,7 @@ import { ancestors } from "./util";
  * Tab and Shift-Tab on a list item nest it under the item above, or move it back out a level,
  * taking its own sub-items along. The indentation is whatever Markdown needs for that (two
  * spaces under "- ", three under "1. "); the editor draws each level the same, wider step.
+ * Numbered items are numbered again, in the list they leave and the one they join.
  * Backspace right after an item's marker moves a nested item out a level, and turns a top-level
  * one into plain text. Enter there puts an empty item above it.
  */
@@ -30,6 +31,18 @@ function markerColumn(doc: Text, item: SyntaxNode) {
   return mark.from - doc.lineAt(mark.from).from;
 }
 
+/** An ordered list item's number. */
+function itemNumber(doc: Text, item: SyntaxNode) {
+  const mark = item.getChild("ListMark")!;
+  return parseInt(doc.sliceString(mark.from, mark.to), 10);
+}
+
+/** The change that numbers an ordered list's item `number`, if it isn't already. */
+function numbered(doc: Text, item: SyntaxNode, number: number) {
+  const mark = item.getChild("ListMark")!;
+  return itemNumber(doc, item) === number ? [] : [{ from: mark.from, to: mark.to - 1, insert: String(number) }];
+}
+
 /**
  * The changes that number an ordered list's items from `item` on, starting at `number`, as far as
  * they were numbered one after another.
@@ -38,21 +51,27 @@ function renumber(doc: Text, item: SyntaxNode | null, number: number) {
   const changes = [];
   for (let last = -1; item; item = item.nextSibling) {
     if (item.name !== "ListItem") continue;
-    const mark = item.getChild("ListMark")!;
-    const written = parseInt(doc.sliceString(mark.from, mark.to), 10);
+    const written = itemNumber(doc, item);
     if (last >= 0 && written !== last + 1) break;
     last = written;
-    if (written !== number) changes.push({ from: mark.from, to: mark.to - 1, insert: String(number) });
-    number++;
+    changes.push(...numbered(doc, item, number++));
   }
   return changes;
+}
+
+/** The number for an item put after `item`'s own numbered sub-items: one more than the last, or 1. */
+function numberAfter(doc: Text, item: SyntaxNode) {
+  const list = item.lastChild;
+  let last = list?.name === "OrderedList" ? list.lastChild : null;
+  while (last && last.name !== "ListItem") last = last.prevSibling;
+  return last ? itemNumber(doc, last) + 1 : 1;
 }
 
 /** Quote markers a line starts with; indentation goes after them. */
 const QUOTES = /^(?:[ \t]*>[ ]?)*/;
 
-/** Shifts every line of `item` (and its sub-items) by `delta` columns. */
-function shift(view: EditorView, item: SyntaxNode, delta: number) {
+/** Shifts every line of `item` (and its sub-items) by `delta` columns, numbering items again as `renumbered` says. */
+function shift(view: EditorView, item: SyntaxNode, delta: number, renumbered: ChangeSpec[] = []) {
   const { doc } = view.state;
   const changes = [];
   for (let n = doc.lineAt(item.from).number; n <= doc.lineAt(item.to).number; n++) {
@@ -62,7 +81,7 @@ function shift(view: EditorView, item: SyntaxNode, delta: number) {
     if (delta > 0) changes.push({ from, insert: " ".repeat(delta) });
     else changes.push({ from, to: from + Math.min(-delta, /^ */.exec(doc.sliceString(from, line.to))![0].length) });
   }
-  view.dispatch({ changes, scrollIntoView: true, userEvent: delta > 0 ? "input.indent" : "delete.dedent" });
+  view.dispatch({ changes: [...changes, ...renumbered], scrollIntoView: true, userEvent: delta > 0 ? "input.indent" : "delete.dedent" });
 }
 
 function indentItem(view: EditorView) {
@@ -75,9 +94,12 @@ function indentItem(view: EditorView) {
   // The first item of a list has nothing to go under; keep Tab from typing spaces anyway.
   if (above?.name !== "ListItem") return true;
   // Line it up with the text of the item above, which is what makes it that item's child.
+  const { doc } = state;
   const mark = above.getChild("ListMark")!;
-  const target = mark.to + 1 - state.doc.lineAt(mark.from).from;
-  shift(view, item, target - markerColumn(state.doc, item));
+  const target = mark.to + 1 - doc.lineAt(mark.from).from;
+  // Numbered, it counts on from the items it goes under (or from 1), and the items after it count down.
+  const renumbered = item.parent?.name === "OrderedList" ? [...numbered(doc, item, numberAfter(doc, above)), ...renumber(doc, item.nextSibling, itemNumber(doc, item))] : [];
+  shift(view, item, target - markerColumn(doc, item), renumbered);
   return true;
 }
 
@@ -87,7 +109,18 @@ function outdentItem(view: EditorView) {
   if (!item) return false;
   const parent = item.parent?.parent;
   if (parent?.name !== "ListItem") return true;
-  shift(view, item, markerColumn(state.doc, parent) - markerColumn(state.doc, item));
+  const { doc } = state;
+  const renumbered = [];
+  if (item.parent!.name === "OrderedList") {
+    // The items after it stay where they are, now under it, after its own.
+    renumbered.push(...renumber(doc, item.nextSibling, numberAfter(doc, item)));
+    // It goes after the item it was under, counting on from it, and the items after that count up.
+    if (parent.parent?.name === "OrderedList") {
+      const number = itemNumber(doc, parent) + 1;
+      renumbered.push(...numbered(doc, item, number), ...renumber(doc, parent.nextSibling, number + 1));
+    }
+  }
+  shift(view, item, markerColumn(doc, parent) - markerColumn(doc, item), renumbered);
   return true;
 }
 
@@ -130,7 +163,7 @@ function itemAbove(view: EditorView) {
     list.firstChild?.from === item.from && list.parent?.name !== "ListItem" && before?.name === "Paragraph" && doc.lineAt(before.to).number === line.number - 1;
   const blank = underParagraph ? `${QUOTES.exec(line.text)![0].trimEnd()}\n` : "";
   const changes = [{ from: line.from, to: line.from, insert: `${blank}${line.text.slice(0, start - line.from).replace(/\[[xX]\]/, "[ ]")}\n` }];
-  if (list.name === "OrderedList") changes.push(...renumber(doc, item, parseInt(doc.sliceString(mark.from, mark.to), 10) + 1));
+  if (list.name === "OrderedList") changes.push(...renumber(doc, item, itemNumber(doc, item) + 1));
   view.dispatch({ changes, scrollIntoView: true, userEvent: "input" });
   return true;
 }
