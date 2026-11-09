@@ -4,7 +4,7 @@ import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type Vi
 import { tags } from "@lezer/highlight";
 import { mount, unmount } from "svelte";
 import { speak } from "../../lib/a11y";
-import { fenceAt, fenceLanguage } from "../../lib/editor/rendered";
+import { fenceAt, fenceFor, fenceLanguage } from "../../lib/editor/rendered";
 import { copyButton, destroyCopyButton } from "../../lib/editor/keyValue";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
 import Icon from "../../lib/icons/Icon.svelte";
@@ -181,7 +181,7 @@ class ResponseWidget extends WidgetType {
 /** A response's body, as a code block after the requests' block; the response then closes. */
 function writeIntoNote(view: EditorView, dom: HTMLElement, exchange: Exchange, text: string, language: string) {
   const at = view.posAtDOM(dom);
-  const fence = "`".repeat(Math.max(3, ...[...text.matchAll(/`{3,}/g)].map((match) => match[0].length + 1)));
+  const fence = fenceFor(text);
   const insert = `\n\n${fence}${language}\n${text}\n${fence}`;
   view.dispatch({
     changes: { from: at, insert },

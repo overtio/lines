@@ -39,9 +39,17 @@ export function blockName(info: string): string | null {
 const infoText = (language: string, name: string | null, width: number | null) =>
   language + (name ? ` name=${/[\s"]/.test(name) ? `"${name.replaceAll('"', "")}"` : name}` : "") + (width ? ` |${width}` : "");
 
+/** A fence like `fence` for a block of `code`, longer than any run of its character in the code, so no line of the code ends the block. */
+export function fenceFor(code: string, fence = "```") {
+  const runs = code.match(fence[0] === "~" ? /~{3,}/g : /`{3,}/g) ?? [];
+  return fence[0].repeat(Math.max(fence.length, ...runs.map((run) => run.length + 1)));
+}
+
 /** A code block of `language`, with a name if it has one: a ```csv block from its CSV, say. */
-export const fencedBlock = (language: string, code: string, name: string | null = null) =>
-  `\`\`\`${infoText(language, name, null)}\n${code ? `${code}\n` : ""}\`\`\``;
+export function fencedBlock(language: string, code: string, name: string | null = null) {
+  const fence = fenceFor(code);
+  return `${fence}${infoText(language, name, null)}\n${code ? `${code}\n` : ""}${fence}`;
+}
 
 /**
  * The renderer for a code block's info string, and the width it's shown at, if it gives one. The
@@ -314,8 +322,13 @@ class Block implements EditableBlock {
     const marks = node.getChildren("CodeMark");
     const from = state.doc.lineAt(node.from).to;
     const to = marks.length > 1 ? state.doc.lineAt(marks[marks.length - 1].from).from - 1 : node.to;
-    const changes = changeBetween(from, state.sliceDoc(from, to), source ? `\n${source}` : "");
-    if (changes) this.view.dispatch({ changes, userEvent: "input", annotations: isolateHistory.of("full") });
+    const code = changeBetween(from, state.sliceDoc(from, to), source ? `\n${source}` : "");
+    if (!code) return;
+    // Longer fences, if a line of the code would end the block.
+    const fence = state.sliceDoc(marks[0].from, marks[0].to);
+    const longer = fenceFor(source, fence).slice(fence.length);
+    const fences = longer ? marks.map((mark) => ({ from: mark.from, insert: longer })) : [];
+    this.view.dispatch({ changes: [code, ...fences], userEvent: "input", annotations: isolateHistory.of("full") });
   }
 
   rename(name: string | null) {

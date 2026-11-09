@@ -232,4 +232,27 @@ describe("fixed", () => {
   test("a Python note downloads as .py", async () => {
     expect(await app.page.evaluate(() => window.testing.plugins.language("code-python").extensions[0])).toBe("py");
   });
+
+  test("a spreadsheet block's cell with a ``` line in it doesn't end the block", async () => {
+    await app.open("```csv\nname,example\nJS,x\n```\n\nAfter the block.");
+    await app.page.locator(".cm-sheet [role=gridcell]").nth(3).dblclick();
+    await app.page.keyboard.press(`${mod()}+A`);
+    await app.page.keyboard.type("Example:");
+    // ⌥↩: a line break in the cell.
+    for (const line of ["```", "let a = 1", "```"]) {
+      await app.page.keyboard.press("Alt+Enter");
+      await app.page.keyboard.type(line);
+    }
+    await app.page.keyboard.press("Enter");
+    await app.page.waitForFunction(() => window.testing.text()!.includes("let a = 1"));
+    expect(await app.text()).toBe('````csv\nname,example\nJS,"Example:\n```\nlet a = 1\n```"\n````\n\nAfter the block.');
+    expect(await app.page.locator(".cm-sheet").count()).toBe(1);
+  });
+
+  test("a table with a ``` cell, converted to a spreadsheet, keeps it in the block", async () => {
+    await app.open("| Fence |\n| --- |\n| ``` |\n\nAfter the table.");
+    await app.page.locator(".editor-pane .cm-lp-table-wrap").hover();
+    await app.page.getByRole("button", { name: "Convert to Spreadsheet" }).click();
+    expect(await app.text()).toBe("````csv\nFence\n```\n````\n\nAfter the table.");
+  });
 });
