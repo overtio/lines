@@ -164,6 +164,12 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - A picture of a note (PNG) is one long page, without its breaks.
 - With a pattern drawn in columns (squares, graph) over a backdrop, each page's columns run its full height, past the last line's row.
 
+## Mascots
+
+- A mascot lives in the main window only, not in floating notes or Settings' own window, and walks along the bottom of the note's pane. Where it stands, it's clicked rather than what's under it: drag it away.
+- It sits beside the line being written in notes; a spreadsheet's cells and other fields don't call it.
+- Only the four lines draws can be chosen; a plugin can add more, but there's no way yet to draw your own in Settings.
+
 ## Cursors
 
 - The text cursor's look is in notes and Settings' little note; fields (search, renaming) and a spreadsheet's cells keep the system's, in the color chosen.

@@ -76,6 +76,7 @@ class Plugins {
   readonly markerSources = $derived(this.#from("markers"));
   /** Keyboards to hear as you type: the plugins', then your sound packs (sounds/packs.svelte.ts). */
   readonly keyboardSounds = $derived([...this.#from("keyboardSounds"), ...soundPacks.keyboards]);
+  readonly mascots = $derived(this.#from("mascots"));
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).

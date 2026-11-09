@@ -34,6 +34,8 @@ export const CARET_EFFECTS = ["none", "glow", "rainbow", "sparks"] as const;
 /** The pointer: the system's, pixel art, or a dot in the accent; and what follows it. */
 export const POINTER_STYLES = ["system", "retro", "dot"] as const;
 export const POINTER_TRAILS = ["none", "comet", "sparkles"] as const;
+/** A mascot's size, as how many screen pixels each of its pixels takes. */
+export const MASCOT_SIZES = ["small", "medium", "large"] as const;
 
 /** Headings' color: the text's, the theme's accent, or one of your own. */
 export const HEADING_COLORS = ["text", "accent", "custom"] as const;
@@ -230,6 +232,10 @@ interface Stored {
   caretEffect: (typeof CARET_EFFECTS)[number];
   pointerStyle: (typeof POINTER_STYLES)[number];
   pointerTrail: (typeof POINTER_TRAILS)[number];
+  /** A mascot keeping you company (lib/mascot/): a plugin's, by id, or "none"; how big; and whether it talks. */
+  mascot: string;
+  mascotSize: (typeof MASCOT_SIZES)[number];
+  mascotTalks: boolean;
   /** Headings' color, and the color of your own, kept while another is chosen (themes/show.svelte.ts). */
   headingColor: HeadingColor;
   headingCustomColor: string;
@@ -354,6 +360,9 @@ const DEFAULTS: Stored = {
   caretEffect: "none",
   pointerStyle: "system",
   pointerTrail: "none",
+  mascot: "none",
+  mascotSize: "medium",
+  mascotTalks: true,
   headingCustomColor: "#3d7dd8",
   symbolsInText: true,
   symbolsInCode: true,
@@ -485,6 +494,9 @@ function read(json?: string): Stored {
     caretEffect: oneOf(raw.caretEffect, CARET_EFFECTS, DEFAULTS.caretEffect),
     pointerStyle: oneOf(raw.pointerStyle, POINTER_STYLES, DEFAULTS.pointerStyle),
     pointerTrail: oneOf(raw.pointerTrail, POINTER_TRAILS, DEFAULTS.pointerTrail),
+    mascot: id(raw.mascot, DEFAULTS.mascot),
+    mascotSize: oneOf(raw.mascotSize, MASCOT_SIZES, DEFAULTS.mascotSize),
+    mascotTalks: flag(raw.mascotTalks, DEFAULTS.mascotTalks),
     headingCustomColor: color(raw.headingCustomColor, DEFAULTS.headingCustomColor),
     symbolsInText: flag(raw.symbolsInText, DEFAULTS.symbolsInText),
     symbolsInCode: flag(raw.symbolsInCode, DEFAULTS.symbolsInCode),
@@ -566,6 +578,9 @@ class Prefs {
   caretEffect = $state(this.#initial.caretEffect);
   pointerStyle = $state(this.#initial.pointerStyle);
   pointerTrail = $state(this.#initial.pointerTrail);
+  mascot = $state(this.#initial.mascot);
+  mascotSize = $state(this.#initial.mascotSize);
+  mascotTalks = $state(this.#initial.mascotTalks);
   headingCustomColor = $state(this.#initial.headingCustomColor);
   symbolsInText = $state(this.#initial.symbolsInText);
   symbolsInCode = $state(this.#initial.symbolsInCode);
@@ -748,6 +763,9 @@ class Prefs {
       caretEffect: this.caretEffect,
       pointerStyle: this.pointerStyle,
       pointerTrail: this.pointerTrail,
+      mascot: this.mascot,
+      mascotSize: this.mascotSize,
+      mascotTalks: this.mascotTalks,
       headingCustomColor: this.headingCustomColor,
       symbolsInText: this.symbolsInText,
       symbolsInCode: this.symbolsInCode,
@@ -840,6 +858,9 @@ class Prefs {
     this.caretEffect = next.caretEffect;
     this.pointerStyle = next.pointerStyle;
     this.pointerTrail = next.pointerTrail;
+    this.mascot = next.mascot;
+    this.mascotSize = next.mascotSize;
+    this.mascotTalks = next.mascotTalks;
     this.headingCustomColor = next.headingCustomColor;
     this.symbolsInText = next.symbolsInText;
     this.symbolsInCode = next.symbolsInCode;

@@ -344,6 +344,51 @@
   cursor: var(--pointer-hand), pointer;
 }
 
+/*
+ * A mascot (lib/mascot/): its pixel art scaled up without smoothing, under dialogs and menus, which
+ * the pointer can pick up; and what it says, in a bubble over it.
+ */
+.mascot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 35;
+  pointer-events: none;
+}
+
+.mascot-sprite {
+  display: block;
+  image-rendering: pixelated;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+}
+
+.mascot-sprite:active {
+  cursor: grabbing;
+}
+
+.mascot-bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  translate: -50% -4px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow: var(--shadow-menu);
+  font: 600 var(--text-xs) / 1.5 var(--font-ui);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.mascot-bubble.is-shown {
+  opacity: 1;
+}
+
 .pointer-trail {
   position: fixed;
   inset: 0;

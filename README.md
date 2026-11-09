@@ -109,6 +109,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 - **Paper to write on.** Ruled lines that every line of text sits on, and dots, squares or graph paper with a row of cells for each line (or any size you like), isometric paper, in your theme's colors or any color, as faint or strong as you like, and a grain or linen texture (Settings → Paper).
 - **A backdrop behind the page.** Put a soft gradient, a color or a picture of your own behind your notes, which then sit on it as pages, solid or frosted like glass (Settings → Paper → Backdrop).
 - **Fonts, text size, note width and spacing**, and headings in the accent or a color of your own, with a live preview; <kbd>⌘+</kbd> and <kbd>⌘−</kbd> size the text as you read. Notes can be narrow, medium, wide, any width between, or fill the window.
+- **A mascot.** A cat, an alien, a slime in your accent or a pixel girl, in pixel art, that walks along the bottom of your note, hops up to sit at the end of the sentence you're writing, cheers you on, naps when you're away, pounces on the pointer, and can be picked up and dropped. Plugins can add their own.
 - **Cursors.** A text cursor as a bar, a thick one, a block or an underline, in the accent or any color, blinking, fading or steady, that glides or trails where it goes as some terminals' do, glows, turns through the rainbow or throws sparks as you type. And a pointer of 90s pixels or a dot in the accent, with a comet's tail or sparkles behind it.
 - **Typing sounds.** Hear a keyboard as you type: creamy or clacky linears, tactile, clicky, Topre, or a typewriter that rings its bell at Return. Or add a recorded one: any [Mechvibes](https://mechvibes.com) sound pack, from a .zip or its folder. Off to begin with.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
@@ -290,6 +291,7 @@ src/
     changes/                 Marks the lines changed since a note was opened (a line diff, diff.ts)
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
     keyboards/               Keyboards to hear as you type, made from sound (synth.ts)
+    mascots/                 Companions in the window, as pixel art (art.ts); what they do is lib/mascot/
     themes/                  The twenty-three themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
     styles/                  Whole looks beyond the colors: Classic, Pixel and Neon, each a CSS file, its fonts and its colors
     lucide/  sf-symbols/     Icon sets

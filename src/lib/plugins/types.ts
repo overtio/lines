@@ -73,6 +73,37 @@ export interface Contributions {
   markers?: MarkerSource[];
   /** Keyboards to hear as you type (Settings → Editor → Typing sounds). */
   keyboardSounds?: KeyboardSound[];
+  /** Companions that live in the window, walk about and keep you company as you write (Settings → Mascot). */
+  mascots?: Mascot[];
+}
+
+/** The poses a mascot is drawn in. */
+export type MascotPose = "stand" | "walk1" | "walk2" | "sit" | "sleep" | "cheer";
+
+/**
+ * A companion that lives in the window: pixel art in a few poses, which lines walks about the note,
+ * sits beside the line you're writing, puts to sleep and has react (lib/mascot/).
+ */
+export interface Mascot {
+  id: string;
+  name: string;
+  /** What it's like, under its name in Settings. */
+  description?: string;
+  /**
+   * Its poses, facing right: pixel art, a row a line, each character a color from `palette` (`.`
+   * see-through), all as wide and as tall as the rest. A pose can be another with its eyes shut.
+   */
+  frames: Record<MascotPose, string[] | { like: MascotPose; closed: true }>;
+  /**
+   * Its colors by character: CSS colors, or `accent` and `accent-dark` for the theme's. `e` is its
+   * eyes and `i` their shine, which a blink turns to `lid`'s color, leaving a line.
+   */
+  palette: Record<string, string>;
+  lid: string;
+  /** How it gets about: on foot, floating (bobbing as it goes), or hopping. */
+  moves: "walk" | "float" | "hop";
+  /** What it says, its own way ("mrrp"), besides what lines has every mascot say. */
+  sounds?: string[];
 }
 
 /**
