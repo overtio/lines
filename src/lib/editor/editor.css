@@ -143,6 +143,15 @@
   opacity: 0.7;
 }
 
+/* A link to a folder or file on this computer (localLinks.ts): its icon in front, in the link's color. */
+.cm-lp-local-icon {
+  display: inline-flex;
+  margin-right: 0.2em;
+  vertical-align: -0.12em;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
 /* A mention of another note (`@Oleks`, objects.ts): its icon and title, as a link (⌘-click opens it). */
 .cm-lp-mention {
   color: var(--accent);

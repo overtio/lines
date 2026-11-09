@@ -355,53 +355,58 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 [Sky.mp4](attachment:sky.mp4)
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Video, then Attached 3D model (STL)
+#### 41. Video, then Folder and file links
+
+[Sky.mp4](attachment:sky.mp4)
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Video, then Attached 3D model (STL)
 
 [Sky.mp4](attachment:sky.mp4)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Video, then Terminal recording (.cast file)
+#### 43. Video, then Terminal recording (.cast file)
 
 [Sky.mp4](attachment:sky.mp4)
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Video, then Audio
+#### 44. Video, then Audio
 
 [Sky.mp4](attachment:sky.mp4)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Video, then Video
+#### 45. Video, then Video
 
 [Sky.mp4](attachment:sky.mp4)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Video, then Missing file
+#### 46. Video, then Missing file
 
 [Sky.mp4](attachment:sky.mp4)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Video, then Card
+#### 47. Video, then Card
 
 [Sky.mp4](attachment:sky.mp4)
 ::: card
 Text in a card.
 :::
 
-#### 47. Video, then Callout (info)
+#### 48. Video, then Callout (info)
 
 [Sky.mp4](attachment:sky.mp4)
 :::i
 Text in an info callout.
 :::
 
-#### 48. Video, then Callout (warning, chosen icon)
+#### 49. Video, then Callout (warning, chosen icon)
 
 [Sky.mp4](attachment:sky.mp4)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Video, then Callout (decision, no icon)
+#### 50. Video, then Callout (decision, no icon)
 
 [Sky.mp4](attachment:sky.mp4)
 :::^ icon=none

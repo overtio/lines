@@ -355,53 +355,58 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [Budget.csv](attachment:budget.csv)
 
-#### 41. arXiv links, then Attached 3D model (STL)
+#### 41. arXiv links, then Folder and file links
+
+Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. arXiv links, then Attached 3D model (STL)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. arXiv links, then Terminal recording (.cast file)
+#### 43. arXiv links, then Terminal recording (.cast file)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. arXiv links, then Audio
+#### 44. arXiv links, then Audio
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. arXiv links, then Video
+#### 45. arXiv links, then Video
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. arXiv links, then Missing file
+#### 46. arXiv links, then Missing file
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. arXiv links, then Card
+#### 47. arXiv links, then Card
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 ::: card
 Text in a card.
 :::
 
-#### 47. arXiv links, then Callout (info)
+#### 48. arXiv links, then Callout (info)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::i
 Text in an info callout.
 :::
 
-#### 48. arXiv links, then Callout (warning, chosen icon)
+#### 49. arXiv links, then Callout (warning, chosen icon)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. arXiv links, then Callout (decision, no icon)
+#### 50. arXiv links, then Callout (decision, no icon)
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::^ icon=none

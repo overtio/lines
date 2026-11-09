@@ -355,53 +355,58 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 [Budget.csv](attachment:budget.csv)
 [Budget.csv](attachment:budget.csv)
 
-#### 41. File, then Attached 3D model (STL)
+#### 41. File, then Folder and file links
+
+[Budget.csv](attachment:budget.csv)
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. File, then Attached 3D model (STL)
 
 [Budget.csv](attachment:budget.csv)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. File, then Terminal recording (.cast file)
+#### 43. File, then Terminal recording (.cast file)
 
 [Budget.csv](attachment:budget.csv)
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. File, then Audio
+#### 44. File, then Audio
 
 [Budget.csv](attachment:budget.csv)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. File, then Video
+#### 45. File, then Video
 
 [Budget.csv](attachment:budget.csv)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. File, then Missing file
+#### 46. File, then Missing file
 
 [Budget.csv](attachment:budget.csv)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. File, then Card
+#### 47. File, then Card
 
 [Budget.csv](attachment:budget.csv)
 ::: card
 Text in a card.
 :::
 
-#### 47. File, then Callout (info)
+#### 48. File, then Callout (info)
 
 [Budget.csv](attachment:budget.csv)
 :::i
 Text in an info callout.
 :::
 
-#### 48. File, then Callout (warning, chosen icon)
+#### 49. File, then Callout (warning, chosen icon)
 
 [Budget.csv](attachment:budget.csv)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. File, then Callout (decision, no icon)
+#### 50. File, then Callout (decision, no icon)
 
 [Budget.csv](attachment:budget.csv)
 :::^ icon=none

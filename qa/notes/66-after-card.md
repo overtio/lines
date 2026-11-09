@@ -435,42 +435,49 @@ Text in a card.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Card, then Attached 3D model (STL)
+#### 41. Card, then Folder and file links
+
+::: card
+Text in a card.
+:::
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Card, then Attached 3D model (STL)
 
 ::: card
 Text in a card.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Card, then Terminal recording (.cast file)
+#### 43. Card, then Terminal recording (.cast file)
 
 ::: card
 Text in a card.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Card, then Audio
+#### 44. Card, then Audio
 
 ::: card
 Text in a card.
 :::
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Card, then Video
+#### 45. Card, then Video
 
 ::: card
 Text in a card.
 :::
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Card, then Missing file
+#### 46. Card, then Missing file
 
 ::: card
 Text in a card.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Card, then Card
+#### 47. Card, then Card
 
 ::: card
 Text in a card.
@@ -479,7 +486,7 @@ Text in a card.
 Text in a card.
 :::
 
-#### 47. Card, then Callout (info)
+#### 48. Card, then Callout (info)
 
 ::: card
 Text in a card.
@@ -488,7 +495,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 48. Card, then Callout (warning, chosen icon)
+#### 49. Card, then Callout (warning, chosen icon)
 
 ::: card
 Text in a card.
@@ -497,7 +504,7 @@ Text in a card.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Card, then Callout (decision, no icon)
+#### 50. Card, then Callout (decision, no icon)
 
 ::: card
 Text in a card.

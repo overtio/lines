@@ -237,7 +237,7 @@ pub async fn sync_folder_pick(app: AppHandle) -> Option<String> {
     let (send, receive) = std::sync::mpsc::channel();
     app
       .run_on_main_thread(move || {
-        let _ = send.send(macos::pick_folder());
+        let _ = send.send(macos::pick_folder("Use This Folder", "Choose where lines keeps your notes. A folder in a cloud drive syncs them."));
       })
       .ok()?;
     tauri::async_runtime::spawn_blocking(move || receive.recv().ok().flatten()).await.ok().flatten()
@@ -308,7 +308,7 @@ fn request_download(path: &Path) {
 }
 
 #[cfg(target_os = "macos")]
-mod macos {
+pub(crate) mod macos {
   use std::path::Path;
 
   use objc2::MainThreadMarker;
@@ -320,16 +320,16 @@ mod macos {
     let _ = NSFileManager::defaultManager().startDownloadingUbiquitousItemAtURL_error(&url);
   }
 
-  /// Must run on the main thread.
-  pub fn pick_folder() -> Option<String> {
+  /// A folder the person chooses, with `prompt` on its button and `message` above. Must run on the main thread.
+  pub fn pick_folder(prompt: &str, message: &str) -> Option<String> {
     let mtm = MainThreadMarker::new()?;
     let panel = NSOpenPanel::openPanel(mtm);
     panel.setCanChooseDirectories(true);
     panel.setCanChooseFiles(false);
     panel.setCanCreateDirectories(true);
     panel.setAllowsMultipleSelection(false);
-    panel.setPrompt(Some(&NSString::from_str("Use This Folder")));
-    panel.setMessage(Some(&NSString::from_str("Choose where lines keeps your notes. A folder in a cloud drive syncs them.")));
+    panel.setPrompt(Some(&NSString::from_str(prompt)));
+    panel.setMessage(Some(&NSString::from_str(message)));
     if panel.runModal() != NSModalResponseOK {
       return None;
     }

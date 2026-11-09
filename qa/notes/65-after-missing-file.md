@@ -355,53 +355,58 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Missing file, then Attached 3D model (STL)
+#### 41. Missing file, then Folder and file links
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Missing file, then Attached 3D model (STL)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Missing file, then Terminal recording (.cast file)
+#### 43. Missing file, then Terminal recording (.cast file)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Missing file, then Audio
+#### 44. Missing file, then Audio
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Missing file, then Video
+#### 45. Missing file, then Video
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Missing file, then Missing file
+#### 46. Missing file, then Missing file
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Missing file, then Card
+#### 47. Missing file, then Card
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ::: card
 Text in a card.
 :::
 
-#### 47. Missing file, then Callout (info)
+#### 48. Missing file, then Callout (info)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::i
 Text in an info callout.
 :::
 
-#### 48. Missing file, then Callout (warning, chosen icon)
+#### 49. Missing file, then Callout (warning, chosen icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Missing file, then Callout (decision, no icon)
+#### 50. Missing file, then Callout (decision, no icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::^ icon=none

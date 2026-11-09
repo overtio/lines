@@ -475,7 +475,15 @@ plain code
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Code block, then Attached 3D model (STL)
+#### 41. Code block, then Folder and file links
+
+```
+plain code
+  indented line
+```
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Code block, then Attached 3D model (STL)
 
 ```
 plain code
@@ -483,7 +491,7 @@ plain code
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Code block, then Terminal recording (.cast file)
+#### 43. Code block, then Terminal recording (.cast file)
 
 ```
 plain code
@@ -491,7 +499,7 @@ plain code
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Code block, then Audio
+#### 44. Code block, then Audio
 
 ```
 plain code
@@ -499,7 +507,7 @@ plain code
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Code block, then Video
+#### 45. Code block, then Video
 
 ```
 plain code
@@ -507,7 +515,7 @@ plain code
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Code block, then Missing file
+#### 46. Code block, then Missing file
 
 ```
 plain code
@@ -515,7 +523,7 @@ plain code
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Code block, then Card
+#### 47. Code block, then Card
 
 ```
 plain code
@@ -525,7 +533,7 @@ plain code
 Text in a card.
 :::
 
-#### 47. Code block, then Callout (info)
+#### 48. Code block, then Callout (info)
 
 ```
 plain code
@@ -535,7 +543,7 @@ plain code
 Text in an info callout.
 :::
 
-#### 48. Code block, then Callout (warning, chosen icon)
+#### 49. Code block, then Callout (warning, chosen icon)
 
 ```
 plain code
@@ -545,7 +553,7 @@ plain code
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Code block, then Callout (decision, no icon)
+#### 50. Code block, then Callout (decision, no icon)
 
 ```
 plain code

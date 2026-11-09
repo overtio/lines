@@ -435,42 +435,49 @@ Text in an info callout.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Callout (info), then Attached 3D model (STL)
+#### 41. Callout (info), then Folder and file links
+
+:::i
+Text in an info callout.
+:::
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Callout (info), then Attached 3D model (STL)
 
 :::i
 Text in an info callout.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Callout (info), then Terminal recording (.cast file)
+#### 43. Callout (info), then Terminal recording (.cast file)
 
 :::i
 Text in an info callout.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Callout (info), then Audio
+#### 44. Callout (info), then Audio
 
 :::i
 Text in an info callout.
 :::
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Callout (info), then Video
+#### 45. Callout (info), then Video
 
 :::i
 Text in an info callout.
 :::
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Callout (info), then Missing file
+#### 46. Callout (info), then Missing file
 
 :::i
 Text in an info callout.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Callout (info), then Card
+#### 47. Callout (info), then Card
 
 :::i
 Text in an info callout.
@@ -479,7 +486,7 @@ Text in an info callout.
 Text in a card.
 :::
 
-#### 47. Callout (info), then Callout (info)
+#### 48. Callout (info), then Callout (info)
 
 :::i
 Text in an info callout.
@@ -488,7 +495,7 @@ Text in an info callout.
 Text in an info callout.
 :::
 
-#### 48. Callout (info), then Callout (warning, chosen icon)
+#### 49. Callout (info), then Callout (warning, chosen icon)
 
 :::i
 Text in an info callout.
@@ -497,7 +504,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Callout (info), then Callout (decision, no icon)
+#### 50. Callout (info), then Callout (decision, no icon)
 
 :::i
 Text in an info callout.

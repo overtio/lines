@@ -555,7 +555,17 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Table with formulas, then Attached 3D model (STL)
+#### 41. Table with formulas, then Folder and file links
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Table with formulas, then Attached 3D model (STL)
 
 | Item | Cost |
 | --- | ---: |
@@ -565,7 +575,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Table with formulas, then Terminal recording (.cast file)
+#### 43. Table with formulas, then Terminal recording (.cast file)
 
 | Item | Cost |
 | --- | ---: |
@@ -575,7 +585,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Table with formulas, then Audio
+#### 44. Table with formulas, then Audio
 
 | Item | Cost |
 | --- | ---: |
@@ -585,7 +595,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Table with formulas, then Video
+#### 45. Table with formulas, then Video
 
 | Item | Cost |
 | --- | ---: |
@@ -595,7 +605,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Table with formulas, then Missing file
+#### 46. Table with formulas, then Missing file
 
 | Item | Cost |
 | --- | ---: |
@@ -605,7 +615,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Table with formulas, then Card
+#### 47. Table with formulas, then Card
 
 | Item | Cost |
 | --- | ---: |
@@ -617,7 +627,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 47. Table with formulas, then Callout (info)
+#### 48. Table with formulas, then Callout (info)
 
 | Item | Cost |
 | --- | ---: |
@@ -629,7 +639,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 48. Table with formulas, then Callout (warning, chosen icon)
+#### 49. Table with formulas, then Callout (warning, chosen icon)
 
 | Item | Cost |
 | --- | ---: |
@@ -641,7 +651,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Table with formulas, then Callout (decision, no icon)
+#### 50. Table with formulas, then Callout (decision, no icon)
 
 | Item | Cost |
 | --- | ---: |

@@ -355,53 +355,58 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Mention, then Attached 3D model (STL)
+#### 41. Mention, then Folder and file links
+
+Ask @[QA · Ada] at @[QA · Ada].email.
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Mention, then Attached 3D model (STL)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Mention, then Terminal recording (.cast file)
+#### 43. Mention, then Terminal recording (.cast file)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Mention, then Audio
+#### 44. Mention, then Audio
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Mention, then Video
+#### 45. Mention, then Video
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Mention, then Missing file
+#### 46. Mention, then Missing file
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Mention, then Card
+#### 47. Mention, then Card
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ::: card
 Text in a card.
 :::
 
-#### 47. Mention, then Callout (info)
+#### 48. Mention, then Callout (info)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::i
 Text in an info callout.
 :::
 
-#### 48. Mention, then Callout (warning, chosen icon)
+#### 49. Mention, then Callout (warning, chosen icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Mention, then Callout (decision, no icon)
+#### 50. Mention, then Callout (decision, no icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::^ icon=none

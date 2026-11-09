@@ -435,42 +435,49 @@ $$
 $$
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Math block, then Attached 3D model (STL)
+#### 41. Math block, then Folder and file links
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Math block, then Attached 3D model (STL)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Math block, then Terminal recording (.cast file)
+#### 43. Math block, then Terminal recording (.cast file)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Math block, then Audio
+#### 44. Math block, then Audio
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Math block, then Video
+#### 45. Math block, then Video
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Math block, then Missing file
+#### 46. Math block, then Missing file
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Math block, then Card
+#### 47. Math block, then Card
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -479,7 +486,7 @@ $$
 Text in a card.
 :::
 
-#### 47. Math block, then Callout (info)
+#### 48. Math block, then Callout (info)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -488,7 +495,7 @@ $$
 Text in an info callout.
 :::
 
-#### 48. Math block, then Callout (warning, chosen icon)
+#### 49. Math block, then Callout (warning, chosen icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
@@ -497,7 +504,7 @@ $$
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Math block, then Callout (decision, no icon)
+#### 50. Math block, then Callout (decision, no icon)
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}

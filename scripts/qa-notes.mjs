@@ -121,6 +121,7 @@ const ELEMENTS = [
   { id: "image", name: "Image", md: "![A sample picture](attachment:photo.png)" },
   { id: "drawing", name: "Drawing", md: "![A sample drawing](attachment:drawing.svg)" },
   { id: "file", name: "File", md: "[Budget.csv](attachment:budget.csv)" },
+  { id: "local-links", name: "Folder and file links", md: "See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer." },
   { id: "model-file", name: "Attached 3D model (STL)", md: "[Bracket.stl](attachment:bracket.stl)" },
   { id: "recording", name: "Terminal recording (.cast file)", md: "[terminal.cast](attachment:terminal.cast)" },
   { id: "audio", name: "Audio", md: "[Chime.mp3](attachment:chime.mp3)" },

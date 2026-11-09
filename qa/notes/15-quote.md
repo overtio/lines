@@ -315,45 +315,49 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 
 > [Budget.csv](attachment:budget.csv)
 
-#### 41. Attached 3D model (STL) in a quote
+#### 41. Folder and file links in a quote
+
+> See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Attached 3D model (STL) in a quote
 
 > [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Terminal recording (.cast file) in a quote
+#### 43. Terminal recording (.cast file) in a quote
 
 > [terminal.cast](attachment:terminal.cast)
 
-#### 43. Audio in a quote (stays Markdown here)
+#### 44. Audio in a quote (stays Markdown here)
 
 > [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Video in a quote (stays Markdown here)
+#### 45. Video in a quote (stays Markdown here)
 
 > [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Missing file in a quote (stays Markdown here)
+#### 46. Missing file in a quote (stays Markdown here)
 
 > [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Card in a quote
+#### 47. Card in a quote
 
 > ::: card
 > Text in a card.
 > :::
 
-#### 47. Callout (info) in a quote
+#### 48. Callout (info) in a quote
 
 > :::i
 > Text in an info callout.
 > :::
 
-#### 48. Callout (warning, chosen icon) in a quote
+#### 49. Callout (warning, chosen icon) in a quote
 
 > :::! icon=flag
 > Text in a warning callout with the flag icon.
 > :::
 
-#### 49. Callout (decision, no icon) in a quote
+#### 50. Callout (decision, no icon) in a quote
 
 > :::^ icon=none
 > Text in a decision callout with no icon.

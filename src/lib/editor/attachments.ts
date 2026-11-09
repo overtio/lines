@@ -22,7 +22,9 @@ import {
   saveAttachment,
   whenArrived,
 } from "../notes/attachments";
-import { coarsePointer } from "../platform";
+import { speak } from "../a11y";
+import { linkTo, nameOf } from "../notes/localLinks";
+import { coarsePointer, droppedPaths, pickLinkFolder } from "../platform";
 import { locale, type MessageKey, t } from "../i18n/index.svelte";
 import { plugins } from "../plugins/registry.svelte";
 import type { Embed, EmbedLink, FileView, Renderer, Shown } from "../plugins/types";
@@ -716,8 +718,25 @@ const allowed = (writer: AttachmentWriter, state: EditorState, pos: number) => !
  * its own, with the cursor on the line after them so they show at once. `snap` puts them above
  * or below the line instead of splitting its text, as a drop does.
  */
-async function insertFiles(view: EditorView, writer: AttachmentWriter, files: File[], from: number, to = from, snap = false) {
-  const saved = (await Promise.all(files.map((file) => attach(file, writer)))).filter((text): text is string => !!text);
+/**
+ * Links to the folders called `names`, dropped from Finder, as `writer` writes links: their paths
+ * are asked of the app (the page isn't told them), so only in the Mac app; elsewhere it says so.
+ */
+async function folderLinks(names: string[], writer: AttachmentWriter): Promise<string[]> {
+  if (!names.length) return [];
+  const paths = await droppedPaths();
+  const links = names.flatMap((name) => {
+    const path = paths.find((each) => nameOf(each) === name);
+    return path ? [writer.file(linkTo(path, true), name)] : [];
+  });
+  if (links.length < names.length) speak(t("editor.folderDropApp"));
+  return links;
+}
+
+/** Saves `files` and puts them in at `from`–`to` (or a line of their own by `from`, with `snap`), with `links` (to folders) after them. */
+async function insertFiles(view: EditorView, writer: AttachmentWriter, files: File[], from: number, to = from, snap = false, links: Promise<string[]> = Promise.resolve([])) {
+  const attached = (await Promise.all(files.map((file) => attach(file, writer)))).filter((text): text is string => !!text);
+  const saved = [...attached, ...(await links)];
   if (!saved.length || !view.dom.isConnected) return;
   const { doc } = view.state;
   // The note may have changed while the files were saved.
@@ -823,12 +842,22 @@ const dropAndPaste = (writer: AttachmentWriter) => EditorView.domEventHandlers({
     return true;
   },
   drop(event, view) {
-    const files = [...(event.dataTransfer?.files ?? [])];
-    if (!files.length) return false;
+    // Folders are told apart now, while the drop's items can be read: they become links, the rest attachments.
+    const items = [...(event.dataTransfer?.items ?? [])].filter((item) => item.kind === "file");
+    const folders: string[] = [];
+    const files: File[] = [];
+    for (const item of items) {
+      const entry = item.webkitGetAsEntry?.();
+      const file = item.getAsFile();
+      if (entry?.isDirectory) folders.push(entry.name);
+      else if (file) files.push(file);
+    }
+    if (!items.length) files.push(...(event.dataTransfer?.files ?? []));
+    if (!files.length && !folders.length) return false;
     event.preventDefault();
     const pos = view.posAtCoords({ x: event.clientX, y: event.clientY }, false);
     if (!allowed(writer, view.state, pos)) return true;
-    void insertFiles(view, writer, files, pos, pos, true);
+    void insertFiles(view, writer, files, pos, pos, true, folderLinks(folders, writer));
     return true;
   },
 });
@@ -857,6 +886,18 @@ export function choose(accept: string, writer = markdownWriter) {
 
 export const chooseImages = choose("image/*");
 export const chooseFiles = choose("");
+
+/** The /folder command: a link to a folder chosen with the system's picker (the Mac app), in place of the typed command. */
+export function chooseFolder(writer = markdownWriter) {
+  return (view: EditorView, from: number, to: number) => {
+    view.dispatch({ changes: { from, to }, userEvent: "delete" });
+    void pickLinkFolder(t("editor.folder.prompt"), t("editor.folder.message")).then((path) => {
+      const pos = view.state.selection.main.head;
+      if (!path || !view.dom.isConnected || !allowed(writer, view.state, pos)) return;
+      insertLines(view, writer.file(linkTo(path, true), nameOf(path)), pos, pos, "input");
+    });
+  };
+}
 
 /** Pasting and dropping files, and pasting links to Unsplash photos (and with `embeds` what plugins draw), written by `writer`. */
 export const attachmentPasting = (writer: AttachmentWriter, { embeds = false } = {}): Extension => [dropAndPaste(writer), pasteLink(writer, embeds)];

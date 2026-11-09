@@ -435,42 +435,49 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
   - [ ] Nested open todo
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Todo list, then Attached 3D model (STL)
+#### 41. Todo list, then Folder and file links
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Todo list, then Attached 3D model (STL)
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Todo list, then Terminal recording (.cast file)
+#### 43. Todo list, then Terminal recording (.cast file)
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Todo list, then Audio
+#### 44. Todo list, then Audio
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Todo list, then Video
+#### 45. Todo list, then Video
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Todo list, then Missing file
+#### 46. Todo list, then Missing file
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Todo list, then Card
+#### 47. Todo list, then Card
 
 - [x] Done todo
 - [ ] Open todo
@@ -479,7 +486,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 47. Todo list, then Callout (info)
+#### 48. Todo list, then Callout (info)
 
 - [x] Done todo
 - [ ] Open todo
@@ -488,7 +495,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 48. Todo list, then Callout (warning, chosen icon)
+#### 49. Todo list, then Callout (warning, chosen icon)
 
 - [x] Done todo
 - [ ] Open todo
@@ -497,7 +504,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Todo list, then Callout (decision, no icon)
+#### 50. Todo list, then Callout (decision, no icon)
 
 - [x] Done todo
 - [ ] Open todo

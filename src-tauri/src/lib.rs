@@ -4,6 +4,7 @@ mod attachments;
 mod devtools;
 mod export;
 mod folder_sync;
+mod local_links;
 mod lock;
 mod sf_symbols;
 #[cfg(desktop)]
@@ -33,6 +34,9 @@ pub fn run() {
       folder_sync::sync_folder_write_file,
       folder_sync::sync_folder_delete,
       folder_sync::sync_folder_pick,
+      local_links::dropped_paths,
+      local_links::pick_link_folder,
+      local_links::open_local,
       lock::lock_share,
       lock::lock_shared,
       lock::lock_forget,

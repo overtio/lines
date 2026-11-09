@@ -515,7 +515,16 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Line marks, then Attached 3D model (STL)
+#### 41. Line marks, then Folder and file links
+
+Marked as the accent. <!-- mark -->
+Two lines marked green, one bar. <!-- mark green: ready -->
+The second of them. <!-- mark green: ready -->
+Red, with a label to point at. <!-- mark red: to fix -->
+- A list item, marked purple. <!-- mark purple -->
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Line marks, then Attached 3D model (STL)
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -524,7 +533,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Line marks, then Terminal recording (.cast file)
+#### 43. Line marks, then Terminal recording (.cast file)
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -533,7 +542,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Line marks, then Audio
+#### 44. Line marks, then Audio
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -542,7 +551,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Line marks, then Video
+#### 45. Line marks, then Video
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -551,7 +560,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Line marks, then Missing file
+#### 46. Line marks, then Missing file
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -560,7 +569,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Line marks, then Card
+#### 47. Line marks, then Card
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -571,7 +580,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 Text in a card.
 :::
 
-#### 47. Line marks, then Callout (info)
+#### 48. Line marks, then Callout (info)
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -582,7 +591,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 Text in an info callout.
 :::
 
-#### 48. Line marks, then Callout (warning, chosen icon)
+#### 49. Line marks, then Callout (warning, chosen icon)
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -593,7 +602,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Line marks, then Callout (decision, no icon)
+#### 50. Line marks, then Callout (decision, no icon)
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->

@@ -355,53 +355,58 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Wiki link, then Attached 3D model (STL)
+#### 41. Wiki link, then Folder and file links
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Wiki link, then Attached 3D model (STL)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Wiki link, then Terminal recording (.cast file)
+#### 43. Wiki link, then Terminal recording (.cast file)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Wiki link, then Audio
+#### 44. Wiki link, then Audio
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Wiki link, then Video
+#### 45. Wiki link, then Video
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Wiki link, then Missing file
+#### 46. Wiki link, then Missing file
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Wiki link, then Card
+#### 47. Wiki link, then Card
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ::: card
 Text in a card.
 :::
 
-#### 47. Wiki link, then Callout (info)
+#### 48. Wiki link, then Callout (info)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::i
 Text in an info callout.
 :::
 
-#### 48. Wiki link, then Callout (warning, chosen icon)
+#### 49. Wiki link, then Callout (warning, chosen icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Wiki link, then Callout (decision, no icon)
+#### 50. Wiki link, then Callout (decision, no icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::^ icon=none

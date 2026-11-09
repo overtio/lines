@@ -355,53 +355,58 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ![A sample drawing](attachment:drawing.svg)
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Drawing, then Attached 3D model (STL)
+#### 41. Drawing, then Folder and file links
+
+![A sample drawing](attachment:drawing.svg)
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Drawing, then Attached 3D model (STL)
 
 ![A sample drawing](attachment:drawing.svg)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Drawing, then Terminal recording (.cast file)
+#### 43. Drawing, then Terminal recording (.cast file)
 
 ![A sample drawing](attachment:drawing.svg)
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Drawing, then Audio
+#### 44. Drawing, then Audio
 
 ![A sample drawing](attachment:drawing.svg)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Drawing, then Video
+#### 45. Drawing, then Video
 
 ![A sample drawing](attachment:drawing.svg)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Drawing, then Missing file
+#### 46. Drawing, then Missing file
 
 ![A sample drawing](attachment:drawing.svg)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Drawing, then Card
+#### 47. Drawing, then Card
 
 ![A sample drawing](attachment:drawing.svg)
 ::: card
 Text in a card.
 :::
 
-#### 47. Drawing, then Callout (info)
+#### 48. Drawing, then Callout (info)
 
 ![A sample drawing](attachment:drawing.svg)
 :::i
 Text in an info callout.
 :::
 
-#### 48. Drawing, then Callout (warning, chosen icon)
+#### 49. Drawing, then Callout (warning, chosen icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Drawing, then Callout (decision, no icon)
+#### 50. Drawing, then Callout (decision, no icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::^ icon=none

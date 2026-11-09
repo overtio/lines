@@ -355,53 +355,58 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 [Chime.mp3](attachment:chime.mp3)
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Audio, then Attached 3D model (STL)
+#### 41. Audio, then Folder and file links
+
+[Chime.mp3](attachment:chime.mp3)
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Audio, then Attached 3D model (STL)
 
 [Chime.mp3](attachment:chime.mp3)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Audio, then Terminal recording (.cast file)
+#### 43. Audio, then Terminal recording (.cast file)
 
 [Chime.mp3](attachment:chime.mp3)
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Audio, then Audio
+#### 44. Audio, then Audio
 
 [Chime.mp3](attachment:chime.mp3)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Audio, then Video
+#### 45. Audio, then Video
 
 [Chime.mp3](attachment:chime.mp3)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Audio, then Missing file
+#### 46. Audio, then Missing file
 
 [Chime.mp3](attachment:chime.mp3)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Audio, then Card
+#### 47. Audio, then Card
 
 [Chime.mp3](attachment:chime.mp3)
 ::: card
 Text in a card.
 :::
 
-#### 47. Audio, then Callout (info)
+#### 48. Audio, then Callout (info)
 
 [Chime.mp3](attachment:chime.mp3)
 :::i
 Text in an info callout.
 :::
 
-#### 48. Audio, then Callout (warning, chosen icon)
+#### 49. Audio, then Callout (warning, chosen icon)
 
 [Chime.mp3](attachment:chime.mp3)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Audio, then Callout (decision, no icon)
+#### 50. Audio, then Callout (decision, no icon)
 
 [Chime.mp3](attachment:chime.mp3)
 :::^ icon=none

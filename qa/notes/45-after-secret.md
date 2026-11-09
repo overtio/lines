@@ -355,53 +355,58 @@ The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Secret ({{name}}, kept in a locked secrets note), then Attached 3D model (STL)
+#### 41. Secret ({{name}}, kept in a locked secrets note), then Folder and file links
+
+The token is {{qa-token}}, and {{no-such-secret}} isn't one.
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Secret ({{name}}, kept in a locked secrets note), then Attached 3D model (STL)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Secret ({{name}}, kept in a locked secrets note), then Terminal recording (.cast file)
+#### 43. Secret ({{name}}, kept in a locked secrets note), then Terminal recording (.cast file)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Secret ({{name}}, kept in a locked secrets note), then Audio
+#### 44. Secret ({{name}}, kept in a locked secrets note), then Audio
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Secret ({{name}}, kept in a locked secrets note), then Video
+#### 45. Secret ({{name}}, kept in a locked secrets note), then Video
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Secret ({{name}}, kept in a locked secrets note), then Missing file
+#### 46. Secret ({{name}}, kept in a locked secrets note), then Missing file
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Secret ({{name}}, kept in a locked secrets note), then Card
+#### 47. Secret ({{name}}, kept in a locked secrets note), then Card
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 ::: card
 Text in a card.
 :::
 
-#### 47. Secret ({{name}}, kept in a locked secrets note), then Callout (info)
+#### 48. Secret ({{name}}, kept in a locked secrets note), then Callout (info)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::i
 Text in an info callout.
 :::
 
-#### 48. Secret ({{name}}, kept in a locked secrets note), then Callout (warning, chosen icon)
+#### 49. Secret ({{name}}, kept in a locked secrets note), then Callout (warning, chosen icon)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Secret ({{name}}, kept in a locked secrets note), then Callout (decision, no icon)
+#### 50. Secret ({{name}}, kept in a locked secrets note), then Callout (decision, no icon)
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::^ icon=none

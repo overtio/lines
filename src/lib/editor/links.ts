@@ -2,15 +2,17 @@ import type { EditorView } from "@codemirror/view";
 import { speak } from "../a11y";
 import { t } from "../i18n/index.svelte";
 import { attachmentName, openAttachment } from "../notes/attachments";
+import { isLocal } from "../notes/localLinks";
 import { coarsePointer, copyText, isApple, openExternal } from "../platform";
 import { type LinkAction, prefs } from "../prefs.svelte";
 import { tabs } from "../tabs.svelte";
 import { windowLabel } from "../windows/channel";
 import { canFloat, openFloating } from "../windows/floating";
+import { openLocal } from "./localLinks";
 import { openNote, openTag, openType } from "./objects";
 
 /*
- * Following what a note links to: web pages and attached files, tags, and mentions of notes. A
+ * Following what a note links to: web pages, attached files and folders and files on this computer, tags, and mentions of notes. A
  * click, ⌘-click (Ctrl-click) and ⌘⇧-click on each do what Settings → Editor → Links says. A tap
  * while not typing opens, whatever a click is set to, as a touch screen has no other way; ⌥↵
  * opens what the cursor is on (openAtCursor in livePreview.ts).
@@ -55,8 +57,9 @@ export function followClick(event: MouseEvent, view: EditorView): boolean {
   return true;
 }
 
-/** Opens a link's address: an attached file in its app, anything else in the browser. */
-export function openHref(href: string, text: string) {
+/** Opens a link's address: an attached file in its app, a folder or file on this computer in Finder or its app, anything else in the browser. */
+export function openHref(href: string, text: string, element?: HTMLElement) {
+  if (isLocal(href)) return void openLocal(href, element);
   const name = attachmentName(href);
   void (name ? openAttachment(name, text || name) : openExternal(href));
 }
@@ -64,7 +67,7 @@ export function openHref(href: string, text: string) {
 function follow(link: Link, action: LinkAction) {
   if (link.kind === "web") {
     if (action === "copy") copyAddress(link.href, link.element);
-    else openHref(link.href, link.text);
+    else openHref(link.href, link.text, link.element);
   } else if (link.kind === "tag") openTag(link.tag);
   else if (link.note) openNoteAs(link.note, action);
   else if (link.type) openType(link.type);
