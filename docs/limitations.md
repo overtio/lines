@@ -156,6 +156,13 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - LaTeX notes follow Source, Visible and Live; with Hidden they show their commands as in Live.
 - Not tried yet with input methods that compose text (Japanese, Chinese, Korean) in Hidden, nor in the Mac app or on phones.
 
+## Page breaks
+
+- Only at a note's top level: in a card, a callout, a list or a quote a page break stays as written, and doesn't break the PDF's page.
+- Other apps don't break pages at `<!-- pagebreak -->`; for their PDFs, `<div style="page-break-after: always"></div>` (which lines reads too) does in Obsidian, Typora and VS Code, with a blank line after it.
+- A picture of a note (PNG) is one long page, without its breaks.
+- With a pattern drawn in columns (squares, graph) over a backdrop, each page's columns run its full height, past the last line's row.
+
 ## Symbols
 
 - Only Markdown notes show `->` as →; LaTeX notes show what's typed (LaTeX has `\to` and `\neq` for these).

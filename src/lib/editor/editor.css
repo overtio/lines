@@ -364,6 +364,51 @@
   box-shadow: 0 0 0 0.5px var(--border);
 }
 
+/*
+ * A page break (pageBreaks.ts): a dashed line across the note, named, with room around it. Over a
+ * backdrop it's the gap between two pages, as wide as the gap around them.
+ */
+.cm-page-break {
+  padding-block: 1em;
+}
+
+.cm-page-break-gap {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  height: 1.5em;
+  font-size: 0.75em;
+  color: var(--text-faint);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.cm-page-break-gap::before,
+.cm-page-break-gap::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed var(--text-faint);
+  opacity: 0.6;
+}
+
+/* Its Markdown, while it shows above it. */
+.cm-line:has(+ .cm-page-break) {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: var(--text-faint);
+}
+
+:root[data-backdrop] .editor-pane .cm-page-break-gap {
+  height: var(--page-gap);
+  font-size: inherit;
+  color: transparent;
+}
+
+:root[data-backdrop] .editor-pane .cm-page-break-gap::before,
+:root[data-backdrop] .editor-pane .cm-page-break-gap::after {
+  visibility: hidden;
+}
+
 .cm-lp-codeblock {
   font-family: var(--font-mono);
   font-size: 0.86em;
@@ -2304,7 +2349,8 @@
 /*
  * The page: as wide as a note's text runs, with room around it, as solid as Settings says. Drawn
  * behind the column (in the scroller, the editor's stacking context) and below the layers cards and
- * callouts are drawn on, which the column's own background would cover.
+ * callouts are drawn on, which the column's own background would cover. In a note that can have
+ * page breaks (`cm-paged`), a card for each page, drawn by pageBreaks.ts.
  */
 :root[data-backdrop] .editor-pane .cm-editor.cm-page > .cm-scroller > .cm-content {
   position: relative;
@@ -2314,11 +2360,25 @@
   margin: var(--page-gap) auto;
 }
 
-:root[data-backdrop] .editor-pane .cm-editor.cm-page > .cm-scroller > .cm-content::before {
+:root[data-backdrop] .editor-pane .cm-editor.cm-page:not(.cm-paged) > .cm-scroller > .cm-content::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -2;
+}
+
+.cm-page-layer {
+  display: none;
+  /* Under the layers cards and callouts are drawn on, whatever order CodeMirror gives them. */
+  z-index: -50 !important;
+}
+
+:root[data-backdrop] .editor-pane .cm-page-layer {
+  display: block;
+}
+
+:root[data-backdrop] .editor-pane .cm-editor.cm-page:not(.cm-paged) > .cm-scroller > .cm-content::before,
+:root[data-backdrop] .editor-pane .cm-page-card {
   border-radius: var(--radius-xl);
   background-color: var(--page-bg);
   box-shadow:
@@ -2333,14 +2393,37 @@
   background-image: none;
 }
 
-:root[data-backdrop][data-paper] .editor-pane .cm-editor.cm-page:not(.cm-sheet-note) > .cm-scroller > .cm-content::before {
+:root[data-backdrop][data-paper] .editor-pane .cm-editor.cm-page:not(.cm-sheet-note, .cm-paged) > .cm-scroller > .cm-content::before,
+:root[data-backdrop][data-paper] .editor-pane .cm-page-card {
   background-image: var(--paper-light);
   background-size: var(--paper-size);
   background-position: var(--paper-position);
 }
 
-:root[data-backdrop][data-paper][data-scheme="dark"] .editor-pane .cm-editor.cm-page:not(.cm-sheet-note) > .cm-scroller > .cm-content::before {
+:root[data-backdrop][data-paper][data-scheme="dark"] .editor-pane .cm-editor.cm-page:not(.cm-sheet-note, .cm-paged) > .cm-scroller > .cm-content::before,
+:root[data-backdrop][data-paper][data-scheme="dark"] .editor-pane .cm-page-card {
   background-image: var(--paper-dark);
+}
+
+/* A grid's columns on each page, rather than down the column through the gaps between them. */
+:root[data-backdrop][data-paper-columns] .editor-pane .cm-editor.cm-paged > .cm-scroller > .cm-content {
+  background-image: none;
+}
+
+:root[data-backdrop][data-paper-columns] .editor-pane .cm-page-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 var(--editor-pad-x);
+  background-image: var(--paper-columns);
+  background-size: var(--paper-columns-size);
+}
+
+:root[data-backdrop][data-paper-columns] .editor-pane .cm-page-card.is-first::after {
+  top: var(--editor-pad-top);
+}
+
+:root[data-backdrop][data-paper-columns] .editor-pane .cm-page-card.is-last::after {
+  bottom: var(--editor-pad-bottom);
 }
 
 /*

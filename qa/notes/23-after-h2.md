@@ -288,98 +288,110 @@ Total, =costs!B2*2
 ## Heading two
 ---
 
-#### 30. Heading 2, then Key: Value line
+#### 30. Heading 2, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+## Heading two
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Heading 2, then Key: Value line
 
 ## Heading two
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Heading 2, then Mention
+#### 32. Heading 2, then Mention
 
 ## Heading two
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Heading 2, then Wiki link
+#### 33. Heading 2, then Wiki link
 
 ## Heading two
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Heading 2, then Symbols
+#### 34. Heading 2, then Symbols
 
 ## Heading two
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Heading 2, then GitHub links
+#### 35. Heading 2, then GitHub links
 
 ## Heading two
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Heading 2, then arXiv links
+#### 36. Heading 2, then arXiv links
 
 ## Heading two
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Heading 2, then Image
+#### 37. Heading 2, then Image
 
 ## Heading two
 ![A sample picture](attachment:photo.png)
 
-#### 37. Heading 2, then Drawing
+#### 38. Heading 2, then Drawing
 
 ## Heading two
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Heading 2, then File
+#### 39. Heading 2, then File
 
 ## Heading two
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Heading 2, then Attached 3D model (STL)
+#### 40. Heading 2, then Attached 3D model (STL)
 
 ## Heading two
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Heading 2, then Terminal recording (.cast file)
+#### 41. Heading 2, then Terminal recording (.cast file)
 
 ## Heading two
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Heading 2, then Audio
+#### 42. Heading 2, then Audio
 
 ## Heading two
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Heading 2, then Video
+#### 43. Heading 2, then Video
 
 ## Heading two
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Heading 2, then Missing file
+#### 44. Heading 2, then Missing file
 
 ## Heading two
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Heading 2, then Card
+#### 45. Heading 2, then Card
 
 ## Heading two
 ::: card
 Text in a card.
 :::
 
-#### 45. Heading 2, then Callout (info)
+#### 46. Heading 2, then Callout (info)
 
 ## Heading two
 :::i
 Text in an info callout.
 :::
 
-#### 46. Heading 2, then Callout (warning, chosen icon)
+#### 47. Heading 2, then Callout (warning, chosen icon)
 
 ## Heading two
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Heading 2, then Callout (decision, no icon)
+#### 48. Heading 2, then Callout (decision, no icon)
 
 ## Heading two
 :::^ icon=none

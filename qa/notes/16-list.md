@@ -317,91 +317,104 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
 
   ---
 
-#### 30. Key: Value line in a list item
+#### 30. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a list item (stays Markdown here)
+
+- List item
+
+  Before the break.
+
+  <!-- pagebreak -->
+  After it, on a new page.
+
+  <div style="page-break-after: always"></div>
+
+  And another.
+
+#### 31. Key: Value line in a list item
 
 - List item
 
   **Wi-Fi password:** correct-horse-battery
 
-#### 31. Mention in a list item
+#### 32. Mention in a list item
 
 - List item
 
   Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Wiki link in a list item
+#### 33. Wiki link in a list item
 
 - List item
 
   Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Symbols in a list item
+#### 34. Symbols in a list item
 
 - List item
 
   Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. GitHub links in a list item
+#### 35. GitHub links in a list item
 
 - List item
 
   Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. arXiv links in a list item
+#### 36. arXiv links in a list item
 
 - List item
 
   Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Image in a list item (stays Markdown here)
+#### 37. Image in a list item (stays Markdown here)
 
 - List item
 
   ![A sample picture](attachment:photo.png)
 
-#### 37. Drawing in a list item (stays Markdown here)
+#### 38. Drawing in a list item (stays Markdown here)
 
 - List item
 
   ![A sample drawing](attachment:drawing.svg)
 
-#### 38. File in a list item (stays Markdown here)
+#### 39. File in a list item (stays Markdown here)
 
 - List item
 
   [Budget.csv](attachment:budget.csv)
 
-#### 39. Attached 3D model (STL) in a list item
+#### 40. Attached 3D model (STL) in a list item
 
 - List item
 
   [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Terminal recording (.cast file) in a list item
+#### 41. Terminal recording (.cast file) in a list item
 
 - List item
 
   [terminal.cast](attachment:terminal.cast)
 
-#### 41. Audio in a list item (stays Markdown here)
+#### 42. Audio in a list item (stays Markdown here)
 
 - List item
 
   [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Video in a list item (stays Markdown here)
+#### 43. Video in a list item (stays Markdown here)
 
 - List item
 
   [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Missing file in a list item (stays Markdown here)
+#### 44. Missing file in a list item (stays Markdown here)
 
 - List item
 
   [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Card in a list item
+#### 45. Card in a list item
 
 - List item
 
@@ -409,7 +422,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a card.
   :::
 
-#### 45. Callout (info) in a list item
+#### 46. Callout (info) in a list item
 
 - List item
 
@@ -417,7 +430,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in an info callout.
   :::
 
-#### 46. Callout (warning, chosen icon) in a list item
+#### 47. Callout (warning, chosen icon) in a list item
 
 - List item
 
@@ -425,7 +438,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a warning callout with the flag icon.
   :::
 
-#### 47. Callout (decision, no icon) in a list item
+#### 48. Callout (decision, no icon) in a list item
 
 - List item
 

@@ -375,7 +375,22 @@ Total, =costs!B2*2
 3. Third
 ---
 
-#### 30. Numbered list, then Key: Value line
+#### 30. Numbered list, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+1. First
+2. Second
+   1. Nested
+3. Third
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Numbered list, then Key: Value line
 
 1. First
 2. Second
@@ -383,7 +398,7 @@ Total, =costs!B2*2
 3. Third
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Numbered list, then Mention
+#### 32. Numbered list, then Mention
 
 1. First
 2. Second
@@ -391,7 +406,7 @@ Total, =costs!B2*2
 3. Third
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Numbered list, then Wiki link
+#### 33. Numbered list, then Wiki link
 
 1. First
 2. Second
@@ -399,7 +414,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 3. Third
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Numbered list, then Symbols
+#### 34. Numbered list, then Symbols
 
 1. First
 2. Second
@@ -407,7 +422,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 3. Third
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Numbered list, then GitHub links
+#### 35. Numbered list, then GitHub links
 
 1. First
 2. Second
@@ -415,7 +430,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 3. Third
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Numbered list, then arXiv links
+#### 36. Numbered list, then arXiv links
 
 1. First
 2. Second
@@ -423,7 +438,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Numbered list, then Image
+#### 37. Numbered list, then Image
 
 1. First
 2. Second
@@ -431,7 +446,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 ![A sample picture](attachment:photo.png)
 
-#### 37. Numbered list, then Drawing
+#### 38. Numbered list, then Drawing
 
 1. First
 2. Second
@@ -439,7 +454,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Numbered list, then File
+#### 39. Numbered list, then File
 
 1. First
 2. Second
@@ -447,7 +462,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Numbered list, then Attached 3D model (STL)
+#### 40. Numbered list, then Attached 3D model (STL)
 
 1. First
 2. Second
@@ -455,7 +470,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Numbered list, then Terminal recording (.cast file)
+#### 41. Numbered list, then Terminal recording (.cast file)
 
 1. First
 2. Second
@@ -463,7 +478,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Numbered list, then Audio
+#### 42. Numbered list, then Audio
 
 1. First
 2. Second
@@ -471,7 +486,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Numbered list, then Video
+#### 43. Numbered list, then Video
 
 1. First
 2. Second
@@ -479,7 +494,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Numbered list, then Missing file
+#### 44. Numbered list, then Missing file
 
 1. First
 2. Second
@@ -487,7 +502,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Numbered list, then Card
+#### 45. Numbered list, then Card
 
 1. First
 2. Second
@@ -497,7 +512,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 45. Numbered list, then Callout (info)
+#### 46. Numbered list, then Callout (info)
 
 1. First
 2. Second
@@ -507,7 +522,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 46. Numbered list, then Callout (warning, chosen icon)
+#### 47. Numbered list, then Callout (warning, chosen icon)
 
 1. First
 2. Second
@@ -517,7 +532,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Numbered list, then Callout (decision, no icon)
+#### 48. Numbered list, then Callout (decision, no icon)
 
 1. First
 2. Second

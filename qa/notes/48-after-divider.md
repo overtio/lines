@@ -288,98 +288,110 @@ Total, =costs!B2*2
 ---
 ---
 
-#### 30. Divider, then Key: Value line
+#### 30. Divider, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+---
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Divider, then Key: Value line
 
 ---
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Divider, then Mention
+#### 32. Divider, then Mention
 
 ---
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Divider, then Wiki link
+#### 33. Divider, then Wiki link
 
 ---
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Divider, then Symbols
+#### 34. Divider, then Symbols
 
 ---
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Divider, then GitHub links
+#### 35. Divider, then GitHub links
 
 ---
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Divider, then arXiv links
+#### 36. Divider, then arXiv links
 
 ---
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Divider, then Image
+#### 37. Divider, then Image
 
 ---
 ![A sample picture](attachment:photo.png)
 
-#### 37. Divider, then Drawing
+#### 38. Divider, then Drawing
 
 ---
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Divider, then File
+#### 39. Divider, then File
 
 ---
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Divider, then Attached 3D model (STL)
+#### 40. Divider, then Attached 3D model (STL)
 
 ---
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Divider, then Terminal recording (.cast file)
+#### 41. Divider, then Terminal recording (.cast file)
 
 ---
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Divider, then Audio
+#### 42. Divider, then Audio
 
 ---
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Divider, then Video
+#### 43. Divider, then Video
 
 ---
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Divider, then Missing file
+#### 44. Divider, then Missing file
 
 ---
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Divider, then Card
+#### 45. Divider, then Card
 
 ---
 ::: card
 Text in a card.
 :::
 
-#### 45. Divider, then Callout (info)
+#### 46. Divider, then Callout (info)
 
 ---
 :::i
 Text in an info callout.
 :::
 
-#### 46. Divider, then Callout (warning, chosen icon)
+#### 47. Divider, then Callout (warning, chosen icon)
 
 ---
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Divider, then Callout (decision, no icon)
+#### 48. Divider, then Callout (decision, no icon)
 
 ---
 :::^ icon=none

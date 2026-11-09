@@ -317,91 +317,104 @@ Total, =costs!B2*2
 ---
 :::
 
-#### 30. Key: Value line in a callout
+#### 30. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a callout (stays Markdown here)
+
+:::i
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+:::
+
+#### 31. Key: Value line in a callout
 
 :::i
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 31. Mention in a callout
+#### 32. Mention in a callout
 
 :::i
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 32. Wiki link in a callout
+#### 33. Wiki link in a callout
 
 :::i
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 33. Symbols in a callout
+#### 34. Symbols in a callout
 
 :::i
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 34. GitHub links in a callout
+#### 35. GitHub links in a callout
 
 :::i
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 35. arXiv links in a callout
+#### 36. arXiv links in a callout
 
 :::i
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::
 
-#### 36. Image in a callout
+#### 37. Image in a callout
 
 :::i
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 37. Drawing in a callout
+#### 38. Drawing in a callout
 
 :::i
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 38. File in a callout
+#### 39. File in a callout
 
 :::i
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 39. Attached 3D model (STL) in a callout
+#### 40. Attached 3D model (STL) in a callout
 
 :::i
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 40. Terminal recording (.cast file) in a callout
+#### 41. Terminal recording (.cast file) in a callout
 
 :::i
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 41. Audio in a callout
+#### 42. Audio in a callout
 
 :::i
 [Chime.mp3](attachment:chime.mp3)
 :::
 
-#### 42. Video in a callout
+#### 43. Video in a callout
 
 :::i
 [Sky.mp4](attachment:sky.mp4)
 :::
 
-#### 43. Missing file in a callout
+#### 44. Missing file in a callout
 
 :::i
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 44. Card in a callout
+#### 45. Card in a callout
 
 :::i
 ::: card
@@ -409,7 +422,7 @@ Text in a card.
 :::
 :::
 
-#### 45. Callout (info) in a callout
+#### 46. Callout (info) in a callout
 
 :::i
 :::i
@@ -417,7 +430,7 @@ Text in an info callout.
 :::
 :::
 
-#### 46. Callout (warning, chosen icon) in a callout
+#### 47. Callout (warning, chosen icon) in a callout
 
 :::i
 :::! icon=flag
@@ -425,7 +438,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 47. Callout (decision, no icon) in a callout
+#### 48. Callout (decision, no icon) in a callout
 
 :::i
 :::^ icon=none

@@ -375,7 +375,22 @@ console.log(greeting);
 ```
 ---
 
-#### 30. Code block (TypeScript), then Key: Value line
+#### 30. Code block (TypeScript), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+```ts
+const greeting: string = "hello";
+console.log(greeting);
+```
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Code block (TypeScript), then Key: Value line
 
 ```ts
 const greeting: string = "hello";
@@ -383,7 +398,7 @@ console.log(greeting);
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Code block (TypeScript), then Mention
+#### 32. Code block (TypeScript), then Mention
 
 ```ts
 const greeting: string = "hello";
@@ -391,7 +406,7 @@ console.log(greeting);
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Code block (TypeScript), then Wiki link
+#### 33. Code block (TypeScript), then Wiki link
 
 ```ts
 const greeting: string = "hello";
@@ -399,7 +414,7 @@ console.log(greeting);
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Code block (TypeScript), then Symbols
+#### 34. Code block (TypeScript), then Symbols
 
 ```ts
 const greeting: string = "hello";
@@ -407,7 +422,7 @@ console.log(greeting);
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Code block (TypeScript), then GitHub links
+#### 35. Code block (TypeScript), then GitHub links
 
 ```ts
 const greeting: string = "hello";
@@ -415,7 +430,7 @@ console.log(greeting);
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Code block (TypeScript), then arXiv links
+#### 36. Code block (TypeScript), then arXiv links
 
 ```ts
 const greeting: string = "hello";
@@ -423,7 +438,7 @@ console.log(greeting);
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Code block (TypeScript), then Image
+#### 37. Code block (TypeScript), then Image
 
 ```ts
 const greeting: string = "hello";
@@ -431,7 +446,7 @@ console.log(greeting);
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 37. Code block (TypeScript), then Drawing
+#### 38. Code block (TypeScript), then Drawing
 
 ```ts
 const greeting: string = "hello";
@@ -439,7 +454,7 @@ console.log(greeting);
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Code block (TypeScript), then File
+#### 39. Code block (TypeScript), then File
 
 ```ts
 const greeting: string = "hello";
@@ -447,7 +462,7 @@ console.log(greeting);
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Code block (TypeScript), then Attached 3D model (STL)
+#### 40. Code block (TypeScript), then Attached 3D model (STL)
 
 ```ts
 const greeting: string = "hello";
@@ -455,7 +470,7 @@ console.log(greeting);
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Code block (TypeScript), then Terminal recording (.cast file)
+#### 41. Code block (TypeScript), then Terminal recording (.cast file)
 
 ```ts
 const greeting: string = "hello";
@@ -463,7 +478,7 @@ console.log(greeting);
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Code block (TypeScript), then Audio
+#### 42. Code block (TypeScript), then Audio
 
 ```ts
 const greeting: string = "hello";
@@ -471,7 +486,7 @@ console.log(greeting);
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Code block (TypeScript), then Video
+#### 43. Code block (TypeScript), then Video
 
 ```ts
 const greeting: string = "hello";
@@ -479,7 +494,7 @@ console.log(greeting);
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Code block (TypeScript), then Missing file
+#### 44. Code block (TypeScript), then Missing file
 
 ```ts
 const greeting: string = "hello";
@@ -487,7 +502,7 @@ console.log(greeting);
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Code block (TypeScript), then Card
+#### 45. Code block (TypeScript), then Card
 
 ```ts
 const greeting: string = "hello";
@@ -497,7 +512,7 @@ console.log(greeting);
 Text in a card.
 :::
 
-#### 45. Code block (TypeScript), then Callout (info)
+#### 46. Code block (TypeScript), then Callout (info)
 
 ```ts
 const greeting: string = "hello";
@@ -507,7 +522,7 @@ console.log(greeting);
 Text in an info callout.
 :::
 
-#### 46. Code block (TypeScript), then Callout (warning, chosen icon)
+#### 47. Code block (TypeScript), then Callout (warning, chosen icon)
 
 ```ts
 const greeting: string = "hello";
@@ -517,7 +532,7 @@ console.log(greeting);
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Code block (TypeScript), then Callout (decision, no icon)
+#### 48. Code block (TypeScript), then Callout (decision, no icon)
 
 ```ts
 const greeting: string = "hello";

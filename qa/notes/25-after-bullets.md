@@ -404,7 +404,23 @@ Total, =costs!B2*2
 - Last item
 ---
 
-#### 30. Bullet list, then Key: Value line
+#### 30. Bullet list, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Bullet list, then Key: Value line
 
 - First item
 - Second item
@@ -413,7 +429,7 @@ Total, =costs!B2*2
 - Last item
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Bullet list, then Mention
+#### 32. Bullet list, then Mention
 
 - First item
 - Second item
@@ -422,7 +438,7 @@ Total, =costs!B2*2
 - Last item
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Bullet list, then Wiki link
+#### 33. Bullet list, then Wiki link
 
 - First item
 - Second item
@@ -431,7 +447,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 - Last item
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Bullet list, then Symbols
+#### 34. Bullet list, then Symbols
 
 - First item
 - Second item
@@ -440,7 +456,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 - Last item
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Bullet list, then GitHub links
+#### 35. Bullet list, then GitHub links
 
 - First item
 - Second item
@@ -449,7 +465,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 - Last item
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Bullet list, then arXiv links
+#### 36. Bullet list, then arXiv links
 
 - First item
 - Second item
@@ -458,7 +474,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Bullet list, then Image
+#### 37. Bullet list, then Image
 
 - First item
 - Second item
@@ -467,7 +483,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 ![A sample picture](attachment:photo.png)
 
-#### 37. Bullet list, then Drawing
+#### 38. Bullet list, then Drawing
 
 - First item
 - Second item
@@ -476,7 +492,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Bullet list, then File
+#### 39. Bullet list, then File
 
 - First item
 - Second item
@@ -485,7 +501,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Bullet list, then Attached 3D model (STL)
+#### 40. Bullet list, then Attached 3D model (STL)
 
 - First item
 - Second item
@@ -494,7 +510,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Bullet list, then Terminal recording (.cast file)
+#### 41. Bullet list, then Terminal recording (.cast file)
 
 - First item
 - Second item
@@ -503,7 +519,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Bullet list, then Audio
+#### 42. Bullet list, then Audio
 
 - First item
 - Second item
@@ -512,7 +528,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Bullet list, then Video
+#### 43. Bullet list, then Video
 
 - First item
 - Second item
@@ -521,7 +537,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Bullet list, then Missing file
+#### 44. Bullet list, then Missing file
 
 - First item
 - Second item
@@ -530,7 +546,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Bullet list, then Card
+#### 45. Bullet list, then Card
 
 - First item
 - Second item
@@ -541,7 +557,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 45. Bullet list, then Callout (info)
+#### 46. Bullet list, then Callout (info)
 
 - First item
 - Second item
@@ -552,7 +568,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 46. Bullet list, then Callout (warning, chosen icon)
+#### 47. Bullet list, then Callout (warning, chosen icon)
 
 - First item
 - Second item
@@ -563,7 +579,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Bullet list, then Callout (decision, no icon)
+#### 48. Bullet list, then Callout (decision, no icon)
 
 - First item
 - Second item

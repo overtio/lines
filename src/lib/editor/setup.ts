@@ -32,6 +32,7 @@ import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
 import type { MarkdownAddition, NoteLanguage, PaperSource } from "../plugins/types";
 import { lineMarkers } from "./markers";
 import { hiddenMarkdown } from "./hiddenMarkdown";
+import { markdownPageBreaks } from "./pageBreaks";
 import { markupMode } from "./markupMode";
 import { type MarkdownMode, prefs } from "../prefs.svelte";
 
@@ -140,7 +141,7 @@ const theme = EditorView.theme({
   ".cm-content": {
     maxWidth: "var(--editor-width)",
     margin: "0 auto",
-    padding: "var(--editor-pad-top) var(--editor-pad-x) 40vh",
+    padding: "var(--editor-pad-top) var(--editor-pad-x) var(--editor-pad-bottom)",
   },
   ".cm-line": { padding: "0" },
   ".cm-placeholder": { color: "var(--text-faint)" },
@@ -251,6 +252,7 @@ const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[], m
   mathBlocks,
   typeTables,
   attachmentBlocks,
+  markdownPageBreaks,
   cards,
   drag ? dragBlocks : [],
   listKeymap,

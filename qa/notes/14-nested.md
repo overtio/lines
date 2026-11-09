@@ -375,7 +375,22 @@ Total, =costs!B2*2
 :::
 :::
 
-#### 30. Key: Value line in a callout in a card
+#### 30. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a callout in a card (stays Markdown here)
+
+::: card
+:::!
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+:::
+:::
+
+#### 31. Key: Value line in a callout in a card
 
 ::: card
 :::!
@@ -383,7 +398,7 @@ Total, =costs!B2*2
 :::
 :::
 
-#### 31. Mention in a callout in a card
+#### 32. Mention in a callout in a card
 
 ::: card
 :::!
@@ -391,7 +406,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 :::
 
-#### 32. Wiki link in a callout in a card
+#### 33. Wiki link in a callout in a card
 
 ::: card
 :::!
@@ -399,7 +414,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 :::
 
-#### 33. Symbols in a callout in a card
+#### 34. Symbols in a callout in a card
 
 ::: card
 :::!
@@ -407,7 +422,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 :::
 :::
 
-#### 34. GitHub links in a callout in a card
+#### 35. GitHub links in a callout in a card
 
 ::: card
 :::!
@@ -415,7 +430,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 35. arXiv links in a callout in a card
+#### 36. arXiv links in a callout in a card
 
 ::: card
 :::!
@@ -423,7 +438,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 36. Image in a callout in a card
+#### 37. Image in a callout in a card
 
 ::: card
 :::!
@@ -431,7 +446,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 37. Drawing in a callout in a card
+#### 38. Drawing in a callout in a card
 
 ::: card
 :::!
@@ -439,7 +454,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 38. File in a callout in a card
+#### 39. File in a callout in a card
 
 ::: card
 :::!
@@ -447,7 +462,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 39. Attached 3D model (STL) in a callout in a card
+#### 40. Attached 3D model (STL) in a callout in a card
 
 ::: card
 :::!
@@ -455,7 +470,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 40. Terminal recording (.cast file) in a callout in a card
+#### 41. Terminal recording (.cast file) in a callout in a card
 
 ::: card
 :::!
@@ -463,7 +478,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 41. Audio in a callout in a card
+#### 42. Audio in a callout in a card
 
 ::: card
 :::!
@@ -471,7 +486,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 42. Video in a callout in a card
+#### 43. Video in a callout in a card
 
 ::: card
 :::!
@@ -479,7 +494,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 43. Missing file in a callout in a card
+#### 44. Missing file in a callout in a card
 
 ::: card
 :::!
@@ -487,7 +502,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 44. Card in a callout in a card
+#### 45. Card in a callout in a card
 
 ::: card
 :::!
@@ -497,7 +512,7 @@ Text in a card.
 :::
 :::
 
-#### 45. Callout (info) in a callout in a card
+#### 46. Callout (info) in a callout in a card
 
 ::: card
 :::!
@@ -507,7 +522,7 @@ Text in an info callout.
 :::
 :::
 
-#### 46. Callout (warning, chosen icon) in a callout in a card
+#### 47. Callout (warning, chosen icon) in a callout in a card
 
 ::: card
 :::!
@@ -517,7 +532,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 47. Callout (decision, no icon) in a callout in a card
+#### 48. Callout (decision, no icon) in a callout in a card
 
 ::: card
 :::!

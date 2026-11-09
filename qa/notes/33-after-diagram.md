@@ -404,7 +404,23 @@ flowchart LR
 ```
 ---
 
-#### 30. Diagram, then Key: Value line
+#### 30. Diagram, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+```mermaid
+flowchart LR
+  A[Start] --> B{Choice}
+  B --> C[Done]
+```
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Diagram, then Key: Value line
 
 ```mermaid
 flowchart LR
@@ -413,7 +429,7 @@ flowchart LR
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Diagram, then Mention
+#### 32. Diagram, then Mention
 
 ```mermaid
 flowchart LR
@@ -422,7 +438,7 @@ flowchart LR
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Diagram, then Wiki link
+#### 33. Diagram, then Wiki link
 
 ```mermaid
 flowchart LR
@@ -431,7 +447,7 @@ flowchart LR
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Diagram, then Symbols
+#### 34. Diagram, then Symbols
 
 ```mermaid
 flowchart LR
@@ -440,7 +456,7 @@ flowchart LR
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Diagram, then GitHub links
+#### 35. Diagram, then GitHub links
 
 ```mermaid
 flowchart LR
@@ -449,7 +465,7 @@ flowchart LR
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Diagram, then arXiv links
+#### 36. Diagram, then arXiv links
 
 ```mermaid
 flowchart LR
@@ -458,7 +474,7 @@ flowchart LR
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Diagram, then Image
+#### 37. Diagram, then Image
 
 ```mermaid
 flowchart LR
@@ -467,7 +483,7 @@ flowchart LR
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 37. Diagram, then Drawing
+#### 38. Diagram, then Drawing
 
 ```mermaid
 flowchart LR
@@ -476,7 +492,7 @@ flowchart LR
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Diagram, then File
+#### 39. Diagram, then File
 
 ```mermaid
 flowchart LR
@@ -485,7 +501,7 @@ flowchart LR
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Diagram, then Attached 3D model (STL)
+#### 40. Diagram, then Attached 3D model (STL)
 
 ```mermaid
 flowchart LR
@@ -494,7 +510,7 @@ flowchart LR
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Diagram, then Terminal recording (.cast file)
+#### 41. Diagram, then Terminal recording (.cast file)
 
 ```mermaid
 flowchart LR
@@ -503,7 +519,7 @@ flowchart LR
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Diagram, then Audio
+#### 42. Diagram, then Audio
 
 ```mermaid
 flowchart LR
@@ -512,7 +528,7 @@ flowchart LR
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Diagram, then Video
+#### 43. Diagram, then Video
 
 ```mermaid
 flowchart LR
@@ -521,7 +537,7 @@ flowchart LR
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Diagram, then Missing file
+#### 44. Diagram, then Missing file
 
 ```mermaid
 flowchart LR
@@ -530,7 +546,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Diagram, then Card
+#### 45. Diagram, then Card
 
 ```mermaid
 flowchart LR
@@ -541,7 +557,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 45. Diagram, then Callout (info)
+#### 46. Diagram, then Callout (info)
 
 ```mermaid
 flowchart LR
@@ -552,7 +568,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 46. Diagram, then Callout (warning, chosen icon)
+#### 47. Diagram, then Callout (warning, chosen icon)
 
 ```mermaid
 flowchart LR
@@ -563,7 +579,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Diagram, then Callout (decision, no icon)
+#### 48. Diagram, then Callout (decision, no icon)
 
 ```mermaid
 flowchart LR

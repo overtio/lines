@@ -26,6 +26,7 @@ import { editProperties, type IconCompletion, mentionKeys, mentionSource } from 
 import { insertTable } from "./tables";
 import { backslashSource, inOpenMath, MATH_COMMANDS, paragraphBefore, TEXT_COMMANDS } from "./texCommands";
 import { ancestors } from "./util";
+import { PAGE_BREAK } from "../notes/pageBreak";
 
 export interface SlashCommand {
   /** Names it to other commands, which can say to come after it (`after`). */
@@ -158,6 +159,7 @@ const COMMANDS: SlashCommand[] = [
   { ...named("editor.slash.file"), hint: "[]()", icon: "paperclip", section: INSERT, apply: chooseFiles },
   { ...named("editor.slash.drawing"), hint: "Excalidraw", icon: "pencil", section: INSERT, apply: newDrawing },
   { ...named("editor.slash.divider"), hint: "---", icon: "minus", section: INSERT, apply: insert("---\n", true) },
+  { ...named("editor.slash.pageBreak"), hint: "<!-- -->", icon: "square-split-vertical", section: INSERT, apply: insert(`${PAGE_BREAK}\n`, true) },
   { ...named("editor.slash.link"), hint: "[](…)", icon: "link", section: INSERT, apply: insert(`[${t("editor.slash.link.text")}](https://)`) },
   { ...named("editor.slash.tag"), hint: "#", icon: "hash", section: INSERT, apply: insert("#") },
   { ...named("editor.slash.mention"), hint: "@", icon: "at-sign", section: INSERT, apply: insert("@") },

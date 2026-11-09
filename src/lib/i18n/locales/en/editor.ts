@@ -66,6 +66,9 @@ export default {
   // A horizontal line (`---`).
   "editor.slash.divider": "Divider",
   "editor.slash.divider.keywords": "rule line separator hr break",
+  // Where a printed note goes on to a new page.
+  "editor.slash.pageBreak": "Page break",
+  "editor.slash.pageBreak.keywords": "new page pagebreak print pdf split separator",
   "editor.slash.link": "Link",
   "editor.slash.link.keywords": "url web href",
   // Put in place of the link's text, selected, ready to type over.
@@ -260,6 +263,8 @@ export default {
   "editor.cm.selectionDeleted": "Selection deleted",
   // Said by screen readers only: a bullet, and markup hidden from sight (a card's ::: lines, the properties' ---, a code block's fences).
   "editor.a11y.bullet": "Bullet",
+  // A page break in a note, as it shows and as screen readers say it.
+  "editor.pageBreak": "Page break",
   "editor.a11y.cardStart": "Card",
   "editor.a11y.cardEnd": "End of card",
   "editor.a11y.calloutStart": "{kind} callout",

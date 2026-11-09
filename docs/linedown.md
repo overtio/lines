@@ -14,6 +14,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Tables, ~~strikethrough~~, `- [ ]` task lists, autolinks | As in GFM | GFM |
 | Highlight | `==text==` | No (also in Obsidian, Bear, Pandoc's `mark`) |
 | Line mark | `<!-- mark green: to check -->` at a line's end | Yes: an HTML comment, which other apps don't show |
+| Page break | `<!-- pagebreak -->` on a line of its own | Yes: an HTML comment, which other apps don't show |
 | Underline | `<u>text</u>` | Yes (inline HTML, as GitHub, Obsidian and Typora show it) |
 | Tag | `#tag`, `#nested/tag` | No (as in Bear) |
 | Card | `::: card` … `:::` | Pandoc fenced div |
@@ -61,6 +62,19 @@ Which theme is the default? <!-- mark -->
 The colors are `red`, `orange`, `yellow`, `green`, `blue`, `purple` and `gray`, each the theme's own. Lines next to each other marked alike make one bar, and pointing at it shows what it says. The comment is hidden but on the line being edited; ⌘⇧M (Ctrl+Shift+M) marks the selected lines, or takes their marks off. In code it's text, not a mark. Other Markdown apps don't show HTML comments, so the note reads the same there, without its marks.
 
 Plugins can mark lines too, each in a lane of its own further out (the Changes plugin marks what's changed since the note was opened; [plugins.md](plugins.md)).
+
+## Page breaks
+
+Where a printed note, or its PDF, goes on to a new page: an HTML comment on a line of its own, at the note's top level. `/page break` writes one.
+
+```markdown
+The first chapter ends here.
+
+<!-- pagebreak -->
+## Chapter two
+```
+
+It's drawn as a dashed line across the note, named; over a backdrop (Settings → Paper), as a gap between two pages, as Craft draws them. With the cursor on its line, its Markdown shows above it. The PDF and print start a new page at each (two in a row leave one empty); a picture of the note (PNG) is one long page, without them. lines also reads the empty `<div style="page-break-after: always"></div>` that Obsidian's, Typora's and VS Code's PDF exports break pages at, so notes from them keep theirs, though it needs a blank line after it: Markdown counts the lines after an HTML block's `<div>` as part of it up to a blank line. In a card, a list or a quote, either stays as written. Other apps show the comment as nothing, and break no pages at it.
 
 ## Underline
 

@@ -288,98 +288,110 @@ Total, =costs!B2*2
 ![A sample drawing](attachment:drawing.svg)
 ---
 
-#### 30. Drawing, then Key: Value line
+#### 30. Drawing, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+![A sample drawing](attachment:drawing.svg)
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Drawing, then Key: Value line
 
 ![A sample drawing](attachment:drawing.svg)
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Drawing, then Mention
+#### 32. Drawing, then Mention
 
 ![A sample drawing](attachment:drawing.svg)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Drawing, then Wiki link
+#### 33. Drawing, then Wiki link
 
 ![A sample drawing](attachment:drawing.svg)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Drawing, then Symbols
+#### 34. Drawing, then Symbols
 
 ![A sample drawing](attachment:drawing.svg)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Drawing, then GitHub links
+#### 35. Drawing, then GitHub links
 
 ![A sample drawing](attachment:drawing.svg)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Drawing, then arXiv links
+#### 36. Drawing, then arXiv links
 
 ![A sample drawing](attachment:drawing.svg)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Drawing, then Image
+#### 37. Drawing, then Image
 
 ![A sample drawing](attachment:drawing.svg)
 ![A sample picture](attachment:photo.png)
 
-#### 37. Drawing, then Drawing
+#### 38. Drawing, then Drawing
 
 ![A sample drawing](attachment:drawing.svg)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Drawing, then File
+#### 39. Drawing, then File
 
 ![A sample drawing](attachment:drawing.svg)
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Drawing, then Attached 3D model (STL)
+#### 40. Drawing, then Attached 3D model (STL)
 
 ![A sample drawing](attachment:drawing.svg)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Drawing, then Terminal recording (.cast file)
+#### 41. Drawing, then Terminal recording (.cast file)
 
 ![A sample drawing](attachment:drawing.svg)
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Drawing, then Audio
+#### 42. Drawing, then Audio
 
 ![A sample drawing](attachment:drawing.svg)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Drawing, then Video
+#### 43. Drawing, then Video
 
 ![A sample drawing](attachment:drawing.svg)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Drawing, then Missing file
+#### 44. Drawing, then Missing file
 
 ![A sample drawing](attachment:drawing.svg)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Drawing, then Card
+#### 45. Drawing, then Card
 
 ![A sample drawing](attachment:drawing.svg)
 ::: card
 Text in a card.
 :::
 
-#### 45. Drawing, then Callout (info)
+#### 46. Drawing, then Callout (info)
 
 ![A sample drawing](attachment:drawing.svg)
 :::i
 Text in an info callout.
 :::
 
-#### 46. Drawing, then Callout (warning, chosen icon)
+#### 47. Drawing, then Callout (warning, chosen icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Drawing, then Callout (decision, no icon)
+#### 48. Drawing, then Callout (decision, no icon)
 
 ![A sample drawing](attachment:drawing.svg)
 :::^ icon=none

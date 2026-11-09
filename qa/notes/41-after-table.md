@@ -375,7 +375,22 @@ Total, =costs!B2*2
 | longer cell text | `code` | 22 |
 ---
 
-#### 30. Table, then Key: Value line
+#### 30. Table, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Table, then Key: Value line
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -383,7 +398,7 @@ Total, =costs!B2*2
 | longer cell text | `code` | 22 |
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Table, then Mention
+#### 32. Table, then Mention
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -391,7 +406,7 @@ Total, =costs!B2*2
 | longer cell text | `code` | 22 |
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Table, then Wiki link
+#### 33. Table, then Wiki link
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -399,7 +414,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 | longer cell text | `code` | 22 |
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Table, then Symbols
+#### 34. Table, then Symbols
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -407,7 +422,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | longer cell text | `code` | 22 |
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Table, then GitHub links
+#### 35. Table, then GitHub links
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -415,7 +430,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | longer cell text | `code` | 22 |
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Table, then arXiv links
+#### 36. Table, then arXiv links
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -423,7 +438,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Table, then Image
+#### 37. Table, then Image
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -431,7 +446,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 ![A sample picture](attachment:photo.png)
 
-#### 37. Table, then Drawing
+#### 38. Table, then Drawing
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -439,7 +454,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Table, then File
+#### 39. Table, then File
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -447,7 +462,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Table, then Attached 3D model (STL)
+#### 40. Table, then Attached 3D model (STL)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -455,7 +470,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Table, then Terminal recording (.cast file)
+#### 41. Table, then Terminal recording (.cast file)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -463,7 +478,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Table, then Audio
+#### 42. Table, then Audio
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -471,7 +486,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Table, then Video
+#### 43. Table, then Video
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -479,7 +494,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Table, then Missing file
+#### 44. Table, then Missing file
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -487,7 +502,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Table, then Card
+#### 45. Table, then Card
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -497,7 +512,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 45. Table, then Callout (info)
+#### 46. Table, then Callout (info)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -507,7 +522,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 46. Table, then Callout (warning, chosen icon)
+#### 47. Table, then Callout (warning, chosen icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -517,7 +532,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Table, then Callout (decision, no icon)
+#### 48. Table, then Callout (decision, no icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |

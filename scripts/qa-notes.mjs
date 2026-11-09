@@ -94,6 +94,11 @@ const ELEMENTS = [
     md: "```csv name=costs\nItem, Cost, Day\nRent, $1200, 2026-01-05\n```\n\n```csv\nTotal, =costs!B2*2\n```",
   },
   { id: "divider", name: "Divider", md: "---" },
+  {
+    id: "page-break",
+    name: "Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)",
+    md: 'Before the break.\n\n<!-- pagebreak -->\nAfter it, on a new page.\n\n<div style="page-break-after: always"></div>\n\nAnd another.',
+  },
   { id: "key-value", name: "Key: Value line", md: "**Wi-Fi password:** correct-horse-battery" },
   { id: "mention", name: "Mention", md: "Ask @[QA · Ada] at @[QA · Ada].email." },
   { id: "wiki-link", name: "Wiki link", md: "Ask [[QA · Ada]], or [[QA · Ada|her]]." },
@@ -140,6 +145,8 @@ const CONTAINERS = [
 /** Some things are only drawn at the top level and in cards; elsewhere they stay Markdown. */
 const DRAWN = new Set(["diagram", "diagram-sized", "timing", "math", "table", "table-formulas", "spreadsheet", "spreadsheet-named", "image", "drawing", "file", "audio", "video", "missing-file"]);
 const DRAWN_ONLY_IN = new Set(["top-level", "card", "callout", "callout-none", "nested"]);
+/** And some only at the top level: a page break splits the page, not a card. */
+const TOP_LEVEL_ONLY = new Set(["page-break"]);
 
 const notes = [];
 
@@ -409,7 +416,7 @@ note(
 
 CONTAINERS.forEach((container, c) => {
   const sections = ELEMENTS.map((element, i) => {
-    const plain = DRAWN.has(element.id) && !DRAWN_ONLY_IN.has(container.id) ? " (stays Markdown here)" : "";
+    const plain = (DRAWN.has(element.id) && !DRAWN_ONLY_IN.has(container.id)) || (TOP_LEVEL_ONLY.has(element.id) && container.id !== "top-level") ? " (stays Markdown here)" : "";
     return `${label(i + 1, `${element.name} ${container.name}${plain}`)}\n\n${container.wrap(element.md)}`;
   });
   note(

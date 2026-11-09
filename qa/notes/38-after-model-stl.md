@@ -1593,7 +1593,64 @@ endsolid pyramid
 ```
 ---
 
-#### 30. 3D model (stl block), then Key: Value line
+#### 30. 3D model (stl block), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+```stl
+solid pyramid
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 10 10 0
+vertex 10 0 0
+endloop
+endfacet
+facet normal 0 0 -1
+outer loop
+vertex 0 0 0
+vertex 0 10 0
+vertex 10 10 0
+endloop
+endfacet
+facet normal 0 -1 1
+outer loop
+vertex 0 0 0
+vertex 10 0 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 1 0 1
+outer loop
+vertex 10 0 0
+vertex 10 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal 0 1 1
+outer loop
+vertex 10 10 0
+vertex 0 10 0
+vertex 5 5 8
+endloop
+endfacet
+facet normal -1 0 1
+outer loop
+vertex 0 10 0
+vertex 0 0 0
+vertex 5 5 8
+endloop
+endfacet
+endsolid pyramid
+```
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. 3D model (stl block), then Key: Value line
 
 ```stl
 solid pyramid
@@ -1643,7 +1700,7 @@ endsolid pyramid
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. 3D model (stl block), then Mention
+#### 32. 3D model (stl block), then Mention
 
 ```stl
 solid pyramid
@@ -1693,7 +1750,7 @@ endsolid pyramid
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. 3D model (stl block), then Wiki link
+#### 33. 3D model (stl block), then Wiki link
 
 ```stl
 solid pyramid
@@ -1743,7 +1800,7 @@ endsolid pyramid
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. 3D model (stl block), then Symbols
+#### 34. 3D model (stl block), then Symbols
 
 ```stl
 solid pyramid
@@ -1793,7 +1850,7 @@ endsolid pyramid
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. 3D model (stl block), then GitHub links
+#### 35. 3D model (stl block), then GitHub links
 
 ```stl
 solid pyramid
@@ -1843,7 +1900,7 @@ endsolid pyramid
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. 3D model (stl block), then arXiv links
+#### 36. 3D model (stl block), then arXiv links
 
 ```stl
 solid pyramid
@@ -1893,7 +1950,7 @@ endsolid pyramid
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. 3D model (stl block), then Image
+#### 37. 3D model (stl block), then Image
 
 ```stl
 solid pyramid
@@ -1943,7 +2000,7 @@ endsolid pyramid
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 37. 3D model (stl block), then Drawing
+#### 38. 3D model (stl block), then Drawing
 
 ```stl
 solid pyramid
@@ -1993,7 +2050,7 @@ endsolid pyramid
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. 3D model (stl block), then File
+#### 39. 3D model (stl block), then File
 
 ```stl
 solid pyramid
@@ -2043,7 +2100,7 @@ endsolid pyramid
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 39. 3D model (stl block), then Attached 3D model (STL)
+#### 40. 3D model (stl block), then Attached 3D model (STL)
 
 ```stl
 solid pyramid
@@ -2093,7 +2150,7 @@ endsolid pyramid
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. 3D model (stl block), then Terminal recording (.cast file)
+#### 41. 3D model (stl block), then Terminal recording (.cast file)
 
 ```stl
 solid pyramid
@@ -2143,7 +2200,7 @@ endsolid pyramid
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. 3D model (stl block), then Audio
+#### 42. 3D model (stl block), then Audio
 
 ```stl
 solid pyramid
@@ -2193,7 +2250,7 @@ endsolid pyramid
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. 3D model (stl block), then Video
+#### 43. 3D model (stl block), then Video
 
 ```stl
 solid pyramid
@@ -2243,7 +2300,7 @@ endsolid pyramid
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. 3D model (stl block), then Missing file
+#### 44. 3D model (stl block), then Missing file
 
 ```stl
 solid pyramid
@@ -2293,7 +2350,7 @@ endsolid pyramid
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. 3D model (stl block), then Card
+#### 45. 3D model (stl block), then Card
 
 ```stl
 solid pyramid
@@ -2345,7 +2402,7 @@ endsolid pyramid
 Text in a card.
 :::
 
-#### 45. 3D model (stl block), then Callout (info)
+#### 46. 3D model (stl block), then Callout (info)
 
 ```stl
 solid pyramid
@@ -2397,7 +2454,7 @@ endsolid pyramid
 Text in an info callout.
 :::
 
-#### 46. 3D model (stl block), then Callout (warning, chosen icon)
+#### 47. 3D model (stl block), then Callout (warning, chosen icon)
 
 ```stl
 solid pyramid
@@ -2449,7 +2506,7 @@ endsolid pyramid
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. 3D model (stl block), then Callout (decision, no icon)
+#### 48. 3D model (stl block), then Callout (decision, no icon)
 
 ```stl
 solid pyramid

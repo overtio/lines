@@ -346,105 +346,119 @@ Total, =costs!B2*2
   - [ ] Nested open todo
 ---
 
-#### 30. Todo list, then Key: Value line
+#### 30. Todo list, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Todo list, then Key: Value line
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Todo list, then Mention
+#### 32. Todo list, then Mention
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Todo list, then Wiki link
+#### 33. Todo list, then Wiki link
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Todo list, then Symbols
+#### 34. Todo list, then Symbols
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Todo list, then GitHub links
+#### 35. Todo list, then GitHub links
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Todo list, then arXiv links
+#### 36. Todo list, then arXiv links
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Todo list, then Image
+#### 37. Todo list, then Image
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample picture](attachment:photo.png)
 
-#### 37. Todo list, then Drawing
+#### 38. Todo list, then Drawing
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Todo list, then File
+#### 39. Todo list, then File
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Todo list, then Attached 3D model (STL)
+#### 40. Todo list, then Attached 3D model (STL)
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Todo list, then Terminal recording (.cast file)
+#### 41. Todo list, then Terminal recording (.cast file)
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Todo list, then Audio
+#### 42. Todo list, then Audio
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Todo list, then Video
+#### 43. Todo list, then Video
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Todo list, then Missing file
+#### 44. Todo list, then Missing file
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Todo list, then Card
+#### 45. Todo list, then Card
 
 - [x] Done todo
 - [ ] Open todo
@@ -453,7 +467,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 45. Todo list, then Callout (info)
+#### 46. Todo list, then Callout (info)
 
 - [x] Done todo
 - [ ] Open todo
@@ -462,7 +476,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 46. Todo list, then Callout (warning, chosen icon)
+#### 47. Todo list, then Callout (warning, chosen icon)
 
 - [x] Done todo
 - [ ] Open todo
@@ -471,7 +485,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Todo list, then Callout (decision, no icon)
+#### 48. Todo list, then Callout (decision, no icon)
 
 - [x] Done todo
 - [ ] Open todo

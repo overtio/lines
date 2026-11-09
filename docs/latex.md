@@ -49,6 +49,7 @@ The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.
 | `\%`, `\&`, `\$`, `\#`, `\_`, `\{`, `\}`, `~`, `--`, `---`, ` `` `, `''`, `\ldots`, `\LaTeX` | The characters they stand for |
 | Accents and letters: `\"o`, `\'{e}`, `` \`a ``, `\^o`, `\~n`, `\c{c}`, `\v{s}`, `\L`, `\o`, `\ss`, `\ae`… | ö, é, à, ô, ñ, ç, š, Ł, ø, ß, æ |
 | `\label{…}` | Hidden (LaTeX prints nothing for it); on a line of its own, the line shrinks away |
+| `\newpage`, `\clearpage`, `\pagebreak` on a line of their own | A page break, as in a Markdown note ([linedown.md](linedown.md#page-breaks)): a dashed line, or a gap between two pages over a backdrop; the PDF goes on to a new page |
 | `\\` | Hidden (a line break) |
 | `% comment` | Faint and italic |
 | `% mark green: cite`, at a line's end | A bar in the margin beside the line, the comment hidden but while it's edited ([linedown.md](linedown.md#line-marks)); ⌘⇧M marks the lines selected |

@@ -375,7 +375,22 @@ flowchart LR
 ```
 ---
 
-#### 30. Diagram (240 px wide), then Key: Value line
+#### 30. Diagram (240 px wide), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Diagram (240 px wide), then Key: Value line
 
 ```mermaid |240
 flowchart LR
@@ -383,7 +398,7 @@ flowchart LR
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Diagram (240 px wide), then Mention
+#### 32. Diagram (240 px wide), then Mention
 
 ```mermaid |240
 flowchart LR
@@ -391,7 +406,7 @@ flowchart LR
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Diagram (240 px wide), then Wiki link
+#### 33. Diagram (240 px wide), then Wiki link
 
 ```mermaid |240
 flowchart LR
@@ -399,7 +414,7 @@ flowchart LR
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Diagram (240 px wide), then Symbols
+#### 34. Diagram (240 px wide), then Symbols
 
 ```mermaid |240
 flowchart LR
@@ -407,7 +422,7 @@ flowchart LR
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Diagram (240 px wide), then GitHub links
+#### 35. Diagram (240 px wide), then GitHub links
 
 ```mermaid |240
 flowchart LR
@@ -415,7 +430,7 @@ flowchart LR
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Diagram (240 px wide), then arXiv links
+#### 36. Diagram (240 px wide), then arXiv links
 
 ```mermaid |240
 flowchart LR
@@ -423,7 +438,7 @@ flowchart LR
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Diagram (240 px wide), then Image
+#### 37. Diagram (240 px wide), then Image
 
 ```mermaid |240
 flowchart LR
@@ -431,7 +446,7 @@ flowchart LR
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 37. Diagram (240 px wide), then Drawing
+#### 38. Diagram (240 px wide), then Drawing
 
 ```mermaid |240
 flowchart LR
@@ -439,7 +454,7 @@ flowchart LR
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Diagram (240 px wide), then File
+#### 39. Diagram (240 px wide), then File
 
 ```mermaid |240
 flowchart LR
@@ -447,7 +462,7 @@ flowchart LR
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Diagram (240 px wide), then Attached 3D model (STL)
+#### 40. Diagram (240 px wide), then Attached 3D model (STL)
 
 ```mermaid |240
 flowchart LR
@@ -455,7 +470,7 @@ flowchart LR
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Diagram (240 px wide), then Terminal recording (.cast file)
+#### 41. Diagram (240 px wide), then Terminal recording (.cast file)
 
 ```mermaid |240
 flowchart LR
@@ -463,7 +478,7 @@ flowchart LR
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Diagram (240 px wide), then Audio
+#### 42. Diagram (240 px wide), then Audio
 
 ```mermaid |240
 flowchart LR
@@ -471,7 +486,7 @@ flowchart LR
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Diagram (240 px wide), then Video
+#### 43. Diagram (240 px wide), then Video
 
 ```mermaid |240
 flowchart LR
@@ -479,7 +494,7 @@ flowchart LR
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Diagram (240 px wide), then Missing file
+#### 44. Diagram (240 px wide), then Missing file
 
 ```mermaid |240
 flowchart LR
@@ -487,7 +502,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Diagram (240 px wide), then Card
+#### 45. Diagram (240 px wide), then Card
 
 ```mermaid |240
 flowchart LR
@@ -497,7 +512,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 45. Diagram (240 px wide), then Callout (info)
+#### 46. Diagram (240 px wide), then Callout (info)
 
 ```mermaid |240
 flowchart LR
@@ -507,7 +522,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 46. Diagram (240 px wide), then Callout (warning, chosen icon)
+#### 47. Diagram (240 px wide), then Callout (warning, chosen icon)
 
 ```mermaid |240
 flowchart LR
@@ -517,7 +532,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Diagram (240 px wide), then Callout (decision, no icon)
+#### 48. Diagram (240 px wide), then Callout (decision, no icon)
 
 ```mermaid |240
 flowchart LR
