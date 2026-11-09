@@ -3,8 +3,10 @@
   import { t } from "../../i18n/index.svelte";
   import { openExternal } from "../../platform";
   import { REPO, VERSION as version } from "../../release";
+  import { updates } from "../../updates.svelte";
   import Button from "../ui/Button.svelte";
   import FieldGroup from "../ui/FieldGroup.svelte";
+  import UpdatesGroup from "./UpdatesGroup.svelte";
 
   /** The open source projects lines is built on; every license is in the full notices below. */
   const CREDITS = [
@@ -60,6 +62,8 @@
     <p class="m-0 mt-1 text-sm text-muted">{t("settings.tagline")}</p>
   </div>
 </section>
+
+{#if updates.supported}<UpdatesGroup />{/if}
 
 <FieldGroup>
   <div class="px-4 py-3">

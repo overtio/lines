@@ -279,6 +279,31 @@ export default {
   "settings.notices": "Third-party licenses",
   "settings.loading": "Loading…",
   "settings.noticesFailed": "The notices couldn’t be loaded.",
+  // About → Updates, in the desktop apps. {version} is a version's number, "0.4.0".
+  "settings.updates": "Updates",
+  "settings.updatesIdle": "Not checked yet.",
+  "settings.updatesChecking": "Checking for updates…",
+  "settings.updatesUpToDate": "lines is up to date.",
+  "settings.updatesAvailable": "Version {version} is out.",
+  // {date} is a day, "November 15".
+  "settings.updatesWaiting": "Version {version} is out. lines updates to it on its own from {date}.",
+  "settings.updatesDownloading": "Downloading version {version}…",
+  // {percent} is how much has come, "40%".
+  "settings.updatesDownloadingPercent": "Downloading version {version}… {percent}",
+  "settings.updatesReady": "Version {version} is ready. It’s installed when you quit lines.",
+  "settings.updatesFailed": "Couldn’t update lines.",
+  "settings.checkNow": "Check now",
+  "settings.installNow": "Install and restart",
+  "settings.restartToUpdate": "Restart to update",
+  "settings.tryAgain": "Try again",
+  "settings.autoUpdate": "Update automatically",
+  "settings.autoUpdateNote": "lines downloads new versions in the background and installs them when you quit it. Off, it only looks when you check.",
+  "settings.updateWait": "Wait before updating",
+  "settings.updateWaitNote": "lines only updates to a version that’s been out this long, which gives time for problems in it to be found and fixed.",
+  "settings.updateWaitNone": "Don’t wait",
+  "settings.updateWaitDays": "{count, plural, one {# day} other {# days}}",
+  "settings.updateWaitWeeks": "{count, plural, one {# week} other {# weeks}}",
+  "settings.updateWaitMonth": "1 month",
 
   // Data: export.
   "settings.export": "Export",

@@ -6,14 +6,21 @@ mod export;
 mod folder_sync;
 mod lock;
 mod sf_symbols;
+#[cfg(desktop)]
+mod updates;
 mod window_style;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  tauri::Builder::default()
+  let builder = tauri::Builder::default()
     .plugin(tauri_plugin_opener::init())
     .plugin(tauri_plugin_http::init())
-    .manage(lock::Unlocked::default())
+    .manage(lock::Unlocked::default());
+  #[cfg(desktop)]
+  let builder = builder
+    .plugin(tauri_plugin_updater::Builder::new().build())
+    .manage(updates::Updates::default());
+  builder
     .invoke_handler(tauri::generate_handler![
       attachments::open_attachment,
       devtools::toggle_devtools,
@@ -34,6 +41,12 @@ pub fn run() {
       lock::touch_id_keep,
       lock::touch_id_forget,
       lock::touch_id_unlock,
+      #[cfg(desktop)]
+      updates::updates_status,
+      #[cfg(desktop)]
+      updates::updates_check,
+      #[cfg(desktop)]
+      updates::updates_restart,
       window_style::set_window_buttons,
       window_style::set_window_effects,
       window_style::set_follows_desktops,
@@ -62,6 +75,8 @@ pub fn run() {
       }
       #[cfg(all(debug_assertions, target_os = "macos"))]
       add_devtools_menu_item(app.handle())?;
+      #[cfg(desktop)]
+      updates::clean_up(app.handle());
       if cfg!(debug_assertions) {
         app.handle().plugin(
           tauri_plugin_log::Builder::default()
@@ -71,8 +86,16 @@ pub fn run() {
       }
       Ok(())
     })
-    .run(tauri::generate_context!())
-    .expect("error while building tauri application");
+    .build(tauri::generate_context!())
+    .expect("error while building tauri application")
+    .run(|app, event| {
+      #[cfg(desktop)]
+      if let tauri::RunEvent::Exit = event {
+        updates::on_exit(app);
+      }
+      #[cfg(mobile)]
+      let _ = (app, event);
+    });
 }
 
 /// View → Developer Tools (F12) in debug builds of the Mac app.

@@ -27,5 +27,6 @@ export default {
   "sidebar.alpha": "Alpha {version}",
   "sidebar.alphaHint": "lines est en version alpha : une version précoce qui change souvent et peut comporter des bugs. Ne vous y fiez pas encore pour un travail important, et exportez vos notes de temps en temps.",
   "sidebar.source": "Code source sur GitHub",
+  "sidebar.updateHint": "Redémarrer pour passer à la version {version}",
   "sidebar.settings": "Réglages",
 } satisfies Translation<typeof en>;

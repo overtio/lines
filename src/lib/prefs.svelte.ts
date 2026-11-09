@@ -179,12 +179,19 @@ interface Stored {
   /** Spreadsheets' first row, and first column, stand out as headers. */
   sheetHeaderRow: boolean;
   sheetHeaderColumn: boolean;
+  /** The desktop apps update themselves (updates.svelte.ts), to a version that's been out `updateWait` days. */
+  autoUpdate: boolean;
+  updateWait: UpdateWait;
 }
 
 export const SHEET_STATS = ["sum", "average", "min", "max", "count"] as const;
 export type SheetStat = (typeof SHEET_STATS)[number];
 
 export const OPACITY = { min: 0.3, max: 1, step: 0.01 };
+
+/** How many days a new version may have to be out before lines updates to it (Settings → About → Updates). */
+export const UPDATE_WAITS = [0, 1, 3, 7, 14, 30] as const;
+export type UpdateWait = (typeof UPDATE_WAITS)[number];
 
 /** Window opacity and blur only exist where windows can be see-through: the Mac app. */
 export const windowLookAvailable = isMacApp;
@@ -248,6 +255,8 @@ const DEFAULTS: Stored = {
   sheetHeadings: true,
   sheetHeaderRow: false,
   sheetHeaderColumn: false,
+  autoUpdate: true,
+  updateWait: 7,
   links: {
     web: { click: "edit", modClick: "open", modShiftClick: "copy" },
     tag: { click: "edit", modClick: "open", modShiftClick: "open" },
@@ -345,6 +354,8 @@ function read(json?: string): Stored {
     sheetHeadings: flag(raw.sheetHeadings, DEFAULTS.sheetHeadings),
     sheetHeaderRow: flag(raw.sheetHeaderRow, DEFAULTS.sheetHeaderRow),
     sheetHeaderColumn: flag(raw.sheetHeaderColumn, DEFAULTS.sheetHeaderColumn),
+    autoUpdate: flag(raw.autoUpdate, DEFAULTS.autoUpdate),
+    updateWait: oneOf(raw.updateWait, UPDATE_WAITS, DEFAULTS.updateWait),
   };
 }
 
@@ -392,6 +403,8 @@ class Prefs {
   sheetHeadings = $state(this.#initial.sheetHeadings);
   sheetHeaderRow = $state(this.#initial.sheetHeaderRow);
   sheetHeaderColumn = $state(this.#initial.sheetHeaderColumn);
+  autoUpdate = $state(this.#initial.autoUpdate);
+  updateWait = $state(this.#initial.updateWait);
   /** Settings → Editor → Links: what a click, ⌘-click and ⌘⇧-click on each kind of link does. */
   links = $state(this.#initial.links);
   #markWindowReady!: () => void;
@@ -538,6 +551,8 @@ class Prefs {
       sheetHeadings: this.sheetHeadings,
       sheetHeaderRow: this.sheetHeaderRow,
       sheetHeaderColumn: this.sheetHeaderColumn,
+      autoUpdate: this.autoUpdate,
+      updateWait: this.updateWait,
     };
     return JSON.stringify(stored);
   }
@@ -596,6 +611,8 @@ class Prefs {
     this.sheetHeadings = next.sheetHeadings;
     this.sheetHeaderRow = next.sheetHeaderRow;
     this.sheetHeaderColumn = next.sheetHeaderColumn;
+    this.autoUpdate = next.autoUpdate;
+    this.updateWait = next.updateWait;
     if (JSON.stringify(this.links) !== JSON.stringify(next.links)) this.links = next.links;
     // As already saved, so taking it up here doesn't send it back out.
     this.#saved = this.#serialize();

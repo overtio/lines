@@ -256,6 +256,14 @@ What isn't done yet is in [secrets.md](secrets.md#not-yet).
 - The welcome note, the feature tour and the examples are English. A note's text isn't translated, and the date `/date` writes is in the app's language.
 - Changing the language starts lines again.
 
+## Updates
+
+- Tried on a Mac, with test builds and a stand-in for GitHub: a release that had waited long enough was downloaded and installed as the app quit, and the new version opened. Restart to update, and updating on Windows and Linux, haven't been tried yet; the first real release with updates will be the first test of its packages.
+- The apps aren't signed, so after an update macOS may ask for the login password once more to read lines' Keychain item (app lock, Touch ID), as after reinstalling by hand.
+- A `.deb` or `.rpm` install asks for a password when it updates, and the Windows MSI for permission; the AppImage and the `-setup.exe` install don't.
+- Once an update is downloaded it's the one installed: a newer one found before quitting waits for the next run.
+- There's no Check for Updates… in the Mac's app menu yet; it's in Settings → About.
+
 ## End-to-end encryption (sync)
 
 - Still visible to the storage provider: how many notes and attachments there are, their sizes, when they change, and note ids (random).

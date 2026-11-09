@@ -20,6 +20,7 @@ import { announce, onAnnounce, windowLabel } from "./lib/windows/channel";
 import { canFloat, floatingOpen, restoreFloating } from "./lib/windows/floating";
 import { closeSettings, forwardToMain, initialSection, isSettingsWindow, serveSettings } from "./lib/windows/settings.svelte";
 import { ui } from "./lib/ui.svelte";
+import { updates } from "./lib/updates.svelte";
 
 if (isMacApp) document.documentElement.dataset.platform = "mac-app";
 
@@ -42,7 +43,7 @@ if (isTauri) {
   });
 }
 
-if (import.meta.env.DEV) Object.assign(window, { lines: { notes, sync, lock, lockedNotes, noteKeys, plugins } });
+if (import.meta.env.DEV) Object.assign(window, { lines: { notes, sync, lock, lockedNotes, noteKeys, plugins, updates } });
 // The benchmarks' helpers (scripts/bench.mjs), only in builds made for them.
 if (import.meta.env.MODE === "bench") await import("./bench/harness");
 
@@ -120,6 +121,7 @@ async function start() {
   } else {
     mount(App, { target });
     if (lock.enabled) lock.watch();
+    void updates.watch();
   }
 
   await notes.load();

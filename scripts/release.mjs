@@ -7,12 +7,15 @@
 //                           CHANGELOG.md; prints `version=…` (for GitHub Actions), or nothing
 //                           when nothing since the last release calls for one
 //   notes <version>         that version's notes from CHANGELOG.md, for its GitHub release
+//   manifest <version> <dir>
+//                           the update manifest (latest.json) the apps check for that version,
+//                           from its packages' signatures (the .sig files) in <dir>
 //
 // The version is in package.json (the app's About shows it), src-tauri/tauri.conf.json,
 // src-tauri/Cargo.toml and src-tauri/Cargo.lock; releases are tagged `v0.2.0`.
 
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -153,7 +156,35 @@ function notesOf(version) {
   return (end < 0 ? body : body.slice(0, end)).trim();
 }
 
-const [command, arg] = process.argv.slice(2);
+/**
+ * The installs each update package is for, by how its name ends: the apps look for
+ * `{os}-{arch}-{installer}` in the manifest (src-tauri/src/updates.rs). One Mac app is for both.
+ */
+const PACKAGES = [
+  [".app.tar.gz", () => ["darwin-aarch64-app", "darwin-x86_64-app"]],
+  ["-setup.exe", (arch) => [`windows-${arch}-nsis`]],
+  [".msi", (arch) => [`windows-${arch}-msi`]],
+  [".AppImage", (arch) => [`linux-${arch}-appimage`]],
+  [".deb", (arch) => [`linux-${arch}-deb`]],
+  [".rpm", (arch) => [`linux-${arch}-rpm`]],
+];
+
+/** The update manifest for `version`: each package signed in `dir`, where to download it, and its signature. */
+function manifest(version, dir) {
+  const platforms = {};
+  for (const name of readdirSync(dir).filter((name) => name.endsWith(".sig"))) {
+    const file = name.slice(0, -".sig".length);
+    const targets = PACKAGES.find(([end]) => file.endsWith(end))?.[1];
+    if (!targets) continue;
+    const arch = /aarch64|arm64/.test(file) ? "aarch64" : "x86_64";
+    const url = `${REPO}/releases/download/v${version}/${encodeURIComponent(file)}`;
+    for (const target of targets(arch)) platforms[target] = { url, signature: readFileSync(join(dir, name), "utf8").trim() };
+  }
+  if (!Object.keys(platforms).length) throw new Error(`No signed update packages in ${dir}`);
+  return { version, pub_date: new Date().toISOString(), platforms };
+}
+
+const [command, arg, arg2] = process.argv.slice(2);
 if (command === "check-title") {
   const problem = titleProblem(arg ?? "");
   if (problem) {
@@ -173,6 +204,8 @@ if (command === "check-title") {
   }
 } else if (command === "notes") {
   console.log(notesOf(arg));
+} else if (command === "manifest") {
+  console.log(JSON.stringify(manifest(arg, arg2), null, 2));
 } else {
   console.error(`Unknown command "${command}". See the top of scripts/release.mjs.`);
   process.exit(1);

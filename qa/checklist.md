@@ -398,6 +398,8 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] ⌘+ and ⌘− (Ctrl+ and Ctrl− on Windows and Linux; ⌘= and the keypad's + and − too) make notes' text a pixel bigger or smaller, from 12 to 28 px, in the main window and floating notes alike, and Settings → Typography → Text size follows; ⌘0 goes back to 17 px; the page itself doesn't zoom (web); screen readers hear the new size; in the drawing editor the keys zoom the drawing instead
 - [ ] Editor → Symbols: turning off "in text" or "in code" shows the characters there at once (tables too), in every window, and is remembered; the other keeps its symbols
 - [ ] About: version, Source on GitHub, Report an issue, license, credits, third-party licenses load
+- [ ] [Desktop, installed from a release] About → Updates: Check now says whether lines is up to date (a screen reader hears it); with a newer version out, the row says which and the day it updates on its own, with Install and restart, which downloads it (percent shown) and restarts into it; turning Update automatically off hides Wait before updating, and lines then looks only when asked; not shown on the web, on phones, or in a development build
+- [ ] [Desktop] Once a version that's been out as long as Wait before updating (a week unless changed) is downloaded, About says it's ready with Restart to update, and the sidebar shows a ↻ button beside the version (its tooltip, and what a screen reader says, names the version); either restarts into it, keeping what's typed; quitting instead (⌘Q, or closing the last window) installs it, and lines opens as the new version next time
 
 ## 13a. Plugins
 

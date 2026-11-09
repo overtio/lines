@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from "../icons/Icon.svelte";
   import type { IconName } from "../icons/icons";
   import { formatDate } from "../format";
   import { t } from "../i18n/index.svelte";
@@ -13,6 +14,7 @@
   import { sync } from "../sync/engine.svelte";
   import type { Filter } from "../notes/types";
   import { ui } from "../ui.svelte";
+  import { updates } from "../updates.svelte";
   import { openSettings } from "../windows/settings.svelte";
   import IconButton from "./ui/IconButton.svelte";
   import SidebarRow from "./SidebarRow.svelte";
@@ -200,6 +202,18 @@
     >
       {t("sidebar.alpha", { version: VERSION })}<span class="sr-only">. {t("sidebar.alphaHint")}</span>
     </span>
+    <!-- Only once a newer version is downloaded (it's also installed when lines quits). -->
+    {#if updates.status.kind === "ready"}
+      {@const hint = t("sidebar.updateHint", { version: updates.status.version })}
+      <button
+        class="touch-target ml-auto grid size-7 place-items-center rounded-md text-accent transition-colors hover:bg-hover"
+        onclick={() => void updates.restart()}
+        aria-label={hint}
+        title={hint}
+      >
+        <Icon name="refresh" size={15} />
+      </button>
+    {/if}
     <button
       class="touch-target grid size-7 place-items-center rounded-md text-faint transition-colors hover:bg-hover hover:text-fg [&_svg]:size-4"
       onclick={() => openExternal(REPO)}
