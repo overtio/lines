@@ -23,6 +23,8 @@ export type WindowMessage =
   | { type: "plugins"; choices: Record<string, boolean> }
   /** A picture chosen for the backdrop (lib/paper.svelte.ts), or none: carried, as it's too big to read back in time. */
   | { type: "backdrop-image"; image: string | null }
+  /** A sound pack was added or removed (sounds/packs.svelte.ts). */
+  | { type: "sound-packs" }
   /** A floating note's window opened or closed. */
   | { type: "floating"; id: string; open: boolean }
   /** The app lock locked lines, or was turned on or off: save, and start over. */

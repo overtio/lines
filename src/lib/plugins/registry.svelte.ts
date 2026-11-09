@@ -2,7 +2,8 @@ import { builtIn } from "../../plugins";
 import { customThemes } from "../themes/custom.svelte";
 import { announce, onAnnounce } from "../windows/channel";
 import { plainTextLanguage } from "./plainText";
-import type { AppStyle, Contributions, EmbedLink, IconSet, NoteLanguage, Plugin, Theme } from "./types";
+import { soundPacks } from "../sounds/packs.svelte";
+import type { AppStyle, Contributions, EmbedLink, IconSet, KeyboardSound, NoteLanguage, Plugin, Theme } from "./types";
 
 /*
  * The plugins lines has, which of them are on, and what the ones on add. Everything that asks for a
@@ -73,6 +74,8 @@ class Plugins {
   readonly papers = $derived(this.#from("papers"));
   readonly paperStyles = $derived(this.#from("paperStyles"));
   readonly markerSources = $derived(this.#from("markers"));
+  /** Keyboards to hear as you type: the plugins', then your sound packs (sounds/packs.svelte.ts). */
+  readonly keyboardSounds = $derived([...this.#from("keyboardSounds"), ...soundPacks.keyboards]);
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).
@@ -148,6 +151,11 @@ class Plugins {
   /** The theme `id`, or lines' own while its plugin is off. */
   theme(id: string): Theme {
     return this.themes.find((theme) => theme.id === id) ?? this.themes.find((theme) => theme.id === DEFAULT_THEME)!;
+  }
+
+  /** The keyboard `id` to hear as you type, or the first there is while its plugin is off or its pack is gone. */
+  keyboardSound(id: string): KeyboardSound | undefined {
+    return this.keyboardSounds.find((keyboard) => keyboard.id === id) ?? this.keyboardSounds[0];
   }
 
   /** The style `id` (Settings → Theme → Style), or lines' own while its plugin is off. */

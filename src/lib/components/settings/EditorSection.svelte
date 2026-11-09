@@ -9,6 +9,7 @@
   import Segmented from "../ui/Segmented.svelte";
   import Select from "../ui/Select.svelte";
   import Switch from "../ui/Switch.svelte";
+  import TypingSounds from "./TypingSounds.svelte";
 
   const MODE_NAMES: Record<MarkdownMode, [name: MessageKey, note: MessageKey]> = {
     source: ["settings.markdownSource", "settings.markdownSourceNote"],
@@ -75,6 +76,8 @@
     <Switch label={t("settings.spellcheck")} checked={prefs.spellcheck} onchange={(on) => (prefs.spellcheck = on)} />
   </FieldRow>
 </FieldGroup>
+
+<TypingSounds />
 
 <FieldGroup title={t("settings.symbols")} note={t("settings.symbolsNote")}>
   <FieldRow label={t("settings.symbolsInText")}>

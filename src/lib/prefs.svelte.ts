@@ -208,6 +208,10 @@ interface Stored {
   dragBlocks: boolean;
   /** The system checks notes' spelling, and corrects it as you type (code and math never). */
   spellcheck: boolean;
+  /** A keyboard's sound as you type (sounds/typing.svelte.ts): on, which (a plugin's or a sound pack's, by id), and how loud. */
+  typingSounds: boolean;
+  keyboardSound: string;
+  typingVolume: number;
   /** Headings' color, and the color of your own, kept while another is chosen (themes/show.svelte.ts). */
   headingColor: HeadingColor;
   headingCustomColor: string;
@@ -238,6 +242,8 @@ export const SHEET_STATS = ["sum", "average", "min", "max", "count"] as const;
 export type SheetStat = (typeof SHEET_STATS)[number];
 
 export const OPACITY = { min: 0.3, max: 1, step: 0.01 };
+/** How loud typing sounds are, 5 to 100%. */
+export const TYPING_VOLUME = { min: 0.05, max: 1, step: 0.05 };
 /** A paper pattern's own size, in px, when it doesn't follow the text. */
 export const PAPER_SIZE = { min: 8, max: 64, step: 1 };
 /** How strongly a paper pattern's lines are drawn over the page (dots, being small, a few times more). */
@@ -318,6 +324,9 @@ const DEFAULTS: Stored = {
   markdownMode: "live",
   dragBlocks: true,
   spellcheck: true,
+  typingSounds: false,
+  keyboardSound: "creamy",
+  typingVolume: 0.5,
   headingColor: "text",
   headingCustomColor: "#3d7dd8",
   symbolsInText: true,
@@ -438,6 +447,9 @@ function read(json?: string): Stored {
     markdownMode: oneOf(raw.markdownMode, MARKDOWN_MODES, DEFAULTS.markdownMode),
     dragBlocks: flag(raw.dragBlocks, DEFAULTS.dragBlocks),
     spellcheck: flag(raw.spellcheck, DEFAULTS.spellcheck),
+    typingSounds: flag(raw.typingSounds, DEFAULTS.typingSounds),
+    keyboardSound: id(raw.keyboardSound, DEFAULTS.keyboardSound),
+    typingVolume: clamp(raw.typingVolume, TYPING_VOLUME.min, TYPING_VOLUME.max, DEFAULTS.typingVolume),
     headingColor: oneOf(raw.headingColor, HEADING_COLORS, DEFAULTS.headingColor),
     headingCustomColor: color(raw.headingCustomColor, DEFAULTS.headingCustomColor),
     symbolsInText: flag(raw.symbolsInText, DEFAULTS.symbolsInText),
@@ -508,6 +520,9 @@ class Prefs {
   markdownMode = $state(this.#initial.markdownMode);
   dragBlocks = $state(this.#initial.dragBlocks);
   spellcheck = $state(this.#initial.spellcheck);
+  typingSounds = $state(this.#initial.typingSounds);
+  keyboardSound = $state(this.#initial.keyboardSound);
+  typingVolume = $state(this.#initial.typingVolume);
   headingColor = $state(this.#initial.headingColor);
   headingCustomColor = $state(this.#initial.headingCustomColor);
   symbolsInText = $state(this.#initial.symbolsInText);
@@ -679,6 +694,9 @@ class Prefs {
       markdownMode: this.markdownMode,
       dragBlocks: this.dragBlocks,
       spellcheck: this.spellcheck,
+      typingSounds: this.typingSounds,
+      keyboardSound: this.keyboardSound,
+      typingVolume: this.typingVolume,
       headingColor: this.headingColor,
       headingCustomColor: this.headingCustomColor,
       symbolsInText: this.symbolsInText,
@@ -760,6 +778,9 @@ class Prefs {
     this.markdownMode = next.markdownMode;
     this.dragBlocks = next.dragBlocks;
     this.spellcheck = next.spellcheck;
+    this.typingSounds = next.typingSounds;
+    this.keyboardSound = next.keyboardSound;
+    this.typingVolume = next.typingVolume;
     this.headingColor = next.headingColor;
     this.headingCustomColor = next.headingCustomColor;
     this.symbolsInText = next.symbolsInText;

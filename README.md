@@ -109,6 +109,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 - **Paper to write on.** Ruled lines that every line of text sits on, and dots, squares or graph paper with a row of cells for each line (or any size you like), isometric paper, in your theme's colors or any color, as faint or strong as you like, and a grain or linen texture (Settings → Paper).
 - **A backdrop behind the page.** Put a soft gradient, a color or a picture of your own behind your notes, which then sit on it as pages, solid or frosted like glass (Settings → Paper → Backdrop).
 - **Fonts, text size, note width and spacing**, and headings in the accent or a color of your own, with a live preview; <kbd>⌘+</kbd> and <kbd>⌘−</kbd> size the text as you read. Notes can be narrow, medium, wide, any width between, or fill the window.
+- **Typing sounds.** Hear a keyboard as you type: creamy or clacky linears, tactile, clicky, Topre, or a typewriter that rings its bell at Return. Or add a recorded one: any [Mechvibes](https://mechvibes.com) sound pack, from a .zip or its folder. Off to begin with.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
 - **Fits any screen**: three columns on a desktop, a drawer on a tablet, a stack on a phone. Drag the columns to resize them.
 - **Your layout.** Put the sidebar and the note list on the left or the right, each its own way, and turn on tabs for the notes you open, as in a code editor (Settings → Layout). Scroll bars can be turned off everywhere.
@@ -287,6 +288,7 @@ src/
     code/                    Code notes, a format for each language CodeMirror knows, shown as one (Code) with a choice of language
     changes/                 Marks the lines changed since a note was opened (a line diff, diff.ts)
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
+    keyboards/               Keyboards to hear as you type, made from sound (synth.ts)
     themes/                  The twenty-three themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
     styles/                  Whole looks beyond the colors: Classic, Pixel and Neon, each a CSS file, its fonts and its colors
     lucide/  sf-symbols/     Icon sets
