@@ -2,6 +2,26 @@
 
 What changed in each release of lines. Written by `bun scripts/release.mjs prepare` from the commits since the release before (docs/releasing.md).
 
+## [0.3.2](https://github.com/overtio/lines/compare/v0.3.1...v0.3.2) (2026-11-09)
+
+### Fixes
+
+- **editor:** enter at the start of a list item adds an empty item above, not a heading ([#248](https://github.com/overtio/lines/pull/248))
+- **a11y:** F6 leaves the note while the sidebar is hidden, going through only the panes showing ([#247](https://github.com/overtio/lines/pull/247))
+- **spreadsheets:** a CSV from Excel on Windows imports with its accents and euro signs ([#246](https://github.com/overtio/lines/pull/246))
+- **settings:** under Invert, a custom page color starts as the page was, not white under light text ([#245](https://github.com/overtio/lines/pull/245))
+- **notes:** a code note's #include or 'use strict' first line is its title as written ([#243](https://github.com/overtio/lines/pull/243))
+- **editor:** enter on an empty second item ends the list instead of spacing it out ([#241](https://github.com/overtio/lines/pull/241))
+- **requests:** a Hurl note made under a tag no longer shows the tag as its first entry's title ([#242](https://github.com/overtio/lines/pull/242))
+- **sync:** choose any cloud drive folder on Windows and Linux, and find OneDrive and iCloud there ([#238](https://github.com/overtio/lines/pull/238))
+- **requests:** an XML or text body stops before the comments after it, the next Hurl entry's title ([#239](https://github.com/overtio/lines/pull/239))
+- **settings:** opened on a section in a narrow window, focus is in Settings, not in the note behind ([#237](https://github.com/overtio/lines/pull/237))
+- **requests:** a pasted curl command reads -XPUT, -H'Accept: …' and --data-urlencode as curl does ([#236](https://github.com/overtio/lines/pull/236))
+- **editor:** a code block in a list item or a quote copies, formats and prints all its lines ([#234](https://github.com/overtio/lines/pull/234))
+- **requests:** a curl command copied from Chrome or Firefox keeps its !, accents and control codes ([#233](https://github.com/overtio/lines/pull/233))
+- **spreadsheets:** a cell with a ``` line no longer ends its spreadsheet block early ([#231](https://github.com/overtio/lines/pull/231))
+- **requests:** keep 64-bit ids as written in responses, the requests that use them, and pasted curl ([#230](https://github.com/overtio/lines/pull/230))
+
 ## [0.3.1](https://github.com/overtio/lines/compare/v0.3.0...v0.3.1) (2026-11-09)
 
 ### Fixes
