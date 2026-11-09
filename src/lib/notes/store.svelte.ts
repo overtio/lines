@@ -25,6 +25,9 @@ export interface TagNode {
 }
 
 const SAVE_DELAY = 400;
+/** After a write fails, how long the next waits: twice as long after each failure since, up to RETRY_MAX. */
+const RETRY_DELAY = 1000;
+const RETRY_MAX = 60_000;
 const SEEDED_KEY = "lines.seeded";
 
 export function isBlank(body: string) {
@@ -117,6 +120,9 @@ class NotesStore {
    */
   #pending = new Map<string, number>();
   #saveTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Writes that failed in a row, and when the next may be tried (`performance.now()`). */
+  #failures = 0;
+  #retryAt = 0;
   /** Each note's write under way, so its writes land in order and `flush` can wait for them. */
   #saving = new Map<string, Promise<void>>();
   #changeListeners = new Set<() => void>();
@@ -137,6 +143,8 @@ class NotesStore {
   ready = $state(false);
   /** Why notes couldn't be loaded, if they couldn't. */
   loadError = $state<string | null>(null);
+  /** Why the last write failed, until one works again. Its notes are tried again meanwhile. */
+  saveError = $state<string | null>(null);
   selectedId = $state<string | null>(null);
   /**
    * Notes picked in the list to act on together (⌘-click, ⇧-click, ⌘A), the open one among them.
@@ -788,12 +796,13 @@ class NotesStore {
 
   /**
    * Writes any pending saves now, and waits for those under way (e.g. when the app is backgrounded
-   * or a window closes).
+   * or a window closes). Fails if they couldn't be written.
    */
-  flush(): Promise<void> {
+  async flush(): Promise<void> {
     this.#handOver();
     void this.#save([...this.#pending.keys()]);
-    return Promise.all(this.#saving.values()).then(() => {});
+    await Promise.all(this.#saving.values());
+    if (this.saveError !== null) throw new Error(this.saveError);
   }
 
   /** Changes a note, or several the same way, and saves them after a pause. */
@@ -813,18 +822,24 @@ class NotesStore {
       this.#pending.delete(id);
       this.#pending.set(id, due);
     }
-    if (!this.#saveTimer) this.#saveTimer = setTimeout(() => this.#saveDue(), SAVE_DELAY);
+    this.#saveIn(SAVE_DELAY);
     this.#notify();
+  }
+
+  /** Saves the notes due in `delay` ms, unless a save is set already. */
+  #saveIn(delay: number) {
+    if (!this.#saveTimer) this.#saveTimer = setTimeout(() => this.#saveDue(), delay);
   }
 
   /** Saves the notes that are due, and waits for the next. */
   #saveDue() {
     this.#saveTimer = undefined;
     const now = performance.now();
+    if (now < this.#retryAt) return this.#saveIn(this.#retryAt - now);
     const due: string[] = [];
     for (const [id, at] of this.#pending) {
       if (at > now) {
-        this.#saveTimer = setTimeout(() => this.#saveDue(), at - now);
+        this.#saveIn(at - now);
         break;
       }
       due.push(id);
@@ -853,11 +868,30 @@ class NotesStore {
       if (!sealed.length) return;
       await this.#storage.put(...sealed.map(stored));
       for (const { id } of sealed) void announce({ type: "note", id, local: true });
-    })().finally(() => {
-      for (const id of ids) if (this.#saving.get(id) === saving) this.#saving.delete(id);
-    });
+    })()
+      .then(() => this.#saved(), (error) => this.#failed(ids, error))
+      .finally(() => {
+        for (const id of ids) if (this.#saving.get(id) === saving) this.#saving.delete(id);
+      });
     for (const id of ids) this.#saving.set(id, saving);
     return saving;
+  }
+
+  /** A write worked: saving goes on as usual. */
+  #saved() {
+    this.#failures = 0;
+    this.#retryAt = 0;
+    this.saveError = null;
+  }
+
+  /** A write failed (the disk is full, say): its notes are tried again, after longer each time it fails. */
+  #failed(ids: string[], error: unknown) {
+    console.error("lines: couldn't save notes", error);
+    this.saveError = error instanceof Error ? error.message : String(error);
+    const now = performance.now();
+    this.#retryAt = now + Math.min(RETRY_DELAY * 2 ** this.#failures++, RETRY_MAX);
+    for (const id of ids) if (this.get(id) && !this.#pending.has(id)) this.#pending.set(id, now + SAVE_DELAY);
+    this.#saveIn(this.#retryAt - now);
   }
 
   /** Encrypts an open locked note's Markdown, ready to store and sync. */

@@ -11,6 +11,7 @@
   import NotesPasswordDialog from "./lib/components/NotesPasswordDialog.svelte";
   import PdfPreview from "./lib/components/PdfPreview.svelte";
   import PaneResizer from "./lib/components/PaneResizer.svelte";
+  import SaveError from "./lib/components/SaveError.svelte";
   import SideNote from "./lib/components/SideNote.svelte";
   import SidebarToggle from "./lib/components/SidebarToggle.svelte";
   import TabBar from "./lib/components/TabBar.svelte";
@@ -611,6 +612,7 @@
           <SidebarToggle />
         {/if}
       </header>
+      <SaveError class="mx-3 mb-2" />
 
       {#if selected}
         <!-- The editor stays, out of sight, so other notes keep their undo history and place. -->

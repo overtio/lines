@@ -4,6 +4,7 @@
   import { t } from "../i18n/index.svelte";
   import { isClosed, notes } from "../notes/store.svelte";
   import LockedNoteView from "./LockedNoteView.svelte";
+  import SaveError from "./SaveError.svelte";
   import { prefs } from "../prefs.svelte";
   import { announce } from "../windows/channel";
   import { saveFloatingState } from "../windows/floating";
@@ -137,6 +138,7 @@
   <header class="flex h-9 shrink-0 items-center gap-0.5 pr-1.5 pl-20" data-tauri-drag-region>
     <span class="flex-1 self-stretch" data-tauri-drag-region></span>
   </header>
+  <SaveError class="mx-3 mb-2" />
 
   {#if entry && !entry.note.trashed}
     <div class="min-h-0 flex-1" hidden={closed}>
