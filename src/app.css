@@ -301,6 +301,19 @@
   scrollbar-color: var(--scrollbar) transparent;
 }
 
+/*
+ * Settings → Layout → Scroll bars off: none anywhere, Excalidraw's own included (so not in a layer,
+ * which its styles would outrank). Scrolling still works with a trackpad, wheel, touch or the keys.
+ */
+:root[data-no-scrollbars],
+:root[data-no-scrollbars] * {
+  scrollbar-width: none;
+}
+
+:root[data-no-scrollbars] ::-webkit-scrollbar {
+  display: none;
+}
+
 /* Fingers need bigger targets. */
 @media (pointer: coarse) {
   :root {

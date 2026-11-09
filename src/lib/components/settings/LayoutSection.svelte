@@ -30,4 +30,7 @@
       <Segmented label={t("settings.outlineSide")} options={sides} value={prefs.outlineSide} onselect={(side) => (prefs.outlineSide = side)} />
     </FieldRow>
   {/if}
+  <FieldRow label={t("settings.scrollbars")} note={t("settings.scrollbarsNote")}>
+    <Switch label={t("settings.scrollbars")} checked={prefs.scrollbars} onchange={(on) => (prefs.scrollbars = on)} />
+  </FieldRow>
 </FieldGroup>

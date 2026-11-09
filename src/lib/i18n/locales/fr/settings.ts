@@ -158,6 +158,8 @@ export default {
   "settings.outline": "Afficher un plan à côté de la note",
   "settings.outlineNote": "Un petit trait à côté de la note pour chacun de ses titres, plus foncé pour la partie que vous lisez. Survolez-les pour voir les titres, et choisissez-en un pour y aller. Affiché quand une note a au moins deux titres et qu’il y a de la place à côté.",
   "settings.outlineSide": "Côté du plan",
+  "settings.scrollbars": "Barres de défilement",
+  "settings.scrollbarsNote": "Désactivées, elles disparaissent partout dans lines. Vous pouvez toujours faire défiler avec un trackpad, une molette, au toucher ou au clavier.",
   "settings.mainWindow": "Fenêtre principale",
   "settings.opacity": "Opacité",
   "settings.blur": "Flouter l’arrière-plan",
