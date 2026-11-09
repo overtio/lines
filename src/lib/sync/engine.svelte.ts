@@ -3,7 +3,8 @@ import { fromBase64, lockKey, randomBytes, toBase64, unlockKey } from "../crypto
 import { t } from "../i18n/index.svelte";
 import { readSecret, writeSecret } from "../lock/vault";
 import { attachmentNames, getAttachment, putAttachment, usedAttachments } from "../notes/attachments";
-import { isBlank, notes } from "../notes/store.svelte";
+import { noteKeys } from "../notes/noteKeys.svelte";
+import { isBlank, notes, opened } from "../notes/store.svelte";
 import { syncRecords, type SyncRecord } from "../notes/storage";
 import type { Note } from "../notes/types";
 import { plugins } from "../plugins/registry.svelte";
@@ -146,6 +147,43 @@ function markConflicted({ body, format }: Note): string {
   if (format) return body;
   const first = lines.findIndex((line) => line.trim());
   return first === -1 ? `# ${t("sync.conflictedCopy")}\n${body}` : marked(first);
+}
+
+/** A note's text, format and lock: all it says but its dates and what `merge` takes apart from them; hashed. */
+const textOf = (note: Note) => hash(serialize({ ...note, updatedAt: 0, pinned: false, trashed: false, icon: undefined }));
+
+/** What a sync record keeps of a note as synced, so `merge` can tell later what each side changed. */
+const baseOf = (note: Note) => ({ text: textOf(note), pinned: note.pinned, trashed: note.trashed, icon: note.icon });
+
+/**
+ * A note changed on both sides since it was synced as `base`, made one: its text from the side that
+ * edited it, its pin, trash and icon from the side that changed each (pinning or locking it isn't an
+ * edit). Text edited on both sides is the newer edit's, and the other comes back as `older`, for a
+ * conflicted copy. A lock on either side stays: sync never turns a locked note back into plain text.
+ */
+async function merge(here: Note, there: Note, base: SyncRecord | undefined): Promise<{ merged: Note; older?: Note }> {
+  there = await opened(there);
+  const edited = (note: Note) =>
+    !base?.text || (textOf(note) !== base.text && !(note.locked?.open && textOf({ ...note, locked: undefined }) === base.text));
+  let text: Note;
+  if (!edited(there)) text = here;
+  else if (!edited(here)) text = there;
+  // Edited on both: the locked one, or else the newer edit.
+  else if (!here.locked !== !there.locked) text = here.locked ? here : there;
+  else text = there.updatedAt > here.updatedAt ? there : here;
+  let other = text === here ? there : here;
+  if (other.locked && !text.locked) {
+    // The edit goes into the other side's lock, if its key is open here; if not, the locked one stays as it is.
+    if (other.locked.open) text = { ...text, locked: await noteKeys.seal({ ...text, locked: other.locked }) };
+    else [text, other] = [other, text];
+  }
+  // Here's if both changed it. A record from before lines kept these doesn't say: as the side whose text is kept.
+  const pick = <K extends "pinned" | "trashed" | "icon">(field: K) =>
+    (base?.text ? here[field] !== base[field] : text === here) ? here[field] : there[field];
+  return {
+    merged: { ...text, pinned: pick("pinned"), trashed: pick("trashed"), icon: pick("icon") },
+    older: edited(other) ? other : undefined,
+  };
 }
 
 /** What the person calls where notes sync to: the drive or folder, or the bucket. */
@@ -438,8 +476,8 @@ class SyncEngine {
     const local = notes.entries.map((e) => e.note).filter((note) => (note.locked ? !!note.locked.sealed : !isBlank(note.body)));
     const localIds = new Set(notes.entries.map((e) => e.note.id));
 
-    const record = (id: string, etag: string | null, text: string) =>
-      syncRecords.put({ id, etag, hash: hash(text) });
+    const record = (note: Note, etag: string | null, text = serialize(note)) =>
+      syncRecords.put({ id: note.id, etag, hash: hash(text), ...baseOf(note) });
 
     /**
      * Uploads the note over what was there, `expected` by its tag (null: nothing). Not if another
@@ -452,7 +490,7 @@ class SyncEngine {
         this.schedule();
         return false;
       }
-      await record(note.id, etag, text);
+      await record(note, etag, text);
       return true;
     };
 
@@ -501,22 +539,26 @@ class SyncEngine {
 
       if (last && remoteHash === last.hash) {
         // Same content; only the ETag was unknown or different.
-        await syncRecords.put({ id: note.id, etag, hash: last.hash });
+        await syncRecords.put({ ...last, etag });
         if (dirty) await upload(note, etag);
       } else if (remoteHash === localHash) {
-        await syncRecords.put({ id: note.id, etag, hash: localHash });
+        await record(note, etag, text);
       } else if (!dirty) {
-        if (await applyIfUnchanged(note.id, text, fetched.note)) await record(note.id, etag, fetched.text);
+        if (await applyIfUnchanged(note.id, text, fetched.note)) await record(fetched.note, etag, fetched.text);
       } else {
-        // Edited on both sides. Nothing is lost: the older edit becomes a copy.
-        const remoteNewer = fetched.note.updatedAt > note.updatedAt;
-        if (remoteNewer) {
-          if (!(await applyIfUnchanged(note.id, text, fetched.note))) return;
-          await record(note.id, etag, fetched.text);
-          await notes.insert(conflictCopy(note));
-        } else if (await upload(note, etag)) {
-          await notes.insert(conflictCopy(fetched.note));
+        // Changed on both sides. Nothing is lost: see `merge`.
+        const { merged, older } = await merge(note, fetched.note, last);
+        const mergedText = serialize(merged);
+        if (mergedText === text) {
+          // Not if another device wrote it since: the next pass brings that in and merges again.
+          if (!(await upload(note, etag))) return;
+        } else {
+          if (!(await applyIfUnchanged(note.id, text, merged))) return;
+          // The note here is the merge now, so the older edit is kept as a copy even if this upload has to wait.
+          if (mergedText === fetched.text) await record(fetched.note, etag, fetched.text);
+          else await upload(merged, etag);
         }
+        if (older) await notes.insert(conflictCopy(older));
       }
     });
 
@@ -536,7 +578,7 @@ class SyncEngine {
         await syncRecords.delete(id);
       } else if (!notes.get(id)) {
         // New on another device, or edited there after we deleted it here.
-        if (await notes.applyRemote(fetched.note)) await record(id, fetched.etag ?? object.etag, fetched.text);
+        if (await notes.applyRemote(fetched.note)) await record(fetched.note, fetched.etag ?? object.etag, fetched.text);
       }
     });
 

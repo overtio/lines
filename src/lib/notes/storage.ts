@@ -1,4 +1,5 @@
 import { fromUtf8, utf8 } from "../crypto";
+import type { IconName } from "../icons/icons";
 import { isSealed, openRecord, sealRecord, vault, type Sealed } from "../lock/vault";
 import type { Note } from "./types";
 
@@ -132,6 +133,14 @@ export interface SyncRecord {
   etag: string | null;
   /** Hash of the serialized note at that moment; differs once edited locally. */
   hash: string;
+  /**
+   * Its text (with its format and lock) hashed, and its pin, trash and icon, as they were then: to
+   * tell which side changed what since. Records kept before lines did this don't have them.
+   */
+  text?: string;
+  pinned?: boolean;
+  trashed?: boolean;
+  icon?: IconName;
 }
 
 export const syncRecords = new ObjectStore<SyncRecord>(SYNC);

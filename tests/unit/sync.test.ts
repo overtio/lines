@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { beforeAll, describe, expect, test } from "bun:test";
 import { latexContent, markTitle } from "../../src/plugins/latex/text";
 import { beforeWrite, devices, drive, editElsewhere, fileOf, languages, notes, serialize } from "./sync";
 
@@ -103,5 +103,110 @@ describe("importing a note's file from a sync folder", () => {
     await notes.importFiles([file]);
     expect(notes.get(id)!.note.locked?.sealed).toBeTruthy();
     expect(notes.get(id)!.meta.title).toBe("Bank");
+  });
+});
+
+const { noteKeys } = await import("../../src/lib/notes/noteKeys.svelte");
+
+/** The notes on the device that's open: their text, and how they're kept. */
+const listed = () => notes.entries.map(({ note }) => ({ body: note.body, pinned: note.pinned, trashed: note.trashed, icon: note.icon, locked: !!note.locked }));
+
+describe("sync, of a note changed on two devices", () => {
+  test("a note edited on two devices keeps the newer edit, and the other as a conflicted copy", async () => {
+    const [here, there] = await devices(2);
+    const id = notes.add("# Trip\n\nRome");
+    await here.sync();
+    await there.sync();
+    notes.update(id, "# Trip\n\nRome\nVenice");
+    await there.sync();
+    await here.open();
+    notes.update(id, "# Trip\n\nRome\nFlorence");
+    await here.sync();
+    expect(listed().map((note) => note.body)).toEqual(["# Trip (conflicted copy)\n\nRome\nVenice", "# Trip\n\nRome\nFlorence"]);
+  });
+
+  test("pinning a note, or giving it an icon, while it's edited on another device keeps both, without a conflicted copy", async () => {
+    const [here, there] = await devices(2);
+    const id = notes.add("# Groceries\n\nmilk");
+    await here.sync();
+    await there.sync();
+    notes.update(id, "# Groceries\n\nmilk\neggs");
+    await there.sync();
+    await here.open();
+    notes.togglePin(id);
+    notes.setIcon(id, "archive");
+    await here.sync();
+    const merged: ReturnType<typeof listed> = [{ body: "# Groceries\n\nmilk\neggs", pinned: true, trashed: false, icon: "archive", locked: false }];
+    expect(listed()).toEqual(merged);
+    await there.sync();
+    expect(listed()).toEqual(merged);
+  });
+
+  test("a note moved to the trash while it's edited elsewhere goes there with the edit", async () => {
+    const [here, there] = await devices(2);
+    const id = notes.add("# Draft\n\none");
+    await here.sync();
+    await there.sync();
+    notes.trash(id);
+    await there.sync();
+    await here.open();
+    notes.update(id, "# Draft\n\none\ntwo");
+    await here.sync();
+    expect(listed()).toEqual([{ body: "# Draft\n\none\ntwo", pinned: false, trashed: true, icon: undefined, locked: false }]);
+  });
+
+  describe("locked on one device while edited on another", () => {
+    beforeAll(async () => {
+      const { key } = await noteKeys.create("correct horse");
+      noteKeys.save({ key, touchId: false });
+    });
+
+    test("stays locked, with the edit", async () => {
+      const [here, there] = await devices(2);
+      const id = notes.add("# Bank\n\nPIN 1234");
+      await here.sync();
+      await there.sync();
+      notes.update(id, "# Bank\n\nPIN 1234\nPUK 5678");
+      await there.sync();
+      await here.open();
+      await notes.lock(id);
+      await here.sync();
+      const locked = [{ body: "# Bank\n\nPIN 1234\nPUK 5678", pinned: false, trashed: false, icon: undefined, locked: true }];
+      expect(listed()).toEqual(locked);
+      expect(drive.get(fileOf(id))!.text).not.toContain("PIN");
+      await there.sync();
+      expect(listed()).toEqual(locked);
+    });
+
+    test("also when it's edited here and locked there", async () => {
+      const [here, there] = await devices(2);
+      const id = notes.add("# Bank\n\nPIN 1234");
+      await here.sync();
+      await there.sync();
+      await notes.lock(id);
+      await there.sync();
+      await here.open();
+      notes.update(id, "# Bank\n\nPIN 1234\nPUK 5678");
+      await here.sync();
+      expect(listed()).toEqual([{ body: "# Bank\n\nPIN 1234\nPUK 5678", pinned: false, trashed: false, icon: undefined, locked: true }]);
+      expect(drive.get(fileOf(id))!.text).not.toContain("PIN");
+    });
+
+    test("and with the password not given here, the locked note is kept as it is, the edit as a copy", async () => {
+      const [here, there] = await devices(2);
+      const id = notes.add("# Bank\n\nPIN 1234");
+      await here.sync();
+      await there.sync();
+      await notes.lock(id);
+      await there.sync();
+      await here.open();
+      notes.update(id, "# Bank\n\nPIN 1234\nPUK 5678");
+      noteKeys.clear();
+      await here.sync();
+      expect(listed()).toEqual([
+        { body: "# Bank (conflicted copy)\n\nPIN 1234\nPUK 5678", pinned: false, trashed: false, icon: undefined, locked: false },
+        { body: "", pinned: false, trashed: false, icon: undefined, locked: true },
+      ]);
+    });
   });
 });

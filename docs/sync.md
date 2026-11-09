@@ -71,7 +71,8 @@ On each sync, lines compares every note with what it last exchanged with the buc
 | --- | --- |
 | Changed on this device | Uploaded |
 | Changed on another device | Downloaded, including into an open editor |
-| Changed on both | The newer edit wins, and the other is saved as a separate note titled “… (conflicted copy)”, its properties and type kept (a spreadsheet's mark goes on its title line, not in its cells, and a LaTeX document's in its `\title`; a note in another format whose title can't be marked that way keeps its text as it is). Nothing is lost. |
+| Edited on both | The newer edit wins, and the other is saved as a separate note titled “… (conflicted copy)”, its properties and type kept (a spreadsheet's mark goes on its title line, not in its cells, and a LaTeX document's in its `\title`; a note in another format whose title can't be marked that way keeps its text as it is). Nothing is lost. |
+| Edited on one, pinned, moved to the trash, given an icon or locked on the other | Both kept, in one note: pinning and the rest don't count as edits. A note locked on either device stays locked, the edit inside it (or, on a device that doesn't have the password, the edit as a conflicted copy) |
 | Deleted on one device | Deleted on the others, unless another device edited it in the meantime, in which case the edit wins |
 
 Images and files in notes sit next to them, named after their content and keeping their extension:
