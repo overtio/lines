@@ -70,6 +70,12 @@ export function shownColor(color: Rgb, turned = prefs.invert): Rgb {
   return turned ? inverted(toned) : toned;
 }
 
+/** A color of your own as Monochrome and Invert show it, as CSS; or `fallback` if it isn't a color. */
+export function ownColor(value: string, fallback: string) {
+  const color = parse(value);
+  return color ? css(shownColor(color)) : fallback;
+}
+
 /**
  * Monochrome makes each color the grey as light as it; Invert turns each around, light for dark, its
  * hue kept. Both keep the contrast every two colors had, so what read well still does. They work on
@@ -115,13 +121,23 @@ function showTheme() {
   document.querySelector('meta[name="theme-color"]:not([media])')?.setAttribute("content", bg);
 }
 
+/** Headings in the text's color, the accent, or a color of your own (Settings → Typography; editor.css). */
+function showHeadings() {
+  const root = document.documentElement;
+  const { headingColor, headingCustomColor } = prefs;
+  if (headingColor === "text") root.style.removeProperty("--heading-color");
+  else root.style.setProperty("--heading-color", headingColor === "accent" ? "var(--accent)" : ownColor(headingCustomColor, "var(--accent)"));
+}
+
 // Before the first paint, so there's no flash of another theme; then whenever they change. One
 // effect, as the page has to have the themes' colors before Monochrome and Invert read them.
 showThemes();
 showTheme();
+showHeadings();
 $effect.root(() => {
   $effect(() => {
     showThemes();
     showTheme();
   });
+  $effect(showHeadings);
 });

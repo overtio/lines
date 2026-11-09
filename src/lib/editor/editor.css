@@ -1,9 +1,11 @@
 /* Live preview styles. Markup is plain text; these classes make it look formatted. */
 
+/* In the text's color unless Settings → Typography gives headings one (--heading-color). */
 .cm-lp-h {
   font-weight: 700;
   letter-spacing: -0.015em;
   line-height: 1.3;
+  color: var(--heading-color);
 }
 
 .cm-lp-h1 {
@@ -44,7 +46,7 @@
 }
 
 .cm-lp-h6 {
-  color: var(--text-muted);
+  color: var(--heading-color, var(--text-muted));
 }
 
 .cm-lp-strong {

@@ -1,8 +1,7 @@
 import { plugins } from "./plugins/registry.svelte";
 import type { PaperStyle } from "./plugins/types";
 import { prefs } from "./prefs.svelte";
-import { css, parse } from "./themes/color";
-import { shownColor } from "./themes/show.svelte";
+import { ownColor } from "./themes/show.svelte";
 import { announce, onAnnounce } from "./windows/channel";
 
 /*
@@ -82,12 +81,6 @@ export async function chooseBackdropImage(file: File) {
 }
 
 void onAnnounce((message) => message.type === "backdrop-image" && showImage(message.image));
-
-/** A color of your own, as Monochrome and Invert show it; or `fallback` if it isn't a color. */
-function ownColor(value: string, fallback: string) {
-  const color = parse(value);
-  return color ? css(shownColor(color)) : fallback;
-}
 
 /** The backdrop chosen, as CSS's background properties, in the scheme shown; none without one. */
 function backdropBackground(scheme: "light" | "dark") {

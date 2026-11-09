@@ -225,6 +225,9 @@ export default {
   "settings.fontSerif": "Serif",
   "settings.fontRounded": "Rounded",
   "settings.fontMono": "Mono",
+  "settings.headingColor": "Heading color",
+  // Headings in the same color as the text.
+  "settings.headingColorText": "Text",
   "settings.textSize": "Text size",
   // A size in pixels, as shown beside a slider.
   "settings.pixels": "{value}px",
