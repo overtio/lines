@@ -105,10 +105,9 @@ jobs:
           # The key whose public half is in tauri.conf.json; the apps install only what it signed.
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      - name: Name the Mac app's update package by its version, as the installers are
-        if: runner.os == 'macOS'
-        working-directory: src-tauri/target/universal-apple-darwin/release/bundle/macos
-        run: for file in lines.app.tar.gz*; do mv "$file" "lines_${VERSION}_universal${file#lines}"; done
+      - name: Name the downloads by the system they're for, lines_0.3.3_macos_universal.dmg
+        shell: bash
+        run: bun scripts/release.mjs name-downloads "$VERSION" src-tauri/target
       - name: Attach the installers and update packages to the release
         shell: bash
         run: |
