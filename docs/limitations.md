@@ -262,6 +262,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - The icon chosen for a type is kept on the device, like a tag's, so other devices show the default.
 - A locked note can be mentioned by its title, but its properties can't be read, even while it's open.
 - A synced note's file has two front matter blocks: lines' own (id, dates…) and then the note's properties, as part of its text. Apps that read front matter see the first.
+- A synced note's file is read as UTF-8 (or UTF-16, with its byte order mark). One another app saved in another encoding, such as Latin-1, shows its other characters as �, and keeps them so once the note is edited here.
 
 ## Paper
 

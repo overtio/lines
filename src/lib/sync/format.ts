@@ -49,8 +49,8 @@ export function serialize(note: Note): string {
 }
 
 export function deserialize(text: string, fallbackId: string): Note {
-  // With Windows line endings too, as another app may save it.
-  text = text.replace(/\r\n?/g, "\n");
+  // With a byte order mark, or Windows line endings, as another app may save it.
+  text = text.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
   let match = /^---\n([\s\S]*?)\n---\n?/.exec(text);
   const fields = new Map<string, string>();
   for (const line of match?.[1].split("\n") ?? []) {

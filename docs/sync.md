@@ -9,6 +9,7 @@ In the Mac (and Windows/Linux) app, Settings → Sync → Cloud drive lists the 
 - lines only ever touches its own files in that one folder: `.md` notes and their attachments (or, with end-to-end encryption, `.enc` files and `encryption.json`).
 - macOS asks once for permission to use the drive's folder.
 - If iCloud hasn't downloaded a note to this Mac yet, lines asks it to and picks the note up on the next pass.
+- A note's file another app saved with a byte order mark or Windows line endings, or as UTF-16, reads as usual. Bytes that aren't UTF-8 (a file saved as Latin-1, say) read as �, as they do from a bucket, rather than stop sync.
 - The drive's app does the uploading, so lines doesn't need to be online, and conflicts are handled just like with a bucket.
 
 On the web and on phones, use a bucket for now; signing in to iCloud, Google Drive and Proton Drive there is on the roadmap.
