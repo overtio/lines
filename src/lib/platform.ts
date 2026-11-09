@@ -1,13 +1,15 @@
+import { onPhoneOrTablet } from "./device";
+
 export const isTauri = "__TAURI_INTERNALS__" in window;
 /** The demo website (`bun run build:site`): the web app with the feature tour, saving only to a folder. */
 export const isSite = import.meta.env.VITE_SITE === "1";
 
 const ua = navigator.userAgent;
 export const isApple = /Mac|iPhone|iPad|iPod/.test(ua);
-const isTouch = navigator.maxTouchPoints > 1;
+const isMobile = onPhoneOrTablet(ua, navigator.maxTouchPoints);
 
 /** The native macOS app, where the window draws traffic lights over our content. */
-export const isMacApp = isTauri && /Macintosh/.test(ua) && !isTouch;
+export const isMacApp = isTauri && /Macintosh/.test(ua) && !isMobile;
 
 /** A touch screen is the main pointer; it may change, so read `.matches` when it matters. */
 export const coarsePointer = matchMedia("(pointer: coarse)");
@@ -21,7 +23,7 @@ export const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 export const modKey = isApple ? "⌘" : "Ctrl+";
 
 /** The Mac, Windows or Linux app (not the web, and not phones or tablets). */
-export const isDesktopApp = isTauri && !isTouch && !/iPhone|iPad|Android/.test(ua);
+export const isDesktopApp = isTauri && !isMobile;
 
 /** The system print dialog: in browsers, and in the desktop apps (not on iPhone or iPad). */
 export const canPrint = !isTauri || isDesktopApp;
