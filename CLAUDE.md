@@ -8,8 +8,9 @@ When a change adds or changes something users can see, update these in the same 
 
 - **Markdown syntax, or how lines reads Markdown:** `docs/linedown.md`, and `ELEMENTS` / `CONTAINERS` in `scripts/qa-notes.mjs`. Then run `bun run qa-notes` to regenerate `qa/notes/`. Don't edit `qa/notes/` by hand.
 - **Interactions** (shortcuts, buttons, menus, gestures, settings, behaviour): `qa/checklist.md`. A keyboard shortcut added or changed also goes in `src/lib/shortcuts.ts`, the list Settings → Shortcuts shows.
-- **Features worth showing:** the feature tour in `src/lib/notes/tour/` (the demo website's first notes), the README's feature list, and `src/lib/notes/welcome.ts`.
+- **Features worth showing:** the feature tour in `src/lib/notes/tour/` (the web app's first notes on the website), the README's feature list, the website's home page (`site/home.mjs`; `bun site/screenshots.mjs` takes its pictures again), and `src/lib/notes/welcome.ts`.
 - **Known limits and planned work:** `docs/limitations.md` and the README roadmap.
+- **A new page in `docs/`:** a row in the README's Documentation tables, which are the website's list of docs (`site/`); `bun site/build.mjs` checks every link.
 - **A plugin added or changed, or something new plugins can add:** `docs/plugins.md`, and the list in `src/plugins/index.ts`. Formats, engines, themes and icon sets are plugins: code outside a plugin asks the registry (`src/lib/plugins/`) rather than checking for one.
 - **Text the app shows (labels, tooltips, aria-labels, messages):** a message in `src/lib/i18n/locales/en/` looked up with `t()`, with its Spanish and French; `bun run i18n` lists any missing. See `docs/translations.md`.
 - **Anything people interact with:** keep it usable by keyboard and screen reader, as `docs/accessibility.md` describes.

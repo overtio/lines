@@ -1,0 +1,28 @@
+\section{Circular orbits}
+% #physics
+
+How fast does a satellite go, and how long does one turn take? Only gravity holds it, so the two are tied together.
+
+A satellite of mass $m$ circles a planet of mass $M$ at a distance $r$, and gravity keeps it turning:
+\begin{equation}
+  \frac{G M m}{r^2} = \frac{m v^2}{r}
+  \qquad\text{so}\qquad
+  v = \sqrt{\frac{G M}{r}} .
+\end{equation}
+
+\begin{theorem}[Kepler's third law]
+The square of the period grows as the cube of the distance:
+\[ T^2 = \frac{4\pi^2}{G M}\, r^3 . \]
+\end{theorem}
+
+\begin{proof}
+One turn is $2\pi r$ long, so $T = 2\pi r / v$. Square it, and put in $v^2 = G M / r$.
+\end{proof}
+
+\begin{tabular}{lrr}
+  & Distance (km) & Period \\
+  \hline
+  Space station & 6,771 & 92 minutes \\
+  GPS satellite & 26,560 & 12 hours \\
+  The Moon & 384,400 & 27.3 days \\
+\end{tabular}

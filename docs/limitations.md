@@ -25,6 +25,14 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - Notes kept only in the browser can be lost: clearing site data deletes them, the browser may evict them when the disk is low (lines doesn't ask for persistent storage), and Safari deletes them after 7 days without a visit.
 - The demo website shares its storage with every other site on `overtio.github.io`. It needs a domain of its own before people keep real notes there.
 
+## The website
+
+The home page and the docs at https://overtio.github.io/lines/ (`site/`):
+
+- There's no search across the docs yet.
+- They're in English only, though the app speaks Spanish and French too.
+- Code in the docs isn't highlighted.
+
 ## Import and export
 
 - Import takes files, not an export's .zip. Imported, an export's notes come back without their images and files, whose links then show as missing.

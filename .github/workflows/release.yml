@@ -1,7 +1,8 @@
 # Releases lines when its release pull request is merged (release-pr.yml): tags the version, builds
 # the desktop apps on macOS, Windows and Linux, attaches them and their signed update packages to a
 # GitHub release with the version's notes from CHANGELOG.md, adds the update manifest the apps
-# check, and publishes it. docs/releasing.md has the whole process.
+# check, publishes it, and deploys the website again for its downloads. docs/releasing.md has the
+# whole process.
 name: Release
 
 on:
@@ -118,6 +119,10 @@ jobs:
   publish:
     needs: [tag, build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      # To deploy the website again (website.yml).
+      actions: write
     env:
       GH_TOKEN: ${{ github.token }}
       VERSION: ${{ needs.tag.outputs.version }}
@@ -135,3 +140,6 @@ jobs:
           gh release upload "v$VERSION" "$RUNNER_TEMP/latest.json" --clobber
       - name: Publish the release
         run: gh release edit "v$VERSION" --draft=false
+      # A release published with this workflow's token starts no workflow by itself; a dispatch does.
+      - name: Offer its downloads on the website
+        run: gh workflow run website.yml --ref main

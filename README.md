@@ -2,11 +2,11 @@
 
 **Calm, local-first notes in plain Markdown.** Type Markdown and see it formatted as you write. Your notes stay on your device, as ordinary text you can open anywhere.
 
-**[Try it in your browser →](https://overtio.github.io/lines/)** No account, nothing to install. Or download the apps for Mac, Windows and Linux from [the releases](https://github.com/overtio/lines/releases).
+**[Try it in your browser →](https://overtio.github.io/lines/app/)** No account, nothing to install. Or download the apps for Mac, Windows and Linux from [the website](https://overtio.github.io/lines/#download), which also has [the docs](https://overtio.github.io/lines/docs/).
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/screenshot-dark.png">
-  <img alt="lines: the sidebar with tags, the note list, and a note with colored callouts" src="docs/images/screenshot-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="site/images/app-dark.webp">
+  <img alt="lines: tags in the sidebar, the list of notes, and a note with a callout, todos and a table" src="site/images/app-light.webp">
 </picture>
 
 > [!WARNING]
@@ -23,7 +23,7 @@
 
 ## Features
 
-The [demo website](https://overtio.github.io/lines/) opens with a tour: one short note per feature, to read and play with.
+The [web app](https://overtio.github.io/lines/app/) opens with a tour: one short note per feature, to read and play with.
 
 ### Writing
 
@@ -100,7 +100,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 ### Make it yours
 
 - **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. See [docs/plugins.md](docs/plugins.md).
-- **Sixteen themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
+- **Seventeen themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
 - **Monochrome and Invert**: any theme in greys, or turned light for dark, with the contrast it had.
 - **Fonts, text size, note width and spacing**, with a live preview; <kbd>⌘+</kbd> and <kbd>⌘−</kbd> size the text as you read. Notes can be narrow, medium, wide, any width between, or fill the window.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
@@ -136,20 +136,33 @@ Press <kbd>⌘/</kbd> to see them all. On Windows and Linux, use <kbd>Ctrl</kbd>
 
 ## Documentation
 
+Also on the website: [overtio.github.io/lines/docs](https://overtio.github.io/lines/docs/).
+
+### Using lines
+
 | | |
 | --- | --- |
 | [Linedown](docs/linedown.md) | The Markdown lines reads and writes, including its few additions (callouts, highlights, tags…) |
 | [LaTeX notes](docs/latex.md) | What's drawn in notes written in LaTeX |
 | [Spreadsheets](docs/spreadsheets.md) | Formulas in tables, spreadsheet notes, and opening and saving CSV and Excel files |
 | [Themes](docs/themes.md) | Making, sharing and importing themes, and lines' theme files |
+| [API requests](docs/requests.md) | Sending requests from notes, in the `.http` and Hurl formats |
+| [Secrets](docs/secrets.md) | API keys and passwords kept in a locked note, and used by name |
 | [Plugins](docs/plugins.md) | How lines is made of plugins, turning them off, and writing one |
 | [Sync](docs/sync.md) | How sync and encryption work |
 | [Storage](docs/storage.md) | Where the web app keeps your notes, and for how long |
-| [Limitations](docs/limitations.md) | What doesn't work yet, and what hasn't been tried on real devices |
 | [Accessibility](docs/accessibility.md) | Keyboard and screen reader use, and how it's checked |
+| [Limitations](docs/limitations.md) | What doesn't work yet, and what hasn't been tried on real devices |
+| [What's new](CHANGELOG.md) | What changed in each release |
+
+### Working on lines
+
+| | |
+| --- | --- |
+| [Contributing](CONTRIBUTING.md) | Setting up, making a change, and the pull requests main takes |
 | [Performance](docs/performance.md) | How fast lines is with thousands of notes, and the benchmarks that check it |
-| [Releasing](docs/releasing.md) | Versions, release notes, and how the apps are built and published |
 | [Translations](docs/translations.md) | How translations work, and adding a language |
+| [Releasing](docs/releasing.md) | Versions, release notes, and how the apps are built and published |
 
 ## Development
 
@@ -264,14 +277,14 @@ src/
     unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
     github/                  Links to GitHub drawn short
     arxiv/                   Links to arXiv's papers drawn short, and searching arXiv for /paper (pacing requests as arXiv asks)
-    themes/                  The sixteen themes, as their colors, and the theme files of other apps it reads (formats/)
+    themes/                  The seventeen themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
     lucide/  sf-symbols/     Icon sets
   lib/
     plugins/
       types.ts               What a plugin is and what it can add: formats, themes, icon sets, engines…
       registry.svelte.ts     The plugins, which are on (kept and shared between windows), and what they add
       plainText.ts           How a note shows while its format's plugin is off
-    themes/                  The themes plugins add, as CSS, and this window's theme (show.svelte.ts); your own themes, their files, importing them, and working out colors
+    themes/                  The themes plugins add, as CSS (css.ts, which the website uses too), and this window's theme (show.svelte.ts); your own themes, their files, importing them, and working out colors
     editor/
       Editor.svelte          CodeMirror host; per-note undo history
       livePreview.ts         Hides Markdown and renders bullets, checkboxes, rules, images
@@ -356,6 +369,9 @@ src-tauri/                   Native shell (Rust); sf_symbols.rs draws SF Symbols
                              downloads and installs new versions
 src-tauri/icons/source/      App icon artwork (SVG): Mac layout and full-bleed for iOS/Android
 docs/                        Linedown, LaTeX, spreadsheets, plugins, sync, storage, limitations, accessibility, translations, performance
+site/                        The website (bun run build:site): the home page (home.mjs), the docs as pages, the web
+                             app at app/; build.mjs builds it and checks its links, screenshots.mjs takes the home
+                             page's pictures (images/) of the notes in samples/
 qa/                          Release checklist and QA notes (generated by scripts/qa-notes.mjs)
 scripts/bench.mjs            The benchmarks (bun run bench): builds, seeds 5,000 notes, drives WebKit and Chromium
 scripts/release.mjs          Versions and release notes from the commits (docs/releasing.md)

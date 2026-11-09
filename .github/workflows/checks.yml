@@ -48,6 +48,10 @@ jobs:
         run: bun run i18n --strict
       - name: QA notes up to date (bun run qa-notes)
         run: bun run qa-notes && git diff --exit-code -- qa/notes
+      - name: The website's pages, and every link in them (bun site/build.mjs)
+        run: bun site/build.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Build
         run: bun run build
 

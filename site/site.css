@@ -1,0 +1,291 @@
+/*
+ * The website's look: the app's tokens (app.css) in the Lines theme, Tailwind's utilities in the
+ * pages (pages.mjs), and below, what Markdown turns into in the docs, which has no classes.
+ */
+@import "../src/app.css";
+@source "./";
+
+@theme {
+  --text-2xl: 24px;
+  --text-display: clamp(34px, 6vw, 52px);
+  --text-display--line-height: 1.08;
+  --text-display--letter-spacing: -0.025em;
+}
+
+/* Unlike the app, the website scrolls, and its words can be selected. */
+@layer base {
+  html,
+  body {
+    height: auto;
+    overflow: visible;
+    overscroll-behavior: auto;
+  }
+  html {
+    scroll-padding-top: 16px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    font-size: 16px;
+    line-height: 1.6;
+    padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
+    user-select: text;
+    -webkit-user-select: text;
+  }
+  a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: var(--accent-soft);
+    text-underline-offset: 2px;
+  }
+  a:hover {
+    text-decoration-color: currentColor;
+  }
+  a:focus-visible {
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+  h1,
+  h2,
+  h3,
+  p {
+    margin: 0;
+  }
+  code {
+    padding: 2px 5px;
+    border-radius: 5px;
+    background: var(--code-bg);
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    overflow-wrap: anywhere;
+  }
+  kbd {
+    padding: 1px 6px;
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    background: var(--bg-elevated);
+    font-family: var(--font-ui);
+    font-size: 0.82em;
+    white-space: nowrap;
+  }
+}
+
+@layer components {
+  .skip {
+    position: fixed;
+    left: 12px;
+    top: 12px;
+    z-index: 10;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow-menu);
+    &:not(:focus) {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  /* The app's Button (components/ui/Button.svelte), secondary and primary. */
+  .button {
+    @apply inline-flex h-control shrink-0 items-center justify-center gap-1.5 rounded-md border border-line bg-panel px-3 text-sm font-medium whitespace-nowrap text-fg no-underline shadow-segment transition-colors hover:bg-hover;
+  }
+  .button-primary {
+    @apply border-transparent bg-accent px-4 font-semibold text-on-accent shadow-none hover:bg-accent hover:opacity-90;
+  }
+  .button-large {
+    @apply h-11 rounded-lg px-5 text-md;
+  }
+
+  /* A heading's link to itself, shown on pointing at it. */
+  .anchor {
+    margin-left: 8px;
+    color: var(--text-faint);
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 120ms;
+  }
+  :is(h2, h3, h4):hover > .anchor {
+    opacity: 1;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold tracking-tight sm:text-[32px];
+  }
+
+  /* A picture of the app, framed as its window is. */
+  .shot {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow-dialog);
+  }
+
+  .value-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-lg);
+    background: var(--tag-bg);
+    color: var(--accent);
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-line bg-panel px-3.5 py-1.5 text-sm text-muted shadow-segment;
+    svg {
+      color: var(--accent);
+    }
+  }
+
+  /* "Learn more" under a section: the arrow moves on pointing. */
+  .more {
+    @apply inline-flex items-center gap-1.5 font-medium no-underline;
+    svg {
+      transition: translate 160ms var(--ease-pop);
+    }
+    &:hover svg {
+      translate: 3px 0;
+    }
+  }
+
+  .docs-menu {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 8px 12px;
+    summary {
+      font-weight: 500;
+    }
+    &[open] summary {
+      margin-bottom: 4px;
+    }
+  }
+
+  /* Markdown in the docs, much as GitHub shows it, in the app's colors and type. */
+  .prose {
+    max-width: 720px;
+    font-family: var(--font-text);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-wrap: break-word;
+
+    & > :first-child {
+      margin-top: 0;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 34px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      text-wrap: balance;
+    }
+    h2,
+    h3,
+    h4 {
+      line-height: 1.3;
+      font-weight: 650;
+      text-wrap: balance;
+    }
+    h2 {
+      margin: 44px 0 12px;
+      font-size: 24px;
+      letter-spacing: -0.01em;
+    }
+    h3 {
+      margin: 32px 0 8px;
+      font-size: 19px;
+    }
+    h4 {
+      margin: 24px 0 6px;
+      font-size: 16px;
+    }
+    p,
+    ul,
+    ol,
+    pre,
+    blockquote,
+    .table-scroll {
+      margin: 0 0 16px;
+    }
+    ul,
+    ol {
+      padding-left: 24px;
+    }
+    ul {
+      list-style: disc;
+    }
+    ol {
+      list-style: decimal;
+    }
+    li {
+      margin: 4px 0;
+    }
+    li > :is(ul, ol) {
+      margin: 4px 0 0;
+    }
+    li::marker {
+      color: var(--text-faint);
+    }
+    .task-list-item {
+      list-style: none;
+      input {
+        margin: 0 8px 0 -22px;
+        vertical-align: -1px;
+      }
+    }
+    pre {
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      background: var(--code-bg);
+      overflow-x: auto;
+      font-size: 14px;
+      line-height: 1.55;
+      code {
+        padding: 0;
+        background: none;
+        font-size: inherit;
+      }
+    }
+    .table-scroll {
+      overflow-x: auto;
+    }
+    table {
+      border-collapse: collapse;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    th,
+    td {
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: var(--code-bg);
+      font-weight: 600;
+    }
+    blockquote {
+      margin-left: 0;
+      padding-left: 16px;
+      border-left: 3px solid var(--border);
+      color: var(--text-muted);
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+    hr {
+      margin: 32px 0;
+      border: 0;
+      border-top: 1px solid var(--border);
+    }
+  }
+}

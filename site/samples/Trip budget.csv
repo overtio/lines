@@ -1,0 +1,6 @@
+Date,Place,Stay,Food,Travel,Total
+2026-05-14,Rome,$140,$62,$38,=SUM(C2:E2)
+2026-05-15,Rome,$140,$55,$12,=SUM(C3:E3)
+2026-05-16,Florence,$118,$70,$45,=SUM(C4:E4)
+2026-05-17,Florence,$118,$48,$0,=SUM(C5:E5)
+Total,,=SUM(C2:C5),=SUM(D2:D5),=SUM(E2:E5),=SUM(F2:F5)

@@ -378,7 +378,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Shortcuts (also ⌘/ or Ctrl+/, even with the cursor in a note): every shortcut, grouped; shown the Mac way on a Mac (⌘⇧F, ⌃⌘L) and as Ctrl+Shift+F, Ctrl+Alt+L elsewhere, with the switch showing the other system's; new note is ⌘N (Ctrl+N) in the apps and ⌥N (Alt+N) on the web; Close a floating note only in the desktop apps; each shortcut listed does what it says; VoiceOver reads the keys in words ("Shift Command F")
 - [ ] Section names and labels fit in English, French and Spanish, wrapping rather than being cut off
 - [ ] General → Language: English, Español, Français and System; choosing one saves what's being typed and starts lines again in it, in every window (floating notes too); System follows the device (English when lines doesn't speak it); dates follow it (24-hour clock in French)
-- [ ] Theme: each of the 16 themes in light and dark; Theme → Light or dark: System follows the OS live
+- [ ] Theme: each of the 17 themes in light and dark; Theme → Light or dark: System follows the OS live
 - [ ] Theme: the Accessibility group (High Contrast, Red-Green Friendly, Blue-Yellow Friendly) sits below the other themes with its heading and note; Tab stops once on the theme picker and the arrow keys move through every theme, across both groups
 - [ ] Theme → New makes "<theme> Copy" under Your themes, chosen, and scrolls to its editor with the name selected to type over; renaming changes the swatch's name and the heading as you type, and an emptied name comes back on leaving the field
 - [ ] Your theme's editor: Colors for Light / Dark switches the preview and the colors listed; changing a color (typing a hex, `rgb()` or `oklch()`, or the swatch's system picker) changes the preview and, for the scheme showing, all of lines at once, Settings and the main window and floating notes too [Desktop]; a value that isn't a color is outlined red and changes nothing; More Colors shows Status, Callouts and Code, each Auto (its swatch lines' own color) until set, and the arrow makes it Auto again
@@ -534,9 +534,16 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] [Mac] The window drags by its toolbars and starts without a flash
 - [ ] Reduced motion in the OS settings stops the slides
 
-## 21. Demo website
+## 21. Website and demo
 
-- [ ] A first visit opens the feature tour, with the picture and the file working
+- [ ] The home page (overtio.github.io/lines/) and its pictures show in light and dark as the system is, with no flash of the other
+- [ ] **Download** offers the visitor's system's app (Mac, Windows or Linux), and the Download section lists the latest release's files with their sizes; each link downloads
+- [ ] **Open in your browser** and **Open lines** open the web app (overtio.github.io/lines/app/)
+- [ ] lines installed from the web app before it moved to app/ opens the app, not the home page
+- [ ] Docs: every page in the README's Documentation tables is listed, the open one marked; links between pages and to their headings land; the outline beside a page jumps to its headings; on a phone, All docs opens the list
+- [ ] At a phone's width no page scrolls sideways; wide tables and code scroll by themselves
+- [ ] Tab first shows Skip to content; every link shows the focus ring
+- [ ] The web app: a first visit opens the feature tour, with the picture and the file working
 - [ ] Save to a folder at the bottom of the sidebar opens Sync with only the folder option
 - [ ] Reloading keeps every change
 - [ ] It works when served from a subfolder (GitHub Pages): icons, the manifest and third-party notices load
@@ -584,7 +591,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 
 - [ ] With Contrast → Increased, Lighthouse's accessibility audit (Chrome DevTools) scores 100 on the main window, with Settings open, and in a note with a table, math and a callout, in a few themes light and dark (Lines, Solarized, Ayu, Everforest); on Standard, only contrast fails
 - [ ] Theme → Monochrome: every color in lines turns grey (accent, tags, links, chips, callouts, code, the chosen switch), in light and dark and a few themes, at once in every window [Desktop]; pictures in notes keep their colors; diagrams, 3D models and recordings redraw in greys; off, the colors come back
-- [ ] Theme → Invert: a light theme shows as a dark one (Lines: black background, light text, red links) and a dark one as a light one; highlights stay yellow and readable; diagrams, drawings, 3D models, recordings, scrollbars and form controls follow the new light or dark; pictures stay as they are; with Monochrome too, greys turned; with Contrast → Increased, still darker grey text; switching theme or Light or dark while it's on changes what's turned
+- [ ] Theme → Invert: a light theme shows as a dark one (Lines: black background, light text, teal links) and a dark one as a light one; highlights stay yellow and readable; diagrams, drawings, 3D models, recordings, scrollbars and form controls follow the new light or dark; pictures stay as they are; with Monochrome too, greys turned; with Contrast → Increased, still darker grey text; switching theme or Light or dark while it's on changes what's turned
 - [ ] Contrast: System follows the device's Increase Contrast live; Increased darkens grey text, links, tags and borders in every theme, light and dark, and a selected row's date and count stay readable
 - [ ] Keyboard only, from launch: reach the sidebar, list, note, toolbar, menus, Settings and every control in it with Tab; use each with Enter or Space; arrows move in lists, menus, tabs, segmented controls and the icon picker; Esc closes what's open and focus returns to what opened it; focus is always visible
 - [ ] Focus never drops to the page: after renaming a tag or a type (Enter or Esc) it's on that row; after a menu item that opens a dialog (Share → Preview as PDF), then Esc, on what opened the menu; locking a note keeps it on the lock button; closing the last tab with Delete puts it in the note list; a window resized to or from phone width moves it to a pane that shows
