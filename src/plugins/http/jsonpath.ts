@@ -224,9 +224,11 @@ class Reader {
 function compare(left: Json, operator: string, right: Json) {
   if (operator === "==") return equal(left, right);
   if (operator === "!=") return !equal(left, right);
-  const comparable = (typeof left === "number" && typeof right === "number") || (typeof left === "string" && typeof right === "string");
+  // A whole number too large for a double is a BigInt (json.ts), which compares with numbers.
+  const numeric = (value: Json) => typeof value === "number" || typeof value === "bigint";
+  const comparable = (numeric(left) && numeric(right)) || (typeof left === "string" && typeof right === "string");
   if (!comparable) return operator.includes("=") && equal(left, right);
-  const [a, b] = [left as number | string, right as number | string];
+  const [a, b] = [left as number | bigint | string, right as number | bigint | string];
   return operator === "<" ? a < b : operator === "<=" ? a <= b : operator === ">" ? a > b : a >= b;
 }
 

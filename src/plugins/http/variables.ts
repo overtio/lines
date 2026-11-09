@@ -7,6 +7,7 @@
  * (notes/secrets.svelte.ts). No scripts run.
  */
 
+import { jsonText, parseJson } from "./json";
 import { jsonPath } from "./jsonpath";
 
 /** A response as variables read it. */
@@ -74,8 +75,8 @@ function part(response: ResponseValues, expression: string, path: string): strin
   } else if (kind === "body") {
     if (selector === "*") return response.text;
     try {
-      const found = jsonPath(JSON.parse(response.text), selector);
-      if (found !== undefined) return typeof found === "string" ? found : JSON.stringify(found);
+      const found = jsonPath(parseJson(response.text), selector);
+      if (found !== undefined) return typeof found === "string" ? found : jsonText(found);
     } catch {
       // Not JSON, or not a path: nothing to find.
     }
