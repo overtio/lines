@@ -59,6 +59,8 @@ export default {
   "sync.folder.none":
     "No se han encontrado unidades en la nube en este Mac. Activa iCloud Drive en Ajustes del Sistema → tu nombre → iCloud, o instala Google Drive, Proton Drive, Dropbox u OneDrive. O usa cualquier carpeta:",
   "sync.folder.chooseOther": "Elegir otra carpeta…",
+  "sync.folder.pickPrompt": "Usar esta carpeta",
+  "sync.folder.pickMessage": "Elige dónde guarda lines tus notas. Una carpeta de una unidad en la nube las sincroniza.",
   "sync.folder.icloud":
     "iCloud Drive mantiene tus Mac al día. La sincronización con la app para iPhone y el inicio de sesión con iCloud en la web están en camino.",
   "sync.folder.showInFinder": "Mostrar en el Finder",
