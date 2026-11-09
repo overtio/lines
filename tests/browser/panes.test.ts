@@ -33,3 +33,21 @@ test("F6 goes only through the panes showing: past a hidden sidebar, and nowhere
   await app.page.keyboard.press("F6");
   expect(await focused()).toBe("editor");
 });
+
+test("the sidebar drawer closed by a click beside it gives focus back to what had it", async () => {
+  app = await openApp({ width: 850 });
+  await app.open("Some text");
+  const drawer = async (open: () => Promise<void>) => {
+    await open();
+    await app.page.waitForFunction(() => document.querySelector("[data-pane=sidebar]")?.contains(document.activeElement));
+    await app.page.getByRole("button", { name: "Close sidebar" }).click({ position: { x: 700, y: 400 } });
+  };
+  await drawer(async () => {
+    await app.page.evaluate(() => window.testing.place());
+    await app.page.keyboard.press(`${mod()}+\\`);
+  });
+  await app.page.waitForFunction(() => document.activeElement?.classList.contains("cm-content"), null, { timeout: 2000 });
+  // Opened by a click, on the button that opens it (which in Safari a click doesn't focus).
+  await drawer(() => app.page.locator(".sidebar-toggle").first().click());
+  await app.page.waitForFunction(() => document.activeElement?.classList.contains("sidebar-toggle"), null, { timeout: 2000 });
+});

@@ -456,7 +456,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] The sidebar's hide button is on its inner edge, with the icon of its side; its show button is in the note list's title bar on the sidebar's side when the list is on that side, else at the note toolbar's edge on that side; focus moves between the two as they swap
 - [ ] Dragging a pane's inner edge resizes it the way the pointer goes, on either side; from the keyboard, ← and → move the edge; double-click and Enter put it back
 - [ ] With the sidebar and list dragged wide, making the window smaller narrows the sidebar first, then the list, the note keeping at least 360 px; made bigger again, they go back to their widths
-- [ ] Tablet width: the sidebar drawer slides in from its own side, with the scrim; Esc closes it and focus goes back to the button that opened it
+- [ ] Tablet width: the sidebar drawer slides in from its own side, with the scrim; Esc, or a click on the scrim, closes it and focus goes back to what had it (the button that opened it, or the note after ⌘\\)
 - [ ] Phone width: the drawer comes from the sidebar's side, and its button is in the note list's title bar; the list and note still stack
 - [ ] F6 goes through the panes left to right in every arrangement
 - [ ] [Mac] The window buttons never cover anything: the leftmost pane's title bar leaves room for them in every arrangement, with the sidebar shown or hidden, in focus mode, and at each width

@@ -162,6 +162,8 @@
   let sidebarPane: HTMLElement;
   let listPane: HTMLElement;
   let editorPane: HTMLElement;
+  /** The dimmed window beside the drawer: a click there closes it, and takes focus, which is as good as lost. */
+  let scrim = $state<HTMLElement>();
 
   /*
    * Focus follows the sidebar. As a drawer it takes focus when it slides in and gives it back when
@@ -181,8 +183,9 @@
         if (drawer || active?.classList.contains("sidebar-toggle")) {
           sidebarPane.querySelector<HTMLElement>("button")?.focus({ preventScroll: true });
         }
-      } else if (sidebarPane.contains(active) || (beforeDrawer && active === document.body)) {
-        const back = beforeDrawer instanceof HTMLElement && beforeDrawer.isConnected ? beforeDrawer : null;
+      } else if (sidebarPane.contains(active) || (beforeDrawer && (active === document.body || active === scrim))) {
+        // What had focus may have been nothing: in Safari a click doesn't focus a button.
+        const back = beforeDrawer instanceof HTMLElement && beforeDrawer.isConnected && beforeDrawer !== document.body ? beforeDrawer : null;
         (back ?? document.querySelector<HTMLElement>(".sidebar-toggle") ?? listPane.querySelector<HTMLElement>(".titlebar button"))?.focus({
           preventScroll: true,
         });
@@ -493,6 +496,7 @@
 
   {#if !wide}
     <button
+      bind:this={scrim}
       class={["absolute inset-0 z-10 bg-scrim transition-opacity duration-320 ease-sheet", ui.sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"]}
       aria-label={t("app.closeSidebar")}
       tabindex="-1"
