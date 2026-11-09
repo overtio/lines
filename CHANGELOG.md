@@ -2,6 +2,20 @@
 
 What changed in each release of lines. Written by `bun scripts/release.mjs prepare` from the commits since the release before (docs/releasing.md).
 
+## [0.3.1](https://github.com/overtio/lines/compare/v0.3.0...v0.3.1) (2026-11-09)
+
+### Fixes
+
+- **attachments:** resized images and odd or long names open, and one failed open no longer sticks ([#227](https://github.com/overtio/lines/pull/227))
+- **native:** turning Update automatically off stops a downloaded version installing at quit ([#229](https://github.com/overtio/lines/pull/229))
+- **notes:** save a note its format can't read, such as a Hurl note with an unclosed body ([#228](https://github.com/overtio/lines/pull/228))
+- **latex:** a half-typed \end no longer freezes the app ([#226](https://github.com/overtio/lines/pull/226))
+- **native:** Windows and Linux laptops with a touch screen get updates, floating notes and printing ([#225](https://github.com/overtio/lines/pull/225))
+- **editor:** links to a whole drive open, and one that can't be opened doesn't say it's missing ([#223](https://github.com/overtio/lines/pull/223))
+- **native:** show programs in Finder rather than run them when an attachment or link opens ([#222](https://github.com/overtio/lines/pull/222))
+- **notes:** keep images whose link has a title, which were deleted at the next launch ([#221](https://github.com/overtio/lines/pull/221))
+- **native:** a picture of an SF Symbol sized NaN no longer closes the Mac app ([#220](https://github.com/overtio/lines/pull/220))
+
 ## [0.3.0](https://github.com/overtio/lines/compare/v0.2.0...v0.3.0) (2026-11-09)
 
 ### Features
