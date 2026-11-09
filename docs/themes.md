@@ -6,7 +6,9 @@ Everything here is in Settings → Theme.
 
 ## Your own themes
 
-**New** makes a copy of the theme chosen, under **Your themes**, and opens it to change below Light or dark, Contrast and Icons: its name, and its colors.
+**New → From** the theme chosen makes a copy of it, under **Your themes**, and opens it to change below Light or dark, Contrast and Icons: its name, and its colors.
+
+**New → From a Picture…** makes one from a picture's colors, a wallpaper or a photo, named after it, light and dark. The picture is read on this device, nothing is sent anywhere: its colors are grouped, its main tone tints the backgrounds (more of it the more colorful the picture, less in light, where a little goes a long way), its most vivid color that's also plentiful becomes the accent, and colors near red, green, blue and the rest color the callouts and code. The text reads at least 7:1 on the background, grey text 5:1 and the accent 4.5:1; a picture without color makes a theme in greys. **Use the Picture as the Backdrop** then puts it behind the page (Settings → Paper → Backdrop). Like any of your themes, it can be changed color by color after.
 
 - **Colors for** Light or Dark chooses which of its two sets of colors you're changing. The preview above the colors shows that set, as the sidebar, the note list and a note with a tag, a link, code and a callout; lines itself shows the set Light or dark asks for, as you change it.
 - Each color has a swatch, which opens your system's color picker, and its value as text, where you can type or paste any color CSS reads (`#7c3aed`, `rgb(124 58 237)`, `oklch(55% 0.2 290)`).

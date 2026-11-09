@@ -7,7 +7,9 @@
   import type { IconName } from "../../icons/icons";
   import { DEFAULT_THEME, plugins } from "../../plugins/registry.svelte";
   import { prefs, type Appearance, type Contrast } from "../../prefs.svelte";
+  import { chooseBackdropImage } from "../../paper.svelte";
   import { customThemes } from "../../themes/custom.svelte";
+  import { pictureName, themeFromPicture } from "../../themes/picture";
   import { readableFormats, readThemes } from "../../themes/import";
   import { schemeShown } from "../../themes/show.svelte";
   import Button from "../ui/Button.svelte";
@@ -96,6 +98,35 @@
   let imported = $state<string | null>(null);
   let importError = $state<string | null>(null);
 
+  let pictures = $state<HTMLInputElement>();
+  /** The picture a theme was just made from, which can be the backdrop too. */
+  let fromPicture = $state<{ name: string; file: File } | null>(null);
+  let pictureError = $state<string | null>(null);
+
+  /** A theme of your own from a picture's colors (themes/picture.ts), shown at once, to change as wanted. */
+  async function themeFromChosen() {
+    const file = pictures?.files?.[0];
+    pictures!.value = "";
+    if (!file) return;
+    imported = importError = pictureError = null;
+    fromPicture = null;
+    try {
+      const made = await themeFromPicture(file, pictureName(file.name) || t("settings.themePictureName"));
+      prefs.theme = customThemes.add(made);
+      fromPicture = { name: made.name, file };
+      speak(t("settings.themeFromPicture", { name: made.name }));
+    } catch {
+      pictureError = t("settings.themePictureError");
+      speak(pictureError);
+    }
+  }
+
+  async function useAsBackdrop() {
+    if (!fromPicture) return;
+    await chooseBackdropImage(fromPicture.file);
+    fromPicture = null;
+  }
+
   /** Adds the themes in files (or pasted text), and shows the first; says which it couldn't read. */
   async function importThemes(sources: { text: string; name: string }[]) {
     imported = importError = null;
@@ -169,9 +200,26 @@
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
-    <Button variant="quiet" icon="plus" onclick={newTheme} title={t("settings.themeNewHint")}>{t("settings.themeNew")}</Button>
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger>
+        {#snippet child({ props })}
+          <Button {...props} variant="quiet" icon="plus" title={t("settings.themeNewHint")}>{t("settings.themeNew")}</Button>
+        {/snippet}
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content align="end" sideOffset={6} collisionPadding={8} aria-label={t("settings.themeNew")} class="{floating} min-w-[200px] p-[5px]">
+          <DropdownMenu.Item class={menuOption} onSelect={newTheme}>
+            <Icon name="copy" size={15} />{t("settings.themeNewFrom", { name: shown.name })}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item class={menuOption} onSelect={() => pictures?.click()}>
+            <Icon name="image" size={15} />{t("settings.themeNewFromPicture")}
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   </div>
   <input bind:this={picker} type="file" multiple class="hidden" onchange={importChosen} />
+  <input bind:this={pictures} type="file" accept="image/*" class="hidden" onchange={themeFromChosen} />
 {/snippet}
 
 {#if plugins.styles.length > 1}
@@ -202,7 +250,7 @@
 {/if}
 
 <FieldGroup title={t("settings.themes")} note={t("settings.themeNote")} action={themeActions} id={themeHeading}>
-  {#if pasting || imported || importError}
+  {#if pasting || imported || importError || fromPicture || pictureError}
     <div class="flex flex-col gap-2 border-b border-line p-3">
       {#if pasting}
         <div class="flex items-center gap-2">
@@ -220,6 +268,13 @@
       {/if}
       {#if imported}<Callout tone="success">{imported}</Callout>{/if}
       {#if importError}<Callout tone="danger">{importError}</Callout>{/if}
+      {#if fromPicture}
+        <Callout tone="success" class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+          <span>{t("settings.themeFromPicture", { name: fromPicture.name })}</span>
+          <Button icon="image" onclick={useAsBackdrop}>{t("settings.themePictureBackdrop")}</Button>
+        </Callout>
+      {/if}
+      {#if pictureError}<Callout tone="danger">{pictureError}</Callout>{/if}
     </div>
   {/if}
   <div class="border-b border-line p-3">
