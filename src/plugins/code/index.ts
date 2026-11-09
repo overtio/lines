@@ -22,16 +22,17 @@ const USUAL: Record<string, string> = { Python: "py", APL: "apl", XQuery: "xquer
 /** Formats of their own, with editors of their own, rather than code. */
 const OWN_FORMATS = new Set(["Markdown", "LaTeX"]);
 
-/** How each kind of language comments, for a note's tags; `//` for the rest. */
+/** How each kind of language comments, for a note's title and tags; `//` for the rest (`/*` too, when reading). */
 const COMMENTS: [string[], string, string?][] = [
-  [["Python", "Cython", "Shell", "Ruby", "Perl", "R", "YAML", "TOML", "CMake", "CoffeeScript", "Julia", "PowerShell", "Properties files", "Crystal", "Puppet", "RPM Spec", "Tcl", "Sieve", "NSIS"], "#"],
-  [["SQL", "MySQL", "MariaDB SQL", "PostgreSQL", "SQLite", "PLSQL", "MS SQL", "CQL", "Lua", "Haskell", "Elm", "VHDL", "Eiffel", "Pig"], "--"],
-  [["Clojure", "ClojureScript", "Common Lisp", "Scheme", "edn", "Gas", "Z80", "MUMPS"], ";"],
-  [["Erlang", "Octave"], "%"],
+  [["Python", "Cython", "Shell", "Ruby", "Perl", "R", "YAML", "TOML", "CMake", "CoffeeScript", "LiveScript", "Julia", "PowerShell", "Properties files", "Crystal", "Puppet", "RPM Spec", "Tcl", "Sieve", "NSIS", "Gherkin", "HXML", "SPARQL", "Turtle", "NTriples"], "#"],
+  [["SQL", "MySQL", "MariaDB SQL", "PostgreSQL", "SQLite", "PLSQL", "MS SQL", "CQL", "Lua", "Haskell", "Elm", "VHDL", "Eiffel", "Pig", "ASN.1"], "--"],
+  [["Clojure", "ClojureScript", "Common Lisp", "Scheme", "edn", "Gas", "Z80", "MUMPS", "mIRC", "IDL", "WebAssembly"], ";"],
+  [["Erlang", "Octave", "Oz"], "%"],
   [["VB.NET", "VBScript"], "'"],
   [["HTML", "XML", "Vue", "DTD", "Markdown"], "<!--", "-->"],
   [["CSS", "Closure Stylesheets (GSS)"], "/*", "*/"],
   [["OCaml", "SML", "Pascal", "Mathematica"], "(*", "*)"],
+  [["Jinja"], "{#", "#}"],
 ];
 
 const commentOf = (name: string): [string, string?] => {
@@ -39,31 +40,36 @@ const commentOf = (name: string): [string, string?] => {
   return found ? [found[1], found[2]] : ["//"];
 };
 
-/** A comment's opening and closing marks, and a script's `#!` line. */
-const OPENING = /^\s*(?:\/\/+|#+|--+|;+|%+|'+|\/\*+|\(\*|<!--|\{#)\s*/;
+/**
+ * What opens a comment in a language that comments with `mark` (`##` too), or with `//` and `/*`,
+ * so a line of code (`#include`, `'use strict'`) isn't read as one.
+ */
+const openingOf = (mark: string) =>
+  new RegExp(`^\\s*(?:${(mark === "//" ? ["//", "/*"] : [mark]).map((each) => `${each.replace(/[*(){]/g, "\\$&")}+`).join("|")})\\s*`);
+/** A comment's closing mark, and a script's `#!` line. */
 const CLOSING = /\s*(?:\*\/|\*\)|-->|#\})\s*$/;
 const SHEBANG = /^#!/;
 const TAGS_ONLY = /^(?:#[\p{L}\p{N}_\-/]+\s*)+$/u;
 
-const commentText = (line: string) => line.replace(OPENING, "").replace(CLOSING, "").trim();
+const commentText = (line: string, opening: RegExp) => line.replace(opening, "").replace(CLOSING, "").trim();
 /** A comment that's only tags, as `addTag` writes them. */
-const tagsLine = (line: string) => OPENING.test(line) && TAGS_ONLY.test(commentText(line));
+const tagsLine = (line: string, opening: RegExp) => opening.test(line) && TAGS_ONLY.test(commentText(line, opening));
 /** Where the note starts, after a script's `#!` line. */
 const topOf = (lines: string[]) => lines.findIndex((line) => line.trim() && !SHEBANG.test(line));
 
 /**
- * A note's title is its first line as it reads, a comment without its marks (but one of only tags);
- * its tags are in the comments at its top.
+ * A note's title is its first line as it reads, a comment (`opening` starts one) without its marks
+ * (but one of only tags); its tags are in the comments at its top.
  */
-function meta(body: string): NoteMeta {
+function meta(body: string, opening: RegExp): NoteMeta {
   const lines = body.split("\n", 400);
-  const first = lines.findIndex((line) => line.trim() && !SHEBANG.test(line) && !tagsLine(line));
-  const title = first < 0 ? "" : commentText(lines[first]);
+  const first = lines.findIndex((line) => line.trim() && !SHEBANG.test(line) && !tagsLine(line, opening));
+  const title = first < 0 ? "" : commentText(lines[first], opening);
   const comments: string[] = [];
   for (const line of lines.slice(Math.max(topOf(lines), 0))) {
     if (!line.trim()) continue;
-    if (!OPENING.test(line)) break;
-    comments.push(line.replace(OPENING, "").replace(CLOSING, ""));
+    if (!opening.test(line)) break;
+    comments.push(line.replace(opening, "").replace(CLOSING, ""));
   }
   return {
     title,
@@ -85,17 +91,17 @@ function meta(body: string): NoteMeta {
  * The note with `#tag` in a comment at its top, unless it has the tag: in a comment of tags there
  * already, or one of its own below the title (a comment) or above the code, after a `#!` line.
  */
-const addTag = (comment: [string, string?]) => (body: string, tag: string) => {
-  if (meta(body).tags.includes(tag)) return body;
+const addTag = (comment: [string, string?], opening: RegExp) => (body: string, tag: string) => {
+  if (meta(body, opening).tags.includes(tag)) return body;
   const lines = body.split("\n");
   const top = topOf(lines);
   if (top < 0) return `${[comment[0], `#${tag}`, comment[1]].filter(Boolean).join(" ")}\n${body}`;
-  for (let i = top; i < lines.length && OPENING.test(lines[i]); i++) {
-    if (!tagsLine(lines[i])) continue;
+  for (let i = top; i < lines.length && opening.test(lines[i]); i++) {
+    if (!tagsLine(lines[i], opening)) continue;
     lines[i] = CLOSING.test(lines[i]) ? lines[i].replace(CLOSING, (closing) => ` #${tag}${closing}`) : `${lines[i].trimEnd()} #${tag}`;
     return lines.join("\n");
   }
-  const at = OPENING.test(lines[top]) ? top + 1 : top;
+  const at = opening.test(lines[top]) ? top + 1 : top;
   lines.splice(at, 0, [comment[0], `#${tag}`, comment[1]].filter(Boolean).join(" "));
   return lines.join("\n");
 };
@@ -122,6 +128,7 @@ export const code = (): Plugin => ({
       .filter((description) => description.extensions.length && !OWN_FORMATS.has(description.name))
       .map((description): NoteLanguage => {
         const comment = commentOf(description.name);
+        const opening = openingOf(comment[0]);
         // Made once, so a note opened in the language again is set up as it was.
         let editing: Extension | undefined;
         return {
@@ -131,11 +138,11 @@ export const code = (): Plugin => ({
           extensions: [...new Set([USUAL[description.name] ?? description.extensions[0], ...description.extensions])],
           mimeType: "text/plain",
           editor: () => (editing ??= codeEditing(description)),
-          meta,
+          meta: (body) => meta(body, opening),
           plainText: (body) => body,
           stats: (body) => countLines(body.split("\n").map((text) => ({ text, heading: false }))),
-          addTag: addTag(comment),
-          newNote: ({ tag }) => (tag ? addTag(comment)("", tag) : ""),
+          addTag: addTag(comment, opening),
+          newNote: ({ tag }) => (tag ? addTag(comment, opening)("", tag) : ""),
           file: (body) => body,
           print: (body, parts) => el("div", "doc doc-code-note", parts.code(body, description.name)),
         };
