@@ -305,6 +305,13 @@ describe("fixed", () => {
     expect(await app.page.evaluate(() => window.testing.plugins.language("code-python").extensions[0])).toBe("py");
   });
 
+  test("a tag with combining marks is drawn whole", async () => {
+    await app.open(`Notes\n\n#हिंदी and ${"#tiếng_việt".normalize("NFD")}`);
+    await app.page.evaluate(() => window.testing.place(0));
+    const tags = await app.page.locator(".editor-pane .cm-lp-tag").allTextContents();
+    expect(tags.map((tag) => tag.normalize("NFC"))).toEqual(["#हिंदी", "#tiếng_việt"]);
+  });
+
   test("a spreadsheet block's cell with a ``` line in it doesn't end the block", async () => {
     await app.open("```csv\nname,example\nJS,x\n```\n\nAfter the block.");
     await app.page.locator(".cm-sheet [role=gridcell]").nth(3).dblclick();

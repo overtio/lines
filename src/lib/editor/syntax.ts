@@ -1,6 +1,6 @@
 import type { BlockContext, InlineContext, Line, MarkdownConfig } from "@lezer/markdown";
 import { tags as t } from "@lezer/highlight";
-import { TAG_CHAR } from "../notes/parse";
+import { TAG_CHAR } from "../notes/tags";
 
 const HASH = 35, EQUALS = 61, SLASH = 47, OPEN_PAREN = 40;
 
@@ -59,10 +59,10 @@ export const Tag: MarkdownConfig = {
 
 const AT = 64, OPEN_BRACKET = 91, BANG = 33;
 /** A mention at the start of the text (see notes/properties.ts `MENTION`, which also checks what's before it). */
-const MENTION_AT = /@(?:\[[^\]\n]+\]|[\p{L}\p{N}_][\p{L}\p{N}_-]*)(?:\.[\p{L}_][\p{L}\p{N}_-]*)?/uy;
+const MENTION_AT = /@(?:\[[^\]\n]+\]|[\p{L}\p{N}_][\p{L}\p{M}\p{N}_-]*)(?:\.[\p{L}_][\p{L}\p{M}\p{N}_-]*)?/uy;
 const TYPE_AT = /@type\.[\p{L}\p{N}_][\p{L}\p{N}_-]*(?:\([^()\n]*\))?/iuy;
 /** What can't come right before a mention's `@`: emails, `owner/repo@sha`, `\@`. */
-const NOT_BEFORE_MENTION = /[\p{L}\p{N}_./\\@`]/u;
+const NOT_BEFORE_MENTION = /[\p{L}\p{M}\p{N}_./\\@`]/u;
 /** A wiki link at the start of the text (see notes/properties.ts `MENTION`). */
 const WIKI_AT = /\[\[[^[\]\n|#]*[^\s[\]|#][^[\]\n|#]*(?:#[^[\]\n|]*)?(?:\|[^[\]\n]+)?\]\]/uy;
 

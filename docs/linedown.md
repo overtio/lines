@@ -92,9 +92,9 @@ It's drawn as a dashed line across the note, named; over a backdrop (Settings �
 `#tag` anywhere in a note files it under that tag in the sidebar. `#work/meetings` is a nested tag: it shows under `work` there. A tag is drawn with its icon in the sidebar in place of its `#` (a hash, unless one was chosen there), and the `#` shows again with the cursor on the tag. ⌘-click a tag (or ⌥↵ with the cursor on it) to list its notes, as choosing it in the sidebar does.
 
 - A tag starts at the beginning of a line, after a space, or after `(`. It doesn't start in the middle of a word (`C#`), and not as a link's URL (`[x](#anchor)`).
-- It runs on while there are letters, digits, `_`, `-` or `/` (any script: `#café`, `#日本`). A trailing `/` isn't part of it.
+- It runs on while there are letters (with their accents and vowel signs), digits, `_`, `-` or `/`, in any script: `#café`, `#日本`, `#हिंदी`. A trailing `/` isn't part of it.
 - A run of only digits isn't a tag (`#1`, `#2024`), so numbered references stay as they are.
-- Tags are matched without case: `#Work` and `#work` are the same tag, shown in lowercase in the sidebar.
+- Tags are matched without case: `#Work` and `#work` are the same tag, shown in lowercase in the sidebar. An accent typed as a letter of its own or as a mark after one makes the same tag, and `#İstanbul` is `#istanbul`.
 - Tags inside code (inline or blocks) don't count.
 - `# Heading` (with a space) is a heading, not a tag. A line of only `#` (up to six, with nothing after) is text, where a tag is being typed, rather than CommonMark's empty heading: `# ` with its space is the heading.
 

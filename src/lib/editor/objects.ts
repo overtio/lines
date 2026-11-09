@@ -187,11 +187,11 @@ export interface IconCompletion extends Completion {
 }
 
 /** An "@" being typed, and the name after it (after a "[" for a title with spaces). */
-const TYPING_MENTION = /(?<![\p{L}\p{N}_./\\@`])@(\[[^\]\n]*|[\p{L}\p{N}_-]*)$/u;
+const TYPING_MENTION = /(?<![\p{L}\p{M}\p{N}_./\\@`])@(\[[^\]\n]*|[\p{L}\p{M}\p{N}_-]*)$/u;
 /** A wiki link being typed, `[[` and the name after it (not an embed, `![[`). */
 const TYPING_WIKI = /(?<![!\\])\[\[([^[\]\n|#]*)$/u;
 /** A mention followed by a "." and the start of a property's key. */
-const TYPING_KEY = /(?<![\p{L}\p{N}_./\\@`])@(?:\[([^\]\n]+)\]|([\p{L}\p{N}_][\p{L}\p{N}_-]*))\.([\p{L}\p{N}_-]*)$/u;
+const TYPING_KEY = /(?<![\p{L}\p{M}\p{N}_./\\@`])@(?:\[([^\]\n]+)\]|([\p{L}\p{N}_][\p{L}\p{M}\p{N}_-]*))\.([\p{L}\p{M}\p{N}_-]*)$/u;
 /** Where an "@" is just an "@". */
 const LITERAL = new Set(["FencedCode", "CodeBlock", "InlineCode", "CodeText", "URL"]);
 const MAX_OPTIONS = 40;
@@ -272,7 +272,7 @@ export function editProperties(view: EditorView, from: number, to: number) {
 }
 
 /** A mention and a "." with nothing after it yet, before the cursor. */
-const JUST_DOT = /(?<![\p{L}\p{N}_./\\@`])@(?:\[[^\]\n]+\]|[\p{L}\p{N}_][\p{L}\p{N}_-]*)\.$/u;
+const JUST_DOT = /(?<![\p{L}\p{M}\p{N}_./\\@`])@(?:\[[^\]\n]+\]|[\p{L}\p{N}_][\p{L}\p{M}\p{N}_-]*)\.$/u;
 
 /**
  * The properties menu opens on the "." after a mention, but that "." often ends a sentence: Enter

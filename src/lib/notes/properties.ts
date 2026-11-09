@@ -100,7 +100,7 @@ export const typeLabel = (type: string) => type.charAt(0).toUpperCase() + type.s
  * (`![[…]]`) isn't one.
  */
 export const MENTION =
-  /(?<![\p{L}\p{N}_./\\@`])@(?:\[([^\]\n]+)\]|([\p{L}\p{N}_][\p{L}\p{N}_-]*))(?:\.([\p{L}_][\p{L}\p{N}_-]*))?|(?<![!\\])\[\[([^[\]\n|#]*[^\s[\]|#][^[\]\n|#]*)(?:#[^[\]\n|]*)?(?:\|([^[\]\n]+))?\]\]/gu;
+  /(?<![\p{L}\p{M}\p{N}_./\\@`])@(?:\[([^\]\n]+)\]|([\p{L}\p{N}_][\p{L}\p{M}\p{N}_-]*))(?:\.([\p{L}_][\p{L}\p{M}\p{N}_-]*))?|(?<![!\\])\[\[([^[\]\n|#]*[^\s[\]|#][^[\]\n|#]*)(?:#[^[\]\n|]*)?(?:\|([^[\]\n]+))?\]\]/gu;
 
 export interface Mention {
   /** The note's name, as written. */
@@ -125,7 +125,7 @@ export const wikiLinkOf = (title: string) => `[[${title.replace(/[[\]|#\n]/g, ""
 
 /** How to write a mention of the note titled `title`: bare if it's one word, in brackets otherwise. */
 export function mentionOf(title: string) {
-  return /^[\p{L}\p{N}_][\p{L}\p{N}_-]*$/u.test(title) ? `@${title}` : `@[${title.replace(/[\]\n]/g, "")}]`;
+  return /^[\p{L}\p{N}_][\p{L}\p{M}\p{N}_-]*$/u.test(title) ? `@${title}` : `@[${title.replace(/[\]\n]/g, "")}]`;
 }
 
 /** A property's key as a mention writes it: `Full name` → `full_name`. */

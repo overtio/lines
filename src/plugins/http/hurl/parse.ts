@@ -1,3 +1,4 @@
+import { TAGS_ONLY } from "../../../lib/notes/tags";
 import type { Asked } from "../curl";
 import type { Assert, Capture, Expect, Filter, Query, ReadText, Request, Value } from "../request";
 
@@ -13,8 +14,6 @@ const RESPONSE_LINE = /^HTTP(?:\/([\d.]+))?\s+(\d{3}|\*)$/;
 const SECTION = /^\[([A-Za-z]+)\]$/;
 const KEY_VALUE = /^((?:[\w.\-[\]@$]|\\.)+)\s*:\s?(.*)$/;
 const COMMENT = /^#\s?(.*)$/;
-/** A comment of nothing but tags, `# #work #api`: a note made under a tag has one, and it isn't a title. */
-const TAGS = /^(?:#[\p{L}\p{N}_/-]+\s*)+$/u;
 
 /** Section names, by alias. */
 const SECTIONS: Record<string, string> = {
@@ -264,7 +263,8 @@ export function parseHurl(text: string): ReadText {
       if (comment) {
         const said = comment[1].trim();
         if (said) comments.push(said);
-        if (!TAGS.test(said)) title = said;
+        // A comment of nothing but tags, `# #work #api`, as a note made under a tag has, isn't a title.
+        if (!TAGS_ONLY.test(said)) title = said;
       }
       continue;
     }
