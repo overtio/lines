@@ -103,7 +103,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 ### Make it yours
 
 - **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. See [docs/plugins.md](docs/plugins.md).
-- **Seventeen themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
+- **Twenty-three themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
 - **Monochrome and Invert**: any theme in greys, or turned light for dark, with the contrast it had.
 - **Paper to write on.** Ruled lines that every line of text sits on, and dots, squares or graph paper with a row of cells for each line (or any size you like), isometric paper, in your theme's colors or any color, as faint or strong as you like, and a grain or linen texture (Settings → Paper).
 - **A backdrop behind the page.** Put a soft gradient, a color or a picture of your own behind your notes, which then sit on it as pages, solid or frosted like glass (Settings → Paper → Backdrop).
@@ -286,7 +286,7 @@ src/
     code/                    Code notes, a format for each language CodeMirror knows, shown as one (Code) with a choice of language
     changes/                 Marks the lines changed since a note was opened (a line diff, diff.ts)
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
-    themes/                  The seventeen themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
+    themes/                  The twenty-three themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
     lucide/  sf-symbols/     Icon sets
   lib/
     plugins/
