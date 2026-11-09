@@ -69,6 +69,7 @@ class Plugins {
   readonly codeLanguages = $derived(this.#from("codeLanguages"));
   readonly links = $derived(this.#from("links"));
   readonly papers = $derived(this.#from("papers"));
+  readonly paperStyles = $derived(this.#from("paperStyles"));
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).
@@ -144,6 +145,11 @@ class Plugins {
   /** The theme `id`, or lines' own while its plugin is off. */
   theme(id: string): Theme {
     return this.themes.find((theme) => theme.id === id) ?? this.themes.find((theme) => theme.id === DEFAULT_THEME)!;
+  }
+
+  /** The paper style `id` (Settings → Paper), if its plugin is on. */
+  paperStyle(id: string) {
+    return this.paperStyles.find((style) => style.id === id);
   }
 
   /** The icon set `id`, or Lucide while its plugin is off. */

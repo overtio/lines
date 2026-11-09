@@ -15,6 +15,10 @@ export type SwipeDirection = "fingers" | "reversed";
 export type Paper = "a4" | "letter";
 /** Which side of the window a pane goes on. */
 export type Side = "left" | "right";
+/** How far apart a paper pattern's lines and dots are (Settings → Paper), as a part of a line of text. */
+export type PaperSpacing = "small" | "medium" | "large";
+/** What color a paper pattern is drawn in: the theme's ink or accent, or one of your own. */
+export type PaperColor = "ink" | "accent" | "custom";
 
 /** What a click on a link in a note does (editor/links.ts): web links (and attached files), tags, and mentions of notes. */
 export type LinkKind = "web" | "tag" | "mention";
@@ -147,6 +151,14 @@ interface Stored {
   /** Floating notes also float over full-screen apps (they're on every desktop either way). */
   floatingOverFullscreen: boolean;
   paper: Paper;
+  /** The paper notes are written on (lib/paper.svelte.ts): a pattern's and a texture's ids from plugins, or "none". */
+  paperPattern: string;
+  paperTexture: string;
+  paperSpacing: PaperSpacing;
+  paperColor: PaperColor;
+  /** The color of your own a pattern is drawn in, kept while another is chosen. */
+  paperCustomColor: string;
+  paperOpacity: number;
   /** How a LaTeX note's PDF is made: by lines (as it draws the note), or a typesetter plugin's id ("tex"). */
   typesetter: string;
   /** The sidebar's and note list's widths, in pixels, as dragged (App.svelte), and their sides of the window. */
@@ -188,6 +200,8 @@ export const SHEET_STATS = ["sum", "average", "min", "max", "count"] as const;
 export type SheetStat = (typeof SHEET_STATS)[number];
 
 export const OPACITY = { min: 0.3, max: 1, step: 0.01 };
+/** How strongly a paper pattern's lines are drawn over the page (dots, being small, a few times more). */
+export const PAPER_OPACITY = { min: 0.04, max: 0.6, step: 0.01 };
 
 /** How many days a new version may have to be out before lines updates to it (Settings → About → Updates). */
 export const UPDATE_WAITS = [0, 1, 3, 7, 14, 30] as const;
@@ -235,6 +249,12 @@ const DEFAULTS: Stored = {
   floatingButtons: "hover",
   floatingOverFullscreen: true,
   paper: localPaper(),
+  paperPattern: "none",
+  paperTexture: "none",
+  paperSpacing: "medium",
+  paperColor: "ink",
+  paperCustomColor: "#3d7dd8",
+  paperOpacity: 0.12,
   typesetter: "lines",
   sidebarWidth: 230,
   listWidth: 320,
@@ -297,6 +317,8 @@ function readLinks(raw: unknown): LinkClicks {
 
 /** A plugin's theme, icon set or typesetter, by id. */
 const id = (value: unknown, fallback: string) => (typeof value === "string" && /^[a-z0-9][a-z0-9-]*$/.test(value) ? value : fallback);
+/** A CSS color, short enough to be one someone chose rather than anything else. */
+const color = (value: unknown, fallback: string) => (typeof value === "string" && value.length <= 120 && CSS.supports("color", value) ? value : fallback);
 
 /** The saved preferences (or those `json` gives), each checked and falling back to its default; unknown keys are dropped. */
 function read(json?: string): Stored {
@@ -333,6 +355,12 @@ function read(json?: string): Stored {
     floatingButtons: oneOf(raw.floatingButtons, ["hover", "always"] as const, DEFAULTS.floatingButtons),
     floatingOverFullscreen: flag(raw.floatingOverFullscreen, true),
     paper: oneOf(raw.paper, ["a4", "letter"] as const, DEFAULTS.paper),
+    paperPattern: id(raw.paperPattern, DEFAULTS.paperPattern),
+    paperTexture: id(raw.paperTexture, DEFAULTS.paperTexture),
+    paperSpacing: oneOf(raw.paperSpacing, ["small", "medium", "large"] as const, DEFAULTS.paperSpacing),
+    paperColor: oneOf(raw.paperColor, ["ink", "accent", "custom"] as const, DEFAULTS.paperColor),
+    paperCustomColor: color(raw.paperCustomColor, DEFAULTS.paperCustomColor),
+    paperOpacity: clamp(raw.paperOpacity, PAPER_OPACITY.min, PAPER_OPACITY.max, DEFAULTS.paperOpacity),
     typesetter: id(raw.typesetter, DEFAULTS.typesetter),
     sidebarWidth: clamp(raw.sidebarWidth, PANE_WIDTHS.sidebar.min, PANE_WIDTHS.sidebar.max, DEFAULTS.sidebarWidth),
     listWidth: clamp(raw.listWidth, PANE_WIDTHS.list.min, PANE_WIDTHS.list.max, DEFAULTS.listWidth),
@@ -383,6 +411,12 @@ class Prefs {
   floatingButtons = $state<WindowButtons>(this.#initial.floatingButtons);
   floatingOverFullscreen = $state(this.#initial.floatingOverFullscreen);
   paper = $state<Paper>(this.#initial.paper);
+  paperPattern = $state(this.#initial.paperPattern);
+  paperTexture = $state(this.#initial.paperTexture);
+  paperSpacing = $state<PaperSpacing>(this.#initial.paperSpacing);
+  paperColor = $state<PaperColor>(this.#initial.paperColor);
+  paperCustomColor = $state(this.#initial.paperCustomColor);
+  paperOpacity = $state(this.#initial.paperOpacity);
   typesetter = $state(this.#initial.typesetter);
   sidebarWidth = $state(this.#initial.sidebarWidth);
   listWidth = $state(this.#initial.listWidth);
@@ -530,6 +564,12 @@ class Prefs {
       floatingButtons: this.floatingButtons,
       floatingOverFullscreen: this.floatingOverFullscreen,
       paper: this.paper,
+      paperPattern: this.paperPattern,
+      paperTexture: this.paperTexture,
+      paperSpacing: this.paperSpacing,
+      paperColor: this.paperColor,
+      paperCustomColor: this.paperCustomColor,
+      paperOpacity: this.paperOpacity,
       typesetter: this.typesetter,
       sidebarWidth: this.sidebarWidth,
       listWidth: this.listWidth,
@@ -591,6 +631,12 @@ class Prefs {
     this.floatingButtons = next.floatingButtons;
     this.floatingOverFullscreen = next.floatingOverFullscreen;
     this.paper = next.paper;
+    this.paperPattern = next.paperPattern;
+    this.paperTexture = next.paperTexture;
+    this.paperSpacing = next.paperSpacing;
+    this.paperColor = next.paperColor;
+    this.paperCustomColor = next.paperCustomColor;
+    this.paperOpacity = next.paperOpacity;
     this.typesetter = next.typesetter;
     this.sidebarWidth = next.sidebarWidth;
     this.listWidth = next.listWidth;

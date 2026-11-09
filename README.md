@@ -102,6 +102,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 - **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. See [docs/plugins.md](docs/plugins.md).
 - **Seventeen themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
 - **Monochrome and Invert**: any theme in greys, or turned light for dark, with the contrast it had.
+- **Paper to write on.** Ruled lines that every line of text sits on, dots, squares, graph or isometric paper, in your theme's colors or any color, as faint or strong as you like, and a grain or linen texture (Settings → Paper).
 - **Fonts, text size, note width and spacing**, with a live preview; <kbd>⌘+</kbd> and <kbd>⌘−</kbd> size the text as you read. Notes can be narrow, medium, wide, any width between, or fill the window.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
 - **Fits any screen**: three columns on a desktop, a drawer on a tablet, a stack on a phone. Drag the columns to resize them.
@@ -277,6 +278,7 @@ src/
     unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
     github/                  Links to GitHub drawn short
     arxiv/                   Links to arXiv's papers drawn short, and searching arXiv for /paper (pacing requests as arXiv asks)
+    paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen
     themes/                  The seventeen themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
     lucide/  sf-symbols/     Icon sets
   lib/
@@ -284,6 +286,7 @@ src/
       types.ts               What a plugin is and what it can add: formats, themes, icon sets, engines…
       registry.svelte.ts     The plugins, which are on (kept and shared between windows), and what they add
       plainText.ts           How a note shows while its format's plugin is off
+    paper.svelte.ts          The paper chosen in Settings → Paper, as custom properties editor.css draws
     themes/                  The themes plugins add, as CSS (css.ts, which the website uses too), and this window's theme (show.svelte.ts); your own themes, their files, importing them, and working out colors
     editor/
       Editor.svelte          CodeMirror host; per-note undo history

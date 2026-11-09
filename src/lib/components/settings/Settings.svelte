@@ -14,6 +14,7 @@
   import FloatingSection from "./FloatingSection.svelte";
   import GeneralSection from "./GeneralSection.svelte";
   import LayoutSection from "./LayoutSection.svelte";
+  import PaperSection from "./PaperSection.svelte";
   import PluginsSection from "./PluginsSection.svelte";
   import PrivacySection from "./PrivacySection.svelte";
   import { sectionList, sections, type Section, type SettingsGroup, type SettingsSection } from "./sections";
@@ -37,6 +38,7 @@
   const SHOWN: Record<SettingsSection, Component> = {
     general: GeneralSection,
     theme: ThemeSection,
+    paper: PaperSection,
     layout: LayoutSection,
     text: TextSection,
     editor: EditorSection,

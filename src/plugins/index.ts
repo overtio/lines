@@ -12,6 +12,7 @@ import { lucide } from "./lucide";
 import { markdown } from "./markdown";
 import { mermaid } from "./mermaid";
 import { models } from "./models";
+import { paper } from "./paper";
 import { pele } from "./pele";
 import { secrets } from "./secrets";
 import { sfSymbols } from "./sf-symbols";
@@ -46,6 +47,7 @@ export const builtIn = (): Plugin[] => [
   github(),
   arxiv(),
   themes(),
+  paper(),
   lucide(),
   // Its symbols may only be used on Apple's platforms.
   ...(isApple ? [sfSymbols()] : []),
