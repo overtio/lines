@@ -30,14 +30,14 @@
     class="relative flex h-5 min-w-0 flex-1 touch-none items-center select-none data-disabled:opacity-45"
   >
     <!-- In forced colors, which drop backgrounds, the track is its border and the part chosen is Highlight. -->
-    <span class="relative h-1 w-full grow overflow-hidden rounded-full bg-ink/15 forced-colors:h-1.5 forced-colors:border forced-colors:border-[CanvasText]">
+    <span class="ui-slider-track relative h-1 w-full grow overflow-hidden rounded-full bg-ink/15 forced-colors:h-1.5 forced-colors:border forced-colors:border-[CanvasText]">
       <Slider.Range class="absolute h-full bg-accent forced-colors:bg-[Highlight] forced-colors:[forced-color-adjust:none]" />
     </span>
     <Slider.Thumb
       index={0}
       aria-label={label}
       aria-valuetext={(spoken ?? format)?.(value)}
-      class="block size-4 cursor-pointer rounded-full border border-line bg-[#fff] shadow-segment transition-[scale] active:scale-110 coarse:size-6"
+      class="ui-slider-thumb block size-4 cursor-pointer rounded-full border border-line bg-[#fff] shadow-segment transition-[scale] active:scale-110 coarse:size-6"
     />
   </Slider.Root>
   {#if format}

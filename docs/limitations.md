@@ -164,6 +164,14 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - A picture of a note (PNG) is one long page, without its breaks.
 - With a pattern drawn in columns (squares, graph) over a backdrop, each page's columns run its full height, past the last line's row.
 
+## Styles
+
+- A style can't be made in Settings yet, only added by a plugin; a theme of your own can be used with any style.
+- Pixel's and Neon's fonts cover Latin (and Pixel's Cyrillic, Neon's Thai and Vietnamese); other writing shows in the fallback font. Classic uses Tahoma, which Linux usually lacks, so it falls back to Verdana or the system's sans.
+- Classic's scroll bars with arrow buttons show where the system draws scroll bars that stay (Windows, Linux, or macOS set to show them always); overlay scroll bars stay the system's.
+- Printed pages and PDFs look the same in every style.
+- Not tried in the Mac app yet, nor on phones.
+
 ## Symbols
 
 - Only Markdown notes show `->` as →; LaTeX notes show what's typed (LaTeX has `\to` and `\neq` for these).

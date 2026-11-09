@@ -20,6 +20,7 @@ import { secrets } from "./secrets";
 import { sfSymbols } from "./sf-symbols";
 import { spreadsheet } from "./spreadsheet";
 import { tex } from "./tex";
+import { styles } from "./styles";
 import { themes } from "./themes";
 import { unsplash } from "./unsplash";
 import { wavedrom } from "./wavedrom";
@@ -51,6 +52,7 @@ export const builtIn = (): Plugin[] => [
   arxiv(),
   changesPlugin(),
   themes(),
+  styles(),
   paper(),
   lucide(),
   // Its symbols may only be used on Apple's platforms.

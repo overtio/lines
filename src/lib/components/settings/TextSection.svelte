@@ -3,6 +3,7 @@
   import { EditorView } from "@codemirror/view";
   import { createExtensions, readOnly } from "../../editor/setup";
   import { t } from "../../i18n/index.svelte";
+  import { plugins } from "../../plugins/registry.svelte";
   import {
     DEFAULT_SPACING,
     FONTS,
@@ -83,7 +84,7 @@
     <Segmented
       class="w-full"
       label={t("settings.font")}
-      options={FONTS.map((font) => ({ id: font.id, label: font.name }))}
+      options={FONTS.map((font) => ({ id: font.id, label: font.id === "system" ? (plugins.style(prefs.style)?.font?.name ?? font.name) : font.name }))}
       value={prefs.font}
       onselect={(id) => (prefs.font = id)}
       stacked

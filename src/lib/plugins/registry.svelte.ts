@@ -2,7 +2,7 @@ import { builtIn } from "../../plugins";
 import { customThemes } from "../themes/custom.svelte";
 import { announce, onAnnounce } from "../windows/channel";
 import { plainTextLanguage } from "./plainText";
-import type { Contributions, EmbedLink, IconSet, NoteLanguage, Plugin, Theme } from "./types";
+import type { AppStyle, Contributions, EmbedLink, IconSet, NoteLanguage, Plugin, Theme } from "./types";
 
 /*
  * The plugins lines has, which of them are on, and what the ones on add. Everything that asks for a
@@ -15,7 +15,8 @@ const KEY = "lines.plugins";
 
 /** What a note is written in when it doesn't say. */
 export const DEFAULT_LANGUAGE = "markdown";
-const DEFAULT_THEME = "lines";
+export const DEFAULT_THEME = "lines";
+export const DEFAULT_STYLE = "lines";
 const DEFAULT_ICONS = "lucide";
 
 /** A file name's extension, in lowercase: `stl` for `Bracket.STL`. */
@@ -58,6 +59,7 @@ class Plugins {
   /** The plugins' themes, then your own (themes/custom.svelte.ts). */
   readonly themes = $derived([...this.#from("themes"), ...customThemes.themes]);
   readonly themeFormats = $derived(this.#from("themeFormats"));
+  readonly styles = $derived(this.#from("styles"));
   readonly iconSets = $derived(this.#from("iconSets"));
   readonly mathEngines = $derived(this.#from("math"));
   readonly renderers = $derived(this.#from("renderers"));
@@ -146,6 +148,11 @@ class Plugins {
   /** The theme `id`, or lines' own while its plugin is off. */
   theme(id: string): Theme {
     return this.themes.find((theme) => theme.id === id) ?? this.themes.find((theme) => theme.id === DEFAULT_THEME)!;
+  }
+
+  /** The style `id` (Settings → Theme → Style), or lines' own while its plugin is off. */
+  style(id: string): AppStyle | undefined {
+    return this.styles.find((style) => style.id === id) ?? this.styles.find((style) => style.id === DEFAULT_STYLE);
   }
 
   /** The paper style `id` (Settings → Paper), if its plugin is on. */

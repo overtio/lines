@@ -246,7 +246,7 @@
         {onOpenAutoFocus}
         {onCloseAutoFocus}
         aria-labelledby="settings-title"
-        class="fixed top-[max(16px,9dvh)] left-1/2 z-50 flex h-[min(680px,calc(100dvh-max(16px,9dvh)-16px))] w-[min(900px,calc(100vw-32px))] -translate-x-1/2 overflow-hidden rounded-xl border border-line bg-panel text-fg shadow-dialog outline-none animate-pop-in"
+        class="ui-dialog fixed top-[max(16px,9dvh)] left-1/2 z-50 flex h-[min(680px,calc(100dvh-max(16px,9dvh)-16px))] w-[min(900px,calc(100vw-32px))] -translate-x-1/2 overflow-hidden rounded-xl border border-line bg-panel text-fg shadow-dialog outline-none animate-pop-in"
       >
         {@render content()}
       </Dialog.Content>

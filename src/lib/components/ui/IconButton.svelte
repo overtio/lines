@@ -26,7 +26,7 @@
   aria-label={label}
   title={tooltip ?? label}
   class={[
-    "touch-target grid size-8 shrink-0 place-items-center rounded-md transition-colors enabled:hover:bg-hover disabled:opacity-35",
+    "ui-icon-button touch-target grid size-8 shrink-0 place-items-center rounded-md transition-colors enabled:hover:bg-hover disabled:opacity-35",
     danger ? "text-danger" : ["enabled:hover:text-fg", open ? "bg-active text-fg" : on ? "text-accent" : "text-muted"],
     className,
   ]}

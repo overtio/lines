@@ -28,10 +28,11 @@
 <button
   type="button"
   class={[
-    "inline-flex h-control shrink-0 items-center justify-center gap-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors disabled:opacity-45",
+    "ui-button inline-flex h-control shrink-0 items-center justify-center gap-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors disabled:opacity-45",
     variants[variant],
     className,
   ]}
+  data-variant={variant}
   {...rest}
 >
   {#if busy || icon}<Icon name={busy ? "loader" : icon!} size={15} class={busy ? "animate-spin" : ""} />{/if}

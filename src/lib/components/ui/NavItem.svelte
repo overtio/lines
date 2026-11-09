@@ -14,7 +14,7 @@
 <button
   type="button"
   class={[
-    "flex h-8 w-full shrink-0 items-center gap-2.5 rounded-md px-2.5 text-left text-sm transition-colors coarse:h-11",
+    "ui-nav-item flex h-8 w-full shrink-0 items-center gap-2.5 rounded-md px-2.5 text-left text-sm transition-colors coarse:h-11",
     !icon && "pl-9",
     active ? "bg-active font-medium text-fg" : "text-muted hover:bg-hover hover:text-fg",
     className,

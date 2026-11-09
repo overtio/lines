@@ -36,6 +36,13 @@ export default {
   "plugins.tex.description": "Typesets a LaTeX note’s PDF with TeX itself, instead of lines’ own pages.",
   "plugins.themes": "Themes",
   "plugins.themes.description": "Lines and twenty-two more, including High Contrast and two for color blindness. Reads themes made for VS Code, Zed, Base16, terminals and Linux desktops too.",
+  "plugins.styles": "Styles",
+  "plugins.styles.description": "Whole looks for the app beyond its colors: Classic, a desktop of the 90s; Pixel, one-bit and minimal; and Neon. Each comes with colors of its own.",
+  // What each style is like, under its name in Settings → Theme → Style.
+  "styles.lines": "Soft corners, quiet shadows and your system's font.",
+  "styles.classic": "A desktop of the late 90s: bevels, a title bar, square corners.",
+  "styles.pixel": "One-bit and minimal: a pixel font, hard shadows, nothing round.",
+  "styles.neon": "A city at night: glowing lines, a grid, scan lines.",
   "plugins.changes": "Changes",
   "plugins.changes.description": "Marks the lines you change in a note beside them, as a code editor does: added in green, changed in blue, and where lines were taken out in red. Since the note was opened.",
   "plugins.changes.added": "Added",

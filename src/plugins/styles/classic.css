@@ -1,0 +1,273 @@
+/*
+ * Classic: a desktop of the late 90s. Square everything, raised and sunken bevels lit from the top
+ * left, a title bar with a gradient, the selection in the accent, and aliased type. The bevels are
+ * the panel color lightened and darkened, so they follow whatever theme is chosen with it.
+ */
+
+:root[data-style="classic"] {
+  --bevel-light: color-mix(in srgb, var(--bg-elevated), white 85%);
+  --bevel-soft: color-mix(in srgb, var(--bg-elevated), white 45%);
+  --bevel-mid: color-mix(in srgb, var(--bg-elevated), black 33%);
+  --bevel-dark: color-mix(in srgb, var(--bg-elevated), black 92%);
+  --raised: inset -1px -1px var(--bevel-dark), inset 1px 1px var(--bevel-light), inset -2px -2px var(--bevel-mid), inset 2px 2px var(--bevel-soft);
+  --window: inset -1px -1px var(--bevel-dark), inset 1px 1px var(--bevel-soft), inset -2px -2px var(--bevel-mid), inset 2px 2px var(--bevel-light);
+  --pressed: inset -1px -1px var(--bevel-light), inset 1px 1px var(--bevel-dark), inset -2px -2px var(--bevel-soft), inset 2px 2px var(--bevel-mid);
+  --sunken: inset -1px -1px var(--bevel-light), inset 1px 1px var(--bevel-mid), inset -2px -2px var(--bevel-soft), inset 2px 2px var(--bevel-dark);
+  --thin-raised: inset -1px -1px var(--bevel-mid), inset 1px 1px var(--bevel-light);
+  --thin-pressed: inset -1px -1px var(--bevel-light), inset 1px 1px var(--bevel-mid);
+  --title-bar: linear-gradient(90deg, var(--accent), color-mix(in oklch, var(--accent) 55%, white));
+}
+
+:root[data-style="classic"] body {
+  -webkit-font-smoothing: none;
+}
+
+/* The window's chrome in the panel color, the title of the list as a title bar. */
+:root[data-style="classic"] .toolbar {
+  background: var(--bg-elevated);
+  box-shadow: inset 0 -1px var(--bevel-mid), inset 0 1px var(--bevel-light);
+}
+
+:root[data-style="classic"] .note-list > .titlebar {
+  background: var(--title-bar);
+  color: var(--on-accent);
+}
+
+:root[data-style="classic"] .note-list > .titlebar :is(h1, .ui-icon-button, .icon) {
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+/* Chosen rows in the accent, as a list box's were; no lighting up under the pointer. */
+:root[data-style="classic"] .ui-note-row.selected {
+  --layer: var(--accent);
+}
+
+:root[data-style="classic"] .ui-note-row:not(.selected):hover {
+  --layer: transparent;
+}
+
+:root[data-style="classic"] .ui-sidebar-row.active,
+:root[data-style="classic"] .ui-option[data-highlighted] {
+  background: var(--accent);
+}
+
+:root[data-style="classic"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-option[data-highlighted]),
+:root[data-style="classic"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-option[data-highlighted]) * {
+  color: var(--on-accent) !important;
+}
+
+:root[data-style="classic"] .ui-sidebar-row:not(.active):hover,
+:root[data-style="classic"] .ui-nav-item:hover {
+  background: transparent;
+  text-decoration: underline;
+}
+
+/* Buttons: raised, pressed in when held; the main one with a dark frame around it. */
+:root[data-style="classic"] :is(.ui-button, .ui-select) {
+  min-width: 75px;
+  border: 0;
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-weight: 400;
+  box-shadow: var(--raised);
+}
+
+:root[data-style="classic"] .ui-button:is([data-variant="primary"], [data-variant="danger-primary"]) {
+  box-shadow: 0 0 0 1px var(--bevel-dark), var(--raised);
+}
+
+:root[data-style="classic"] .ui-button[data-variant="danger-primary"] {
+  color: var(--danger);
+}
+
+:root[data-style="classic"] .ui-button:is([data-variant="quiet"], [data-variant="danger"]) {
+  min-width: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+:root[data-style="classic"] .ui-button:is([data-variant="quiet"], [data-variant="danger"]):enabled:hover {
+  background: transparent;
+  box-shadow: var(--thin-raised);
+}
+
+:root[data-style="classic"] :is(.ui-button, .ui-select):enabled:hover {
+  background: var(--bg-elevated);
+  opacity: 1;
+}
+
+:root[data-style="classic"] .ui-button:enabled:active,
+:root[data-style="classic"] .ui-select[data-state="open"] {
+  box-shadow: var(--pressed);
+}
+
+:root[data-style="classic"] .ui-icon-button:enabled:hover {
+  background: transparent;
+  box-shadow: var(--thin-raised);
+}
+
+:root[data-style="classic"] .ui-icon-button:enabled:active {
+  box-shadow: var(--thin-pressed);
+}
+
+:root[data-style="classic"] :is(.ui-button, .ui-icon-button, .ui-segment, .ui-option):focus-visible {
+  outline: 1px dotted var(--text);
+  outline-offset: -4px;
+}
+
+/* Fields sunk into the panel, white inside. */
+:root[data-style="classic"] .ui-field {
+  border: 0;
+  background: var(--bg);
+  box-shadow: var(--sunken);
+}
+
+/* Menus and dialogs: a window's raised edge, no shadow. */
+:root[data-style="classic"] :is(.ui-menu, .ui-dialog) {
+  border: 0;
+  background: var(--bg-elevated);
+  box-shadow: var(--window);
+}
+
+:root[data-style="classic"] .ui-separator {
+  height: 0;
+  border-top: 1px solid var(--bevel-mid);
+  border-bottom: 1px solid var(--bevel-light);
+  background: none;
+}
+
+/* Groups of settings as etched group boxes. */
+:root[data-style="classic"] .ui-card {
+  border: 1px solid var(--bevel-mid);
+  background: transparent;
+  box-shadow: inset 1px 1px var(--bevel-light), 1px 1px var(--bevel-light);
+}
+
+/* A row of choices as buttons, the chosen one held in. */
+:root[data-style="classic"] .ui-segmented {
+  gap: 0;
+  padding: 0;
+  background: none;
+}
+
+:root[data-style="classic"] .ui-segment {
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow: var(--raised);
+}
+
+:root[data-style="classic"] .ui-segment[data-state="checked"] {
+  background: var(--bevel-soft);
+  box-shadow: var(--pressed);
+}
+
+/* A switch as a sunken slot with a raised knob; a slider as a groove with a raised handle. */
+/* Round only by being pills, which the radius scale leaves round: squared off here. */
+:root[data-style="classic"] :is(.ui-switch, .ui-switch-thumb, .ui-slider-thumb, .cm-lp-tag) {
+  border-radius: 0;
+}
+
+:root[data-style="classic"] .ui-switch {
+  border: 0;
+  background: var(--bg);
+  box-shadow: var(--sunken);
+  padding: 2px;
+}
+
+:root[data-style="classic"] .ui-switch[data-state="checked"] {
+  background: var(--accent);
+}
+
+:root[data-style="classic"] .ui-switch-thumb {
+  background: var(--bg-elevated);
+  box-shadow: var(--raised);
+}
+
+:root[data-style="classic"] .ui-slider-track {
+  height: 4px;
+  background: var(--bg);
+  box-shadow: var(--sunken);
+}
+
+:root[data-style="classic"] .ui-slider-track > * {
+  background: transparent;
+}
+
+:root[data-style="classic"] .ui-slider-thumb {
+  width: 11px;
+  height: 21px;
+  border: 0;
+  background: var(--bg-elevated);
+  box-shadow: var(--raised);
+}
+
+/* Scroll bars with arrow buttons, a raised thumb and a dotted track. Not while they're turned off. */
+:root[data-style="classic"]:not([data-no-scrollbars]),
+:root[data-style="classic"]:not([data-no-scrollbars]) * {
+  scrollbar-color: auto;
+}
+
+:root[data-style="classic"] ::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+:root[data-style="classic"] ::-webkit-scrollbar-track {
+  background-color: var(--bg-elevated);
+  background-image: conic-gradient(var(--bevel-light) 25%, transparent 0 50%, var(--bevel-light) 0 75%, transparent 0);
+  background-size: 2px 2px;
+}
+
+:root[data-style="classic"] ::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  box-shadow: var(--raised);
+}
+
+:root[data-style="classic"] ::-webkit-scrollbar-corner {
+  background: var(--bg-elevated);
+}
+
+:root[data-style="classic"] ::-webkit-scrollbar-button:single-button {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-color: var(--bg-elevated);
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: var(--raised);
+}
+
+:root[data-style="classic"] ::-webkit-scrollbar-button:single-button:active {
+  box-shadow: var(--pressed);
+}
+
+:root[data-style="classic"] ::-webkit-scrollbar-button:single-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath d='M3.5 0 7 4H0z'/%3E%3C/svg%3E");
+}
+
+:root[data-style="classic"] ::-webkit-scrollbar-button:single-button:vertical:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath d='M0 0h7L3.5 4z'/%3E%3C/svg%3E");
+}
+
+:root[data-style="classic"] ::-webkit-scrollbar-button:single-button:horizontal:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7'%3E%3Cpath d='M0 3.5 4 0v7z'/%3E%3C/svg%3E");
+}
+
+:root[data-style="classic"] ::-webkit-scrollbar-button:single-button:horizontal:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7'%3E%3Cpath d='M0 0l4 3.5L0 7z'/%3E%3C/svg%3E");
+}
+
+/* In notes: checkboxes sunk into the page, headings plain. */
+:root[data-style="classic"] .cm-lp-h {
+  letter-spacing: 0;
+}
+
+:root[data-style="classic"] .cm-lp-checkbox {
+  border: 0;
+  box-shadow: var(--sunken);
+}
+
+:root[data-style="classic"] .cm-lp-checkbox:not(.is-checked) {
+  background: var(--bg);
+}

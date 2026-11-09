@@ -43,6 +43,8 @@ export interface Contributions {
   languages?: NoteLanguage[];
   /** Color themes, each with a light and a dark side. */
   themes?: Theme[];
+  /** Whole looks for the app, beyond its colors: shapes, type, borders, shadows (Settings → Theme → Style). */
+  styles?: AppStyle[];
   /** Kinds of theme files made for other apps (VS Code, Base16, a terminal's) that lines can read themes from. */
   themeFormats?: ThemeFormat[];
   /** Ways to draw the icons lines uses. */
@@ -291,6 +293,33 @@ export interface Theme {
   dark: ThemeColors;
   /** What changes with Settings → Theme → Contrast → Increased, or the device's Increase Contrast. */
   moreContrast?: { light?: Partial<ThemeColors>; dark?: Partial<ThemeColors> };
+}
+
+/**
+ * A look for the whole app, beside the colors a theme gives it: its corners, type, borders and
+ * shadows, and what makes it itself, a 90s desktop's bevels or a neon glow. The app's parts are made
+ * from tokens (app.css) a style sets, and carry `data-ui` (`button`, `field`, `menu`…) for the rest.
+ */
+export interface AppStyle {
+  id: string;
+  name: string;
+  /** What it's like, in a few words, under its name in Settings. */
+  description?: string;
+  /** The color theme it's made with, chosen with it; any other can be chosen after. */
+  theme?: string;
+  /** Its own font, for the app and as notes' first font in Settings → Typography: what it's called, and its CSS font-family. */
+  font?: { name: string; family: string };
+  /**
+   * Custom properties it sets, by name: the radii (`radius-sm` … `radius-xl`), shadows (`card-shadow`,
+   * `shadow-menu`, `shadow-dialog`, `shadow-segment`), fonts (`font-system`, `font-mono`), heights
+   * (`control`, `row`).
+   */
+  properties?: Record<string, string>;
+  /**
+   * CSS for the rest, shown only while it's chosen: every rule's selector starts with
+   * `:root[data-style="<id>"]`. Comes after the app's own, so it outranks it.
+   */
+  css?: string;
 }
 
 /**

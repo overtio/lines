@@ -1,0 +1,148 @@
+/*
+ * Neon: a city at night. Lines and text that glow in the accent and the tags' color, a faint grid
+ * and scan lines, headings in a wide display face, buttons with their corners cut. The glow and the
+ * scan lines go with Increased contrast, and the grid with a paper chosen in Settings → Paper.
+ */
+
+:root[data-style="neon"] {
+  --glow: color-mix(in srgb, var(--accent) 55%, transparent);
+  --wire: color-mix(in srgb, var(--tag-text) 35%, transparent);
+  --wire-glow: color-mix(in srgb, var(--tag-text) 30%, transparent);
+  --display: Orbitron, var(--font-ui);
+  --cut: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+}
+
+/* Scan lines over everything, too faint to get in the way. */
+:root[data-style="neon"]:not([data-contrast="more"]) body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ink) 3.5%, transparent) 0 1px, transparent 1px 3px);
+}
+
+/* A grid behind the note. */
+:root[data-style="neon"]:not([data-paper]) .editor-pane {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--tag-text) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--tag-text) 5%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+:root[data-style="neon"] ::selection {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* Titles in the display face. */
+:root[data-style="neon"] :is(#note-list-title, #settings-title, .ui-dialog h2) {
+  font-family: var(--display);
+  font-size: var(--text-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+:root[data-style="neon"]:not([data-contrast="more"]) #note-list-title {
+  text-shadow: 0 0 10px var(--glow);
+}
+
+/* What's chosen: a bar of light down its edge. */
+:root[data-style="neon"] .ui-note-row.selected {
+  --layer: color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: inset 2px 0 var(--accent);
+}
+
+:root[data-style="neon"] :is(.ui-sidebar-row.active, .ui-option[data-highlighted]) {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  box-shadow: inset 2px 0 var(--accent);
+}
+
+:root[data-style="neon"]:not([data-contrast="more"]) :is(.ui-sidebar-row.active, .ui-note-row.selected) .icon {
+  filter: drop-shadow(0 0 4px var(--accent));
+}
+
+/* Buttons: the main one lit and cut at the corners, the rest wired in the tags' color. */
+:root[data-style="neon"] .ui-button {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+:root[data-style="neon"] .ui-button:is([data-variant="primary"], [data-variant="danger-primary"]) {
+  clip-path: var(--cut);
+  padding-inline: 18px;
+}
+
+:root[data-style="neon"] :is(.ui-button[data-variant="secondary"], .ui-select) {
+  border-color: var(--wire);
+  background: transparent;
+  color: var(--tag-text);
+  box-shadow: none;
+}
+
+:root[data-style="neon"] :is(.ui-button[data-variant="secondary"], .ui-select):enabled:hover {
+  border-color: var(--tag-text);
+  background: color-mix(in srgb, var(--tag-text) 8%, transparent);
+  box-shadow: 0 0 14px var(--wire-glow);
+}
+
+/* Fields and floating panels, wired and see-through. */
+:root[data-style="neon"] .ui-field {
+  border-color: var(--wire);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+
+:root[data-style="neon"] .ui-field:focus-within {
+  border-color: var(--tag-text);
+  box-shadow: 0 0 14px var(--wire-glow);
+}
+
+:root[data-style="neon"] :is(.ui-menu, .ui-dialog) {
+  border-color: var(--wire);
+  background: color-mix(in srgb, var(--bg-elevated) 90%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+:root[data-style="neon"] .ui-card {
+  border-color: var(--wire);
+  background: color-mix(in srgb, var(--bg-elevated) 60%, transparent);
+}
+
+:root[data-style="neon"] .ui-segment[data-state="checked"] {
+  color: var(--accent);
+}
+
+:root[data-style="neon"]:not([data-contrast="more"]) .ui-segment[data-state="checked"] {
+  text-shadow: 0 0 8px var(--glow);
+}
+
+:root[data-style="neon"]:not([data-contrast="more"]) .ui-switch[data-state="checked"],
+:root[data-style="neon"]:not([data-contrast="more"]) .ui-slider-track > * {
+  box-shadow: 0 0 10px var(--glow);
+}
+
+:root[data-style="neon"]:not([data-no-scrollbars]) {
+  scrollbar-color: var(--wire) transparent;
+}
+
+/* In notes: headings in the display face and glowing, links and tags lit, the cursor too. */
+:root[data-style="neon"] .cm-lp-h {
+  font-family: var(--display);
+  letter-spacing: 0.04em;
+}
+
+:root[data-style="neon"]:not([data-contrast="more"]) .cm-lp-h {
+  text-shadow: 0 0 12px var(--glow);
+}
+
+:root[data-style="neon"]:not([data-contrast="more"]) .cm-lp-link {
+  text-shadow: 0 0 8px var(--wire-glow);
+}
+
+:root[data-style="neon"] .cm-lp-tag {
+  box-shadow: 0 0 0 1px var(--wire);
+}
+
+:root[data-style="neon"] .cm-cursor {
+  border-left-color: var(--tag-text);
+  box-shadow: 0 0 6px var(--tag-text);
+}

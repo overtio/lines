@@ -1,0 +1,193 @@
+/*
+ * Pixel: as few things as can be, drawn as on a one-bit screen. Square, 2px lines in the text's
+ * color, hard shadows that a pressed button drops, what's chosen turned around (light on dark), a
+ * pixel font, and no easing: things change at once.
+ */
+
+:root[data-style="pixel"] {
+  --pixel-line: 2px solid var(--text);
+}
+
+/* Aliased, and without ligatures, which the pixel font draws poorly (its "fi" reads as an "A"). */
+:root[data-style="pixel"] body {
+  -webkit-font-smoothing: none;
+  font-variant-ligatures: none;
+}
+
+:root[data-style="pixel"] *,
+:root[data-style="pixel"] *::before,
+:root[data-style="pixel"] *::after {
+  transition-duration: 0s !important;
+}
+
+:root[data-style="pixel"] .animate-pop-in {
+  animation: none;
+}
+
+/* Icons drawn on the pixel grid. */
+:root[data-style="pixel"] .icon {
+  shape-rendering: crispEdges;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+:root[data-style="pixel"] ::selection {
+  background: var(--text);
+  color: var(--bg);
+}
+
+/* What's chosen, turned around. */
+:root[data-style="pixel"] .ui-note-row.selected {
+  --layer: var(--text);
+}
+
+:root[data-style="pixel"] .ui-sidebar-row.active,
+:root[data-style="pixel"] .ui-option[data-highlighted],
+:root[data-style="pixel"] .ui-segment[data-state="checked"],
+:root[data-style="pixel"] .ui-icon-button:enabled:hover {
+  background: var(--text);
+  box-shadow: none;
+}
+
+:root[data-style="pixel"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-option[data-highlighted], .ui-segment[data-state="checked"], .ui-icon-button:enabled:hover),
+:root[data-style="pixel"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-option[data-highlighted], .ui-segment[data-state="checked"], .ui-icon-button:enabled:hover) * {
+  color: var(--bg) !important;
+}
+
+/* Lines around what can be pressed or typed in, and around what floats. */
+:root[data-style="pixel"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select, .ui-field, .ui-segmented, .ui-card, .ui-menu, .ui-dialog) {
+  border: var(--pixel-line);
+}
+
+:root[data-style="pixel"] :is(.ui-button, .ui-select) {
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 700;
+  box-shadow: 3px 3px 0 var(--text);
+}
+
+:root[data-style="pixel"] .ui-button:is([data-variant="primary"], [data-variant="danger-primary"]) {
+  background: var(--text);
+  color: var(--bg);
+}
+
+:root[data-style="pixel"] .ui-button:is([data-variant="quiet"], [data-variant="danger"]) {
+  box-shadow: none;
+}
+
+:root[data-style="pixel"] :is(.ui-button, .ui-select):enabled:hover {
+  opacity: 1;
+}
+
+:root[data-style="pixel"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select):enabled:active {
+  translate: 3px 3px;
+  box-shadow: none;
+}
+
+:root[data-style="pixel"] .ui-field {
+  background: var(--bg);
+}
+
+:root[data-style="pixel"] .ui-field:focus-within {
+  box-shadow: 3px 3px 0 var(--text);
+}
+
+:root[data-style="pixel"] .ui-segmented {
+  padding: 2px;
+  background: var(--bg);
+}
+
+:root[data-style="pixel"] .ui-card {
+  background: var(--bg);
+}
+
+:root[data-style="pixel"] .ui-callout {
+  border: 2px dashed currentColor;
+}
+
+/* Switches and sliders as blocks. */
+/* Round only by being pills, which the radius scale leaves round: squared off here. */
+:root[data-style="pixel"] :is(.ui-switch, .ui-switch-thumb, .ui-slider-thumb, .cm-lp-tag) {
+  border-radius: 0;
+}
+
+:root[data-style="pixel"] .ui-switch {
+  border: var(--pixel-line);
+  background: var(--bg);
+  height: 22px;
+  width: 40px;
+}
+
+:root[data-style="pixel"] .ui-switch[data-state="checked"] {
+  background: var(--text);
+}
+
+:root[data-style="pixel"] .ui-switch-thumb {
+  background: var(--text);
+  box-shadow: none;
+}
+
+:root[data-style="pixel"] .ui-switch[data-state="checked"] .ui-switch-thumb {
+  background: var(--bg);
+  translate: 2px 0;
+}
+
+:root[data-style="pixel"] .ui-slider-track {
+  height: 2px;
+  background: var(--text);
+}
+
+:root[data-style="pixel"] .ui-slider-thumb {
+  width: 12px;
+  height: 18px;
+  border: var(--pixel-line);
+  background: var(--bg);
+  box-shadow: none;
+}
+
+/* Scroll bars as a block on a line. Not while they're turned off. */
+:root[data-style="pixel"]:not([data-no-scrollbars]),
+:root[data-style="pixel"]:not([data-no-scrollbars]) * {
+  scrollbar-color: auto;
+}
+
+:root[data-style="pixel"] ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+:root[data-style="pixel"] ::-webkit-scrollbar-track {
+  background: linear-gradient(90deg, transparent 5px, var(--text) 5px 7px, transparent 7px);
+}
+
+:root[data-style="pixel"] ::-webkit-scrollbar-track:horizontal {
+  background: linear-gradient(transparent 5px, var(--text) 5px 7px, transparent 7px);
+}
+
+:root[data-style="pixel"] ::-webkit-scrollbar-thumb {
+  background: var(--text);
+}
+
+:root[data-style="pixel"] ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* In notes: square bullets and boxes, a block for the cursor. */
+:root[data-style="pixel"] .cm-lp-h {
+  letter-spacing: 0;
+}
+
+:root[data-style="pixel"] .cm-lp-bullet::before {
+  border-radius: 0;
+}
+
+:root[data-style="pixel"] .cm-lp-checkbox {
+  border: var(--pixel-line);
+}
+
+:root[data-style="pixel"] .cm-cursor {
+  width: 0.55em;
+  border-left: 0;
+  margin-left: 0;
+  background: color-mix(in srgb, var(--text) 45%, transparent);
+}

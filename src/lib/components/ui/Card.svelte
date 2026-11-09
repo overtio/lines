@@ -6,6 +6,6 @@
   let { class: className, children, ...rest }: HTMLAttributes<HTMLDivElement> & { children: Snippet } = $props();
 </script>
 
-<div class={["rounded-xl border border-card-line bg-card", className]} {...rest}>
+<div class={["ui-card rounded-xl border border-card-line bg-card", className]} {...rest}>
   {@render children()}
 </div>

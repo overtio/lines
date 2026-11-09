@@ -13,9 +13,9 @@
   bind:checked={() => checked, onchange}
   {disabled}
   aria-label={label}
-  class="touch-target inline-flex h-5 w-[34px] shrink-0 items-center rounded-full border border-transparent bg-ink/15 p-px transition-colors data-[state=checked]:bg-accent data-disabled:opacity-45"
+  class="ui-switch touch-target inline-flex h-5 w-[34px] shrink-0 items-center rounded-full border border-transparent bg-ink/15 p-px transition-colors data-[state=checked]:bg-accent data-disabled:opacity-45"
 >
   <Switch.Thumb
-    class="pointer-events-none block size-4 rounded-full border border-transparent bg-[#fff] shadow-segment transition-transform duration-200 ease-pop data-[state=checked]:translate-x-[14px]"
+    class="ui-switch-thumb pointer-events-none block size-4 rounded-full border border-transparent bg-[#fff] shadow-segment transition-transform duration-200 ease-pop data-[state=checked]:translate-x-[14px]"
   />
 </Switch.Root>

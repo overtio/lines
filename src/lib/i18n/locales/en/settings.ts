@@ -10,7 +10,7 @@ export default {
   // A heading in the list of sections, over Theme, Layout, Typography, Editor and Floating.
   "settings.section.appearance": "Appearance",
   "settings.section.theme": "Theme",
-  "settings.section.themeAbout": "The theme, light or dark, contrast, colors and icons.",
+  "settings.section.themeAbout": "The app's style, its colors, light or dark, contrast and icons.",
   "settings.section.paper": "Paper",
   "settings.section.paperAbout": "What notes are written on: a pattern behind the text, a texture under it, and a backdrop behind the page.",
   "settings.paperPattern": "Pattern",
@@ -64,6 +64,8 @@ export default {
   "settings.languageNote": "lines starts again in the language chosen. System follows your device's language when lines speaks it, and English when it doesn't.",
   "settings.theme": "Theme",
   "settings.themes": "Themes",
+  "settings.style": "Style",
+  "settings.styleNote": "The whole look, beyond the colors. Each style comes with colors of its own, which you can change below.",
   // The heading over the themes made for low vision and color blindness, and their names.
   "settings.themesAccessibility": "Accessibility",
   "settings.themeHighContrast": "High Contrast",
