@@ -100,7 +100,8 @@ export function parseHttp(text: string): HttpText {
         continue;
       }
       if (!request) continue;
-      if (line.trim()) request.to = end;
+      // The comments after a body aren't part of it (below): its response goes above them.
+      if (line.trim() && !(section === "body" && COMMENT.test(line))) request.to = end;
       if (section === "headers") {
         if (!line.trim()) section = "body";
         else if (CONTINUATION.test(line) && !request.headers.length) request.url += line.trim();
@@ -133,7 +134,10 @@ export function parseHttp(text: string): HttpText {
 
     if (request) {
       request.end = pos - 1;
-      while (body.length && !body.at(-1)!.trim()) body.pop();
+      while (body.length && (!body.at(-1)!.trim() || COMMENT.test(body.at(-1)!))) {
+        const said = COMMENT.exec(body.pop()!)?.[1].trim();
+        if (said && !said.startsWith("@")) comments.push(said);
+      }
       while (body.length && !body[0].trim()) body.shift();
       if (body.length) {
         request.body = body.join("\n");

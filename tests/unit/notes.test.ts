@@ -2,6 +2,7 @@ import { describe, expect, mock, test } from "bun:test";
 import { stubApp } from "./stubs";
 import { readPack } from "../../src/lib/sounds/mechvibes";
 import { parseHurl } from "../../src/plugins/http/hurl/parse";
+import { parseHttp } from "../../src/plugins/http/parse";
 import type { NoteLanguage } from "../../src/lib/plugins/types";
 
 stubApp();
@@ -54,6 +55,19 @@ test("a Hurl body whose ``` isn't closed yet runs to the end of the note", () =>
   const response = "GET https://example.com\nHTTP 200\n```\nok";
   expect(parseHurl(request).requests[0]).toMatchObject({ body: '{"name": "Ada"}\n', to: request.length });
   expect(parseHurl(response).requests[0]).toMatchObject({ expect: { body: "ok\n" }, to: response.length });
+});
+
+test("a request's body ends before the comments after it: a Hurl entry's title, say", () => {
+  const hurl = "# Create a user\nPOST https://example.com/users\n<user>ada</user>\n\n# Read it back\nGET https://example.com/users/ada\nHTTP 200";
+  const [create, read] = parseHurl(hurl).requests;
+  expect(create).toMatchObject({ body: "<user>ada</user>", to: hurl.indexOf("</user>") + "</user>".length });
+  expect(read.title).toBe("Read it back");
+  expect(parseHurl("POST https://example.com\n<user>ada</user>\n# Moved\nHTTP 302").requests[0]).toMatchObject({ body: "<user>ada</user>", expect: { status: 302 } });
+  expect(parseHurl("GET https://example.com\nHTTP 200\n<ok/>\n\n# Then\nGET https://example.com/2").requests[0].expect?.body).toBe("<ok/>");
+  const http = "### Create\nPOST https://example.com/users\nContent-Type: text/plain\n\nada\n\n# Try a longer name #todo\n\n### Read\nGET https://example.com/users/ada";
+  const { requests, comments } = parseHttp(http);
+  expect(requests[0]).toMatchObject({ body: "ada", to: http.indexOf("\nada") + "\nada".length });
+  expect(comments).toEqual(["Try a longer name #todo"]);
 });
 
 test("a line's comments, a line mark among them, aren't part of its text", () => {
