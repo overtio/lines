@@ -2,7 +2,7 @@
 //! folders dropped from Finder, which the page isn't told; a folder chosen to link to; and opening
 //! what a link leads to.
 
-use std::path::PathBuf;
+use std::path::{Component, Path, PathBuf};
 
 use tauri::AppHandle;
 
@@ -54,13 +54,26 @@ pub async fn open_local(path: String) -> Result<(), String> {
   crate::attachments::open(&path)
 }
 
-/// A path a note can link to: absolute, without `..`.
+/// A path a note can link to: absolute, on this computer, without `..`.
 fn local_path(path: &str) -> Result<PathBuf, String> {
   let path = PathBuf::from(path);
-  if !path.is_absolute() || path.components().any(|part| matches!(part, std::path::Component::ParentDir)) {
+  if !path.is_absolute() || on_network(&path) || path.components().any(|part| matches!(part, Component::ParentDir)) {
     return Err("Not a path on this computer".into());
   }
   Ok(path)
+}
+
+/// A share on another computer (`\\server\share`), which Windows signs in to, sending the
+/// person's credentials, only to see whether something's there: a note's link mustn't lead there.
+#[cfg(windows)]
+fn on_network(path: &Path) -> bool {
+  use std::path::Prefix;
+  matches!(path.components().next(), Some(Component::Prefix(prefix)) if !matches!(prefix.kind(), Prefix::Disk(_) | Prefix::VerbatimDisk(_)))
+}
+
+#[cfg(not(windows))]
+fn on_network(_path: &Path) -> bool {
+  false
 }
 
 #[cfg(target_os = "macos")]
@@ -100,5 +113,14 @@ mod tests {
     assert!(local_path(&format!("{HOME}/Projects")).is_ok());
     assert!(local_path("Projects").is_err());
     assert!(local_path(&format!("{HOME}/../other")).is_err());
+  }
+
+  #[cfg(windows)]
+  #[test]
+  fn never_a_network_share() {
+    assert!(local_path(r"D:\").is_ok());
+    assert!(local_path(r"\\server\share\Report.pdf").is_err());
+    assert!(local_path("//server/share").is_err());
+    assert!(local_path(r"\\?\UNC\server\share").is_err());
   }
 }

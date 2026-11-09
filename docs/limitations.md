@@ -158,6 +158,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Dropping a folder to link to it, and `/folder`, are in lines for Mac only: a page isn't told where a dropped folder is, and the Windows and Linux apps don't ask the system yet. Their links open in the Windows and Linux apps too.
 - On the web and on phones a link to the computer can't be opened; following one copies its path.
 - A link leads to a path: moved or renamed, the folder isn't followed, and on another device the path may lead nowhere.
+- On Windows, a link to a share on another computer (`\\server\share`) isn't followed, since Windows would sign in to that computer, with your account, only to look; a share mapped to a drive letter is followed.
 - Not tried yet with folders on network drives, or dropped from apps other than Finder.
 
 ## Audio and video

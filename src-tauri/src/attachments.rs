@@ -4,10 +4,23 @@ use tauri::{ipc::InvokeBody, AppHandle, Manager};
 
 use crate::folder_sync::{percent_decode, valid_name};
 
-/// Kinds of file that run something when opened, rather than show it. These are shown in Finder
-/// instead, so opening an attachment never runs a script by surprise.
-const RUNS: [&str; 13] = [
-  "app", "command", "tool", "terminal", "sh", "bash", "zsh", "pkg", "mpkg", "workflow", "jar", "fileloc", "inetloc",
+/// Kinds of file that run something when opened, rather than show it, on each system. These are
+/// shown in Finder (Explorer, the file manager) instead, so opening an attachment or a link never
+/// runs a program by surprise.
+#[cfg(target_os = "macos")]
+const RUNS: &[&str] = &[
+  "app", "command", "tool", "terminal", "sh", "bash", "zsh", "csh", "ksh", "fish", "py", "pl", "rb", "pkg", "mpkg",
+  "workflow", "action", "prefpane", "jar", "fileloc", "inetloc", "webloc",
+];
+#[cfg(windows)]
+const RUNS: &[&str] = &[
+  "exe", "com", "bat", "cmd", "ps1", "psm1", "vbs", "vbe", "js", "jse", "wsf", "wsh", "hta", "scr", "pif", "cpl", "msc",
+  "msi", "msp", "msix", "msixbundle", "appx", "appxbundle", "appinstaller", "application", "appref-ms", "lnk", "url",
+  "website", "reg", "inf", "scf", "chm", "jar", "py", "pyw", "settingcontent-ms", "library-ms", "search-ms", "gadget",
+];
+#[cfg(all(desktop, not(any(target_os = "macos", windows))))]
+const RUNS: &[&str] = &[
+  "desktop", "sh", "bash", "zsh", "run", "bin", "appimage", "jar", "py", "pl", "rb", "deb", "rpm", "flatpakref",
 ];
 
 /// Opens an attachment (the raw request body) in its default app. Attachments live in the
@@ -35,13 +48,34 @@ pub async fn open_attachment(app: AppHandle, request: tauri::ipc::Request<'_>) -
 /// Opens a file or folder in its app (a folder in Finder), or shows it in Finder if it runs something.
 #[cfg(desktop)]
 pub(crate) fn open(path: &Path) -> Result<(), String> {
-  let runs = path.extension().is_some_and(|ext| RUNS.contains(&ext.to_string_lossy().to_lowercase().as_str()));
-  if runs {
+  if runs(path) {
     tauri_plugin_opener::reveal_item_in_dir(path)
   } else {
     tauri_plugin_opener::open_path(path, None::<&str>)
   }
   .map_err(|e| e.to_string())
+}
+
+/// Whether opening `path` would run something: a kind of file in `RUNS`, or a program without an
+/// extension, which macOS opens in Terminal. What a symbolic link leads to is what counts.
+#[cfg(desktop)]
+fn runs(path: &Path) -> bool {
+  let path = std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
+  match path.extension() {
+    Some(ext) => RUNS.contains(&ext.to_string_lossy().to_lowercase().as_str()),
+    None => executable(&path),
+  }
+}
+
+#[cfg(all(desktop, unix))]
+fn executable(path: &Path) -> bool {
+  use std::os::unix::fs::PermissionsExt;
+  std::fs::metadata(path).is_ok_and(|meta| meta.is_file() && meta.permissions().mode() & 0o111 != 0)
+}
+
+#[cfg(windows)]
+fn executable(_path: &Path) -> bool {
+  false
 }
 
 #[cfg(mobile)]
@@ -98,6 +132,31 @@ mod tests {
     assert_eq!(file_name(" .hidden.pdf", name), PathBuf::from("hidden.pdf"));
     assert_eq!(file_name("", name), PathBuf::from(name));
     assert_eq!(stem(name), "3f9c0a1b2c3d4e5f60718293a4b5c6d7");
+  }
+
+  #[test]
+  fn shows_what_runs_instead_of_opening_it() {
+    let dir = std::env::temp_dir().join(format!("lines-runs-test-{}", std::process::id()));
+    std::fs::create_dir_all(dir.join("Photos.v2")).unwrap();
+    let file = |name: &str| {
+      let path = dir.join(name);
+      std::fs::write(&path, b"").unwrap();
+      path
+    };
+    assert!(!runs(&file("Report.pdf")));
+    assert!(!runs(&dir.join("Photos.v2")));
+    assert!(runs(&file(if cfg!(windows) { "Invoice.pdf.EXE" } else { "install.SH" })));
+    #[cfg(unix)]
+    {
+      use std::os::unix::fs::PermissionsExt;
+      let program = file("tool");
+      assert!(!runs(&program));
+      std::fs::set_permissions(&program, std::fs::Permissions::from_mode(0o755)).unwrap();
+      assert!(runs(&program));
+      std::os::unix::fs::symlink(&program, dir.join("Notes.txt")).unwrap();
+      assert!(runs(&dir.join("Notes.txt")));
+    }
+    std::fs::remove_dir_all(&dir).unwrap();
   }
 
   #[test]
