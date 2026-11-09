@@ -71,6 +71,33 @@ export interface Contributions {
   paperStyles?: PaperStyle[];
   /** What marks lines in a note's margin, as a code editor marks the lines changed. */
   markers?: MarkerSource[];
+  /** Keyboards to hear as you type (Settings → Editor → Typing sounds). */
+  keyboardSounds?: KeyboardSound[];
+}
+
+/**
+ * A keyboard to hear as you type: its sounds, made or read for an audio context the first time
+ * it's chosen. Sound packs of your own (Mechvibes') are listed after the plugins' keyboards.
+ */
+export interface KeyboardSound {
+  id: string;
+  name: string;
+  /** What it sounds like, or who recorded it, under its name in Settings. */
+  description?: string;
+  load(context: BaseAudioContext): Promise<KeySounds>;
+}
+
+/** A keyboard's sounds, by the key (`KeyboardEvent.code`, `KeyA`) going down and coming back up. */
+export interface KeySounds {
+  press(code: string): KeyClip | undefined;
+  release(code: string): KeyClip | undefined;
+}
+
+/** A sound: a buffer, or the part of one from `offset` for `duration` seconds. */
+export interface KeyClip {
+  buffer: AudioBuffer;
+  offset?: number;
+  duration?: number;
 }
 
 /** The colors a line can be marked in: the theme's accent, or one of its status and callout colors. */

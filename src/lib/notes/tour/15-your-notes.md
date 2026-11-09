@@ -21,6 +21,7 @@ The Mac app (and the iPhone app, coming) adds:
 ## Make it yours
 
 - **Look:** Settings → Theme → Style changes the whole look, not just the colors: Classic is a desktop of the late 90s, Pixel is one-bit pixels, Neon glows. Below it are twenty-three themes, each light and dark (High Contrast and two for color blindness among them), and Contrast → Increased darkens grey text in any of them. **New** makes a theme of your own from one to change color by color, which you can share as a file; **Import** reads themes made for VS Code, Zed, Base16, iTerm2, Ghostty and other terminals. Settings → Paper puts ruled lines, dots or squares behind your notes, a paper texture under them, and a backdrop behind the page: a gradient, a color or a picture of yours. `/page break` splits a note into pages over it, and starts a new page in its PDF. Settings → Typography has four fonts, and a note width and spacing to tune.
+- **Sound:** Settings → Editor → Typing sounds plays a keyboard as you type: a creamy linear, a clicky one, Topre, a typewriter with its bell. Add a recorded one from any Mechvibes sound pack.
 - **Layout:** under Appearance → Layout, put the sidebar and the note list on either side, open notes in tabs, or show an outline of the note's headings beside it.
 - **Two notes at once:** ⌥-click a note in the list, or right-click it and choose Open to the Side, to read it beside the one you're writing.
 - **Links:** Settings → Editor → Links chooses what a click, ⌘-click and ⇧⌘-click do on links, tags and mentions.

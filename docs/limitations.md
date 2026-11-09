@@ -164,6 +164,14 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - A picture of a note (PNG) is one long page, without its breaks.
 - With a pattern drawn in columns (squares, graph) over a backdrop, each page's columns run its full height, past the last line's row.
 
+## Typing sounds
+
+- The built-in keyboards are made from sound, not recorded: close to the real thing, not the real thing. Recorded ones come as Mechvibes sound packs, which people share under their own terms; lines carries none of them.
+- Only keys pressed in lines' windows play, not everywhere on the computer, as Mechvibes does.
+- A pack whose sounds the system can't decode stays silent and says so: OGG files play in Chrome and Firefox, and in Safari and the Mac app only on recent versions of macOS. Not tried in the Mac app yet.
+- Packs are read from a .zip or a folder; a ZIP64 or encrypted .zip isn't read. Mouse packs are left out, and a pack's `random_pitch` and recommended volume aren't used (every keyboard varies its pitch a little).
+- Packs are kept on this device and don't sync.
+
 ## Themes from a picture
 
 - A picture is read in whatever formats the system can show (JPEG, PNG, WebP, GIF; HEIC in the Mac app and Safari); an animated one by its first frame.

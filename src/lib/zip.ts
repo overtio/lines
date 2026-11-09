@@ -89,3 +89,41 @@ export function zip(entries: ZipEntry[]): Uint8Array<ArrayBuffer> {
   }
   return out;
 }
+
+/**
+ * The files in a ZIP by name (folders left out), stored or deflated, as nearly every ZIP has them;
+ * inflated by the browser's own DecompressionStream. Not ZIP64, nor encrypted files.
+ */
+export async function unzip(data: Uint8Array<ArrayBuffer>): Promise<Map<string, Uint8Array<ArrayBuffer>>> {
+  const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+  // The end of the central directory, which a comment of up to 64 KB can follow.
+  let end = -1;
+  for (let at = data.length - 22; at >= Math.max(0, data.length - 22 - 0xffff); at--) {
+    if (view.getUint32(at, true) === 0x06054b50) {
+      end = at;
+      break;
+    }
+  }
+  if (end < 0) throw new Error("Not a ZIP file");
+  const names = new TextDecoder();
+  const files = new Map<string, Uint8Array<ArrayBuffer>>();
+  let at = view.getUint32(end + 16, true);
+  for (let count = view.getUint16(end + 10, true); count > 0; count--) {
+    if (view.getUint32(at, true) !== 0x02014b50) throw new Error("A damaged ZIP file");
+    const method = view.getUint16(at + 10, true);
+    const size = view.getUint32(at + 20, true);
+    const nameLength = view.getUint16(at + 28, true);
+    const local = view.getUint32(at + 42, true);
+    const name = names.decode(data.subarray(at + 46, at + 46 + nameLength));
+    at += 46 + nameLength + view.getUint16(at + 30, true) + view.getUint16(at + 32, true);
+    if (name.endsWith("/")) continue;
+    const start = local + 30 + view.getUint16(local + 26, true) + view.getUint16(local + 28, true);
+    const stored = data.subarray(start, start + size);
+    if (method === 0) files.set(name, stored);
+    else if (method === 8) {
+      const inflated = new Blob([stored]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      files.set(name, new Uint8Array(await new Response(inflated).arrayBuffer()));
+    }
+  }
+  return files;
+}
