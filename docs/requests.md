@@ -31,7 +31,7 @@ Authorization: Bearer {{login.response.body.$.token}}
 - The request line is a method and an address (`GET https://…`), or just an address for a GET. `HTTP/1.1` after it is allowed, and ignored. An address without its scheme gets `http://` for `localhost` and `127.0.0.1`, and `https://` otherwise.
 - Lines starting with `?` or `&`, indented, go on with the address.
 - Then the headers, one `Name: value` to a line; then, after a blank line, the body.
-- Before a request, lines starting with `#` or `//` are comments. `#tag` in a comment is a tag of a `.http` note.
+- Before a request, and after its body, lines starting with `#` or `//` are comments, not sent. `#tag` in a comment is a tag of a `.http` note.
 
 ## Variables
 

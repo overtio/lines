@@ -218,10 +218,11 @@ function body(lines: string[], from: number, starts: (line: string) => boolean):
   }
   if (first.startsWith("file,")) return { text: null, last: from, file: true };
   if (/^(base64|hex),/.test(first)) return { text: null, last: from, unsupported: first.slice(0, first.indexOf(",")) };
-  // XML, or anything else: to the next entry, or response.
+  // XML, or anything else: to the next entry or response. The comments (and blank lines) just
+  // above that are its own: an entry's title, say.
   let last = from;
   while (last + 1 < lines.length && !starts(lines[last + 1])) last++;
-  while (last > from && !lines[last].trim()) last--;
+  while (last > from && (!lines[last].trim() || COMMENT.test(lines[last].trim()))) last--;
   return { text: lines.slice(from, last + 1).join("\n"), last, type: first.startsWith("<") ? "application/xml" : undefined };
 }
 
