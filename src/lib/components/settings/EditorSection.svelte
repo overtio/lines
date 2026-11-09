@@ -1,13 +1,22 @@
 <script lang="ts">
   import { locale, type MessageKey, t } from "../../i18n/index.svelte";
-  import { LINK_ACTIONS, LINK_CLICKS, prefs, SHEET_STATS, type LinkAction, type LinkClick, type LinkKind, type SheetStat } from "../../prefs.svelte";
+  import { LINK_ACTIONS, LINK_CLICKS, MARKDOWN_MODES, prefs, SHEET_STATS, type LinkAction, type LinkClick, type LinkKind, type MarkdownMode, type SheetStat } from "../../prefs.svelte";
   import { CURRENCIES, DATE_STYLES, MONEY_STYLES, NEGATIVE_STYLES, showDate, showMoney } from "../../sheets/display";
   import { formatKeys, speakKeys, system } from "../../shortcuts";
   import { canFloat } from "../../windows/floating";
   import FieldGroup from "../ui/FieldGroup.svelte";
   import FieldRow from "../ui/FieldRow.svelte";
+  import Segmented from "../ui/Segmented.svelte";
   import Select from "../ui/Select.svelte";
   import Switch from "../ui/Switch.svelte";
+
+  const MODE_NAMES: Record<MarkdownMode, [name: MessageKey, note: MessageKey]> = {
+    source: ["settings.markdownSource", "settings.markdownSourceNote"],
+    visible: ["settings.markdownVisible", "settings.markdownVisibleNote"],
+    live: ["settings.markdownLive", "settings.markdownLiveNote"],
+    hidden: ["settings.markdownHidden", "settings.markdownHiddenNote"],
+  };
+  const modes = $derived(MARKDOWN_MODES.map((id) => ({ id, label: t(MODE_NAMES[id][0]) })));
 
   const LINK_KINDS: { kind: LinkKind; name: MessageKey }[] = [
     { kind: "web", name: "settings.linksWeb" },
@@ -54,6 +63,15 @@
     prefs.sheetStats = SHEET_STATS.filter((s) => (s === stat ? on : prefs.sheetStats.includes(s)));
   };
 </script>
+
+<FieldGroup title={t("settings.markdown")} note={t("settings.markdownNote")}>
+  <FieldRow label={t("settings.markdownMode")} note={t(MODE_NAMES[prefs.markdownMode][1])}>
+    <Segmented label={t("settings.markdownMode")} options={modes} value={prefs.markdownMode} onselect={(mode) => (prefs.markdownMode = mode)} />
+  </FieldRow>
+  <FieldRow label={t("settings.dragBlocks")} note={t("settings.dragBlocksNote")}>
+    <Switch label={t("settings.dragBlocks")} checked={prefs.dragBlocks} onchange={(on) => (prefs.dragBlocks = on)} />
+  </FieldRow>
+</FieldGroup>
 
 <FieldGroup title={t("settings.symbols")} note={t("settings.symbolsNote")}>
   <FieldRow label={t("settings.symbolsInText")}>

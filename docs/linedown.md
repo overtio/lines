@@ -4,6 +4,8 @@ Linedown is the Markdown that lines reads and writes: [CommonMark](https://commo
 
 Everything here is plain text that other Markdown apps open without trouble. An app that doesn't know an addition shows its characters as they are (`==highlight==`, `#tag`), or, for cards and callouts, as a Pandoc fenced div.
 
+How much of it shows as you write is a setting (Settings → Editor → Markdown), and the text is the same in each: as written, only colored (Source); drawn, with every mark in sight (Visible); drawn, with the marks hidden but where you're writing (Live, the first choice); or drawn, with marks that only style text (`**`, a heading's `#`, a list's marker) never shown, as in Bear or Notion (Hidden).
+
 The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underline, cards, math, mentions), on top of `@lezer/markdown` with GFM. What the editor draws for each construct is in `src/lib/editor/`. The QA notes in `qa/notes/` show every construct, alone and combined (see [qa/README.md](../qa/README.md)).
 
 | Construct | Linedown | Standard? |

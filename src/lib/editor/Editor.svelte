@@ -55,11 +55,17 @@
     if (notes.get(currentId)?.note.body !== body) notes.update(currentId, body);
   }
 
-  /** Sets the editor up for the open note's language (its plugin's editing), unless it is already. */
-  function applyFormat() {
+  /**
+   * Sets the editor up for the open note's language (its plugin's editing), unless it is already
+   * (or `again`): from nothing, so what was drawn for another language, or with Markdown shown
+   * another way, goes.
+   */
+  function applyFormat(again = false) {
     if (!view || !currentId) return;
     const editing = formatEditing(notes.get(currentId)?.note.format);
-    if (formatCompartment.get(view.state) !== editing) view.dispatch({ effects: formatCompartment.reconfigure(editing) });
+    if (!again && formatCompartment.get(view.state) === editing) return;
+    view.dispatch({ effects: formatCompartment.reconfigure([]) });
+    view.dispatch({ effects: formatCompartment.reconfigure(editing) });
   }
 
   function cachedFor(id: string) {
@@ -165,10 +171,14 @@
     const active = plugins.active;
     if (active === pluginsSeen) return;
     pluginsSeen = active;
-    untrack(() => {
-      view?.dispatch({ effects: formatCompartment.reconfigure([]) });
-      applyFormat();
-    });
+    untrack(() => applyFormat(true));
+  });
+
+  // Markdown shown another way, or dragging turned on or off (Settings → Editor).
+  $effect(() => {
+    void prefs.markdownMode;
+    void prefs.dragBlocks;
+    untrack(() => applyFormat());
   });
 
   /** Whether the note can be edited, and the outline beside it (Settings → Layout). */

@@ -1,4 +1,5 @@
 import type { CompletionSection } from "@codemirror/autocomplete";
+import { languages } from "@codemirror/language-data";
 import { EditorSelection, type EditorState, type Extension, Prec, type Range, type StateCommand, StateField, type Text } from "@codemirror/state";
 import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
 import { locale, t } from "../../lib/i18n/index.svelte";
@@ -13,11 +14,14 @@ import { numericColumn, tablePasting } from "../../lib/editor/tables";
 import { InlineMathWidget, type Macros, macrosOf, MathBlockWidget, mathElement, preloadMath } from "../../lib/editor/math";
 import { insert, SECTIONS, type SlashCommand, slashMenu } from "../../lib/editor/slashCommands";
 import { inOpenMath, MATH_COMMANDS, paragraphBefore, searchWords, TEXT_COMMANDS } from "../../lib/editor/texCommands";
+import { lazyLanguage } from "../../lib/editor/lazyLanguage";
+import { markupMode } from "../../lib/editor/markupMode";
 import { arrowsInto, focusChanged, focused, isEditing } from "../../lib/editor/util";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
 import { type PaperLink, paperCommands } from "../../lib/editor/papers";
 import { shortLink, ShortLinkWidget } from "../../lib/editor/shortLinks";
 import { plugins } from "../../lib/plugins/registry.svelte";
+import { type MarkdownMode, prefs } from "../../lib/prefs.svelte";
 import type { PaperSource } from "../../lib/plugins/types";
 
 /*
@@ -337,10 +341,13 @@ const ENV_LINES: Record<string, string> = {
  */
 function build(state: EditorState, visible?: { from: number; to: number }): DecorationSet {
   const { doc } = state;
+  const mode = state.facet(markupMode);
+  if (mode === "source") return Decoration.none;
   const { spans, title, macros, theorems, preamble, layout } = state.field(parsed);
-  // When the editor isn't focused, everything is drawn.
+  // When the editor isn't focused, everything is drawn; while markup is all in sight, it all shows.
   const selection = state.field(focused) ? state.selection.ranges : [];
-  const touches = (from: number, to: number) => selection.some((r) => r.from <= to && r.to >= from);
+  const all = mode === "visible";
+  const touches = (from: number, to: number) => all || selection.some((r) => r.from <= to && r.to >= from);
   const lineActive = (pos: number) => {
     const line = doc.lineAt(pos);
     return touches(line.from, line.to);
@@ -937,16 +944,21 @@ const outline = outlineHeadings.of((state) =>
 const slashCommands = (papers: readonly PaperSource[]) =>
   COMMANDS.flatMap((command) => (command.id === "link" ? [command, ...paperCommands(papers, latexPaperLink)] : [command]));
 
-let built: { papers: readonly PaperSource[]; editing: Extension } | undefined;
+let built: { papers: readonly PaperSource[]; mode: MarkdownMode; editing: Extension } | undefined;
 
-/** What a LaTeX note's editor adds to the shared ones (setup.ts), in place of the Markdown ones; made again when sources of papers change. */
+/** What a LaTeX note's editor adds to the shared ones (setup.ts), in place of the Markdown ones; made again when sources of papers change, or how markup shows. */
 export function latexEditing(): Extension {
   const { papers } = plugins;
-  if (built?.papers !== papers) built = { papers, editing: editing(papers) };
+  const mode = prefs.markdownMode;
+  if (built?.papers !== papers || built.mode !== mode) built = { papers, mode, editing: editing(papers, mode) };
   return built.editing;
 }
 
-const editing = (papers: readonly PaperSource[]): Extension => [
+/** LaTeX's highlighting, for a note shown as it's written (Settings → Editor → Markdown → Source), where nothing's drawn. */
+const highlighting = languages.find((language) => language.name === "LaTeX");
+
+const editing = (papers: readonly PaperSource[], mode: MarkdownMode): Extension => [
+  mode === "source" && highlighting ? lazyLanguage(highlighting) : [],
   focused,
   parsed,
   blocks,

@@ -1,4 +1,5 @@
 import { languages } from "@codemirror/language-data";
+import type { Extension } from "@codemirror/state";
 import { t } from "../../lib/i18n/index.svelte";
 import { extractTags } from "../../lib/notes/parse";
 import { countLines } from "../../lib/notes/stats";
@@ -89,13 +90,15 @@ export const code = (): Plugin => ({
       .filter((description) => description.extensions.length)
       .map((description): NoteLanguage => {
         const comment = commentOf(description.name);
+        // Made once, so a note opened in the language again is set up as it was.
+        let editing: Extension | undefined;
         return {
           id: formatId(description.name),
           name: description.name,
           group: group(),
           extensions: [...description.extensions],
           mimeType: "text/plain",
-          editor: () => codeEditing(description),
+          editor: () => (editing ??= codeEditing(description)),
           meta,
           plainText: (body) => body,
           stats: (body) => countLines(body.split("\n").map((text) => ({ text, heading: false }))),
