@@ -36,6 +36,32 @@ export function toCurl({ method, url, headers, body, user }: Asked): string {
   return lines.join(" \\\n  ");
 }
 
+/** What bash reads these escapes in `$'…'` as. */
+const ESCAPES: Record<string, string> = { a: "\x07", b: "\b", e: "\x1b", E: "\x1b", f: "\f", n: "\n", r: "\r", t: "\t", v: "\v", "\\": "\\", "'": "'", '"': '"', "?": "?" };
+const utf8 = new TextDecoder("utf-8", { fatal: true });
+
+/**
+ * The text of an ANSI-C quoted string, `$'…'`, as bash reads it: Chrome's "Copy as cURL" writes
+ * quotes, `!` and control characters this way (`\u0021`), Firefox's anything outside ASCII (`\xe9`).
+ */
+function ansiC(text: string) {
+  return text.replace(/((?:\\(?:[0-7]{1,3}|x[\da-fA-F]{1,2}))+)|\\u([\da-fA-F]{1,4})|\\U([\da-fA-F]{1,8})|\\(.)/gs, (escape, bytes?: string, short?: string, long?: string, letter?: string) => {
+    if (bytes) {
+      const values = Uint8Array.from(bytes.split("\\").slice(1), (each) => (each[0] === "x" ? parseInt(each.slice(1), 16) : parseInt(each, 8)));
+      // Bytes are UTF-8, as bash writes them for a terminal; but Firefox writes `é` as `\xe9`, its code.
+      try {
+        return utf8.decode(values);
+      } catch {
+        return String.fromCharCode(...values);
+      }
+    }
+    const code = parseInt(short ?? long ?? "", 16);
+    if (!Number.isNaN(code)) return code <= 0x10ffff ? String.fromCodePoint(code) : escape;
+    // An escape bash doesn't know stays as written.
+    return ESCAPES[letter!] ?? escape;
+  });
+}
+
 /** A command's words, as a shell splits them: quotes, `$'…'`, backslashes and continued lines. */
 export function words(command: string): string[] {
   const found: string[] = [];
@@ -53,16 +79,10 @@ export function words(command: string): string[] {
       add(command.slice(i + 1, end < 0 ? undefined : end));
       i = end < 0 ? command.length : end;
     } else if (c === "$" && command[i + 1] === "'") {
-      // ANSI-C quoting, as Chrome's "Copy as cURL" writes bodies with quotes in them.
-      let text = "";
-      for (i += 2; i < command.length && command[i] !== "'"; i++) {
-        if (command[i] !== "\\") text += command[i];
-        else {
-          const escaped = command[++i];
-          text += ({ n: "\n", t: "\t", r: "\r" } as Record<string, string>)[escaped] ?? escaped;
-        }
-      }
-      add(text);
+      let end = i + 2;
+      while (end < command.length && command[end] !== "'") end += command[end] === "\\" ? 2 : 1;
+      add(ansiC(command.slice(i + 2, end)));
+      i = end;
     } else if (c === '"') {
       let text = "";
       for (i++; i < command.length && command[i] !== '"'; i++) {
