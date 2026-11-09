@@ -27,6 +27,7 @@ import { typeTables } from "./typeTables";
 import { frontMatterField, missingNotes } from "./objects";
 import { markdownOutline, outlineCompartment } from "./outline.svelte";
 import { todoDone } from "./util";
+import { copyOnSelect } from "./copyOnSelect";
 import { Card, Highlight, Mention, Tag, TexMath, Underline } from "./syntax";
 import { t as message } from "../i18n/index.svelte";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
@@ -323,6 +324,7 @@ export function readOnly(value: boolean): Extension {
 }
 
 export const spellingCompartment = new Compartment();
+export const copyOnSelectCompartment = new Compartment();
 
 /** Whether the system checks a note's spelling, and corrects it as you type (Settings → Editor). */
 export const spelling = (on: boolean): Extension =>
@@ -334,6 +336,7 @@ export function createExtensions(onChange: () => void, format?: string): Extensi
     history(),
     EditorView.lineWrapping,
     spellingCompartment.of(spelling(prefs.spellcheck)),
+    copyOnSelectCompartment.of(copyOnSelect(prefs.copyOnSelect)),
     EditorView.contentAttributes.of({
       autocapitalize: "sentences",
       "aria-label": message("editor.note"),

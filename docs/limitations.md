@@ -170,6 +170,11 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - It sits beside the line being written in notes; a spreadsheet's cells and other fields don't call it.
 - Only the four lines draws can be chosen; a plugin can add more, but there's no way yet to draw your own in Settings.
 
+## Copying what you select
+
+- Only in notes: the note list's search, renaming and a spreadsheet's cells copy only with ⌘C. There's no pasting with the middle button, as terminals on Linux have; and it isn't the system's own selection to paste from on Linux, just the clipboard.
+- Not tried on phones and tablets, where selecting is the system's long press.
+
 ## Cursors
 
 - The text cursor's look is in notes and Settings' little note; fields (search, renaming) and a spreadsheet's cells keep the system's, in the color chosen.

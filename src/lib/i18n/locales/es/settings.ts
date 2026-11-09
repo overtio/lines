@@ -291,6 +291,8 @@ export default {
   "settings.markdownHiddenNote": "Dibujado, sin mostrar nunca las marcas: escribe ** alrededor de una palabra y queda en negrita, # y un espacio y es un título.",
   "settings.spellcheck": "Revisar la ortografía",
   "settings.spellcheckNote": "Subraya las palabras mal escritas en las notas y deja que el sistema las corrija al escribir. El código y las fórmulas nunca se revisan.",
+  "settings.copyOnSelect": "Copiar lo que seleccionas",
+  "settings.copyOnSelectNote": "El texto que seleccionas en una nota con el ratón se copia al soltarlo, como en un terminal: arrastrando, o con doble clic en una palabra.",
   "settings.dragBlocks": "Arrastrar para mover líneas",
   "settings.dragBlocksNote": "Un asa junto a la línea o el bloque que señalas, para arrastrarlo a otro sitio de la nota.",
   "settings.typingSounds": "Sonidos al escribir",

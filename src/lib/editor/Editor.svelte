@@ -10,7 +10,8 @@
   import { prefs } from "../prefs.svelte";
   import { objectsChanged } from "./objects";
   import { outline, outlineCompartment } from "./outline.svelte";
-  import { createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment, spelling, spellingCompartment } from "./setup";
+  import { copyOnSelectCompartment, createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment, spelling, spellingCompartment } from "./setup";
+  import { copyOnSelect } from "./copyOnSelect";
   import { symbolsChanged } from "./symbols";
   import { changesBetween } from "./util";
 
@@ -181,11 +182,12 @@
     untrack(() => applyFormat());
   });
 
-  /** Whether the note can be edited, the outline beside it (Settings → Layout), and whether its spelling is checked (Settings → Editor). */
+  /** Whether the note can be edited, the outline beside it (Settings → Layout), and its spelling and copying what's selected (Settings → Editor). */
   const setUp = () => [
     readOnlyCompartment.reconfigure(readOnly(viewOnly)),
     outlineCompartment.reconfigure(prefs.outline ? outline : []),
     spellingCompartment.reconfigure(spelling(prefs.spellcheck)),
+    copyOnSelectCompartment.reconfigure(copyOnSelect(prefs.copyOnSelect)),
   ];
 
   $effect(() => {

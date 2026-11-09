@@ -75,6 +75,9 @@
   <FieldRow label={t("settings.spellcheck")} note={t("settings.spellcheckNote")}>
     <Switch label={t("settings.spellcheck")} checked={prefs.spellcheck} onchange={(on) => (prefs.spellcheck = on)} />
   </FieldRow>
+  <FieldRow label={t("settings.copyOnSelect")} note={t("settings.copyOnSelectNote")}>
+    <Switch label={t("settings.copyOnSelect")} checked={prefs.copyOnSelect} onchange={(on) => (prefs.copyOnSelect = on)} />
+  </FieldRow>
 </FieldGroup>
 
 <TypingSounds />

@@ -29,7 +29,7 @@ The [web app](https://overtio.github.io/lines/app/) opens with a tour: one short
 
 - **Live Markdown.** Type `**bold**`, `# Heading` or `- [ ] todo` and see it formatted. Put the cursor on a line to see its Markdown again, or choose in Settings to keep it all in sight, show it as written, or never show it at all, as in Bear or Notion.
 - **Slash commands.** Type `/` at the start of a line for headings, todos, tables, callouts, code, diagrams, math, images, drawings, today's date and more. <kbd>Tab</kbd> completes, like a shell.
-- **Format toolbar.** Select text to make it bold, italic, underlined, struck through, code or highlighted.
+- **Format toolbar.** Select text to make it bold, italic, underlined, struck through, code or highlighted. Or have what you select copied at once, as in a terminal (Settings → Editor).
 - **Lists and todos.** <kbd>Tab</kbd> and <kbd>⇧Tab</kbd> nest list items. Click a checkbox to tick it; the Todo view gathers every note with open tasks.
 - **Drag to move.** Grab the grip beside any line, list item, heading, table or card to move it, or use <kbd>⌥↑</kbd> / <kbd>⌥↓</kbd>. The grips can be turned off.
 - **Arrows and symbols.** `->` shows as →, `!=` as ≠, and so on, on screen only. The note keeps what you typed.
