@@ -10,12 +10,15 @@
 //   manifest <version> <dir>
 //                           the update manifest (latest.json) the apps check for that version,
 //                           from its packages' signatures (the .sig files) in <dir>
+//   name-downloads <version> <target>
+//                           names the installers and update packages Tauri built in <target> (its
+//                           bundle folders) by the system they're for: lines_0.3.3_macos_universal.dmg
 //
 // The version is in package.json (the app's About shows it), src-tauri/tauri.conf.json,
 // src-tauri/Cargo.toml and src-tauri/Cargo.lock; releases are tagged `v0.2.0`.
 
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -184,8 +187,51 @@ function manifest(version, dir) {
   return { version, pub_date: new Date().toISOString(), platforms };
 }
 
+/** The system each download is for, by how its name ends. */
+const SYSTEMS = [
+  [".dmg", "macos"],
+  [".app.tar.gz", "macos"],
+  ["-setup.exe", "windows"],
+  [".msi", "windows"],
+  [".AppImage", "linux"],
+  [".deb", "linux"],
+  [".rpm", "linux"],
+];
+
+/**
+ * A download's name with the system it's for after the version, as Tauri names it otherwise:
+ * `lines_0.3.3_macos_universal.dmg`, `lines_0.3.3_windows_x64.msi`, `lines_0.3.3_linux_amd64.deb`,
+ * and `lines_0.3.3_linux_x86_64.rpm` (`lines-0.3.3-1.x86_64.rpm`). The Mac's update package,
+ * `lines.app.tar.gz`, gets the version and `universal` too: the Mac app is one for both kinds of Mac.
+ * Signatures (`.sig`) follow their file. Other files keep their names.
+ */
+export function downloadName(file, version) {
+  const system = SYSTEMS.find(([end]) => file.replace(/\.sig$/, "").endsWith(end))?.[1];
+  if (!system) return file;
+  const named = file.startsWith("lines.app.tar.gz") ? `lines_${version}_universal${file.slice("lines".length)}` : file;
+  const versioned = new RegExp(`^lines[_-]${version.replaceAll(".", "\\.")}(?:-1)?[_.](?!${system}_)`);
+  return named.replace(versioned, `lines_${version}_${system}_`).replace("_en-US", "");
+}
+
+/** Renames what Tauri built in `target` (`…/release/bundle/<kind>/`, for any target triple) as downloadName says. */
+function nameDownloads(version, target) {
+  const folders = (dir) => (existsSync(dir) ? readdirSync(dir).map((name) => join(dir, name)).filter((path) => statSync(path).isDirectory()) : []);
+  const bundles = [join(target, "release", "bundle"), ...folders(target).map((dir) => join(dir, "release", "bundle"))];
+  for (const folder of bundles.flatMap(folders)) {
+    for (const file of readdirSync(folder)) {
+      const name = downloadName(file, version);
+      if (name !== file && statSync(join(folder, file)).isFile()) {
+        renameSync(join(folder, file), join(folder, name));
+        console.log(`${file} → ${name}`);
+      }
+    }
+  }
+}
+
 const [command, arg, arg2] = process.argv.slice(2);
-if (command === "check-title") {
+if (!import.meta.main) {
+  // Imported, by its tests.
+} else if (command === "check-title") {
   const problem = titleProblem(arg ?? "");
   if (problem) {
     console.error(`${problem}\nSee "Commits and pull requests" in CONTRIBUTING.md.`);
@@ -206,6 +252,8 @@ if (command === "check-title") {
   console.log(notesOf(arg));
 } else if (command === "manifest") {
   console.log(JSON.stringify(manifest(arg, arg2), null, 2));
+} else if (command === "name-downloads") {
+  nameDownloads(arg, arg2);
 } else {
   console.error(`Unknown command "${command}". See the top of scripts/release.mjs.`);
   process.exit(1);
