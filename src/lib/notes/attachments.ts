@@ -91,8 +91,12 @@ export function attachmentName(src: string): string | null {
   return NAME.test(name) ? name : null;
 }
 
-/** A link to an attachment: `](../attachments/…)` in Markdown, `{../attachments/…}` in LaTeX. */
-const REFERENCE = /(?:\]\(|\{)\.\.\/attachments\/([0-9a-f]{32}\.[a-z0-9]+)[)}]/g;
+/**
+ * An attachment's path anywhere in a note: `](../attachments/…)` in Markdown, with a title or spaces
+ * after it or in `<…>` as well, `{../attachments/…}` in LaTeX, or a reference link's address. Any
+ * mention counts, so a file isn't deleted, or left out of sync or an export, while a note shows it.
+ */
+const REFERENCE = /\.\.\/attachments\/([0-9a-f]{32}\.[a-z0-9]+)(?![a-z0-9])/g;
 
 /** Every attachment these notes show or link to. */
 export function referencedAttachments(bodies: Iterable<string>): Set<string> {
