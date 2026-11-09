@@ -198,14 +198,24 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Key: Value line, then Math block
+#### 21. Key: Value line, then Typing practice (typing block)
+
+**Wi-Fi password:** correct-horse-battery
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Key: Value line, then Math block
 
 **Wi-Fi password:** correct-horse-battery
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Key: Value line, then Table
+#### 23. Key: Value line, then Table
 
 **Wi-Fi password:** correct-horse-battery
 | Left | Center | Right |
@@ -213,7 +223,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Key: Value line, then Table with formulas
+#### 24. Key: Value line, then Table with formulas
 
 **Wi-Fi password:** correct-horse-battery
 | Item | Cost |
@@ -223,7 +233,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Key: Value line, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Key: Value line, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 **Wi-Fi password:** correct-horse-battery
 ```hurl
@@ -242,12 +252,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Key: Value line, then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Key: Value line, then Secret ({{name}}, kept in a locked secrets note)
 
 **Wi-Fi password:** correct-horse-battery
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Key: Value line, then API requests (http block): a variable, a named request and one using its response
+#### 27. Key: Value line, then API requests (http block): a variable, a named request and one using its response
 
 **Wi-Fi password:** correct-horse-battery
 ```http
@@ -261,7 +271,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Key: Value line, then Spreadsheet (csv block)
+#### 28. Key: Value line, then Spreadsheet (csv block)
 
 **Wi-Fi password:** correct-horse-battery
 ```csv
@@ -271,7 +281,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Key: Value line, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Key: Value line, then Named spreadsheet (csv name=), and a formula in another block using it
 
 **Wi-Fi password:** correct-horse-battery
 ```csv name=costs
@@ -283,12 +293,12 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Key: Value line, then Divider
+#### 30. Key: Value line, then Divider
 
 **Wi-Fi password:** correct-horse-battery
 ---
 
-#### 30. Key: Value line, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Key: Value line, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 **Wi-Fi password:** correct-horse-battery
 Before the break.
@@ -300,98 +310,98 @@ After it, on a new page.
 
 And another.
 
-#### 31. Key: Value line, then Key: Value line
+#### 32. Key: Value line, then Key: Value line
 
 **Wi-Fi password:** correct-horse-battery
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Key: Value line, then Mention
+#### 33. Key: Value line, then Mention
 
 **Wi-Fi password:** correct-horse-battery
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Key: Value line, then Wiki link
+#### 34. Key: Value line, then Wiki link
 
 **Wi-Fi password:** correct-horse-battery
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Key: Value line, then Symbols
+#### 35. Key: Value line, then Symbols
 
 **Wi-Fi password:** correct-horse-battery
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Key: Value line, then GitHub links
+#### 36. Key: Value line, then GitHub links
 
 **Wi-Fi password:** correct-horse-battery
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Key: Value line, then arXiv links
+#### 37. Key: Value line, then arXiv links
 
 **Wi-Fi password:** correct-horse-battery
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Key: Value line, then Image
+#### 38. Key: Value line, then Image
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample picture](attachment:photo.png)
 
-#### 38. Key: Value line, then Drawing
+#### 39. Key: Value line, then Drawing
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Key: Value line, then File
+#### 40. Key: Value line, then File
 
 **Wi-Fi password:** correct-horse-battery
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Key: Value line, then Attached 3D model (STL)
+#### 41. Key: Value line, then Attached 3D model (STL)
 
 **Wi-Fi password:** correct-horse-battery
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Key: Value line, then Terminal recording (.cast file)
+#### 42. Key: Value line, then Terminal recording (.cast file)
 
 **Wi-Fi password:** correct-horse-battery
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Key: Value line, then Audio
+#### 43. Key: Value line, then Audio
 
 **Wi-Fi password:** correct-horse-battery
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Key: Value line, then Video
+#### 44. Key: Value line, then Video
 
 **Wi-Fi password:** correct-horse-battery
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Key: Value line, then Missing file
+#### 45. Key: Value line, then Missing file
 
 **Wi-Fi password:** correct-horse-battery
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Key: Value line, then Card
+#### 46. Key: Value line, then Card
 
 **Wi-Fi password:** correct-horse-battery
 ::: card
 Text in a card.
 :::
 
-#### 46. Key: Value line, then Callout (info)
+#### 47. Key: Value line, then Callout (info)
 
 **Wi-Fi password:** correct-horse-battery
 :::i
 Text in an info callout.
 :::
 
-#### 47. Key: Value line, then Callout (warning, chosen icon)
+#### 48. Key: Value line, then Callout (warning, chosen icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Key: Value line, then Callout (decision, no icon)
+#### 49. Key: Value line, then Callout (decision, no icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::^ icon=none

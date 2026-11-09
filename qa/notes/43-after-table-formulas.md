@@ -298,7 +298,22 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Table with formulas, then Math block
+#### 21. Table with formulas, then Typing practice (typing block)
+
+| Item | Cost |
+| --- | ---: |
+| Rent | 1200 |
+| Food | 450.50 |
+| Total | =SUM(B2:B3) |
+| Broken | =B2/0 |
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Table with formulas, then Math block
 
 | Item | Cost |
 | --- | ---: |
@@ -310,7 +325,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Table with formulas, then Table
+#### 23. Table with formulas, then Table
 
 | Item | Cost |
 | --- | ---: |
@@ -323,7 +338,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Table with formulas, then Table with formulas
+#### 24. Table with formulas, then Table with formulas
 
 | Item | Cost |
 | --- | ---: |
@@ -338,7 +353,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Table with formulas, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Table with formulas, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 | Item | Cost |
 | --- | ---: |
@@ -362,7 +377,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Table with formulas, then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Table with formulas, then Secret ({{name}}, kept in a locked secrets note)
 
 | Item | Cost |
 | --- | ---: |
@@ -372,7 +387,7 @@ jsonpath "$.name" isString
 | Broken | =B2/0 |
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Table with formulas, then API requests (http block): a variable, a named request and one using its response
+#### 27. Table with formulas, then API requests (http block): a variable, a named request and one using its response
 
 | Item | Cost |
 | --- | ---: |
@@ -391,7 +406,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Table with formulas, then Spreadsheet (csv block)
+#### 28. Table with formulas, then Spreadsheet (csv block)
 
 | Item | Cost |
 | --- | ---: |
@@ -406,7 +421,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Table with formulas, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Table with formulas, then Named spreadsheet (csv name=), and a formula in another block using it
 
 | Item | Cost |
 | --- | ---: |
@@ -423,7 +438,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Table with formulas, then Divider
+#### 30. Table with formulas, then Divider
 
 | Item | Cost |
 | --- | ---: |
@@ -433,7 +448,7 @@ Total, =costs!B2*2
 | Broken | =B2/0 |
 ---
 
-#### 30. Table with formulas, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Table with formulas, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 | Item | Cost |
 | --- | ---: |
@@ -450,7 +465,7 @@ After it, on a new page.
 
 And another.
 
-#### 31. Table with formulas, then Key: Value line
+#### 32. Table with formulas, then Key: Value line
 
 | Item | Cost |
 | --- | ---: |
@@ -460,7 +475,7 @@ And another.
 | Broken | =B2/0 |
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Table with formulas, then Mention
+#### 33. Table with formulas, then Mention
 
 | Item | Cost |
 | --- | ---: |
@@ -470,7 +485,7 @@ And another.
 | Broken | =B2/0 |
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Table with formulas, then Wiki link
+#### 34. Table with formulas, then Wiki link
 
 | Item | Cost |
 | --- | ---: |
@@ -480,7 +495,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 | Broken | =B2/0 |
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Table with formulas, then Symbols
+#### 35. Table with formulas, then Symbols
 
 | Item | Cost |
 | --- | ---: |
@@ -490,7 +505,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | Broken | =B2/0 |
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Table with formulas, then GitHub links
+#### 36. Table with formulas, then GitHub links
 
 | Item | Cost |
 | --- | ---: |
@@ -500,7 +515,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | Broken | =B2/0 |
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Table with formulas, then arXiv links
+#### 37. Table with formulas, then arXiv links
 
 | Item | Cost |
 | --- | ---: |
@@ -510,7 +525,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Broken | =B2/0 |
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Table with formulas, then Image
+#### 38. Table with formulas, then Image
 
 | Item | Cost |
 | --- | ---: |
@@ -520,7 +535,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 ![A sample picture](attachment:photo.png)
 
-#### 38. Table with formulas, then Drawing
+#### 39. Table with formulas, then Drawing
 
 | Item | Cost |
 | --- | ---: |
@@ -530,7 +545,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Table with formulas, then File
+#### 40. Table with formulas, then File
 
 | Item | Cost |
 | --- | ---: |
@@ -540,7 +555,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Table with formulas, then Attached 3D model (STL)
+#### 41. Table with formulas, then Attached 3D model (STL)
 
 | Item | Cost |
 | --- | ---: |
@@ -550,7 +565,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Table with formulas, then Terminal recording (.cast file)
+#### 42. Table with formulas, then Terminal recording (.cast file)
 
 | Item | Cost |
 | --- | ---: |
@@ -560,7 +575,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Table with formulas, then Audio
+#### 43. Table with formulas, then Audio
 
 | Item | Cost |
 | --- | ---: |
@@ -570,7 +585,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Table with formulas, then Video
+#### 44. Table with formulas, then Video
 
 | Item | Cost |
 | --- | ---: |
@@ -580,7 +595,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Table with formulas, then Missing file
+#### 45. Table with formulas, then Missing file
 
 | Item | Cost |
 | --- | ---: |
@@ -590,7 +605,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | Broken | =B2/0 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Table with formulas, then Card
+#### 46. Table with formulas, then Card
 
 | Item | Cost |
 | --- | ---: |
@@ -602,7 +617,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 46. Table with formulas, then Callout (info)
+#### 47. Table with formulas, then Callout (info)
 
 | Item | Cost |
 | --- | ---: |
@@ -614,7 +629,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 47. Table with formulas, then Callout (warning, chosen icon)
+#### 48. Table with formulas, then Callout (warning, chosen icon)
 
 | Item | Cost |
 | --- | ---: |
@@ -626,7 +641,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Table with formulas, then Callout (decision, no icon)
+#### 49. Table with formulas, then Callout (decision, no icon)
 
 | Item | Cost |
 | --- | ---: |

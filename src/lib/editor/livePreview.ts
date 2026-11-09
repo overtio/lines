@@ -32,7 +32,7 @@ import { InlineMathWidget } from "./math";
 import { followClick, openHref } from "./links";
 import { drawMention, frontMatterField, objectsChanged, openMention, openTag, valueText } from "./objects";
 import { normalizeTag } from "../notes/parse";
-import { todoDone } from "./util";
+import { cheer } from "./util";
 import { keyOf } from "../notes/properties";
 import { markupMode } from "./markupMode";
 import { plainLine } from "../notes/stats";
@@ -716,7 +716,7 @@ function toggleCheckbox(view: EditorView, el: Element) {
     changes: { from: at, to: at + 1, insert: match[1] === " " ? "x" : " " },
     userEvent: "input.toggle",
   });
-  if (match[1] === " ") todoDone();
+  if (match[1] === " ") cheer();
 }
 
 /**

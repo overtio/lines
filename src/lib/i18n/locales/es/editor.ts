@@ -32,6 +32,8 @@ export default {
   "editor.slash.model.keywords": "openscad scad cad 3d modelo stl malla imprimir sólido",
   "editor.slash.timing": "Cronograma",
   "editor.slash.timing.keywords": "wavedrom diagrama de tiempos señal onda reloj bus registro bits lógica puerta digital electrónica",
+  "editor.slash.typing": "Mecanografía",
+  "editor.slash.typing.keywords": "mecanografía práctica escribir velocidad ppm palabras por minuto teclado ejercicio prueba lección",
   "editor.slash.request": "Solicitud a una API",
   "editor.slash.request.keywords": "http rest api solicitud petición curl get post endpoint",
   "editor.slash.hurl": "Prueba Hurl",

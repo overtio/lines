@@ -198,14 +198,24 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Terminal recording (.cast file), then Math block
+#### 21. Terminal recording (.cast file), then Typing practice (typing block)
+
+[terminal.cast](attachment:terminal.cast)
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Terminal recording (.cast file), then Math block
 
 [terminal.cast](attachment:terminal.cast)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Terminal recording (.cast file), then Table
+#### 23. Terminal recording (.cast file), then Table
 
 [terminal.cast](attachment:terminal.cast)
 | Left | Center | Right |
@@ -213,7 +223,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Terminal recording (.cast file), then Table with formulas
+#### 24. Terminal recording (.cast file), then Table with formulas
 
 [terminal.cast](attachment:terminal.cast)
 | Item | Cost |
@@ -223,7 +233,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Terminal recording (.cast file), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Terminal recording (.cast file), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 [terminal.cast](attachment:terminal.cast)
 ```hurl
@@ -242,12 +252,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Terminal recording (.cast file), then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Terminal recording (.cast file), then Secret ({{name}}, kept in a locked secrets note)
 
 [terminal.cast](attachment:terminal.cast)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Terminal recording (.cast file), then API requests (http block): a variable, a named request and one using its response
+#### 27. Terminal recording (.cast file), then API requests (http block): a variable, a named request and one using its response
 
 [terminal.cast](attachment:terminal.cast)
 ```http
@@ -261,7 +271,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Terminal recording (.cast file), then Spreadsheet (csv block)
+#### 28. Terminal recording (.cast file), then Spreadsheet (csv block)
 
 [terminal.cast](attachment:terminal.cast)
 ```csv
@@ -271,7 +281,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Terminal recording (.cast file), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Terminal recording (.cast file), then Named spreadsheet (csv name=), and a formula in another block using it
 
 [terminal.cast](attachment:terminal.cast)
 ```csv name=costs
@@ -283,12 +293,12 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Terminal recording (.cast file), then Divider
+#### 30. Terminal recording (.cast file), then Divider
 
 [terminal.cast](attachment:terminal.cast)
 ---
 
-#### 30. Terminal recording (.cast file), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Terminal recording (.cast file), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 [terminal.cast](attachment:terminal.cast)
 Before the break.
@@ -300,98 +310,98 @@ After it, on a new page.
 
 And another.
 
-#### 31. Terminal recording (.cast file), then Key: Value line
+#### 32. Terminal recording (.cast file), then Key: Value line
 
 [terminal.cast](attachment:terminal.cast)
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Terminal recording (.cast file), then Mention
+#### 33. Terminal recording (.cast file), then Mention
 
 [terminal.cast](attachment:terminal.cast)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Terminal recording (.cast file), then Wiki link
+#### 34. Terminal recording (.cast file), then Wiki link
 
 [terminal.cast](attachment:terminal.cast)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Terminal recording (.cast file), then Symbols
+#### 35. Terminal recording (.cast file), then Symbols
 
 [terminal.cast](attachment:terminal.cast)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Terminal recording (.cast file), then GitHub links
+#### 36. Terminal recording (.cast file), then GitHub links
 
 [terminal.cast](attachment:terminal.cast)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Terminal recording (.cast file), then arXiv links
+#### 37. Terminal recording (.cast file), then arXiv links
 
 [terminal.cast](attachment:terminal.cast)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Terminal recording (.cast file), then Image
+#### 38. Terminal recording (.cast file), then Image
 
 [terminal.cast](attachment:terminal.cast)
 ![A sample picture](attachment:photo.png)
 
-#### 38. Terminal recording (.cast file), then Drawing
+#### 39. Terminal recording (.cast file), then Drawing
 
 [terminal.cast](attachment:terminal.cast)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Terminal recording (.cast file), then File
+#### 40. Terminal recording (.cast file), then File
 
 [terminal.cast](attachment:terminal.cast)
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Terminal recording (.cast file), then Attached 3D model (STL)
+#### 41. Terminal recording (.cast file), then Attached 3D model (STL)
 
 [terminal.cast](attachment:terminal.cast)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Terminal recording (.cast file), then Terminal recording (.cast file)
+#### 42. Terminal recording (.cast file), then Terminal recording (.cast file)
 
 [terminal.cast](attachment:terminal.cast)
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Terminal recording (.cast file), then Audio
+#### 43. Terminal recording (.cast file), then Audio
 
 [terminal.cast](attachment:terminal.cast)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Terminal recording (.cast file), then Video
+#### 44. Terminal recording (.cast file), then Video
 
 [terminal.cast](attachment:terminal.cast)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Terminal recording (.cast file), then Missing file
+#### 45. Terminal recording (.cast file), then Missing file
 
 [terminal.cast](attachment:terminal.cast)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Terminal recording (.cast file), then Card
+#### 46. Terminal recording (.cast file), then Card
 
 [terminal.cast](attachment:terminal.cast)
 ::: card
 Text in a card.
 :::
 
-#### 46. Terminal recording (.cast file), then Callout (info)
+#### 47. Terminal recording (.cast file), then Callout (info)
 
 [terminal.cast](attachment:terminal.cast)
 :::i
 Text in an info callout.
 :::
 
-#### 47. Terminal recording (.cast file), then Callout (warning, chosen icon)
+#### 48. Terminal recording (.cast file), then Callout (warning, chosen icon)
 
 [terminal.cast](attachment:terminal.cast)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Terminal recording (.cast file), then Callout (decision, no icon)
+#### 49. Terminal recording (.cast file), then Callout (decision, no icon)
 
 [terminal.cast](attachment:terminal.cast)
 :::^ icon=none

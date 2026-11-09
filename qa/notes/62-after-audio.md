@@ -198,14 +198,24 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Audio, then Math block
+#### 21. Audio, then Typing practice (typing block)
+
+[Chime.mp3](attachment:chime.mp3)
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Audio, then Math block
 
 [Chime.mp3](attachment:chime.mp3)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Audio, then Table
+#### 23. Audio, then Table
 
 [Chime.mp3](attachment:chime.mp3)
 | Left | Center | Right |
@@ -213,7 +223,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Audio, then Table with formulas
+#### 24. Audio, then Table with formulas
 
 [Chime.mp3](attachment:chime.mp3)
 | Item | Cost |
@@ -223,7 +233,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Audio, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Audio, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 [Chime.mp3](attachment:chime.mp3)
 ```hurl
@@ -242,12 +252,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Audio, then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Audio, then Secret ({{name}}, kept in a locked secrets note)
 
 [Chime.mp3](attachment:chime.mp3)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Audio, then API requests (http block): a variable, a named request and one using its response
+#### 27. Audio, then API requests (http block): a variable, a named request and one using its response
 
 [Chime.mp3](attachment:chime.mp3)
 ```http
@@ -261,7 +271,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Audio, then Spreadsheet (csv block)
+#### 28. Audio, then Spreadsheet (csv block)
 
 [Chime.mp3](attachment:chime.mp3)
 ```csv
@@ -271,7 +281,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Audio, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Audio, then Named spreadsheet (csv name=), and a formula in another block using it
 
 [Chime.mp3](attachment:chime.mp3)
 ```csv name=costs
@@ -283,12 +293,12 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Audio, then Divider
+#### 30. Audio, then Divider
 
 [Chime.mp3](attachment:chime.mp3)
 ---
 
-#### 30. Audio, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Audio, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 [Chime.mp3](attachment:chime.mp3)
 Before the break.
@@ -300,98 +310,98 @@ After it, on a new page.
 
 And another.
 
-#### 31. Audio, then Key: Value line
+#### 32. Audio, then Key: Value line
 
 [Chime.mp3](attachment:chime.mp3)
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Audio, then Mention
+#### 33. Audio, then Mention
 
 [Chime.mp3](attachment:chime.mp3)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Audio, then Wiki link
+#### 34. Audio, then Wiki link
 
 [Chime.mp3](attachment:chime.mp3)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Audio, then Symbols
+#### 35. Audio, then Symbols
 
 [Chime.mp3](attachment:chime.mp3)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Audio, then GitHub links
+#### 36. Audio, then GitHub links
 
 [Chime.mp3](attachment:chime.mp3)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Audio, then arXiv links
+#### 37. Audio, then arXiv links
 
 [Chime.mp3](attachment:chime.mp3)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Audio, then Image
+#### 38. Audio, then Image
 
 [Chime.mp3](attachment:chime.mp3)
 ![A sample picture](attachment:photo.png)
 
-#### 38. Audio, then Drawing
+#### 39. Audio, then Drawing
 
 [Chime.mp3](attachment:chime.mp3)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Audio, then File
+#### 40. Audio, then File
 
 [Chime.mp3](attachment:chime.mp3)
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Audio, then Attached 3D model (STL)
+#### 41. Audio, then Attached 3D model (STL)
 
 [Chime.mp3](attachment:chime.mp3)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Audio, then Terminal recording (.cast file)
+#### 42. Audio, then Terminal recording (.cast file)
 
 [Chime.mp3](attachment:chime.mp3)
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Audio, then Audio
+#### 43. Audio, then Audio
 
 [Chime.mp3](attachment:chime.mp3)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Audio, then Video
+#### 44. Audio, then Video
 
 [Chime.mp3](attachment:chime.mp3)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Audio, then Missing file
+#### 45. Audio, then Missing file
 
 [Chime.mp3](attachment:chime.mp3)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Audio, then Card
+#### 46. Audio, then Card
 
 [Chime.mp3](attachment:chime.mp3)
 ::: card
 Text in a card.
 :::
 
-#### 46. Audio, then Callout (info)
+#### 47. Audio, then Callout (info)
 
 [Chime.mp3](attachment:chime.mp3)
 :::i
 Text in an info callout.
 :::
 
-#### 47. Audio, then Callout (warning, chosen icon)
+#### 48. Audio, then Callout (warning, chosen icon)
 
 [Chime.mp3](attachment:chime.mp3)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Audio, then Callout (decision, no icon)
+#### 49. Audio, then Callout (decision, no icon)
 
 [Chime.mp3](attachment:chime.mp3)
 :::^ icon=none

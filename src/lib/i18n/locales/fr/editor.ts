@@ -32,6 +32,8 @@ export default {
   "editor.slash.model.keywords": "openscad scad cao 3d modèle stl maillage imprimer solide",
   "editor.slash.timing": "Chronogramme",
   "editor.slash.timing.keywords": "wavedrom diagramme temporel signal onde horloge bus registre bits logique porte numérique électronique",
+  "editor.slash.typing": "Dactylographie",
+  "editor.slash.typing.keywords": "dactylographie frappe entraînement taper vitesse mpm mots par minute clavier exercice test leçon",
   "editor.slash.request": "Requête d’API",
   "editor.slash.request.keywords": "http rest api requête curl get post endpoint",
   "editor.slash.hurl": "Test Hurl",

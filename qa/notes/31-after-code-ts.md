@@ -258,7 +258,20 @@ console.log(greeting);
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Code block (TypeScript), then Math block
+#### 21. Code block (TypeScript), then Typing practice (typing block)
+
+```ts
+const greeting: string = "hello";
+console.log(greeting);
+```
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Code block (TypeScript), then Math block
 
 ```ts
 const greeting: string = "hello";
@@ -268,7 +281,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Code block (TypeScript), then Table
+#### 23. Code block (TypeScript), then Table
 
 ```ts
 const greeting: string = "hello";
@@ -279,7 +292,7 @@ console.log(greeting);
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Code block (TypeScript), then Table with formulas
+#### 24. Code block (TypeScript), then Table with formulas
 
 ```ts
 const greeting: string = "hello";
@@ -292,7 +305,7 @@ console.log(greeting);
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Code block (TypeScript), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Code block (TypeScript), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ```ts
 const greeting: string = "hello";
@@ -314,7 +327,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Code block (TypeScript), then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Code block (TypeScript), then Secret ({{name}}, kept in a locked secrets note)
 
 ```ts
 const greeting: string = "hello";
@@ -322,7 +335,7 @@ console.log(greeting);
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Code block (TypeScript), then API requests (http block): a variable, a named request and one using its response
+#### 27. Code block (TypeScript), then API requests (http block): a variable, a named request and one using its response
 
 ```ts
 const greeting: string = "hello";
@@ -339,7 +352,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Code block (TypeScript), then Spreadsheet (csv block)
+#### 28. Code block (TypeScript), then Spreadsheet (csv block)
 
 ```ts
 const greeting: string = "hello";
@@ -352,7 +365,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Code block (TypeScript), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Code block (TypeScript), then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```ts
 const greeting: string = "hello";
@@ -367,7 +380,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Code block (TypeScript), then Divider
+#### 30. Code block (TypeScript), then Divider
 
 ```ts
 const greeting: string = "hello";
@@ -375,7 +388,7 @@ console.log(greeting);
 ```
 ---
 
-#### 30. Code block (TypeScript), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Code block (TypeScript), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 ```ts
 const greeting: string = "hello";
@@ -390,7 +403,7 @@ After it, on a new page.
 
 And another.
 
-#### 31. Code block (TypeScript), then Key: Value line
+#### 32. Code block (TypeScript), then Key: Value line
 
 ```ts
 const greeting: string = "hello";
@@ -398,7 +411,7 @@ console.log(greeting);
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Code block (TypeScript), then Mention
+#### 33. Code block (TypeScript), then Mention
 
 ```ts
 const greeting: string = "hello";
@@ -406,7 +419,7 @@ console.log(greeting);
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Code block (TypeScript), then Wiki link
+#### 34. Code block (TypeScript), then Wiki link
 
 ```ts
 const greeting: string = "hello";
@@ -414,7 +427,7 @@ console.log(greeting);
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Code block (TypeScript), then Symbols
+#### 35. Code block (TypeScript), then Symbols
 
 ```ts
 const greeting: string = "hello";
@@ -422,7 +435,7 @@ console.log(greeting);
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Code block (TypeScript), then GitHub links
+#### 36. Code block (TypeScript), then GitHub links
 
 ```ts
 const greeting: string = "hello";
@@ -430,7 +443,7 @@ console.log(greeting);
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Code block (TypeScript), then arXiv links
+#### 37. Code block (TypeScript), then arXiv links
 
 ```ts
 const greeting: string = "hello";
@@ -438,7 +451,7 @@ console.log(greeting);
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Code block (TypeScript), then Image
+#### 38. Code block (TypeScript), then Image
 
 ```ts
 const greeting: string = "hello";
@@ -446,7 +459,7 @@ console.log(greeting);
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 38. Code block (TypeScript), then Drawing
+#### 39. Code block (TypeScript), then Drawing
 
 ```ts
 const greeting: string = "hello";
@@ -454,7 +467,7 @@ console.log(greeting);
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Code block (TypeScript), then File
+#### 40. Code block (TypeScript), then File
 
 ```ts
 const greeting: string = "hello";
@@ -462,7 +475,7 @@ console.log(greeting);
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Code block (TypeScript), then Attached 3D model (STL)
+#### 41. Code block (TypeScript), then Attached 3D model (STL)
 
 ```ts
 const greeting: string = "hello";
@@ -470,7 +483,7 @@ console.log(greeting);
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Code block (TypeScript), then Terminal recording (.cast file)
+#### 42. Code block (TypeScript), then Terminal recording (.cast file)
 
 ```ts
 const greeting: string = "hello";
@@ -478,7 +491,7 @@ console.log(greeting);
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Code block (TypeScript), then Audio
+#### 43. Code block (TypeScript), then Audio
 
 ```ts
 const greeting: string = "hello";
@@ -486,7 +499,7 @@ console.log(greeting);
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Code block (TypeScript), then Video
+#### 44. Code block (TypeScript), then Video
 
 ```ts
 const greeting: string = "hello";
@@ -494,7 +507,7 @@ console.log(greeting);
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Code block (TypeScript), then Missing file
+#### 45. Code block (TypeScript), then Missing file
 
 ```ts
 const greeting: string = "hello";
@@ -502,7 +515,7 @@ console.log(greeting);
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Code block (TypeScript), then Card
+#### 46. Code block (TypeScript), then Card
 
 ```ts
 const greeting: string = "hello";
@@ -512,7 +525,7 @@ console.log(greeting);
 Text in a card.
 :::
 
-#### 46. Code block (TypeScript), then Callout (info)
+#### 47. Code block (TypeScript), then Callout (info)
 
 ```ts
 const greeting: string = "hello";
@@ -522,7 +535,7 @@ console.log(greeting);
 Text in an info callout.
 :::
 
-#### 47. Code block (TypeScript), then Callout (warning, chosen icon)
+#### 48. Code block (TypeScript), then Callout (warning, chosen icon)
 
 ```ts
 const greeting: string = "hello";
@@ -532,7 +545,7 @@ console.log(greeting);
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Code block (TypeScript), then Callout (decision, no icon)
+#### 49. Code block (TypeScript), then Callout (decision, no icon)
 
 ```ts
 const greeting: string = "hello";

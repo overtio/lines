@@ -21,6 +21,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Callout | `:::!` … `:::`, `:::info icon=flag` … `:::` | Pandoc fenced div |
 | Diagram | ` ```mermaid ` code block | GitHub, GitLab, Obsidian |
 | Timing diagram | ` ```wavedrom ` code block | Apps with a WaveDrom plugin (Obsidian, VS Code's Markdown Preview Enhanced, MkDocs) |
+| Typing practice | ` ```typing ` code block | Yes (a code block of its text) |
 | 3D model | ` ```openscad ` code block, ` ```stl ` code block | OpenSCAD (its code); GitHub (` ```stl `) |
 | Spreadsheet | ` ```csv ` code block | Yes (a code block of CSV) |
 | API requests | ` ```http ` code block | JetBrains IDEs, VS Code (REST Client, httpYac), Visual Studio |
@@ -150,7 +151,7 @@ Fenced code blocks (` ``` ` or `~~~`) are as in CommonMark. lines reads the info
 
 - The first word names the language, for syntax highlighting: ` ```sql `, ` ```ts `, ` ```python `. Any language in CodeMirror's language data works, by name or alias.
 - A block with no language whose text starts with `{` or `[` is treated as JSON, so it can be tidied.
-- ` ```mermaid ` is a diagram, ` ```wavedrom ` a timing diagram, ` ```openscad ` (or ` ```scad `) and ` ```stl ` 3D models, ` ```csv ` a spreadsheet, and ` ```http ` (or ` ```rest `) requests to an API, and ` ```hurl ` requests with checks of their responses (below).
+- ` ```mermaid ` is a diagram, ` ```wavedrom ` a timing diagram, ` ```typing ` a passage to practice typing, ` ```openscad ` (or ` ```scad `) and ` ```stl ` 3D models, ` ```csv ` a spreadsheet, and ` ```http ` (or ` ```rest `) requests to an API, and ` ```hurl ` requests with checks of their responses (below).
 
 ## Spreadsheets
 
@@ -179,6 +180,21 @@ A code block with the language `wavedrom` is drawn by [WaveDrom](https://wavedro
 ```
 
 It's drawn as Mermaid diagrams are, in the note's font and the theme's colors: names and labels in the text color, waves and outlines muted, plain data, gates and their inputs in boxes tinted with the accent, colored data and fields in the theme's colors of the same hue, and arrows in the accent. On paper it's black on white, with light fills. A width after a bar works as a diagram's does (` ```wavedrom |400 `). `config: { skin: "narrow" }` picks one of WaveDrom's other looks (`narrow`, `narrower`, `narrowerer`, `lowkey`); its `dark` look is left to the theme. Names can use WaveDrom's markup (`<b>`, `<i>`, `<sub>`, `<sup>`, `<o>` for a line over); other markup is left out. Other apps show the block as code, or draw it with a WaveDrom plugin.
+
+## Typing practice
+
+A code block with the language `typing` is a passage to practice typing on, drawn as a drill by the Typing Practice [plugin](plugins.md) (with it off, it's a code block). `/typing` puts one in with a passage to start from; any text will do, a quote, a page of a book, code.
+
+```typing
+Sphinx of black quartz, judge my vow! The five boxing wizards jump quickly.
+```
+
+Click it, or go into it with ↓ from the line above (↑ from below), and type it over. What's typed right turns the text's color, a mistake red, and above it are your speed in words a minute (five characters typed right making a word), your accuracy (the keys typed right of all those typed, a mistake fixed after still counting) and the time, which starts with the first key and stops while you're elsewhere. When the last character is typed it says how it went, the three characters missed most, and whether that's your best for this text on this device. Enter, or Again, starts over; Esc goes back to the note.
+
+- A line break is a press of Enter, shown as ↵, and a blank line between paragraphs only one. After it, the next line's indent is typed for you, as in a code editor. Spaces at the ends of lines don't count, and tabs are two spaces.
+- Curly quotes, dashes and a no-break space are typed with the keys a keyboard has for them: `'`, `"`, `-` and Space. Accented letters typed with a dead key or an input method count once they're made.
+- Pasting doesn't type, and the cursor stays at the end: Backspace takes back what's typed.
+- **Edit Text**, beside it, shows its text to change. On paper it prints as a quote.
 
 ## 3D models
 

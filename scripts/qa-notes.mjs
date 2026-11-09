@@ -65,6 +65,7 @@ const ELEMENTS = [
     name: "Timing diagram (wavedrom block)",
     md: '```wavedrom\n{ signal: [\n  { name: "clk", wave: "p.....|..." },\n  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },\n  {},\n  { name: "ack", wave: "1.....|01.", node: ".a......b" }\n], edge: ["a~>b t1"] }\n```',
   },
+  { id: "typing", name: "Typing practice (typing block)", md: "```typing\nIt’s a “fine” day — type it.\nfunction go() {\n  return 1;\n}\n```" },
   { id: "math", name: "Math block", md: "$$\n\\int_0^1 x^2\\,dx = \\frac{1}{3}\n$$" },
   {
     id: "table",

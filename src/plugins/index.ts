@@ -24,6 +24,7 @@ import { keyboardSounds } from "./keyboards";
 import { mascots } from "./mascots";
 import { styles } from "./styles";
 import { themes } from "./themes";
+import { typing } from "./typing";
 import { unsplash } from "./unsplash";
 import { wavedrom } from "./wavedrom";
 
@@ -45,6 +46,7 @@ export const builtIn = (): Plugin[] => [
   mermaid(),
   wavedrom(),
   models(),
+  typing(),
   ironcalc(),
   tex(),
   unsplash(),

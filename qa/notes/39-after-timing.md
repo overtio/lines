@@ -338,7 +338,24 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Timing diagram (wavedrom block), then Math block
+#### 21. Timing diagram (wavedrom block), then Typing practice (typing block)
+
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Timing diagram (wavedrom block), then Math block
 
 ```wavedrom
 { signal: [
@@ -352,7 +369,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Timing diagram (wavedrom block), then Table
+#### 23. Timing diagram (wavedrom block), then Table
 
 ```wavedrom
 { signal: [
@@ -367,7 +384,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Timing diagram (wavedrom block), then Table with formulas
+#### 24. Timing diagram (wavedrom block), then Table with formulas
 
 ```wavedrom
 { signal: [
@@ -384,7 +401,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Timing diagram (wavedrom block), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Timing diagram (wavedrom block), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ```wavedrom
 { signal: [
@@ -410,7 +427,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Timing diagram (wavedrom block), then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Timing diagram (wavedrom block), then Secret ({{name}}, kept in a locked secrets note)
 
 ```wavedrom
 { signal: [
@@ -422,7 +439,7 @@ jsonpath "$.name" isString
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Timing diagram (wavedrom block), then API requests (http block): a variable, a named request and one using its response
+#### 27. Timing diagram (wavedrom block), then API requests (http block): a variable, a named request and one using its response
 
 ```wavedrom
 { signal: [
@@ -443,7 +460,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Timing diagram (wavedrom block), then Spreadsheet (csv block)
+#### 28. Timing diagram (wavedrom block), then Spreadsheet (csv block)
 
 ```wavedrom
 { signal: [
@@ -460,7 +477,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Timing diagram (wavedrom block), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Timing diagram (wavedrom block), then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```wavedrom
 { signal: [
@@ -479,7 +496,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Timing diagram (wavedrom block), then Divider
+#### 30. Timing diagram (wavedrom block), then Divider
 
 ```wavedrom
 { signal: [
@@ -491,7 +508,7 @@ Total, =costs!B2*2
 ```
 ---
 
-#### 30. Timing diagram (wavedrom block), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Timing diagram (wavedrom block), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 ```wavedrom
 { signal: [
@@ -510,7 +527,7 @@ After it, on a new page.
 
 And another.
 
-#### 31. Timing diagram (wavedrom block), then Key: Value line
+#### 32. Timing diagram (wavedrom block), then Key: Value line
 
 ```wavedrom
 { signal: [
@@ -522,7 +539,7 @@ And another.
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Timing diagram (wavedrom block), then Mention
+#### 33. Timing diagram (wavedrom block), then Mention
 
 ```wavedrom
 { signal: [
@@ -534,7 +551,7 @@ And another.
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Timing diagram (wavedrom block), then Wiki link
+#### 34. Timing diagram (wavedrom block), then Wiki link
 
 ```wavedrom
 { signal: [
@@ -546,7 +563,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Timing diagram (wavedrom block), then Symbols
+#### 35. Timing diagram (wavedrom block), then Symbols
 
 ```wavedrom
 { signal: [
@@ -558,7 +575,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Timing diagram (wavedrom block), then GitHub links
+#### 36. Timing diagram (wavedrom block), then GitHub links
 
 ```wavedrom
 { signal: [
@@ -570,7 +587,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Timing diagram (wavedrom block), then arXiv links
+#### 37. Timing diagram (wavedrom block), then arXiv links
 
 ```wavedrom
 { signal: [
@@ -582,7 +599,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Timing diagram (wavedrom block), then Image
+#### 38. Timing diagram (wavedrom block), then Image
 
 ```wavedrom
 { signal: [
@@ -594,7 +611,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 38. Timing diagram (wavedrom block), then Drawing
+#### 39. Timing diagram (wavedrom block), then Drawing
 
 ```wavedrom
 { signal: [
@@ -606,7 +623,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Timing diagram (wavedrom block), then File
+#### 40. Timing diagram (wavedrom block), then File
 
 ```wavedrom
 { signal: [
@@ -618,7 +635,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Timing diagram (wavedrom block), then Attached 3D model (STL)
+#### 41. Timing diagram (wavedrom block), then Attached 3D model (STL)
 
 ```wavedrom
 { signal: [
@@ -630,7 +647,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Timing diagram (wavedrom block), then Terminal recording (.cast file)
+#### 42. Timing diagram (wavedrom block), then Terminal recording (.cast file)
 
 ```wavedrom
 { signal: [
@@ -642,7 +659,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Timing diagram (wavedrom block), then Audio
+#### 43. Timing diagram (wavedrom block), then Audio
 
 ```wavedrom
 { signal: [
@@ -654,7 +671,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Timing diagram (wavedrom block), then Video
+#### 44. Timing diagram (wavedrom block), then Video
 
 ```wavedrom
 { signal: [
@@ -666,7 +683,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Timing diagram (wavedrom block), then Missing file
+#### 45. Timing diagram (wavedrom block), then Missing file
 
 ```wavedrom
 { signal: [
@@ -678,7 +695,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Timing diagram (wavedrom block), then Card
+#### 46. Timing diagram (wavedrom block), then Card
 
 ```wavedrom
 { signal: [
@@ -692,7 +709,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 46. Timing diagram (wavedrom block), then Callout (info)
+#### 47. Timing diagram (wavedrom block), then Callout (info)
 
 ```wavedrom
 { signal: [
@@ -706,7 +723,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 47. Timing diagram (wavedrom block), then Callout (warning, chosen icon)
+#### 48. Timing diagram (wavedrom block), then Callout (warning, chosen icon)
 
 ```wavedrom
 { signal: [
@@ -720,7 +737,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Timing diagram (wavedrom block), then Callout (decision, no icon)
+#### 49. Timing diagram (wavedrom block), then Callout (decision, no icon)
 
 ```wavedrom
 { signal: [

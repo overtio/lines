@@ -218,7 +218,18 @@ endsolid pyramid
 ```
 :::
 
-#### 21. Math block in a callout with no icon
+#### 21. Typing practice (typing block) in a callout with no icon
+
+:::^ icon=none
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+:::
+
+#### 22. Math block in a callout with no icon
 
 :::^ icon=none
 $$
@@ -226,7 +237,7 @@ $$
 $$
 :::
 
-#### 22. Table in a callout with no icon
+#### 23. Table in a callout with no icon
 
 :::^ icon=none
 | Left | Center | Right |
@@ -235,7 +246,7 @@ $$
 | longer cell text | `code` | 22 |
 :::
 
-#### 23. Table with formulas in a callout with no icon
+#### 24. Table with formulas in a callout with no icon
 
 :::^ icon=none
 | Item | Cost |
@@ -246,7 +257,7 @@ $$
 | Broken | =B2/0 |
 :::
 
-#### 24. Hurl entries (hurl block): a capture used by the next entry, and asserts in a callout with no icon
+#### 25. Hurl entries (hurl block): a capture used by the next entry, and asserts in a callout with no icon
 
 :::^ icon=none
 ```hurl
@@ -266,13 +277,13 @@ jsonpath "$.name" isString
 ```
 :::
 
-#### 25. Secret ({{name}}, kept in a locked secrets note) in a callout with no icon
+#### 26. Secret ({{name}}, kept in a locked secrets note) in a callout with no icon
 
 :::^ icon=none
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::
 
-#### 26. API requests (http block): a variable, a named request and one using its response in a callout with no icon
+#### 27. API requests (http block): a variable, a named request and one using its response in a callout with no icon
 
 :::^ icon=none
 ```http
@@ -287,7 +298,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 :::
 
-#### 27. Spreadsheet (csv block) in a callout with no icon
+#### 28. Spreadsheet (csv block) in a callout with no icon
 
 :::^ icon=none
 ```csv
@@ -298,7 +309,7 @@ Total, =SUM(B2:B3)
 ```
 :::
 
-#### 28. Named spreadsheet (csv name=), and a formula in another block using it in a callout with no icon
+#### 29. Named spreadsheet (csv name=), and a formula in another block using it in a callout with no icon
 
 :::^ icon=none
 ```csv name=costs
@@ -311,13 +322,13 @@ Total, =costs!B2*2
 ```
 :::
 
-#### 29. Divider in a callout with no icon
+#### 30. Divider in a callout with no icon
 
 :::^ icon=none
 ---
 :::
 
-#### 30. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a callout with no icon (stays Markdown here)
+#### 31. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a callout with no icon (stays Markdown here)
 
 :::^ icon=none
 Before the break.
@@ -330,91 +341,91 @@ After it, on a new page.
 And another.
 :::
 
-#### 31. Key: Value line in a callout with no icon
+#### 32. Key: Value line in a callout with no icon
 
 :::^ icon=none
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 32. Mention in a callout with no icon
+#### 33. Mention in a callout with no icon
 
 :::^ icon=none
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 33. Wiki link in a callout with no icon
+#### 34. Wiki link in a callout with no icon
 
 :::^ icon=none
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 34. Symbols in a callout with no icon
+#### 35. Symbols in a callout with no icon
 
 :::^ icon=none
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 35. GitHub links in a callout with no icon
+#### 36. GitHub links in a callout with no icon
 
 :::^ icon=none
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 36. arXiv links in a callout with no icon
+#### 37. arXiv links in a callout with no icon
 
 :::^ icon=none
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::
 
-#### 37. Image in a callout with no icon
+#### 38. Image in a callout with no icon
 
 :::^ icon=none
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 38. Drawing in a callout with no icon
+#### 39. Drawing in a callout with no icon
 
 :::^ icon=none
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 39. File in a callout with no icon
+#### 40. File in a callout with no icon
 
 :::^ icon=none
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 40. Attached 3D model (STL) in a callout with no icon
+#### 41. Attached 3D model (STL) in a callout with no icon
 
 :::^ icon=none
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 41. Terminal recording (.cast file) in a callout with no icon
+#### 42. Terminal recording (.cast file) in a callout with no icon
 
 :::^ icon=none
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 42. Audio in a callout with no icon
+#### 43. Audio in a callout with no icon
 
 :::^ icon=none
 [Chime.mp3](attachment:chime.mp3)
 :::
 
-#### 43. Video in a callout with no icon
+#### 44. Video in a callout with no icon
 
 :::^ icon=none
 [Sky.mp4](attachment:sky.mp4)
 :::
 
-#### 44. Missing file in a callout with no icon
+#### 45. Missing file in a callout with no icon
 
 :::^ icon=none
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 45. Card in a callout with no icon
+#### 46. Card in a callout with no icon
 
 :::^ icon=none
 ::: card
@@ -422,7 +433,7 @@ Text in a card.
 :::
 :::
 
-#### 46. Callout (info) in a callout with no icon
+#### 47. Callout (info) in a callout with no icon
 
 :::^ icon=none
 :::i
@@ -430,7 +441,7 @@ Text in an info callout.
 :::
 :::
 
-#### 47. Callout (warning, chosen icon) in a callout with no icon
+#### 48. Callout (warning, chosen icon) in a callout with no icon
 
 :::^ icon=none
 :::! icon=flag
@@ -438,7 +449,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 48. Callout (decision, no icon) in a callout with no icon
+#### 49. Callout (decision, no icon) in a callout with no icon
 
 :::^ icon=none
 :::^ icon=none

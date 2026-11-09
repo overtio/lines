@@ -142,6 +142,11 @@
   color: var(--doc-muted);
 }
 
+/* A typing drill's passage (the Typing Practice plugin), its lines as written. */
+.doc .doc-typing {
+  white-space: pre-wrap;
+}
+
 .doc hr {
   height: 0;
   margin: 1.1em 0;
