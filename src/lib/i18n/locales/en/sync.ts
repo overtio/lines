@@ -70,6 +70,8 @@ export default {
   "sync.folder.none":
     "No cloud drives found on this Mac. Turn on iCloud Drive in System Settings → your name → iCloud, or install Google Drive, Proton Drive, Dropbox or OneDrive. Or use any folder:",
   "sync.folder.chooseOther": "Choose another folder…",
+  "sync.folder.pickPrompt": "Use This Folder",
+  "sync.folder.pickMessage": "Choose where lines keeps your notes. A folder in a cloud drive syncs them.",
   "sync.folder.icloud":
     "iCloud Drive keeps your Macs in step. Syncing with the iPhone app and signing in with iCloud on the web are on the way.",
   "sync.folder.showInFinder": "Show in Finder",

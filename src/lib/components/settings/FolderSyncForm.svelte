@@ -19,6 +19,7 @@
   import { sync } from "../../sync/engine.svelte";
   import { findCloudFolders, pickFolder, type DriveId } from "../../sync/folder";
   import { isFolder, type FolderConfig } from "../../sync/providers";
+  import { nameOf } from "../../notes/localLinks";
   import { closeSettings } from "../../windows/settings.svelte";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
@@ -71,8 +72,8 @@
   async function chooseOther() {
     message = null;
     try {
-      const path = await pickFolder();
-      if (path) chosen = { kind: "folder", provider: "folder", name: path.split("/").pop() || path, path };
+      const path = await pickFolder(t("sync.folder.pickPrompt"), t("sync.folder.pickMessage"));
+      if (path) chosen = { kind: "folder", provider: "folder", name: nameOf(path), path };
     } catch (error) {
       message = t("sync.folder.failed", { error: describe(error) });
     }

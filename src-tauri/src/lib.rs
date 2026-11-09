@@ -21,6 +21,8 @@ pub fn run() {
   let builder = builder
     .plugin(tauri_plugin_updater::Builder::new().build())
     .manage(updates::Updates::default());
+  #[cfg(any(windows, target_os = "linux"))]
+  let builder = builder.plugin(tauri_plugin_dialog::init());
   builder
     .invoke_handler(tauri::generate_handler![
       attachments::open_attachment,

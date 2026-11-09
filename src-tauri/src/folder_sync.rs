@@ -77,10 +77,43 @@ fn candidates_in(home: &Path) -> Vec<Candidate> {
     }
   }
 
-  // Dropbox's older, non-File Provider location.
+  if cfg!(windows) {
+    found.extend(windows_drives(home));
+  }
+
+  // Dropbox's older, non-File Provider location, and where its Windows and Linux apps keep it.
   let dropbox = home.join("Dropbox");
   if dropbox.is_dir() && !found.iter().any(|c| c.provider == "dropbox") {
     found.push(candidate("dropbox", "Dropbox".into(), dropbox));
+  }
+  found
+}
+
+/// Where the drives' Windows apps keep them: in the home folder, OneDrive's as "OneDrive" or
+/// "OneDrive - <organization>"; Google Drive's as a drive of its own (G: unless changed) when it
+/// streams files, or "My Drive" when it mirrors them.
+fn windows_drives(home: &Path) -> Vec<Candidate> {
+  let mut found = Vec::new();
+  let mut entries: Vec<_> = std::fs::read_dir(home).into_iter().flatten().flatten().filter(|e| e.path().is_dir()).collect();
+  entries.sort_by_key(|e| e.file_name());
+  for entry in entries {
+    let dir = entry.file_name().to_string_lossy().into_owned();
+    let path = entry.path();
+    match dir.as_str() {
+      "OneDrive" => found.push(candidate("onedrive", "OneDrive".into(), path)),
+      "iCloudDrive" => found.push(candidate("icloud", "iCloud Drive".into(), path)),
+      "My Drive" => found.push(candidate("google", "Google Drive".into(), path)),
+      "Box" => found.push(candidate("box", "Box".into(), path)),
+      _ => {
+        if let Some(organization) = dir.strip_prefix("OneDrive - ") {
+          found.push(candidate("onedrive", format!("OneDrive ({organization})"), path));
+        }
+      }
+    }
+  }
+  let streamed = Path::new(r"G:\My Drive");
+  if !found.iter().any(|c| c.provider == "google") && streamed.is_dir() {
+    found.push(candidate("google", "Google Drive".into(), streamed.to_path_buf()));
   }
   found
 }
@@ -229,22 +262,31 @@ async fn blocking<T: Send + 'static>(work: impl FnOnce() -> Result<T, String> + 
 /// The tag listed for a file iCloud hasn't downloaded yet.
 const PLACEHOLDER: &str = "icloud-placeholder";
 
-/// Lets the person choose any folder with the system's folder picker.
+/// Lets the person choose any folder with the system's folder picker; `prompt` and `message` in the
+/// app's language (Windows and Linux show only the message, as the picker's title).
 #[tauri::command]
-pub async fn sync_folder_pick(app: AppHandle) -> Option<String> {
+pub async fn sync_folder_pick(app: AppHandle, prompt: String, message: String) -> Option<String> {
   #[cfg(target_os = "macos")]
   {
     let (send, receive) = std::sync::mpsc::channel();
     app
       .run_on_main_thread(move || {
-        let _ = send.send(macos::pick_folder("Use This Folder", "Choose where lines keeps your notes. A folder in a cloud drive syncs them."));
+        let _ = send.send(macos::pick_folder(&prompt, &message));
       })
       .ok()?;
     tauri::async_runtime::spawn_blocking(move || receive.recv().ok().flatten()).await.ok().flatten()
   }
-  #[cfg(not(target_os = "macos"))]
+  #[cfg(any(windows, target_os = "linux"))]
   {
-    let _ = app;
+    use tauri_plugin_dialog::DialogExt;
+    let _ = prompt;
+    let picker = app.dialog().file().set_title(message);
+    let folder = tauri::async_runtime::spawn_blocking(move || picker.blocking_pick_folder()).await.ok().flatten()?;
+    folder.into_path().ok().map(|path| path.to_string_lossy().into_owned())
+  }
+  #[cfg(mobile)]
+  {
+    let _ = (app, prompt, message);
     None
   }
 }
@@ -292,10 +334,11 @@ fn etag(meta: &std::fs::Metadata) -> String {
 
 fn describe(path: &Path, error: std::io::Error) -> String {
   match error.kind() {
-    std::io::ErrorKind::PermissionDenied => format!(
+    std::io::ErrorKind::PermissionDenied if cfg!(target_os = "macos") => format!(
       "lines isn't allowed to use {}. Allow it in System Settings → Privacy & Security → Files and Folders.",
       path.display()
     ),
+    std::io::ErrorKind::PermissionDenied => format!("lines isn't allowed to use {}. Choose another folder.", path.display()),
     _ => format!("{}: {error}", path.display()),
   }
 }
@@ -381,6 +424,25 @@ mod tests {
         ("google", "Google Drive (me@gmail.com)".to_string()),
         ("onedrive", "OneDrive (Personal)".to_string()),
         ("proton", "Proton Drive (me@proton.me)".to_string()),
+      ]
+    );
+    std::fs::remove_dir_all(&home).unwrap();
+  }
+
+  #[test]
+  fn finds_windows_drives() {
+    let home = std::env::temp_dir().join(format!("lines-windows-home-{}", std::process::id()));
+    for dir in ["OneDrive", "OneDrive - Contoso", "iCloudDrive", "My Drive", "Documents"] {
+      std::fs::create_dir_all(home.join(dir)).unwrap();
+    }
+    let found: Vec<_> = windows_drives(&home).into_iter().map(|c| (c.provider, c.name)).collect();
+    assert_eq!(
+      found,
+      [
+        ("google", "Google Drive".to_string()),
+        ("onedrive", "OneDrive".to_string()),
+        ("onedrive", "OneDrive (Contoso)".to_string()),
+        ("icloud", "iCloud Drive".to_string()),
       ]
     );
     std::fs::remove_dir_all(&home).unwrap();
