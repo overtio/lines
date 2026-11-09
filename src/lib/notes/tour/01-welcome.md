@@ -14,13 +14,13 @@ Your notes are saved in this browser, on this computer, and nothing is sent anyw
 Browsers don't keep a website's data forever. Clearing your browsing data deletes these notes, the browser may remove them when the disk is full, and Safari removes them after 7 days without a visit.
 :::
 
-To keep your notes, click **Save to a folder** at the bottom of the sidebar and pick a folder (in Chrome or Edge). lines writes every note there as a Markdown file, with pictures and files beside them, and keeps the folder up to date as you write. Or export everything as a .zip from Settings → Data.
+To keep your notes, click **Save to a folder** at the bottom of the sidebar and pick a folder (in Chrome or Edge). lines writes every note there as a Markdown file, with pictures and files beside them, and keeps the folder up to date as you write. Or export everything as a .zip from Settings → Export and Import.
 
 ## Start here
 
 - [ ] Write something in this note
 - [ ] Type `/` at the start of a line
 - [ ] Open the next note, **Writing in Markdown**
-- [ ] Try a theme in Settings → Appearance
+- [ ] Try a theme in Settings → Theme
 
 #tour

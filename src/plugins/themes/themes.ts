@@ -6,7 +6,7 @@ import type { Theme } from "../../lib/plugins/types";
  * rest (borders, hovers, selection, tags) unless a theme sets them too. `ink` is the color subtle
  * overlays are mixed from.
  *
- * `moreContrast` is for Contrast → Increased (Settings → Appearance, or the system's Increase Contrast):
+ * `moreContrast` is for Contrast → Increased (Settings → Theme, or the system's Increase Contrast):
  * text at least 9:1 against the backgrounds it's on, muted text 7:1 (WCAG AAA), faint text and the
  * accent (links, mentions, tags) 4.5:1 (AA, tinted chips' backgrounds included), and borders 3:1.
  * Each theme's own colors, darkened (lightened in dark) only as far as that takes; worked out from

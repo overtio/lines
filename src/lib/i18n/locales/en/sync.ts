@@ -85,7 +85,7 @@ export default {
   "sync.browser.allow": "Allow access",
   "sync.browser.asksAgain": "Your browser asks again after a restart before lines may use the folder.",
   "sync.browser.unsupported":
-    "This browser can’t save to a folder. Open lines in Chrome or Edge to save your notes as files, or export them from Settings → Data. Your notes are kept in this browser in the meantime.",
+    "This browser can’t save to a folder. Open lines in Chrome or Edge to save your notes as files, or export them from Settings → Export and Import. Your notes are kept in this browser in the meantime.",
   "sync.browser.choose": "Choose a Folder…",
   "sync.browser.chooseAnother": "Choose Another Folder…",
   "sync.browser.cantPick": "This browser can’t save to a folder. Try Chrome or Edge.",

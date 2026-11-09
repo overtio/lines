@@ -111,7 +111,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Formulas are in English with commas, and numbers and dates are read as in US English, whatever the app's language: `1.200,50` is text, not a number.
 - Find in a note (⌘F) doesn't search a spreadsheet's cells. The note list's search does. In a Markdown note, it finds text in a ` ```csv ` block but can't show it in the grid; the cells' Edit as CSV shows the block's text.
 - A ` ```csv ` block is comma-separated only; a ` ```tsv ` block is code. Empty rows at the end of a one-column block aren't kept.
-- Only a CSV or TSV file in a note can be turned into a spreadsheet there; an Excel workbook can't yet, though Settings → Data imports it as notes.
+- Only a CSV or TSV file in a note can be turned into a spreadsheet there; an Excel workbook can't yet, though Settings → Export and Import imports it as notes.
 - A screen reader hears each cell as it's reached, but can't browse the grid's rows and columns as a table: the grid is inside the editor's text box (docs/accessibility.md).
 - Filling by dragging scrolls the grid only as the pointer moves, not while it's held still past the edge. Dates go on only written as `2026-01-31`; days and months by name only in English and the app's language. There are no lists of your own to fill from, and double-clicking the corner fills down, not across.
 - Every row is kept in memory and worked out again on each change, so very large sheets (tens of thousands of rows) are slow to change, though only the rows in view are drawn.
@@ -190,7 +190,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Open tabs are kept on each device; they don't sync.
 - Two notes side by side: only two, and only where the window has room for both (the notes' pane at least 660 px wide; otherwise the note beside waits, and Open to the Side isn't offered), and never the same note in both (selecting the one beside closes it). The note beside isn't remembered when lines restarts, and has no tabs of its own.
 - Panes on the right, and tabs, haven't been tried in the Mac app yet: the window buttons' room in each arrangement, and dragging the window by the space around the tabs.
-- Links (Settings → Editing → Links): a web link can't open in a background tab of the browser, as browsers decide that; tab choices for mentions need tabs on, and in a floating note they open the note in the main window.
+- Links (Settings → Editor → Links): a web link can't open in a background tab of the browser, as browsers decide that; tab choices for mentions need tabs on, and in a floating note they open the note in the main window.
 - The outline shows only with room for it beside the text (none at phone width, nor with Compact spacing in a narrow window), and in Markdown and LaTeX notes; plain-text notes have no headings. In a very long note, headings far down join it a moment after the note opens, as the note is read in the background.
 
 ## Plugins

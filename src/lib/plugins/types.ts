@@ -196,7 +196,7 @@ export interface Theme {
   accessible?: boolean;
   light: ThemeColors;
   dark: ThemeColors;
-  /** What changes with Settings → Appearance → Contrast → Increased, or the device's Increase Contrast. */
+  /** What changes with Settings → Theme → Contrast → Increased, or the device's Increase Contrast. */
   moreContrast?: { light?: Partial<ThemeColors>; dark?: Partial<ThemeColors> };
 }
 

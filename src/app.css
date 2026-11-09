@@ -115,7 +115,7 @@
   --row: 28px;
 
   /*
-   * Window surfaces. In the Mac app, window opacity (Settings → Windows) makes them
+   * Window surfaces. In the Mac app, window opacity (Settings → Floating) makes them
    * see-through, with the desktop blurred behind; elsewhere they're always solid.
    */
   --window-alpha: 100%;

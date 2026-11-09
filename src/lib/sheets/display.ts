@@ -1,5 +1,5 @@
 /*
- * How spreadsheets show dates and money, as Settings → Editing → Spreadsheets says. Dates are kept
+ * How spreadsheets show dates and money, as Settings → Editor → Spreadsheets says. Dates are kept
  * as ISO dates (2026-11-05), however they're typed (11/5/2026, 5 Nov 2026, November 5, 2026), so
  * every device and app reads them alike, and shown in the chosen style. Money is kept as written,
  * its symbol first ($1200, €5, CHF 30), and shown in the chosen currency style, its symbol at the

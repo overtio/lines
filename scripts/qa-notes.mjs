@@ -1,6 +1,6 @@
 // Writes the QA notes in qa/notes/: every Linedown element on its own, inside every container, and
 // right after every other element, plus inline styles, callouts and edge cases. A QA engineer adds
-// them to lines (Settings → Data → Add QA Notes) and looks through each before a release; see
+// them to lines (Settings → Export and Import → Add QA Notes) and looks through each before a release; see
 // qa/README.md.
 //
 // When a feature adds something that can appear in a note, add it to ELEMENTS (and to CONTAINERS

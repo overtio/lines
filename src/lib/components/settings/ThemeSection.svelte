@@ -43,7 +43,7 @@
   const theme = $derived(plugins.theme(prefs.theme).id);
 </script>
 
-<FieldGroup title={t("settings.theme")}>
+<FieldGroup title={t("settings.themes")}>
   <div class="border-b border-line p-3">
     <!-- One group of radio buttons, so Tab stops once and the arrow keys go through every theme. -->
     <RadioGroup.Root value={theme} onValueChange={(id) => (prefs.theme = id)} aria-label={t("settings.theme")}>

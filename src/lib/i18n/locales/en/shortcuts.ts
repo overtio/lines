@@ -112,7 +112,7 @@ export default {
   "shortcuts.selectNext": "Select the next match too",
   "shortcuts.goToLine": "Go to a line",
   "shortcuts.inList": "In the note list",
-  "shortcuts.linksSetting": "Unless changed in Settings → Editing → Links",
+  "shortcuts.linksSetting": "Unless changed in Settings → Editor → Links",
   "shortcuts.inNote": "In a note",
   "shortcuts.key.click": "click",
   "shortcuts.key.drag": "drag",

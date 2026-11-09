@@ -7,11 +7,11 @@ import { frontMatterField } from "./objects";
 
 /*
  * A Markdown note's `->` shown as →, `!=` as ≠ (notes/symbols.ts), in its text and its code as
- * Settings → Editing has it. Like the rest of live preview, the cursor touching one shows what was
+ * Settings → Editor has it. Like the rest of live preview, the cursor touching one shows what was
  * typed again, to edit.
  */
 
-/** Settings → Editing changed which symbols show: draw them again. */
+/** Settings → Editor changed which symbols show: draw them again. */
 export const symbolsChanged = StateEffect.define<null>();
 
 const CODE = new Set(["InlineCode", "FencedCode", "CodeBlock"]);

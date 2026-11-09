@@ -31,7 +31,7 @@
   let pointed = $state(-1);
   let timer: ReturnType<typeof setTimeout> | undefined;
 
-  /** Which side of the note it's on (Settings → General → Layout); its card opens toward the text. */
+  /** Which side of the note it's on (Settings → Layout); its card opens toward the text. */
   const side = $derived(prefs.outlineSide);
   const shown = $derived(outline.room[side] && outline.headings.length > 1);
   /** The note's largest heading, which isn't indented. */

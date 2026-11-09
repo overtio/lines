@@ -383,7 +383,7 @@ class Prefs {
   sheetHeadings = $state(this.#initial.sheetHeadings);
   sheetHeaderRow = $state(this.#initial.sheetHeaderRow);
   sheetHeaderColumn = $state(this.#initial.sheetHeaderColumn);
-  /** Settings → Editing → Links: what a click, ⌘-click and ⌘⇧-click on each kind of link does. */
+  /** Settings → Editor → Links: what a click, ⌘-click and ⌘⇧-click on each kind of link does. */
   links = $state(this.#initial.links);
   #markWindowReady!: () => void;
   /** Resolves once this window's native look (opaque or see-through) has first been applied. */

@@ -104,7 +104,7 @@ Turning it on syncs once, uploads everything again encrypted, and removes the pl
 
 If you forget the passphrase, any device that still syncs can set a new one (Change passphrase…), since it already has the key. With no such device left, the encrypted notes can't be recovered; the copies on each device are unaffected.
 
-With encryption on, the bucket no longer holds Markdown other apps can open; Settings → Data → Export still makes a .zip of plain files, each in its note's format.
+With encryption on, the bucket no longer holds Markdown other apps can open; Settings → Export and Import → Export still makes a .zip of plain files, each in its note's format.
 
 ## Locked notes
 

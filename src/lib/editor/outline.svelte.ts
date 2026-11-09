@@ -9,7 +9,7 @@ import { frontMatterField } from "./objects";
 import OutlineRail from "./OutlineRail.svelte";
 
 /*
- * The outline (Settings → General → Layout, off by default): a short line beside the note for each
+ * The outline (Settings → Layout, off by default): a short line beside the note for each
  * of its headings, darker for the part being read. Pointing at them shows the headings by name;
  * choosing one glides there. A language's editor says where its headings are (`outlineHeadings`);
  * a note in a language that doesn't has no outline.

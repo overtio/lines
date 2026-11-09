@@ -67,7 +67,7 @@ The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.
 - Enter after an `\item` starts the next item; Enter on an empty item ends the list.
 - Enter after a `\begin{…}` (or `\[`) that isn't closed yet adds the `\end{…}` (or `\]`), with the cursor between. A list starts with an `\item`.
 - ⌘B, ⌘I, ⌘U and ⌘E put the selection in `\textbf{…}`, `\emph{…}`, `\underline{…}` and `\texttt{…}`, or take it out.
-- With the outline on (Settings → General → Layout), `\section`, `\subsection` and `\subsubsection` (starred too) are its headings.
+- With the outline on (Settings → Layout), `\section`, `\subsection` and `\subsubsection` (starred too) are its headings.
 - Pasting and dropping work as in Markdown notes, written as LaTeX:
   - Rows copied from a spreadsheet, pgAdmin or a web page become a `tabular`, lined up in the LaTeX, with the first row over a `\hline` and number columns right-aligned. Special characters in cells are escaped (`well_id` → `well\_id`). Undo once for the text as copied.
   - An image becomes `\includegraphics[width=\linewidth]{../attachments/…}`; any other file `\href{../attachments/…}{Name.pdf}`. `/image` and `/file` choose them from the device.
@@ -95,7 +95,7 @@ A note that has a `\begin{document}` line is a whole document, as you'd download
 
 ## Export
 
-Download LaTeX (in the note's share menu) and Export (Settings → Data) write a LaTeX note as a `.tex` file that compiles on its own:
+Download LaTeX (in the note's share menu) and Export (Settings → Export and Import) write a LaTeX note as a `.tex` file that compiles on its own:
 
 ```latex
 \documentclass{article}
@@ -126,4 +126,4 @@ In a synced folder or bucket, a LaTeX note is a file like any other note's (`not
 
 ## Examples
 
-Settings → Data → **Add LaTeX Examples** adds three notes written in LaTeX, tagged `examples` (in `src/lib/notes/examples/`): a short paper (a whole document with a preamble, its own math commands, theorems, a table and a bibliography), lecture notes, and a problem set.
+Settings → Export and Import → **Add LaTeX Examples** adds three notes written in LaTeX, tagged `examples` (in `src/lib/notes/examples/`): a short paper (a whole document with a preamble, its own math commands, theorems, a table and a bibliography), lecture notes, and a problem set.

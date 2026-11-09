@@ -13,7 +13,7 @@ What to check before a release, and the notes to check it with.
 ## Before a release
 
 1. On each platform you ship (Mac app, web in Chrome and Safari, phone width), start from a fresh profile.
-2. Settings → Data → **Add QA Notes**. The notes are added alongside any others, tagged `qa`.
+2. Settings → Export and Import → **Add QA Notes**. The notes are added alongside any others, tagged `qa`.
 3. Open **QA · Release checklist** and work through it, ticking items off. Each QA note says at the top what to check in it. Look at them in light and dark, and at phone width.
 4. File anything that's wrong, with the note and section number (e.g. "11-card #14").
 
