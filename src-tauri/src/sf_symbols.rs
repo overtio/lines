@@ -11,17 +11,7 @@ pub const SCHEME: &str = "sfsymbol";
 pub fn handle(request: Request<Vec<u8>>) -> Response<Vec<u8>> {
   let uri = request.uri();
   let name = uri.path().trim_start_matches('/');
-  let mut size = 18.0_f64;
-  let mut scale = 2.0_f64;
-  for pair in uri.query().unwrap_or_default().split('&') {
-    match pair.split_once('=') {
-      Some(("size", value)) => size = value.parse().unwrap_or(size),
-      Some(("scale", value)) => scale = value.parse().unwrap_or(scale),
-      _ => {}
-    }
-  }
-  let size = size.clamp(8.0, 96.0);
-  let scale = scale.clamp(1.0, 4.0);
+  let (size, scale) = sizes(uri.query().unwrap_or_default());
 
   let valid = !name.is_empty() && name.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'.');
   let png = if valid { render(name, size, scale) } else { None };
@@ -37,6 +27,21 @@ pub fn handle(request: Request<Vec<u8>>) -> Response<Vec<u8>> {
     None => builder.status(StatusCode::NOT_FOUND).body(Vec::new()),
   }
   .expect("valid response")
+}
+
+/// The point size and scale a query asks for, within what's drawn. Anything else, NaN or infinity
+/// among them (which AppKit aborts on), is the default.
+fn sizes(query: &str) -> (f64, f64) {
+  let (mut size, mut scale) = (18.0_f64, 2.0_f64);
+  for pair in query.split('&') {
+    let number = |value: &str| value.parse::<f64>().ok().filter(|value| value.is_finite());
+    match pair.split_once('=') {
+      Some(("size", value)) => size = number(value).unwrap_or(size),
+      Some(("scale", value)) => scale = number(value).unwrap_or(scale),
+      _ => {}
+    }
+  }
+  (size.clamp(8.0, 96.0), scale.clamp(1.0, 4.0))
 }
 
 /// Share of the square box a symbol's visible shape fills along its longer side: what a Lucide
@@ -191,6 +196,17 @@ mod tests {
       }
     }
     assert!(render("not.a.real.symbol", 18.0, 2.0).is_none());
+  }
+
+  #[test]
+  fn sizes_only_finite_numbers() {
+    assert_eq!(sizes("size=24&scale=3"), (24.0, 3.0));
+    assert_eq!(sizes("size=1000&scale=0"), (96.0, 1.0));
+    for bad in ["nan", "NaN", "-nan", "inf", "-infinity", "", "x"] {
+      assert_eq!(sizes(&format!("size={bad}&scale={bad}")), (18.0, 2.0), "{bad}");
+    }
+    let request = Request::builder().uri("sfsymbol://localhost/trash?size=nan").body(Vec::new()).unwrap();
+    assert_eq!(handle(request).status(), StatusCode::OK);
   }
 
   #[test]
