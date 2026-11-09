@@ -98,7 +98,7 @@ A spreadsheet's grid (`src/plugins/spreadsheet/Grid.svelte`, [spreadsheets.md](s
 
 - On the web and on phones and tablets, a modal dialog: Tab stays inside, Esc (or a click outside it) closes it, and focus goes back to what opened it. In the desktop apps, a window of its own: Esc or ⌘W closes it, and the window's own buttons work as in any app.
 - Its sections are a list, "Settings sections", the one showing marked as the current page (`aria-current`). Appearance and Data are headings over theirs, buttons that open and close them (`aria-expanded`); closed over the section showing, a heading is marked as it would be and takes its place. The list is one stop for Tab: ↑ and ↓ move through it, headings too, Home and End go to the first and last, Enter or Space opens a section (or a heading), and Tab goes on into the section. It opens with the section asked for focused. Only the section scrolls, so the list stays in view. Each setting's control is named by its label, and its note is right after it. Privacy's "Open Sync" goes to the Sync section.
-- Narrow, the list and a section take turns: choosing a section opens it, and a Back button (named "All settings") returns to the list.
+- Narrow, the list and a section take turns: choosing a section opens it, and a Back button (named "All settings") returns to the list. Opened on a section (⌘/, the sidebar's sync button), it opens with that section's title focused.
 - About → Updates (desktop apps): what Check now finds is said aloud ("lines is up to date."), since the row changing isn't. The ↻ button the sidebar shows beside the version once an update is downloaded is named by what it does ("Restart to update to version 0.4.0").
 
 ## Drawings
