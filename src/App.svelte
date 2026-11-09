@@ -17,7 +17,7 @@
   import Button from "./lib/components/ui/Button.svelte";
   import IconButton from "./lib/components/ui/IconButton.svelte";
   import Editor from "./lib/editor/Editor.svelte";
-  import { untrack } from "svelte";
+  import { flushSync, untrack } from "svelte";
   import { speak } from "./lib/a11y";
   import { t } from "./lib/i18n/index.svelte";
   import { lock } from "./lib/lock/lock.svelte";
@@ -450,10 +450,12 @@
     if (key === "f" && event.shiftKey) {
       event.preventDefault();
       // The list (and its search field) has to be showing: out of focus mode, and on a phone
-      // back from the open note.
+      // back from the open note. Focus goes there once it is.
       ui.focus = false;
       if (ui.layout === "narrow") notes.select(null);
-      searchInput?.focus();
+      flushSync();
+      // Not scrolled into view while the list slides in, which would shift the window along.
+      searchInput?.focus({ preventScroll: true });
     } else if (key === "f" && !event.altKey && !event.defaultPrevented && selected && !closed) {
       // ⌘F finds in the open note from anywhere in the window, not only with the cursor in it.
       if (findInPane(editorPane)) event.preventDefault();
