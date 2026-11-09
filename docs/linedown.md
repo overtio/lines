@@ -309,7 +309,7 @@ company: @Overtio
 
 ## Mentions
 
-`@Name` mentions another note: it's drawn as that note's title, with its icon, and ⌘-click opens it, as it does a link. So does ⌥↵ with the cursor on it, and on a link or an attached file. Settings → Editing → Links sets what a click, ⌘-click and ⇧⌘-click do on links, tags and mentions: edit, open, copy a link's address, or open a mentioned note in a new tab, a background tab or a floating window. `@Name.key` is the value of one of its properties.
+`@Name` mentions another note: it's drawn as that note's title, with its icon, and ⌘-click opens it, as it does a link. So does ⌥↵ with the cursor on it, and on a link or an attached file. Settings → Editor → Links sets what a click, ⌘-click and ⇧⌘-click do on links, tags and mentions: edit, open, copy a link's address, or open a mentioned note in a new tab, a background tab or a floating window. `@Name.key` is the value of one of its properties.
 
 ```markdown
 Call @Oleks about the contract; @Oleks.fullname signs for @Overtio.
@@ -371,7 +371,7 @@ lines shows some pairs of characters as the symbol they stand for, without chang
 | `<->` | ↔ | `>=` | ≥ |
 | `=>` | ⇒ | `!=` | ≠ |
 
-- Code blocks and code spans show them too. In code, each symbol takes the width of the characters it replaces, so columns still line up. Settings → Editing turns them off in text and in code separately.
+- Code blocks and code spans show them too. In code, each symbol takes the width of the characters it replaces, so columns still line up. Settings → Editor turns them off in text and in code separately.
 - A pair inside a longer run of these characters stays as typed: `-->`, `<!--`, `!==`, `>>=`, `==>`. So does a pair after a backslash: `\->`.
 - Links' addresses, HTML, math, tags, mentions, Markdown's own marks (a quote's `>`, say) and properties keep their characters.
 - With the cursor touching one, the characters show, ready to edit.
@@ -379,7 +379,7 @@ lines shows some pairs of characters as the symbol they stand for, without chang
 
 ## Files on disk
 
-When lines saves notes to a folder or a bucket, each note is a Markdown file named after its id, with a small front matter block (id, dates, pin, trash, icon, format) ahead of its Linedown; a note's own properties come after it, as part of its text. Locked notes and end-to-end encryption change what's stored. See [sync.md](sync.md). An export (Settings → Data) writes plain Linedown files named after their titles, without front matter.
+When lines saves notes to a folder or a bucket, each note is a Markdown file named after its id, with a small front matter block (id, dates, pin, trash, icon, format) ahead of its Linedown; a note's own properties come after it, as part of its text. Locked notes and end-to-end encryption change what's stored. See [sync.md](sync.md). An export (Settings → Export and Import) writes plain Linedown files named after their titles, without front matter.
 
 ## Other formats
 

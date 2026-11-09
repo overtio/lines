@@ -6,7 +6,7 @@ All of it can be inspected in the browser's developer tools (in Chrome: Applicat
 
 ## In the browser
 
-Browser storage belongs to one site (origin) in one browser profile. Another browser, a private window or another computer starts empty, and the demo website starts again with the feature tour. Settings → Data → Start Again goes back to the tour and the examples in the same browser, deleting the notes there first.
+Browser storage belongs to one site (origin) in one browser profile. Another browser, a private window or another computer starts empty, and the demo website starts again with the feature tour. Settings → Export and Import → Start Again goes back to the tour and the examples in the same browser, deleting the notes there first.
 
 ### IndexedDB
 
@@ -54,7 +54,7 @@ Browser storage isn't permanent:
 - **The browser can evict it** when the disk runs low. lines doesn't ask for persistent storage (`navigator.storage.persist()`), so it's "best effort" storage.
 - **Safari** deletes the storage of a site that hasn't been visited for 7 days.
 
-For notes that should last, use **Save to a folder**, or export them (Settings → Data → Export).
+For notes that should last, use **Save to a folder**, or export them (Settings → Export and Import → Export).
 
 ## Shared with other sites on the same domain
 

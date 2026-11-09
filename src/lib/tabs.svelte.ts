@@ -3,7 +3,7 @@ import { prefs } from "./prefs.svelte";
 import { ui } from "./ui.svelte";
 
 /*
- * Tabs (Settings → General → Layout, off by default): the notes opened, side by side above the note,
+ * Tabs (Settings → Layout, off by default): the notes opened, side by side above the note,
  * as in a code editor. A note opened from the list shows in a preview tab, in italics, which the
  * next note opened takes over; editing the note, or double-clicking its tab, keeps it open. The
  * open note is the selected one: picking a note anywhere opens it here. Tabs are kept until the

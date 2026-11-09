@@ -171,7 +171,7 @@
     });
   });
 
-  /** Whether the note can be edited, and the outline beside it (Settings → General → Layout). */
+  /** Whether the note can be edited, and the outline beside it (Settings → Layout). */
   const setUp = () => [readOnlyCompartment.reconfigure(readOnly(viewOnly)), outlineCompartment.reconfigure(prefs.outline ? outline : [])];
 
   $effect(() => {
@@ -188,7 +188,7 @@
     untrack(() => view?.dispatch({ effects: objectsChanged.of(null) }));
   });
 
-  // Settings → Editing: `->` shown as →, or as typed.
+  // Settings → Editor: `->` shown as →, or as typed.
   $effect(() => {
     void prefs.symbolsInText;
     void prefs.symbolsInCode;

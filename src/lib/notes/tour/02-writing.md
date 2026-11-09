@@ -12,7 +12,7 @@ Type Markdown and it's formatted as you go. The text stays exactly what you type
 
 ## Arrows and symbols
 
-Type `-` and then `>` and it shows as an arrow: Home -> cabin. The same goes for <-, <->, =>, <=>, <=, >= and !=, in code too. The note keeps the characters you typed: move the cursor onto one to see them. Settings → Editing turns symbols off.
+Type `-` and then `>` and it shows as an arrow: Home -> cabin. The same goes for <-, <->, =>, <=>, <=, >= and !=, in code too. The note keeps the characters you typed: move the cursor onto one to see them. Settings → Editor turns symbols off.
 
 ## Headings
 

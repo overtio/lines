@@ -409,7 +409,7 @@ function plainInline(content: Inline[]): string {
   return content.map((item) => (typeof item === "string" ? item : "tex" in item ? item.tex : plainInline(item.children))).join("");
 }
 
-/** `code`: inside a code span, which shows symbols (notes/symbols.ts) as Settings → Editing has it for code. */
+/** `code`: inside a code span, which shows symbols (notes/symbols.ts) as Settings → Editor has it for code. */
 function renderInline(parent: HTMLElement, content: Inline[], view: EditorView, code = false) {
   for (const item of content) {
     if (typeof item === "string") {
@@ -468,7 +468,7 @@ class TableWidget extends WidgetType {
     readonly parse: () => TableModel,
     /** How far in it sits, in cards. */
     readonly inset: CardInset,
-    /** Which symbols it shows (Settings → Editing), so changing them draws it again. */
+    /** Which symbols it shows (Settings → Editor), so changing them draws it again. */
     readonly symbols = `${prefs.symbolsInText} ${prefs.symbolsInCode}`,
     /** What works out its formulas, so turning that on or off draws it again. */
     readonly formulas = plugins.formulas?.id,

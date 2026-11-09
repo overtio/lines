@@ -107,7 +107,7 @@ export default {
   "editor.callout.changeIcon": "Change icon…",
   "editor.callout.addIcon": "Add icon…",
 
-  // The outline beside a note (Settings → General → Layout): its headings, by name when pointed at.
+  // The outline beside a note (Settings → Layout): its headings, by name when pointed at.
   "editor.outline": "Outline",
   "editor.outline.headings": "Headings",
 

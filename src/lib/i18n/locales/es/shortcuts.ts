@@ -114,7 +114,7 @@ export default {
   "shortcuts.selectNext": "Seleccionar también la siguiente coincidencia",
   "shortcuts.goToLine": "Ir a una línea",
   "shortcuts.inList": "En la lista de notas",
-  "shortcuts.linksSetting": "Salvo que lo cambies en Ajustes → Edición → Enlaces",
+  "shortcuts.linksSetting": "Salvo que lo cambies en Ajustes → Editor → Enlaces",
   "shortcuts.inNote": "En una nota",
   "shortcuts.key.click": "clic",
   "shortcuts.key.drag": "arrastrar",

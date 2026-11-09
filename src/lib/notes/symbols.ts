@@ -1,7 +1,7 @@
 /*
  * Symbols: `->` shown as →, `!=` as ≠ and the like, only where a note is drawn (the editor, its
  * tables, its PDF and pictures). The note keeps what was typed, so it copies, syncs and opens
- * elsewhere as typed. Settings → Editing turns them off in text and in code separately.
+ * elsewhere as typed. Settings → Editor turns them off in text and in code separately.
  */
 
 export const SYMBOLS: Record<string, string> = {

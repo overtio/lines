@@ -1,4 +1,4 @@
-/** Settings: its sections (general, appearance, windows, text, editing, privacy, data, about). */
+/** Settings: its sections (general, theme, layout, typography, editor, floating, privacy, export and import, about). */
 export default {
   // The window and its sections, each with what it's for.
   "settings.title": "Settings",
@@ -6,29 +6,37 @@ export default {
   "settings.back": "All settings",
   "settings.close": "Close",
   "settings.section.general": "General",
-  "settings.section.generalAbout": "The language lines speaks, where its panes go, and how swiping moves.",
+  "settings.section.generalAbout": "The language lines speaks, and how swiping moves.",
+  // A heading in the list of sections, over Theme, Layout, Typography, Editor and Floating.
   "settings.section.appearance": "Appearance",
-  "settings.section.appearanceAbout": "The theme, light or dark, contrast and icons.",
-  "settings.section.windows": "Windows",
-  "settings.section.windowsAbout": "How see-through the main window is, and how floating notes look.",
+  "settings.section.theme": "Theme",
+  "settings.section.themeAbout": "The theme, light or dark, contrast, colors and icons.",
+  "settings.section.layout": "Layout",
+  "settings.section.layoutAbout": "Where the sidebar and the note list go, tabs, and the outline beside notes.",
   "settings.section.text": "Typography",
   "settings.section.textAbout": "The font notes are in, its size, and how wide and spaced out notes are.",
-  "settings.section.editing": "Editing",
-  "settings.section.editingAbout": "Symbols that replace what you type, and what clicking a link does.",
+  "settings.section.editor": "Editor",
+  "settings.section.editorAbout": "Symbols that replace what you type, and what clicking a link does.",
+  // Floating notes, and how see-through windows are.
+  "settings.section.floating": "Floating",
+  "settings.section.floatingAbout": "How see-through the main window is, and how floating notes look.",
   "settings.section.plugins": "Plugins",
+  // A heading in the list of sections, over Sync, Privacy, and Export and Import.
+  "settings.section.data": "Data",
   "settings.section.sync": "Sync",
   "settings.section.privacy": "Privacy",
   "settings.section.privacyAbout": "Lock lines, or single notes, with a password or Touch ID.",
-  "settings.section.data": "Data",
-  "settings.section.dataAbout": "Export your notes, import files, add example notes, or start again.",
+  "settings.section.export": "Export and Import",
+  "settings.section.exportAbout": "Export your notes, import files, add example notes, or start again.",
   "settings.section.shortcuts": "Shortcuts",
   "settings.section.about": "About",
 
-  // General, Appearance and Windows.
+  // General, Theme, Layout and Floating.
   "settings.language": "Language",
   "settings.languageSystem": "System",
   "settings.languageNote": "lines starts again in the language chosen. System follows your device's language when lines speaks it, and English when it doesn't.",
   "settings.theme": "Theme",
+  "settings.themes": "Themes",
   // The heading over the themes made for low vision and color blindness, and their names.
   "settings.themesAccessibility": "Accessibility",
   "settings.themeHighContrast": "High Contrast",
@@ -51,8 +59,7 @@ export default {
   "settings.contrastNote": "Increased darkens grey text and borders, in every theme, so they’re easier to read. System follows Increase Contrast in your device’s accessibility settings.",
   "settings.icons": "Icons",
   "settings.sfSymbolsNote": "SF Symbols are available in the Mac and iPhone apps.",
-  // Settings → General → Layout: which side the sidebar and the note list are on, tabs and the outline.
-  "settings.layout": "Layout",
+  // Settings → Layout: which side the sidebar and the note list are on, tabs and the outline.
   "settings.sidebarSide": "Sidebar",
   "settings.listSide": "Note list",
   "settings.sideLeft": "Left",
@@ -136,7 +143,7 @@ export default {
   "settings.symbolsNote":
     "Also <- as ←, <-> as ↔, => as ⇒, <=> as ⇔, <= as ≤, >= as ≥ and != as ≠. Your notes keep what you typed: put the cursor on one to see it, or type \\-> to keep it as typed.",
 
-  // Settings → Editing → Links: what a click, ⌘-click and ⌘⇧-click on each kind of link in a note does.
+  // Settings → Editor → Links: what a click, ⌘-click and ⌘⇧-click on each kind of link in a note does.
   "settings.spreadsheets": "Spreadsheets",
   "settings.spreadsheetsNote": "How spreadsheets look, and how their cells show dates and money. Dates are kept as 2026-11-05 however they’re typed; money as written, its symbol first ($1200).",
   "settings.sheetHeadings": "Column letters and row numbers",

@@ -40,7 +40,7 @@
   type Pane = "sidebar" | "list" | "editor";
 
   /**
-   * The panes from left to right, as Settings → General → Layout puts them: the sidebar outermost on
+   * The panes from left to right, as Settings → Layout puts them: the sidebar outermost on
    * its side, the note list beside the note.
    */
   const order = $derived.by(() => {

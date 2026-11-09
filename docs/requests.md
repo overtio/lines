@@ -7,7 +7,7 @@ Requests are written in the `.http` format, or in [Hurl](#hurl)'s, which adds ch
 ## Where requests go
 
 - **In a Markdown note**, in a code block whose language is `http` (or `rest`), or `hurl`. `/request` and `/hurl` add one. A note can have several, with writing between them.
-- **A whole note of requests**: switch a note to HTTP Requests or Hurl in its ⓘ panel, or import a `.http`, `.rest` or `.hurl` file (Settings → Data → Import). It's kept as the `.http` file it is, and exports as one. Its title is its first line as it reads (a `###` title, a comment or a request), and its `###` titles are its outline.
+- **A whole note of requests**: switch a note to HTTP Requests or Hurl in its ⓘ panel, or import a `.http`, `.rest` or `.hurl` file (Settings → Export and Import → Import). It's kept as the `.http` file it is, and exports as one. Its title is its first line as it reads (a `###` title, a comment or a request), and its `###` titles are its outline.
 
 ## Writing a request
 

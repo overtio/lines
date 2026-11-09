@@ -72,7 +72,7 @@ export default {
   "sync.browser.allow": "Autoriser l’accès",
   "sync.browser.asksAgain": "Votre navigateur redemande l’autorisation après un redémarrage avant que lines puisse utiliser le dossier.",
   "sync.browser.unsupported":
-    "Ce navigateur ne peut pas enregistrer dans un dossier. Ouvrez lines dans Chrome ou Edge pour enregistrer vos notes sous forme de fichiers, ou exportez-les depuis Réglages → Données. En attendant, vos notes sont conservées dans ce navigateur.",
+    "Ce navigateur ne peut pas enregistrer dans un dossier. Ouvrez lines dans Chrome ou Edge pour enregistrer vos notes sous forme de fichiers, ou exportez-les depuis Réglages → Exporter et importer. En attendant, vos notes sont conservées dans ce navigateur.",
   "sync.browser.choose": "Choisir un dossier…",
   "sync.browser.chooseAnother": "Choisir un autre dossier…",
   "sync.browser.cantPick": "Ce navigateur ne peut pas enregistrer dans un dossier. Essayez Chrome ou Edge.",

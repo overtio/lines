@@ -71,7 +71,7 @@ export default {
   "sync.browser.allow": "Permitir el acceso",
   "sync.browser.asksAgain": "Tu navegador vuelve a preguntar tras reiniciarse antes de que lines pueda usar la carpeta.",
   "sync.browser.unsupported":
-    "Este navegador no puede guardar en una carpeta. Abre lines en Chrome o Edge para guardar tus notas como archivos, o expórtalas desde Ajustes → Datos. Mientras tanto, tus notas se guardan en este navegador.",
+    "Este navegador no puede guardar en una carpeta. Abre lines en Chrome o Edge para guardar tus notas como archivos, o expórtalas desde Ajustes → Exportar e importar. Mientras tanto, tus notas se guardan en este navegador.",
   "sync.browser.choose": "Elegir una carpeta…",
   "sync.browser.chooseAnother": "Elegir otra carpeta…",
   "sync.browser.cantPick": "Este navegador no puede guardar en una carpeta. Prueba con Chrome o Edge.",

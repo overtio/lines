@@ -114,7 +114,7 @@ export default {
   "shortcuts.selectNext": "Sélectionner aussi le résultat suivant",
   "shortcuts.goToLine": "Aller à une ligne",
   "shortcuts.inList": "Dans la liste des notes",
-  "shortcuts.linksSetting": "Sauf modification dans Réglages → Édition → Liens",
+  "shortcuts.linksSetting": "Sauf modification dans Réglages → Éditeur → Liens",
   "shortcuts.inNote": "Dans une note",
   "shortcuts.key.click": "clic",
   "shortcuts.key.drag": "glisser",

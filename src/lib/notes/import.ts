@@ -2,7 +2,7 @@ import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
 import type { Note } from "./types";
 
 /*
- * Files made into notes (Settings → Data → Import), each by the language its extension belongs
+ * Files made into notes (Settings → Export and Import → Import), each by the language its extension belongs
  * to: a Markdown file as a Markdown note, a CSV file or each sheet of an Excel workbook as a
  * spreadsheet note. A language reads a file its own way, or takes its text as it is.
  */

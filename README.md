@@ -10,7 +10,7 @@
 </picture>
 
 > [!WARNING]
-> **lines is in alpha.** It changes often and may have bugs, so please don't rely on it for important work yet, and export your notes now and then (Settings → Data → Export).
+> **lines is in alpha.** It changes often and may have bugs, so please don't rely on it for important work yet, and export your notes now and then (Settings → Export and Import → Export).
 
 ## Why lines
 
@@ -66,7 +66,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 - **Money, dates and numbers below zero** shown your way, accounting style too, and the sum and average of what's selected.
 - **Formulas across notes.** `=Budget!B4` uses another note's spreadsheet, and follows it when it's renamed.
 - **Plain CSV underneath**, so it syncs and searches like any note. A block turns into a Markdown table, and back, with a button.
-- **CSV and Excel files.** Import them from Settings → Data, or turn a CSV file in a note into a spreadsheet there with its button; download a spreadsheet as CSV (formulas or values) or as an Excel workbook.
+- **CSV and Excel files.** Import them from Settings → Export and Import, or turn a CSV file in a note into a spreadsheet there with its button; download a spreadsheet as CSV (formulas or values) or as an Excel workbook.
 
 ### Organizing
 
@@ -83,9 +83,9 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 
 - **PDF and print.** <kbd>⌘P</kbd> lays a note out on A4 or Letter pages, black on white. Save it as a PDF, or as PNG images.
 - **Share** a note through the system share sheet, copy it as Markdown or plain text, or download it as a file.
-- **Export everything** as files in a .zip, each in its note's format (Markdown, LaTeX, CSV, .http or .hurl), with images and files (Settings → Data).
-- **Import** Markdown, LaTeX, CSV, Excel, `.http` and `.hurl` files as notes (Settings → Data).
-- **Sample notes.** Add the feature tour, LaTeX examples or the QA notes from Settings → Data.
+- **Export everything** as files in a .zip, each in its note's format (Markdown, LaTeX, CSV, .http or .hurl), with images and files (Settings → Export and Import).
+- **Import** Markdown, LaTeX, CSV, Excel, `.http` and `.hurl` files as notes (Settings → Export and Import).
+- **Sample notes.** Add the feature tour, LaTeX examples or the QA notes from Settings → Export and Import.
 
 ### Sync and privacy
 
@@ -104,7 +104,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 - **Fonts, text size, note width and spacing**, with a live preview; <kbd>⌘+</kbd> and <kbd>⌘−</kbd> size the text as you read. Notes can be narrow, medium, wide, any width between, or fill the window.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
 - **Fits any screen**: three columns on a desktop, a drawer on a tablet, a stack on a phone. Drag the columns to resize them.
-- **Your layout.** Put the sidebar and the note list on the left or the right, each its own way, and turn on tabs for the notes you open, as in a code editor (Settings → General → Layout).
+- **Your layout.** Put the sidebar and the note list on the left or the right, each its own way, and turn on tabs for the notes you open, as in a code editor (Settings → Layout).
 - **Outline.** Turn on short lines beside the note, on its right or left, one for each heading, darker for the part you're reading. Point at them to see the headings by name, and click one to glide there. Markdown and LaTeX notes both have it.
 - **Native touches**: SF Symbols on Apple devices, see-through windows on the Mac, and Settings in its own window.
 - **English, Spanish and French**, following your system or chosen in Settings. See [docs/translations.md](docs/translations.md) to add a language.
@@ -123,7 +123,7 @@ Press <kbd>⌘/</kbd> to see them all. On Windows and Linux, use <kbd>Ctrl</kbd>
 | <kbd>⌘⇧X</kbd> <kbd>⌘⇧H</kbd> | Strikethrough, highlight |
 | <kbd>⌘↵</kbd> | Make a todo, or tick it |
 | <kbd>Tab</kbd> <kbd>⇧Tab</kbd> | Nest or un-nest a list item; next or previous table cell |
-| <kbd>⌘-click</kbd> or <kbd>⌥↵</kbd> | Open a link, mention, tag or file (Settings → Editing → Links sets what click, ⌘-click and ⇧⌘-click do) |
+| <kbd>⌘-click</kbd> or <kbd>⌥↵</kbd> | Open a link, mention, tag or file (Settings → Editor → Links sets what click, ⌘-click and ⇧⌘-click do) |
 | <kbd>⌘-click</kbd> <kbd>⇧-click</kbd> <kbd>⌘A</kbd> | Select several notes in the list (<kbd>⌫</kbd> moves them to the Trash) |
 | <kbd>⌘\\</kbd> | Show or hide the sidebar |
 | <kbd>⇧⌘\\</kbd> | Focus mode |
@@ -277,7 +277,7 @@ src/
       cards.ts               Draws ::: card blocks and callouts behind their text; /card, leaving a card
       formatCode.ts          Tidies code blocks (JSON, SQL, Prettier languages)
       formatting.ts          Bold, italic, underline, code… toggles and the toolbar over selected text
-      links.ts               Following links, tags and mentions as Settings → Editing → Links says for each click
+      links.ts               Following links, tags and mentions as Settings → Editor → Links says for each click
       outline.svelte.ts      The outline beside a note: its languages' headings, the part being read, gliding to one
       OutlineRail.svelte     The outline's lines and its card of headings
       dragBlocks.ts          Grips for dragging lines and blocks to move them
@@ -321,7 +321,7 @@ src/
       parse.ts               Title, excerpt and tag extraction; adding and renaming tags and types
       properties.ts          Properties (front matter), types and mentions as text
       samples.ts             Adds the feature tour (tour/), the LaTeX examples (examples/) or the QA notes (qa/)
-      import.ts              Makes notes from files, each by its format's plugin (Settings → Data → Import)
+      import.ts              Makes notes from files, each by its format's plugin (Settings → Export and Import → Import)
       export.ts              Every note as a file in its format, in a .zip
       tour/                  The feature tour: the demo website's first notes
       examples/              Notes written in LaTeX: a paper, lecture notes, a problem set

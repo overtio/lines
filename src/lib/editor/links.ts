@@ -11,7 +11,7 @@ import { openNote, openTag, openType } from "./objects";
 
 /*
  * Following what a note links to: web pages and attached files, tags, and mentions of notes. A
- * click, ⌘-click (Ctrl-click) and ⌘⇧-click on each do what Settings → Editing → Links says. A tap
+ * click, ⌘-click (Ctrl-click) and ⌘⇧-click on each do what Settings → Editor → Links says. A tap
  * while not typing opens, whatever a click is set to, as a touch screen has no other way; ⌥↵
  * opens what the cursor is on (openAtCursor in livePreview.ts).
  */

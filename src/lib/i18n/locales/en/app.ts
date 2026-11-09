@@ -32,7 +32,7 @@ export default {
   "app.previewPdf": "Preview as PDF",
   "app.exportPdf": "Export as PDF…",
   "app.exportPng": "Export as PNG…",
-  // Tabs (Settings → General → Layout): their list, their menu, and a preview tab, which the next note opened replaces.
+  // Tabs (Settings → Layout): their list, their menu, and a preview tab, which the next note opened replaces.
   "app.tabs": "Open notes",
   "app.keepTab": "Keep Open",
   "app.closeTab": "Close Tab",
