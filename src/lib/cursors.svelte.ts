@@ -1,3 +1,4 @@
+import { plugins } from "./plugins/registry.svelte";
 import { prefs } from "./prefs.svelte";
 import { ownColor } from "./themes/show.svelte";
 
@@ -45,11 +46,13 @@ function pointerImages(style: string, accent: string) {
 let accent = "";
 
 function showPointer() {
-  // Read after the theme's colors are set, which this effect follows.
+  // Read after the theme's colors are set, which this effect follows: your own theme's as you change
+  // them, and Increased contrast's as the system's setting changes too.
+  void plugins.themes;
   void prefs.windowLook;
   void prefs.monochrome;
   void prefs.invert;
-  void prefs.contrast;
+  void prefs.moreContrast;
   accent = getComputedStyle(root).getPropertyValue("--accent").trim() || "#0e7a7e";
   if (prefs.pointerStyle === "system") {
     delete root.dataset.pointer;

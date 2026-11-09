@@ -31,6 +31,31 @@ describe("cursor", () => {
     expect(await app.style("body", "cursor")).toContain("url(");
     expect(await app.style(".editor-pane .cm-content", "cursor")).toBe("text");
   });
+
+  test("Dot is in the accent shown, as your own theme's changes, and with the system's Increase Contrast", async () => {
+    app = await openApp({ prefs: { pointerStyle: "dot", theme: "ember" } });
+    /** The dot's color, and the accent. */
+    const colors = () =>
+      app.page.evaluate(() => {
+        const root = getComputedStyle(document.documentElement);
+        return [decodeURIComponent(root.getPropertyValue("--pointer-arrow")).match(/fill="([^"]+)"/)![1], root.getPropertyValue("--accent").trim()];
+      });
+    const [before] = await colors();
+    await app.page.emulateMedia({ contrast: "more" });
+    await app.page.waitForFunction(() => document.documentElement.dataset.contrast === "more");
+    const [dot, accent] = await colors();
+    expect(dot).not.toBe(before);
+    expect(dot).toBe(accent);
+    const settings = await app.settings("Theme");
+    await settings.getByRole("button", { name: "New", exact: true }).click();
+    await app.page.getByRole("menuitem").first().click();
+    const field = settings.getByRole("textbox", { name: "Accent", exact: true });
+    await field.fill("#c01060");
+    await field.press("Enter");
+    const [edited, shown] = await colors();
+    expect(edited).not.toBe(dot);
+    expect(edited).toBe(shown);
+  });
 });
 
 describe("mascot", () => {
