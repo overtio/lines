@@ -17,7 +17,7 @@ On the web and on phones, use a bucket for now; signing in to iCloud, Google Dri
 
 lines can also sync through any S3-compatible object storage you control.
 
-Tested API surface: `ListObjectsV2`, `GetObject`, `PutObject`, `DeleteObject`. Any provider that implements these with AWS Signature V4 should work:
+Tested API surface: `ListObjectsV2`, `GetObject`, `PutObject` (with `If-Match` and `If-None-Match` where the provider supports them), `DeleteObject`. Any provider that implements these with AWS Signature V4 should work:
 
 - Cloudflare R2
 - Backblaze B2
@@ -82,6 +82,8 @@ Images and files in notes sit next to them, named after their content and keepin
 A note shows an image as `![](../attachments/<hash>.png)` and links a file as `[Report.pdf](../attachments/<hash>.pdf)`, so the folder reads correctly in other Markdown apps too. Since a name always means the same bytes, there's nothing to merge: each sync uploads the attachments your notes use that the bucket lacks, and downloads the ones this device lacks. Every device keeps a copy of every attachment, so large files take room everywhere. One no note uses any more is removed from the device at the next launch (one where lines isn't open in another tab, which could still bring it back with undo), but stays in the bucket for now.
 
 Only one sync pass runs at a time, even with lines open in several browser tabs, so a conflict makes one copy, not one per tab.
+
+A note is only written over the version lines saw there a moment before, so an edit another device saves while this one syncs isn't overwritten: the next pass brings it in and compares, as above. In a bucket that's a conditional write (`If-Match`, or `If-None-Match` for a new note); a service that ignores those, or doesn't do them (it refuses a write over the very version it holds), is written to as before. In a cloud drive's folder, lines looks at the file again just before writing it.
 
 Several devices can share one bucket and folder. To keep separate libraries in one bucket, use different folders.
 
@@ -197,7 +199,7 @@ Browsers only let a web page call your bucket if the bucket allows the page's or
 ]
 ```
 
-`ExposeHeaders: ETag` is recommended. Without it sync still works, but it downloads a little more than necessary.
+`ExposeHeaders: ETag` is recommended. Without it sync still works, but it downloads a little more than necessary. A rule that lists the headers it allows, rather than `*`, needs `If-Match` and `If-None-Match` among them.
 
 ## Security notes
 

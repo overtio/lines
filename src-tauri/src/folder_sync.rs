@@ -171,14 +171,30 @@ pub async fn sync_folder_read(dir: String, name: String) -> Result<Option<File>,
   .await
 }
 
+/// Writes a note and returns its new tag. Given the tag it's `expected` to have (empty for none),
+/// only if it still has it: `None` if the drive brought in another device's version since.
 #[tauri::command]
-pub async fn sync_folder_write(dir: String, name: String, text: String) -> Result<String, String> {
+pub async fn sync_folder_write(dir: String, name: String, text: String, expected: Option<String>) -> Result<Option<String>, String> {
   blocking(move || {
     let path = file(&dir, &name)?;
+    if let Some(expected) = expected
+      && etag_of(&path)? != expected
+    {
+      return Ok(None);
+    }
     let meta = write_atomic(&path, text.as_bytes())?;
-    Ok(etag(&meta))
+    Ok(Some(etag(&meta)))
   })
   .await
+}
+
+/// The file's tag as listed, or an empty one if it isn't there.
+fn etag_of(path: &Path) -> Result<String, String> {
+  match std::fs::metadata(path) {
+    Ok(meta) => Ok(etag(&meta)),
+    Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(String::new()),
+    Err(e) => Err(describe(path, e)),
+  }
 }
 
 /// Writes through a temporary file and a rename, so the drive never uploads half a file.
@@ -458,6 +474,24 @@ mod tests {
   }
 
   #[test]
+  fn writes_only_over_the_file_expected() {
+    tauri::async_runtime::block_on(async {
+      let dir = std::env::temp_dir().join(format!("lines-folder-expected-{}", std::process::id()));
+      let d = dir.to_string_lossy().into_owned();
+      let write = |text: &str, expected: Option<&str>| sync_folder_write(d.clone(), "a.md".into(), text.into(), expected.map(Into::into));
+      // A new note, where there's none: written, and not again over the one now there.
+      let mine = write("mine", Some("")).await.unwrap().unwrap();
+      assert_eq!(write("mine again", Some("")).await.unwrap(), None);
+      // The drive brings in another device's version after this one listed the folder.
+      let theirs = write("theirs, longer", None).await.unwrap().unwrap();
+      assert_eq!(write("mine, edited", Some(&mine)).await.unwrap(), None);
+      assert_eq!(sync_folder_read(d.clone(), "a.md".into()).await.unwrap().unwrap().text, "theirs, longer");
+      assert!(write("mine, edited", Some(&theirs)).await.unwrap().is_some());
+      std::fs::remove_dir_all(&dir).unwrap();
+    });
+  }
+
+  #[test]
   fn round_trip() {
     tauri::async_runtime::block_on(round_trip_async());
   }
@@ -466,14 +500,14 @@ mod tests {
     let dir = std::env::temp_dir().join(format!("lines-folder-sync-{}", std::process::id()));
     let d = dir.to_string_lossy().into_owned();
     assert!(sync_folder_list(d.clone()).await.unwrap().is_empty());
-    let etag = sync_folder_write(d.clone(), "a.md".into(), "hello".into()).await.unwrap();
+    let etag = sync_folder_write(d.clone(), "a.md".into(), "hello".into(), None).await.unwrap().unwrap();
     let listed = sync_folder_list(d.clone()).await.unwrap();
     assert_eq!(listed.len(), 1);
     assert_eq!(listed[0].etag, etag);
     assert_eq!(sync_folder_read(d.clone(), "a.md".into()).await.unwrap().unwrap().text, "hello");
     sync_folder_delete(d.clone(), "a.md".into()).await.unwrap();
     assert!(sync_folder_read(d.clone(), "a.md".into()).await.unwrap().is_none());
-    assert!(sync_folder_write(d.clone(), "../x.md".into(), "no".into()).await.is_err());
+    assert!(sync_folder_write(d.clone(), "../x.md".into(), "no".into(), None).await.is_err());
     // An empty attachment is there; a missing one isn't.
     let empty = dir.join("3f9c0a1b2c3d4e5f60718293a4b5c6d7.txt");
     write_atomic(&empty, b"").unwrap();

@@ -441,9 +441,19 @@ class SyncEngine {
     const record = (id: string, etag: string | null, text: string) =>
       syncRecords.put({ id, etag, hash: hash(text) });
 
-    const upload = async (note: Note) => {
+    /**
+     * Uploads the note over what was there, `expected` by its tag (null: nothing). Not if another
+     * device wrote it since (false): the next pass, in a moment, brings that in and compares.
+     */
+    const upload = async (note: Note, expected: string | null) => {
       const text = serialize(note);
-      await record(note.id, await remote.put(keyOf(note.id), text), text);
+      const etag = await remote.put(keyOf(note.id), text, expected);
+      if (etag === false) {
+        this.schedule();
+        return false;
+      }
+      await record(note.id, etag, text);
+      return true;
     };
 
     const download = async (id: string) => {
@@ -474,13 +484,13 @@ class SyncEngine {
           }
           await syncRecords.delete(note.id);
         } else {
-          await upload(note);
+          await upload(note, null);
         }
         return;
       }
 
       if (last && last.etag === object.etag) {
-        if (dirty) await upload(note);
+        if (dirty) await upload(note, object.etag);
         return;
       }
 
@@ -492,7 +502,7 @@ class SyncEngine {
       if (last && remoteHash === last.hash) {
         // Same content; only the ETag was unknown or different.
         await syncRecords.put({ id: note.id, etag, hash: last.hash });
-        if (dirty) await upload(note);
+        if (dirty) await upload(note, etag);
       } else if (remoteHash === localHash) {
         await syncRecords.put({ id: note.id, etag, hash: localHash });
       } else if (!dirty) {
@@ -504,8 +514,7 @@ class SyncEngine {
           if (!(await applyIfUnchanged(note.id, text, fetched.note))) return;
           await record(note.id, etag, fetched.text);
           await notes.insert(conflictCopy(note));
-        } else {
-          await upload(note);
+        } else if (await upload(note, etag)) {
           await notes.insert(conflictCopy(fetched.note));
         }
       }

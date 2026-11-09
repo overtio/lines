@@ -6,8 +6,11 @@ export interface Remote {
   /** Every object under `prefix`, with a tag that changes whenever its content does. */
   list(prefix: string): Promise<RemoteObject[]>;
   get(key: string): Promise<{ text: string; etag: string | null } | null>;
-  /** Returns the new tag, if known. */
-  put(key: string, text: string): Promise<string | null>;
+  /**
+   * Returns the new tag, if known. Given the tag it's `expected` to have (null for none: a new one),
+   * writes only if it still has it, and returns false if not: another device wrote it since.
+   */
+  put(key: string, text: string, expected?: string | null): Promise<string | null | false>;
   delete(key: string): Promise<void>;
   /** Images and other files; null if it's not there (yet). */
   getFile(key: string): Promise<Blob | null>;

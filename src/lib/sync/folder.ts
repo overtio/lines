@@ -36,8 +36,10 @@ export class FolderRemote implements Remote {
     return this.#call<{ text: string; etag: string } | null>("sync_folder_read", this.#split(key));
   }
 
-  async put(key: string, text: string) {
-    return this.#call<string>("sync_folder_write", { ...this.#split(key), text });
+  async put(key: string, text: string, expected?: string | null) {
+    // A file's tag is never empty, so an empty one expects no file.
+    const etag = await this.#call<string | null>("sync_folder_write", { ...this.#split(key), text, expected: expected === null ? "" : expected });
+    return etag ?? false;
   }
 
   async delete(key: string) {
