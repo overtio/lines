@@ -3,7 +3,7 @@
   import { onDestroy, onMount, untrack } from "svelte";
   import { speak } from "../a11y";
   import { t } from "../i18n/index.svelte";
-  import { fileName } from "../notes/export";
+  import { fileName } from "../notes/fileName";
   import type { Entry } from "../notes/store.svelte";
   import { canPrint, isApple, revealFile, saveFile } from "../platform";
   import { plugins } from "../plugins/registry.svelte";

@@ -6,7 +6,7 @@
   import { speak } from "../../a11y";
   import { t } from "../../i18n/index.svelte";
   import Icon from "../../icons/Icon.svelte";
-  import { fileName } from "../../notes/export";
+  import { fileName } from "../../notes/fileName";
   import { copyText, reducedMotion } from "../../platform";
   import { prefs } from "../../prefs.svelte";
   import { saveAndShow } from "../../save";

@@ -9,7 +9,8 @@ stubApp();
 mock.module("../../src/lib/print/parts", () => ({ el: () => null }));
 const { plainLine } = await import("../../src/lib/notes/stats");
 const { code } = await import("../../src/plugins/code");
-const { referencedAttachments } = await import("../../src/lib/notes/attachments");
+const { attachmentFileName, referencedAttachments } = await import("../../src/lib/notes/attachments");
+const { fileName } = await import("../../src/lib/notes/fileName");
 
 const languages = code().contributes.languages as NoteLanguage[];
 const language = (name: string) => languages.find((each) => each.name === name)!;
@@ -85,5 +86,23 @@ describe("attachments", () => {
     ].join("\n\n");
     expect([...referencedAttachments([body])].sort()).toEqual([a, b, c, d, e, f]);
     expect(referencedAttachments(["![](../attachments/sky.png) ![](attachments/" + a + ")"]).size).toBe(0);
+  });
+});
+
+describe("file names", () => {
+  test("safe on every system, and short enough for any", () => {
+    expect(fileName("Trip: Rome/Paris?")).toBe("Trip - Rome-Paris");
+    expect(fileName("  ...  ", "Untitled")).toBe("Untitled");
+    expect([fileName("con"), fileName("Nul.backup"), fileName("COM1"), fileName("Console")]).toEqual(["_con", "_Nul.backup", "_COM1", "Console"]);
+    const long = fileName("日本語".repeat(40));
+    expect(new TextEncoder().encode(long).length).toBeLessThanOrEqual(200);
+    expect(long.endsWith("語")).toBe(true);
+  });
+
+  test("an attachment is opened under what the note calls it, without its width", () => {
+    const name = `${"a".repeat(32)}.png`;
+    expect(attachmentFileName(name, "Lake at dawn|400")).toBe("Lake at dawn.png");
+    expect(attachmentFileName(name, "Sky.PNG")).toBe("Sky.PNG");
+    expect(attachmentFileName(name, "")).toBe(name);
   });
 });
