@@ -65,6 +65,35 @@ export interface Contributions {
   links?: ShortLinks[];
   /** Where research papers are found, to search from a note and link to: arXiv. */
   papers?: PaperSource[];
+  /** Paper to write on: patterns drawn behind a note (ruled lines, dots, squares) and textures under them. */
+  paperStyles?: PaperStyle[];
+}
+
+/** One background layer, as CSS's `background` takes them: an image, its size and where it starts. */
+export interface PaperLayer {
+  image: string;
+  size: string;
+  position?: string;
+}
+
+/**
+ * Paper a note's page can look like (Settings → Paper): a pattern drawn behind the text, or a texture
+ * under it, one of each at a time. Patterns draw in `--paper-color` (the theme's ink, its accent, or a
+ * color chosen) at `--paper-opacity` (0 to 1: a line's, more for what's smaller), every
+ * `--paper-step` (the spacing chosen), so they follow the theme; a texture is told the scheme it's
+ * shown in.
+ */
+export interface PaperStyle {
+  id: string;
+  /** In the app's language: "Dots". */
+  name: string;
+  kind: "pattern" | "texture";
+  /**
+   * Drawn under each line of the note rather than across the page, a tile every `1lh` (the line's
+   * own height): ruled lines the text always sits on, headings and wrapped lines too.
+   */
+  perLine?: boolean;
+  layers(scheme: "light" | "dark"): PaperLayer[];
 }
 
 /**

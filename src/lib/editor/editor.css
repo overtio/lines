@@ -2222,3 +2222,30 @@
   font-size: 0.9em;
   color: var(--accent);
 }
+
+/*
+ * The paper chosen in Settings → Paper (lib/paper.svelte.ts), behind the note and scrolling with it,
+ * and a pattern drawn per line under each line's own rows. Not behind a spreadsheet note's grid, nor
+ * on lines that draw a background of their own (code blocks, the line closing properties).
+ */
+:root[data-paper] .cm-editor.cm-page:not(.cm-sheet-note) > .cm-scroller {
+  background-image: var(--paper-light);
+  background-size: var(--paper-size);
+  background-position: var(--paper-position);
+  background-attachment: local;
+}
+
+:root[data-paper][data-scheme="dark"] .cm-editor.cm-page:not(.cm-sheet-note) > .cm-scroller {
+  background-image: var(--paper-dark);
+}
+
+:root[data-paper-lines] .cm-editor.cm-page:not(.cm-sheet-note) .cm-line:not(.cm-lp-codeblock, .cm-lp-props-close) {
+  background-image: var(--paper-lines);
+  background-size: var(--paper-lines-size);
+  background-origin: content-box;
+}
+
+/* Rows start below a heading's padding, which would otherwise be ruled too. */
+:root[data-paper-lines] .cm-editor.cm-page:not(.cm-sheet-note) .cm-line:is(.cm-lp-h, .cm-lp-title) {
+  background-clip: content-box;
+}

@@ -211,7 +211,7 @@ export function home({ release }) {
       <section aria-labelledby="themes" class="mx-auto mt-32 max-w-6xl px-4 sm:px-6">
         <div class="mx-auto max-w-2xl text-center">
           <h2 id="themes" class="section-title">Seventeen themes</h2>
-          <p class="mt-4 text-lg text-muted">Each in light and dark, including High Contrast and two for color blindness. The fonts, sizes and widths are yours to choose too.</p>
+          <p class="mt-4 text-lg text-muted">Each in light and dark, including High Contrast and two for color blindness. Write on ruled, dotted or squared paper if you like, and choose the fonts, sizes and widths too.</p>
         </div>
         <ul class="mt-12 grid grid-cols-2 gap-5 lg:grid-cols-4">
           ${themes}

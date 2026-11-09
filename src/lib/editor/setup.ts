@@ -295,6 +295,8 @@ export function createExtensions(onChange: () => void, format?: string): Extensi
       lang: "",
     }),
     formatCompartment.of(formatEditing(format)),
+    // The note's page, which the paper chosen in Settings → Paper is drawn on (editor.css).
+    EditorView.editorAttributes.of({ class: "cm-page" }),
     cursor,
     syntaxHighlighting(highlightStyle),
     find,

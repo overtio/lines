@@ -191,6 +191,13 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - A locked note can be mentioned by its title, but its properties can't be read, even while it's open.
 - A synced note's file has two front matter blocks: lines' own (id, dates…) and then the note's properties, as part of its text. Apps that read front matter see the first.
 
+## Paper
+
+- Patterns and textures are for the screen: printing, PDFs and exports are on plain white.
+- Ruled lines go under each line of a note's text, so they run as wide as the text, not across the whole page, and start again below pictures, diagrams and code. Dots and squares are the page's own and don't line up with the text.
+- The paper is the same for every note, not chosen for each.
+- Ruled lines need the `lh` unit: Safari 16.4 and macOS 13.3 or later, Chrome 109 or later. Earlier ones show the other patterns, and Lines as plain.
+
 ## Layout, tabs and the outline
 
 - Tabs have no keyboard shortcuts of their own beyond their tablist (← →, Delete): browsers keep ⌘W, Ctrl+Tab and ⌘1–9 for their own tabs.

@@ -1,7 +1,7 @@
 import { plugins } from "../plugins/registry.svelte";
 import type { Theme } from "../plugins/types";
 import { prefs } from "../prefs.svelte";
-import { css, grey, inverted, parse } from "./color";
+import { css, grey, inverted, parse, type Rgb } from "./color";
 import { themeCss } from "./css";
 import { BASE_COLORS } from "./palette";
 
@@ -64,6 +64,12 @@ const FILTERED = [
 /** The colors set on the page for them, taken off before they're worked out again. */
 let filtered: string[] = [];
 
+/** A color as Monochrome and Invert show it, for what's drawn in a color of its own (the paper's). */
+export function shownColor(color: Rgb, turned = prefs.invert): Rgb {
+  const toned = prefs.monochrome ? grey(color) : color;
+  return turned ? inverted(toned) : toned;
+}
+
 /**
  * Monochrome makes each color the grey as light as it; Invert turns each around, light for dark, its
  * hue kept. Both keep the contrast every two colors had, so what read well still does. They work on
@@ -80,10 +86,8 @@ function filter(root: HTMLElement, scheme: "light" | "dark") {
   for (const name of FILTERED) {
     const color = parse(shown.getPropertyValue(`--${name}`));
     if (!color) continue;
-    const toned = monochrome ? grey(color) : color;
     // A highlighter is as bright in light as in dark, where app.css mixes in less of it.
-    const turned = invert && name !== "highlight-base";
-    root.style.setProperty(`--${name}`, css(turned ? inverted(toned) : toned));
+    root.style.setProperty(`--${name}`, css(shownColor(color, invert && name !== "highlight-base")));
     filtered.push(name);
   }
   return invert ? (scheme === "dark" ? "light" : "dark") : scheme;
