@@ -164,6 +164,12 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - A picture of a note (PNG) is one long page, without its breaks.
 - With a pattern drawn in columns (squares, graph) over a backdrop, each page's columns run its full height, past the last line's row.
 
+## Cursors
+
+- The text cursor's look is in notes and Settings' little note; fields (search, renaming) and a spreadsheet's cells keep the system's, in the color chosen.
+- The Retro and Dot pointers show over lines' own windows only, and only where something hasn't asked for a pointer of its own (a resize edge, a diagram you can drag): those keep the system's. Not tried in the Mac app yet, where WebKit draws pointer images itself.
+- Rainbow and the trail need a recent browser (`@property`, the Web Animations API); in an older one the cursor stays its color and jumps.
+
 ## Typing sounds
 
 - The built-in keyboards are made from sound, not recorded: close to the real thing, not the real thing. Recorded ones come as Mechvibes sound packs, which people share under their own terms; lines carries none of them.

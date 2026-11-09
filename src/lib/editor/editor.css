@@ -2082,7 +2082,7 @@
   overflow-wrap: normal;
   cursor: default;
   /* The editor hides the browser's caret and draws its own (cursor.ts); a cell's is the browser's, in the same color. */
-  caret-color: var(--accent);
+  caret-color: var(--caret-color);
   /* As wide as the note's text, however many columns: the grid scrolls sideways instead. */
   contain: inline-size;
 }
@@ -2496,4 +2496,94 @@
 .cm-editor.cm-code-note .cm-matchingBracket {
   background: var(--active);
   outline: 1px solid var(--border);
+}
+
+/*
+ * The text cursor (editor/cursor.ts), as Settings → Cursor says (cursors.svelte.ts): a bar, a thick
+ * one, a block over the character (see-through, so the character shows) or an underline; in
+ * --caret-color; blinking on and off, fading, or not at all; gliding to where it goes, glowing, or
+ * turning through the colors. Its trail and sparks are drawn above it, and nothing moves with reduced
+ * motion.
+ */
+/* Outranking CodeMirror's own, which it adds to the page after these. */
+:root .cm-editor .cm-cursor {
+  border-left: 2px solid var(--caret-color);
+  margin-left: -1px;
+}
+
+:root[data-caret-shape="thick"] .cm-cursor {
+  border-left-width: 3px;
+  margin-left: -1.5px;
+}
+
+:root[data-caret-shape="block"] .cm-cursor,
+:root[data-caret-shape="underline"] .cm-cursor {
+  border-left: 0;
+  margin-left: 0;
+  background: var(--caret-color);
+}
+
+:root[data-caret-shape="block"] .cm-cursor {
+  background: color-mix(in srgb, var(--caret-color) 45%, transparent);
+}
+
+:root[data-caret-blink="smooth"] .cm-editor.cm-focused > .cm-scroller > .cm-cursorLayer {
+  animation-timing-function: ease-in-out;
+}
+
+:root[data-caret-blink="off"] .cm-editor.cm-focused > .cm-scroller > .cm-cursorLayer {
+  /* Over the name cursor.ts sets on it to start the blink again. */
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-caret-motion="glide"] .cm-cursor {
+    transition:
+      left 90ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      top 90ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      width 90ms ease,
+      height 90ms ease;
+  }
+}
+
+:root[data-caret-effect="glow"] .cm-cursor {
+  box-shadow: 0 0 9px 1px var(--caret-color);
+}
+
+@property --caret-hue {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@keyframes lines-caret-hue {
+  to {
+    --caret-hue: 360;
+  }
+}
+
+:root[data-caret-effect="rainbow"] :is(.cm-cursor, .cm-caretEffects) {
+  --caret-color: oklch(0.7 0.19 var(--caret-hue));
+  animation: lines-caret-hue 3s linear infinite;
+}
+
+.cm-caretEffects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 151;
+  pointer-events: none;
+}
+
+.cm-caret-trail,
+.cm-caret-spark {
+  position: absolute;
+  background: var(--caret-color);
+}
+
+.cm-caret-spark {
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
 }

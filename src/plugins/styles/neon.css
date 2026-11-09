@@ -124,7 +124,7 @@
   scrollbar-color: var(--wire) transparent;
 }
 
-/* In notes: headings in the display face and glowing, links and tags lit, the cursor too. */
+/* In notes: headings in the display face and glowing, links and tags lit. */
 :root[data-style="neon"] .cm-lp-h {
   font-family: var(--display);
   letter-spacing: 0.04em;
@@ -140,9 +140,4 @@
 
 :root[data-style="neon"] .cm-lp-tag {
   box-shadow: 0 0 0 1px var(--wire);
-}
-
-:root[data-style="neon"] .cm-cursor {
-  border-left-color: var(--tag-text);
-  box-shadow: 0 0 6px var(--tag-text);
 }

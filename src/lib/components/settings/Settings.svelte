@@ -21,6 +21,7 @@
   import ShortcutsSection from "./ShortcutsSection.svelte";
   import SyncSection from "./SyncSection.svelte";
   import TextSection from "./TextSection.svelte";
+  import CursorSection from "./CursorSection.svelte";
   import ThemeSection from "./ThemeSection.svelte";
 
   /*
@@ -41,6 +42,7 @@
     paper: PaperSection,
     layout: LayoutSection,
     text: TextSection,
+    cursor: CursorSection,
     editor: EditorSection,
     floating: FloatingSection,
     plugins: PluginsSection,
