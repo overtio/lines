@@ -201,6 +201,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Colors made from the other scheme (Make Light Colors) are a start, not a designed theme.
 - Increased contrast is worked out only from colors lines can read itself (hex and `rgb()`); a theme written with `oklch()` or `var()` keeps those colors with it.
 - GTK themes are read only as named colors (`@define-color`, or libadwaita's custom properties); colors made with GTK's functions (`mix()`, `shade()`, `alpha()`) are left out.
+- Monochrome and Invert change lines' colors, not pictures or drawings' pen colors; a color a theme writes in a way lines can't read itself (`oklch()`) is left as it is. Inverted, menus and cards (lighter than the note in a dark theme) are darker than the note, as in a negative.
 - The color picker is the system's (`<input type="color">`), which picks colors without transparency.
 
 ## Plugins

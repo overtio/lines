@@ -478,4 +478,4 @@ export async function modelPicture(model: Model): Promise<HTMLImageElement> {
 /** Each model's materials and look on screen follow the theme. */
 new MutationObserver(() => {
   for (const view of views) view.redraw();
-}).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-scheme", "data-contrast"] });
+}).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-scheme", "data-contrast", "data-filters"] });
