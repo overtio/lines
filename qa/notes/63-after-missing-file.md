@@ -288,98 +288,110 @@ Total, =costs!B2*2
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ---
 
-#### 30. Missing file, then Key: Value line
+#### 30. Missing file, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Missing file, then Key: Value line
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Missing file, then Mention
+#### 32. Missing file, then Mention
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Missing file, then Wiki link
+#### 33. Missing file, then Wiki link
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Missing file, then Symbols
+#### 34. Missing file, then Symbols
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Missing file, then GitHub links
+#### 35. Missing file, then GitHub links
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Missing file, then arXiv links
+#### 36. Missing file, then arXiv links
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Missing file, then Image
+#### 37. Missing file, then Image
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ![A sample picture](attachment:photo.png)
 
-#### 37. Missing file, then Drawing
+#### 38. Missing file, then Drawing
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Missing file, then File
+#### 39. Missing file, then File
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Missing file, then Attached 3D model (STL)
+#### 40. Missing file, then Attached 3D model (STL)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Missing file, then Terminal recording (.cast file)
+#### 41. Missing file, then Terminal recording (.cast file)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Missing file, then Audio
+#### 42. Missing file, then Audio
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Missing file, then Video
+#### 43. Missing file, then Video
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Missing file, then Missing file
+#### 44. Missing file, then Missing file
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Missing file, then Card
+#### 45. Missing file, then Card
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ::: card
 Text in a card.
 :::
 
-#### 45. Missing file, then Callout (info)
+#### 46. Missing file, then Callout (info)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::i
 Text in an info callout.
 :::
 
-#### 46. Missing file, then Callout (warning, chosen icon)
+#### 47. Missing file, then Callout (warning, chosen icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Missing file, then Callout (decision, no icon)
+#### 48. Missing file, then Callout (decision, no icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::^ icon=none

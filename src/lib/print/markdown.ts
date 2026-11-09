@@ -10,6 +10,7 @@ import { tableData } from "../editor/typeTables";
 import { fenceLanguage, renderedInfo } from "../editor/rendered";
 import { isUnsplashPhoto } from "../editor/unsplash";
 import { attachmentName, imageSize, mediaLink } from "../notes/attachments";
+import { isPageBreak } from "../notes/pageBreak";
 import { frontMatter, readTypeRef, typeLabel } from "../notes/properties";
 import { isFormula } from "../sheets/cells";
 import { withSymbols } from "../notes/symbols";
@@ -348,9 +349,17 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
         card.append(content);
         return void into.append(card);
       }
+      case "CommentBlock":
       case "HTMLBlock": {
+        // A page break, at the note's top level, is where pages.ts starts a new page; HTML after it
+        // in the same block prints as written.
+        const [first, ...rest] = slice(node.from, node.to).split("\n");
+        const pageBreak = into === doc && isPageBreak(first);
+        if (pageBreak) into.append(el("div", "doc-page-break"));
+        const html = pageBreak ? rest.join("\n") : node.name === "HTMLBlock" ? slice(node.from, node.to) : "";
+        if (!html.trim()) return;
         const p = el("p");
-        plain(slice(node.from, node.to), p, false);
+        plain(html, p, false);
         return void into.append(p);
       }
       default:

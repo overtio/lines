@@ -288,98 +288,110 @@ Total, =costs!B2*2
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ---
 
-#### 30. Wiki link, then Key: Value line
+#### 30. Wiki link, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Wiki link, then Key: Value line
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Wiki link, then Mention
+#### 32. Wiki link, then Mention
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Wiki link, then Wiki link
+#### 33. Wiki link, then Wiki link
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Wiki link, then Symbols
+#### 34. Wiki link, then Symbols
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Wiki link, then GitHub links
+#### 35. Wiki link, then GitHub links
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Wiki link, then arXiv links
+#### 36. Wiki link, then arXiv links
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Wiki link, then Image
+#### 37. Wiki link, then Image
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ![A sample picture](attachment:photo.png)
 
-#### 37. Wiki link, then Drawing
+#### 38. Wiki link, then Drawing
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Wiki link, then File
+#### 39. Wiki link, then File
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Wiki link, then Attached 3D model (STL)
+#### 40. Wiki link, then Attached 3D model (STL)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Wiki link, then Terminal recording (.cast file)
+#### 41. Wiki link, then Terminal recording (.cast file)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Wiki link, then Audio
+#### 42. Wiki link, then Audio
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Wiki link, then Video
+#### 43. Wiki link, then Video
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Wiki link, then Missing file
+#### 44. Wiki link, then Missing file
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Wiki link, then Card
+#### 45. Wiki link, then Card
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ::: card
 Text in a card.
 :::
 
-#### 45. Wiki link, then Callout (info)
+#### 46. Wiki link, then Callout (info)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::i
 Text in an info callout.
 :::
 
-#### 46. Wiki link, then Callout (warning, chosen icon)
+#### 47. Wiki link, then Callout (warning, chosen icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Wiki link, then Callout (decision, no icon)
+#### 48. Wiki link, then Callout (decision, no icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::^ icon=none

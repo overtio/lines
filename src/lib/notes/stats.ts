@@ -1,4 +1,5 @@
 import { imageSize, mediaLink } from "./attachments";
+import { isPageBreak } from "./pageBreak";
 import { frontMatter } from "./properties";
 
 export interface NoteStats {
@@ -21,6 +22,7 @@ const sentenceSegmenter = "Segmenter" in Intl ? new Intl.Segmenter(undefined, { 
 
 /** One line with its Markdown syntax removed, so it reads (and counts) as written. */
 export function plainLine(line: string): string {
+  if (isPageBreak(line)) return "";
   return line
     .replace(/^\s*\|(.*?)\|?\s*$/, (_, row: string) =>
       row.split(/(?<!\\)\|/).map((cell) => cell.trim().replace(/\\\|/g, "|")).join("\t"),

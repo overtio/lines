@@ -16,7 +16,9 @@ import { insert, SECTIONS, type SlashCommand, slashMenu } from "../../lib/editor
 import { inOpenMath, MATH_COMMANDS, paragraphBefore, searchWords, TEXT_COMMANDS } from "../../lib/editor/texCommands";
 import { lazyLanguage } from "../../lib/editor/lazyLanguage";
 import { markupMode } from "../../lib/editor/markupMode";
-import { arrowsInto, focusChanged, focused, isEditing } from "../../lib/editor/util";
+import { arrowsInto, drawnBlock, focusChanged, focused, isEditing } from "../../lib/editor/util";
+import { pageBreak, pagedNote } from "../../lib/editor/pageBreaks";
+import { LATEX_PAGE_BREAK } from "../../lib/notes/pageBreak";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
 import { type PaperLink, paperCommands } from "../../lib/editor/papers";
 import { shortLink, ShortLinkWidget } from "../../lib/editor/shortLinks";
@@ -99,6 +101,8 @@ function changesLayout(doc: Text, span: Span) {
       return doc.lineAt(span.from).to < span.to;
     case "env":
       return doc.lineAt(span.from).to < span.beginTo;
+    case "command":
+      return LATEX_PAGE_BREAK.test(doc.lineAt(span.from).text);
     default:
       return false;
   }
@@ -631,6 +635,14 @@ function build(state: EditorState, visible?: { from: number; to: number }): Deco
       }
 
       case "command": {
+        // A page break on a line of its own (\newpage): drawn as Markdown's are, below it while it's edited.
+        if (layout.has(span)) {
+          const line = doc.lineAt(span.from);
+          const editing = isEditing(state, line.from, line.to);
+          add(drawnBlock(pageBreak, line.from, line.to, editing));
+          if (editing) mark(span.from, span.to, "cm-lt-command", noSpellcheck);
+          break;
+        }
         // What LaTeX prints nothing for: \label{…}, and \maketitle when the folded preamble shows the title.
         const command = doc.sliceString(span.from, span.to);
         const silent = command.startsWith("\\label{") || (folded > 0 && command === "\\maketitle");
@@ -962,6 +974,7 @@ const editing = (papers: readonly PaperSource[], mode: MarkdownMode): Extension 
   focused,
   parsed,
   blocks,
+  pagedNote,
   inView,
   arrowsInto(blocks),
   preloadMath,

@@ -109,6 +109,8 @@
   --editor-margin: 40px;
   --editor-pad-x: var(--editor-margin);
   --editor-pad-top: 24px;
+  /* Room under a note's last line, so it can be scrolled up to the middle. */
+  --editor-pad-bottom: 40vh;
   --titlebar-pad-top: 0px;
   --titlebar-h: calc(52px + var(--titlebar-pad-top));
   --control: 32px;

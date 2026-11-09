@@ -694,7 +694,33 @@ jsonpath "$.name" isString
 ```
 ---
 
-#### 30. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Key: Value line
+#### 30. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+```hurl
+# A todo
+GET https://jsonplaceholder.typicode.com/todos/1
+HTTP 200
+[Captures]
+owner: jsonpath "$.userId"
+[Asserts]
+jsonpath "$.id" == 1
+
+# Its owner
+GET https://jsonplaceholder.typicode.com/users/{{owner}}
+HTTP 200
+[Asserts]
+jsonpath "$.name" isString
+```
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Key: Value line
 
 ```hurl
 # A todo
@@ -713,7 +739,7 @@ jsonpath "$.name" isString
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Mention
+#### 32. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Mention
 
 ```hurl
 # A todo
@@ -732,7 +758,7 @@ jsonpath "$.name" isString
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Wiki link
+#### 33. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Wiki link
 
 ```hurl
 # A todo
@@ -751,7 +777,7 @@ jsonpath "$.name" isString
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Symbols
+#### 34. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Symbols
 
 ```hurl
 # A todo
@@ -770,7 +796,7 @@ jsonpath "$.name" isString
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Hurl entries (hurl block): a capture used by the next entry, and asserts, then GitHub links
+#### 35. Hurl entries (hurl block): a capture used by the next entry, and asserts, then GitHub links
 
 ```hurl
 # A todo
@@ -789,7 +815,7 @@ jsonpath "$.name" isString
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Hurl entries (hurl block): a capture used by the next entry, and asserts, then arXiv links
+#### 36. Hurl entries (hurl block): a capture used by the next entry, and asserts, then arXiv links
 
 ```hurl
 # A todo
@@ -808,7 +834,7 @@ jsonpath "$.name" isString
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Image
+#### 37. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Image
 
 ```hurl
 # A todo
@@ -827,7 +853,7 @@ jsonpath "$.name" isString
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 37. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Drawing
+#### 38. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Drawing
 
 ```hurl
 # A todo
@@ -846,7 +872,7 @@ jsonpath "$.name" isString
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Hurl entries (hurl block): a capture used by the next entry, and asserts, then File
+#### 39. Hurl entries (hurl block): a capture used by the next entry, and asserts, then File
 
 ```hurl
 # A todo
@@ -865,7 +891,7 @@ jsonpath "$.name" isString
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Attached 3D model (STL)
+#### 40. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Attached 3D model (STL)
 
 ```hurl
 # A todo
@@ -884,7 +910,7 @@ jsonpath "$.name" isString
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Terminal recording (.cast file)
+#### 41. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Terminal recording (.cast file)
 
 ```hurl
 # A todo
@@ -903,7 +929,7 @@ jsonpath "$.name" isString
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Audio
+#### 42. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Audio
 
 ```hurl
 # A todo
@@ -922,7 +948,7 @@ jsonpath "$.name" isString
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Video
+#### 43. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Video
 
 ```hurl
 # A todo
@@ -941,7 +967,7 @@ jsonpath "$.name" isString
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Missing file
+#### 44. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Missing file
 
 ```hurl
 # A todo
@@ -960,7 +986,7 @@ jsonpath "$.name" isString
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Card
+#### 45. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Card
 
 ```hurl
 # A todo
@@ -981,7 +1007,7 @@ jsonpath "$.name" isString
 Text in a card.
 :::
 
-#### 45. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (info)
+#### 46. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (info)
 
 ```hurl
 # A todo
@@ -1002,7 +1028,7 @@ jsonpath "$.name" isString
 Text in an info callout.
 :::
 
-#### 46. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (warning, chosen icon)
+#### 47. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (warning, chosen icon)
 
 ```hurl
 # A todo
@@ -1023,7 +1049,7 @@ jsonpath "$.name" isString
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (decision, no icon)
+#### 48. Hurl entries (hurl block): a capture used by the next entry, and asserts, then Callout (decision, no icon)
 
 ```hurl
 # A todo

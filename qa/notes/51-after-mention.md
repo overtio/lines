@@ -288,98 +288,110 @@ Total, =costs!B2*2
 Ask @[QA · Ada] at @[QA · Ada].email.
 ---
 
-#### 30. Mention, then Key: Value line
+#### 30. Mention, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+Ask @[QA · Ada] at @[QA · Ada].email.
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Mention, then Key: Value line
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Mention, then Mention
+#### 32. Mention, then Mention
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Mention, then Wiki link
+#### 33. Mention, then Wiki link
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Mention, then Symbols
+#### 34. Mention, then Symbols
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Mention, then GitHub links
+#### 35. Mention, then GitHub links
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Mention, then arXiv links
+#### 36. Mention, then arXiv links
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Mention, then Image
+#### 37. Mention, then Image
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ![A sample picture](attachment:photo.png)
 
-#### 37. Mention, then Drawing
+#### 38. Mention, then Drawing
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Mention, then File
+#### 39. Mention, then File
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Mention, then Attached 3D model (STL)
+#### 40. Mention, then Attached 3D model (STL)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Mention, then Terminal recording (.cast file)
+#### 41. Mention, then Terminal recording (.cast file)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Mention, then Audio
+#### 42. Mention, then Audio
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Mention, then Video
+#### 43. Mention, then Video
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Mention, then Missing file
+#### 44. Mention, then Missing file
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Mention, then Card
+#### 45. Mention, then Card
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ::: card
 Text in a card.
 :::
 
-#### 45. Mention, then Callout (info)
+#### 46. Mention, then Callout (info)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::i
 Text in an info callout.
 :::
 
-#### 46. Mention, then Callout (warning, chosen icon)
+#### 47. Mention, then Callout (warning, chosen icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Mention, then Callout (decision, no icon)
+#### 48. Mention, then Callout (decision, no icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::^ icon=none

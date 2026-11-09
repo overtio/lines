@@ -288,98 +288,110 @@ Total, =costs!B2*2
 ![A sample picture](attachment:photo.png)
 ---
 
-#### 30. Image, then Key: Value line
+#### 30. Image, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+![A sample picture](attachment:photo.png)
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Image, then Key: Value line
 
 ![A sample picture](attachment:photo.png)
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Image, then Mention
+#### 32. Image, then Mention
 
 ![A sample picture](attachment:photo.png)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Image, then Wiki link
+#### 33. Image, then Wiki link
 
 ![A sample picture](attachment:photo.png)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Image, then Symbols
+#### 34. Image, then Symbols
 
 ![A sample picture](attachment:photo.png)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Image, then GitHub links
+#### 35. Image, then GitHub links
 
 ![A sample picture](attachment:photo.png)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Image, then arXiv links
+#### 36. Image, then arXiv links
 
 ![A sample picture](attachment:photo.png)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Image, then Image
+#### 37. Image, then Image
 
 ![A sample picture](attachment:photo.png)
 ![A sample picture](attachment:photo.png)
 
-#### 37. Image, then Drawing
+#### 38. Image, then Drawing
 
 ![A sample picture](attachment:photo.png)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Image, then File
+#### 39. Image, then File
 
 ![A sample picture](attachment:photo.png)
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Image, then Attached 3D model (STL)
+#### 40. Image, then Attached 3D model (STL)
 
 ![A sample picture](attachment:photo.png)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Image, then Terminal recording (.cast file)
+#### 41. Image, then Terminal recording (.cast file)
 
 ![A sample picture](attachment:photo.png)
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Image, then Audio
+#### 42. Image, then Audio
 
 ![A sample picture](attachment:photo.png)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Image, then Video
+#### 43. Image, then Video
 
 ![A sample picture](attachment:photo.png)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Image, then Missing file
+#### 44. Image, then Missing file
 
 ![A sample picture](attachment:photo.png)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Image, then Card
+#### 45. Image, then Card
 
 ![A sample picture](attachment:photo.png)
 ::: card
 Text in a card.
 :::
 
-#### 45. Image, then Callout (info)
+#### 46. Image, then Callout (info)
 
 ![A sample picture](attachment:photo.png)
 :::i
 Text in an info callout.
 :::
 
-#### 46. Image, then Callout (warning, chosen icon)
+#### 47. Image, then Callout (warning, chosen icon)
 
 ![A sample picture](attachment:photo.png)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Image, then Callout (decision, no icon)
+#### 48. Image, then Callout (decision, no icon)
 
 ![A sample picture](attachment:photo.png)
 :::^ icon=none

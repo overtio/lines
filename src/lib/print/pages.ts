@@ -3,9 +3,9 @@ import { el } from "./parts";
 /*
  * Pages from a printed note. The document is laid out once, as one long column the width of a
  * page's text; pages are then cut from it between lines of text, never through a line, an image,
- * math or a table row, and a heading stays with what follows it. Each page shows its part of the
- * column (copies of the blocks it holds, in place), so what prints is exactly what the preview
- * shows: the page breaks are lines' own, not the browser's.
+ * math or a table row, and a heading stays with what follows it, and at each page break the note
+ * has. Each page shows its part of the column (copies of the blocks it holds, in place), so what
+ * prints is exactly what the preview shows: the page breaks are lines' own, not the browser's.
  */
 
 export type PaperId = "a4" | "letter";
@@ -53,12 +53,27 @@ function solids(doc: HTMLElement): [number, number][] {
   return merged;
 }
 
-/** Where each page starts and ends in the column, for pages `height` tall. */
-function breaks(parts: [number, number][], height: number): [number, number][] {
+/**
+ * Where each page starts and ends in the column, for pages `height` tall, and a new page at each
+ * of `forced` (the note's page breaks). Two breaks in a row leave a page empty, as in a word
+ * processor; one at the start or end of the note doesn't.
+ */
+function breaks(parts: [number, number][], height: number, forced: number[]): [number, number][] {
+  const edges = [0, ...forced, Infinity];
+  const pages: [number, number][] = [];
+  for (let k = 0; k + 1 < edges.length; k++) {
+    const stretch = parts.filter(([top]) => top >= edges[k] && top < edges[k + 1]);
+    if (stretch.length) pages.push(...cut(stretch, height, edges[k]));
+    else if (k > 0 && k + 2 < edges.length) pages.push([edges[k], edges[k]]);
+  }
+  return pages.length ? pages : [[0, 0]];
+}
+
+/** Pages `height` tall from `start`, cut between `parts`. */
+function cut(parts: [number, number][], height: number, start: number): [number, number][] {
   const pages: [number, number][] = [];
   // A little of the space around a cut goes with each side, for boxes' padding (a code block's).
   const slack = 8;
-  let start = 0;
   let i = 0;
   while (i < parts.length) {
     const limit = start + height;
@@ -77,7 +92,7 @@ function breaks(parts: [number, number][], height: number): [number, number][] {
     i = j;
     if (i < parts.length) start = Math.max(end, parts[i][0] - slack);
   }
-  return pages.length ? pages : [[0, 0]];
+  return pages;
 }
 
 /**
@@ -100,7 +115,8 @@ export function paginate(doc: HTMLElement, measure: HTMLElement, paper: PaperId,
     const rect = block.getBoundingClientRect();
     return { block, top: rect.top - origin.top, bottom: rect.bottom - origin.top, left: rect.left - origin.left, width: rect.width };
   });
-  const cuts = whole ? [[0, Math.ceil(origin.height)] as [number, number]] : breaks(solids(doc), height);
+  const forced = [...doc.querySelectorAll(":scope > .doc-page-break")].map((block) => block.getBoundingClientRect().top - origin.top);
+  const cuts = whole ? [[0, Math.ceil(origin.height)] as [number, number]] : breaks(solids(doc), height, forced);
   return cuts.map(([start, end], index) => {
     const page = el("div", "print-page");
     page.style.width = `${size.width}mm`;

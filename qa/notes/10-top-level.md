@@ -259,81 +259,92 @@ Total, =costs!B2*2
 
 ---
 
-#### 30. Key: Value line at the top level
+#### 30. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) at the top level
+
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Key: Value line at the top level
 
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Mention at the top level
+#### 32. Mention at the top level
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Wiki link at the top level
+#### 33. Wiki link at the top level
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Symbols at the top level
+#### 34. Symbols at the top level
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. GitHub links at the top level
+#### 35. GitHub links at the top level
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. arXiv links at the top level
+#### 36. arXiv links at the top level
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Image at the top level
+#### 37. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 37. Drawing at the top level
+#### 38. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. File at the top level
+#### 39. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Attached 3D model (STL) at the top level
+#### 40. Attached 3D model (STL) at the top level
 
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Terminal recording (.cast file) at the top level
+#### 41. Terminal recording (.cast file) at the top level
 
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Audio at the top level
+#### 42. Audio at the top level
 
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Video at the top level
+#### 43. Video at the top level
 
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Missing file at the top level
+#### 44. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Card at the top level
+#### 45. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 45. Callout (info) at the top level
+#### 46. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 46. Callout (warning, chosen icon) at the top level
+#### 47. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Callout (decision, no icon) at the top level
+#### 48. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

@@ -346,105 +346,119 @@ Text in an info callout.
 :::
 ---
 
-#### 30. Callout (info), then Key: Value line
+#### 30. Callout (info), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+:::i
+Text in an info callout.
+:::
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Callout (info), then Key: Value line
 
 :::i
 Text in an info callout.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Callout (info), then Mention
+#### 32. Callout (info), then Mention
 
 :::i
 Text in an info callout.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Callout (info), then Wiki link
+#### 33. Callout (info), then Wiki link
 
 :::i
 Text in an info callout.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Callout (info), then Symbols
+#### 34. Callout (info), then Symbols
 
 :::i
 Text in an info callout.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Callout (info), then GitHub links
+#### 35. Callout (info), then GitHub links
 
 :::i
 Text in an info callout.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Callout (info), then arXiv links
+#### 36. Callout (info), then arXiv links
 
 :::i
 Text in an info callout.
 :::
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Callout (info), then Image
+#### 37. Callout (info), then Image
 
 :::i
 Text in an info callout.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 37. Callout (info), then Drawing
+#### 38. Callout (info), then Drawing
 
 :::i
 Text in an info callout.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Callout (info), then File
+#### 39. Callout (info), then File
 
 :::i
 Text in an info callout.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Callout (info), then Attached 3D model (STL)
+#### 40. Callout (info), then Attached 3D model (STL)
 
 :::i
 Text in an info callout.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Callout (info), then Terminal recording (.cast file)
+#### 41. Callout (info), then Terminal recording (.cast file)
 
 :::i
 Text in an info callout.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Callout (info), then Audio
+#### 42. Callout (info), then Audio
 
 :::i
 Text in an info callout.
 :::
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Callout (info), then Video
+#### 43. Callout (info), then Video
 
 :::i
 Text in an info callout.
 :::
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Callout (info), then Missing file
+#### 44. Callout (info), then Missing file
 
 :::i
 Text in an info callout.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Callout (info), then Card
+#### 45. Callout (info), then Card
 
 :::i
 Text in an info callout.
@@ -453,7 +467,7 @@ Text in an info callout.
 Text in a card.
 :::
 
-#### 45. Callout (info), then Callout (info)
+#### 46. Callout (info), then Callout (info)
 
 :::i
 Text in an info callout.
@@ -462,7 +476,7 @@ Text in an info callout.
 Text in an info callout.
 :::
 
-#### 46. Callout (info), then Callout (warning, chosen icon)
+#### 47. Callout (info), then Callout (warning, chosen icon)
 
 :::i
 Text in an info callout.
@@ -471,7 +485,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Callout (info), then Callout (decision, no icon)
+#### 48. Callout (info), then Callout (decision, no icon)
 
 :::i
 Text in an info callout.

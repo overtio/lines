@@ -317,91 +317,104 @@ Total, =costs!B2*2
 ---
 :::
 
-#### 30. Key: Value line in a card
+#### 30. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a card (stays Markdown here)
+
+::: card
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+:::
+
+#### 31. Key: Value line in a card
 
 ::: card
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 31. Mention in a card
+#### 32. Mention in a card
 
 ::: card
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 32. Wiki link in a card
+#### 33. Wiki link in a card
 
 ::: card
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 33. Symbols in a card
+#### 34. Symbols in a card
 
 ::: card
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 34. GitHub links in a card
+#### 35. GitHub links in a card
 
 ::: card
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 35. arXiv links in a card
+#### 36. arXiv links in a card
 
 ::: card
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::
 
-#### 36. Image in a card
+#### 37. Image in a card
 
 ::: card
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 37. Drawing in a card
+#### 38. Drawing in a card
 
 ::: card
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 38. File in a card
+#### 39. File in a card
 
 ::: card
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 39. Attached 3D model (STL) in a card
+#### 40. Attached 3D model (STL) in a card
 
 ::: card
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 40. Terminal recording (.cast file) in a card
+#### 41. Terminal recording (.cast file) in a card
 
 ::: card
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 41. Audio in a card
+#### 42. Audio in a card
 
 ::: card
 [Chime.mp3](attachment:chime.mp3)
 :::
 
-#### 42. Video in a card
+#### 43. Video in a card
 
 ::: card
 [Sky.mp4](attachment:sky.mp4)
 :::
 
-#### 43. Missing file in a card
+#### 44. Missing file in a card
 
 ::: card
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 44. Card in a card
+#### 45. Card in a card
 
 ::: card
 ::: card
@@ -409,7 +422,7 @@ Text in a card.
 :::
 :::
 
-#### 45. Callout (info) in a card
+#### 46. Callout (info) in a card
 
 ::: card
 :::i
@@ -417,7 +430,7 @@ Text in an info callout.
 :::
 :::
 
-#### 46. Callout (warning, chosen icon) in a card
+#### 47. Callout (warning, chosen icon) in a card
 
 ::: card
 :::! icon=flag
@@ -425,7 +438,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 47. Callout (decision, no icon) in a card
+#### 48. Callout (decision, no icon) in a card
 
 ::: card
 :::^ icon=none

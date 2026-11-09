@@ -375,7 +375,22 @@ sphere(3;
 ```
 ---
 
-#### 30. Broken model (openscad block), then Key: Value line
+#### 30. Broken model (openscad block), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+```openscad
+cube(10)
+sphere(3;
+```
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Broken model (openscad block), then Key: Value line
 
 ```openscad
 cube(10)
@@ -383,7 +398,7 @@ sphere(3;
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Broken model (openscad block), then Mention
+#### 32. Broken model (openscad block), then Mention
 
 ```openscad
 cube(10)
@@ -391,7 +406,7 @@ sphere(3;
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Broken model (openscad block), then Wiki link
+#### 33. Broken model (openscad block), then Wiki link
 
 ```openscad
 cube(10)
@@ -399,7 +414,7 @@ sphere(3;
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Broken model (openscad block), then Symbols
+#### 34. Broken model (openscad block), then Symbols
 
 ```openscad
 cube(10)
@@ -407,7 +422,7 @@ sphere(3;
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Broken model (openscad block), then GitHub links
+#### 35. Broken model (openscad block), then GitHub links
 
 ```openscad
 cube(10)
@@ -415,7 +430,7 @@ sphere(3;
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Broken model (openscad block), then arXiv links
+#### 36. Broken model (openscad block), then arXiv links
 
 ```openscad
 cube(10)
@@ -423,7 +438,7 @@ sphere(3;
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Broken model (openscad block), then Image
+#### 37. Broken model (openscad block), then Image
 
 ```openscad
 cube(10)
@@ -431,7 +446,7 @@ sphere(3;
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 37. Broken model (openscad block), then Drawing
+#### 38. Broken model (openscad block), then Drawing
 
 ```openscad
 cube(10)
@@ -439,7 +454,7 @@ sphere(3;
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Broken model (openscad block), then File
+#### 39. Broken model (openscad block), then File
 
 ```openscad
 cube(10)
@@ -447,7 +462,7 @@ sphere(3;
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Broken model (openscad block), then Attached 3D model (STL)
+#### 40. Broken model (openscad block), then Attached 3D model (STL)
 
 ```openscad
 cube(10)
@@ -455,7 +470,7 @@ sphere(3;
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Broken model (openscad block), then Terminal recording (.cast file)
+#### 41. Broken model (openscad block), then Terminal recording (.cast file)
 
 ```openscad
 cube(10)
@@ -463,7 +478,7 @@ sphere(3;
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Broken model (openscad block), then Audio
+#### 42. Broken model (openscad block), then Audio
 
 ```openscad
 cube(10)
@@ -471,7 +486,7 @@ sphere(3;
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Broken model (openscad block), then Video
+#### 43. Broken model (openscad block), then Video
 
 ```openscad
 cube(10)
@@ -479,7 +494,7 @@ sphere(3;
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Broken model (openscad block), then Missing file
+#### 44. Broken model (openscad block), then Missing file
 
 ```openscad
 cube(10)
@@ -487,7 +502,7 @@ sphere(3;
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Broken model (openscad block), then Card
+#### 45. Broken model (openscad block), then Card
 
 ```openscad
 cube(10)
@@ -497,7 +512,7 @@ sphere(3;
 Text in a card.
 :::
 
-#### 45. Broken model (openscad block), then Callout (info)
+#### 46. Broken model (openscad block), then Callout (info)
 
 ```openscad
 cube(10)
@@ -507,7 +522,7 @@ sphere(3;
 Text in an info callout.
 :::
 
-#### 46. Broken model (openscad block), then Callout (warning, chosen icon)
+#### 47. Broken model (openscad block), then Callout (warning, chosen icon)
 
 ```openscad
 cube(10)
@@ -517,7 +532,7 @@ sphere(3;
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Broken model (openscad block), then Callout (decision, no icon)
+#### 48. Broken model (openscad block), then Callout (decision, no icon)
 
 ```openscad
 cube(10)

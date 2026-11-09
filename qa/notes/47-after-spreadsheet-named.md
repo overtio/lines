@@ -491,7 +491,26 @@ Total, =costs!B2*2
 ```
 ---
 
-#### 30. Named spreadsheet (csv name=), and a formula in another block using it, then Key: Value line
+#### 30. Named spreadsheet (csv name=), and a formula in another block using it, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+```csv name=costs
+Item, Cost, Day
+Rent, $1200, 2026-01-05
+```
+
+```csv
+Total, =costs!B2*2
+```
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Named spreadsheet (csv name=), and a formula in another block using it, then Key: Value line
 
 ```csv name=costs
 Item, Cost, Day
@@ -503,7 +522,7 @@ Total, =costs!B2*2
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Named spreadsheet (csv name=), and a formula in another block using it, then Mention
+#### 32. Named spreadsheet (csv name=), and a formula in another block using it, then Mention
 
 ```csv name=costs
 Item, Cost, Day
@@ -515,7 +534,7 @@ Total, =costs!B2*2
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Named spreadsheet (csv name=), and a formula in another block using it, then Wiki link
+#### 33. Named spreadsheet (csv name=), and a formula in another block using it, then Wiki link
 
 ```csv name=costs
 Item, Cost, Day
@@ -527,7 +546,7 @@ Total, =costs!B2*2
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Named spreadsheet (csv name=), and a formula in another block using it, then Symbols
+#### 34. Named spreadsheet (csv name=), and a formula in another block using it, then Symbols
 
 ```csv name=costs
 Item, Cost, Day
@@ -539,7 +558,7 @@ Total, =costs!B2*2
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Named spreadsheet (csv name=), and a formula in another block using it, then GitHub links
+#### 35. Named spreadsheet (csv name=), and a formula in another block using it, then GitHub links
 
 ```csv name=costs
 Item, Cost, Day
@@ -551,7 +570,7 @@ Total, =costs!B2*2
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Named spreadsheet (csv name=), and a formula in another block using it, then arXiv links
+#### 36. Named spreadsheet (csv name=), and a formula in another block using it, then arXiv links
 
 ```csv name=costs
 Item, Cost, Day
@@ -563,7 +582,7 @@ Total, =costs!B2*2
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Named spreadsheet (csv name=), and a formula in another block using it, then Image
+#### 37. Named spreadsheet (csv name=), and a formula in another block using it, then Image
 
 ```csv name=costs
 Item, Cost, Day
@@ -575,7 +594,7 @@ Total, =costs!B2*2
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 37. Named spreadsheet (csv name=), and a formula in another block using it, then Drawing
+#### 38. Named spreadsheet (csv name=), and a formula in another block using it, then Drawing
 
 ```csv name=costs
 Item, Cost, Day
@@ -587,7 +606,7 @@ Total, =costs!B2*2
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Named spreadsheet (csv name=), and a formula in another block using it, then File
+#### 39. Named spreadsheet (csv name=), and a formula in another block using it, then File
 
 ```csv name=costs
 Item, Cost, Day
@@ -599,7 +618,7 @@ Total, =costs!B2*2
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Named spreadsheet (csv name=), and a formula in another block using it, then Attached 3D model (STL)
+#### 40. Named spreadsheet (csv name=), and a formula in another block using it, then Attached 3D model (STL)
 
 ```csv name=costs
 Item, Cost, Day
@@ -611,7 +630,7 @@ Total, =costs!B2*2
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Named spreadsheet (csv name=), and a formula in another block using it, then Terminal recording (.cast file)
+#### 41. Named spreadsheet (csv name=), and a formula in another block using it, then Terminal recording (.cast file)
 
 ```csv name=costs
 Item, Cost, Day
@@ -623,7 +642,7 @@ Total, =costs!B2*2
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Named spreadsheet (csv name=), and a formula in another block using it, then Audio
+#### 42. Named spreadsheet (csv name=), and a formula in another block using it, then Audio
 
 ```csv name=costs
 Item, Cost, Day
@@ -635,7 +654,7 @@ Total, =costs!B2*2
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Named spreadsheet (csv name=), and a formula in another block using it, then Video
+#### 43. Named spreadsheet (csv name=), and a formula in another block using it, then Video
 
 ```csv name=costs
 Item, Cost, Day
@@ -647,7 +666,7 @@ Total, =costs!B2*2
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Named spreadsheet (csv name=), and a formula in another block using it, then Missing file
+#### 44. Named spreadsheet (csv name=), and a formula in another block using it, then Missing file
 
 ```csv name=costs
 Item, Cost, Day
@@ -659,7 +678,7 @@ Total, =costs!B2*2
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Named spreadsheet (csv name=), and a formula in another block using it, then Card
+#### 45. Named spreadsheet (csv name=), and a formula in another block using it, then Card
 
 ```csv name=costs
 Item, Cost, Day
@@ -673,7 +692,7 @@ Total, =costs!B2*2
 Text in a card.
 :::
 
-#### 45. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (info)
+#### 46. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (info)
 
 ```csv name=costs
 Item, Cost, Day
@@ -687,7 +706,7 @@ Total, =costs!B2*2
 Text in an info callout.
 :::
 
-#### 46. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (warning, chosen icon)
+#### 47. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (warning, chosen icon)
 
 ```csv name=costs
 Item, Cost, Day
@@ -701,7 +720,7 @@ Total, =costs!B2*2
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (decision, no icon)
+#### 48. Named spreadsheet (csv name=), and a formula in another block using it, then Callout (decision, no icon)
 
 ```csv name=costs
 Item, Cost, Day

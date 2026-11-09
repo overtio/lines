@@ -346,105 +346,119 @@ Text in a decision callout with no icon.
 :::
 ---
 
-#### 30. Callout (decision, no icon), then Key: Value line
+#### 30. Callout (decision, no icon), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+
+:::^ icon=none
+Text in a decision callout with no icon.
+:::
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Callout (decision, no icon), then Key: Value line
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. Callout (decision, no icon), then Mention
+#### 32. Callout (decision, no icon), then Mention
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. Callout (decision, no icon), then Wiki link
+#### 33. Callout (decision, no icon), then Wiki link
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. Callout (decision, no icon), then Symbols
+#### 34. Callout (decision, no icon), then Symbols
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. Callout (decision, no icon), then GitHub links
+#### 35. Callout (decision, no icon), then GitHub links
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. Callout (decision, no icon), then arXiv links
+#### 36. Callout (decision, no icon), then arXiv links
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. Callout (decision, no icon), then Image
+#### 37. Callout (decision, no icon), then Image
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 ![A sample picture](attachment:photo.png)
 
-#### 37. Callout (decision, no icon), then Drawing
+#### 38. Callout (decision, no icon), then Drawing
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. Callout (decision, no icon), then File
+#### 39. Callout (decision, no icon), then File
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 39. Callout (decision, no icon), then Attached 3D model (STL)
+#### 40. Callout (decision, no icon), then Attached 3D model (STL)
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. Callout (decision, no icon), then Terminal recording (.cast file)
+#### 41. Callout (decision, no icon), then Terminal recording (.cast file)
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. Callout (decision, no icon), then Audio
+#### 42. Callout (decision, no icon), then Audio
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. Callout (decision, no icon), then Video
+#### 43. Callout (decision, no icon), then Video
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. Callout (decision, no icon), then Missing file
+#### 44. Callout (decision, no icon), then Missing file
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. Callout (decision, no icon), then Card
+#### 45. Callout (decision, no icon), then Card
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -453,7 +467,7 @@ Text in a decision callout with no icon.
 Text in a card.
 :::
 
-#### 45. Callout (decision, no icon), then Callout (info)
+#### 46. Callout (decision, no icon), then Callout (info)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -462,7 +476,7 @@ Text in a decision callout with no icon.
 Text in an info callout.
 :::
 
-#### 46. Callout (decision, no icon), then Callout (warning, chosen icon)
+#### 47. Callout (decision, no icon), then Callout (warning, chosen icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -471,7 +485,7 @@ Text in a decision callout with no icon.
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. Callout (decision, no icon), then Callout (decision, no icon)
+#### 48. Callout (decision, no icon), then Callout (decision, no icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.

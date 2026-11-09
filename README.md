@@ -34,6 +34,7 @@ The [web app](https://overtio.github.io/lines/app/) opens with a tour: one short
 - **Drag to move.** Grab the grip beside any line, list item, heading, table or card to move it, or use <kbd>⌥↑</kbd> / <kbd>⌥↓</kbd>. The grips can be turned off.
 - **Arrows and symbols.** `->` shows as →, `!=` as ≠, and so on, on screen only. The note keeps what you typed.
 - **Copy buttons** on values in `Key: Value` lines and on table cells.
+- **Page breaks.** `/page break` starts a new page in the PDF, and over a backdrop splits the note into pages, as Craft does.
 - **Marks in the margin.** <kbd>⌘⇧M</kbd> puts a colored bar beside lines, with what it means on pointing at it, as a code editor marks changed lines; it's an HTML comment other apps don't show. Plugins mark lines too: Changes marks what you've changed since opening a note.
 - **Find and replace** in a note (<kbd>⌘F</kbd>), matching case, whole words or a regular expression.
 

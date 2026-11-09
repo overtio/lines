@@ -1,116 +1,116 @@
-# QA · Right after: File
+# QA · Right after: Audio
 
-File followed straight away, with no blank line, by each element. Check: nothing overlaps, nothing is cut off, and the space between is even. Markdown joins some pairs without a blank line (text followed by --- is a heading, and a line of text can carry on into the next), so check that what's drawn matches the Markdown.
+Audio followed straight away, with no blank line, by each element. Check: nothing overlaps, nothing is cut off, and the space between is even. Markdown joins some pairs without a blank line (text followed by --- is a heading, and a line of text can carry on into the next), so check that what's drawn matches the Markdown.
 
 #qa/adjacent
 
-#### 1. File, then Paragraph
+#### 1. Audio, then Paragraph
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 
-#### 2. File, then Long paragraph
+#### 2. Audio, then Long paragraph
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 
-#### 3. File, then Heading 1
+#### 3. Audio, then Heading 1
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 # Heading one
 
-#### 4. File, then Heading 2
+#### 4. Audio, then Heading 2
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ## Heading two
 
-#### 5. File, then Heading 3
+#### 5. Audio, then Heading 3
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ### Heading three
 
-#### 6. File, then Bullet list
+#### 6. Audio, then Bullet list
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 - First item
 - Second item
   - Nested item
     - Third level
 - Last item
 
-#### 7. File, then Numbered list
+#### 7. Audio, then Numbered list
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 1. First
 2. Second
    1. Nested
 3. Third
 
-#### 8. File, then Todo list
+#### 8. Audio, then Todo list
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 
-#### 9. File, then Quote
+#### 9. Audio, then Quote
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 > A quote that runs over
 > two lines.
 
-#### 10. File, then Line marks
+#### 10. Audio, then Line marks
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
 The second of them. <!-- mark green: ready -->
 Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 
-#### 11. File, then Code block
+#### 11. Audio, then Code block
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```
 plain code
   indented line
 ```
 
-#### 12. File, then Code block (TypeScript)
+#### 12. Audio, then Code block (TypeScript)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```ts
 const greeting: string = "hello";
 console.log(greeting);
 ```
 
-#### 13. File, then JSON block (no language)
+#### 13. Audio, then JSON block (no language)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 
-#### 14. File, then Diagram
+#### 14. Audio, then Diagram
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```mermaid
 flowchart LR
   A[Start] --> B{Choice}
   B --> C[Done]
 ```
 
-#### 15. File, then Diagram (240 px wide)
+#### 15. Audio, then Diagram (240 px wide)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```mermaid |240
 flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 16. File, then 3D model (openscad block), a colored part, an echo
+#### 16. Audio, then 3D model (openscad block), a colored part, an echo
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```openscad
 difference() {
   cube(20, center = true);
@@ -120,25 +120,25 @@ translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
 echo("made");
 ```
 
-#### 17. File, then Flat model (openscad block)
+#### 17. Audio, then Flat model (openscad block)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```openscad
 square(20);
 translate([30, 10]) circle(8);
 ```
 
-#### 18. File, then Broken model (openscad block)
+#### 18. Audio, then Broken model (openscad block)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```openscad
 cube(10)
 sphere(3;
 ```
 
-#### 19. File, then 3D model (stl block)
+#### 19. Audio, then 3D model (stl block)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```stl
 solid pyramid
 facet normal 0 0 -1
@@ -186,9 +186,9 @@ endfacet
 endsolid pyramid
 ```
 
-#### 20. File, then Timing diagram (wavedrom block)
+#### 20. Audio, then Timing diagram (wavedrom block)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```wavedrom
 { signal: [
   { name: "clk", wave: "p.....|..." },
@@ -198,24 +198,24 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. File, then Math block
+#### 21. Audio, then Math block
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. File, then Table
+#### 22. Audio, then Table
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 | Left | Center | Right |
 | :--- | :----: | ----: |
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. File, then Table with formulas
+#### 23. Audio, then Table with formulas
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 | Item | Cost |
 | --- | ---: |
 | Rent | 1200 |
@@ -223,9 +223,9 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. File, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 24. Audio, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```hurl
 # A todo
 GET https://jsonplaceholder.typicode.com/todos/1
@@ -242,14 +242,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. File, then Secret ({{name}}, kept in a locked secrets note)
+#### 25. Audio, then Secret ({{name}}, kept in a locked secrets note)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. File, then API requests (http block): a variable, a named request and one using its response
+#### 26. Audio, then API requests (http block): a variable, a named request and one using its response
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```http
 @api = https://jsonplaceholder.typicode.com
 
@@ -261,9 +261,9 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. File, then Spreadsheet (csv block)
+#### 27. Audio, then Spreadsheet (csv block)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```csv
 Item, Cost
 Rent, 1200
@@ -271,9 +271,9 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. File, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 28. Audio, then Named spreadsheet (csv name=), and a formula in another block using it
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ```csv name=costs
 Item, Cost, Day
 Rent, $1200, 2026-01-05
@@ -283,105 +283,117 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. File, then Divider
+#### 29. Audio, then Divider
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ---
 
-#### 30. File, then Key: Value line
+#### 30. Audio, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+
+#### 31. Audio, then Key: Value line
+
+[Chime.mp3](attachment:chime.mp3)
 **Wi-Fi password:** correct-horse-battery
 
-#### 31. File, then Mention
+#### 32. Audio, then Mention
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 32. File, then Wiki link
+#### 33. Audio, then Wiki link
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 33. File, then Symbols
+#### 34. Audio, then Symbols
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 34. File, then GitHub links
+#### 35. Audio, then GitHub links
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 35. File, then arXiv links
+#### 36. Audio, then arXiv links
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 36. File, then Image
+#### 37. Audio, then Image
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ![A sample picture](attachment:photo.png)
 
-#### 37. File, then Drawing
+#### 38. Audio, then Drawing
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 38. File, then File
+#### 39. Audio, then File
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 [Budget.csv](attachment:budget.csv)
 
-#### 39. File, then Attached 3D model (STL)
+#### 40. Audio, then Attached 3D model (STL)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 40. File, then Terminal recording (.cast file)
+#### 41. Audio, then Terminal recording (.cast file)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 [terminal.cast](attachment:terminal.cast)
 
-#### 41. File, then Audio
+#### 42. Audio, then Audio
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 42. File, then Video
+#### 43. Audio, then Video
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 43. File, then Missing file
+#### 44. Audio, then Missing file
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 44. File, then Card
+#### 45. Audio, then Card
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 ::: card
 Text in a card.
 :::
 
-#### 45. File, then Callout (info)
+#### 46. Audio, then Callout (info)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 :::i
 Text in an info callout.
 :::
 
-#### 46. File, then Callout (warning, chosen icon)
+#### 47. Audio, then Callout (warning, chosen icon)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 47. File, then Callout (decision, no icon)
+#### 48. Audio, then Callout (decision, no icon)
 
-[Budget.csv](attachment:budget.csv)
+[Chime.mp3](attachment:chime.mp3)
 :::^ icon=none
 Text in a decision callout with no icon.
 :::

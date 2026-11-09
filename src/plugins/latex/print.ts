@@ -18,11 +18,13 @@ interface Node {
   children: Node[];
 }
 
+const PAGE_BREAKS = new Set(["newpage", "clearpage", "cleardoublepage", "pagebreak"]);
+
 /** Commands that print nothing here: layout, sizes, definitions and the like. */
 const SILENT = new Set(
   (
     "label vspace hspace vskip hskip setlength addtolength setcounter addtocounter usepackage documentclass input include " +
-    "bibliographystyle bibliography pagestyle thispagestyle newpage clearpage cleardoublepage pagebreak nopagebreak linebreak " +
+    "bibliographystyle bibliography pagestyle thispagestyle nopagebreak linebreak " +
     "nolinebreak centering raggedright raggedleft small footnotesize scriptsize tiny large Large LARGE huge Huge normalsize " +
     "bfseries itshape ttfamily rmfamily sffamily scshape upshape mdseries slshape em indent noindent smallskip medskip bigskip " +
     "vfill hfill tableofcontents listoffigures listoftables appendix frontmatter mainmatter backmatter newcommand renewcommand " +
@@ -293,6 +295,11 @@ export function printDocument(body: string, parts: Parts): HTMLElement {
       return;
     }
     if (name === "maketitle") return flow.block(titleBlock());
+    // A new page, where pages.ts starts one (at the document's top level).
+    if (PAGE_BREAKS.has(name)) {
+      if (flow.into === doc) flow.block(el("div", "doc-page-break"));
+      return;
+    }
     if (name === "today") return void flow.inline().append(today());
     if (name === "newline") return void flow.inline().append(el("br"));
     if (name === "par") return flow.end();
