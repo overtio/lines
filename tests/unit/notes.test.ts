@@ -8,6 +8,7 @@ stubApp();
 mock.module("../../src/lib/print/parts", () => ({ el: () => null }));
 const { plainLine } = await import("../../src/lib/notes/stats");
 const { code } = await import("../../src/plugins/code");
+const { referencedAttachments } = await import("../../src/lib/notes/attachments");
 
 const languages = code().contributes.languages as NoteLanguage[];
 const language = (name: string) => languages.find((each) => each.name === name)!;
@@ -60,4 +61,21 @@ test("a pack's empty or backwards sound timings are left out", () => {
   expect(Object.keys(readPack(files, "x").keys)).toEqual(["KeyC"]);
   const v1 = new Map([["config.json", bytes(JSON.stringify({ sound: "a.ogg", defines: { "30": [10, 0], "31": [10, 5] } }))], ["a.ogg", bytes("OggS")]]);
   expect(Object.keys(readPack(v1, "x").keys)).toEqual(["KeyS"]);
+});
+
+describe("attachments", () => {
+  // Those a note doesn't use are deleted at launch, and left out of sync and exports.
+  test("a note uses each one it mentions, however the link is written", () => {
+    const [a, b, c, d, e, f] = ["a", "b", "c", "d", "e", "f"].map((digit) => `${digit.repeat(32)}.png`);
+    const body = [
+      `![](../attachments/${a})`,
+      `![Lake](../attachments/${b} "Sunrise")`,
+      `[Report]( ../attachments/${c} )`,
+      `![Sky](<../attachments/${d}>)`,
+      `[sky]: ../attachments/${e}`,
+      `\\includegraphics[width=4cm]{../attachments/${f}}`,
+    ].join("\n\n");
+    expect([...referencedAttachments([body])].sort()).toEqual([a, b, c, d, e, f]);
+    expect(referencedAttachments(["![](../attachments/sky.png) ![](attachments/" + a + ")"]).size).toBe(0);
+  });
 });
