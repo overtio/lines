@@ -200,6 +200,12 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - A picture chosen for the backdrop stays on the device it was chosen on (made no larger than 2400 pixels across), and doesn't sync or export.
 - Ruled lines need the `lh` unit: Safari 16.4 and macOS 13.3 or later, Chrome 109 or later. Earlier ones show the other patterns, and Lines as plain.
 
+## Line marks
+
+- Marks are for the screen: printing and PDFs leave them out (a note's own are comments, which don't print either).
+- A screen reader hears a note's own mark as the comment it is, on the line being edited; the marks plugins add aren't read yet.
+- The Changes plugin compares a note with how it was when it was opened, not with the last time it synced or was exported.
+
 ## Layout, tabs and the outline
 
 - Tabs have no keyboard shortcuts of their own beyond their tablist (← →, Delete): browsers keep ⌘W, Ctrl+Tab and ⌘1–9 for their own tabs.

@@ -2342,3 +2342,36 @@
 :root[data-backdrop][data-paper][data-scheme="dark"] .editor-pane .cm-editor.cm-page:not(.cm-sheet-note) > .cm-scroller > .cm-content::before {
   background-image: var(--paper-dark);
 }
+
+/*
+ * Marks in the margin (markers.ts), as a code editor marks the lines changed: a bar beside lines, or
+ * a wedge pointing at where lines were taken out. Wider than they look where the pointer finds them,
+ * for what they say. Not on a spreadsheet note, whose text is its grid.
+ */
+.cm-markers {
+  pointer-events: none;
+}
+
+.cm-marker {
+  position: absolute;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--marker);
+  pointer-events: auto;
+}
+
+.cm-marker::after {
+  content: "";
+  position: absolute;
+  inset: 0 -4px;
+}
+
+.cm-marker.is-between {
+  width: 7px;
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.cm-sheet-note .cm-markers {
+  display: none;
+}

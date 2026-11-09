@@ -95,7 +95,20 @@ A long paragraph that wraps onto several lines at the usual width, so the space 
 > A quote that runs over
 > two lines.
 
-#### 10. Bullet list, then Code block
+#### 10. Bullet list, then Line marks
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+Marked as the accent. <!-- mark -->
+Two lines marked green, one bar. <!-- mark green: ready -->
+The second of them. <!-- mark green: ready -->
+Red, with a label to point at. <!-- mark red: to fix -->
+- A list item, marked purple. <!-- mark purple -->
+
+#### 11. Bullet list, then Code block
 
 - First item
 - Second item
@@ -107,7 +120,7 @@ plain code
   indented line
 ```
 
-#### 11. Bullet list, then Code block (TypeScript)
+#### 12. Bullet list, then Code block (TypeScript)
 
 - First item
 - Second item
@@ -119,7 +132,7 @@ const greeting: string = "hello";
 console.log(greeting);
 ```
 
-#### 12. Bullet list, then JSON block (no language)
+#### 13. Bullet list, then JSON block (no language)
 
 - First item
 - Second item
@@ -130,7 +143,7 @@ console.log(greeting);
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 
-#### 13. Bullet list, then Diagram
+#### 14. Bullet list, then Diagram
 
 - First item
 - Second item
@@ -143,7 +156,7 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Bullet list, then Diagram (240 px wide)
+#### 15. Bullet list, then Diagram (240 px wide)
 
 - First item
 - Second item
@@ -155,7 +168,7 @@ flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. Bullet list, then 3D model (openscad block), a colored part, an echo
+#### 16. Bullet list, then 3D model (openscad block), a colored part, an echo
 
 - First item
 - Second item
@@ -171,7 +184,7 @@ translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
 echo("made");
 ```
 
-#### 16. Bullet list, then Flat model (openscad block)
+#### 17. Bullet list, then Flat model (openscad block)
 
 - First item
 - Second item
@@ -183,7 +196,7 @@ square(20);
 translate([30, 10]) circle(8);
 ```
 
-#### 17. Bullet list, then Broken model (openscad block)
+#### 18. Bullet list, then Broken model (openscad block)
 
 - First item
 - Second item
@@ -195,7 +208,7 @@ cube(10)
 sphere(3;
 ```
 
-#### 18. Bullet list, then 3D model (stl block)
+#### 19. Bullet list, then 3D model (stl block)
 
 - First item
 - Second item
@@ -249,7 +262,7 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Bullet list, then Timing diagram (wavedrom block)
+#### 20. Bullet list, then Timing diagram (wavedrom block)
 
 - First item
 - Second item
@@ -265,7 +278,7 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 20. Bullet list, then Math block
+#### 21. Bullet list, then Math block
 
 - First item
 - Second item
@@ -276,7 +289,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 21. Bullet list, then Table
+#### 22. Bullet list, then Table
 
 - First item
 - Second item
@@ -288,7 +301,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 22. Bullet list, then Table with formulas
+#### 23. Bullet list, then Table with formulas
 
 - First item
 - Second item
@@ -302,7 +315,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 23. Bullet list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 24. Bullet list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 - First item
 - Second item
@@ -325,7 +338,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 24. Bullet list, then Secret ({{name}}, kept in a locked secrets note)
+#### 25. Bullet list, then Secret ({{name}}, kept in a locked secrets note)
 
 - First item
 - Second item
@@ -334,7 +347,7 @@ jsonpath "$.name" isString
 - Last item
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 25. Bullet list, then API requests (http block): a variable, a named request and one using its response
+#### 26. Bullet list, then API requests (http block): a variable, a named request and one using its response
 
 - First item
 - Second item
@@ -352,7 +365,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 26. Bullet list, then Spreadsheet (csv block)
+#### 27. Bullet list, then Spreadsheet (csv block)
 
 - First item
 - Second item
@@ -366,7 +379,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 27. Bullet list, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 28. Bullet list, then Named spreadsheet (csv name=), and a formula in another block using it
 
 - First item
 - Second item
@@ -382,7 +395,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 28. Bullet list, then Divider
+#### 29. Bullet list, then Divider
 
 - First item
 - Second item
@@ -391,7 +404,7 @@ Total, =costs!B2*2
 - Last item
 ---
 
-#### 29. Bullet list, then Key: Value line
+#### 30. Bullet list, then Key: Value line
 
 - First item
 - Second item
@@ -400,7 +413,7 @@ Total, =costs!B2*2
 - Last item
 **Wi-Fi password:** correct-horse-battery
 
-#### 30. Bullet list, then Mention
+#### 31. Bullet list, then Mention
 
 - First item
 - Second item
@@ -409,7 +422,7 @@ Total, =costs!B2*2
 - Last item
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 31. Bullet list, then Wiki link
+#### 32. Bullet list, then Wiki link
 
 - First item
 - Second item
@@ -418,7 +431,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 - Last item
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 32. Bullet list, then Symbols
+#### 33. Bullet list, then Symbols
 
 - First item
 - Second item
@@ -427,7 +440,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 - Last item
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 33. Bullet list, then GitHub links
+#### 34. Bullet list, then GitHub links
 
 - First item
 - Second item
@@ -436,7 +449,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 - Last item
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 34. Bullet list, then arXiv links
+#### 35. Bullet list, then arXiv links
 
 - First item
 - Second item
@@ -445,7 +458,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 35. Bullet list, then Image
+#### 36. Bullet list, then Image
 
 - First item
 - Second item
@@ -454,7 +467,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 ![A sample picture](attachment:photo.png)
 
-#### 36. Bullet list, then Drawing
+#### 37. Bullet list, then Drawing
 
 - First item
 - Second item
@@ -463,7 +476,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 ![A sample drawing](attachment:drawing.svg)
 
-#### 37. Bullet list, then File
+#### 38. Bullet list, then File
 
 - First item
 - Second item
@@ -472,7 +485,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Budget.csv](attachment:budget.csv)
 
-#### 38. Bullet list, then Attached 3D model (STL)
+#### 39. Bullet list, then Attached 3D model (STL)
 
 - First item
 - Second item
@@ -481,7 +494,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Bracket.stl](attachment:bracket.stl)
 
-#### 39. Bullet list, then Terminal recording (.cast file)
+#### 40. Bullet list, then Terminal recording (.cast file)
 
 - First item
 - Second item
@@ -490,7 +503,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Bullet list, then Audio
+#### 41. Bullet list, then Audio
 
 - First item
 - Second item
@@ -499,7 +512,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Chime.mp3](attachment:chime.mp3)
 
-#### 41. Bullet list, then Video
+#### 42. Bullet list, then Video
 
 - First item
 - Second item
@@ -508,7 +521,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Sky.mp4](attachment:sky.mp4)
 
-#### 42. Bullet list, then Missing file
+#### 43. Bullet list, then Missing file
 
 - First item
 - Second item
@@ -517,7 +530,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 43. Bullet list, then Card
+#### 44. Bullet list, then Card
 
 - First item
 - Second item
@@ -528,7 +541,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 44. Bullet list, then Callout (info)
+#### 45. Bullet list, then Callout (info)
 
 - First item
 - Second item
@@ -539,7 +552,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 45. Bullet list, then Callout (warning, chosen icon)
+#### 46. Bullet list, then Callout (warning, chosen icon)
 
 - First item
 - Second item
@@ -550,7 +563,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 46. Bullet list, then Callout (decision, no icon)
+#### 47. Bullet list, then Callout (decision, no icon)
 
 - First item
 - Second item

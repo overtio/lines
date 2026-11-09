@@ -68,7 +68,17 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   > A quote that runs over
   > two lines.
 
-#### 10. Code block in a list item
+#### 10. Line marks in a list item
+
+- List item
+
+  Marked as the accent. <!-- mark -->
+  Two lines marked green, one bar. <!-- mark green: ready -->
+  The second of them. <!-- mark green: ready -->
+  Red, with a label to point at. <!-- mark red: to fix -->
+  - A list item, marked purple. <!-- mark purple -->
+
+#### 11. Code block in a list item
 
 - List item
 
@@ -77,7 +87,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
     indented line
   ```
 
-#### 11. Code block (TypeScript) in a list item
+#### 12. Code block (TypeScript) in a list item
 
 - List item
 
@@ -86,7 +96,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   console.log(greeting);
   ```
 
-#### 12. JSON block (no language) in a list item
+#### 13. JSON block (no language) in a list item
 
 - List item
 
@@ -94,7 +104,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   {"name":"lines","tags":["a","b"],"id":12345678901234567890}
   ```
 
-#### 13. Diagram in a list item (stays Markdown here)
+#### 14. Diagram in a list item (stays Markdown here)
 
 - List item
 
@@ -104,7 +114,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
     B --> C[Done]
   ```
 
-#### 14. Diagram (240 px wide) in a list item (stays Markdown here)
+#### 15. Diagram (240 px wide) in a list item (stays Markdown here)
 
 - List item
 
@@ -113,7 +123,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
     A[Small] --> B[Diagram]
   ```
 
-#### 15. 3D model (openscad block), a colored part, an echo in a list item
+#### 16. 3D model (openscad block), a colored part, an echo in a list item
 
 - List item
 
@@ -126,7 +136,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   echo("made");
   ```
 
-#### 16. Flat model (openscad block) in a list item
+#### 17. Flat model (openscad block) in a list item
 
 - List item
 
@@ -135,7 +145,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   translate([30, 10]) circle(8);
   ```
 
-#### 17. Broken model (openscad block) in a list item
+#### 18. Broken model (openscad block) in a list item
 
 - List item
 
@@ -144,7 +154,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   sphere(3;
   ```
 
-#### 18. 3D model (stl block) in a list item
+#### 19. 3D model (stl block) in a list item
 
 - List item
 
@@ -195,7 +205,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   endsolid pyramid
   ```
 
-#### 19. Timing diagram (wavedrom block) in a list item (stays Markdown here)
+#### 20. Timing diagram (wavedrom block) in a list item (stays Markdown here)
 
 - List item
 
@@ -208,7 +218,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   ], edge: ["a~>b t1"] }
   ```
 
-#### 20. Math block in a list item (stays Markdown here)
+#### 21. Math block in a list item (stays Markdown here)
 
 - List item
 
@@ -216,7 +226,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   \int_0^1 x^2\,dx = \frac{1}{3}
   $$
 
-#### 21. Table in a list item (stays Markdown here)
+#### 22. Table in a list item (stays Markdown here)
 
 - List item
 
@@ -225,7 +235,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   | a | **b** | 1 |
   | longer cell text | `code` | 22 |
 
-#### 22. Table with formulas in a list item (stays Markdown here)
+#### 23. Table with formulas in a list item (stays Markdown here)
 
 - List item
 
@@ -236,7 +246,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   | Total | =SUM(B2:B3) |
   | Broken | =B2/0 |
 
-#### 23. Hurl entries (hurl block): a capture used by the next entry, and asserts in a list item
+#### 24. Hurl entries (hurl block): a capture used by the next entry, and asserts in a list item
 
 - List item
 
@@ -256,13 +266,13 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   jsonpath "$.name" isString
   ```
 
-#### 24. Secret ({{name}}, kept in a locked secrets note) in a list item
+#### 25. Secret ({{name}}, kept in a locked secrets note) in a list item
 
 - List item
 
   The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 25. API requests (http block): a variable, a named request and one using its response in a list item
+#### 26. API requests (http block): a variable, a named request and one using its response in a list item
 
 - List item
 
@@ -277,7 +287,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   GET {{api}}/users/{{todo.response.body.$.userId}}
   ```
 
-#### 26. Spreadsheet (csv block) in a list item (stays Markdown here)
+#### 27. Spreadsheet (csv block) in a list item (stays Markdown here)
 
 - List item
 
@@ -288,7 +298,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Total, =SUM(B2:B3)
   ```
 
-#### 27. Named spreadsheet (csv name=), and a formula in another block using it in a list item (stays Markdown here)
+#### 28. Named spreadsheet (csv name=), and a formula in another block using it in a list item (stays Markdown here)
 
 - List item
 
@@ -301,97 +311,97 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Total, =costs!B2*2
   ```
 
-#### 28. Divider in a list item
+#### 29. Divider in a list item
 
 - List item
 
   ---
 
-#### 29. Key: Value line in a list item
+#### 30. Key: Value line in a list item
 
 - List item
 
   **Wi-Fi password:** correct-horse-battery
 
-#### 30. Mention in a list item
+#### 31. Mention in a list item
 
 - List item
 
   Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 31. Wiki link in a list item
+#### 32. Wiki link in a list item
 
 - List item
 
   Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 32. Symbols in a list item
+#### 33. Symbols in a list item
 
 - List item
 
   Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 33. GitHub links in a list item
+#### 34. GitHub links in a list item
 
 - List item
 
   Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 34. arXiv links in a list item
+#### 35. arXiv links in a list item
 
 - List item
 
   Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 35. Image in a list item (stays Markdown here)
+#### 36. Image in a list item (stays Markdown here)
 
 - List item
 
   ![A sample picture](attachment:photo.png)
 
-#### 36. Drawing in a list item (stays Markdown here)
+#### 37. Drawing in a list item (stays Markdown here)
 
 - List item
 
   ![A sample drawing](attachment:drawing.svg)
 
-#### 37. File in a list item (stays Markdown here)
+#### 38. File in a list item (stays Markdown here)
 
 - List item
 
   [Budget.csv](attachment:budget.csv)
 
-#### 38. Attached 3D model (STL) in a list item
+#### 39. Attached 3D model (STL) in a list item
 
 - List item
 
   [Bracket.stl](attachment:bracket.stl)
 
-#### 39. Terminal recording (.cast file) in a list item
+#### 40. Terminal recording (.cast file) in a list item
 
 - List item
 
   [terminal.cast](attachment:terminal.cast)
 
-#### 40. Audio in a list item (stays Markdown here)
+#### 41. Audio in a list item (stays Markdown here)
 
 - List item
 
   [Chime.mp3](attachment:chime.mp3)
 
-#### 41. Video in a list item (stays Markdown here)
+#### 42. Video in a list item (stays Markdown here)
 
 - List item
 
   [Sky.mp4](attachment:sky.mp4)
 
-#### 42. Missing file in a list item (stays Markdown here)
+#### 43. Missing file in a list item (stays Markdown here)
 
 - List item
 
   [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 43. Card in a list item
+#### 44. Card in a list item
 
 - List item
 
@@ -399,7 +409,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a card.
   :::
 
-#### 44. Callout (info) in a list item
+#### 45. Callout (info) in a list item
 
 - List item
 
@@ -407,7 +417,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in an info callout.
   :::
 
-#### 45. Callout (warning, chosen icon) in a list item
+#### 46. Callout (warning, chosen icon) in a list item
 
 - List item
 
@@ -415,7 +425,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a warning callout with the flag icon.
   :::
 
-#### 46. Callout (decision, no icon) in a list item
+#### 47. Callout (decision, no icon) in a list item
 
 - List item
 

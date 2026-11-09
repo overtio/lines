@@ -142,4 +142,5 @@ export default {
   "shortcuts.key.at": "Arroba",
   "shortcuts.key.plus": "Más",
   "shortcuts.key.minus": "Menos",
+  "shortcuts.markLines": "Marcar líneas en el margen, o quitarles la marca",
 } satisfies Translation<typeof en>;

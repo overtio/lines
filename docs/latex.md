@@ -51,6 +51,7 @@ The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.
 | `\label{…}` | Hidden (LaTeX prints nothing for it); on a line of its own, the line shrinks away |
 | `\\` | Hidden (a line break) |
 | `% comment` | Faint and italic |
+| `% mark green: cite`, at a line's end | A bar in the margin beside the line, the comment hidden but while it's edited ([linedown.md](linedown.md#line-marks)); ⌘⇧M marks the lines selected |
 | Any other command, like `\vspace{…}` or `\noindent` | As written, faint |
 
 - With the cursor on a construct, its LaTeX shows. Clicking drawn math or a table shows its LaTeX, with displayed math redrawn below as you type.

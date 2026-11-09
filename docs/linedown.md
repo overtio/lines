@@ -11,6 +11,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Headings, emphasis, lists, quotes, code, links, images, rules | As in CommonMark | Yes |
 | Tables, ~~strikethrough~~, `- [ ]` task lists, autolinks | As in GFM | GFM |
 | Highlight | `==text==` | No (also in Obsidian, Bear, Pandoc's `mark`) |
+| Line mark | `<!-- mark green: to check -->` at a line's end | Yes: an HTML comment, which other apps don't show |
 | Underline | `<u>text</u>` | Yes (inline HTML, as GitHub, Obsidian and Typora show it) |
 | Tag | `#tag`, `#nested/tag` | No (as in Bear) |
 | Card | `::: card` … `:::` | Pandoc fenced div |
@@ -44,6 +45,20 @@ A note has no separate title field: its title is its **first line with text on i
 - Exactly two `=` on each side. `===` doesn't start one.
 - Like emphasis: the opening `==` can't be followed by a space and the closing one can't follow a space, so `a == b` stays text.
 - It nests with the other inline styles: `==**bold** and highlighted==`.
+
+## Line marks
+
+A bar in the margin beside a line, as a code editor marks the lines changed: an HTML comment at the line's end, `mark`, then a color if not the theme's accent, and what it means after a colon.
+
+```markdown
+Ship it on Friday. <!-- mark green: ready -->
+Check it in WebKit first. <!-- mark orange: to check -->
+Which theme is the default? <!-- mark -->
+```
+
+The colors are `red`, `orange`, `yellow`, `green`, `blue`, `purple` and `gray`, each the theme's own. Lines next to each other marked alike make one bar, and pointing at it shows what it says. The comment is hidden but on the line being edited; ⌘⇧M (Ctrl+Shift+M) marks the selected lines, or takes their marks off. In code it's text, not a mark. Other Markdown apps don't show HTML comments, so the note reads the same there, without its marks.
+
+Plugins can mark lines too, each in a lane of its own further out (the Changes plugin marks what's changed since the note was opened; [plugins.md](plugins.md)).
 
 ## Underline
 

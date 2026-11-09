@@ -50,27 +50,35 @@ A long paragraph that wraps onto several lines at the usual width, so the space 
 > A quote that runs over
 > two lines.
 
-#### 10. Code block at the top level
+#### 10. Line marks at the top level
+
+Marked as the accent. <!-- mark -->
+Two lines marked green, one bar. <!-- mark green: ready -->
+The second of them. <!-- mark green: ready -->
+Red, with a label to point at. <!-- mark red: to fix -->
+- A list item, marked purple. <!-- mark purple -->
+
+#### 11. Code block at the top level
 
 ```
 plain code
   indented line
 ```
 
-#### 11. Code block (TypeScript) at the top level
+#### 12. Code block (TypeScript) at the top level
 
 ```ts
 const greeting: string = "hello";
 console.log(greeting);
 ```
 
-#### 12. JSON block (no language) at the top level
+#### 13. JSON block (no language) at the top level
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 
-#### 13. Diagram at the top level
+#### 14. Diagram at the top level
 
 ```mermaid
 flowchart LR
@@ -78,14 +86,14 @@ flowchart LR
   B --> C[Done]
 ```
 
-#### 14. Diagram (240 px wide) at the top level
+#### 15. Diagram (240 px wide) at the top level
 
 ```mermaid |240
 flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 15. 3D model (openscad block), a colored part, an echo at the top level
+#### 16. 3D model (openscad block), a colored part, an echo at the top level
 
 ```openscad
 difference() {
@@ -96,21 +104,21 @@ translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
 echo("made");
 ```
 
-#### 16. Flat model (openscad block) at the top level
+#### 17. Flat model (openscad block) at the top level
 
 ```openscad
 square(20);
 translate([30, 10]) circle(8);
 ```
 
-#### 17. Broken model (openscad block) at the top level
+#### 18. Broken model (openscad block) at the top level
 
 ```openscad
 cube(10)
 sphere(3;
 ```
 
-#### 18. 3D model (stl block) at the top level
+#### 19. 3D model (stl block) at the top level
 
 ```stl
 solid pyramid
@@ -159,7 +167,7 @@ endfacet
 endsolid pyramid
 ```
 
-#### 19. Timing diagram (wavedrom block) at the top level
+#### 20. Timing diagram (wavedrom block) at the top level
 
 ```wavedrom
 { signal: [
@@ -170,20 +178,20 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 20. Math block at the top level
+#### 21. Math block at the top level
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 21. Table at the top level
+#### 22. Table at the top level
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 22. Table with formulas at the top level
+#### 23. Table with formulas at the top level
 
 | Item | Cost |
 | --- | ---: |
@@ -192,7 +200,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 23. Hurl entries (hurl block): a capture used by the next entry, and asserts at the top level
+#### 24. Hurl entries (hurl block): a capture used by the next entry, and asserts at the top level
 
 ```hurl
 # A todo
@@ -210,11 +218,11 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 24. Secret ({{name}}, kept in a locked secrets note) at the top level
+#### 25. Secret ({{name}}, kept in a locked secrets note) at the top level
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 25. API requests (http block): a variable, a named request and one using its response at the top level
+#### 26. API requests (http block): a variable, a named request and one using its response at the top level
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -227,7 +235,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 26. Spreadsheet (csv block) at the top level
+#### 27. Spreadsheet (csv block) at the top level
 
 ```csv
 Item, Cost
@@ -236,7 +244,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 27. Named spreadsheet (csv name=), and a formula in another block using it at the top level
+#### 28. Named spreadsheet (csv name=), and a formula in another block using it at the top level
 
 ```csv name=costs
 Item, Cost, Day
@@ -247,85 +255,85 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 28. Divider at the top level
+#### 29. Divider at the top level
 
 ---
 
-#### 29. Key: Value line at the top level
+#### 30. Key: Value line at the top level
 
 **Wi-Fi password:** correct-horse-battery
 
-#### 30. Mention at the top level
+#### 31. Mention at the top level
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 31. Wiki link at the top level
+#### 32. Wiki link at the top level
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 32. Symbols at the top level
+#### 33. Symbols at the top level
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 33. GitHub links at the top level
+#### 34. GitHub links at the top level
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 34. arXiv links at the top level
+#### 35. arXiv links at the top level
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 35. Image at the top level
+#### 36. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 36. Drawing at the top level
+#### 37. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 37. File at the top level
+#### 38. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 38. Attached 3D model (STL) at the top level
+#### 39. Attached 3D model (STL) at the top level
 
 [Bracket.stl](attachment:bracket.stl)
 
-#### 39. Terminal recording (.cast file) at the top level
+#### 40. Terminal recording (.cast file) at the top level
 
 [terminal.cast](attachment:terminal.cast)
 
-#### 40. Audio at the top level
+#### 41. Audio at the top level
 
 [Chime.mp3](attachment:chime.mp3)
 
-#### 41. Video at the top level
+#### 42. Video at the top level
 
 [Sky.mp4](attachment:sky.mp4)
 
-#### 42. Missing file at the top level
+#### 43. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 43. Card at the top level
+#### 44. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 44. Callout (info) at the top level
+#### 45. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 45. Callout (warning, chosen icon) at the top level
+#### 46. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 46. Callout (decision, no icon) at the top level
+#### 47. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

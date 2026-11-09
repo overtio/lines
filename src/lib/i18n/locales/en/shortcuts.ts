@@ -140,4 +140,5 @@ export default {
   "shortcuts.key.at": "At sign",
   "shortcuts.key.plus": "Plus",
   "shortcuts.key.minus": "Minus",
+  "shortcuts.markLines": "Mark lines in the margin, or take their marks off",
 };

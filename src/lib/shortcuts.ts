@@ -92,6 +92,7 @@ export const SHORTCUTS: ShortcutGroup[] = [
   {
     name: "shortcuts.group.formatting",
     shortcuts: [
+      { action: "shortcuts.markLines", keys: ["Mod-Shift-m"] },
       { action: "shortcuts.bold", keys: ["Mod-b"] },
       { action: "shortcuts.italic", keys: ["Mod-i"] },
       { action: "shortcuts.underline", keys: ["Mod-u"] },

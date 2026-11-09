@@ -1,8 +1,12 @@
+import { syntaxTree } from "@codemirror/language";
+import { commentMarks } from "../../lib/editor/markers";
 import { markdownEditing } from "../../lib/editor/setup";
 import { t } from "../../lib/i18n/index.svelte";
 import { ATTACHMENT_PATH } from "../../lib/notes/attachments";
 import { addTagIn, computeMeta } from "../../lib/notes/parse";
 import { noteStats, plainText } from "../../lib/notes/stats";
+import type { EditorState } from "@codemirror/state";
+import type { SyntaxNode } from "@lezer/common";
 import type { Plugin } from "../../lib/plugins/types";
 import { markdownDocument } from "../../lib/print/markdown";
 
@@ -11,6 +15,14 @@ import { markdownDocument } from "../../lib/print/markdown";
  * written in unless they say otherwise. Other plugins can add to it (its `markdown` additions).
  * Its code is the editor's (lib/editor), which other languages build on too, and lib/print/markdown.ts.
  */
+
+/** In code, where `<!-- … -->` is text, not a comment. */
+function inCode(state: EditorState, pos: number) {
+  for (let node: SyntaxNode | null = syntaxTree(state).resolveInner(pos, 1); node; node = node.parent) {
+    if (node.name === "FencedCode" || node.name === "CodeBlock" || node.name === "InlineCode") return true;
+  }
+  return false;
+}
 
 export const markdown = (): Plugin => ({
   id: "markdown",
@@ -35,6 +47,8 @@ export const markdown = (): Plugin => ({
         newNote: ({ tag, type }) => (tag ? `# \n\n#${tag}` : type ? `---\ntype: ${type}\n---\n# ` : "# "),
         file: (body, attachments) => (attachments ? body.replaceAll(`](${ATTACHMENT_PATH}`, `](${attachments}`) : body),
         print: markdownDocument,
+        // An HTML comment, which Markdown apps don't show.
+        lineMarks: commentMarks("<!--", "-->", { skip: inCode }),
       },
     ],
   },
