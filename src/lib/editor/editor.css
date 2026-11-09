@@ -2351,6 +2351,19 @@
   }
 }
 
+/* With no note open, what's said in its place sits on a page of its own, so it reads over any picture. */
+:root[data-backdrop] .editor-pane .editor-placeholder {
+  flex: 0 1 auto;
+  margin: auto;
+  padding: 28px 40px;
+  border-radius: var(--radius-xl);
+  background-color: var(--page-bg);
+  box-shadow:
+    var(--card-shadow),
+    0 18px 60px rgb(0 0 0 / 0.16);
+  backdrop-filter: var(--page-blur);
+}
+
 /* The toolbar frosted, so its buttons read over any picture. */
 :root[data-backdrop] .editor-pane .toolbar {
   background: color-mix(in srgb, var(--surface) 72%, transparent);

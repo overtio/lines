@@ -45,6 +45,16 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - lines loads the photo through Unsplash's download link, which counts as a download each time it's shown.
 - Unsplash+ photos don't show: Unsplash only hands them to subscribers. They say the image couldn't be shown. `/unsplash` leaves them out.
 
+## Wallhaven
+
+- In the apps only: Wallhaven's site doesn't answer web pages (it sends no CORS headers), so the web app can't search it.
+- Only wallpapers Wallhaven marks safe for work; there's no way to sign in to Wallhaven for the rest.
+- What you search for goes to Wallhaven, and the picture you pick is fetched whole (often several megabytes) before it's made smaller and kept.
+- Wallhaven's search gives no description of a wallpaper, so a picture's description in the note is what you searched for; change it as you would any image's.
+- Wallpapers are uploaded by Wallhaven's users, who may not have made them: whose they are, and what you may do with one beyond your own notes, is as Wallhaven says on its page.
+- Wallhaven answers 45 searches a minute; typing fast may wait for it.
+- In Markdown notes only, as `/unsplash` and `/giphy` are.
+
 ## /unsplash and /giphy
 
 - They need the internet, and an API key from each service built into lines (see the README). A build without one doesn't have the command, and Settings → Plugins says so.

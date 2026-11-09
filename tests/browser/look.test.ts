@@ -106,6 +106,16 @@ describe("themes", () => {
     expect(await app.root("theme")).toStartWith("custom");
   });
 
+  test("Wallhaven is the apps': on the web it says so, and New has no From Wallhaven…", async () => {
+    app = await openApp();
+    const plugins = await app.settings("Plugins");
+    expect(await plugins.getByText("Needs the lines app: Wallhaven's site doesn't answer web pages.").isVisible()).toBe(true);
+    const theme = await app.settings("Theme");
+    await theme.getByRole("button", { name: "New" }).click();
+    expect(await app.page.getByRole("menuitem", { name: "From Wallhaven…" }).count()).toBe(0);
+    await app.page.keyboard.press("Escape");
+  });
+
   test("New → From a theme with colors for one scheme only copies that one", async () => {
     app = await openApp({ prefs: { theme: "neon" } });
     const settings = await app.settings("Theme");

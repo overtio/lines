@@ -8,6 +8,8 @@ Everything here is in Settings → Theme.
 
 **New → From** the theme chosen makes a copy of it, under **Your themes**, and opens it to change below Light or dark, Contrast and Icons: its name, and its colors.
 
+**New → From Wallhaven…** (in the apps, with the Wallhaven [plugin](plugins.md)) does the same with a wallpaper found on [Wallhaven](https://wallhaven.cc): search, pick one, and its colors are a theme, named after what you searched for, which it can be the backdrop of too. Only wallpapers Wallhaven marks safe for work are searched.
+
 **New → From a Picture…** makes one from a picture's colors, a wallpaper or a photo, named after it, light and dark. The picture is read on this device, nothing is sent anywhere: its colors are grouped, its main tone tints the backgrounds (more of it the more colorful the picture, less in light, where a little goes a long way), its most vivid color that's also plentiful becomes the accent, and colors near red, green, blue and the rest color the callouts and code. The text reads at least 7:1 on the background, grey text 5:1 and the accent 4.5:1; a picture without color makes a theme in greys. **Use the Picture as the Backdrop** then puts it behind the page (Settings → Paper → Backdrop). Like any of your themes, it can be changed color by color after.
 
 - **Colors for** Light or Dark chooses which of its two sets of colors you're changing. The preview above the colors shows that set, as the sidebar, the note list and a note with a tag, a link, code and a callout; lines itself shows the set Light or dark asks for, as you change it.

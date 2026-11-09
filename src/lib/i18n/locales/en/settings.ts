@@ -95,6 +95,9 @@ export default {
   "settings.themeFromPicture": "Made {name} from your picture's colors. Change any of them below.",
   "settings.themePictureBackdrop": "Use the Picture as the Backdrop",
   "settings.themePictureError": "Couldn't read the colors of that picture. Try a JPEG, PNG or WebP.",
+  "settings.themeNewFromLibrary": "From {name}…",
+  "settings.themeFetching": "Getting the picture from {name}…",
+  "settings.themeLibraryError": "Couldn't make a theme of that picture: {name} didn't send it, or it can't be read. Try another.",
   // The name of a theme made from another, until it's renamed.
   "settings.themeCopyName": "{name} Copy",
   "settings.themeImport": "Import",

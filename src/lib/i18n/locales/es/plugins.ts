@@ -129,4 +129,8 @@ export default {
   "typing.sample1": "La mejor manera de escribir más rápido es ir más despacio. Escribe cada palabra con cuidado, mira el texto y no las manos, y deja que la velocidad llegue sola. Primero la precisión; lo demás viene después.",
   "typing.sample2": "El veloz murciélago hindú comía feliz cardillo y kiwi. La cigüeña tocaba el saxofón detrás del palenque de paja. Cada letra del alfabeto está en estas frases, así que cada dedo tiene su turno.",
   "typing.sample3": "Una buena nota es corta y clara. Escribe lo que quieres decir con las palabras con que lo dirías, y léela una vez. Si a una frase le sobra una palabra, quítasela. Mañana agradecerás cada línea clara.",
+  "plugins.wallhaven.description": "/wallhaven: busca fondos de pantalla en Wallhaven y pon uno en una nota, guardado con ella; y haz un tema con sus colores, y el fondo, en Ajustes → Tema → Nuevo. Solo fondos aptos para el trabajo.",
+  "plugins.wallhaven.credit": "Fondos de pantalla de Wallhaven",
+  "plugins.wallhaven.apps": "Necesita la app de lines: el sitio de Wallhaven no responde a las páginas web.",
+  "plugins.wallhaven.wallpaper": "Fondo de pantalla",
 } satisfies Translation<typeof en>;

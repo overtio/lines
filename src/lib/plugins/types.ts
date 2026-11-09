@@ -75,6 +75,8 @@ export interface Contributions {
   keyboardSounds?: KeyboardSound[];
   /** Companions that live in the window, walk about and keep you company as you write (Settings → Mascot). */
   mascots?: Mascot[];
+  /** Pictures on the web to make a theme from, and the backdrop (Settings → Theme → New → From …). */
+  pictureLibraries?: PictureLibrary[];
 }
 
 /** The poses a mascot is drawn in. */
@@ -211,6 +213,43 @@ export interface ShortLinks {
 export interface SearchPage<T> {
   items: T[];
   more: boolean;
+}
+
+/** A picture a library found. */
+export interface FoundImage {
+  id: string;
+  /** A small version, for the picker. */
+  thumb: string;
+  /** Its color while the thumbnail loads, if the library says. */
+  color?: string;
+  /** Who made it, shown over it in the picker. */
+  by?: string;
+  /** Its address and description in the note: `![alt](src)`. */
+  src: string;
+  alt: string;
+}
+
+export interface ImageLibrary {
+  /** As it's known: "Unsplash". */
+  name: string;
+  /** The credit under the picker, linking to the library ("Powered by GIPHY"). */
+  credit: { text: string; href: string };
+  /**
+   * One page (1 for the first) of what `query` finds, or with no query what's featured, and
+   * whether there are more pages.
+   */
+  search(query: string, page: number, signal: AbortSignal): Promise<SearchPage<FoundImage>>;
+  /** Told which picture went in the note, for libraries that count them (Unsplash). */
+  chosen?(image: FoundImage): void;
+}
+
+/**
+ * A library whose pictures can be had whole, not only shown from it: a picture chosen in a note is
+ * kept with it, and one can be a theme's colors and the backdrop (Settings → Theme → New).
+ */
+export interface PictureLibrary extends ImageLibrary {
+  /** The picture itself, as large as the library has it. */
+  picture(image: FoundImage, signal?: AbortSignal): Promise<Blob>;
 }
 
 /** A research paper, as a source found it. */

@@ -1,10 +1,10 @@
 import { describe, expect, mock, test } from "bun:test";
+import { stubApp } from "./stubs";
 import { readPack } from "../../src/lib/sounds/mechvibes";
 import type { NoteLanguage } from "../../src/lib/plugins/types";
 
-// What these modules import for the app (messages, the platform, printing), which they don't need here.
-mock.module("../../src/lib/i18n/index.svelte", () => ({ t: (key: string) => key }));
-mock.module("../../src/lib/platform", () => ({ isTauri: false, isDesktopApp: false, isApple: false, download() {}, saveFile() {} }));
+stubApp();
+// Printing, which these modules import for the app and don't need here.
 mock.module("../../src/lib/print/parts", () => ({ el: () => null }));
 const { plainLine } = await import("../../src/lib/notes/stats");
 const { code } = await import("../../src/plugins/code");

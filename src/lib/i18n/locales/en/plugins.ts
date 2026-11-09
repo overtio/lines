@@ -136,4 +136,8 @@ export default {
   "typing.sample1": "The best way to type faster is to slow down. Type each word cleanly, keep your eyes on the text rather than your hands, and let the speed come on its own. Accuracy first; the rest follows.",
   "typing.sample2": "Sphinx of black quartz, judge my vow! The five boxing wizards jump quickly. How vexingly quick daft zebras jump. Every letter of the alphabet is in each of these, so every finger gets its turn.",
   "typing.sample3": "A good note is short and plain. Write what you mean in the words you would say it in, then read it back once. If a sentence can lose a word, let it go. Tomorrow you will be glad of every clear line.",
+  "plugins.wallhaven.description": "/wallhaven: search Wallhaven's wallpapers and put one in a note, kept with it; and make a theme of one's colors, and the backdrop, in Settings → Theme → New. Only wallpapers safe for work.",
+  "plugins.wallhaven.credit": "Wallpapers from Wallhaven",
+  "plugins.wallhaven.apps": "Needs the lines app: Wallhaven's site doesn't answer web pages.",
+  "plugins.wallhaven.wallpaper": "Wallpaper",
 };
