@@ -32,8 +32,9 @@ pub async fn open_attachment(app: AppHandle, request: tauri::ipc::Request<'_>) -
     .and_then(|path| open(&path))
 }
 
+/// Opens a file or folder in its app (a folder in Finder), or shows it in Finder if it runs something.
 #[cfg(desktop)]
-fn open(path: &Path) -> Result<(), String> {
+pub(crate) fn open(path: &Path) -> Result<(), String> {
   let runs = path.extension().is_some_and(|ext| RUNS.contains(&ext.to_string_lossy().to_lowercase().as_str()));
   if runs {
     tauri_plugin_opener::reveal_item_in_dir(path)
@@ -44,7 +45,7 @@ fn open(path: &Path) -> Result<(), String> {
 }
 
 #[cfg(mobile)]
-fn open(_path: &Path) -> Result<(), String> {
+pub(crate) fn open(_path: &Path) -> Result<(), String> {
   Err("Opening attachments isn't supported here".into())
 }
 

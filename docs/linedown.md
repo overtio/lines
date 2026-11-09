@@ -29,6 +29,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Secret | `{{github}}` | No (shown as written; the value is in a locked note) |
 | Math | `$x^2$`, `$$` … `$$`, ` ```math ` code block | GitHub, GitLab, Obsidian, Pandoc |
 | Attachment | `![](../attachments/<hash>.png)`, `[Name.pdf](../attachments/<hash>.pdf)` | Yes (relative links) |
+| Folder or file on this computer | `[Projects](file:///Users/me/Projects/)`, `[Plan](file:///Users/me/plan.pdf)` | Yes (file URLs; Obsidian, VS Code and Typora open them too) |
 | Copyable value | `Key: Value` lines | Yes (plain text, read specially) |
 | GitHub link | `https://github.com/owner/repo/issues/12` | Yes (an ordinary link, drawn short) |
 | Terminal recording | `[![asciicast](https://asciinema.org/a/<id>.svg)](https://asciinema.org/a/<id>)`, `[demo.cast](../attachments/<hash>.cast)` | Yes (asciinema's embed code: a linked image; a link) |
@@ -276,6 +277,15 @@ A recording of a terminal from [asciinema](https://asciinema.org) plays in the n
 - Clicking it plays it, and it's selected, moved and deleted as an image is: ↑ and ↓ stop on it, and Backspace after it selects it. With it selected, Enter plays it. In the player Space pauses, ← and → skip 5 seconds, a number jumps to that tenth of it, F is full screen, and Esc goes back to the note's text with it selected.
 - Like images, recordings are drawn at the top level and in cards. Within a line of text, in a list or in a quote, they're the picture or link they're written as. A link to an asciinema.org page is a link: only the embed code plays.
 - Printed, a recording from asciinema.org is its preview, linked to it; a `.cast` file is its name.
+
+## Folders and files on your computer
+
+A link to a `file://` address leads to a folder or a file on this computer, kept where it is rather than in the note: `[Projects](file:///Users/me/Projects/)`, a folder's address ending in `/`. It's drawn with a folder's or a file's icon before its text, its path shown on pointing at it.
+
+- **Making one:** in lines for Mac, drop a folder from Finder onto a note (files dropped are attached, as always, and a folder among them is a link), or type `/folder` and choose one. The link is named after the folder, and written as an address needs it: `file:///Users/me/My%20Projects/`.
+- **Following one** (as Settings → Editor → Links says for links, ⌘-click to begin with): in the desktop apps, a folder opens in Finder (the system's file manager elsewhere) and a file in its app; one that runs something (an app, a script) is shown in Finder instead, as attached files are. If it isn't there any more, lines says so. A web page can't open what's on a computer, so on the web following one copies its path.
+- In LaTeX notes it's `\href{file:///Users/me/Projects/}{Projects}`, drawn and followed the same way, and dropped folders and `/folder` write that.
+- Synced to another device, a link leads to the same path there, which may not be.
 
 ## Links drawn short
 

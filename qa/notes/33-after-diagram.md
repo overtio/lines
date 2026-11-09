@@ -515,7 +515,16 @@ flowchart LR
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Diagram, then Attached 3D model (STL)
+#### 41. Diagram, then Folder and file links
+
+```mermaid
+flowchart LR
+  A[Start] --> B{Choice}
+  B --> C[Done]
+```
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Diagram, then Attached 3D model (STL)
 
 ```mermaid
 flowchart LR
@@ -524,7 +533,7 @@ flowchart LR
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Diagram, then Terminal recording (.cast file)
+#### 43. Diagram, then Terminal recording (.cast file)
 
 ```mermaid
 flowchart LR
@@ -533,7 +542,7 @@ flowchart LR
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Diagram, then Audio
+#### 44. Diagram, then Audio
 
 ```mermaid
 flowchart LR
@@ -542,7 +551,7 @@ flowchart LR
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Diagram, then Video
+#### 45. Diagram, then Video
 
 ```mermaid
 flowchart LR
@@ -551,7 +560,7 @@ flowchart LR
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Diagram, then Missing file
+#### 46. Diagram, then Missing file
 
 ```mermaid
 flowchart LR
@@ -560,7 +569,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Diagram, then Card
+#### 47. Diagram, then Card
 
 ```mermaid
 flowchart LR
@@ -571,7 +580,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 47. Diagram, then Callout (info)
+#### 48. Diagram, then Callout (info)
 
 ```mermaid
 flowchart LR
@@ -582,7 +591,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 48. Diagram, then Callout (warning, chosen icon)
+#### 49. Diagram, then Callout (warning, chosen icon)
 
 ```mermaid
 flowchart LR
@@ -593,7 +602,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Diagram, then Callout (decision, no icon)
+#### 50. Diagram, then Callout (decision, no icon)
 
 ```mermaid
 flowchart LR

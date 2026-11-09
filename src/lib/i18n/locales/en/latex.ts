@@ -32,6 +32,8 @@ export default {
   "latex.slash.image.keywords": "picture photo screenshot upload figure",
   "latex.slash.file": "File",
   "latex.slash.file.keywords": "attach attachment upload document pdf",
+  "latex.slash.folder": "Folder link",
+  "latex.slash.folder.keywords": "folder directory finder path local computer link open",
   "latex.slash.footnote": "Footnote",
   "latex.slash.footnote.keywords": "note aside",
   "latex.slash.link": "Link",

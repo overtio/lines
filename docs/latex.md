@@ -73,6 +73,7 @@ The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.
 - Pasting and dropping work as in Markdown notes, written as LaTeX:
   - Rows copied from a spreadsheet, pgAdmin or a web page become a `tabular`, lined up in the LaTeX, with the first row over a `\hline` and number columns right-aligned. Special characters in cells are escaped (`well_id` → `well\_id`). Undo once for the text as copied.
   - An image becomes `\includegraphics[width=\linewidth]{../attachments/…}`; any other file `\href{../attachments/…}{Name.pdf}`. `/image` and `/file` choose them from the device.
+  - A folder dropped from Finder, or chosen with `/folder` (lines for Mac), is a link to it where it is: `\href{file:///Users/me/Projects/}{Projects}` ([linedown.md](linedown.md#folders-and-files-on-your-computer)).
   - The link to an Unsplash photo, pasted on an empty line, becomes `\includegraphics{…}` showing the photo.
   - A terminal recording's link (asciinema) stays a link, and a `.cast` file is a file's `\href`: recordings play in Markdown notes only, as a paper can't hold one.
   - A web address pasted over selected text links it: `\href{https://…}{text}`.

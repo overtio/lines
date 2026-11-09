@@ -86,6 +86,35 @@ export async function saveFile(filename: string, data: Uint8Array<ArrayBuffer>, 
   return invoke<string>("save_export", data, { headers: { "x-file-name": encodeURIComponent(filename) } });
 }
 
+/** The paths of what was last dragged from Finder, which a page isn't told (the Mac app); none elsewhere. */
+export async function droppedPaths(): Promise<string[]> {
+  if (!isMacApp) return [];
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<string[]>("dropped_paths");
+}
+
+/** A folder chosen with the system's picker, to link to (the Mac app), `prompt` on its button and `message` above. */
+export async function pickLinkFolder(prompt: string, message: string): Promise<string | null> {
+  if (!isMacApp) return null;
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<string | null>("pick_link_folder", { prompt, message });
+}
+
+/**
+ * Opens a folder or file on this computer (a note's link to it) in the desktop apps: a folder in
+ * Finder, a file in its app. Whether it did, or the path isn't there, or nothing here can open one.
+ */
+export async function openPath(path: string): Promise<"opened" | "missing" | "unavailable"> {
+  if (!isDesktopApp) return "unavailable";
+  const { invoke } = await import("@tauri-apps/api/core");
+  try {
+    await invoke("open_local", { path });
+    return "opened";
+  } catch {
+    return "missing";
+  }
+}
+
 /** Shows a saved file in Finder (or the system's file manager). */
 export async function revealFile(path: string) {
   const { revealItemInDir } = await import("@tauri-apps/plugin-opener");

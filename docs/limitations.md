@@ -143,6 +143,13 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Only an image on a line of its own (in a note or a card) has a resize handle; one within text, a list or a quote takes a width written in its Markdown but can't be dragged. Images in LaTeX notes can't be resized yet (`\includegraphics[width=…]` is shown at the image's own size).
 - A width is in pixels and a height is ignored, so an image always keeps its shape.
 
+## Folders and files on your computer
+
+- Dropping a folder to link to it, and `/folder`, are in lines for Mac only: a page isn't told where a dropped folder is, and the Windows and Linux apps don't ask the system yet. Their links open in the Windows and Linux apps too.
+- On the web and on phones a link to the computer can't be opened; following one copies its path.
+- A link leads to a path: moved or renamed, the folder isn't followed, and on another device the path may lead nowhere.
+- Not tried yet with folders on network drives, or dropped from apps other than Finder.
+
 ## Audio and video
 
 - Which files play is the browser's choice: AIFF plays only in Safari and the Mac app, a `.mov` from an iPhone only where the browser can decode HEVC, and MKV and AVI aren't played at all. Those show as a file's card, to open in another app.

@@ -555,7 +555,17 @@ Total, =SUM(B2:B3)
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Spreadsheet (csv block), then Attached 3D model (STL)
+#### 41. Spreadsheet (csv block), then Folder and file links
+
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Spreadsheet (csv block), then Attached 3D model (STL)
 
 ```csv
 Item, Cost
@@ -565,7 +575,7 @@ Total, =SUM(B2:B3)
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Spreadsheet (csv block), then Terminal recording (.cast file)
+#### 43. Spreadsheet (csv block), then Terminal recording (.cast file)
 
 ```csv
 Item, Cost
@@ -575,7 +585,7 @@ Total, =SUM(B2:B3)
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Spreadsheet (csv block), then Audio
+#### 44. Spreadsheet (csv block), then Audio
 
 ```csv
 Item, Cost
@@ -585,7 +595,7 @@ Total, =SUM(B2:B3)
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Spreadsheet (csv block), then Video
+#### 45. Spreadsheet (csv block), then Video
 
 ```csv
 Item, Cost
@@ -595,7 +605,7 @@ Total, =SUM(B2:B3)
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Spreadsheet (csv block), then Missing file
+#### 46. Spreadsheet (csv block), then Missing file
 
 ```csv
 Item, Cost
@@ -605,7 +615,7 @@ Total, =SUM(B2:B3)
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Spreadsheet (csv block), then Card
+#### 47. Spreadsheet (csv block), then Card
 
 ```csv
 Item, Cost
@@ -617,7 +627,7 @@ Total, =SUM(B2:B3)
 Text in a card.
 :::
 
-#### 47. Spreadsheet (csv block), then Callout (info)
+#### 48. Spreadsheet (csv block), then Callout (info)
 
 ```csv
 Item, Cost
@@ -629,7 +639,7 @@ Total, =SUM(B2:B3)
 Text in an info callout.
 :::
 
-#### 48. Spreadsheet (csv block), then Callout (warning, chosen icon)
+#### 49. Spreadsheet (csv block), then Callout (warning, chosen icon)
 
 ```csv
 Item, Cost
@@ -641,7 +651,7 @@ Total, =SUM(B2:B3)
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Spreadsheet (csv block), then Callout (decision, no icon)
+#### 50. Spreadsheet (csv block), then Callout (decision, no icon)
 
 ```csv
 Item, Cost

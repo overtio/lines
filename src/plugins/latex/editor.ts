@@ -4,7 +4,8 @@ import { EditorSelection, type EditorState, type Extension, Prec, type Range, ty
 import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
 import { locale, t } from "../../lib/i18n/index.svelte";
 import { DOCUMENT_BEGIN, latexEscape, latexLine, latexText, preambleField } from "./text";
-import { type AttachmentWriter, attachmentPasting, choose, mediaBlock } from "../../lib/editor/attachments";
+import { type AttachmentWriter, attachmentPasting, choose, chooseFolder, mediaBlock } from "../../lib/editor/attachments";
+import { isMacApp } from "../../lib/platform";
 import { mediaPlayers } from "../../lib/editor/media";
 import { mediaLink } from "../../lib/notes/attachments";
 import { type Definitions, type Env, LIST_ENVS, scanLatex, type Span, type Table } from "./syntax";
@@ -21,6 +22,7 @@ import { pageBreakAt, pagedNote } from "../../lib/editor/pageBreaks";
 import { LATEX_PAGE_BREAK } from "../../lib/notes/pageBreak";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
 import { type PaperLink, paperCommands } from "../../lib/editor/papers";
+import { linkAttributes, localIcon } from "../../lib/editor/localLinks";
 import { shortLink, ShortLinkWidget } from "../../lib/editor/shortLinks";
 import { plugins } from "../../lib/plugins/registry.svelte";
 import { type MarkdownMode, prefs } from "../../lib/prefs.svelte";
@@ -496,7 +498,10 @@ function build(state: EditorState, visible?: { from: number; to: number }): Deco
           break;
         }
         if (short) add(Decoration.widget({ widget: new ShortLinkWidget(span.href, short.mark, ""), side: -1 }).range(span.textFrom));
-        mark(span.textFrom, span.textTo, "cm-lp-link", { "data-href": span.href });
+        // A folder or file on this computer: its icon in front.
+        const local = !touches(span.from, span.to) && localIcon(span.href);
+        if (local) add(local.range(span.textFrom));
+        mark(span.textFrom, span.textTo, "cm-lp-link", linkAttributes(span.href));
         markup(touches(span.from, span.to), [span.from, span.textFrom], [span.textTo, span.to]);
         break;
       }
@@ -907,7 +912,7 @@ const latexKeymap = Prec.high(
 
 const { format: FORMAT, insert: INSERT } = SECTIONS;
 
-type SlashName = "section" | "subsection" | "subsubsection" | "bullets" | "numbers" | "quote" | "math" | "equations" | "code" | "table" | "image" | "file" | "footnote" | "link" | "date";
+type SlashName = "section" | "subsection" | "subsubsection" | "bullets" | "numbers" | "quote" | "math" | "equations" | "code" | "table" | "image" | "file" | "folder" | "footnote" | "link" | "date";
 
 /** A "/" command, named and found by its messages (`latex.slash.<name>` and its keywords). */
 const command = (name: SlashName, hint: string, icon: SlashCommand["icon"], section: CompletionSection, apply: SlashCommand["apply"]): SlashCommand => ({
@@ -933,6 +938,7 @@ const COMMANDS: SlashCommand[] = [
   command("table", "tabular", "table", INSERT, insert("\\begin{tabular}{ll}\n  | &  \\\\\n   &  \\\\\n\\end{tabular}", true)),
   command("image", "\\includegraphics", "image", INSERT, choose("image/*", latexWriter)),
   command("file", "\\href", "paperclip", INSERT, choose("", latexWriter)),
+  ...(isMacApp ? [command("folder", "\\href", "folder", INSERT, chooseFolder(latexWriter))] : []),
   command("footnote", "\\footnote", "message-circle", INSERT, insert("\\footnote{|}")),
   command("link", "\\href", "link", INSERT, insert("\\href{https://}{|}")),
   command("date", t("latex.slash.date.hint"), "calendar", INSERT, insert(() => new Date().toLocaleDateString(locale, { dateStyle: "long" }))),

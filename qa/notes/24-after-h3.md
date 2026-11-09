@@ -355,53 +355,58 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ### Heading three
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Heading 3, then Attached 3D model (STL)
+#### 41. Heading 3, then Folder and file links
+
+### Heading three
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Heading 3, then Attached 3D model (STL)
 
 ### Heading three
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Heading 3, then Terminal recording (.cast file)
+#### 43. Heading 3, then Terminal recording (.cast file)
 
 ### Heading three
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Heading 3, then Audio
+#### 44. Heading 3, then Audio
 
 ### Heading three
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Heading 3, then Video
+#### 45. Heading 3, then Video
 
 ### Heading three
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Heading 3, then Missing file
+#### 46. Heading 3, then Missing file
 
 ### Heading three
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Heading 3, then Card
+#### 47. Heading 3, then Card
 
 ### Heading three
 ::: card
 Text in a card.
 :::
 
-#### 47. Heading 3, then Callout (info)
+#### 48. Heading 3, then Callout (info)
 
 ### Heading three
 :::i
 Text in an info callout.
 :::
 
-#### 48. Heading 3, then Callout (warning, chosen icon)
+#### 49. Heading 3, then Callout (warning, chosen icon)
 
 ### Heading three
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Heading 3, then Callout (decision, no icon)
+#### 50. Heading 3, then Callout (decision, no icon)
 
 ### Heading three
 :::^ icon=none

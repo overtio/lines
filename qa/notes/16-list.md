@@ -395,37 +395,43 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
 
   [Budget.csv](attachment:budget.csv)
 
-#### 41. Attached 3D model (STL) in a list item
+#### 41. Folder and file links in a list item
+
+- List item
+
+  See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Attached 3D model (STL) in a list item
 
 - List item
 
   [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Terminal recording (.cast file) in a list item
+#### 43. Terminal recording (.cast file) in a list item
 
 - List item
 
   [terminal.cast](attachment:terminal.cast)
 
-#### 43. Audio in a list item (stays Markdown here)
+#### 44. Audio in a list item (stays Markdown here)
 
 - List item
 
   [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Video in a list item (stays Markdown here)
+#### 45. Video in a list item (stays Markdown here)
 
 - List item
 
   [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Missing file in a list item (stays Markdown here)
+#### 46. Missing file in a list item (stays Markdown here)
 
 - List item
 
   [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Card in a list item
+#### 47. Card in a list item
 
 - List item
 
@@ -433,7 +439,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a card.
   :::
 
-#### 47. Callout (info) in a list item
+#### 48. Callout (info) in a list item
 
 - List item
 
@@ -441,7 +447,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in an info callout.
   :::
 
-#### 48. Callout (warning, chosen icon) in a list item
+#### 49. Callout (warning, chosen icon) in a list item
 
 - List item
 
@@ -449,7 +455,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a warning callout with the flag icon.
   :::
 
-#### 49. Callout (decision, no icon) in a list item
+#### 50. Callout (decision, no icon) in a list item
 
 - List item
 

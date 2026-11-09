@@ -435,42 +435,49 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 41. JSON block (no language), then Attached 3D model (STL)
+#### 41. JSON block (no language), then Folder and file links
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. JSON block (no language), then Attached 3D model (STL)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. JSON block (no language), then Terminal recording (.cast file)
+#### 43. JSON block (no language), then Terminal recording (.cast file)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. JSON block (no language), then Audio
+#### 44. JSON block (no language), then Audio
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. JSON block (no language), then Video
+#### 45. JSON block (no language), then Video
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. JSON block (no language), then Missing file
+#### 46. JSON block (no language), then Missing file
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. JSON block (no language), then Card
+#### 47. JSON block (no language), then Card
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -479,7 +486,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 47. JSON block (no language), then Callout (info)
+#### 48. JSON block (no language), then Callout (info)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -488,7 +495,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 48. JSON block (no language), then Callout (warning, chosen icon)
+#### 49. JSON block (no language), then Callout (warning, chosen icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -497,7 +504,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. JSON block (no language), then Callout (decision, no icon)
+#### 50. JSON block (no language), then Callout (decision, no icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}

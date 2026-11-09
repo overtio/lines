@@ -26,6 +26,8 @@ export default {
   "latex.slash.image.keywords": "photo capture importer figure",
   "latex.slash.file": "Fichier",
   "latex.slash.file.keywords": "joindre pièce jointe importer document",
+  "latex.slash.folder": "Lien vers un dossier",
+  "latex.slash.folder.keywords": "dossier répertoire finder chemin local ordinateur lien ouvrir",
   "latex.slash.footnote": "Note de bas de page",
   "latex.slash.footnote.keywords": "note",
   "latex.slash.link": "Lien",

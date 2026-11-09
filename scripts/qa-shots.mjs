@@ -110,6 +110,7 @@ const SCENES = [
     schemes: ["light"],
   })),
   { id: "dark-panes-pixel", title: "Dark panes in Pixel", look: "Pixel's 2px lines light in the dark panes, dark in the note.", prefs: { darkPanes: "both", style: "pixel", theme: "pixel" }, note: PROSE, schemes: ["light"] },
+  { id: "folder-links", title: "Links to a folder and a file on the computer", look: "A folder's icon before Projects and a file's before the plan, in the link's color, lined up with the text.", note: "Work is in [Projects](file:///Users/me/My%20Projects/), and [the plan](file:///Users/me/plan.pdf) says what's next.\n\nEnd", act: (page) => page.evaluate(() => window.testing.place()), shoot: ".editor-pane" },
   { id: "heading-accent", title: "Headings in the accent", look: "Every heading in the accent; h6 not muted.", prefs: { headingColor: "accent" }, note: "# Heading one\n\n## Heading two\n\n### Heading three\n\nText under them." },
   ...["block", "underline", "thick"].map((shape) => ({
     id: `cursor-${shape}`,

@@ -635,7 +635,19 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Timing diagram (wavedrom block), then Attached 3D model (STL)
+#### 41. Timing diagram (wavedrom block), then Folder and file links
+
+```wavedrom
+{ signal: [
+  { name: "clk", wave: "p.....|..." },
+  { name: "data", wave: "x.345x|=.x", data: ["head", "body", "tail", "data"] },
+  {},
+  { name: "ack", wave: "1.....|01.", node: ".a......b" }
+], edge: ["a~>b t1"] }
+```
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Timing diagram (wavedrom block), then Attached 3D model (STL)
 
 ```wavedrom
 { signal: [
@@ -647,7 +659,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Timing diagram (wavedrom block), then Terminal recording (.cast file)
+#### 43. Timing diagram (wavedrom block), then Terminal recording (.cast file)
 
 ```wavedrom
 { signal: [
@@ -659,7 +671,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Timing diagram (wavedrom block), then Audio
+#### 44. Timing diagram (wavedrom block), then Audio
 
 ```wavedrom
 { signal: [
@@ -671,7 +683,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Timing diagram (wavedrom block), then Video
+#### 45. Timing diagram (wavedrom block), then Video
 
 ```wavedrom
 { signal: [
@@ -683,7 +695,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Timing diagram (wavedrom block), then Missing file
+#### 46. Timing diagram (wavedrom block), then Missing file
 
 ```wavedrom
 { signal: [
@@ -695,7 +707,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Timing diagram (wavedrom block), then Card
+#### 47. Timing diagram (wavedrom block), then Card
 
 ```wavedrom
 { signal: [
@@ -709,7 +721,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 47. Timing diagram (wavedrom block), then Callout (info)
+#### 48. Timing diagram (wavedrom block), then Callout (info)
 
 ```wavedrom
 { signal: [
@@ -723,7 +735,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 48. Timing diagram (wavedrom block), then Callout (warning, chosen icon)
+#### 49. Timing diagram (wavedrom block), then Callout (warning, chosen icon)
 
 ```wavedrom
 { signal: [
@@ -737,7 +749,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Timing diagram (wavedrom block), then Callout (decision, no icon)
+#### 50. Timing diagram (wavedrom block), then Callout (decision, no icon)
 
 ```wavedrom
 { signal: [

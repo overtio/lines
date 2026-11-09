@@ -635,7 +635,19 @@ After it, on a new page.
 And another.
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Attached 3D model (STL)
+#### 41. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Folder and file links
+
+Before the break.
+
+<!-- pagebreak -->
+After it, on a new page.
+
+<div style="page-break-after: always"></div>
+
+And another.
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Attached 3D model (STL)
 
 Before the break.
 
@@ -647,7 +659,7 @@ After it, on a new page.
 And another.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Terminal recording (.cast file)
+#### 43. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Terminal recording (.cast file)
 
 Before the break.
 
@@ -659,7 +671,7 @@ After it, on a new page.
 And another.
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Audio
+#### 44. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Audio
 
 Before the break.
 
@@ -671,7 +683,7 @@ After it, on a new page.
 And another.
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Video
+#### 45. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Video
 
 Before the break.
 
@@ -683,7 +695,7 @@ After it, on a new page.
 And another.
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Missing file
+#### 46. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Missing file
 
 Before the break.
 
@@ -695,7 +707,7 @@ After it, on a new page.
 And another.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Card
+#### 47. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Card
 
 Before the break.
 
@@ -709,7 +721,7 @@ And another.
 Text in a card.
 :::
 
-#### 47. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Callout (info)
+#### 48. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Callout (info)
 
 Before the break.
 
@@ -723,7 +735,7 @@ And another.
 Text in an info callout.
 :::
 
-#### 48. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Callout (warning, chosen icon)
+#### 49. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Callout (warning, chosen icon)
 
 Before the break.
 
@@ -737,7 +749,7 @@ And another.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Callout (decision, no icon)
+#### 50. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop), then Callout (decision, no icon)
 
 Before the break.
 

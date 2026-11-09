@@ -515,7 +515,16 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Bullet list, then Attached 3D model (STL)
+#### 41. Bullet list, then Folder and file links
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Bullet list, then Attached 3D model (STL)
 
 - First item
 - Second item
@@ -524,7 +533,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Bullet list, then Terminal recording (.cast file)
+#### 43. Bullet list, then Terminal recording (.cast file)
 
 - First item
 - Second item
@@ -533,7 +542,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Bullet list, then Audio
+#### 44. Bullet list, then Audio
 
 - First item
 - Second item
@@ -542,7 +551,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Bullet list, then Video
+#### 45. Bullet list, then Video
 
 - First item
 - Second item
@@ -551,7 +560,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Bullet list, then Missing file
+#### 46. Bullet list, then Missing file
 
 - First item
 - Second item
@@ -560,7 +569,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Bullet list, then Card
+#### 47. Bullet list, then Card
 
 - First item
 - Second item
@@ -571,7 +580,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 47. Bullet list, then Callout (info)
+#### 48. Bullet list, then Callout (info)
 
 - First item
 - Second item
@@ -582,7 +591,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 48. Bullet list, then Callout (warning, chosen icon)
+#### 49. Bullet list, then Callout (warning, chosen icon)
 
 - First item
 - Second item
@@ -593,7 +602,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Bullet list, then Callout (decision, no icon)
+#### 50. Bullet list, then Callout (decision, no icon)
 
 - First item
 - Second item

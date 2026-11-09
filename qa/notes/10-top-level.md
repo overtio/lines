@@ -315,45 +315,49 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Attached 3D model (STL) at the top level
+#### 41. Folder and file links at the top level
+
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Attached 3D model (STL) at the top level
 
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Terminal recording (.cast file) at the top level
+#### 43. Terminal recording (.cast file) at the top level
 
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Audio at the top level
+#### 44. Audio at the top level
 
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Video at the top level
+#### 45. Video at the top level
 
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Missing file at the top level
+#### 46. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Card at the top level
+#### 47. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 47. Callout (info) at the top level
+#### 48. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 48. Callout (warning, chosen icon) at the top level
+#### 49. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Callout (decision, no icon) at the top level
+#### 50. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

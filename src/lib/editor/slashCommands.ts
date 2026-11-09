@@ -20,7 +20,8 @@ import type { IconName } from "../icons/icons";
 import { locale, type MessageKey, t } from "../i18n/index.svelte";
 import english from "../i18n/locales/en/editor";
 import { CALLOUTS, type CalloutKind, insertCard } from "./cards";
-import { chooseFiles, chooseImages } from "./attachments";
+import { isMacApp } from "../platform";
+import { chooseFiles, chooseFolder, chooseImages } from "./attachments";
 import { newDrawing } from "./drawings";
 import { editProperties, type IconCompletion, mentionKeys, mentionSource } from "./objects";
 import { insertTable } from "./tables";
@@ -157,6 +158,8 @@ const COMMANDS: SlashCommand[] = [
   { ...named("editor.slash.table"), hint: "| |", icon: "table", section: INSERT, apply: insertTable },
   { ...named("editor.slash.image"), hint: "![]()", icon: "image", section: INSERT, apply: chooseImages },
   { ...named("editor.slash.file"), hint: "[]()", icon: "paperclip", section: INSERT, apply: chooseFiles },
+  // Where there's a folder picker to choose one with.
+  ...(isMacApp ? [{ ...named("editor.slash.folder"), hint: "file://", icon: "folder" as const, section: INSERT, apply: chooseFolder() }] : []),
   { ...named("editor.slash.drawing"), hint: "Excalidraw", icon: "pencil", section: INSERT, apply: newDrawing },
   { ...named("editor.slash.divider"), hint: "---", icon: "minus", section: INSERT, apply: insert("---\n", true) },
   { ...named("editor.slash.pageBreak"), hint: "<!-- -->", icon: "square-split-vertical", section: INSERT, apply: insert(`${PAGE_BREAK}\n`, true) },

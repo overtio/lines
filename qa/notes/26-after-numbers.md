@@ -475,7 +475,15 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Numbered list, then Attached 3D model (STL)
+#### 41. Numbered list, then Folder and file links
+
+1. First
+2. Second
+   1. Nested
+3. Third
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Numbered list, then Attached 3D model (STL)
 
 1. First
 2. Second
@@ -483,7 +491,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Numbered list, then Terminal recording (.cast file)
+#### 43. Numbered list, then Terminal recording (.cast file)
 
 1. First
 2. Second
@@ -491,7 +499,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Numbered list, then Audio
+#### 44. Numbered list, then Audio
 
 1. First
 2. Second
@@ -499,7 +507,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Numbered list, then Video
+#### 45. Numbered list, then Video
 
 1. First
 2. Second
@@ -507,7 +515,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Numbered list, then Missing file
+#### 46. Numbered list, then Missing file
 
 1. First
 2. Second
@@ -515,7 +523,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Numbered list, then Card
+#### 47. Numbered list, then Card
 
 1. First
 2. Second
@@ -525,7 +533,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 47. Numbered list, then Callout (info)
+#### 48. Numbered list, then Callout (info)
 
 1. First
 2. Second
@@ -535,7 +543,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 48. Numbered list, then Callout (warning, chosen icon)
+#### 49. Numbered list, then Callout (warning, chosen icon)
 
 1. First
 2. Second
@@ -545,7 +553,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Numbered list, then Callout (decision, no icon)
+#### 50. Numbered list, then Callout (decision, no icon)
 
 1. First
 2. Second

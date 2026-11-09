@@ -475,7 +475,15 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Table, then Attached 3D model (STL)
+#### 41. Table, then Folder and file links
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Table, then Attached 3D model (STL)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -483,7 +491,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Table, then Terminal recording (.cast file)
+#### 43. Table, then Terminal recording (.cast file)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -491,7 +499,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Table, then Audio
+#### 44. Table, then Audio
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -499,7 +507,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Table, then Video
+#### 45. Table, then Video
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -507,7 +515,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Table, then Missing file
+#### 46. Table, then Missing file
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -515,7 +523,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Table, then Card
+#### 47. Table, then Card
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -525,7 +533,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 47. Table, then Callout (info)
+#### 48. Table, then Callout (info)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -535,7 +543,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 48. Table, then Callout (warning, chosen icon)
+#### 49. Table, then Callout (warning, chosen icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -545,7 +553,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Table, then Callout (decision, no icon)
+#### 50. Table, then Callout (decision, no icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |

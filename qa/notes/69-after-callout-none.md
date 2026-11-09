@@ -435,42 +435,49 @@ Text in a decision callout with no icon.
 :::
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Callout (decision, no icon), then Attached 3D model (STL)
+#### 41. Callout (decision, no icon), then Folder and file links
+
+:::^ icon=none
+Text in a decision callout with no icon.
+:::
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Callout (decision, no icon), then Attached 3D model (STL)
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Callout (decision, no icon), then Terminal recording (.cast file)
+#### 43. Callout (decision, no icon), then Terminal recording (.cast file)
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Callout (decision, no icon), then Audio
+#### 44. Callout (decision, no icon), then Audio
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Callout (decision, no icon), then Video
+#### 45. Callout (decision, no icon), then Video
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Callout (decision, no icon), then Missing file
+#### 46. Callout (decision, no icon), then Missing file
 
 :::^ icon=none
 Text in a decision callout with no icon.
 :::
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Callout (decision, no icon), then Card
+#### 47. Callout (decision, no icon), then Card
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -479,7 +486,7 @@ Text in a decision callout with no icon.
 Text in a card.
 :::
 
-#### 47. Callout (decision, no icon), then Callout (info)
+#### 48. Callout (decision, no icon), then Callout (info)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -488,7 +495,7 @@ Text in a decision callout with no icon.
 Text in an info callout.
 :::
 
-#### 48. Callout (decision, no icon), then Callout (warning, chosen icon)
+#### 49. Callout (decision, no icon), then Callout (warning, chosen icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.
@@ -497,7 +504,7 @@ Text in a decision callout with no icon.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Callout (decision, no icon), then Callout (decision, no icon)
+#### 50. Callout (decision, no icon), then Callout (decision, no icon)
 
 :::^ icon=none
 Text in a decision callout with no icon.

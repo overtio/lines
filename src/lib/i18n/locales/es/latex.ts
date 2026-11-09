@@ -26,6 +26,8 @@ export default {
   "latex.slash.image.keywords": "foto captura subir figura",
   "latex.slash.file": "Archivo",
   "latex.slash.file.keywords": "adjuntar adjunto subir documento",
+  "latex.slash.folder": "Enlace a carpeta",
+  "latex.slash.folder.keywords": "carpeta directorio finder ruta local ordenador enlace abrir",
   "latex.slash.footnote": "Nota al pie",
   "latex.slash.footnote.keywords": "nota",
   "latex.slash.link": "Enlace",

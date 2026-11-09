@@ -395,37 +395,43 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 41. Attached 3D model (STL) in a card
+#### 41. Folder and file links in a card
+
+::: card
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+:::
+
+#### 42. Attached 3D model (STL) in a card
 
 ::: card
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 42. Terminal recording (.cast file) in a card
+#### 43. Terminal recording (.cast file) in a card
 
 ::: card
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 43. Audio in a card
+#### 44. Audio in a card
 
 ::: card
 [Chime.mp3](attachment:chime.mp3)
 :::
 
-#### 44. Video in a card
+#### 45. Video in a card
 
 ::: card
 [Sky.mp4](attachment:sky.mp4)
 :::
 
-#### 45. Missing file in a card
+#### 46. Missing file in a card
 
 ::: card
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 46. Card in a card
+#### 47. Card in a card
 
 ::: card
 ::: card
@@ -433,7 +439,7 @@ Text in a card.
 :::
 :::
 
-#### 47. Callout (info) in a card
+#### 48. Callout (info) in a card
 
 ::: card
 :::i
@@ -441,7 +447,7 @@ Text in an info callout.
 :::
 :::
 
-#### 48. Callout (warning, chosen icon) in a card
+#### 49. Callout (warning, chosen icon) in a card
 
 ::: card
 :::! icon=flag
@@ -449,7 +455,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 49. Callout (decision, no icon) in a card
+#### 50. Callout (decision, no icon) in a card
 
 ::: card
 :::^ icon=none

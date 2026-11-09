@@ -26,6 +26,7 @@ import {
 } from "./cards";
 import { FormatWidget, formatterFor } from "./formatCode";
 import { drawnAsBlock, imageElement } from "./attachments";
+import { linkAttributes, localIcon } from "./localLinks";
 import { shortLink, ShortLinkWidget, type ShortLink } from "./shortLinks";
 import { CopyWidget, keyValue } from "./keyValue";
 import { InlineMathWidget } from "./math";
@@ -411,7 +412,10 @@ function build(view: EditorView): DecorationSet {
             if (doc.sliceString(textFrom, textTo) === href) return shortChip(node.from, node.to, href, short);
             decos.push(Decoration.widget({ widget: new ShortLinkWidget(href, short.mark, ""), side: -1 }).range(textFrom));
           }
-          mark(textFrom, textTo, "cm-lp-link", { "data-href": href });
+          // A folder or file on this computer: its icon in front.
+          const local = !touches(node.from, node.to) && localIcon(href);
+          if (local) decos.push(local.range(textFrom));
+          mark(textFrom, textTo, "cm-lp-link", linkAttributes(href));
           if (!touches(node.from, node.to)) {
             hide(node.from, textFrom);
             hide(textTo, node.to);
@@ -425,7 +429,9 @@ function build(view: EditorView): DecorationSet {
           const href = doc.sliceString(url.from, url.to);
           const short = !touches(node.from, node.to) && shortLink(href);
           if (short) return shortChip(node.from, node.to, href, short);
-          mark(url.from, url.to, "cm-lp-link", { "data-href": href });
+          const local = !touches(node.from, node.to) && localIcon(href);
+          if (local) decos.push(local.range(url.from));
+          mark(url.from, url.to, "cm-lp-link", linkAttributes(href));
           if (!touches(node.from, node.to)) hideChildren(node, "LinkMark");
           return false;
         }

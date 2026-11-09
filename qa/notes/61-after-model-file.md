@@ -355,53 +355,58 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 [Bracket.stl](attachment:bracket.stl)
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Attached 3D model (STL), then Attached 3D model (STL)
+#### 41. Attached 3D model (STL), then Folder and file links
+
+[Bracket.stl](attachment:bracket.stl)
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Attached 3D model (STL), then Attached 3D model (STL)
 
 [Bracket.stl](attachment:bracket.stl)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Attached 3D model (STL), then Terminal recording (.cast file)
+#### 43. Attached 3D model (STL), then Terminal recording (.cast file)
 
 [Bracket.stl](attachment:bracket.stl)
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Attached 3D model (STL), then Audio
+#### 44. Attached 3D model (STL), then Audio
 
 [Bracket.stl](attachment:bracket.stl)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Attached 3D model (STL), then Video
+#### 45. Attached 3D model (STL), then Video
 
 [Bracket.stl](attachment:bracket.stl)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Attached 3D model (STL), then Missing file
+#### 46. Attached 3D model (STL), then Missing file
 
 [Bracket.stl](attachment:bracket.stl)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Attached 3D model (STL), then Card
+#### 47. Attached 3D model (STL), then Card
 
 [Bracket.stl](attachment:bracket.stl)
 ::: card
 Text in a card.
 :::
 
-#### 47. Attached 3D model (STL), then Callout (info)
+#### 48. Attached 3D model (STL), then Callout (info)
 
 [Bracket.stl](attachment:bracket.stl)
 :::i
 Text in an info callout.
 :::
 
-#### 48. Attached 3D model (STL), then Callout (warning, chosen icon)
+#### 49. Attached 3D model (STL), then Callout (warning, chosen icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Attached 3D model (STL), then Callout (decision, no icon)
+#### 50. Attached 3D model (STL), then Callout (decision, no icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::^ icon=none

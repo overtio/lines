@@ -395,37 +395,43 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 > two lines.
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Quote, then Attached 3D model (STL)
+#### 41. Quote, then Folder and file links
+
+> A quote that runs over
+> two lines.
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Quote, then Attached 3D model (STL)
 
 > A quote that runs over
 > two lines.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Quote, then Terminal recording (.cast file)
+#### 43. Quote, then Terminal recording (.cast file)
 
 > A quote that runs over
 > two lines.
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Quote, then Audio
+#### 44. Quote, then Audio
 
 > A quote that runs over
 > two lines.
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Quote, then Video
+#### 45. Quote, then Video
 
 > A quote that runs over
 > two lines.
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Quote, then Missing file
+#### 46. Quote, then Missing file
 
 > A quote that runs over
 > two lines.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Quote, then Card
+#### 47. Quote, then Card
 
 > A quote that runs over
 > two lines.
@@ -433,7 +439,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 47. Quote, then Callout (info)
+#### 48. Quote, then Callout (info)
 
 > A quote that runs over
 > two lines.
@@ -441,7 +447,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 48. Quote, then Callout (warning, chosen icon)
+#### 49. Quote, then Callout (warning, chosen icon)
 
 > A quote that runs over
 > two lines.
@@ -449,7 +455,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Quote, then Callout (decision, no icon)
+#### 50. Quote, then Callout (decision, no icon)
 
 > A quote that runs over
 > two lines.

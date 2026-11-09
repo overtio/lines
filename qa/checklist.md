@@ -256,6 +256,8 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Pasting text that also carries a file (a document paragraph) pastes the text
 - [ ] TIFF and BMP images become PNG; unreadable images become files
 - [ ] `/image` and `/file` open the file picker
+- [ ] [Mac] Dropping a folder from Finder onto a note makes a link to it, named after it, with a folder's icon, its path on pointing at it; files dropped with it are attached as always; `/folder` opens the folder picker (Link to This Folder) and links the one chosen; in a LaTeX note both write `\href{file:///…/}{Name}`; ⌘-click opens the folder in Finder, a file link its file in its app (an app or script is shown in Finder instead); a link whose folder was moved or deleted says so; a folder whose name has spaces, `#` or brackets links and opens
+- [ ] On the web, `/folder` isn't offered, a folder dropped adds nothing (screen readers hear why), and ⌘-click on a folder link copies its path
 - [ ] Nothing can be attached in code, tables or trashed notes
 - [ ] Files show as a card with an icon, name and kind · size
 - [ ] A `.csv` or `.tsv` file's card shows Convert to Spreadsheet 6px beside it on hover (always on touch), level with its middle; in a window or card too narrow for it, inside the card's right end, its name cut with "…" before it. Clicking it puts the file's cells in its place as ` ```csv name="<file name>" ` (a semicolon- or tab-separated file read right), the grid drawn and the cursor on the line after it; one ⌘Z brings the file back. Reached with Esc, then Tab. No button on other files, on a file not on this device yet, in the Trash, or with Spreadsheets off

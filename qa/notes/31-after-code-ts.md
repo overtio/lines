@@ -475,7 +475,15 @@ console.log(greeting);
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Code block (TypeScript), then Attached 3D model (STL)
+#### 41. Code block (TypeScript), then Folder and file links
+
+```ts
+const greeting: string = "hello";
+console.log(greeting);
+```
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Code block (TypeScript), then Attached 3D model (STL)
 
 ```ts
 const greeting: string = "hello";
@@ -483,7 +491,7 @@ console.log(greeting);
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Code block (TypeScript), then Terminal recording (.cast file)
+#### 43. Code block (TypeScript), then Terminal recording (.cast file)
 
 ```ts
 const greeting: string = "hello";
@@ -491,7 +499,7 @@ console.log(greeting);
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Code block (TypeScript), then Audio
+#### 44. Code block (TypeScript), then Audio
 
 ```ts
 const greeting: string = "hello";
@@ -499,7 +507,7 @@ console.log(greeting);
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Code block (TypeScript), then Video
+#### 45. Code block (TypeScript), then Video
 
 ```ts
 const greeting: string = "hello";
@@ -507,7 +515,7 @@ console.log(greeting);
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Code block (TypeScript), then Missing file
+#### 46. Code block (TypeScript), then Missing file
 
 ```ts
 const greeting: string = "hello";
@@ -515,7 +523,7 @@ console.log(greeting);
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Code block (TypeScript), then Card
+#### 47. Code block (TypeScript), then Card
 
 ```ts
 const greeting: string = "hello";
@@ -525,7 +533,7 @@ console.log(greeting);
 Text in a card.
 :::
 
-#### 47. Code block (TypeScript), then Callout (info)
+#### 48. Code block (TypeScript), then Callout (info)
 
 ```ts
 const greeting: string = "hello";
@@ -535,7 +543,7 @@ console.log(greeting);
 Text in an info callout.
 :::
 
-#### 48. Code block (TypeScript), then Callout (warning, chosen icon)
+#### 49. Code block (TypeScript), then Callout (warning, chosen icon)
 
 ```ts
 const greeting: string = "hello";
@@ -545,7 +553,7 @@ console.log(greeting);
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Code block (TypeScript), then Callout (decision, no icon)
+#### 50. Code block (TypeScript), then Callout (decision, no icon)
 
 ```ts
 const greeting: string = "hello";

@@ -6,6 +6,8 @@ Paste an image, drop one onto a note, or type `/image`. It's kept with your note
 
 Click a picture to select it, then Delete removes it. Drag the round handle on its corner to make it smaller or larger; double-click the handle for its own size again.
 
+In lines for Mac, drop a folder from Finder to link to it where it is (or type `/folder`): ⌘-click opens it in Finder.
+
 Pictures from the web show too. Type `/unsplash` to search Unsplash's free photos, or `/giphy` for a GIF, or paste the link to a photo on Unsplash on an empty line:
 
 ![Snow covered mountain peak illuminated by sunset light](https://unsplash.com/photos/snow-covered-mountain-peak-illuminated-by-sunset-light-mevyYnC5xCo)

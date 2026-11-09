@@ -355,53 +355,58 @@ A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighte
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Paragraph, then Attached 3D model (STL)
+#### 41. Paragraph, then Folder and file links
+
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Paragraph, then Attached 3D model (STL)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Paragraph, then Terminal recording (.cast file)
+#### 43. Paragraph, then Terminal recording (.cast file)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Paragraph, then Audio
+#### 44. Paragraph, then Audio
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Paragraph, then Video
+#### 45. Paragraph, then Video
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Paragraph, then Missing file
+#### 46. Paragraph, then Missing file
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Paragraph, then Card
+#### 47. Paragraph, then Card
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ::: card
 Text in a card.
 :::
 
-#### 47. Paragraph, then Callout (info)
+#### 48. Paragraph, then Callout (info)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::i
 Text in an info callout.
 :::
 
-#### 48. Paragraph, then Callout (warning, chosen icon)
+#### 49. Paragraph, then Callout (warning, chosen icon)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Paragraph, then Callout (decision, no icon)
+#### 50. Paragraph, then Callout (decision, no icon)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::^ icon=none

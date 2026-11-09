@@ -475,7 +475,15 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 41. Attached 3D model (STL) in a callout in a card
+#### 41. Folder and file links in a callout in a card
+
+::: card
+:::!
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+:::
+:::
+
+#### 42. Attached 3D model (STL) in a callout in a card
 
 ::: card
 :::!
@@ -483,7 +491,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 42. Terminal recording (.cast file) in a callout in a card
+#### 43. Terminal recording (.cast file) in a callout in a card
 
 ::: card
 :::!
@@ -491,7 +499,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 43. Audio in a callout in a card
+#### 44. Audio in a callout in a card
 
 ::: card
 :::!
@@ -499,7 +507,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 44. Video in a callout in a card
+#### 45. Video in a callout in a card
 
 ::: card
 :::!
@@ -507,7 +515,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 45. Missing file in a callout in a card
+#### 46. Missing file in a callout in a card
 
 ::: card
 :::!
@@ -515,7 +523,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 46. Card in a callout in a card
+#### 47. Card in a callout in a card
 
 ::: card
 :::!
@@ -525,7 +533,7 @@ Text in a card.
 :::
 :::
 
-#### 47. Callout (info) in a callout in a card
+#### 48. Callout (info) in a callout in a card
 
 ::: card
 :::!
@@ -535,7 +543,7 @@ Text in an info callout.
 :::
 :::
 
-#### 48. Callout (warning, chosen icon) in a callout in a card
+#### 49. Callout (warning, chosen icon) in a callout in a card
 
 ::: card
 :::!
@@ -545,7 +553,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 49. Callout (decision, no icon) in a callout in a card
+#### 50. Callout (decision, no icon) in a callout in a card
 
 ::: card
 :::!

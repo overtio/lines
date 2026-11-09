@@ -355,53 +355,58 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 ---
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Divider, then Attached 3D model (STL)
+#### 41. Divider, then Folder and file links
+
+---
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+
+#### 42. Divider, then Attached 3D model (STL)
 
 ---
 [Bracket.stl](attachment:bracket.stl)
 
-#### 42. Divider, then Terminal recording (.cast file)
+#### 43. Divider, then Terminal recording (.cast file)
 
 ---
 [terminal.cast](attachment:terminal.cast)
 
-#### 43. Divider, then Audio
+#### 44. Divider, then Audio
 
 ---
 [Chime.mp3](attachment:chime.mp3)
 
-#### 44. Divider, then Video
+#### 45. Divider, then Video
 
 ---
 [Sky.mp4](attachment:sky.mp4)
 
-#### 45. Divider, then Missing file
+#### 46. Divider, then Missing file
 
 ---
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 46. Divider, then Card
+#### 47. Divider, then Card
 
 ---
 ::: card
 Text in a card.
 :::
 
-#### 47. Divider, then Callout (info)
+#### 48. Divider, then Callout (info)
 
 ---
 :::i
 Text in an info callout.
 :::
 
-#### 48. Divider, then Callout (warning, chosen icon)
+#### 49. Divider, then Callout (warning, chosen icon)
 
 ---
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 49. Divider, then Callout (decision, no icon)
+#### 50. Divider, then Callout (decision, no icon)
 
 ---
 :::^ icon=none
