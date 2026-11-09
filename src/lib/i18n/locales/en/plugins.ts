@@ -35,7 +35,7 @@ export default {
   "plugins.tex": "TeX Typesetting",
   "plugins.tex.description": "Typesets a LaTeX note’s PDF with TeX itself, instead of lines’ own pages.",
   "plugins.themes": "Themes",
-  "plugins.themes.description": "Lines and sixteen more, including High Contrast and two for color blindness. Reads themes made for VS Code, Zed, Base16, terminals and Linux desktops too.",
+  "plugins.themes.description": "Lines and twenty-two more, including High Contrast and two for color blindness. Reads themes made for VS Code, Zed, Base16, terminals and Linux desktops too.",
   "plugins.changes": "Changes",
   "plugins.changes.description": "Marks the lines you change in a note beside them, as a code editor does: added in green, changed in blue, and where lines were taken out in red. Since the note was opened.",
   "plugins.changes.added": "Added",

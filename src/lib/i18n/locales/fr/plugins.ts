@@ -34,7 +34,7 @@ export default {
   "plugins.tex": "Composition avec TeX",
   "plugins.tex.description": "Compose le PDF d’une note LaTeX avec TeX lui-même, au lieu des pages de lines.",
   "plugins.themes": "Thèmes",
-  "plugins.themes.description": "Lines et seize autres, dont Contraste élevé et deux pour le daltonisme. Lit aussi les thèmes faits pour VS Code, Zed, Base16, les terminaux et les bureaux Linux.",
+  "plugins.themes.description": "Lines et vingt-deux autres, dont Contraste élevé et deux pour le daltonisme. Lit aussi les thèmes faits pour VS Code, Zed, Base16, les terminaux et les bureaux Linux.",
   "plugins.changes": "Modifications",
   "plugins.changes.description": "Marque à côté les lignes que vous modifiez dans une note, comme un éditeur de code : ajoutées en vert, modifiées en bleu, et là où des lignes ont été retirées en rouge. Depuis l’ouverture de la note.",
   "plugins.changes.added": "Ajoutée",

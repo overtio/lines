@@ -4,7 +4,7 @@ import { formats } from "./formats";
 import { themes as all } from "./themes";
 
 /**
- * lines' seventeen themes (themes.ts), Lines first: the one lines falls back to; and the theme files
+ * lines' twenty-three themes (themes.ts), Lines first: the one lines falls back to; and the theme files
  * of other apps it can read (formats/).
  */
 export const themes = (): Plugin => ({
