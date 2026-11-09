@@ -64,4 +64,6 @@ export default {
   "plugins.noKey": "Necesita una clave de la API de {name}, con la que no se compiló esta copia de lines.",
   "plugins.github.description": "Muestra los enlaces a GitHub abreviados, como los escribe GitHub, con su logotipo: overtio/lines#12.",
   "plugins.arxiv.description": "Muestra los enlaces a artículos de arXiv como los cita arXiv: arXiv:1706.03762. En las apps, añade /artículo, para buscar en arXiv y enlazar un artículo. Lo que buscas se envía a arXiv.",
+  "plugins.code": "Código",
+  "plugins.code.description": "Notas que son archivos de código, en cualquiera de unos 120 lenguajes de programación: números de línea, letra de ancho fijo y resaltado en los colores del tema, con sangría y corchetes como en un editor de código. Se descargan y sincronizan como archivos de su lenguaje (.py, .ts, .rs…).",
 } satisfies Translation<typeof en>;

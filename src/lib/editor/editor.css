@@ -2375,3 +2375,40 @@
 .cm-sheet-note .cm-markers {
   display: none;
 }
+
+/*
+ * Code notes (the Code plugin): as a code editor shows code, in a fixed-width font across the whole
+ * width, beside its line numbers.
+ */
+.cm-editor.cm-code-note .cm-scroller {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  line-height: 1.6;
+}
+
+.cm-editor.cm-code-note .cm-content {
+  max-width: none;
+  margin: 0;
+  padding-left: 14px;
+}
+
+.cm-editor.cm-code-note .cm-gutters {
+  border: 0;
+  background: transparent;
+  color: var(--text-faint);
+}
+
+.cm-editor.cm-code-note .cm-lineNumbers .cm-gutterElement {
+  min-width: 3ch;
+  padding: 0 4px 0 16px;
+}
+
+.cm-editor.cm-code-note .cm-activeLineGutter {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.cm-editor.cm-code-note .cm-matchingBracket {
+  background: var(--active);
+  outline: 1px solid var(--border);
+}

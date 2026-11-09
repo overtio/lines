@@ -200,6 +200,12 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - A picture chosen for the backdrop stays on the device it was chosen on (made no larger than 2400 pixels across), and doesn't sync or export.
 - Ruled lines need the `lh` unit: Safari 16.4 and macOS 13.3 or later, Chrome 109 or later. Earlier ones show the other patterns, and Lines as plain.
 
+## Code notes
+
+- They're for reading and writing code, not running it: no completion as you type, no errors shown, no terminal.
+- Long lines wrap, as in every note, rather than scroll sideways.
+- Only languages with a file extension are offered (Dockerfile and a few others aren't), as a note has to be saved as a file.
+
 ## Line marks
 
 - Marks are for the screen: printing and PDFs leave them out (a note's own are comments, which don't print either).

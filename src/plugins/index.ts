@@ -3,6 +3,7 @@ import type { Plugin } from "../lib/plugins/types";
 import { arxiv } from "./arxiv";
 import { asciinema } from "./asciinema";
 import { changesPlugin } from "./changes";
+import { code } from "./code";
 import { giphy } from "./giphy";
 import { github } from "./github";
 import { requests } from "./http";
@@ -33,6 +34,7 @@ export const builtIn = (): Plugin[] => [
   latex(),
   spreadsheet(),
   requests(),
+  code(),
   secrets(),
   katex(),
   // Before Mermaid: if both were on, Pele would draw the diagrams.

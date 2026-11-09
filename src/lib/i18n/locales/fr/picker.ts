@@ -30,4 +30,5 @@ export default {
   "picker.minutes": "{count, plural, one {# min} other {# min}}",
   "picker.created": "Créée",
   "picker.edited": "Modifiée",
+  "picker.language": "Langage",
 } satisfies Translation<typeof en>;
