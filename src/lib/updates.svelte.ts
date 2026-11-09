@@ -48,6 +48,12 @@ class Updates {
     return invoke<UpdateStatus>("updates_check", { waitDays: prefs.updateWait, download: prefs.autoUpdate });
   }
 
+  /** Automatic updates turned off: one downloaded isn't installed as lines quits any more, but still offered. */
+  async forget() {
+    await invoke("updates_forget");
+    return this.check();
+  }
+
   /** Gets the newest version without waiting, and restarts into it. */
   async installNow() {
     const status = await invoke<UpdateStatus>("updates_check", { waitDays: 0, download: true });
