@@ -196,6 +196,8 @@ export default {
   "settings.fontSerif": "Serif",
   "settings.fontRounded": "Arrondie",
   "settings.fontMono": "Mono",
+  "settings.headingColor": "Couleur des titres",
+  "settings.headingColorText": "Texte",
   "settings.textSize": "Taille du texte",
   "settings.pixels": "{value} px",
   "settings.pixelsSpoken": "{count, plural, one {# pixel} other {# pixels}}",

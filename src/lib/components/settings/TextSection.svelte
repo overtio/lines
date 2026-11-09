@@ -7,6 +7,8 @@
     DEFAULT_SPACING,
     FONTS,
     formatPixels,
+    HEADING_COLORS,
+    type HeadingColor,
     NOTE_WIDTH,
     NOTE_WIDTHS,
     prefs,
@@ -18,12 +20,17 @@
     type Spacing,
   } from "../../prefs.svelte";
   import Button from "../ui/Button.svelte";
+  import ColorField from "../ui/ColorField.svelte";
   import FieldGroup from "../ui/FieldGroup.svelte";
   import FieldRow from "../ui/FieldRow.svelte";
   import Segmented from "../ui/Segmented.svelte";
   import Slider from "../ui/Slider.svelte";
 
   const SAMPLE = t("settings.previewNote");
+
+  const HEADING_COLOR_NAMES = { text: "settings.headingColorText", accent: "settings.color.accent", custom: "settings.paperColorCustom" } as const;
+  const headingColors = HEADING_COLORS.map((id) => ({ id, label: t(HEADING_COLOR_NAMES[id]) }));
+  const headingSwatches: Record<HeadingColor, string> = $derived({ text: "var(--text)", accent: "var(--accent)", custom: prefs.headingCustomColor });
 
   let host: HTMLDivElement;
   let view: EditorView | undefined;
@@ -90,6 +97,19 @@
   <FieldRow label={t("settings.textSize")}>
     <Slider class="w-60" bind:value={prefs.textSize} {...TEXT_SIZE} label={t("settings.textSize")} format={formatPixels} spoken={spokenPixels} />
   </FieldRow>
+  <FieldRow label={t("settings.headingColor")}>
+    <Segmented label={t("settings.headingColor")} options={headingColors} value={prefs.headingColor} onselect={(id) => (prefs.headingColor = id)}>
+      {#snippet content(option)}
+        <span class="size-2.5 shrink-0 rounded-full inset-ring inset-ring-line" style:background={headingSwatches[option.id]} aria-hidden="true"></span>
+        {option.label}
+      {/snippet}
+    </Segmented>
+  </FieldRow>
+  {#if prefs.headingColor === "custom"}
+    <FieldRow label={t("settings.paperCustomColor")} for="heading-custom-color">
+      <ColorField id="heading-custom-color" label={t("settings.paperCustomColor")} value={prefs.headingCustomColor} onchange={(color) => color && (prefs.headingCustomColor = color)} />
+    </FieldRow>
+  {/if}
 </FieldGroup>
 
 <FieldGroup>

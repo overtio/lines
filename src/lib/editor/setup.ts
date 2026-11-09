@@ -271,7 +271,7 @@ const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[], m
 
 /** Markdown as written (Settings → Editor → Show Markdown → Source): its marks faint, what they do to text shown on it. */
 const sourceStyle = HighlightStyle.define([
-  { tag: t.heading, fontWeight: "700" },
+  { tag: t.heading, fontWeight: "700", color: "var(--heading-color)" },
   { tag: t.strong, fontWeight: "700" },
   { tag: t.emphasis, fontStyle: "italic" },
   { tag: t.strikethrough, textDecoration: "line-through" },

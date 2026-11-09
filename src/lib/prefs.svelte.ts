@@ -25,6 +25,9 @@ export const MARKDOWN_MODES = ["source", "visible", "live", "hidden"] as const;
 export type MarkdownMode = (typeof MARKDOWN_MODES)[number];
 /** What color a paper pattern is drawn in: the theme's ink or accent, or one of your own. */
 export type PaperColor = "ink" | "accent" | "custom";
+/** Headings' color: the text's, the theme's accent, or one of your own. */
+export const HEADING_COLORS = ["text", "accent", "custom"] as const;
+export type HeadingColor = (typeof HEADING_COLORS)[number];
 
 /** What a click on a link in a note does (editor/links.ts): web links (and attached files), tags, and mentions of notes. */
 export type LinkKind = "web" | "tag" | "mention";
@@ -203,6 +206,9 @@ interface Stored {
   dragBlocks: boolean;
   /** The system checks notes' spelling, and corrects it as you type (code and math never). */
   spellcheck: boolean;
+  /** Headings' color, and the color of your own, kept while another is chosen (themes/show.svelte.ts). */
+  headingColor: HeadingColor;
+  headingCustomColor: string;
   /** Notes show `->` as →, `!=` as ≠ and so on (notes/symbols.ts): in their text, and in code. */
   symbolsInText: boolean;
   symbolsInCode: boolean;
@@ -309,6 +315,8 @@ const DEFAULTS: Stored = {
   markdownMode: "live",
   dragBlocks: true,
   spellcheck: true,
+  headingColor: "text",
+  headingCustomColor: "#3d7dd8",
   symbolsInText: true,
   symbolsInCode: true,
   sheetStats: ["sum", "average", "count"],
@@ -426,6 +434,8 @@ function read(json?: string): Stored {
     markdownMode: oneOf(raw.markdownMode, MARKDOWN_MODES, DEFAULTS.markdownMode),
     dragBlocks: flag(raw.dragBlocks, DEFAULTS.dragBlocks),
     spellcheck: flag(raw.spellcheck, DEFAULTS.spellcheck),
+    headingColor: oneOf(raw.headingColor, HEADING_COLORS, DEFAULTS.headingColor),
+    headingCustomColor: color(raw.headingCustomColor, DEFAULTS.headingCustomColor),
     symbolsInText: flag(raw.symbolsInText, DEFAULTS.symbolsInText),
     symbolsInCode: flag(raw.symbolsInCode, DEFAULTS.symbolsInCode),
     links: readLinks(raw.links),
@@ -493,6 +503,8 @@ class Prefs {
   markdownMode = $state(this.#initial.markdownMode);
   dragBlocks = $state(this.#initial.dragBlocks);
   spellcheck = $state(this.#initial.spellcheck);
+  headingColor = $state(this.#initial.headingColor);
+  headingCustomColor = $state(this.#initial.headingCustomColor);
   symbolsInText = $state(this.#initial.symbolsInText);
   symbolsInCode = $state(this.#initial.symbolsInCode);
   sheetStats = $state(this.#initial.sheetStats);
@@ -661,6 +673,8 @@ class Prefs {
       markdownMode: this.markdownMode,
       dragBlocks: this.dragBlocks,
       spellcheck: this.spellcheck,
+      headingColor: this.headingColor,
+      headingCustomColor: this.headingCustomColor,
       symbolsInText: this.symbolsInText,
       symbolsInCode: this.symbolsInCode,
       links: $state.snapshot(this.links),
@@ -739,6 +753,8 @@ class Prefs {
     this.markdownMode = next.markdownMode;
     this.dragBlocks = next.dragBlocks;
     this.spellcheck = next.spellcheck;
+    this.headingColor = next.headingColor;
+    this.headingCustomColor = next.headingCustomColor;
     this.symbolsInText = next.symbolsInText;
     this.symbolsInCode = next.symbolsInCode;
     if (next.sheetStats.join() !== this.sheetStats.join()) this.sheetStats = next.sheetStats;
