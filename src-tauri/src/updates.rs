@@ -6,6 +6,7 @@
 //! it. Every window hears how it's going as `updates` events.
 
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 
 use semver::Version;
@@ -47,12 +48,14 @@ struct Downloaded {
 pub struct Updates {
   status: Mutex<Status>,
   ready: Mutex<Option<Downloaded>>,
+  /// Whether an update downloaded is kept to install: automatic updates are on, or one was asked for.
+  wanted: AtomicBool,
 }
 
 impl Default for Updates {
   fn default() -> Self {
     let status = if installed() { Status::Idle } else { Status::Unsupported };
-    Self { status: Mutex::new(status), ready: Mutex::default() }
+    Self { status: Mutex::new(status), ready: Mutex::default(), wanted: AtomicBool::new(false) }
   }
 }
 
@@ -90,6 +93,7 @@ pub async fn updates_check(app: AppHandle, wait_days: u32, download: bool) -> St
       return status.clone();
     }
     *status = Status::Checking;
+    updates.wanted.store(download, Ordering::Relaxed);
   }
   let _ = app.emit(EVENT, Status::Checking);
   let status = check(&app, Duration::days(wait_days.into()), download)
@@ -165,7 +169,13 @@ async fn fetch(app: &AppHandle, release: Candidate) -> Result<Status, String> {
   .await
   .map_err(|e| e.to_string())?
   .map_err(|e| e.to_string())?;
-  *app.state::<Updates>().ready.lock().unwrap() = Some(Downloaded { update, package });
+  let updates = app.state::<Updates>();
+  // Automatic updates were turned off while it downloaded.
+  if !updates.wanted.load(Ordering::Relaxed) {
+    let _ = std::fs::remove_file(&package);
+    return Ok(Status::Available { version, due: None });
+  }
+  *updates.ready.lock().unwrap() = Some(Downloaded { update, package });
   Ok(Status::Ready { version })
 }
 
@@ -186,6 +196,17 @@ fn install(downloaded: Downloaded, relaunch: bool) -> Result<(), String> {
   let bytes = std::fs::read(&downloaded.package).map_err(|e| e.to_string())?;
   let _ = std::fs::remove_file(&downloaded.package);
   downloaded.update.restart_after_install(relaunch).install(bytes).map_err(|e| e.to_string())
+}
+
+/// Forgets an update downloaded, or downloading, to install as lines quits: automatic updates were
+/// turned off, and then lines only looks when asked.
+#[tauri::command]
+pub fn updates_forget(app: AppHandle) {
+  let updates = app.state::<Updates>();
+  updates.wanted.store(false, Ordering::Relaxed);
+  let Some(downloaded) = updates.ready.lock().unwrap().take() else { return };
+  let _ = std::fs::remove_file(downloaded.package);
+  set(&app, Status::Idle);
 }
 
 /// Installs the update that's ready and starts lines again, as the new version.

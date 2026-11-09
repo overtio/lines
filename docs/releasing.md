@@ -31,7 +31,7 @@ The desktop apps update themselves from these releases (`src-tauri/src/updates.r
 - **Downloading.** Each release has `latest.json`, naming a package for each kind of install (`darwin-aarch64-app`, `windows-x86_64-nsis`, `linux-x86_64-appimage`…) with its signature. The app downloads its own in the background, into its cache folder, and checks the signature, and the version signed with it, against the public key in `tauri.conf.json` (`plugins.updater.pubkey`).
 - **Installing.** The package is installed as lines quits, however it's quit, or straight away with Restart to update (in Settings, and beside the version in the sidebar). On a Mac the app is swapped for the new one (macOS asks for a password only if the app is somewhere its user can't change); on Windows the installer runs on its own, the MSI asking for permission since it installs for every user; on Linux the AppImage is replaced, and a `.deb` or `.rpm` install asks for a password.
 - **Only installed apps.** Development builds (`bun run tauri dev`, debug builds) don't look for updates. An app built locally with `bun run tauri build` does, and updates to the next release once it has waited long enough.
-- **Privacy.** A check asks GitHub for the list of releases; nothing about notes or settings is sent. With Update automatically off there are no checks; lines looks only when asked.
+- **Privacy.** A check asks GitHub for the list of releases; nothing about notes or settings is sent. With Update automatically off there are no checks; lines looks only when asked. Turning it off also drops a version already downloaded, which is then offered with Install and restart rather than installed at quit.
 
 ### The signing key
 

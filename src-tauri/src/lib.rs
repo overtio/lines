@@ -50,6 +50,8 @@ pub fn run() {
       #[cfg(desktop)]
       updates::updates_check,
       #[cfg(desktop)]
+      updates::updates_forget,
+      #[cfg(desktop)]
       updates::updates_restart,
       window_style::set_window_buttons,
       window_style::set_window_effects,

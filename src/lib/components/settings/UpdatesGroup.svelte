@@ -76,7 +76,7 @@
 
   function setAuto(on: boolean) {
     prefs.autoUpdate = on;
-    if (on) void updates.check();
+    void (on ? updates.check() : updates.forget());
   }
 
   function setWait(value: string) {
