@@ -6,7 +6,8 @@
   import Icon from "../../icons/Icon.svelte";
   import type { IconName } from "../../icons/icons";
   import { DEFAULT_THEME, plugins } from "../../plugins/registry.svelte";
-  import type { Theme } from "../../plugins/types";
+  import type { FoundImage, PictureLibrary, Theme } from "../../plugins/types";
+  import WebImagePicker from "../../editor/WebImagePicker.svelte";
   import { DARK_PANES, prefs, type Appearance, type Contrast } from "../../prefs.svelte";
   import { chooseBackdropImage } from "../../paper.svelte";
   import { customThemes } from "../../themes/custom.svelte";
@@ -120,8 +121,37 @@
 
   let pictures = $state<HTMLInputElement>();
   /** The picture a theme was just made from, which can be the backdrop too. */
-  let fromPicture = $state<{ name: string; file: File } | null>(null);
+  let fromPicture = $state<{ name: string; file: Blob } | null>(null);
   let pictureError = $state<string | null>(null);
+  /** A library to choose a picture from (Wallhaven's), and where its picker opens. */
+  let library = $state<{ library: PictureLibrary; x: number; y: number } | null>(null);
+  /** The library a chosen picture is coming from, while it comes. */
+  let fetching = $state<string | null>(null);
+
+  function pickFrom(from: PictureLibrary) {
+    const at = document.getElementById(themeHeading)?.getBoundingClientRect();
+    library = { library: from, x: at?.left ?? 0, y: at?.bottom ?? 0 };
+  }
+
+  /** A theme of your own from a library's picture: the picture fetched whole, its colors read as a picture of yours is. */
+  async function themeFromLibrary(from: PictureLibrary, image: FoundImage) {
+    imported = importError = pictureError = null;
+    fromPicture = null;
+    fetching = from.name;
+    try {
+      from.chosen?.(image);
+      const picture = await from.picture(image);
+      const made = await themeFromPicture(picture, image.alt || from.name);
+      prefs.theme = customThemes.add(made);
+      fromPicture = { name: made.name, file: picture };
+      speak(t("settings.themeFromPicture", { name: made.name }));
+    } catch {
+      pictureError = t("settings.themeLibraryError", { name: from.name });
+      speak(pictureError);
+    } finally {
+      fetching = null;
+    }
+  }
 
   /** A theme of your own from a picture's colors (themes/picture.ts), shown at once, to change as wanted. */
   async function themeFromChosen() {
@@ -239,12 +269,21 @@
           <DropdownMenu.Item class={menuOption} onSelect={() => pictures?.click()}>
             <Icon name="image" size={15} />{t("settings.themeNewFromPicture")}
           </DropdownMenu.Item>
+          {#each plugins.pictureLibraries as from (from.name)}
+            <DropdownMenu.Item class={menuOption} onSelect={() => pickFrom(from)}>
+              <Icon name="search" size={15} />{t("settings.themeNewFromLibrary", { name: from.name })}
+            </DropdownMenu.Item>
+          {/each}
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
   </div>
   <input bind:this={picker} type="file" multiple class="hidden" onchange={importChosen} />
   <input bind:this={pictures} type="file" accept="image/*" class="hidden" onchange={themeFromChosen} />
+  {#if library}
+    {@const from = library.library}
+    <WebImagePicker library={from} x={library.x} y={library.y} onchoose={(image) => void themeFromLibrary(from, image)} onclose={() => (library = null)} />
+  {/if}
 {/snippet}
 
 {#if plugins.styles.length > 1}
@@ -275,7 +314,7 @@
 {/if}
 
 <FieldGroup title={t("settings.themes")} note={t("settings.themeNote")} action={themeActions} id={themeHeading}>
-  {#if pasting || imported || importError || fromPicture || pictureError}
+  {#if pasting || imported || importError || fromPicture || pictureError || fetching}
     <div class="flex flex-col gap-2 border-b border-line p-3">
       {#if pasting}
         <div class="flex items-center gap-2">
@@ -299,6 +338,7 @@
           <Button icon="image" onclick={useAsBackdrop}>{t("settings.themePictureBackdrop")}</Button>
         </Callout>
       {/if}
+      {#if fetching}<Callout>{t("settings.themeFetching", { name: fetching })}</Callout>{/if}
       {#if pictureError}<Callout tone="danger">{pictureError}</Callout>{/if}
     </div>
   {/if}

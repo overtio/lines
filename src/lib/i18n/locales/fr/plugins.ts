@@ -129,4 +129,8 @@ export default {
   "typing.sample1": "Pour taper plus vite, il faut d’abord ralentir. Tape chaque mot avec soin, regarde le texte plutôt que tes mains, et laisse la vitesse venir d’elle-même. La précision d’abord ; le reste suit.",
   "typing.sample2": "Portez ce vieux whisky au juge blond qui fume. Voix ambiguë d’un cœur qui, au zéphyr, préfère les jattes de kiwis. Chaque lettre de l’alphabet est dans ces phrases : chaque doigt a son tour.",
   "typing.sample3": "Une bonne note est courte et simple. Écris ce que tu veux dire avec les mots que tu dirais, puis relis-la une fois. Si une phrase peut perdre un mot, laisse-le partir. Demain, chaque ligne claire comptera.",
+  "plugins.wallhaven.description": "/wallhaven : cherche des fonds d’écran sur Wallhaven et mets-en un dans une note, gardé avec elle ; et fais un thème de ses couleurs, et l’arrière-plan, dans Réglages → Thème → Nouveau. Seulement les fonds adaptés au travail.",
+  "plugins.wallhaven.credit": "Fonds d’écran de Wallhaven",
+  "plugins.wallhaven.apps": "Nécessite l’app lines : le site de Wallhaven ne répond pas aux pages web.",
+  "plugins.wallhaven.wallpaper": "Fond d’écran",
 } satisfies Translation<typeof en>;

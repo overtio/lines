@@ -8,7 +8,7 @@ Click a picture to select it, then Delete removes it. Drag the round handle on i
 
 In lines for Mac, drop a folder from Finder to link to it where it is (or type `/folder`): ⌘-click opens it in Finder.
 
-Pictures from the web show too. Type `/unsplash` to search Unsplash's free photos, or `/giphy` for a GIF, or paste the link to a photo on Unsplash on an empty line:
+Pictures from the web show too. Type `/unsplash` to search Unsplash's free photos, `/giphy` for a GIF, or in the app `/wallhaven` for a wallpaper, or paste the link to a photo on Unsplash on an empty line:
 
 ![Snow covered mountain peak illuminated by sunset light](https://unsplash.com/photos/snow-covered-mountain-peak-illuminated-by-sunset-light-mevyYnC5xCo)
 

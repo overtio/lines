@@ -152,7 +152,7 @@
   const focusKey = isApple ? "⇧⌘\\" : "Ctrl+Shift+\\";
 
   /** Where there's no note: what to do, or what went wrong. */
-  const placeholder = "flex flex-1 flex-col items-center justify-center gap-3 pb-(--titlebar-h) text-faint";
+  const placeholder = "editor-placeholder flex flex-1 flex-col items-center justify-center gap-3 pb-(--titlebar-h) text-faint";
 
   let shareOpen = $state(false);
   let lockMenuOpen = $state(false);

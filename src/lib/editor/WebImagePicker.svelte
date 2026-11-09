@@ -1,6 +1,6 @@
 <script lang="ts">
   import { t } from "../i18n/index.svelte";
-  import type { FoundImage, ImageLibrary } from "./webImages";
+  import type { FoundImage, ImageLibrary } from "../plugins/types";
   import WebSearchPicker from "./WebSearchPicker.svelte";
 
   /* A library's pictures to pick from (webImages.ts), three to a row, opening on what it features. */

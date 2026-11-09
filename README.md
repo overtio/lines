@@ -53,6 +53,7 @@ The [web app](https://overtio.github.io/lines/app/) opens with a tour: one short
 - **Links to folders on your computer.** Drop a folder from Finder onto a note, or type `/folder`, for a link that opens it in Finder; links to files open them in their apps. See [docs/linedown.md](docs/linedown.md#folders-and-files-on-your-computer).
 - **Images, files, audio and video.** Paste or drop them in. Drag an image's or video's corner to resize it. Audio and video play right in the note, and audio keeps playing while you scroll and write.
 - **Photos and GIFs from the web.** `/unsplash` searches Unsplash's free photos and `/giphy` GIPHY's GIFs, and puts the one you pick in the note.
+- **Wallpapers from Wallhaven.** In the apps, `/wallhaven` searches [Wallhaven](https://wallhaven.cc)'s wallpapers and keeps the one you pick with the note; Settings → Theme → New → From Wallhaven… makes a theme of a wallpaper's colors, and puts it behind your notes. See [docs/themes.md](docs/themes.md#your-own-themes).
 - **Research papers.** `/paper` searches [arXiv](https://arxiv.org) by title, author or topic and links to the paper you pick by its title, in Markdown and LaTeX notes (in the apps). More sources of papers can be added as plugins.
 - **API requests.** Write requests in an ` ```http ` block (`/request`) and send them from the note, a lighter Postman or Bruno: variables, one request using another's response, curl commands pasted in or copied out. The `.http` format JetBrains' IDEs, VS Code and Visual Studio read, so a whole note of requests opens there too, or [Hurl](https://hurl.dev)'s, whose captures and asserts check each response. See [docs/requests.md](docs/requests.md).
 - **Terminal recordings** from [asciinema](https://asciinema.org) play right in the note, in your theme's colors. Paste a recording's link, or drop in a `.cast` file.
@@ -292,6 +293,7 @@ src/
     wavedrom/                WaveDrom's timing diagrams, register fields and logic circuits, in the theme's colors; /timing
     typing/                  Typing practice: a ```typing block drawn as a drill to type over (Practice.svelte), what it comes to (drill.svelte.ts); /typing
     unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
+    wallhaven/               Wallhaven's wallpapers: /wallhaven, kept in the note, and themes from them (a picture library)
     github/                  Links to GitHub drawn short
     arxiv/                   Links to arXiv's papers drawn short, and searching arXiv for /paper (pacing requests as arXiv asks)
     code/                    Code notes, a format for each language CodeMirror knows, shown as one (Code) with a choice of language

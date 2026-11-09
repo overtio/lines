@@ -1,4 +1,5 @@
-import { describe, expect, mock, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
+import { stubApp } from "./stubs";
 import { readFileSync } from "node:fs";
 import { contrast, over, parse } from "../../src/lib/themes/color";
 import { moreContrast } from "../../src/lib/themes/palette";
@@ -6,7 +7,7 @@ import { BASE_COLORS } from "../../src/lib/themes/palette";
 import type { AppStyle, Mascot, MascotPose, ThemeColors } from "../../src/lib/plugins/types";
 
 // Names are looked up in the app's language; here they're their keys.
-mock.module("../../src/lib/i18n/index.svelte", () => ({ t: (key: string) => key }));
+stubApp();
 const { themes } = await import("../../src/plugins/themes/themes");
 const { styles } = await import("../../src/plugins/styles");
 const { mascots } = await import("../../src/plugins/mascots");

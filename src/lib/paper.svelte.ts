@@ -1,6 +1,7 @@
 import { committed, request } from "./notes/storage";
 import { plugins } from "./plugins/registry.svelte";
 import type { PaperStyle } from "./plugins/types";
+import { smaller } from "./pictures";
 import { prefs } from "./prefs.svelte";
 import { ownColor } from "./themes/show.svelte";
 import { announce, onAnnounce } from "./windows/channel";
@@ -89,13 +90,8 @@ async function loadImage() {
  * Makes `file`, a picture, the backdrop: no larger than it needs to be, kept on this device, and
  * shown in every window. Throws when it isn't a picture or there's no room.
  */
-export async function chooseBackdropImage(file: File) {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, IMAGE_SIZE / Math.max(bitmap.width, bitmap.height));
-  const canvas = new OffscreenCanvas(Math.round(bitmap.width * scale), Math.round(bitmap.height * scale));
-  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  const picture = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.85 });
+export async function chooseBackdropImage(file: Blob) {
+  const picture = await smaller(file, IMAGE_SIZE);
   await keep(picture);
   showImage(picture);
   prefs.paperBackdrop = "image";

@@ -5,6 +5,7 @@ import { asciinema } from "./asciinema";
 import { changesPlugin } from "./changes";
 import { code } from "./code";
 import { giphy } from "./giphy";
+import { wallhaven } from "./wallhaven";
 import { github } from "./github";
 import { requests } from "./http";
 import { ironcalc } from "./ironcalc";
@@ -51,6 +52,7 @@ export const builtIn = (): Plugin[] => [
   tex(),
   unsplash(),
   giphy(),
+  wallhaven(),
   asciinema(),
   github(),
   arxiv(),

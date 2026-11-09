@@ -1,9 +1,9 @@
 import { named, SECTIONS } from "../../lib/editor/slashCommands";
 import { unsplashPhoto } from "../../lib/editor/unsplash";
-import { type FoundImage, type ImageLibrary, pickWebImage } from "../../lib/editor/webImages";
+import { pickWebImage } from "../../lib/editor/webImages";
 import { language, t } from "../../lib/i18n/index.svelte";
 import { webFetch } from "../../lib/platform";
-import type { Plugin } from "../../lib/plugins/types";
+import type { FoundImage, ImageLibrary, Plugin } from "../../lib/plugins/types";
 
 /*
  * /unsplash: search Unsplash's free photos and put one in a note. The note keeps the link to the

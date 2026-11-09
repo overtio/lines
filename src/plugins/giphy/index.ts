@@ -1,9 +1,9 @@
 import { giphyGif } from "../../lib/editor/giphy";
 import { named, SECTIONS } from "../../lib/editor/slashCommands";
-import { type FoundImage, type ImageLibrary, pickWebImage } from "../../lib/editor/webImages";
+import { pickWebImage } from "../../lib/editor/webImages";
 import { language, t } from "../../lib/i18n/index.svelte";
 import { reducedMotion, webFetch } from "../../lib/platform";
-import type { Plugin } from "../../lib/plugins/types";
+import type { FoundImage, ImageLibrary, Plugin } from "../../lib/plugins/types";
 
 /*
  * /giphy: search GIPHY's GIFs and put one in a note, as an image by its address on GIPHY
