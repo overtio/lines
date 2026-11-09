@@ -66,6 +66,7 @@ export default {
   "editor.localFolder": "Dossier",
   "editor.localFile": "Fichier",
   "editor.localMissing": "{name} n’est plus sur cet ordinateur, ou pas là où le dit le lien.",
+  "editor.localFailed": "Impossible d’ouvrir {name}.",
   "editor.localCopied": "Chemin de {name} copié : les dossiers et fichiers de ton ordinateur s’ouvrent depuis l’app lines.",
   "editor.folderDropApp": "Un dossier déposé devient un lien dans l’app lines pour Mac.",
   "editor.slash.drawing": "Dessin",

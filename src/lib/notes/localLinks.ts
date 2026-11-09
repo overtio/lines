@@ -23,7 +23,8 @@ export function pathOf(href: string): string | null {
   // A drive's letter: /C:/Users → C:\Users.
   if (/^\/[a-z]:\//i.test(path)) path = path.slice(1).replaceAll("/", "\\");
   const trimmed = path.length > 1 ? path.replace(/[\\/]+$/, "") : path;
-  return trimmed || null;
+  // A drive is its root, C:\; C: alone is wherever on it the app last was.
+  return /^[a-z]:$/i.test(trimmed) ? `${trimmed}\\` : trimmed || null;
 }
 
 /** A link to `path`, a folder's ending in `/`, its parts escaped as a URL needs (spaces, `#`, `%`, brackets). */

@@ -73,6 +73,7 @@ export default {
   "editor.localFolder": "Folder",
   "editor.localFile": "File",
   "editor.localMissing": "{name} isn’t on this computer any more, or not where the link says.",
+  "editor.localFailed": "Couldn’t open {name}.",
   "editor.localCopied": "Copied the path of {name}: folders and files on your computer open from the lines app.",
   "editor.folderDropApp": "A dropped folder becomes a link in lines’ Mac app.",
   "editor.slash.drawing": "Drawing",

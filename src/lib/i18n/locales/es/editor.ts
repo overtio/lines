@@ -66,6 +66,7 @@ export default {
   "editor.localFolder": "Carpeta",
   "editor.localFile": "Archivo",
   "editor.localMissing": "{name} ya no está en este ordenador, o no donde dice el enlace.",
+  "editor.localFailed": "No se ha podido abrir {name}.",
   "editor.localCopied": "Se ha copiado la ruta de {name}: las carpetas y archivos de tu ordenador se abren desde la app de lines.",
   "editor.folderDropApp": "Una carpeta soltada se convierte en enlace en la app de lines para Mac.",
   "editor.slash.drawing": "Dibujo",
