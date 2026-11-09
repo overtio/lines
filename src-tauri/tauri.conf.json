@@ -31,6 +31,12 @@
       "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: sfsymbol:; media-src 'self' blob:; connect-src 'self' ipc: http://ipc.localhost; frame-src 'self' blob:"
     }
   },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ4QUFGODQxRkY2MEQ1OTMKUldTVDFXRC9RZmlxU011NmFSSVIrTmROcDlSN2JnWDlXS2REN1lWRml4QzdPc3AySGt6Mld5OHEK",
+      "requireSignedVersion": true
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",

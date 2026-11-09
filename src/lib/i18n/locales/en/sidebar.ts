@@ -26,5 +26,7 @@ export default {
   "sidebar.alpha": "Alpha {version}",
   "sidebar.alphaHint": "lines is in alpha: an early version that changes often and may have bugs. Don’t rely on it for important work yet, and export your notes now and then.",
   "sidebar.source": "Source on GitHub",
+  // The button beside the version once a newer one is downloaded, which restarts lines into it.
+  "sidebar.updateHint": "Restart to update to version {version}",
   "sidebar.settings": "Settings",
 };
