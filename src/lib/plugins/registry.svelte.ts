@@ -3,6 +3,7 @@ import { customThemes } from "../themes/custom.svelte";
 import { announce, onAnnounce } from "../windows/channel";
 import { plainTextLanguage } from "./plainText";
 import { soundPacks } from "../sounds/packs.svelte";
+import type { NoteMeta } from "../notes/types";
 import type { AppStyle, Contributions, EmbedLink, IconSet, KeyboardSound, NoteLanguage, Plugin, Theme } from "./types";
 
 /*
@@ -135,6 +136,20 @@ class Plugins {
   /** The language a note shows in: its own while its plugin runs, plain text otherwise. */
   language(id = DEFAULT_LANGUAGE): NoteLanguage {
     return this.languages.find((language) => language.id === id) ?? plainTextLanguage;
+  }
+
+  /**
+   * What the list knows of a note written in language `id`. Read as plain text if its plugin
+   * fails to read it, so the note is still listed, saved and synced.
+   */
+  meta(id: string | undefined, body: string): NoteMeta {
+    const language = this.language(id);
+    try {
+      return language.meta(body);
+    } catch (error) {
+      console.error(`lines: ${language.name} couldn't read a note`, error);
+      return plainTextLanguage.meta(body);
+    }
   }
 
   /**

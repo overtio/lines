@@ -57,9 +57,8 @@ export const isClosed = (note: Note) => !!note.locked && !note.locked.open;
  * to-dos and words stay out of the sidebar and search, so they don't come and go as it opens.
  */
 function metaOf(note: Note): NoteMeta {
-  const language = plugins.language(note.format);
-  if (!note.locked) return language.meta(note.body);
-  const title = note.locked.open ? language.meta(note.body).title : note.locked.title;
+  if (!note.locked) return plugins.meta(note.format, note.body);
+  const title = note.locked.open ? plugins.meta(note.format, note.body).title : note.locked.title;
   return { title, excerpt: "", tags: [], hasOpenTodos: false, searchText: title.toLowerCase(), properties: [], type: "" };
 }
 

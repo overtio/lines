@@ -201,13 +201,15 @@ function body(lines: string[], from: number, starts: (line: string) => boolean):
   const first = lines[from].trim();
   if (first.startsWith("```")) {
     const kind = first.slice(3).trim();
-    let last = from + 1;
-    while (last < lines.length && lines[last].trim() !== "```") last++;
-    const content = lines.slice(from + 1, last).join("\n");
+    let close = from + 1;
+    while (close < lines.length && lines[close].trim() !== "```") close++;
+    const content = lines.slice(from + 1, close).join("\n");
+    // Not closed (yet): it runs to the end of the note.
+    const last = Math.min(close, lines.length - 1);
     if (kind === "graphql") return { text: null, last, unsupported: "GraphQL" };
     if (kind === "base64" || kind === "hex") return { text: null, last, unsupported: kind };
     const type = kind === "json" ? "application/json" : kind === "xml" ? "application/xml" : undefined;
-    return { text: content + (last > from + 1 ? "\n" : ""), last, type };
+    return { text: content + (close > from + 1 ? "\n" : ""), last, type };
   }
   if (first.startsWith("`")) return { text: unescape(first.slice(1, first.lastIndexOf("`"))), last: from };
   if (first.startsWith("{") || first.startsWith("[")) {

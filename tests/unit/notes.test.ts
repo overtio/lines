@@ -1,6 +1,7 @@
 import { describe, expect, mock, test } from "bun:test";
 import { stubApp } from "./stubs";
 import { readPack } from "../../src/lib/sounds/mechvibes";
+import { parseHurl } from "../../src/plugins/http/hurl/parse";
 import type { NoteLanguage } from "../../src/lib/plugins/types";
 
 stubApp();
@@ -45,6 +46,13 @@ describe("code notes", () => {
     expect(language("CSS").addTag("/* Theme */\nbody {}", "web")).toBe("/* Theme */\n/* #web */\nbody {}");
     expect(language("CSS").addTag("/* #a */\nbody {}", "b")).toBe("/* #a #b */\nbody {}");
   });
+});
+
+test("a Hurl body whose ``` isn't closed yet runs to the end of the note", () => {
+  const request = 'POST https://example.com\n```\n{"name": "Ada"}';
+  const response = "GET https://example.com\nHTTP 200\n```\nok";
+  expect(parseHurl(request).requests[0]).toMatchObject({ body: '{"name": "Ada"}\n', to: request.length });
+  expect(parseHurl(response).requests[0]).toMatchObject({ expect: { body: "ok\n" }, to: response.length });
 });
 
 test("a line's comments, a line mark among them, aren't part of its text", () => {

@@ -161,7 +161,7 @@ class NoteKeys {
     return {
       ...lock,
       key: this.newest(lock.key.id) ?? lock.key,
-      title: plugins.language(note.format).meta(note.body).title,
+      title: plugins.meta(note.format, note.body).title,
       files: [...referencedAttachments([note.body])],
       sealed: toBase64(await seal(open.key, utf8(note.body), CONTEXT)),
     };
