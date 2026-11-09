@@ -35,7 +35,7 @@ export default {
   "plugins.tex": "TeX Typesetting",
   "plugins.tex.description": "Typesets a LaTeX note’s PDF with TeX itself, instead of lines’ own pages.",
   "plugins.themes": "Themes",
-  "plugins.themes.description": "Lines and fifteen more, including High Contrast and two for color blindness.",
+  "plugins.themes.description": "Lines and fifteen more, including High Contrast and two for color blindness. Reads themes made for VS Code, Zed, Base16, terminals and Linux desktops too.",
   "plugins.lucide.description": "lines’ icons, from Lucide.",
   "plugins.sfSymbols.description": "Apple’s icons, drawn by your Mac, iPhone or iPad.",
   // Unsplash and GIPHY are names, not translated. {name} is one of them.

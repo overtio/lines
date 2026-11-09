@@ -1,11 +1,12 @@
-import { plugins } from "./plugins/registry.svelte";
-import type { Theme, ThemeColors } from "./plugins/types";
-import { prefs } from "./prefs.svelte";
+import { plugins } from "../plugins/registry.svelte";
+import type { Theme, ThemeColors } from "../plugins/types";
+import { prefs } from "../prefs.svelte";
 
 /*
- * Themes come from plugins (lines' own are in plugins/themes). This writes the colors of the ones
- * on as CSS custom properties, which app.css builds on, and shows this window's theme: the one
- * chosen, or Lines while the plugin it's from is off.
+ * Themes come from plugins (lines' own are in plugins/themes), and your own (custom.svelte.ts). This
+ * writes the colors of the ones on as CSS custom properties, which app.css builds on, and shows this
+ * window's theme: the one chosen, or Lines while the plugin it's from is off, light or dark as
+ * Settings says unless the theme has colors for only one.
  */
 
 /** What Increased contrast changes in every theme, before each theme's own changes. */
@@ -59,15 +60,21 @@ function showThemes() {
   if (style.textContent !== css) style.textContent = css;
 }
 
+/** Which of a theme's schemes shows when Settings asks for dark (or not): the one it has, if it has one. */
+export const schemeShown = (theme: Theme, dark: boolean) => theme.scheme ?? (dark ? "dark" : "light");
+
 function showTheme() {
   const { theme: id, dark } = prefs.windowLook;
   const theme = plugins.theme(id);
+  const scheme = schemeShown(theme, dark);
   const root = document.documentElement;
   root.dataset.theme = theme.id;
+  root.dataset.scheme = scheme;
+  root.style.colorScheme = scheme;
   if (theme.accessible) root.dataset.accessible = "";
   else delete root.dataset.accessible;
   // Tint the browser's and phone's status bar to match.
-  document.querySelector('meta[name="theme-color"]:not([media])')?.setAttribute("content", theme[dark ? "dark" : "light"].bg);
+  document.querySelector('meta[name="theme-color"]:not([media])')?.setAttribute("content", theme[scheme].bg);
 }
 
 // Before the first paint, so there's no flash of another theme; then whenever they change.

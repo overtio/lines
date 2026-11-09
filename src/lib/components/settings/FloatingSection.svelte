@@ -3,6 +3,7 @@
   import { t } from "../../i18n/index.svelte";
   import { plugins } from "../../plugins/registry.svelte";
   import { formatPercent, OPACITY, prefs, windowLookAvailable, type Appearance, type WindowButtons } from "../../prefs.svelte";
+  import { schemeShown } from "../../themes/show.svelte";
   import { canFloat } from "../../windows/floating";
   import FieldGroup from "../ui/FieldGroup.svelte";
   import FieldRow from "../ui/FieldRow.svelte";
@@ -56,7 +57,7 @@
           {t("settings.floatingSame")}
         </RadioGroup.Item>
         {#each plugins.themes as option (option.id)}
-          {@const { bg, accent } = option[prefs.floatingLook.dark ? "dark" : "light"]}
+          {@const { bg, accent } = option[schemeShown(option, prefs.floatingLook.dark)]}
           <!-- In forced colors each swatch keeps its theme's colors. -->
           <RadioGroup.Item
             value={option.id}
