@@ -426,6 +426,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 ## 13b. Layout and tabs
 
 - [ ] Settings → Layout: Sidebar Left/Right and Note list Left/Right; each of the four arrangements applies at once, in every window, and is remembered after reloading
+- [ ] Settings → Layout → Scroll bars off: no scroll bar anywhere (the sidebar, the note list, notes, Settings, menus, pickers, a drawing, a spreadsheet's grid), in every window at once, with Show scroll bars set to Always in macOS too [Mac], and on Windows and Linux; scrolling still works by trackpad, wheel, touch and keys; on again, they're back
 - [ ] Each arrangement, wide: the sidebar is outermost on its side and the list beside the note; dividers are on each pane's inner edge; hiding the sidebar slides it out to its side; focus mode slides both away and back
 - [ ] The sidebar's hide button is on its inner edge, with the icon of its side; its show button is in the note list's title bar on the sidebar's side when the list is on that side, else at the note toolbar's edge on that side; focus moves between the two as they swap
 - [ ] Dragging a pane's inner edge resizes it the way the pointer goes, on either side; from the keyboard, ← and → move the edge; double-click and Enter put it back

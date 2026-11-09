@@ -178,6 +178,8 @@ export default {
   "settings.outline": "Show an outline beside the note",
   "settings.outlineNote": "A short line beside the note for each of its headings, darker for the part you’re reading. Point at them to see the headings, and choose one to go there. Shown when a note has two or more headings and there’s room beside it.",
   "settings.outlineSide": "Outline side",
+  "settings.scrollbars": "Scroll bars",
+  "settings.scrollbarsNote": "Off hides them everywhere in lines. You can still scroll with a trackpad, a mouse wheel, touch or the keyboard.",
   "settings.mainWindow": "Main window",
   // How see-through a window is.
   "settings.opacity": "Opacity",

@@ -184,6 +184,8 @@ interface Stored {
   /** A line beside the note for each of its headings (editor/outline.svelte.ts), on its right or left. */
   outline: boolean;
   outlineSide: Side;
+  /** Scroll bars wherever something scrolls (off: none; scrolling still works). */
+  scrollbars: boolean;
   /** Notes show `->` as →, `!=` as ≠ and so on (notes/symbols.ts): in their text, and in code. */
   symbolsInText: boolean;
   symbolsInCode: boolean;
@@ -285,6 +287,7 @@ const DEFAULTS: Stored = {
   tabs: false,
   outline: false,
   outlineSide: "right",
+  scrollbars: true,
   symbolsInText: true,
   symbolsInCode: true,
   sheetStats: ["sum", "average", "count"],
@@ -397,6 +400,7 @@ function read(json?: string): Stored {
     tabs: flag(raw.tabs, DEFAULTS.tabs),
     outline: flag(raw.outline, DEFAULTS.outline),
     outlineSide: oneOf(raw.outlineSide, SIDES, DEFAULTS.outlineSide),
+    scrollbars: flag(raw.scrollbars, DEFAULTS.scrollbars),
     symbolsInText: flag(raw.symbolsInText, DEFAULTS.symbolsInText),
     symbolsInCode: flag(raw.symbolsInCode, DEFAULTS.symbolsInCode),
     links: readLinks(raw.links),
@@ -459,6 +463,7 @@ class Prefs {
   tabs = $state(this.#initial.tabs);
   outline = $state(this.#initial.outline);
   outlineSide = $state(this.#initial.outlineSide);
+  scrollbars = $state(this.#initial.scrollbars);
   symbolsInText = $state(this.#initial.symbolsInText);
   symbolsInCode = $state(this.#initial.symbolsInCode);
   sheetStats = $state(this.#initial.sheetStats);
@@ -554,6 +559,7 @@ class Prefs {
   #apply() {
     const root = document.documentElement;
     root.dataset.font = this.font;
+    root.toggleAttribute("data-no-scrollbars", !this.scrollbars);
     const { style } = root;
     style.setProperty("--editor-size", `${this.textSize}px`);
     const s = this.spacing;
@@ -618,6 +624,7 @@ class Prefs {
       tabs: this.tabs,
       outline: this.outline,
       outlineSide: this.outlineSide,
+      scrollbars: this.scrollbars,
       symbolsInText: this.symbolsInText,
       symbolsInCode: this.symbolsInCode,
       links: $state.snapshot(this.links),
@@ -691,6 +698,7 @@ class Prefs {
     this.tabs = next.tabs;
     this.outline = next.outline;
     this.outlineSide = next.outlineSide;
+    this.scrollbars = next.scrollbars;
     this.symbolsInText = next.symbolsInText;
     this.symbolsInCode = next.symbolsInCode;
     if (next.sheetStats.join() !== this.sheetStats.join()) this.sheetStats = next.sheetStats;

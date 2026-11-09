@@ -158,6 +158,8 @@ export default {
   "settings.outline": "Mostrar un esquema junto a la nota",
   "settings.outlineNote": "Una línea corta junto a la nota por cada uno de sus encabezados, más oscura en la parte que estás leyendo. Pasa el puntero por encima para ver los encabezados y elige uno para ir allí. Aparece cuando una nota tiene dos o más encabezados y hay espacio a su lado.",
   "settings.outlineSide": "Lado del esquema",
+  "settings.scrollbars": "Barras de desplazamiento",
+  "settings.scrollbarsNote": "Desactivadas, no se ven en ningún lugar de lines. Aún puedes desplazarte con el trackpad, la rueda del ratón, el tacto o el teclado.",
   "settings.mainWindow": "Ventana principal",
   "settings.opacity": "Opacidad",
   "settings.blur": "Desenfocar lo que hay detrás",
