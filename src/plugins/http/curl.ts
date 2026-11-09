@@ -109,6 +109,12 @@ const SKIPPED_WITH_VALUE = new Set([
   "--max-redirs", "--resolve", "--interface", "-U", "--proxy-user",
 ]);
 
+/** Short options that take a value, which can be in the same word: `-XPUT`. */
+const SHORT_WITH_VALUE = new Set(["-X", "-H", "-d", "-u", "-A", "-e", "-b", "-F", ...[...SKIPPED_WITH_VALUE].filter((option) => option.length === 2)]);
+
+/** Encoded as curl encodes `--data-urlencode`'s content: everything but letters, digits and `-._~`. */
+const urlEncode = (text: string) => encodeURIComponent(text).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
+
 const header = (headers: [string, string][], name: string) => headers.find(([each]) => each.toLowerCase() === name.toLowerCase());
 
 /** The request a curl command makes, and what of it lines doesn't send (as comments to write); null if `command` isn't one. */
@@ -116,17 +122,15 @@ export function readCurl(command: string): { asked: Asked; notes: string[] } | n
   const args = words(command.trim());
   if (args[0] !== "curl") return null;
   let method: string | null = null;
-  let url: string | null = null;
+  // `use` sets it, which TypeScript doesn't see: else it would take it to be null still after the loop.
+  let url = null as string | null;
   let user: string | undefined;
   let get = false;
   const headers: [string, string][] = [];
   const data: string[] = [];
   const notes: string[] = [];
-  for (let i = 1; i < args.length; i++) {
-    const arg = args[i];
-    const long = /^(--[\w.-]+)=(.*)$/.exec(arg);
-    const option = long ? long[1] : arg;
-    const value = () => (long ? long[2] : (args[++i] ?? ""));
+  /** Reads an option, which takes its value from `value` if it has one. */
+  const use = (option: string, value: () => string) => {
     switch (option) {
       case "-X":
       case "--request":
@@ -143,9 +147,17 @@ export function readCurl(command: string): { asked: Asked; notes: string[] } | n
       case "--data-raw":
       case "--data-binary":
       case "--data-ascii":
-      case "--data-urlencode":
         data.push(value());
         break;
+      case "--data-urlencode": {
+        // As curl reads it: `name=content` sends the content encoded, `=content` and `content` just
+        // it; `name@file` and `@file` read a file, which lines doesn't.
+        const text = value();
+        const at = text.includes("=") ? text.indexOf("=") : text.indexOf("@");
+        if (text[at] === "@") notes.push(`Not sent: lines doesn't read data from files yet (--data-urlencode ${text})`);
+        else data.push(at > 0 ? `${text.slice(0, at)}=${urlEncode(text.slice(at + 1))}` : urlEncode(text.slice(at + 1)));
+        break;
+      }
       case "--json":
         data.push(value());
         if (!header(headers, "Content-Type")) headers.push(["Content-Type", "application/json"]);
@@ -185,12 +197,27 @@ export function readCurl(command: string): { asked: Asked; notes: string[] } | n
         notes.push(`Not sent: lines doesn't send forms with files yet (-F ${value()})`);
         break;
       default:
-        if (SKIPPED_WITH_VALUE.has(option)) {
-          if (!long) i++;
-        } else if (!arg.startsWith("-") && url === null) {
-          url = arg;
-        }
+        if (SKIPPED_WITH_VALUE.has(option)) value();
+        else if (!option.startsWith("-") && url === null) url = option;
     }
+  };
+  for (let i = 1; i < args.length; i++) {
+    const arg = args[i];
+    const next = () => args[++i] ?? "";
+    const long = /^(--[\w.-]+)=(.*)$/.exec(arg);
+    if (long) use(long[1], () => long[2]);
+    else if (/^-[^-]./.test(arg)) {
+      // Short options run together (`-sL`), the last perhaps with its value in the same word (`-XPUT`, `-H'Accept: …'`).
+      for (let at = 1; at < arg.length; at++) {
+        const option = `-${arg[at]}`;
+        if (!SHORT_WITH_VALUE.has(option)) use(option, next);
+        else {
+          const rest = arg.slice(at + 1);
+          use(option, () => rest || next());
+          break;
+        }
+      }
+    } else use(arg, next);
   }
   if (!url) return null;
   if (!/^[a-z][\w+.-]*:\/\//i.test(url) && !url.startsWith("{{")) url = `https://${url}`;
