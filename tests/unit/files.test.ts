@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { deflateRawSync } from "node:zlib";
 import { diffLines } from "../../src/plugins/changes/diff";
 import { isPageBreak, LATEX_PAGE_BREAK, PAGE_BREAK } from "../../src/lib/notes/pageBreak";
+import { csvText } from "../../src/lib/sheets/csv";
 import { readPack } from "../../src/lib/sounds/mechvibes";
 import { V1_KEYS } from "../../src/lib/sounds/v1keys";
 import { unzip, zip } from "../../src/lib/zip";
@@ -140,6 +141,21 @@ describe("line diff", () => {
     const a = Array.from({ length: 100 }, (_, i) => `a${i}`);
     const b = Array.from({ length: 100 }, (_, i) => `b${i}`);
     expect(diffLines(a, b, 10)).toEqual([{ before: [0, 100], after: [0, 100] }]);
+  });
+});
+
+describe("CSV files", () => {
+  test("Excel's on Windows, in Windows-1252, read with their accents and euros", () => {
+    // Excel's CSV (semicolon-separated): é is 0xE9, € is 0x80.
+    const data = Uint8Array.from([..."Produit;Prix\r\nCafé;3,50 €\r\n"].map((char) => ({ é: 0xe9, "€": 0x80 })[char] ?? char.charCodeAt(0)));
+    expect(csvText(data)).toBe("Produit;Prix\r\nCafé;3,50 €\r\n");
+  });
+
+  test("UTF-8, with a byte order mark or none, and UTF-16 with one", () => {
+    expect(csvText(bytes("Café,€"))).toBe("Café,€");
+    expect(csvText(bytes("﻿Café,€"))).toBe("Café,€");
+    expect(csvText(Uint8Array.from([0xff, 0xfe, 0x43, 0, 0xe9, 0]))).toBe("Cé");
+    expect(csvText(Uint8Array.from([0xfe, 0xff, 0, 0x43, 0, 0xe9]))).toBe("Cé");
   });
 });
 
