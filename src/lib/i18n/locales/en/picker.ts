@@ -33,4 +33,5 @@ export default {
   "picker.minutes": "{count, plural, one {# min} other {# min}}",
   "picker.created": "Created",
   "picker.edited": "Edited",
+  "picker.language": "Language",
 };

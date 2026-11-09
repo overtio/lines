@@ -68,4 +68,6 @@ export default {
   // GitHub and arXiv are names, not translated.
   "plugins.github.description": "Shows links to GitHub short, the way GitHub writes them, with its mark: overtio/lines#12.",
   "plugins.arxiv.description": "Shows links to arXiv’s papers the way arXiv cites them: arXiv:1706.03762. In the apps, adds /paper, to search arXiv and link to a paper. What you search for goes to arXiv.",
+  "plugins.code": "Code",
+  "plugins.code.description": "Notes that are files of code, in any of about 120 programming languages: line numbers, a fixed-width font, and highlighting in the theme's colors, with indenting and brackets as in a code editor. They download and sync as their language's files (.py, .ts, .rs…).",
 };

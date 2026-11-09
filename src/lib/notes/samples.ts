@@ -15,7 +15,7 @@ export type SampleSet = "tour" | "examples" | "qa";
 type Files = Record<string, () => Promise<string>>;
 
 const SETS: Record<SampleSet, Files> = {
-  tour: import.meta.glob<string>("./tour/*.{md,tex,csv,http}", { query: "?raw", import: "default" }),
+  tour: import.meta.glob<string>("./tour/*.{md,tex,csv,http,py}", { query: "?raw", import: "default" }),
   examples: import.meta.glob<string>("./examples/*.{md,tex}", { query: "?raw", import: "default" }),
   qa: import.meta.glob<string>(["/qa/checklist.md", "/qa/notes/*.{md,tex}"], { query: "?raw", import: "default" }),
 };

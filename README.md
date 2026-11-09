@@ -45,6 +45,7 @@ The [web app](https://overtio.github.io/lines/app/) opens with a tour: one short
 - **Diagrams** from [Mermaid](https://mermaid.js.org) code: flowcharts, sequence diagrams, Gantt charts and more, drawn as you type by [Pele](https://pele.run) in your theme's colors, or by Mermaid itself.
 - **Timing diagrams** for electronics, from [WaveDrom](https://wavedrom.com) code: clocks, signals and buses over time, a register's bit fields, and logic circuits (`/timing`).
 - **3D models** to turn around and zoom into: [OpenSCAD](https://openscad.org) code in an ` ```openscad ` block (`/model`), made into its model as you type and downloaded as STL for 3D printing, and attached OpenSCAD, STL, OBJ, 3MF, glTF, STEP and IGES files. See [docs/linedown.md](docs/linedown.md#3d-models).
+- **Code notes.** Switch a note to Code and choose its language, from about 120: line numbers, a fixed-width font, highlighting in your theme's colors, and indenting and brackets as in a code editor. It stays the file it is, and downloads and syncs as one (`.py`, `.ts`, `.rs`…). Importing a code file makes one.
 - **Math** with [KaTeX](https://katex.org): `$…$` in a line, `$$` for a block.
 - **Drawings** with [Excalidraw](https://excalidraw.com), saved in the note as an SVG any Markdown app can show.
 - **Images, files, audio and video.** Paste or drop them in. Drag an image's or video's corner to resize it. Audio and video play right in the note, and audio keeps playing while you scroll and write.
@@ -281,6 +282,7 @@ src/
     unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
     github/                  Links to GitHub drawn short
     arxiv/                   Links to arXiv's papers drawn short, and searching arXiv for /paper (pacing requests as arXiv asks)
+    code/                    Code notes, a format for each language CodeMirror knows, shown as one (Code) with a choice of language
     changes/                 Marks the lines changed since a note was opened (a line diff, diff.ts)
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
     themes/                  The seventeen themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)

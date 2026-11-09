@@ -229,6 +229,11 @@ export interface NoteLanguage {
     read(state: EditorState, line: Line): WrittenMark | null;
     write(color?: MarkerColor, label?: string): string;
   };
+  /**
+   * Formats that are kinds of one thing (Code, in each programming language), shown in a note's ⓘ
+   * panel as one choice and then which; `default` is the one chosen first.
+   */
+  group?: { id: string; name: string; default: string };
   /** Other extensions it can make notes from (an Excel workbook's), besides its own. */
   opens?: string[];
   /** The notes a file of its extensions makes, if not one with the file's text as it is. */

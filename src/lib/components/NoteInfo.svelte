@@ -6,6 +6,7 @@
   import { takeFocus } from "../popover";
   import Button from "./ui/Button.svelte";
   import Segmented from "./ui/Segmented.svelte";
+  import Select from "./ui/Select.svelte";
   import { floating } from "./ui/styles";
 
   /**
@@ -20,10 +21,45 @@
 
   const format = $derived(entry.note.format ?? DEFAULT_LANGUAGE);
   const stats = $derived(plugins.language(format).stats(entry.note.body));
-  const formats = $derived(plugins.languages.map(({ id, name }) => ({ id, label: name })));
+  /** The formats to choose from, those in a group (Code, in each language) as one. */
+  const formats = $derived(
+    plugins.languages.flatMap(({ id, name, group }, i, all) => {
+      if (!group) return [{ id, label: name }];
+      return all.findIndex((each) => each.group?.id === group.id) === i ? [{ id: group.id, label: group.name }] : [];
+    }),
+  );
+  const group = $derived(plugins.language(format).group);
+  /** The formats in the note's group, to choose which. */
+  const members = $derived(group ? plugins.languages.filter((each) => each.group?.id === group.id).map(({ id, name }) => ({ value: id, label: name })) : []);
+
+  /** The format last chosen in a group on this device (the language of the last code note), or its default. */
+  function lastIn(chosen: { id: string; default: string }) {
+    try {
+      const last = localStorage.getItem(`lines.format.${chosen.id}`);
+      if (last && plugins.languages.some((each) => each.id === last)) return last;
+    } catch {
+      // Unreadable storage: its default.
+    }
+    return chosen.default;
+  }
+
+  function choose(id: string) {
+    const chosen = plugins.languages.find((each) => each.group?.id === id)?.group;
+    notes.setFormat(entry.note.id, chosen ? lastIn(chosen) : id);
+  }
+
+  function chooseIn(id: string) {
+    notes.setFormat(entry.note.id, id);
+    try {
+      localStorage.setItem(`lines.format.${group!.id}`, id);
+    } catch {
+      // Not remembered: the default comes up next time.
+    }
+  }
+
   /** The note's language when its plugin is off, or not on this device: it shows as plain text. */
   const unshown = $derived.by(() => {
-    if (formats.some((option) => option.id === format)) return null;
+    if (plugins.languages.some((each) => each.id === format)) return null;
     const plugin = plugins.pluginOf(format);
     return { name: plugin ? plugins.ownLanguage(format).name : format, plugin: plugin?.available === false ? undefined : plugin };
   });
@@ -76,7 +112,13 @@
       {#if formats.length > 1 || unshown}
         <div class="mb-3 border-b border-line pb-3">
           {#if formats.length > 1}
-            <Segmented label={t("picker.writtenIn")} options={formats} value={format} onselect={(id) => notes.setFormat(entry.note.id, id)} />
+            <Segmented label={t("picker.writtenIn")} options={formats} value={group?.id ?? format} onselect={choose} />
+          {/if}
+          {#if group}
+            <div class="mt-2.5 flex items-center justify-between gap-3">
+              <span class="text-muted">{t("picker.language")}</span>
+              <Select label={t("picker.language")} options={members} value={format} onchange={chooseIn} />
+            </div>
           {/if}
           {#if unshown}
             <p class="m-0 max-w-[260px] leading-normal text-muted not-first:mt-2.5">
