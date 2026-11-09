@@ -64,9 +64,11 @@
     list.flatMap((entry) => (entry.kind === "group" && closed.has(entry.id) && entry.sections.includes(current) ? [entry.id] : []))[0],
   );
 
-  /** Focus on the section showing in the list, or the closed group it's in. */
+  /** Focus on the section showing in the list, or the closed group it's in; narrow, with the list hidden, on its title. */
   function focusCurrent() {
-    document.getElementById(hiding ? `settings-group-button-${hiding}` : `settings-nav-${current.id}`)?.focus();
+    const entry = document.getElementById(hiding ? `settings-group-button-${hiding}` : `settings-nav-${current.id}`);
+    if (entry?.checkVisibility()) entry.focus();
+    else title?.focus();
   }
   /** Narrow: the list is showing rather than a section. */
   let listing = $state(false);
@@ -87,12 +89,12 @@
   });
 
   /** Shows a section; narrow, opens it, with focus on its title once the list has gone. */
-  async function openSection(id: SettingsSection, item: HTMLElement) {
+  async function openSection(id: SettingsSection) {
     ui.settings = id;
     if (!listing) return;
     listing = false;
     await tick();
-    if (!item.checkVisibility()) title?.focus();
+    focusCurrent();
   }
 
   /**
@@ -158,7 +160,7 @@
     active={current.id === section.id}
     aria-current={current.id === section.id ? "page" : undefined}
     tabindex={current.id === section.id ? 0 : -1}
-    onclick={(event) => void openSection(section.id, event.currentTarget)}
+    onclick={() => void openSection(section.id)}
     onkeydown={moveInList}
   />
 {/snippet}
