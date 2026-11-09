@@ -193,6 +193,16 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Links (Settings → Editor → Links): a web link can't open in a background tab of the browser, as browsers decide that; tab choices for mentions need tabs on, and in a floating note they open the note in the main window.
 - The outline shows only with room for it beside the text (none at phone width, nor with Compact spacing in a narrow window), and in Markdown and LaTeX notes; plain-text notes have no headings. In a very long note, headings far down join it a moment after the note opens, as the note is read in the background.
 
+## Themes
+
+- Your themes are kept on each device, like the rest of Settings, and don't sync; a theme file or Copy Theme moves one to another device.
+- A VS Code theme that builds on another (`"include": "./dark_plus.json"`) is read without what it includes, so its code may take lines' colors. Themes are read from their `.json`; a `.vsix` extension package isn't opened, nor are Sublime Text's `.sublime-color-scheme` files, Vim, Neovim or Emacs themes (which are code), JetBrains' `.icls`, or Obsidian's CSS.
+- Only colors are imported: an app's fonts, its colors for parts lines doesn't have (an editor's gutter, a terminal's cursor), and translucency are left out. Which of an editor theme's colors becomes the accent is a guess when the theme doesn't say; it can be changed after.
+- Colors made from the other scheme (Make Light Colors) are a start, not a designed theme.
+- Increased contrast is worked out only from colors lines can read itself (hex and `rgb()`); a theme written with `oklch()` or `var()` keeps those colors with it.
+- GTK themes are read only as named colors (`@define-color`, or libadwaita's custom properties); colors made with GTK's functions (`mix()`, `shade()`, `alpha()`) are left out.
+- The color picker is the system's (`<input type="color">`), which picks colors without transparency.
+
 ## Plugins
 
 How plugins work is in [plugins.md](plugins.md).
@@ -279,7 +289,7 @@ What isn't done yet is in [secrets.md](secrets.md#not-yet).
 
 - [ ] Convert a note between Markdown and LaTeX when switching
 - [ ] Formats as plugins: Org mode, AsciiDoc, WikiText and reStructuredText
-- [ ] Install plugins made by others, safely; themes and icon sets from a file
+- [ ] Install plugins made by others, safely; icon sets from a file
 - [ ] Drawings in LaTeX notes, saved as a PDF beside the SVG for TeX
 - [ ] Circuit schematics in CircuiTikZ (` ```circuitikz ` blocks, and `circuitikz` in LaTeX notes), drawn as you type
 - [ ] Save lines' PDF straight to a file in the apps (the web view's own PDF output), and print on iPhone and iPad

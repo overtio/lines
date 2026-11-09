@@ -17,6 +17,8 @@ export type WindowMessage =
   | { type: "prefs"; prefs: string }
   /** The app's language was chosen (i18n/index.svelte.ts). */
   | { type: "language"; choice: string }
+  /** Your own themes changed (themes/custom.svelte.ts): all of them, as saved. */
+  | { type: "themes"; themes: string }
   /** A plugin was turned on or off (plugins/registry.svelte.ts): which are, by choice. */
   | { type: "plugins"; choices: Record<string, boolean> }
   /** A floating note's window opened or closed. */

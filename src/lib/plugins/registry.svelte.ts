@@ -1,4 +1,5 @@
 import { builtIn } from "../../plugins";
+import { customThemes } from "../themes/custom.svelte";
 import { announce, onAnnounce } from "../windows/channel";
 import { plainTextLanguage } from "./plainText";
 import type { Contributions, EmbedLink, IconSet, NoteLanguage, Plugin, Theme } from "./types";
@@ -54,7 +55,9 @@ class Plugins {
   });
 
   readonly languages = $derived(this.#from("languages"));
-  readonly themes = $derived(this.#from("themes"));
+  /** The plugins' themes, then your own (themes/custom.svelte.ts). */
+  readonly themes = $derived([...this.#from("themes"), ...customThemes.themes]);
+  readonly themeFormats = $derived(this.#from("themeFormats"));
   readonly iconSets = $derived(this.#from("iconSets"));
   readonly mathEngines = $derived(this.#from("math"));
   readonly renderers = $derived(this.#from("renderers"));

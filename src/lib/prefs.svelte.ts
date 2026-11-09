@@ -464,8 +464,6 @@ class Prefs {
 
   #apply() {
     const root = document.documentElement;
-    const { dark } = this.windowLook;
-    root.dataset.scheme = dark ? "dark" : "light";
     root.dataset.font = this.font;
     if (this.moreContrast) root.dataset.contrast = "more";
     else delete root.dataset.contrast;
@@ -479,7 +477,6 @@ class Prefs {
     style.setProperty("--editor-width", this.fullWidth ? "none" : `${this.noteWidth}px`);
     style.setProperty("--editor-margin", `${s.margin}px`);
     style.setProperty("--editor-pad-top", `${s.top}px`);
-    root.style.colorScheme = dark ? "dark" : "light";
     const opacity = windowLookAvailable && !isSettings ? (isFloating ? this.floatingOpacity : this.windowOpacity) : 1;
     style.setProperty("--window-alpha", `${Math.round(opacity * 100)}%`);
     if (opacity < 1) root.dataset.translucent = "";

@@ -127,7 +127,18 @@
   --surface-list: color-mix(in srgb, var(--bg-list) var(--window-alpha), transparent);
   --surface-sidebar: color-mix(in srgb, var(--bg-sidebar) var(--window-alpha), transparent);
 
-  /* Derived from each theme's base colors (themes.svelte.ts writes those, from theme plugins). */
+  /* Sliding panes and rows, and popovers opening. */
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-pop: cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+/*
+ * Derived from each theme's base colors (themes/show.svelte.ts writes those, from theme plugins).
+ * A theme's preview in Settings (.theme-preview, with a theme's colors on it) works them out again
+ * for itself.
+ */
+:root,
+.theme-preview {
   --border: color-mix(in srgb, var(--ink) 8%, transparent);
   --hover: color-mix(in srgb, var(--ink) 4.5%, transparent);
   --active: color-mix(in srgb, var(--ink) 7.5%, transparent);
@@ -173,14 +184,12 @@
   --shadow-dialog: 0 24px 80px rgba(0, 0, 0, 0.25);
   --shadow-segment: 0 1px 3px rgba(0, 0, 0, 0.12);
   --shadow-menu: 0 10px 32px rgba(0, 0, 0, 0.14), 0 1px 4px rgba(0, 0, 0, 0.06);
-  /* Sliding panes and rows, and popovers opening. */
-  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
-  --ease-pop: cubic-bezier(0.2, 0.9, 0.3, 1);
 
   color-scheme: light;
 }
 
-:root[data-scheme="dark"] {
+:root[data-scheme="dark"],
+.theme-preview[data-scheme="dark"] {
   --border: color-mix(in srgb, var(--ink) 7%, transparent);
   --active: color-mix(in srgb, var(--ink) 8%, transparent);
   --input: color-mix(in srgb, var(--ink) 6%, transparent);
