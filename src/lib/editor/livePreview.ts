@@ -30,6 +30,7 @@ import { linkAttributes, localIcon } from "./localLinks";
 import { shortLink, ShortLinkWidget, type ShortLink } from "./shortLinks";
 import { CopyWidget, keyValue } from "./keyValue";
 import { InlineMathWidget } from "./math";
+import { fenceCode } from "./rendered";
 import { followClick, openHref } from "./links";
 import { drawMention, frontMatterField, objectsChanged, openMention, openTag, valueText } from "./objects";
 import { normalizeTag } from "../notes/parse";
@@ -577,8 +578,7 @@ function build(view: EditorView): DecorationSet {
           decos.push(Decoration.widget({ widget: new SpokenWidget(t("editor.a11y.codeStart")), side: -1 }).range(node.from));
           decos.push(Decoration.widget({ widget: new SpokenWidget(t("editor.a11y.codeEnd")), side: 1 }).range(node.to));
           // A copy button in the block's top right corner, for the code without its fences.
-          const code = node.node.getChild("CodeText");
-          const text = code ? doc.sliceString(code.from, code.to) : "";
+          const text = fenceCode(node.node, doc);
           const widget = new CopyWidget(text, t("editor.copyCode"), "cm-lp-copy cm-lp-code-copy");
           decos.push(Decoration.widget({ widget, side: 1 }).range(doc.lineAt(node.from).to));
           // A code block in a language that can be tidied gets a Format button beside Copy.

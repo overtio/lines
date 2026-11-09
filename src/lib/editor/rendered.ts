@@ -1,5 +1,5 @@
 import { isolateHistory } from "@codemirror/commands";
-import { type EditorState, type Extension, Prec } from "@codemirror/state";
+import { type EditorState, type Extension, Prec, type Text } from "@codemirror/state";
 import { EditorView, keymap, ViewPlugin, WidgetType } from "@codemirror/view";
 import type { SyntaxNode, SyntaxNodeRef } from "@lezer/common";
 import { mount, unmount } from "svelte";
@@ -25,6 +25,16 @@ import { ancestors, arrowsInto, blockPos, changeBetween, clickToShowCode, drawnB
 
 /** A code block's language as its info string gives it: its first word, in lowercase. */
 export const fenceLanguage = (info: string) => (/\S*/.exec(info.trim())![0] ?? "").toLowerCase();
+
+/**
+ * A code block's code, without its fences. In a list item or a quote, each line is a piece of its
+ * own, after the item's indent or the `>`.
+ */
+export const fenceCode = (node: SyntaxNode, doc: Text | string) =>
+  node
+    .getChildren("CodeText")
+    .map((code) => (typeof doc === "string" ? doc.slice(code.from, code.to) : doc.sliceString(code.from, code.to)))
+    .join("");
 
 /** An info string: its language, then a name (name=costs, or name="Q1 costs"), then a width (|400). */
 const INFO = /^(\S+)(?:\s+name=(?:"([^"]*)"|(\S+)))?(?:\s+\|\s*(\d{1,5})(?:\s*x\s*\d{1,5})?)?$/;

@@ -4,6 +4,7 @@ import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
 import { speak } from "../a11y";
 import { t } from "../i18n/index.svelte";
+import { fenceCode } from "./rendered";
 import { ancestors } from "./util";
 
 /*
@@ -129,13 +130,28 @@ function isJSON(code: string) {
   }
 }
 
-/** The code block whose first line `pos` is on, and its code. */
+/**
+ * The code block whose first line `pos` is on: its code, the lines it's on, and what each of them
+ * starts with in a list item or a quote (the item's indent, or `> `).
+ */
 function codeBlockAt(view: EditorView, pos: number) {
+  const { doc } = view.state;
   for (const node of ancestors(view.state, pos, 1)) {
     if (node.name !== "FencedCode") continue;
     const info = node.getChild("CodeInfo");
-    const code = node.getChild("CodeText");
-    return code && { info: info ? view.state.sliceDoc(info.from, info.to) : "", from: code.from, to: code.to };
+    const lines = node.getChildren("CodeText");
+    if (!lines.length) return null;
+    // As a line with code on it starts (a blank one can do without), with a space after a `>` so
+    // the code's own indent isn't read as part of the quote's marker.
+    const written = lines.find((line) => doc.sliceString(line.from, line.to).trim()) ?? lines[0];
+    const prefix = doc.sliceString(doc.lineAt(written.from).from, written.from).replace(/>$/, "> ");
+    return {
+      info: info ? doc.sliceString(info.from, info.to) : "",
+      code: fenceCode(node, doc),
+      from: doc.lineAt(lines[0].from).from,
+      to: doc.lineAt(lines[lines.length - 1].to).to,
+      prefix,
+    };
   }
   return null;
 }
@@ -158,17 +174,21 @@ export class FormatWidget extends WidgetType {
     button.addEventListener("mousedown", (event) => event.preventDefault());
     button.addEventListener("click", async () => {
       const block = codeBlockAt(view, view.posAtDOM(button));
-      const format = block && formatterFor(block.info, view.state.sliceDoc(block.from, block.to));
+      const format = block && formatterFor(block.info, block.code);
       if (!block || !format || view.state.readOnly) return;
-      const code = view.state.sliceDoc(block.from, block.to);
+      const { code } = block;
       button.classList.add("is-busy");
       delete button.dataset.error;
       try {
         const tidy = (await format(code)).trimEnd();
         // Only if the code is still what was formatted.
         const now = codeBlockAt(view, view.posAtDOM(button));
-        if (tidy !== code && now && view.state.sliceDoc(now.from, now.to) === code) {
-          view.dispatch({ changes: { from: now.from, to: now.to, insert: tidy }, userEvent: "input.format" });
+        if (tidy !== code && now?.code === code) {
+          const insert = tidy
+            .split("\n")
+            .map((line) => (line ? now.prefix + line : now.prefix.trimEnd()))
+            .join("\n");
+          view.dispatch({ changes: { from: now.from, to: now.to, insert }, userEvent: "input.format" });
         }
         speak(t("editor.codeFormatted"));
       } catch (error) {

@@ -7,7 +7,7 @@ import { shortLink } from "../editor/shortLinks";
 import { valueText } from "../editor/objects";
 import { Card, Highlight, Mention, Tag, TexMath, Underline } from "../editor/syntax";
 import { tableData } from "../editor/typeTables";
-import { fenceLanguage, renderedInfo } from "../editor/rendered";
+import { fenceCode, fenceLanguage, renderedInfo } from "../editor/rendered";
 import { isUnsplashPhoto } from "../editor/unsplash";
 import { attachmentName, imageSize, mediaLink } from "../notes/attachments";
 import { isPageBreak } from "../notes/pageBreak";
@@ -318,8 +318,7 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
         const info = node.getChild("CodeInfo");
         const written = info ? slice(info.from, info.to) : "";
         const language = fenceLanguage(written);
-        const code = node.getChild("CodeText");
-        const source = code ? slice(code.from, code.to) : "";
+        const source = fenceCode(node, text);
         const rendered = renderedInfo(written);
         if (rendered) return void into.append(parts.rendered(rendered.renderer, source, rendered.width, body));
         if (language === "math") return void into.append(parts.math(source, true));
