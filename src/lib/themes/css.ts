@@ -1,16 +1,12 @@
 import type { Theme, ThemeColors } from "../plugins/types";
 
-/** What Increased contrast changes in every theme, before each theme's own changes. */
-const MORE_CONTRAST = `:root[data-theme][data-scheme][data-contrast="more"] {
-  --text-sidebar: var(--text);
-  --border: color-mix(in srgb, var(--ink) 42%, transparent);
-  --card-border: color-mix(in srgb, var(--ink) 42%, transparent);
-}
+const ink = (percent: number) => `color-mix(in srgb, var(--ink) ${percent}%, transparent)`;
 
-:root[data-theme][data-scheme="dark"][data-contrast="more"] {
-  --border: color-mix(in srgb, var(--ink) 36%, transparent);
-  --card-border: color-mix(in srgb, var(--ink) 36%, transparent);
-}`;
+/** What Increased contrast changes in every theme, light and dark, before each theme's own changes. */
+export const MORE_CONTRAST = {
+  light: { "text-sidebar": "var(--text)", border: ink(42), "card-border": ink(42) },
+  dark: { "text-sidebar": "var(--text)", border: ink(36), "card-border": ink(36) },
+};
 
 /** A theme's id or a custom property's name, and a value that can't end the rule it's in. */
 const NAME = /^[a-z][a-z0-9-]*$/;
@@ -34,7 +30,8 @@ export function themeCss(all: readonly Theme[]): string {
   const root = (theme: Theme) => `:root[data-theme="${theme.id}"]`;
   return [
     ...themes.flatMap((theme) => [rule(root(theme), theme.light), rule(`${root(theme)}[data-scheme="dark"]`, theme.dark)]),
-    MORE_CONTRAST,
+    rule(':root[data-theme][data-scheme="light"][data-contrast="more"]', MORE_CONTRAST.light),
+    rule(':root[data-theme][data-scheme="dark"][data-contrast="more"]', MORE_CONTRAST.dark),
     ...themes.flatMap((theme) => [
       rule(`${root(theme)}[data-scheme="light"][data-contrast="more"]`, theme.moreContrast?.light),
       rule(`${root(theme)}[data-scheme="dark"][data-contrast="more"]`, theme.moreContrast?.dark),

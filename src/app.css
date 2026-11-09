@@ -131,9 +131,6 @@
   --window-radius: 16px;
   /* The light inner edge macOS gives windows, for see-through ones that lose it. */
   --window-edge: rgba(255, 255, 255, 0.45);
-  --surface: color-mix(in srgb, var(--bg) var(--note-alpha), transparent);
-  --surface-list: color-mix(in srgb, var(--bg-list) var(--list-alpha), transparent);
-  --surface-sidebar: color-mix(in srgb, var(--bg-sidebar) var(--window-alpha), transparent);
 
   /* Sliding panes and rows, and popovers opening. */
   --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
@@ -142,11 +139,14 @@
 
 /*
  * Derived from each theme's base colors (themes/show.svelte.ts writes those, from theme plugins).
- * A theme's preview in Settings (.theme-preview, with a theme's colors on it) works them out again
- * for itself.
+ * A part with colors of its own and its scheme in `data-scheme` (a pane shown dark, a theme's
+ * preview in Settings) works them out again for itself.
  */
 :root,
-.theme-preview {
+[data-scheme] {
+  --surface: color-mix(in srgb, var(--bg) var(--note-alpha), transparent);
+  --surface-list: color-mix(in srgb, var(--bg-list) var(--list-alpha), transparent);
+  --surface-sidebar: color-mix(in srgb, var(--bg-sidebar) var(--window-alpha), transparent);
   --border: color-mix(in srgb, var(--ink) 8%, transparent);
   --hover: color-mix(in srgb, var(--ink) 4.5%, transparent);
   --active: color-mix(in srgb, var(--ink) 7.5%, transparent);
@@ -197,7 +197,7 @@
 }
 
 :root[data-scheme="dark"],
-.theme-preview[data-scheme="dark"] {
+[data-scheme="dark"] {
   --border: color-mix(in srgb, var(--ink) 7%, transparent);
   --active: color-mix(in srgb, var(--ink) 8%, transparent);
   --input: color-mix(in srgb, var(--ink) 6%, transparent);
@@ -311,9 +311,12 @@
 /*
  * Where scroll bars are always shown (Windows, Linux, or macOS set to "Always"), keep them slim
  * with a transparent track so they sit on each theme instead of a gray strip. Overlay scroll
- * bars on Macs and phones are left alone.
+ * bars on Macs and phones are left alone. A part with colors of its own has its text and scroll
+ * bars in them, rather than the page's.
  */
-:root {
+:root,
+[data-scheme] {
+  color: var(--text);
   scrollbar-color: var(--scrollbar) transparent;
 }
 

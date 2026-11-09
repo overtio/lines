@@ -33,6 +33,7 @@
   import { canFloat, floatingOpen, toggleFloating } from "./lib/windows/floating";
   import { tabs } from "./lib/tabs.svelte";
   import { textSizeKey } from "./lib/textSize";
+  import { isDarkPane } from "./lib/themes/show.svelte";
   import { findInPane } from "./lib/editor/find.svelte";
 
   let searchInput = $state<HTMLInputElement>();
@@ -481,7 +482,8 @@
   style:grid-template-areas={grid?.areas}
   style:grid-template-columns={grid?.columns}
 >
-  <aside class={sidebarPaneClass} inert={!wide && !ui.sidebarOpen} bind:this={sidebarPane}>
+  <!-- A pane shown in the theme's dark colors (Settings → Theme → Dark panes) has its scheme of its own. -->
+  <aside class={sidebarPaneClass} data-pane="sidebar" data-scheme={isDarkPane("sidebar") ? "dark" : undefined} inert={!wide && !ui.sidebarOpen} bind:this={sidebarPane}>
     <Sidebar />
   </aside>
 
@@ -495,7 +497,7 @@
   {/if}
 
   <!-- On a phone one pane shows at a time; the other is off-screen and out of reach. -->
-  <div class={listPaneClass} inert={narrow && !!selected} bind:this={listPane}>
+  <div class={listPaneClass} data-pane="list" data-scheme={isDarkPane("list") ? "dark" : undefined} inert={narrow && !!selected} bind:this={listPane}>
     <NoteList bind:searchInput />
   </div>
 

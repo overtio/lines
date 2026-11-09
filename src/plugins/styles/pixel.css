@@ -4,7 +4,9 @@
  * pixel font, and no easing: things change at once.
  */
 
-:root[data-style="pixel"] {
+/* Made from the theme's colors, and made again in a part with its own (a pane shown dark). */
+:root[data-style="pixel"],
+:root[data-style="pixel"] [data-scheme] {
   --pixel-line: 2px solid var(--text);
 }
 

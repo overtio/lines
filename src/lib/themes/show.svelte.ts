@@ -1,22 +1,26 @@
 import { plugins } from "../plugins/registry.svelte";
-import type { Theme } from "../plugins/types";
+import type { Theme, ThemeColors } from "../plugins/types";
 import { prefs } from "../prefs.svelte";
 import { css, grey, inverted, parse, type Rgb } from "./color";
-import { themeCss } from "./css";
-import { BASE_COLORS } from "./palette";
+import { MORE_CONTRAST, rule, themeCss } from "./css";
+import { BASE_COLORS, moreContrast, otherScheme, type Scheme } from "./palette";
 
 /*
  * Themes come from plugins (lines' own are in plugins/themes), and your own (custom.svelte.ts). This
  * writes the colors of the ones on as CSS custom properties, which app.css builds on, and shows this
  * window's theme: the one chosen, or Lines while the plugin it's from is off, light or dark as
  * Settings says unless the theme has colors for only one, and in greys (Monochrome) or turned
- * around (Invert) if asked.
+ * around (Invert) if asked; and its sidebar and note list in its dark colors while it's light, if
+ * Settings → Theme → Dark panes says.
  */
 
 const style = document.createElement("style");
 style.id = "lines-themes";
 // First in the page, so app.css's rules come after the themes' and build on them.
 document.head.prepend(style);
+const panes = document.createElement("style");
+panes.id = "lines-dark-panes";
+style.after(panes);
 
 function showThemes() {
   const css = themeCss(plugins.themes);
@@ -25,6 +29,30 @@ function showThemes() {
 
 /** Which of a theme's schemes shows when Settings asks for dark (or not): the one it has, if it has one. */
 export const schemeShown = (theme: Theme, dark: boolean) => theme.scheme ?? (dark ? "dark" : "light");
+
+const other = (scheme: Scheme): Scheme => (scheme === "dark" ? "light" : "dark");
+
+/** The window's theme, the scheme of its colors, and the scheme it shows: that one, or turned around by Invert. */
+function look() {
+  const { theme: id, dark } = prefs.windowLook;
+  const theme = plugins.theme(id);
+  const own = schemeShown(theme, dark);
+  return { theme, own, shown: prefs.invert ? other(own) : own };
+}
+
+/** Whether `pane` shows in the theme's dark colors: if Settings → Theme → Dark panes says, while the window's light. */
+export const isDarkPane = (pane: "sidebar" | "list") => (prefs.darkPanes === pane || prefs.darkPanes === "both") && look().shown === "light";
+
+/**
+ * A pane's colors while it's dark and the window's light: the theme's for its other scheme (worked
+ * out from the one it has, for a theme with only one), with Increased contrast's if `more`.
+ */
+export function paneColors(theme: Theme, own: Scheme, more: boolean): Partial<ThemeColors> {
+  const scheme = other(own);
+  const colors = theme.scheme ? otherScheme(theme[own]) : theme[scheme];
+  if (!more) return colors;
+  return { ...colors, ...MORE_CONTRAST[scheme], ...(theme.scheme ? moreContrast(colors) : theme.moreContrast?.[scheme]) };
+}
 
 /**
  * The colors Monochrome and Invert change: each theme's, and app.css's own. Those app.css mixes from
@@ -64,6 +92,17 @@ const FILTERED = [
 /** The colors set on the page for them, taken off before they're worked out again. */
 let filtered: string[] = [];
 
+/** The colors Monochrome and Invert change, from those `shown` has, as they show them. */
+function filteredColors(shown: CSSStyleDeclaration) {
+  const colors: Record<string, string> = {};
+  for (const name of FILTERED) {
+    const color = parse(shown.getPropertyValue(`--${name}`));
+    // A highlighter is as bright in light as in dark, where app.css mixes in less of it.
+    if (color) colors[name] = css(shownColor(color, prefs.invert && name !== "highlight-base"));
+  }
+  return colors;
+}
+
 /** A color as Monochrome and Invert show it, for what's drawn in a color of its own (the paper's). */
 export function shownColor(color: Rgb, turned = prefs.invert): Rgb {
   const toned = prefs.monochrome ? grey(color) : color;
@@ -82,40 +121,57 @@ export function ownColor(value: string, fallback: string) {
  * the colors as the theme shows them (with Increased contrast's), set on the page itself so they
  * outrank every rule; pictures in notes aren't touched.
  */
-function filter(root: HTMLElement, scheme: "light" | "dark") {
-  const { monochrome, invert } = prefs;
-  const filters = [monochrome && "monochrome", invert && "invert"].filter(Boolean).join(" ");
+function filter(root: HTMLElement) {
+  const filters = [prefs.monochrome && "monochrome", prefs.invert && "invert"].filter(Boolean).join(" ");
   if (filters) root.dataset.filters = filters;
   else delete root.dataset.filters;
-  if (!filters) return scheme;
-  const shown = getComputedStyle(root);
-  for (const name of FILTERED) {
-    const color = parse(shown.getPropertyValue(`--${name}`));
-    if (!color) continue;
-    // A highlighter is as bright in light as in dark, where app.css mixes in less of it.
-    root.style.setProperty(`--${name}`, css(shownColor(color, invert && name !== "highlight-base")));
+  if (!filters) return;
+  for (const [name, value] of Object.entries(filteredColors(getComputedStyle(root)))) {
+    root.style.setProperty(`--${name}`, value);
     filtered.push(name);
   }
-  return invert ? (scheme === "dark" ? "light" : "dark") : scheme;
+}
+
+/**
+ * The dark panes' colors (App.svelte marks them), for the window's theme. Through Monochrome and
+ * Invert as the window's are: worked out by app.css on an element of their own, in the scheme they
+ * have before Invert turns them around.
+ */
+function showPanes(theme: Theme, own: Scheme, shown: Scheme) {
+  let colors: Partial<ThemeColors> = {};
+  if (prefs.darkPanes !== "none" && shown === "light") {
+    colors = paneColors(theme, own, prefs.moreContrast);
+    if (prefs.monochrome || prefs.invert) {
+      const probe = document.createElement("div");
+      probe.hidden = true;
+      probe.dataset.scheme = other(own);
+      for (const [name, value] of Object.entries(colors)) if (value) probe.style.setProperty(`--${name}`, value);
+      document.body.append(probe);
+      colors = { ...colors, ...filteredColors(getComputedStyle(probe)) };
+      probe.remove();
+    }
+  }
+  // Outranking app.css's colors worked out from them, as the theme's own do on the page.
+  const sheet = rule(":root [data-pane][data-scheme]", colors);
+  if (panes.textContent !== sheet) panes.textContent = sheet;
 }
 
 function showTheme() {
-  const { theme: id, dark } = prefs.windowLook;
-  const theme = plugins.theme(id);
+  const { theme, own, shown } = look();
   const root = document.documentElement;
   for (const name of filtered) root.style.removeProperty(`--${name}`);
   filtered = [];
-  const own = schemeShown(theme, dark);
   root.dataset.theme = theme.id;
   root.dataset.scheme = own;
   if (prefs.moreContrast) root.dataset.contrast = "more";
   else delete root.dataset.contrast;
   if (theme.accessible) root.dataset.accessible = "";
   else delete root.dataset.accessible;
+  filter(root);
   // Inverted, a light theme's colors show as dark ones, so app.css, the web view and diagrams treat them so.
-  const scheme = filter(root, own);
-  root.dataset.scheme = scheme;
-  root.style.colorScheme = scheme;
+  root.dataset.scheme = shown;
+  root.style.colorScheme = shown;
+  showPanes(theme, own, shown);
   // Tint the browser's and phone's status bar to match.
   const bg = root.style.getPropertyValue("--bg") || theme[own].bg;
   document.querySelector('meta[name="theme-color"]:not([media])')?.setAttribute("content", bg);
