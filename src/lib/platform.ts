@@ -102,16 +102,19 @@ export async function pickLinkFolder(prompt: string, message: string): Promise<s
 
 /**
  * Opens a folder or file on this computer (a note's link to it) in the desktop apps: a folder in
- * Finder, a file in its app. Whether it did, or the path isn't there, or nothing here can open one.
+ * Finder, a file in its app. Whether it did, the path isn't there, it couldn't be opened, or nothing
+ * here can open one.
  */
-export async function openPath(path: string): Promise<"opened" | "missing" | "unavailable"> {
+export async function openPath(path: string): Promise<"opened" | "missing" | "failed" | "unavailable"> {
   if (!isDesktopApp) return "unavailable";
   const { invoke } = await import("@tauri-apps/api/core");
   try {
     await invoke("open_local", { path });
     return "opened";
-  } catch {
-    return "missing";
+  } catch (error) {
+    if (error === "missing") return "missing";
+    console.error(`Couldn't open ${path}:`, error);
+    return "failed";
   }
 }
 

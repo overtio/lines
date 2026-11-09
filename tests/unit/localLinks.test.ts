@@ -12,6 +12,7 @@ describe("links to folders and files on this computer", () => {
   test("Windows' paths, by drive", () => {
     expect(linkTo("C:\\Users\\me\\Work", true)).toBe("file:///C:/Users/me/Work/");
     expect(pathOf("file:///C:/Users/me/Work/")).toBe("C:\\Users\\me\\Work");
+    expect(pathOf(linkTo("D:\\", true))).toBe("D:\\");
   });
 
   test("read back as the path they were made from", () => {

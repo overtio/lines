@@ -61,8 +61,8 @@ export async function openLocal(href: string, element?: HTMLElement) {
   if (!path) return;
   const name = nameOf(path);
   const opened = await openPath(path);
-  if (opened === "missing") {
-    speak(t("editor.localMissing", { name }));
+  if (opened === "missing" || opened === "failed") {
+    speak(t(opened === "missing" ? "editor.localMissing" : "editor.localFailed", { name }));
     element?.animate([{ backgroundColor: "color-mix(in srgb, var(--danger) 25%, transparent)", borderRadius: "3px" }, { backgroundColor: "transparent", borderRadius: "3px" }], { duration: 900, easing: "ease-out" });
   } else if (opened === "unavailable") {
     void copyText(path);
