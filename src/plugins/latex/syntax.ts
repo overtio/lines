@@ -212,7 +212,8 @@ export function scanLatex(text: string): { spans: Span[]; definitions: Definitio
           i = close + size;
         } else i += size;
       } else if (c === "\\") {
-        i = command(i, to);
+        // Always onwards, so no half-typed command can keep reading the same text.
+        i = Math.max(command(i, to), i + 1);
       } else if (c === "-" && text[i + 1] === "-") {
         const size = text[i + 2] === "-" ? 3 : 2;
         spans.push({ type: "symbol", from: i, to: i + size, text: size === 3 ? "—" : "–" });
@@ -374,12 +375,16 @@ export function scanLatex(text: string): { spans: Span[]; definitions: Definitio
 
   function endEnv(start: number, pos: number): number {
     const nameEnd = group(pos);
-    const name = nameEnd > 0 ? text.slice(pos + 1, nameEnd - 1).trim() : "";
+    if (nameEnd < 0) {
+      spans.push({ type: "command", from: start, to: pos });
+      return pos;
+    }
+    const name = text.slice(pos + 1, nameEnd - 1).trim();
     let at = open.length - 1;
     while (at >= 0 && open[at].span.name !== name) at--;
     if (at < 0) {
-      spans.push({ type: "command", from: start, to: Math.max(nameEnd, pos) });
-      return Math.max(nameEnd, pos);
+      spans.push({ type: "command", from: start, to: nameEnd });
+      return nameEnd;
     }
     // Environments inside it that never closed end with it.
     for (const env of open.splice(at)) {
