@@ -1,5 +1,6 @@
 import { locale } from "../../lib/i18n/index.svelte";
 import { extractTags } from "../../lib/notes/parse";
+import { TAG_NAME } from "../../lib/notes/tags";
 import { prefs } from "../../lib/prefs.svelte";
 import type { Cells } from "../../lib/plugins/types";
 import { el } from "../../lib/print/parts";
@@ -34,7 +35,7 @@ export function readSheet(body: string): SheetText {
   return { head, dataFrom, cells: parseCsv(body.slice(dataFrom)) };
 }
 
-const TAGS = /(^|\s)#[\p{L}\p{N}_\-/]+/gu;
+const TAGS = new RegExp(`(^|\\s)#${TAG_NAME}`, "gu");
 
 /** The title as it reads, without its tags. */
 export const titleOf = (head: string) => head.replace(TAGS, "$1").replace(/\s+/g, " ").trim();

@@ -2,6 +2,7 @@ import { languages } from "@codemirror/language-data";
 import type { Extension } from "@codemirror/state";
 import { t } from "../../lib/i18n/index.svelte";
 import { extractTags } from "../../lib/notes/parse";
+import { TAGS_ONLY } from "../../lib/notes/tags";
 import { countLines } from "../../lib/notes/stats";
 import type { NoteMeta } from "../../lib/notes/types";
 import type { NoteLanguage, Plugin } from "../../lib/plugins/types";
@@ -49,7 +50,6 @@ const openingOf = (mark: string) =>
 /** A comment's closing mark, and a script's `#!` line. */
 const CLOSING = /\s*(?:\*\/|\*\)|-->|#\})\s*$/;
 const SHEBANG = /^#!/;
-const TAGS_ONLY = /^(?:#[\p{L}\p{N}_\-/]+\s*)+$/u;
 
 const commentText = (line: string, opening: RegExp) => line.replace(opening, "").replace(CLOSING, "").trim();
 /** A comment that's only tags, as `addTag` writes them. */

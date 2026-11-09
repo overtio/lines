@@ -11,7 +11,7 @@ Edge cases for tags, highlights and underlines. Check each line against what it 
 - (#qa/in-brackets) is a tag
 - #qa/trailing-slash/ is a tag without the slash
 - #QA/Upper is the same tag as #qa/upper
-- #qa/café and #qa/日本 are tags
+- #qa/café, #qa/日本 and #qa/हिंदी are tags
 - C# is not a tag
 - #123 is not a tag
 - [a link](#anchor) is not a tag

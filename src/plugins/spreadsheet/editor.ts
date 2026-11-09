@@ -2,6 +2,7 @@ import { type EditorState, type Extension, Prec, type Range, StateField } from "
 import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
 import { mount, unmount } from "svelte";
 import { t } from "../../lib/i18n/index.svelte";
+import { TAG_NAME } from "../../lib/notes/tags";
 import { plugins } from "../../lib/plugins/registry.svelte";
 import Grid from "./Grid.svelte";
 import { NoteSheet, sheets, sheetText } from "./state.svelte";
@@ -58,7 +59,7 @@ class Placeholder extends WidgetType {
   }
 }
 
-const TAG = /(^|\s)(#[\p{L}\p{N}_\-/]+)/gu;
+const TAG = new RegExp(`(^|\\s)(#${TAG_NAME})`, "gu");
 const titleLine = Decoration.line({ class: "cm-lp-h cm-lp-h1 cm-lp-title", attributes: { role: "heading", "aria-level": "1" } });
 const tagMark = Decoration.mark({ class: "cm-lp-tag" });
 const placeholder = Decoration.widget({ widget: new Placeholder(), side: 1 });

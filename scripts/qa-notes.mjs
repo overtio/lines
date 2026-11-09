@@ -207,7 +207,7 @@ note(
   "Tags and highlights",
   "Edge cases for tags, highlights and underlines. Check each line against what it says should happen, and the tags in the sidebar under qa.",
   [
-    `${label(1, "Tags")}\n\n- #qa/plain is a tag\n- #qa/nested/deeper is a nested tag\n- (#qa/in-brackets) is a tag\n- #qa/trailing-slash/ is a tag without the slash\n- #QA/Upper is the same tag as #qa/upper\n- #qa/café and #qa/日本 are tags\n- C# is not a tag\n- #123 is not a tag\n- [a link](#anchor) is not a tag\n- \`#qa/in-code\` is not a tag`,
+    `${label(1, "Tags")}\n\n- #qa/plain is a tag\n- #qa/nested/deeper is a nested tag\n- (#qa/in-brackets) is a tag\n- #qa/trailing-slash/ is a tag without the slash\n- #QA/Upper is the same tag as #qa/upper\n- #qa/café, #qa/日本 and #qa/हिंदी are tags\n- C# is not a tag\n- #123 is not a tag\n- [a link](#anchor) is not a tag\n- \`#qa/in-code\` is not a tag`,
     `${label(2, "Tags in code blocks")}\n\n\`\`\`\n#qa/not-a-tag in a code block\n\`\`\``,
     `${label(3, "Highlights")}\n\n- ==highlighted==\n- a == b is not a highlight\n- ===three equals=== is not a highlight\n- ==highlight across **bold** text==\n- == spaced == is not a highlight`,
     `${label(4, "Underlines")}\n\n- <u>underlined</u>\n- <U>underlined in capitals</U>\n- <u>underline across **bold** and ==highlighted== text</u>\n- **bold with <u>underlined</u> inside**\n- a lone <u> stays as typed\n- <u class="x">a tag with an attribute</u> is not an underline\n- \`<u>in code</u>\` is not an underline`,

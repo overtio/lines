@@ -1,26 +1,28 @@
 import { frontMatter, nameOf, propertyOf, typeOf } from "./properties";
 import { plainLine } from "./stats";
+import { TAG_CHAR, TAG_NAME } from "./tags";
 import type { NoteMeta } from "./types";
 
-/** Characters allowed inside a #tag. Nested tags use `/`, e.g. `#work/meetings`. */
-export const TAG_CHAR = /[\p{L}\p{N}_\-/]/u;
-
 /** A tag starts a line, follows a space, or follows "(" (but not a link's "](", which is a URL). */
-const TAG_RE = /(^|\s|(?<!\])\()#([\p{L}\p{N}_\-/]+)/gu;
+const TAG_RE = new RegExp(`(^|\\s|(?<!\\])\\()#(${TAG_NAME})`, "gu");
 /** A code block, indented or not. One that's never closed runs to the end, as in Markdown. */
 const FENCE_RE = /^[ \t]*(`{3,}|~{3,})[\s\S]*?(?:^[ \t]*\1|(?![\s\S]))/gm;
 const INLINE_CODE_RE = /`[^`\n]*`/g;
 const OPEN_TODO_RE = /^\s*[-*+] \[ \]/m;
 
-/** A tag as it's kept, in lowercase; null for a name that can't be one (`123`, `two words`, `a#b`). */
+/**
+ * A tag as it's kept, in lowercase and composed (NFC), so one typed with combining marks is the
+ * same tag; null for a name that can't be one (`123`, `two words`, `a#b`).
+ */
 export function normalizeTag(raw: string): string | null {
-  const tag = raw.replace(/\/{2,}/g, "/").replace(/^\/+|\/+$/g, "").toLowerCase();
+  // İ lowercases to i and a combining dot, which i has already.
+  const tag = raw.replace(/\/{2,}/g, "/").replace(/^\/+|\/+$/g, "").toLowerCase().normalize("NFC").replaceAll("i\u0307", "i");
   if (!tag || /^\d+$/.test(tag) || ![...tag].every((char) => TAG_CHAR.test(char))) return null;
   return tag;
 }
 
 /** A tag's name as it's typed: spaces become dashes, and characters a tag can't hold go (but `#`). */
-export const cleanTagInput = (text: string) => text.replace(/\s+/g, "-").replace(/[^\p{L}\p{N}_\-/#]/gu, "");
+export const cleanTagInput = (text: string) => text.replace(/\s+/g, "-").replace(/[^#]/gu, (char) => (TAG_CHAR.test(char) ? char : ""));
 
 export function extractTags(body: string): string[] {
   // Tags in code don't count. Most notes have none, and looking for it is most of the work.
@@ -37,7 +39,7 @@ export function extractTags(body: string): string[] {
 
 /** A line of nothing but tags, where another tag can go: `#work #ideas`, or after a `comment` mark (`% #work`). */
 const tagLine = (comment: string) =>
-  new RegExp(`^${comment ? `${comment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[ \\t]*` : ""}(?:#[\\p{L}\\p{N}_\\-/]+[ \\t]*)+$`, "u");
+  new RegExp(`^${comment ? `${comment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[ \\t]*` : ""}(?:#${TAG_NAME}[ \\t]*)+$`, "u");
 
 /**
  * Adds `#tag` to a note's text, unless it has it: after the tags on its last line if that's a line
@@ -67,8 +69,10 @@ export function renameTagIn(body: string, from: string, to: string): string {
     if (code.some(([a, b]) => start >= a && start < b)) continue;
     const tag = normalizeTag(raw);
     if (!tag || (tag !== from && !tag.startsWith(from + "/"))) continue;
-    // Keep how the rest was written (#Work/Meetings → #job/Meetings) unless it's irregular (#a//b).
-    const rest = raw.toLowerCase().startsWith(from) ? raw.slice(from.length) : tag.slice(from.length);
+    // Keep how the rest was written (#Work/Meetings → #job/Meetings) unless it's irregular (#a//b),
+    // part by part, as a part can be longer or shorter in lowercase (İ).
+    const parts = raw.split("/");
+    const rest = parts.slice(0, -1).includes("") ? tag.slice(from.length) : parts.slice(from.split("/").length).map((part) => `/${part}`).join("");
     out += body.slice(last, start) + to + rest;
     last = start + raw.length;
   }

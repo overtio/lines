@@ -20,6 +20,7 @@ import { markupMode } from "../../lib/editor/markupMode";
 import { arrowsInto, focusChanged, focused, isEditing } from "../../lib/editor/util";
 import { pageBreakAt, pagedNote } from "../../lib/editor/pageBreaks";
 import { LATEX_PAGE_BREAK } from "../../lib/notes/pageBreak";
+import { TAG_NAME } from "../../lib/notes/tags";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
 import { type PaperLink, paperCommands } from "../../lib/editor/papers";
 import { linkAttributes, localIcon } from "../../lib/editor/localLinks";
@@ -339,6 +340,8 @@ const ENV_LINES: Record<string, string> = {
   center: "cm-lt-center",
   flushright: "cm-lt-right",
 };
+/** A tag in a comment, `% #work`. */
+const COMMENT_TAG = new RegExp(`(?<=^|[\\s%(])#${TAG_NAME}`, "gu");
 
 /**
  * What's drawn for the note. Given `visible` (the part in view), what's drawn within lines, for that
@@ -633,7 +636,8 @@ function build(state: EditorState, visible?: { from: number; to: number }): Deco
         mark(span.from, span.to, "cm-lt-comment");
         // Tags go in comments, where LaTeX ignores them: % #work.
         const text = doc.sliceString(span.from, span.to);
-        for (const tag of text.matchAll(/(?<=^|[\s%(])#[\p{L}\p{N}_\-/]*[\p{L}_\-/][\p{L}\p{N}_\-/]*/gu)) {
+        for (const tag of text.matchAll(COMMENT_TAG)) {
+          if (/^#\d+$/.test(tag[0])) continue;
           mark(span.from + tag.index, span.from + tag.index + tag[0].length, "cm-lp-tag");
         }
         break;
