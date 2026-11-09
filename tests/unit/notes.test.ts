@@ -50,6 +50,13 @@ describe("code notes", () => {
   });
 });
 
+test("a Hurl entry's title is the comment just above it, but not one of only tags", () => {
+  // As a note made under a tag starts, and as adding a tag writes one.
+  expect(parseHurl("# Sign in\n# #work #api\nPOST https://api.example.com/login\nHTTP 200").requests[0].title).toBe("Sign in");
+  expect(parseHurl("# \n# #work\nGET https://api.example.com/").requests[0].title).toBe("");
+  expect(parseHurl("# #1 priority\nGET https://api.example.com/").requests[0].title).toBe("#1 priority");
+});
+
 test("a Hurl body whose ``` isn't closed yet runs to the end of the note", () => {
   const request = 'POST https://example.com\n```\n{"name": "Ada"}';
   const response = "GET https://example.com\nHTTP 200\n```\nok";

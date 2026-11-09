@@ -228,7 +228,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Send all runs the entries in order: a `[Captures]` value (`owner: jsonpath "$.userId"`) is used by the next entry's `{{owner}}`; `[Query]`, `[Form]`, `[BasicAuth]` and `[Cookies]` are sent (`https://httpbin.org/anything` echoes them); a JSON body is sent as JSON
 - [ ] A response shows "3 passed" in green or "1 failed" in red beside its status; Checks lists each check with ✓ or ✗, and what the response had for a failed one; it opens on Checks when one failed. Send all stops at the first entry that fails
 - [ ] Asserts with jsonpath (wildcards, filters `[?@.price < 10]`), header, regex, xpath on HTML, duration, sha256 `== hex,…;`, `count`, `nth`, `toInt`, `not`, `exists`, `isString`, `matches /…/` and `== {{variable}}` work; one lines can't do (`certificate`, `version`) says so in its check
-- [ ] A note switched to Hurl: Send at the end of each request line, ⌘⇧↵ sends all, the comment above each request is in the outline; importing a `.hurl` file makes a Hurl note
+- [ ] A note switched to Hurl: Send at the end of each request line, ⌘⇧↵ sends all, the comment above each request is in the outline (a `# #tag` line isn't, in a Hurl note made under a tag too); importing a `.hurl` file makes a Hurl note
 - [ ] [Desktop] An entry without `location: true` shows a redirect's own status (`HTTP 302`); with it, the page it leads to
 
 ## 6d. 3D models

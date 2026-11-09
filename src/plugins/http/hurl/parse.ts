@@ -13,6 +13,8 @@ const RESPONSE_LINE = /^HTTP(?:\/([\d.]+))?\s+(\d{3}|\*)$/;
 const SECTION = /^\[([A-Za-z]+)\]$/;
 const KEY_VALUE = /^((?:[\w.\-[\]@$]|\\.)+)\s*:\s?(.*)$/;
 const COMMENT = /^#\s?(.*)$/;
+/** A comment of nothing but tags, `# #work #api`: a note made under a tag has one, and it isn't a title. */
+const TAGS = /^(?:#[\p{L}\p{N}_/-]+\s*)+$/u;
 
 /** Section names, by alias. */
 const SECTIONS: Record<string, string> = {
@@ -262,7 +264,7 @@ export function parseHurl(text: string): ReadText {
       if (comment) {
         const said = comment[1].trim();
         if (said) comments.push(said);
-        title = said;
+        if (!TAGS.test(said)) title = said;
       }
       continue;
     }
