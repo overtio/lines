@@ -201,6 +201,8 @@ interface Stored {
   markdownMode: MarkdownMode;
   /** A grip beside lines and blocks of a Markdown note that drags them somewhere else in it. */
   dragBlocks: boolean;
+  /** The system checks notes' spelling, and corrects it as you type (code and math never). */
+  spellcheck: boolean;
   /** Notes show `->` as →, `!=` as ≠ and so on (notes/symbols.ts): in their text, and in code. */
   symbolsInText: boolean;
   symbolsInCode: boolean;
@@ -306,6 +308,7 @@ const DEFAULTS: Stored = {
   scrollbars: true,
   markdownMode: "live",
   dragBlocks: true,
+  spellcheck: true,
   symbolsInText: true,
   symbolsInCode: true,
   sheetStats: ["sum", "average", "count"],
@@ -422,6 +425,7 @@ function read(json?: string): Stored {
     scrollbars: flag(raw.scrollbars, DEFAULTS.scrollbars),
     markdownMode: oneOf(raw.markdownMode, MARKDOWN_MODES, DEFAULTS.markdownMode),
     dragBlocks: flag(raw.dragBlocks, DEFAULTS.dragBlocks),
+    spellcheck: flag(raw.spellcheck, DEFAULTS.spellcheck),
     symbolsInText: flag(raw.symbolsInText, DEFAULTS.symbolsInText),
     symbolsInCode: flag(raw.symbolsInCode, DEFAULTS.symbolsInCode),
     links: readLinks(raw.links),
@@ -488,6 +492,7 @@ class Prefs {
   scrollbars = $state(this.#initial.scrollbars);
   markdownMode = $state(this.#initial.markdownMode);
   dragBlocks = $state(this.#initial.dragBlocks);
+  spellcheck = $state(this.#initial.spellcheck);
   symbolsInText = $state(this.#initial.symbolsInText);
   symbolsInCode = $state(this.#initial.symbolsInCode);
   sheetStats = $state(this.#initial.sheetStats);
@@ -655,6 +660,7 @@ class Prefs {
       scrollbars: this.scrollbars,
       markdownMode: this.markdownMode,
       dragBlocks: this.dragBlocks,
+      spellcheck: this.spellcheck,
       symbolsInText: this.symbolsInText,
       symbolsInCode: this.symbolsInCode,
       links: $state.snapshot(this.links),
@@ -732,6 +738,7 @@ class Prefs {
     this.scrollbars = next.scrollbars;
     this.markdownMode = next.markdownMode;
     this.dragBlocks = next.dragBlocks;
+    this.spellcheck = next.spellcheck;
     this.symbolsInText = next.symbolsInText;
     this.symbolsInCode = next.symbolsInCode;
     if (next.sheetStats.join() !== this.sheetStats.join()) this.sheetStats = next.sheetStats;

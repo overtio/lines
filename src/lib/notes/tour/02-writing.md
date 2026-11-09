@@ -10,7 +10,7 @@ Type Markdown and it's formatted as you go. The text stays exactly what you type
 - In the apps, `/paper` searches arXiv for a paper by its title, an author or a topic, and links to the one you pick
 - Select some text for a small toolbar that does the same
 
-Settings → Editor → Markdown chooses how much shows: all of it as written, every mark in sight, or none of it, even where you're writing.
+Settings → Editor → Show Markdown chooses how much shows: all of it as written, every mark in sight, or none of it, even where you're writing.
 
 ## Arrows and symbols
 

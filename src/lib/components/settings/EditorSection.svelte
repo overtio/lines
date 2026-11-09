@@ -64,12 +64,15 @@
   };
 </script>
 
-<FieldGroup title={t("settings.markdown")} note={t("settings.markdownNote")}>
-  <FieldRow label={t("settings.markdownMode")} note={t(MODE_NAMES[prefs.markdownMode][1])}>
+<FieldGroup title={t("settings.writing")}>
+  <FieldRow label={t("settings.markdownMode")} note={`${t(MODE_NAMES[prefs.markdownMode][1])} ${t("settings.showMarkdownNote")}`}>
     <Segmented label={t("settings.markdownMode")} options={modes} value={prefs.markdownMode} onselect={(mode) => (prefs.markdownMode = mode)} />
   </FieldRow>
   <FieldRow label={t("settings.dragBlocks")} note={t("settings.dragBlocksNote")}>
     <Switch label={t("settings.dragBlocks")} checked={prefs.dragBlocks} onchange={(on) => (prefs.dragBlocks = on)} />
+  </FieldRow>
+  <FieldRow label={t("settings.spellcheck")} note={t("settings.spellcheckNote")}>
+    <Switch label={t("settings.spellcheck")} checked={prefs.spellcheck} onchange={(on) => (prefs.spellcheck = on)} />
   </FieldRow>
 </FieldGroup>
 
