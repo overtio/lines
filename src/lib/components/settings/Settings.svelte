@@ -22,6 +22,7 @@
   import SyncSection from "./SyncSection.svelte";
   import TextSection from "./TextSection.svelte";
   import CursorSection from "./CursorSection.svelte";
+  import MascotSection from "./MascotSection.svelte";
   import ThemeSection from "./ThemeSection.svelte";
 
   /*
@@ -43,6 +44,7 @@
     layout: LayoutSection,
     text: TextSection,
     cursor: CursorSection,
+    mascot: MascotSection,
     editor: EditorSection,
     floating: FloatingSection,
     plugins: PluginsSection,

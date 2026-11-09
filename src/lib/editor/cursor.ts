@@ -191,9 +191,78 @@ const effects = ViewPlugin.fromClass(
   },
 );
 
+/** Where the cursor is, for a mascot (lib/mascot/) to sit by, in the window's coordinates. */
+export interface CaretPlace {
+  x: number;
+  top: number;
+  bottom: number;
+  /** Where the text on the cursor's line (as it wraps) ends, and on the three lines above it, nearest first. */
+  lineEnd: number;
+  above: { end: number; top: number }[];
+  /** The text column's edges, and the part of the editor in view. */
+  textLeft: number;
+  textRight: number;
+  left: number;
+  right: number;
+  viewTop: number;
+  viewBottom: number;
+}
+
+/**
+ * Says where the cursor is as it moves, while a mascot is out (`data-mascot`): a window event,
+ * `lines:caret`, with its place, or none once the editor loses focus.
+ */
+const report = ViewPlugin.define((view) => {
+  const send = (place: CaretPlace | null) => dispatchEvent(new CustomEvent("lines:caret", { detail: place }));
+  const measure = () =>
+    view.requestMeasure({
+      key: report,
+      read: (): CaretPlace | null => {
+        const { main } = view.state.selection;
+        if (!view.hasFocus || !main.empty) return null;
+        const at = view.coordsAtPos(main.head, main.assoc || 1) ?? view.coordsAtPos(main.head, -1);
+        const end = view.coordsAtPos(view.moveToLineBoundary(main, true, true).head, -1);
+        if (!at) return null;
+        const above: CaretPlace["above"] = [];
+        for (let from = main, n = 0; n < 3; n++) {
+          const up = view.moveVertically(from, false);
+          if (up.head === from.head) break;
+          const end = view.coordsAtPos(view.moveToLineBoundary(up, true, true).head, -1);
+          if (end) above.push({ end: end.right, top: end.top });
+          from = up;
+        }
+        const content = view.contentDOM.getBoundingClientRect();
+        const style = getComputedStyle(view.contentDOM);
+        const shown = view.scrollDOM.getBoundingClientRect();
+        return {
+          x: at.left,
+          top: at.top,
+          bottom: at.bottom,
+          lineEnd: Math.max(end?.right ?? at.left, at.left),
+          above,
+          textLeft: content.left + parseFloat(style.paddingLeft),
+          textRight: content.right - parseFloat(style.paddingRight),
+          left: shown.left,
+          right: shown.right,
+          viewTop: shown.top,
+          viewBottom: shown.bottom,
+        };
+      },
+      write: send,
+    });
+  return {
+    update(update: ViewUpdate) {
+      if (!("mascot" in root)) return;
+      if (update.focusChanged && !update.view.hasFocus) send(null);
+      else if (update.selectionSet || update.docChanged || update.geometryChanged || update.focusChanged) measure();
+    },
+  };
+});
+
 export const cursor = [
   cursorLayer,
   effects,
+  report,
   EditorView.theme({
     ".cm-content, .cm-line": { caretColor: "transparent !important" },
     ".cm-cursorLayer": { animationDuration: "1.2s" },

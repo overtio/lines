@@ -39,6 +39,9 @@ export function changesBetween(before: string, after: string) {
   });
 }
 
+/** Says a todo was ticked, to whatever cares in the window (a mascot, lib/mascot/), as a window event. */
+export const todoDone = () => dispatchEvent(new Event("lines:todo-done"));
+
 /** Whether line `n` exists and has text on it. */
 export const hasText = (doc: Text, n: number) => n >= 1 && n <= doc.lines && !!doc.line(n).text.trim();
 

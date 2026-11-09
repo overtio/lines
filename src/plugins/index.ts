@@ -21,6 +21,7 @@ import { sfSymbols } from "./sf-symbols";
 import { spreadsheet } from "./spreadsheet";
 import { tex } from "./tex";
 import { keyboardSounds } from "./keyboards";
+import { mascots } from "./mascots";
 import { styles } from "./styles";
 import { themes } from "./themes";
 import { unsplash } from "./unsplash";
@@ -56,6 +57,7 @@ export const builtIn = (): Plugin[] => [
   styles(),
   paper(),
   keyboardSounds(),
+  mascots(),
   lucide(),
   // Its symbols may only be used on Apple's platforms.
   ...(isApple ? [sfSymbols()] : []),
