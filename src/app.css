@@ -330,6 +330,29 @@
   display: none;
 }
 
+/*
+ * The pointer (Settings → Cursor, cursors.svelte.ts): images of its own over the window, which
+ * everything without a pointer of its own takes, and its hand over what's clicked. Fields and notes
+ * keep the system's text cursor. What follows it about is drawn on a canvas over everything.
+ */
+:root[data-pointer],
+:root[data-pointer] body {
+  cursor: var(--pointer-arrow), default;
+}
+
+:root[data-pointer] :is(a[href], button:enabled, [role="button"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [role="option"], [role="radio"], [role="tab"], [role="switch"], [role="checkbox"], summary, label[for], select, [data-href]) {
+  cursor: var(--pointer-hand), pointer;
+}
+
+.pointer-trail {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2147483646;
+  pointer-events: none;
+}
+
 /* Fingers need bigger targets. */
 @media (pointer: coarse) {
   :root {

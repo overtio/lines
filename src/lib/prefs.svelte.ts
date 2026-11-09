@@ -25,6 +25,16 @@ export const MARKDOWN_MODES = ["source", "visible", "live", "hidden"] as const;
 export type MarkdownMode = (typeof MARKDOWN_MODES)[number];
 /** What color a paper pattern is drawn in: the theme's ink or accent, or one of your own. */
 export type PaperColor = "ink" | "accent" | "custom";
+/** The text cursor (Settings → Cursor, cursors.svelte.ts): its shape, color, blink, how it moves, and what it does as you type. */
+export const CARET_SHAPES = ["bar", "thick", "block", "underline"] as const;
+export const CARET_COLORS = ["accent", "text", "custom"] as const;
+export const CARET_BLINKS = ["smooth", "steps", "off"] as const;
+export const CARET_MOTIONS = ["jump", "glide", "trail"] as const;
+export const CARET_EFFECTS = ["none", "glow", "rainbow", "sparks"] as const;
+/** The pointer: the system's, pixel art, or a dot in the accent; and what follows it. */
+export const POINTER_STYLES = ["system", "retro", "dot"] as const;
+export const POINTER_TRAILS = ["none", "comet", "sparkles"] as const;
+
 /** Headings' color: the text's, the theme's accent, or one of your own. */
 export const HEADING_COLORS = ["text", "accent", "custom"] as const;
 export type HeadingColor = (typeof HEADING_COLORS)[number];
@@ -212,6 +222,14 @@ interface Stored {
   typingSounds: boolean;
   keyboardSound: string;
   typingVolume: number;
+  caretShape: (typeof CARET_SHAPES)[number];
+  caretColor: (typeof CARET_COLORS)[number];
+  caretCustomColor: string;
+  caretBlink: (typeof CARET_BLINKS)[number];
+  caretMotion: (typeof CARET_MOTIONS)[number];
+  caretEffect: (typeof CARET_EFFECTS)[number];
+  pointerStyle: (typeof POINTER_STYLES)[number];
+  pointerTrail: (typeof POINTER_TRAILS)[number];
   /** Headings' color, and the color of your own, kept while another is chosen (themes/show.svelte.ts). */
   headingColor: HeadingColor;
   headingCustomColor: string;
@@ -328,6 +346,14 @@ const DEFAULTS: Stored = {
   keyboardSound: "creamy",
   typingVolume: 0.5,
   headingColor: "text",
+  caretShape: "bar",
+  caretColor: "accent",
+  caretCustomColor: "#e5484d",
+  caretBlink: "steps",
+  caretMotion: "jump",
+  caretEffect: "none",
+  pointerStyle: "system",
+  pointerTrail: "none",
   headingCustomColor: "#3d7dd8",
   symbolsInText: true,
   symbolsInCode: true,
@@ -451,6 +477,14 @@ function read(json?: string): Stored {
     keyboardSound: id(raw.keyboardSound, DEFAULTS.keyboardSound),
     typingVolume: clamp(raw.typingVolume, TYPING_VOLUME.min, TYPING_VOLUME.max, DEFAULTS.typingVolume),
     headingColor: oneOf(raw.headingColor, HEADING_COLORS, DEFAULTS.headingColor),
+    caretShape: oneOf(raw.caretShape, CARET_SHAPES, DEFAULTS.caretShape),
+    caretColor: oneOf(raw.caretColor, CARET_COLORS, DEFAULTS.caretColor),
+    caretCustomColor: color(raw.caretCustomColor, DEFAULTS.caretCustomColor),
+    caretBlink: oneOf(raw.caretBlink, CARET_BLINKS, DEFAULTS.caretBlink),
+    caretMotion: oneOf(raw.caretMotion, CARET_MOTIONS, DEFAULTS.caretMotion),
+    caretEffect: oneOf(raw.caretEffect, CARET_EFFECTS, DEFAULTS.caretEffect),
+    pointerStyle: oneOf(raw.pointerStyle, POINTER_STYLES, DEFAULTS.pointerStyle),
+    pointerTrail: oneOf(raw.pointerTrail, POINTER_TRAILS, DEFAULTS.pointerTrail),
     headingCustomColor: color(raw.headingCustomColor, DEFAULTS.headingCustomColor),
     symbolsInText: flag(raw.symbolsInText, DEFAULTS.symbolsInText),
     symbolsInCode: flag(raw.symbolsInCode, DEFAULTS.symbolsInCode),
@@ -524,6 +558,14 @@ class Prefs {
   keyboardSound = $state(this.#initial.keyboardSound);
   typingVolume = $state(this.#initial.typingVolume);
   headingColor = $state(this.#initial.headingColor);
+  caretShape = $state(this.#initial.caretShape);
+  caretColor = $state(this.#initial.caretColor);
+  caretCustomColor = $state(this.#initial.caretCustomColor);
+  caretBlink = $state(this.#initial.caretBlink);
+  caretMotion = $state(this.#initial.caretMotion);
+  caretEffect = $state(this.#initial.caretEffect);
+  pointerStyle = $state(this.#initial.pointerStyle);
+  pointerTrail = $state(this.#initial.pointerTrail);
   headingCustomColor = $state(this.#initial.headingCustomColor);
   symbolsInText = $state(this.#initial.symbolsInText);
   symbolsInCode = $state(this.#initial.symbolsInCode);
@@ -698,6 +740,14 @@ class Prefs {
       keyboardSound: this.keyboardSound,
       typingVolume: this.typingVolume,
       headingColor: this.headingColor,
+      caretShape: this.caretShape,
+      caretColor: this.caretColor,
+      caretCustomColor: this.caretCustomColor,
+      caretBlink: this.caretBlink,
+      caretMotion: this.caretMotion,
+      caretEffect: this.caretEffect,
+      pointerStyle: this.pointerStyle,
+      pointerTrail: this.pointerTrail,
       headingCustomColor: this.headingCustomColor,
       symbolsInText: this.symbolsInText,
       symbolsInCode: this.symbolsInCode,
@@ -782,6 +832,14 @@ class Prefs {
     this.keyboardSound = next.keyboardSound;
     this.typingVolume = next.typingVolume;
     this.headingColor = next.headingColor;
+    this.caretShape = next.caretShape;
+    this.caretColor = next.caretColor;
+    this.caretCustomColor = next.caretCustomColor;
+    this.caretBlink = next.caretBlink;
+    this.caretMotion = next.caretMotion;
+    this.caretEffect = next.caretEffect;
+    this.pointerStyle = next.pointerStyle;
+    this.pointerTrail = next.pointerTrail;
     this.headingCustomColor = next.headingCustomColor;
     this.symbolsInText = next.symbolsInText;
     this.symbolsInCode = next.symbolsInCode;

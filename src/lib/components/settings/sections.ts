@@ -6,12 +6,12 @@ import { windowLookAvailable } from "../../prefs.svelte";
 import { canFloat } from "../../windows/floating";
 
 /** Settings' sections, in the order they're listed. */
-export const SECTIONS = ["general", "theme", "paper", "layout", "text", "editor", "floating", "plugins", "sync", "privacy", "export", "shortcuts", "about"] as const;
+export const SECTIONS = ["general", "theme", "paper", "layout", "text", "cursor", "editor", "floating", "plugins", "sync", "privacy", "export", "shortcuts", "about"] as const;
 export type SettingsSection = (typeof SECTIONS)[number];
 
 /** Sections listed together under a heading of their own, which opens and closes. */
 const GROUPS = {
-  appearance: { icon: "palette", sections: ["theme", "paper", "layout", "text", "editor", "floating"] },
+  appearance: { icon: "palette", sections: ["theme", "paper", "layout", "text", "cursor", "editor", "floating"] },
   data: { icon: "hard-drive", sections: ["sync", "privacy", "export"] },
 } as const satisfies Record<string, { icon: IconName; sections: readonly SettingsSection[] }>;
 export type SettingsGroup = keyof typeof GROUPS;
@@ -31,6 +31,7 @@ const ABOUT: Partial<Record<SettingsSection, MessageKey>> = {
   paper: "settings.section.paperAbout",
   layout: "settings.section.layoutAbout",
   text: "settings.section.textAbout",
+  cursor: "settings.section.cursorAbout",
   editor: "settings.section.editorAbout",
   floating: "settings.section.floatingAbout",
   plugins: "plugins.intro",

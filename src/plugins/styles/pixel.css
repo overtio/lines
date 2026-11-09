@@ -172,7 +172,7 @@
   background: transparent;
 }
 
-/* In notes: square bullets and boxes, a block for the cursor. */
+/* In notes: square bullets and boxes. */
 :root[data-style="pixel"] .cm-lp-h {
   letter-spacing: 0;
 }
@@ -183,11 +183,4 @@
 
 :root[data-style="pixel"] .cm-lp-checkbox {
   border: var(--pixel-line);
-}
-
-:root[data-style="pixel"] .cm-cursor {
-  width: 0.55em;
-  border-left: 0;
-  margin-left: 0;
-  background: color-mix(in srgb, var(--text) 45%, transparent);
 }

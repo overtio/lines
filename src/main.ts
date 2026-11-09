@@ -6,6 +6,7 @@ import "./lib/themes/show.svelte";
 import "./lib/paper.svelte";
 import "./lib/themes/styles.svelte";
 import "./lib/sounds/typing.svelte";
+import "./lib/cursors.svelte";
 import "./lib/editor/editor.css";
 import FloatingNote from "./lib/components/FloatingNote.svelte";
 import Settings from "./lib/components/settings/Settings.svelte";
