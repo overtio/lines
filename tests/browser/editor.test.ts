@@ -83,7 +83,7 @@ test("Enter on an empty item ends the list, when it's the second item too", asyn
 test("a note that couldn't be saved is saved once it can be, and until then a message says so", async () => {
   const id = await app.open("# Diary\n\nfirst line");
   const message = await app.page.evaluate(async () => {
-    // Notes can't be written, as when the disk is full, until the message shows.
+    // Notes can't be written, as when the disk is full, for a while after the message shows.
     const put = IDBObjectStore.prototype.put;
     IDBObjectStore.prototype.put = function (...args) {
       if (this.name === "notes") throw new DOMException("The quota has been exceeded.", "QuotaExceededError");
@@ -92,16 +92,19 @@ test("a note that couldn't be saved is saved once it can be, and until then a me
     const view = window.testing.editor()!;
     view.dispatch({ changes: { from: view.state.doc.length, insert: "\nsecond line" } });
     await window.testing.until(() => document.querySelector("[role=alert]"));
+    const shown = document.querySelector("[role=alert]")!.textContent;
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     IDBObjectStore.prototype.put = put;
-    return document.querySelector("[role=alert]")!.textContent;
+    return shown;
   });
   expect(message).toContain("The quota has been exceeded.");
   await app.page.getByRole("alert").waitFor({ state: "detached", timeout: 10_000 });
   await app.page.reload();
   await app.page.waitForFunction(() => window.testing?.notes.ready);
   expect(await app.page.evaluate((id) => window.testing.notes.get(id)!.note.body, id)).toBe("# Diary\n\nfirst line\nsecond line");
-  expect(app.errors.length).toBeGreaterThan(0);
-  expect(app.errors.filter((error) => !error.includes("The quota has been exceeded."))).toEqual([]);
+  // Each failure logged, and nothing else: no write left failing unheard.
+  expect(app.errors.length).toBeGreaterThan(1);
+  expect(app.errors.filter((error) => !error.startsWith("lines: couldn't save notes"))).toEqual([]);
   app.errors.length = 0;
 });
 

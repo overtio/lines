@@ -481,7 +481,7 @@ class NotesStore {
     if (!entry || entry.note.locked || !key || !noteKeys.isOpen(key.id)) return;
     this.#patch(id, { locked: { key, title: entry.meta.title, files: [], sealed: "", open: true } });
     // Stored encrypted right away, rather than after the usual pause.
-    return this.flush();
+    this.saveNow();
   }
 
   /** Takes the lock off an open note. */
@@ -489,7 +489,7 @@ class NotesStore {
     const entry = this.get(id);
     if (!entry?.note.locked?.open) return;
     this.#patch(id, { locked: undefined });
-    return this.flush();
+    this.saveNow();
   }
 
   /** Puts the key into every locked note it opens (after the person gave the password, say). */
@@ -544,7 +544,7 @@ class NotesStore {
   setFormat(id: string, format: string) {
     const entry = this.get(id);
     if (!entry || (entry.note.format ?? DEFAULT_LANGUAGE) === format) return;
-    this.flush();
+    this.saveNow();
     const stored = format === DEFAULT_LANGUAGE ? undefined : format;
     const template = this.#templates.get(id);
     if (template && entry.note.body === template.body) {
@@ -639,7 +639,7 @@ class NotesStore {
    * ones it changes, open ones included. Returns how many it changed.
    */
   rewrite(rewrite: (body: string, note: Note) => string) {
-    this.flush();
+    this.saveNow();
     const changed: string[] = [];
     this.entries = this.entries.map((entry) => {
       if (entry.note.locked) return entry;
@@ -803,6 +803,11 @@ class NotesStore {
     void this.#save([...this.#pending.keys()]);
     await Promise.all(this.#saving.values());
     if (this.saveError !== null) throw new Error(this.saveError);
+  }
+
+  /** `flush`, without waiting for it: should the writes fail, `saveError` says so, and they're tried again. */
+  saveNow() {
+    this.flush().catch(() => {});
   }
 
   /** Changes a note, or several the same way, and saves them after a pause. */

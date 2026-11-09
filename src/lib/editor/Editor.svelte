@@ -118,14 +118,14 @@
   $effect(() => {
     view = new EditorView({ parent: host });
     const unregister = notes.registerFlusher(sync);
-    const flush = () => notes.flush();
-    const onVisibility = () => document.visibilityState === "hidden" && flush();
+    const save = () => notes.saveNow();
+    const onVisibility = () => document.visibilityState === "hidden" && save();
     document.addEventListener("visibilitychange", onVisibility);
-    window.addEventListener("pagehide", flush);
+    window.addEventListener("pagehide", save);
     return () => {
       unregister();
       document.removeEventListener("visibilitychange", onVisibility);
-      window.removeEventListener("pagehide", flush);
+      window.removeEventListener("pagehide", save);
       sync();
       view?.destroy();
       view = undefined;
