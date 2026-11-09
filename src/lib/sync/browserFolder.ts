@@ -158,7 +158,11 @@ export class BrowserFolderRemote implements Remote {
     return file && { text: await file.text(), etag: etagOf(file) };
   }
 
-  async put(key: string, text: string) {
+  async put(key: string, text: string, expected?: string | null) {
+    if (expected !== undefined) {
+      const file = await this.#file(key);
+      if ((file ? etagOf(file) : null) !== expected) return false;
+    }
     return etagOf(await this.#write(key, text));
   }
 
