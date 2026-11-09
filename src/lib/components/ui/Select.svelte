@@ -15,7 +15,7 @@
   <Select.Trigger
     aria-label={label}
     class={[
-      "inline-flex h-control min-w-32 shrink-0 items-center justify-between gap-2 rounded-md border border-line bg-panel px-2.5 text-sm text-fg shadow-segment transition-colors enabled:hover:bg-hover data-disabled:opacity-45",
+      "ui-select inline-flex h-control min-w-32 shrink-0 items-center justify-between gap-2 rounded-md border border-line bg-panel px-2.5 text-sm text-fg shadow-segment transition-colors enabled:hover:bg-hover data-disabled:opacity-45",
       className,
     ]}
   >

@@ -19,10 +19,11 @@
   --radius-*: initial;
   --shadow-*: initial;
 
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
+  /* Scaled by --radius-scale, which a style (Settings → Theme → Style) sets to square them off. */
+  --radius-sm: calc(6px * var(--radius-scale));
+  --radius-md: calc(8px * var(--radius-scale));
+  --radius-lg: calc(10px * var(--radius-scale));
+  --radius-xl: calc(14px * var(--radius-scale));
 
   --text-2xs: 11px;
   --text-xs: 12px;
@@ -92,6 +93,8 @@
 @custom-variant fine (@media (pointer: fine));
 
 :root {
+  /* How round corners are, everywhere: 1 as lines draws them, 0 square (a style's, themes/styles.svelte.ts). */
+  --radius-scale: 1;
   --font-system: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-serif: ui-serif, "New York", "Iowan Old Style", Charter, "Bitstream Charter", Georgia, Cambria, serif;
   --font-rounded: ui-rounded, "SF Pro Rounded", Nunito, "Varela Round", var(--font-system);

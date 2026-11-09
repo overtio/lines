@@ -103,6 +103,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 ### Make it yours
 
 - **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. See [docs/plugins.md](docs/plugins.md).
+- **Styles**: the whole look, not just the colors. Classic, a desktop of the late 90s with bevels and a title bar; Pixel, one-bit and minimal in a pixel font; Neon, glowing lines on a grid. Each with colors of its own, or any theme's. See [docs/themes.md](docs/themes.md#styles).
 - **Twenty-three themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
 - **Monochrome and Invert**: any theme in greys, or turned light for dark, with the contrast it had.
 - **Paper to write on.** Ruled lines that every line of text sits on, and dots, squares or graph paper with a row of cells for each line (or any size you like), isometric paper, in your theme's colors or any color, as faint or strong as you like, and a grain or linen texture (Settings → Paper).
@@ -287,6 +288,7 @@ src/
     changes/                 Marks the lines changed since a note was opened (a line diff, diff.ts)
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
     themes/                  The twenty-three themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
+    styles/                  Whole looks beyond the colors: Classic, Pixel and Neon, each a CSS file, its fonts and its colors
     lucide/  sf-symbols/     Icon sets
   lib/
     plugins/
@@ -294,7 +296,7 @@ src/
       registry.svelte.ts     The plugins, which are on (kept and shared between windows), and what they add
       plainText.ts           How a note shows while its format's plugin is off
     paper.svelte.ts          The paper chosen in Settings → Paper, as custom properties editor.css draws
-    themes/                  The themes plugins add, as CSS (css.ts, which the website uses too), and this window's theme (show.svelte.ts); your own themes, their files, importing them, and working out colors
+    themes/                  The themes plugins add, as CSS (css.ts, which the website uses too), and this window's theme (show.svelte.ts) and style (styles.svelte.ts); your own themes, their files, importing them, and working out colors
     editor/
       Editor.svelte          CodeMirror host; per-note undo history
       livePreview.ts         Hides Markdown and renders bullets, checkboxes, rules, images

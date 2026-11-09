@@ -187,7 +187,7 @@
     <input
       bind:this={searchInput}
       bind:value={notes.query}
-      class="h-[34px] w-full rounded-lg border border-transparent bg-input pr-[30px] pl-8 text-base text-fg outline-none transition-colors focus:border-accent-soft focus:bg-bg coarse:pr-11 [&::-webkit-search-cancel-button]:hidden"
+      class="ui-field h-[34px] w-full rounded-lg border border-transparent bg-input pr-[30px] pl-8 text-base text-fg outline-none transition-colors focus:border-accent-soft focus:bg-bg coarse:pr-11 [&::-webkit-search-cancel-button]:hidden"
       type="search"
       placeholder={t("list.search")}
       aria-label={t("list.searchLabel")}

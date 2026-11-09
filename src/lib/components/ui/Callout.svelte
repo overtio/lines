@@ -17,7 +17,8 @@
 <div
   {...rest}
   role={tone === "danger" ? "alert" : tone === "success" ? "status" : undefined}
-  class={["rounded-lg px-3 py-2.5 text-sm leading-normal", tones[tone], className]}
+  class={["ui-callout rounded-lg px-3 py-2.5 text-sm leading-normal", tones[tone], className]}
+  data-tone={tone}
 >
   {@render children()}
 </div>

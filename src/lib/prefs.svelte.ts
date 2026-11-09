@@ -133,6 +133,8 @@ export function sameSpacing(a: Spacing, b: Spacing) {
  */
 interface Stored {
   theme: string;
+  /** The app's style (Settings → Theme → Style), a plugin's, by id. */
+  style: string;
   appearance: Appearance;
   contrast: Contrast;
   /** Every color of the theme shown as a grey, or turned light for dark (themes/show.svelte.ts). */
@@ -268,6 +270,7 @@ function localPaper(): Paper {
 const KEY = "lines.prefs";
 const DEFAULTS: Stored = {
   theme: "lines",
+  style: "lines",
   appearance: "system",
   contrast: "system",
   monochrome: false,
@@ -384,6 +387,7 @@ function read(json?: string): Stored {
   const spacing = (raw.spacing ?? {}) as Record<string, unknown>;
   return {
     theme: id(raw.theme, DEFAULTS.theme),
+    style: id(raw.style, DEFAULTS.style),
     appearance: oneOf(raw.appearance, APPEARANCES, DEFAULTS.appearance),
     contrast: oneOf(raw.contrast, ["system", "standard", "more"] as const, DEFAULTS.contrast),
     monochrome: flag(raw.monochrome, DEFAULTS.monochrome),
@@ -459,6 +463,7 @@ const contrastQuery = window.matchMedia("(prefers-contrast: more)");
 class Prefs {
   #initial = read();
   theme = $state(this.#initial.theme);
+  style = $state(this.#initial.style);
   appearance = $state<Appearance>(this.#initial.appearance);
   contrast = $state<Contrast>(this.#initial.contrast);
   monochrome = $state(this.#initial.monochrome);
@@ -626,6 +631,7 @@ class Prefs {
   #serialize() {
     const stored: Stored = {
       theme: this.theme,
+      style: this.style,
       appearance: this.appearance,
       contrast: this.contrast,
       monochrome: this.monochrome,
@@ -706,6 +712,7 @@ class Prefs {
   #reload(json: string) {
     const next = read(json);
     this.theme = next.theme;
+    this.style = next.style;
     this.appearance = next.appearance;
     this.contrast = next.contrast;
     this.monochrome = next.monochrome;

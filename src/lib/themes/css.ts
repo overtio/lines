@@ -16,8 +16,9 @@ const MORE_CONTRAST = `:root[data-theme][data-scheme][data-contrast="more"] {
 const NAME = /^[a-z][a-z0-9-]*$/;
 const VALUE = /^[^;{}<>]*$/;
 
-function rule(selector: string, colors: Partial<ThemeColors> = {}) {
-  const lines = Object.entries(colors)
+/** A rule setting custom properties, by name (`accent`, `radius-md`), leaving out any that isn't one. */
+export function rule(selector: string, properties: Partial<ThemeColors> | Record<string, string> = {}) {
+  const lines = Object.entries(properties)
     .filter(([name, value]) => NAME.test(name) && typeof value === "string" && VALUE.test(value))
     .map(([name, value]) => `  --${name}: ${value};`);
   return lines.length ? `${selector} {\n${lines.join("\n")}\n}` : "";

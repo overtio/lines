@@ -75,7 +75,7 @@
       {onOpenAutoFocus}
       {onCloseAutoFocus}
       interactOutsideBehavior="ignore"
-      class="fixed top-[max(16px,14dvh)] left-1/2 z-50 w-[min(400px,calc(100vw-32px))] -translate-x-1/2 rounded-xl border border-line bg-panel px-[22px] pt-[22px] pb-5 text-fg shadow-dialog outline-none animate-pop-in"
+      class="ui-dialog fixed top-[max(16px,14dvh)] left-1/2 z-50 w-[min(400px,calc(100vw-32px))] -translate-x-1/2 rounded-xl border border-line bg-panel px-[22px] pt-[22px] pb-5 text-fg shadow-dialog outline-none animate-pop-in"
     >
       {#if request}
         <div class="mb-3.5 grid size-10 place-items-center rounded-xl bg-tag text-accent" aria-hidden="true">

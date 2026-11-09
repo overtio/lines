@@ -14,7 +14,7 @@
 
 <span
   class={[
-    "flex h-control min-w-0 items-center gap-2 rounded-md border border-transparent bg-input px-2.5 transition-colors focus-within:border-accent focus-within:ring-1 focus-within:ring-accent has-[input:disabled]:opacity-45 has-[input[aria-invalid=true]]:not-focus-within:border-danger",
+    "ui-field flex h-control min-w-0 items-center gap-2 rounded-md border border-transparent bg-input px-2.5 transition-colors focus-within:border-accent focus-within:ring-1 focus-within:ring-accent has-[input:disabled]:opacity-45 has-[input[aria-invalid=true]]:not-focus-within:border-danger",
     className,
   ]}
 >

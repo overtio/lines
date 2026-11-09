@@ -5,7 +5,7 @@
   import { locale, t } from "../../i18n/index.svelte";
   import Icon from "../../icons/Icon.svelte";
   import type { IconName } from "../../icons/icons";
-  import { plugins } from "../../plugins/registry.svelte";
+  import { DEFAULT_THEME, plugins } from "../../plugins/registry.svelte";
   import { prefs, type Appearance, type Contrast } from "../../prefs.svelte";
   import { customThemes } from "../../themes/custom.svelte";
   import { readableFormats, readThemes } from "../../themes/import";
@@ -47,6 +47,27 @@
   const iconsUnavailable = $derived(iconSets.flatMap((set) => set.availability ?? []).join(" ") || null);
   const previewIcons: IconName[] = ["notes", "tag", "pin", "trash"];
 
+  const styleShown = $derived(plugins.style(prefs.style)?.id ?? "");
+
+  /**
+   * A style, with its colors if it brings some; leaving one whose colors still show goes back to
+   * lines' own, so its colors don't stay behind with another look.
+   */
+  function chooseStyle(id: string) {
+    const before = plugins.style(prefs.style);
+    const next = plugins.style(id);
+    prefs.style = id;
+    if (next?.theme) prefs.theme = next.theme;
+    else if (before?.theme && prefs.theme === before.theme) prefs.theme = DEFAULT_THEME;
+  }
+
+  /** The colors a style's tile shows, those choosing it would: its own, or the chosen theme's (lines' own in place of a style's). */
+  function styleColors(themeId: string | undefined) {
+    const own = plugins.style(prefs.style)?.theme;
+    const colors = plugins.theme(themeId ?? (own && prefs.theme === own ? DEFAULT_THEME : prefs.theme));
+    return colors[schemeShown(colors, prefs.dark)];
+  }
+
   const yours = $derived(new Set(customThemes.themes.map((theme) => theme.id)));
   const builtIn = $derived(plugins.themes.filter((theme) => !yours.has(theme.id)));
   // The accessibility themes, then your own, come after the others under headings of their own, in the same group.
@@ -59,6 +80,7 @@
   const shown = $derived(plugins.theme(prefs.theme));
   const theme = $derived(shown.id);
   const themeHeading = $props.id();
+  const styleHeading = `${themeHeading}-style`;
   /** The theme just made, whose name is ready to type over. */
   let made = $state<string | null>(null);
 
@@ -151,6 +173,33 @@
   </div>
   <input bind:this={picker} type="file" multiple class="hidden" onchange={importChosen} />
 {/snippet}
+
+{#if plugins.styles.length > 1}
+  <FieldGroup title={t("settings.style")} note={t("settings.styleNote")} id={styleHeading}>
+    <div class="p-3">
+      <RadioGroup.Root value={styleShown} onValueChange={chooseStyle} aria-labelledby={styleHeading} class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-2">
+        {#each plugins.styles as option (option.id)}
+          {@const { bg, text, accent } = styleColors(option.theme)}
+          {@const round = option.properties?.["radius-scale"] ?? "1"}
+          <RadioGroup.Item value={option.id} class="group flex flex-col gap-1 rounded-xl p-1 pb-1.5 text-left hover:bg-hover">
+            <!-- In forced colors the previews keep each style's own colors, and the chosen one an outline for its ring. -->
+            <span
+              class="flex h-16 items-center gap-3 overflow-hidden rounded-lg px-3.5 inset-ring inset-ring-line transition-shadow forced-color-adjust-none group-data-[state=checked]:ring-2 group-data-[state=checked]:ring-accent group-data-[state=checked]:inset-ring-0 forced-colors:group-data-[state=checked]:outline-2 forced-colors:group-data-[state=checked]:outline-[HighlightText]"
+              style:background={bg}
+              style:color={text}
+              aria-hidden="true"
+            >
+              <span class="text-[26px] leading-none" style:font-family={option.font?.family ?? "system-ui, sans-serif"}>Aa</span>
+              <span class="h-3 flex-1" style:background={accent} style:border-radius="calc(6px * {round})"></span>
+            </span>
+            <span class="px-1 text-sm font-medium text-fg">{option.name}</span>
+            {#if option.description}<span class="px-1 text-xs leading-snug text-muted">{option.description}</span>{/if}
+          </RadioGroup.Item>
+        {/each}
+      </RadioGroup.Root>
+    </div>
+  </FieldGroup>
+{/if}
 
 <FieldGroup title={t("settings.themes")} note={t("settings.themeNote")} action={themeActions} id={themeHeading}>
   {#if pasting || imported || importError}

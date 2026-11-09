@@ -540,7 +540,7 @@
     <button
       bind:this={item}
       class={[
-        "item relative z-1 flex w-full touch-pan-y flex-col gap-[3px] rounded-lg bg-[image:linear-gradient(var(--layer),var(--layer))] px-3 pt-3 pb-[11px] text-left text-fg [-webkit-touch-callout:none]",
+        "item ui-note-row relative z-1 flex w-full touch-pan-y flex-col gap-[3px] rounded-lg bg-[image:linear-gradient(var(--layer),var(--layer))] px-3 pt-3 pb-[11px] text-left text-fg [-webkit-touch-callout:none]",
         lit ? "selected [--layer:var(--active)]" : "[--layer:transparent] hover:[--layer:var(--hover)]",
         swiped && "bg-list",
         menuTarget && "inset-ring-2 inset-ring-accent",

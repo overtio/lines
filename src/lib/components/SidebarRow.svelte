@@ -48,7 +48,7 @@
   <button
     class={[
       row,
-      "transition-colors [-webkit-touch-callout:none]",
+      "ui-sidebar-row transition-colors [-webkit-touch-callout:none]",
       active ? "active bg-active text-fg" : "hover:bg-hover",
       marked && "inset-ring-2 inset-ring-accent",
       className,
