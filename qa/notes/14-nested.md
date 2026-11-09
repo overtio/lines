@@ -258,7 +258,20 @@ endsolid pyramid
 :::
 :::
 
-#### 21. Math block in a callout in a card
+#### 21. Typing practice (typing block) in a callout in a card
+
+::: card
+:::!
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+:::
+:::
+
+#### 22. Math block in a callout in a card
 
 ::: card
 :::!
@@ -268,7 +281,7 @@ $$
 :::
 :::
 
-#### 22. Table in a callout in a card
+#### 23. Table in a callout in a card
 
 ::: card
 :::!
@@ -279,7 +292,7 @@ $$
 :::
 :::
 
-#### 23. Table with formulas in a callout in a card
+#### 24. Table with formulas in a callout in a card
 
 ::: card
 :::!
@@ -292,7 +305,7 @@ $$
 :::
 :::
 
-#### 24. Hurl entries (hurl block): a capture used by the next entry, and asserts in a callout in a card
+#### 25. Hurl entries (hurl block): a capture used by the next entry, and asserts in a callout in a card
 
 ::: card
 :::!
@@ -314,7 +327,7 @@ jsonpath "$.name" isString
 :::
 :::
 
-#### 25. Secret ({{name}}, kept in a locked secrets note) in a callout in a card
+#### 26. Secret ({{name}}, kept in a locked secrets note) in a callout in a card
 
 ::: card
 :::!
@@ -322,7 +335,7 @@ The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::
 :::
 
-#### 26. API requests (http block): a variable, a named request and one using its response in a callout in a card
+#### 27. API requests (http block): a variable, a named request and one using its response in a callout in a card
 
 ::: card
 :::!
@@ -339,7 +352,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 :::
 :::
 
-#### 27. Spreadsheet (csv block) in a callout in a card
+#### 28. Spreadsheet (csv block) in a callout in a card
 
 ::: card
 :::!
@@ -352,7 +365,7 @@ Total, =SUM(B2:B3)
 :::
 :::
 
-#### 28. Named spreadsheet (csv name=), and a formula in another block using it in a callout in a card
+#### 29. Named spreadsheet (csv name=), and a formula in another block using it in a callout in a card
 
 ::: card
 :::!
@@ -367,7 +380,7 @@ Total, =costs!B2*2
 :::
 :::
 
-#### 29. Divider in a callout in a card
+#### 30. Divider in a callout in a card
 
 ::: card
 :::!
@@ -375,7 +388,7 @@ Total, =costs!B2*2
 :::
 :::
 
-#### 30. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a callout in a card (stays Markdown here)
+#### 31. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a callout in a card (stays Markdown here)
 
 ::: card
 :::!
@@ -390,7 +403,7 @@ And another.
 :::
 :::
 
-#### 31. Key: Value line in a callout in a card
+#### 32. Key: Value line in a callout in a card
 
 ::: card
 :::!
@@ -398,7 +411,7 @@ And another.
 :::
 :::
 
-#### 32. Mention in a callout in a card
+#### 33. Mention in a callout in a card
 
 ::: card
 :::!
@@ -406,7 +419,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 :::
 
-#### 33. Wiki link in a callout in a card
+#### 34. Wiki link in a callout in a card
 
 ::: card
 :::!
@@ -414,7 +427,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 :::
 
-#### 34. Symbols in a callout in a card
+#### 35. Symbols in a callout in a card
 
 ::: card
 :::!
@@ -422,7 +435,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 :::
 :::
 
-#### 35. GitHub links in a callout in a card
+#### 36. GitHub links in a callout in a card
 
 ::: card
 :::!
@@ -430,7 +443,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 36. arXiv links in a callout in a card
+#### 37. arXiv links in a callout in a card
 
 ::: card
 :::!
@@ -438,7 +451,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 37. Image in a callout in a card
+#### 38. Image in a callout in a card
 
 ::: card
 :::!
@@ -446,7 +459,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 38. Drawing in a callout in a card
+#### 39. Drawing in a callout in a card
 
 ::: card
 :::!
@@ -454,7 +467,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 39. File in a callout in a card
+#### 40. File in a callout in a card
 
 ::: card
 :::!
@@ -462,7 +475,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 40. Attached 3D model (STL) in a callout in a card
+#### 41. Attached 3D model (STL) in a callout in a card
 
 ::: card
 :::!
@@ -470,7 +483,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 41. Terminal recording (.cast file) in a callout in a card
+#### 42. Terminal recording (.cast file) in a callout in a card
 
 ::: card
 :::!
@@ -478,7 +491,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 42. Audio in a callout in a card
+#### 43. Audio in a callout in a card
 
 ::: card
 :::!
@@ -486,7 +499,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 43. Video in a callout in a card
+#### 44. Video in a callout in a card
 
 ::: card
 :::!
@@ -494,7 +507,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 44. Missing file in a callout in a card
+#### 45. Missing file in a callout in a card
 
 ::: card
 :::!
@@ -502,7 +515,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 45. Card in a callout in a card
+#### 46. Card in a callout in a card
 
 ::: card
 :::!
@@ -512,7 +525,7 @@ Text in a card.
 :::
 :::
 
-#### 46. Callout (info) in a callout in a card
+#### 47. Callout (info) in a callout in a card
 
 ::: card
 :::!
@@ -522,7 +535,7 @@ Text in an info callout.
 :::
 :::
 
-#### 47. Callout (warning, chosen icon) in a callout in a card
+#### 48. Callout (warning, chosen icon) in a callout in a card
 
 ::: card
 :::!
@@ -532,7 +545,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 48. Callout (decision, no icon) in a callout in a card
+#### 49. Callout (decision, no icon) in a callout in a card
 
 ::: card
 :::!

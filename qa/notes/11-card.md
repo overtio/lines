@@ -218,7 +218,18 @@ endsolid pyramid
 ```
 :::
 
-#### 21. Math block in a card
+#### 21. Typing practice (typing block) in a card
+
+::: card
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+:::
+
+#### 22. Math block in a card
 
 ::: card
 $$
@@ -226,7 +237,7 @@ $$
 $$
 :::
 
-#### 22. Table in a card
+#### 23. Table in a card
 
 ::: card
 | Left | Center | Right |
@@ -235,7 +246,7 @@ $$
 | longer cell text | `code` | 22 |
 :::
 
-#### 23. Table with formulas in a card
+#### 24. Table with formulas in a card
 
 ::: card
 | Item | Cost |
@@ -246,7 +257,7 @@ $$
 | Broken | =B2/0 |
 :::
 
-#### 24. Hurl entries (hurl block): a capture used by the next entry, and asserts in a card
+#### 25. Hurl entries (hurl block): a capture used by the next entry, and asserts in a card
 
 ::: card
 ```hurl
@@ -266,13 +277,13 @@ jsonpath "$.name" isString
 ```
 :::
 
-#### 25. Secret ({{name}}, kept in a locked secrets note) in a card
+#### 26. Secret ({{name}}, kept in a locked secrets note) in a card
 
 ::: card
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 :::
 
-#### 26. API requests (http block): a variable, a named request and one using its response in a card
+#### 27. API requests (http block): a variable, a named request and one using its response in a card
 
 ::: card
 ```http
@@ -287,7 +298,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 :::
 
-#### 27. Spreadsheet (csv block) in a card
+#### 28. Spreadsheet (csv block) in a card
 
 ::: card
 ```csv
@@ -298,7 +309,7 @@ Total, =SUM(B2:B3)
 ```
 :::
 
-#### 28. Named spreadsheet (csv name=), and a formula in another block using it in a card
+#### 29. Named spreadsheet (csv name=), and a formula in another block using it in a card
 
 ::: card
 ```csv name=costs
@@ -311,13 +322,13 @@ Total, =costs!B2*2
 ```
 :::
 
-#### 29. Divider in a card
+#### 30. Divider in a card
 
 ::: card
 ---
 :::
 
-#### 30. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a card (stays Markdown here)
+#### 31. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a card (stays Markdown here)
 
 ::: card
 Before the break.
@@ -330,91 +341,91 @@ After it, on a new page.
 And another.
 :::
 
-#### 31. Key: Value line in a card
+#### 32. Key: Value line in a card
 
 ::: card
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 32. Mention in a card
+#### 33. Mention in a card
 
 ::: card
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 33. Wiki link in a card
+#### 34. Wiki link in a card
 
 ::: card
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 34. Symbols in a card
+#### 35. Symbols in a card
 
 ::: card
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 35. GitHub links in a card
+#### 36. GitHub links in a card
 
 ::: card
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 36. arXiv links in a card
+#### 37. arXiv links in a card
 
 ::: card
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::
 
-#### 37. Image in a card
+#### 38. Image in a card
 
 ::: card
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 38. Drawing in a card
+#### 39. Drawing in a card
 
 ::: card
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 39. File in a card
+#### 40. File in a card
 
 ::: card
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 40. Attached 3D model (STL) in a card
+#### 41. Attached 3D model (STL) in a card
 
 ::: card
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 41. Terminal recording (.cast file) in a card
+#### 42. Terminal recording (.cast file) in a card
 
 ::: card
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 42. Audio in a card
+#### 43. Audio in a card
 
 ::: card
 [Chime.mp3](attachment:chime.mp3)
 :::
 
-#### 43. Video in a card
+#### 44. Video in a card
 
 ::: card
 [Sky.mp4](attachment:sky.mp4)
 :::
 
-#### 44. Missing file in a card
+#### 45. Missing file in a card
 
 ::: card
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 45. Card in a card
+#### 46. Card in a card
 
 ::: card
 ::: card
@@ -422,7 +433,7 @@ Text in a card.
 :::
 :::
 
-#### 46. Callout (info) in a card
+#### 47. Callout (info) in a card
 
 ::: card
 :::i
@@ -430,7 +441,7 @@ Text in an info callout.
 :::
 :::
 
-#### 47. Callout (warning, chosen icon) in a card
+#### 48. Callout (warning, chosen icon) in a card
 
 ::: card
 :::! icon=flag
@@ -438,7 +449,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 48. Callout (decision, no icon) in a card
+#### 49. Callout (decision, no icon) in a card
 
 ::: card
 :::^ icon=none

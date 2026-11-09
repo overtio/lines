@@ -198,14 +198,24 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Image, then Math block
+#### 21. Image, then Typing practice (typing block)
+
+![A sample picture](attachment:photo.png)
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Image, then Math block
 
 ![A sample picture](attachment:photo.png)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Image, then Table
+#### 23. Image, then Table
 
 ![A sample picture](attachment:photo.png)
 | Left | Center | Right |
@@ -213,7 +223,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Image, then Table with formulas
+#### 24. Image, then Table with formulas
 
 ![A sample picture](attachment:photo.png)
 | Item | Cost |
@@ -223,7 +233,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Image, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Image, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ![A sample picture](attachment:photo.png)
 ```hurl
@@ -242,12 +252,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Image, then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Image, then Secret ({{name}}, kept in a locked secrets note)
 
 ![A sample picture](attachment:photo.png)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Image, then API requests (http block): a variable, a named request and one using its response
+#### 27. Image, then API requests (http block): a variable, a named request and one using its response
 
 ![A sample picture](attachment:photo.png)
 ```http
@@ -261,7 +271,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Image, then Spreadsheet (csv block)
+#### 28. Image, then Spreadsheet (csv block)
 
 ![A sample picture](attachment:photo.png)
 ```csv
@@ -271,7 +281,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Image, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Image, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ![A sample picture](attachment:photo.png)
 ```csv name=costs
@@ -283,12 +293,12 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Image, then Divider
+#### 30. Image, then Divider
 
 ![A sample picture](attachment:photo.png)
 ---
 
-#### 30. Image, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Image, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 ![A sample picture](attachment:photo.png)
 Before the break.
@@ -300,98 +310,98 @@ After it, on a new page.
 
 And another.
 
-#### 31. Image, then Key: Value line
+#### 32. Image, then Key: Value line
 
 ![A sample picture](attachment:photo.png)
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Image, then Mention
+#### 33. Image, then Mention
 
 ![A sample picture](attachment:photo.png)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Image, then Wiki link
+#### 34. Image, then Wiki link
 
 ![A sample picture](attachment:photo.png)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Image, then Symbols
+#### 35. Image, then Symbols
 
 ![A sample picture](attachment:photo.png)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Image, then GitHub links
+#### 36. Image, then GitHub links
 
 ![A sample picture](attachment:photo.png)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Image, then arXiv links
+#### 37. Image, then arXiv links
 
 ![A sample picture](attachment:photo.png)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Image, then Image
+#### 38. Image, then Image
 
 ![A sample picture](attachment:photo.png)
 ![A sample picture](attachment:photo.png)
 
-#### 38. Image, then Drawing
+#### 39. Image, then Drawing
 
 ![A sample picture](attachment:photo.png)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Image, then File
+#### 40. Image, then File
 
 ![A sample picture](attachment:photo.png)
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Image, then Attached 3D model (STL)
+#### 41. Image, then Attached 3D model (STL)
 
 ![A sample picture](attachment:photo.png)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Image, then Terminal recording (.cast file)
+#### 42. Image, then Terminal recording (.cast file)
 
 ![A sample picture](attachment:photo.png)
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Image, then Audio
+#### 43. Image, then Audio
 
 ![A sample picture](attachment:photo.png)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Image, then Video
+#### 44. Image, then Video
 
 ![A sample picture](attachment:photo.png)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Image, then Missing file
+#### 45. Image, then Missing file
 
 ![A sample picture](attachment:photo.png)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Image, then Card
+#### 46. Image, then Card
 
 ![A sample picture](attachment:photo.png)
 ::: card
 Text in a card.
 :::
 
-#### 46. Image, then Callout (info)
+#### 47. Image, then Callout (info)
 
 ![A sample picture](attachment:photo.png)
 :::i
 Text in an info callout.
 :::
 
-#### 47. Image, then Callout (warning, chosen icon)
+#### 48. Image, then Callout (warning, chosen icon)
 
 ![A sample picture](attachment:photo.png)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Image, then Callout (decision, no icon)
+#### 49. Image, then Callout (decision, no icon)
 
 ![A sample picture](attachment:photo.png)
 :::^ icon=none

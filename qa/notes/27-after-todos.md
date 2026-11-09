@@ -238,7 +238,19 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Todo list, then Math block
+#### 21. Todo list, then Typing practice (typing block)
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Todo list, then Math block
 
 - [x] Done todo
 - [ ] Open todo
@@ -247,7 +259,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Todo list, then Table
+#### 23. Todo list, then Table
 
 - [x] Done todo
 - [ ] Open todo
@@ -257,7 +269,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Todo list, then Table with formulas
+#### 24. Todo list, then Table with formulas
 
 - [x] Done todo
 - [ ] Open todo
@@ -269,7 +281,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Todo list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Todo list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 - [x] Done todo
 - [ ] Open todo
@@ -290,14 +302,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Todo list, then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Todo list, then Secret ({{name}}, kept in a locked secrets note)
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Todo list, then API requests (http block): a variable, a named request and one using its response
+#### 27. Todo list, then API requests (http block): a variable, a named request and one using its response
 
 - [x] Done todo
 - [ ] Open todo
@@ -313,7 +325,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Todo list, then Spreadsheet (csv block)
+#### 28. Todo list, then Spreadsheet (csv block)
 
 - [x] Done todo
 - [ ] Open todo
@@ -325,7 +337,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Todo list, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Todo list, then Named spreadsheet (csv name=), and a formula in another block using it
 
 - [x] Done todo
 - [ ] Open todo
@@ -339,14 +351,14 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Todo list, then Divider
+#### 30. Todo list, then Divider
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ---
 
-#### 30. Todo list, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Todo list, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 - [x] Done todo
 - [ ] Open todo
@@ -360,105 +372,105 @@ After it, on a new page.
 
 And another.
 
-#### 31. Todo list, then Key: Value line
+#### 32. Todo list, then Key: Value line
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Todo list, then Mention
+#### 33. Todo list, then Mention
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Todo list, then Wiki link
+#### 34. Todo list, then Wiki link
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Todo list, then Symbols
+#### 35. Todo list, then Symbols
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Todo list, then GitHub links
+#### 36. Todo list, then GitHub links
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Todo list, then arXiv links
+#### 37. Todo list, then arXiv links
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Todo list, then Image
+#### 38. Todo list, then Image
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample picture](attachment:photo.png)
 
-#### 38. Todo list, then Drawing
+#### 39. Todo list, then Drawing
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Todo list, then File
+#### 40. Todo list, then File
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Todo list, then Attached 3D model (STL)
+#### 41. Todo list, then Attached 3D model (STL)
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Todo list, then Terminal recording (.cast file)
+#### 42. Todo list, then Terminal recording (.cast file)
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Todo list, then Audio
+#### 43. Todo list, then Audio
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Todo list, then Video
+#### 44. Todo list, then Video
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Todo list, then Missing file
+#### 45. Todo list, then Missing file
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Todo list, then Card
+#### 46. Todo list, then Card
 
 - [x] Done todo
 - [ ] Open todo
@@ -467,7 +479,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 46. Todo list, then Callout (info)
+#### 47. Todo list, then Callout (info)
 
 - [x] Done todo
 - [ ] Open todo
@@ -476,7 +488,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 47. Todo list, then Callout (warning, chosen icon)
+#### 48. Todo list, then Callout (warning, chosen icon)
 
 - [x] Done todo
 - [ ] Open todo
@@ -485,7 +497,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Todo list, then Callout (decision, no icon)
+#### 49. Todo list, then Callout (decision, no icon)
 
 - [x] Done todo
 - [ ] Open todo

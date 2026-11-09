@@ -258,7 +258,20 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Numbered list, then Math block
+#### 21. Numbered list, then Typing practice (typing block)
+
+1. First
+2. Second
+   1. Nested
+3. Third
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Numbered list, then Math block
 
 1. First
 2. Second
@@ -268,7 +281,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Numbered list, then Table
+#### 23. Numbered list, then Table
 
 1. First
 2. Second
@@ -279,7 +292,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Numbered list, then Table with formulas
+#### 24. Numbered list, then Table with formulas
 
 1. First
 2. Second
@@ -292,7 +305,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Numbered list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Numbered list, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 1. First
 2. Second
@@ -314,7 +327,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Numbered list, then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Numbered list, then Secret ({{name}}, kept in a locked secrets note)
 
 1. First
 2. Second
@@ -322,7 +335,7 @@ jsonpath "$.name" isString
 3. Third
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Numbered list, then API requests (http block): a variable, a named request and one using its response
+#### 27. Numbered list, then API requests (http block): a variable, a named request and one using its response
 
 1. First
 2. Second
@@ -339,7 +352,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Numbered list, then Spreadsheet (csv block)
+#### 28. Numbered list, then Spreadsheet (csv block)
 
 1. First
 2. Second
@@ -352,7 +365,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Numbered list, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Numbered list, then Named spreadsheet (csv name=), and a formula in another block using it
 
 1. First
 2. Second
@@ -367,7 +380,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Numbered list, then Divider
+#### 30. Numbered list, then Divider
 
 1. First
 2. Second
@@ -375,7 +388,7 @@ Total, =costs!B2*2
 3. Third
 ---
 
-#### 30. Numbered list, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Numbered list, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 1. First
 2. Second
@@ -390,7 +403,7 @@ After it, on a new page.
 
 And another.
 
-#### 31. Numbered list, then Key: Value line
+#### 32. Numbered list, then Key: Value line
 
 1. First
 2. Second
@@ -398,7 +411,7 @@ And another.
 3. Third
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Numbered list, then Mention
+#### 33. Numbered list, then Mention
 
 1. First
 2. Second
@@ -406,7 +419,7 @@ And another.
 3. Third
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Numbered list, then Wiki link
+#### 34. Numbered list, then Wiki link
 
 1. First
 2. Second
@@ -414,7 +427,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 3. Third
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Numbered list, then Symbols
+#### 35. Numbered list, then Symbols
 
 1. First
 2. Second
@@ -422,7 +435,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 3. Third
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Numbered list, then GitHub links
+#### 36. Numbered list, then GitHub links
 
 1. First
 2. Second
@@ -430,7 +443,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 3. Third
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Numbered list, then arXiv links
+#### 37. Numbered list, then arXiv links
 
 1. First
 2. Second
@@ -438,7 +451,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Numbered list, then Image
+#### 38. Numbered list, then Image
 
 1. First
 2. Second
@@ -446,7 +459,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 ![A sample picture](attachment:photo.png)
 
-#### 38. Numbered list, then Drawing
+#### 39. Numbered list, then Drawing
 
 1. First
 2. Second
@@ -454,7 +467,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Numbered list, then File
+#### 40. Numbered list, then File
 
 1. First
 2. Second
@@ -462,7 +475,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Numbered list, then Attached 3D model (STL)
+#### 41. Numbered list, then Attached 3D model (STL)
 
 1. First
 2. Second
@@ -470,7 +483,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Numbered list, then Terminal recording (.cast file)
+#### 42. Numbered list, then Terminal recording (.cast file)
 
 1. First
 2. Second
@@ -478,7 +491,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Numbered list, then Audio
+#### 43. Numbered list, then Audio
 
 1. First
 2. Second
@@ -486,7 +499,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Numbered list, then Video
+#### 44. Numbered list, then Video
 
 1. First
 2. Second
@@ -494,7 +507,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Numbered list, then Missing file
+#### 45. Numbered list, then Missing file
 
 1. First
 2. Second
@@ -502,7 +515,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Numbered list, then Card
+#### 46. Numbered list, then Card
 
 1. First
 2. Second
@@ -512,7 +525,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 Text in a card.
 :::
 
-#### 46. Numbered list, then Callout (info)
+#### 47. Numbered list, then Callout (info)
 
 1. First
 2. Second
@@ -522,7 +535,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 47. Numbered list, then Callout (warning, chosen icon)
+#### 48. Numbered list, then Callout (warning, chosen icon)
 
 1. First
 2. Second
@@ -532,7 +545,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Numbered list, then Callout (decision, no icon)
+#### 49. Numbered list, then Callout (decision, no icon)
 
 1. First
 2. Second

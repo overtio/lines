@@ -178,20 +178,29 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Math block at the top level
+#### 21. Typing practice (typing block) at the top level
+
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Math block at the top level
 
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Table at the top level
+#### 23. Table at the top level
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Table with formulas at the top level
+#### 24. Table with formulas at the top level
 
 | Item | Cost |
 | --- | ---: |
@@ -200,7 +209,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Hurl entries (hurl block): a capture used by the next entry, and asserts at the top level
+#### 25. Hurl entries (hurl block): a capture used by the next entry, and asserts at the top level
 
 ```hurl
 # A todo
@@ -218,11 +227,11 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Secret ({{name}}, kept in a locked secrets note) at the top level
+#### 26. Secret ({{name}}, kept in a locked secrets note) at the top level
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. API requests (http block): a variable, a named request and one using its response at the top level
+#### 27. API requests (http block): a variable, a named request and one using its response at the top level
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -235,7 +244,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Spreadsheet (csv block) at the top level
+#### 28. Spreadsheet (csv block) at the top level
 
 ```csv
 Item, Cost
@@ -244,7 +253,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Named spreadsheet (csv name=), and a formula in another block using it at the top level
+#### 29. Named spreadsheet (csv name=), and a formula in another block using it at the top level
 
 ```csv name=costs
 Item, Cost, Day
@@ -255,11 +264,11 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Divider at the top level
+#### 30. Divider at the top level
 
 ---
 
-#### 30. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) at the top level
+#### 31. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) at the top level
 
 Before the break.
 
@@ -270,81 +279,81 @@ After it, on a new page.
 
 And another.
 
-#### 31. Key: Value line at the top level
+#### 32. Key: Value line at the top level
 
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Mention at the top level
+#### 33. Mention at the top level
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Wiki link at the top level
+#### 34. Wiki link at the top level
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Symbols at the top level
+#### 35. Symbols at the top level
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. GitHub links at the top level
+#### 36. GitHub links at the top level
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. arXiv links at the top level
+#### 37. arXiv links at the top level
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Image at the top level
+#### 38. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 38. Drawing at the top level
+#### 39. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. File at the top level
+#### 40. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Attached 3D model (STL) at the top level
+#### 41. Attached 3D model (STL) at the top level
 
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Terminal recording (.cast file) at the top level
+#### 42. Terminal recording (.cast file) at the top level
 
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Audio at the top level
+#### 43. Audio at the top level
 
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Video at the top level
+#### 44. Video at the top level
 
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Missing file at the top level
+#### 45. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Card at the top level
+#### 46. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 46. Callout (info) at the top level
+#### 47. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 47. Callout (warning, chosen icon) at the top level
+#### 48. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Callout (decision, no icon) at the top level
+#### 49. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

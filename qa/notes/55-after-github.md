@@ -198,14 +198,24 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. GitHub links, then Math block
+#### 21. GitHub links, then Typing practice (typing block)
+
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. GitHub links, then Math block
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. GitHub links, then Table
+#### 23. GitHub links, then Table
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 | Left | Center | Right |
@@ -213,7 +223,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. GitHub links, then Table with formulas
+#### 24. GitHub links, then Table with formulas
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 | Item | Cost |
@@ -223,7 +233,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. GitHub links, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. GitHub links, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ```hurl
@@ -242,12 +252,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. GitHub links, then Secret ({{name}}, kept in a locked secrets note)
+#### 26. GitHub links, then Secret ({{name}}, kept in a locked secrets note)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. GitHub links, then API requests (http block): a variable, a named request and one using its response
+#### 27. GitHub links, then API requests (http block): a variable, a named request and one using its response
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ```http
@@ -261,7 +271,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. GitHub links, then Spreadsheet (csv block)
+#### 28. GitHub links, then Spreadsheet (csv block)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ```csv
@@ -271,7 +281,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. GitHub links, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. GitHub links, then Named spreadsheet (csv name=), and a formula in another block using it
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ```csv name=costs
@@ -283,12 +293,12 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. GitHub links, then Divider
+#### 30. GitHub links, then Divider
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ---
 
-#### 30. GitHub links, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. GitHub links, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Before the break.
@@ -300,98 +310,98 @@ After it, on a new page.
 
 And another.
 
-#### 31. GitHub links, then Key: Value line
+#### 32. GitHub links, then Key: Value line
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. GitHub links, then Mention
+#### 33. GitHub links, then Mention
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. GitHub links, then Wiki link
+#### 34. GitHub links, then Wiki link
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. GitHub links, then Symbols
+#### 35. GitHub links, then Symbols
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. GitHub links, then GitHub links
+#### 36. GitHub links, then GitHub links
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. GitHub links, then arXiv links
+#### 37. GitHub links, then arXiv links
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. GitHub links, then Image
+#### 38. GitHub links, then Image
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ![A sample picture](attachment:photo.png)
 
-#### 38. GitHub links, then Drawing
+#### 39. GitHub links, then Drawing
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. GitHub links, then File
+#### 40. GitHub links, then File
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Budget.csv](attachment:budget.csv)
 
-#### 40. GitHub links, then Attached 3D model (STL)
+#### 41. GitHub links, then Attached 3D model (STL)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. GitHub links, then Terminal recording (.cast file)
+#### 42. GitHub links, then Terminal recording (.cast file)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. GitHub links, then Audio
+#### 43. GitHub links, then Audio
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. GitHub links, then Video
+#### 44. GitHub links, then Video
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. GitHub links, then Missing file
+#### 45. GitHub links, then Missing file
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. GitHub links, then Card
+#### 46. GitHub links, then Card
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ::: card
 Text in a card.
 :::
 
-#### 46. GitHub links, then Callout (info)
+#### 47. GitHub links, then Callout (info)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::i
 Text in an info callout.
 :::
 
-#### 47. GitHub links, then Callout (warning, chosen icon)
+#### 48. GitHub links, then Callout (warning, chosen icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. GitHub links, then Callout (decision, no icon)
+#### 49. GitHub links, then Callout (decision, no icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::^ icon=none

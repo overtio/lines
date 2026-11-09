@@ -36,6 +36,8 @@ export default {
   // A WaveDrom diagram: signals over time, as in digital electronics.
   "editor.slash.timing": "Timing diagram",
   "editor.slash.timing.keywords": "wavedrom waveform signal clock bus register bitfield logic gate digital electronics",
+  "editor.slash.typing": "Typing practice",
+  "editor.slash.typing.keywords": "typing practice speed wpm words per minute keyboard touch type drill test lesson",
   "editor.slash.request": "API request",
   "editor.slash.request.keywords": "http rest api request curl get post fetch endpoint",
   "editor.slash.hurl": "Hurl test",

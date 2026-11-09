@@ -44,6 +44,7 @@ The [web app](https://overtio.github.io/lines/app/) opens with a tour: one short
 - **Cards and callouts.** Group a section into a card, or make it an info, question, warning, error or decision callout: `:::info` … `:::`.
 - **Code blocks** with syntax highlighting in your theme's colors, a copy button, and a wand that tidies JSON, SQL, JavaScript, CSS and more.
 - **Diagrams** from [Mermaid](https://mermaid.js.org) code: flowcharts, sequence diagrams, Gantt charts and more, drawn as you type by [Pele](https://pele.run) in your theme's colors, or by Mermaid itself.
+- **Typing practice.** Put any text in a note to type over (`/typing`): a quote, a page of a book, code. It's timed, shows your speed, your accuracy and the keys you miss, and keeps your best. See [docs/linedown.md](docs/linedown.md#typing-practice).
 - **Timing diagrams** for electronics, from [WaveDrom](https://wavedrom.com) code: clocks, signals and buses over time, a register's bit fields, and logic circuits (`/timing`).
 - **3D models** to turn around and zoom into: [OpenSCAD](https://openscad.org) code in an ` ```openscad ` block (`/model`), made into its model as you type and downloaded as STL for 3D printing, and attached OpenSCAD, STL, OBJ, 3MF, glTF, STEP and IGES files. See [docs/linedown.md](docs/linedown.md#3d-models).
 - **Code notes.** Switch a note to Code and choose its language, from about 120: line numbers, a fixed-width font, highlighting in your theme's colors, and indenting and brackets as in a code editor. It stays the file it is, and downloads and syncs as one (`.py`, `.ts`, `.rs`…). Importing a code file makes one.
@@ -285,6 +286,7 @@ src/
     pele/                    Mermaid diagrams drawn by Pele (the default): the renderer and its colors
     mermaid/                 Mermaid diagrams drawn by Mermaid itself, and what both add (blocks.ts): /diagram, Copy and Edit as Drawing
     wavedrom/                WaveDrom's timing diagrams, register fields and logic circuits, in the theme's colors; /timing
+    typing/                  Typing practice: a ```typing block drawn as a drill to type over (Practice.svelte), what it comes to (drill.svelte.ts); /typing
     unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
     github/                  Links to GitHub drawn short
     arxiv/                   Links to arXiv's papers drawn short, and searching arXiv for /paper (pacing requests as arXiv asks)

@@ -258,7 +258,20 @@ translate([30, 10]) circle(8);
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Flat model (openscad block), then Math block
+#### 21. Flat model (openscad block), then Typing practice (typing block)
+
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Flat model (openscad block), then Math block
 
 ```openscad
 square(20);
@@ -268,7 +281,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Flat model (openscad block), then Table
+#### 23. Flat model (openscad block), then Table
 
 ```openscad
 square(20);
@@ -279,7 +292,7 @@ translate([30, 10]) circle(8);
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Flat model (openscad block), then Table with formulas
+#### 24. Flat model (openscad block), then Table with formulas
 
 ```openscad
 square(20);
@@ -292,7 +305,7 @@ translate([30, 10]) circle(8);
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Flat model (openscad block), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Flat model (openscad block), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ```openscad
 square(20);
@@ -314,7 +327,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Flat model (openscad block), then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Flat model (openscad block), then Secret ({{name}}, kept in a locked secrets note)
 
 ```openscad
 square(20);
@@ -322,7 +335,7 @@ translate([30, 10]) circle(8);
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Flat model (openscad block), then API requests (http block): a variable, a named request and one using its response
+#### 27. Flat model (openscad block), then API requests (http block): a variable, a named request and one using its response
 
 ```openscad
 square(20);
@@ -339,7 +352,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Flat model (openscad block), then Spreadsheet (csv block)
+#### 28. Flat model (openscad block), then Spreadsheet (csv block)
 
 ```openscad
 square(20);
@@ -352,7 +365,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Flat model (openscad block), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Flat model (openscad block), then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```openscad
 square(20);
@@ -367,7 +380,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Flat model (openscad block), then Divider
+#### 30. Flat model (openscad block), then Divider
 
 ```openscad
 square(20);
@@ -375,7 +388,7 @@ translate([30, 10]) circle(8);
 ```
 ---
 
-#### 30. Flat model (openscad block), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Flat model (openscad block), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 ```openscad
 square(20);
@@ -390,7 +403,7 @@ After it, on a new page.
 
 And another.
 
-#### 31. Flat model (openscad block), then Key: Value line
+#### 32. Flat model (openscad block), then Key: Value line
 
 ```openscad
 square(20);
@@ -398,7 +411,7 @@ translate([30, 10]) circle(8);
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Flat model (openscad block), then Mention
+#### 33. Flat model (openscad block), then Mention
 
 ```openscad
 square(20);
@@ -406,7 +419,7 @@ translate([30, 10]) circle(8);
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Flat model (openscad block), then Wiki link
+#### 34. Flat model (openscad block), then Wiki link
 
 ```openscad
 square(20);
@@ -414,7 +427,7 @@ translate([30, 10]) circle(8);
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Flat model (openscad block), then Symbols
+#### 35. Flat model (openscad block), then Symbols
 
 ```openscad
 square(20);
@@ -422,7 +435,7 @@ translate([30, 10]) circle(8);
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Flat model (openscad block), then GitHub links
+#### 36. Flat model (openscad block), then GitHub links
 
 ```openscad
 square(20);
@@ -430,7 +443,7 @@ translate([30, 10]) circle(8);
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Flat model (openscad block), then arXiv links
+#### 37. Flat model (openscad block), then arXiv links
 
 ```openscad
 square(20);
@@ -438,7 +451,7 @@ translate([30, 10]) circle(8);
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Flat model (openscad block), then Image
+#### 38. Flat model (openscad block), then Image
 
 ```openscad
 square(20);
@@ -446,7 +459,7 @@ translate([30, 10]) circle(8);
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 38. Flat model (openscad block), then Drawing
+#### 39. Flat model (openscad block), then Drawing
 
 ```openscad
 square(20);
@@ -454,7 +467,7 @@ translate([30, 10]) circle(8);
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Flat model (openscad block), then File
+#### 40. Flat model (openscad block), then File
 
 ```openscad
 square(20);
@@ -462,7 +475,7 @@ translate([30, 10]) circle(8);
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Flat model (openscad block), then Attached 3D model (STL)
+#### 41. Flat model (openscad block), then Attached 3D model (STL)
 
 ```openscad
 square(20);
@@ -470,7 +483,7 @@ translate([30, 10]) circle(8);
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Flat model (openscad block), then Terminal recording (.cast file)
+#### 42. Flat model (openscad block), then Terminal recording (.cast file)
 
 ```openscad
 square(20);
@@ -478,7 +491,7 @@ translate([30, 10]) circle(8);
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Flat model (openscad block), then Audio
+#### 43. Flat model (openscad block), then Audio
 
 ```openscad
 square(20);
@@ -486,7 +499,7 @@ translate([30, 10]) circle(8);
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Flat model (openscad block), then Video
+#### 44. Flat model (openscad block), then Video
 
 ```openscad
 square(20);
@@ -494,7 +507,7 @@ translate([30, 10]) circle(8);
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Flat model (openscad block), then Missing file
+#### 45. Flat model (openscad block), then Missing file
 
 ```openscad
 square(20);
@@ -502,7 +515,7 @@ translate([30, 10]) circle(8);
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Flat model (openscad block), then Card
+#### 46. Flat model (openscad block), then Card
 
 ```openscad
 square(20);
@@ -512,7 +525,7 @@ translate([30, 10]) circle(8);
 Text in a card.
 :::
 
-#### 46. Flat model (openscad block), then Callout (info)
+#### 47. Flat model (openscad block), then Callout (info)
 
 ```openscad
 square(20);
@@ -522,7 +535,7 @@ translate([30, 10]) circle(8);
 Text in an info callout.
 :::
 
-#### 47. Flat model (openscad block), then Callout (warning, chosen icon)
+#### 48. Flat model (openscad block), then Callout (warning, chosen icon)
 
 ```openscad
 square(20);
@@ -532,7 +545,7 @@ translate([30, 10]) circle(8);
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Flat model (openscad block), then Callout (decision, no icon)
+#### 49. Flat model (openscad block), then Callout (decision, no icon)
 
 ```openscad
 square(20);

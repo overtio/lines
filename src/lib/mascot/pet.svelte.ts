@@ -105,7 +105,7 @@ class Pet {
     addEventListener("lines:caret", (event) => (this.#caret = (event as CustomEvent<CaretPlace | null>).detail), { signal });
     addEventListener("keydown", (event) => this.#typed(event), { signal, capture: true });
     addEventListener("pointermove", (event) => this.#pointed(event), { signal, passive: true });
-    addEventListener("lines:todo-done", () => this.#celebrate(), { signal });
+    addEventListener("lines:done", () => this.#celebrate(), { signal });
     this.#sprite.addEventListener("pointerdown", (event) => this.#grab(event), { signal });
     this.#sprite.addEventListener("pointerup", (event) => this.#release(event), { signal });
     this.#timer = setInterval(() => document.visibilityState === "visible" && this.#step(), TICK);

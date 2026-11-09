@@ -218,7 +218,18 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   ], edge: ["a~>b t1"] }
   ```
 
-#### 21. Math block in a list item (stays Markdown here)
+#### 21. Typing practice (typing block) in a list item
+
+- List item
+
+  ```typing
+  It’s a “fine” day — type it.
+  function go() {
+    return 1;
+  }
+  ```
+
+#### 22. Math block in a list item (stays Markdown here)
 
 - List item
 
@@ -226,7 +237,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   \int_0^1 x^2\,dx = \frac{1}{3}
   $$
 
-#### 22. Table in a list item (stays Markdown here)
+#### 23. Table in a list item (stays Markdown here)
 
 - List item
 
@@ -235,7 +246,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   | a | **b** | 1 |
   | longer cell text | `code` | 22 |
 
-#### 23. Table with formulas in a list item (stays Markdown here)
+#### 24. Table with formulas in a list item (stays Markdown here)
 
 - List item
 
@@ -246,7 +257,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   | Total | =SUM(B2:B3) |
   | Broken | =B2/0 |
 
-#### 24. Hurl entries (hurl block): a capture used by the next entry, and asserts in a list item
+#### 25. Hurl entries (hurl block): a capture used by the next entry, and asserts in a list item
 
 - List item
 
@@ -266,13 +277,13 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   jsonpath "$.name" isString
   ```
 
-#### 25. Secret ({{name}}, kept in a locked secrets note) in a list item
+#### 26. Secret ({{name}}, kept in a locked secrets note) in a list item
 
 - List item
 
   The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. API requests (http block): a variable, a named request and one using its response in a list item
+#### 27. API requests (http block): a variable, a named request and one using its response in a list item
 
 - List item
 
@@ -287,7 +298,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   GET {{api}}/users/{{todo.response.body.$.userId}}
   ```
 
-#### 27. Spreadsheet (csv block) in a list item (stays Markdown here)
+#### 28. Spreadsheet (csv block) in a list item (stays Markdown here)
 
 - List item
 
@@ -298,7 +309,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Total, =SUM(B2:B3)
   ```
 
-#### 28. Named spreadsheet (csv name=), and a formula in another block using it in a list item (stays Markdown here)
+#### 29. Named spreadsheet (csv name=), and a formula in another block using it in a list item (stays Markdown here)
 
 - List item
 
@@ -311,13 +322,13 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Total, =costs!B2*2
   ```
 
-#### 29. Divider in a list item
+#### 30. Divider in a list item
 
 - List item
 
   ---
 
-#### 30. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a list item (stays Markdown here)
+#### 31. Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop) in a list item (stays Markdown here)
 
 - List item
 
@@ -330,91 +341,91 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
 
   And another.
 
-#### 31. Key: Value line in a list item
+#### 32. Key: Value line in a list item
 
 - List item
 
   **Wi-Fi password:** correct-horse-battery
 
-#### 32. Mention in a list item
+#### 33. Mention in a list item
 
 - List item
 
   Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Wiki link in a list item
+#### 34. Wiki link in a list item
 
 - List item
 
   Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Symbols in a list item
+#### 35. Symbols in a list item
 
 - List item
 
   Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. GitHub links in a list item
+#### 36. GitHub links in a list item
 
 - List item
 
   Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. arXiv links in a list item
+#### 37. arXiv links in a list item
 
 - List item
 
   Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Image in a list item (stays Markdown here)
+#### 38. Image in a list item (stays Markdown here)
 
 - List item
 
   ![A sample picture](attachment:photo.png)
 
-#### 38. Drawing in a list item (stays Markdown here)
+#### 39. Drawing in a list item (stays Markdown here)
 
 - List item
 
   ![A sample drawing](attachment:drawing.svg)
 
-#### 39. File in a list item (stays Markdown here)
+#### 40. File in a list item (stays Markdown here)
 
 - List item
 
   [Budget.csv](attachment:budget.csv)
 
-#### 40. Attached 3D model (STL) in a list item
+#### 41. Attached 3D model (STL) in a list item
 
 - List item
 
   [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Terminal recording (.cast file) in a list item
+#### 42. Terminal recording (.cast file) in a list item
 
 - List item
 
   [terminal.cast](attachment:terminal.cast)
 
-#### 42. Audio in a list item (stays Markdown here)
+#### 43. Audio in a list item (stays Markdown here)
 
 - List item
 
   [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Video in a list item (stays Markdown here)
+#### 44. Video in a list item (stays Markdown here)
 
 - List item
 
   [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Missing file in a list item (stays Markdown here)
+#### 45. Missing file in a list item (stays Markdown here)
 
 - List item
 
   [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Card in a list item
+#### 46. Card in a list item
 
 - List item
 
@@ -422,7 +433,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a card.
   :::
 
-#### 46. Callout (info) in a list item
+#### 47. Callout (info) in a list item
 
 - List item
 
@@ -430,7 +441,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in an info callout.
   :::
 
-#### 47. Callout (warning, chosen icon) in a list item
+#### 48. Callout (warning, chosen icon) in a list item
 
 - List item
 
@@ -438,7 +449,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a warning callout with the flag icon.
   :::
 
-#### 48. Callout (decision, no icon) in a list item
+#### 49. Callout (decision, no icon) in a list item
 
 - List item
 

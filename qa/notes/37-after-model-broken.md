@@ -258,7 +258,20 @@ sphere(3;
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Broken model (openscad block), then Math block
+#### 21. Broken model (openscad block), then Typing practice (typing block)
+
+```openscad
+cube(10)
+sphere(3;
+```
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Broken model (openscad block), then Math block
 
 ```openscad
 cube(10)
@@ -268,7 +281,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Broken model (openscad block), then Table
+#### 23. Broken model (openscad block), then Table
 
 ```openscad
 cube(10)
@@ -279,7 +292,7 @@ sphere(3;
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Broken model (openscad block), then Table with formulas
+#### 24. Broken model (openscad block), then Table with formulas
 
 ```openscad
 cube(10)
@@ -292,7 +305,7 @@ sphere(3;
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Broken model (openscad block), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Broken model (openscad block), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ```openscad
 cube(10)
@@ -314,7 +327,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Broken model (openscad block), then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Broken model (openscad block), then Secret ({{name}}, kept in a locked secrets note)
 
 ```openscad
 cube(10)
@@ -322,7 +335,7 @@ sphere(3;
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Broken model (openscad block), then API requests (http block): a variable, a named request and one using its response
+#### 27. Broken model (openscad block), then API requests (http block): a variable, a named request and one using its response
 
 ```openscad
 cube(10)
@@ -339,7 +352,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Broken model (openscad block), then Spreadsheet (csv block)
+#### 28. Broken model (openscad block), then Spreadsheet (csv block)
 
 ```openscad
 cube(10)
@@ -352,7 +365,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Broken model (openscad block), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Broken model (openscad block), then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```openscad
 cube(10)
@@ -367,7 +380,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Broken model (openscad block), then Divider
+#### 30. Broken model (openscad block), then Divider
 
 ```openscad
 cube(10)
@@ -375,7 +388,7 @@ sphere(3;
 ```
 ---
 
-#### 30. Broken model (openscad block), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Broken model (openscad block), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 ```openscad
 cube(10)
@@ -390,7 +403,7 @@ After it, on a new page.
 
 And another.
 
-#### 31. Broken model (openscad block), then Key: Value line
+#### 32. Broken model (openscad block), then Key: Value line
 
 ```openscad
 cube(10)
@@ -398,7 +411,7 @@ sphere(3;
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Broken model (openscad block), then Mention
+#### 33. Broken model (openscad block), then Mention
 
 ```openscad
 cube(10)
@@ -406,7 +419,7 @@ sphere(3;
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Broken model (openscad block), then Wiki link
+#### 34. Broken model (openscad block), then Wiki link
 
 ```openscad
 cube(10)
@@ -414,7 +427,7 @@ sphere(3;
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Broken model (openscad block), then Symbols
+#### 35. Broken model (openscad block), then Symbols
 
 ```openscad
 cube(10)
@@ -422,7 +435,7 @@ sphere(3;
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Broken model (openscad block), then GitHub links
+#### 36. Broken model (openscad block), then GitHub links
 
 ```openscad
 cube(10)
@@ -430,7 +443,7 @@ sphere(3;
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Broken model (openscad block), then arXiv links
+#### 37. Broken model (openscad block), then arXiv links
 
 ```openscad
 cube(10)
@@ -438,7 +451,7 @@ sphere(3;
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Broken model (openscad block), then Image
+#### 38. Broken model (openscad block), then Image
 
 ```openscad
 cube(10)
@@ -446,7 +459,7 @@ sphere(3;
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 38. Broken model (openscad block), then Drawing
+#### 39. Broken model (openscad block), then Drawing
 
 ```openscad
 cube(10)
@@ -454,7 +467,7 @@ sphere(3;
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Broken model (openscad block), then File
+#### 40. Broken model (openscad block), then File
 
 ```openscad
 cube(10)
@@ -462,7 +475,7 @@ sphere(3;
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Broken model (openscad block), then Attached 3D model (STL)
+#### 41. Broken model (openscad block), then Attached 3D model (STL)
 
 ```openscad
 cube(10)
@@ -470,7 +483,7 @@ sphere(3;
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Broken model (openscad block), then Terminal recording (.cast file)
+#### 42. Broken model (openscad block), then Terminal recording (.cast file)
 
 ```openscad
 cube(10)
@@ -478,7 +491,7 @@ sphere(3;
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Broken model (openscad block), then Audio
+#### 43. Broken model (openscad block), then Audio
 
 ```openscad
 cube(10)
@@ -486,7 +499,7 @@ sphere(3;
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Broken model (openscad block), then Video
+#### 44. Broken model (openscad block), then Video
 
 ```openscad
 cube(10)
@@ -494,7 +507,7 @@ sphere(3;
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Broken model (openscad block), then Missing file
+#### 45. Broken model (openscad block), then Missing file
 
 ```openscad
 cube(10)
@@ -502,7 +515,7 @@ sphere(3;
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Broken model (openscad block), then Card
+#### 46. Broken model (openscad block), then Card
 
 ```openscad
 cube(10)
@@ -512,7 +525,7 @@ sphere(3;
 Text in a card.
 :::
 
-#### 46. Broken model (openscad block), then Callout (info)
+#### 47. Broken model (openscad block), then Callout (info)
 
 ```openscad
 cube(10)
@@ -522,7 +535,7 @@ sphere(3;
 Text in an info callout.
 :::
 
-#### 47. Broken model (openscad block), then Callout (warning, chosen icon)
+#### 48. Broken model (openscad block), then Callout (warning, chosen icon)
 
 ```openscad
 cube(10)
@@ -532,7 +545,7 @@ sphere(3;
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Broken model (openscad block), then Callout (decision, no icon)
+#### 49. Broken model (openscad block), then Callout (decision, no icon)
 
 ```openscad
 cube(10)

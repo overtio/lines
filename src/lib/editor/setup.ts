@@ -26,7 +26,7 @@ import { tables } from "./tables";
 import { typeTables } from "./typeTables";
 import { frontMatterField, missingNotes } from "./objects";
 import { markdownOutline, outlineCompartment } from "./outline.svelte";
-import { todoDone } from "./util";
+import { cheer } from "./util";
 import { copyOnSelect } from "./copyOnSelect";
 import { Card, Highlight, Mention, Tag, TexMath, Underline } from "./syntax";
 import { t as message } from "../i18n/index.svelte";
@@ -95,7 +95,7 @@ const toggleTodo: StateCommand = ({ state, dispatch }) => {
     }
   }
   dispatch(state.update({ changes, scrollIntoView: true, userEvent: "input.format" }));
-  if (changes.some((change) => change.insert === "x")) todoDone();
+  if (changes.some((change) => change.insert === "x")) cheer();
   return true;
 };
 

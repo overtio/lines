@@ -198,14 +198,24 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Missing file, then Math block
+#### 21. Missing file, then Typing practice (typing block)
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Missing file, then Math block
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Missing file, then Table
+#### 23. Missing file, then Table
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 | Left | Center | Right |
@@ -213,7 +223,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Missing file, then Table with formulas
+#### 24. Missing file, then Table with formulas
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 | Item | Cost |
@@ -223,7 +233,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Missing file, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Missing file, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ```hurl
@@ -242,12 +252,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Missing file, then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Missing file, then Secret ({{name}}, kept in a locked secrets note)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Missing file, then API requests (http block): a variable, a named request and one using its response
+#### 27. Missing file, then API requests (http block): a variable, a named request and one using its response
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ```http
@@ -261,7 +271,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Missing file, then Spreadsheet (csv block)
+#### 28. Missing file, then Spreadsheet (csv block)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ```csv
@@ -271,7 +281,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Missing file, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Missing file, then Named spreadsheet (csv name=), and a formula in another block using it
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ```csv name=costs
@@ -283,12 +293,12 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Missing file, then Divider
+#### 30. Missing file, then Divider
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ---
 
-#### 30. Missing file, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Missing file, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Before the break.
@@ -300,98 +310,98 @@ After it, on a new page.
 
 And another.
 
-#### 31. Missing file, then Key: Value line
+#### 32. Missing file, then Key: Value line
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Missing file, then Mention
+#### 33. Missing file, then Mention
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Missing file, then Wiki link
+#### 34. Missing file, then Wiki link
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Missing file, then Symbols
+#### 35. Missing file, then Symbols
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Missing file, then GitHub links
+#### 36. Missing file, then GitHub links
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Missing file, then arXiv links
+#### 37. Missing file, then arXiv links
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Missing file, then Image
+#### 38. Missing file, then Image
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ![A sample picture](attachment:photo.png)
 
-#### 38. Missing file, then Drawing
+#### 39. Missing file, then Drawing
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Missing file, then File
+#### 40. Missing file, then File
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Missing file, then Attached 3D model (STL)
+#### 41. Missing file, then Attached 3D model (STL)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Missing file, then Terminal recording (.cast file)
+#### 42. Missing file, then Terminal recording (.cast file)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Missing file, then Audio
+#### 43. Missing file, then Audio
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Missing file, then Video
+#### 44. Missing file, then Video
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Missing file, then Missing file
+#### 45. Missing file, then Missing file
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Missing file, then Card
+#### 46. Missing file, then Card
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ::: card
 Text in a card.
 :::
 
-#### 46. Missing file, then Callout (info)
+#### 47. Missing file, then Callout (info)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::i
 Text in an info callout.
 :::
 
-#### 47. Missing file, then Callout (warning, chosen icon)
+#### 48. Missing file, then Callout (warning, chosen icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Missing file, then Callout (decision, no icon)
+#### 49. Missing file, then Callout (decision, no icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::^ icon=none

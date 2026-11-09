@@ -258,7 +258,20 @@ flowchart LR
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Diagram (240 px wide), then Math block
+#### 21. Diagram (240 px wide), then Typing practice (typing block)
+
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Diagram (240 px wide), then Math block
 
 ```mermaid |240
 flowchart LR
@@ -268,7 +281,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Diagram (240 px wide), then Table
+#### 23. Diagram (240 px wide), then Table
 
 ```mermaid |240
 flowchart LR
@@ -279,7 +292,7 @@ flowchart LR
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Diagram (240 px wide), then Table with formulas
+#### 24. Diagram (240 px wide), then Table with formulas
 
 ```mermaid |240
 flowchart LR
@@ -292,7 +305,7 @@ flowchart LR
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Diagram (240 px wide), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Diagram (240 px wide), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ```mermaid |240
 flowchart LR
@@ -314,7 +327,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Diagram (240 px wide), then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Diagram (240 px wide), then Secret ({{name}}, kept in a locked secrets note)
 
 ```mermaid |240
 flowchart LR
@@ -322,7 +335,7 @@ flowchart LR
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Diagram (240 px wide), then API requests (http block): a variable, a named request and one using its response
+#### 27. Diagram (240 px wide), then API requests (http block): a variable, a named request and one using its response
 
 ```mermaid |240
 flowchart LR
@@ -339,7 +352,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Diagram (240 px wide), then Spreadsheet (csv block)
+#### 28. Diagram (240 px wide), then Spreadsheet (csv block)
 
 ```mermaid |240
 flowchart LR
@@ -352,7 +365,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Diagram (240 px wide), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Diagram (240 px wide), then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```mermaid |240
 flowchart LR
@@ -367,7 +380,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Diagram (240 px wide), then Divider
+#### 30. Diagram (240 px wide), then Divider
 
 ```mermaid |240
 flowchart LR
@@ -375,7 +388,7 @@ flowchart LR
 ```
 ---
 
-#### 30. Diagram (240 px wide), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Diagram (240 px wide), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 ```mermaid |240
 flowchart LR
@@ -390,7 +403,7 @@ After it, on a new page.
 
 And another.
 
-#### 31. Diagram (240 px wide), then Key: Value line
+#### 32. Diagram (240 px wide), then Key: Value line
 
 ```mermaid |240
 flowchart LR
@@ -398,7 +411,7 @@ flowchart LR
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Diagram (240 px wide), then Mention
+#### 33. Diagram (240 px wide), then Mention
 
 ```mermaid |240
 flowchart LR
@@ -406,7 +419,7 @@ flowchart LR
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Diagram (240 px wide), then Wiki link
+#### 34. Diagram (240 px wide), then Wiki link
 
 ```mermaid |240
 flowchart LR
@@ -414,7 +427,7 @@ flowchart LR
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Diagram (240 px wide), then Symbols
+#### 35. Diagram (240 px wide), then Symbols
 
 ```mermaid |240
 flowchart LR
@@ -422,7 +435,7 @@ flowchart LR
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Diagram (240 px wide), then GitHub links
+#### 36. Diagram (240 px wide), then GitHub links
 
 ```mermaid |240
 flowchart LR
@@ -430,7 +443,7 @@ flowchart LR
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Diagram (240 px wide), then arXiv links
+#### 37. Diagram (240 px wide), then arXiv links
 
 ```mermaid |240
 flowchart LR
@@ -438,7 +451,7 @@ flowchart LR
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Diagram (240 px wide), then Image
+#### 38. Diagram (240 px wide), then Image
 
 ```mermaid |240
 flowchart LR
@@ -446,7 +459,7 @@ flowchart LR
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 38. Diagram (240 px wide), then Drawing
+#### 39. Diagram (240 px wide), then Drawing
 
 ```mermaid |240
 flowchart LR
@@ -454,7 +467,7 @@ flowchart LR
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Diagram (240 px wide), then File
+#### 40. Diagram (240 px wide), then File
 
 ```mermaid |240
 flowchart LR
@@ -462,7 +475,7 @@ flowchart LR
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Diagram (240 px wide), then Attached 3D model (STL)
+#### 41. Diagram (240 px wide), then Attached 3D model (STL)
 
 ```mermaid |240
 flowchart LR
@@ -470,7 +483,7 @@ flowchart LR
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Diagram (240 px wide), then Terminal recording (.cast file)
+#### 42. Diagram (240 px wide), then Terminal recording (.cast file)
 
 ```mermaid |240
 flowchart LR
@@ -478,7 +491,7 @@ flowchart LR
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Diagram (240 px wide), then Audio
+#### 43. Diagram (240 px wide), then Audio
 
 ```mermaid |240
 flowchart LR
@@ -486,7 +499,7 @@ flowchart LR
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Diagram (240 px wide), then Video
+#### 44. Diagram (240 px wide), then Video
 
 ```mermaid |240
 flowchart LR
@@ -494,7 +507,7 @@ flowchart LR
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Diagram (240 px wide), then Missing file
+#### 45. Diagram (240 px wide), then Missing file
 
 ```mermaid |240
 flowchart LR
@@ -502,7 +515,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Diagram (240 px wide), then Card
+#### 46. Diagram (240 px wide), then Card
 
 ```mermaid |240
 flowchart LR
@@ -512,7 +525,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 46. Diagram (240 px wide), then Callout (info)
+#### 47. Diagram (240 px wide), then Callout (info)
 
 ```mermaid |240
 flowchart LR
@@ -522,7 +535,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 47. Diagram (240 px wide), then Callout (warning, chosen icon)
+#### 48. Diagram (240 px wide), then Callout (warning, chosen icon)
 
 ```mermaid |240
 flowchart LR
@@ -532,7 +545,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Diagram (240 px wide), then Callout (decision, no icon)
+#### 49. Diagram (240 px wide), then Callout (decision, no icon)
 
 ```mermaid |240
 flowchart LR

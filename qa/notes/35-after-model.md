@@ -338,7 +338,24 @@ echo("made");
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. 3D model (openscad block), a colored part, an echo, then Math block
+#### 21. 3D model (openscad block), a colored part, an echo, then Typing practice (typing block)
+
+```openscad
+difference() {
+  cube(20, center = true);
+  sphere(r = 13);
+}
+translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
+echo("made");
+```
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. 3D model (openscad block), a colored part, an echo, then Math block
 
 ```openscad
 difference() {
@@ -352,7 +369,7 @@ $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. 3D model (openscad block), a colored part, an echo, then Table
+#### 23. 3D model (openscad block), a colored part, an echo, then Table
 
 ```openscad
 difference() {
@@ -367,7 +384,7 @@ echo("made");
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. 3D model (openscad block), a colored part, an echo, then Table with formulas
+#### 24. 3D model (openscad block), a colored part, an echo, then Table with formulas
 
 ```openscad
 difference() {
@@ -384,7 +401,7 @@ echo("made");
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. 3D model (openscad block), a colored part, an echo, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. 3D model (openscad block), a colored part, an echo, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 ```openscad
 difference() {
@@ -410,7 +427,7 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. 3D model (openscad block), a colored part, an echo, then Secret ({{name}}, kept in a locked secrets note)
+#### 26. 3D model (openscad block), a colored part, an echo, then Secret ({{name}}, kept in a locked secrets note)
 
 ```openscad
 difference() {
@@ -422,7 +439,7 @@ echo("made");
 ```
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. 3D model (openscad block), a colored part, an echo, then API requests (http block): a variable, a named request and one using its response
+#### 27. 3D model (openscad block), a colored part, an echo, then API requests (http block): a variable, a named request and one using its response
 
 ```openscad
 difference() {
@@ -443,7 +460,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. 3D model (openscad block), a colored part, an echo, then Spreadsheet (csv block)
+#### 28. 3D model (openscad block), a colored part, an echo, then Spreadsheet (csv block)
 
 ```openscad
 difference() {
@@ -460,7 +477,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. 3D model (openscad block), a colored part, an echo, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. 3D model (openscad block), a colored part, an echo, then Named spreadsheet (csv name=), and a formula in another block using it
 
 ```openscad
 difference() {
@@ -479,7 +496,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. 3D model (openscad block), a colored part, an echo, then Divider
+#### 30. 3D model (openscad block), a colored part, an echo, then Divider
 
 ```openscad
 difference() {
@@ -491,7 +508,7 @@ echo("made");
 ```
 ---
 
-#### 30. 3D model (openscad block), a colored part, an echo, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. 3D model (openscad block), a colored part, an echo, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 ```openscad
 difference() {
@@ -510,7 +527,7 @@ After it, on a new page.
 
 And another.
 
-#### 31. 3D model (openscad block), a colored part, an echo, then Key: Value line
+#### 32. 3D model (openscad block), a colored part, an echo, then Key: Value line
 
 ```openscad
 difference() {
@@ -522,7 +539,7 @@ echo("made");
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. 3D model (openscad block), a colored part, an echo, then Mention
+#### 33. 3D model (openscad block), a colored part, an echo, then Mention
 
 ```openscad
 difference() {
@@ -534,7 +551,7 @@ echo("made");
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. 3D model (openscad block), a colored part, an echo, then Wiki link
+#### 34. 3D model (openscad block), a colored part, an echo, then Wiki link
 
 ```openscad
 difference() {
@@ -546,7 +563,7 @@ echo("made");
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. 3D model (openscad block), a colored part, an echo, then Symbols
+#### 35. 3D model (openscad block), a colored part, an echo, then Symbols
 
 ```openscad
 difference() {
@@ -558,7 +575,7 @@ echo("made");
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. 3D model (openscad block), a colored part, an echo, then GitHub links
+#### 36. 3D model (openscad block), a colored part, an echo, then GitHub links
 
 ```openscad
 difference() {
@@ -570,7 +587,7 @@ echo("made");
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. 3D model (openscad block), a colored part, an echo, then arXiv links
+#### 37. 3D model (openscad block), a colored part, an echo, then arXiv links
 
 ```openscad
 difference() {
@@ -582,7 +599,7 @@ echo("made");
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. 3D model (openscad block), a colored part, an echo, then Image
+#### 38. 3D model (openscad block), a colored part, an echo, then Image
 
 ```openscad
 difference() {
@@ -594,7 +611,7 @@ echo("made");
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 38. 3D model (openscad block), a colored part, an echo, then Drawing
+#### 39. 3D model (openscad block), a colored part, an echo, then Drawing
 
 ```openscad
 difference() {
@@ -606,7 +623,7 @@ echo("made");
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. 3D model (openscad block), a colored part, an echo, then File
+#### 40. 3D model (openscad block), a colored part, an echo, then File
 
 ```openscad
 difference() {
@@ -618,7 +635,7 @@ echo("made");
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 40. 3D model (openscad block), a colored part, an echo, then Attached 3D model (STL)
+#### 41. 3D model (openscad block), a colored part, an echo, then Attached 3D model (STL)
 
 ```openscad
 difference() {
@@ -630,7 +647,7 @@ echo("made");
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. 3D model (openscad block), a colored part, an echo, then Terminal recording (.cast file)
+#### 42. 3D model (openscad block), a colored part, an echo, then Terminal recording (.cast file)
 
 ```openscad
 difference() {
@@ -642,7 +659,7 @@ echo("made");
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. 3D model (openscad block), a colored part, an echo, then Audio
+#### 43. 3D model (openscad block), a colored part, an echo, then Audio
 
 ```openscad
 difference() {
@@ -654,7 +671,7 @@ echo("made");
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. 3D model (openscad block), a colored part, an echo, then Video
+#### 44. 3D model (openscad block), a colored part, an echo, then Video
 
 ```openscad
 difference() {
@@ -666,7 +683,7 @@ echo("made");
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. 3D model (openscad block), a colored part, an echo, then Missing file
+#### 45. 3D model (openscad block), a colored part, an echo, then Missing file
 
 ```openscad
 difference() {
@@ -678,7 +695,7 @@ echo("made");
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. 3D model (openscad block), a colored part, an echo, then Card
+#### 46. 3D model (openscad block), a colored part, an echo, then Card
 
 ```openscad
 difference() {
@@ -692,7 +709,7 @@ echo("made");
 Text in a card.
 :::
 
-#### 46. 3D model (openscad block), a colored part, an echo, then Callout (info)
+#### 47. 3D model (openscad block), a colored part, an echo, then Callout (info)
 
 ```openscad
 difference() {
@@ -706,7 +723,7 @@ echo("made");
 Text in an info callout.
 :::
 
-#### 47. 3D model (openscad block), a colored part, an echo, then Callout (warning, chosen icon)
+#### 48. 3D model (openscad block), a colored part, an echo, then Callout (warning, chosen icon)
 
 ```openscad
 difference() {
@@ -720,7 +737,7 @@ echo("made");
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. 3D model (openscad block), a colored part, an echo, then Callout (decision, no icon)
+#### 49. 3D model (openscad block), a colored part, an echo, then Callout (decision, no icon)
 
 ```openscad
 difference() {

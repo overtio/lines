@@ -198,14 +198,24 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Heading 1, then Math block
+#### 21. Heading 1, then Typing practice (typing block)
+
+# Heading one
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Heading 1, then Math block
 
 # Heading one
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Heading 1, then Table
+#### 23. Heading 1, then Table
 
 # Heading one
 | Left | Center | Right |
@@ -213,7 +223,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Heading 1, then Table with formulas
+#### 24. Heading 1, then Table with formulas
 
 # Heading one
 | Item | Cost |
@@ -223,7 +233,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Heading 1, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Heading 1, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 # Heading one
 ```hurl
@@ -242,12 +252,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Heading 1, then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Heading 1, then Secret ({{name}}, kept in a locked secrets note)
 
 # Heading one
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Heading 1, then API requests (http block): a variable, a named request and one using its response
+#### 27. Heading 1, then API requests (http block): a variable, a named request and one using its response
 
 # Heading one
 ```http
@@ -261,7 +271,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Heading 1, then Spreadsheet (csv block)
+#### 28. Heading 1, then Spreadsheet (csv block)
 
 # Heading one
 ```csv
@@ -271,7 +281,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Heading 1, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Heading 1, then Named spreadsheet (csv name=), and a formula in another block using it
 
 # Heading one
 ```csv name=costs
@@ -283,12 +293,12 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Heading 1, then Divider
+#### 30. Heading 1, then Divider
 
 # Heading one
 ---
 
-#### 30. Heading 1, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Heading 1, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 # Heading one
 Before the break.
@@ -300,98 +310,98 @@ After it, on a new page.
 
 And another.
 
-#### 31. Heading 1, then Key: Value line
+#### 32. Heading 1, then Key: Value line
 
 # Heading one
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Heading 1, then Mention
+#### 33. Heading 1, then Mention
 
 # Heading one
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Heading 1, then Wiki link
+#### 34. Heading 1, then Wiki link
 
 # Heading one
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Heading 1, then Symbols
+#### 35. Heading 1, then Symbols
 
 # Heading one
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Heading 1, then GitHub links
+#### 36. Heading 1, then GitHub links
 
 # Heading one
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Heading 1, then arXiv links
+#### 37. Heading 1, then arXiv links
 
 # Heading one
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Heading 1, then Image
+#### 38. Heading 1, then Image
 
 # Heading one
 ![A sample picture](attachment:photo.png)
 
-#### 38. Heading 1, then Drawing
+#### 39. Heading 1, then Drawing
 
 # Heading one
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Heading 1, then File
+#### 40. Heading 1, then File
 
 # Heading one
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Heading 1, then Attached 3D model (STL)
+#### 41. Heading 1, then Attached 3D model (STL)
 
 # Heading one
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Heading 1, then Terminal recording (.cast file)
+#### 42. Heading 1, then Terminal recording (.cast file)
 
 # Heading one
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Heading 1, then Audio
+#### 43. Heading 1, then Audio
 
 # Heading one
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Heading 1, then Video
+#### 44. Heading 1, then Video
 
 # Heading one
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Heading 1, then Missing file
+#### 45. Heading 1, then Missing file
 
 # Heading one
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Heading 1, then Card
+#### 46. Heading 1, then Card
 
 # Heading one
 ::: card
 Text in a card.
 :::
 
-#### 46. Heading 1, then Callout (info)
+#### 47. Heading 1, then Callout (info)
 
 # Heading one
 :::i
 Text in an info callout.
 :::
 
-#### 47. Heading 1, then Callout (warning, chosen icon)
+#### 48. Heading 1, then Callout (warning, chosen icon)
 
 # Heading one
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Heading 1, then Callout (decision, no icon)
+#### 49. Heading 1, then Callout (decision, no icon)
 
 # Heading one
 :::^ icon=none

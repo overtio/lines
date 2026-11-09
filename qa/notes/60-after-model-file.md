@@ -198,14 +198,24 @@ endsolid pyramid
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Attached 3D model (STL), then Math block
+#### 21. Attached 3D model (STL), then Typing practice (typing block)
+
+[Bracket.stl](attachment:bracket.stl)
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+
+#### 22. Attached 3D model (STL), then Math block
 
 [Bracket.stl](attachment:bracket.stl)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 22. Attached 3D model (STL), then Table
+#### 23. Attached 3D model (STL), then Table
 
 [Bracket.stl](attachment:bracket.stl)
 | Left | Center | Right |
@@ -213,7 +223,7 @@ $$
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 23. Attached 3D model (STL), then Table with formulas
+#### 24. Attached 3D model (STL), then Table with formulas
 
 [Bracket.stl](attachment:bracket.stl)
 | Item | Cost |
@@ -223,7 +233,7 @@ $$
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 24. Attached 3D model (STL), then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. Attached 3D model (STL), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 [Bracket.stl](attachment:bracket.stl)
 ```hurl
@@ -242,12 +252,12 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 25. Attached 3D model (STL), then Secret ({{name}}, kept in a locked secrets note)
+#### 26. Attached 3D model (STL), then Secret ({{name}}, kept in a locked secrets note)
 
 [Bracket.stl](attachment:bracket.stl)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 26. Attached 3D model (STL), then API requests (http block): a variable, a named request and one using its response
+#### 27. Attached 3D model (STL), then API requests (http block): a variable, a named request and one using its response
 
 [Bracket.stl](attachment:bracket.stl)
 ```http
@@ -261,7 +271,7 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 27. Attached 3D model (STL), then Spreadsheet (csv block)
+#### 28. Attached 3D model (STL), then Spreadsheet (csv block)
 
 [Bracket.stl](attachment:bracket.stl)
 ```csv
@@ -271,7 +281,7 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 28. Attached 3D model (STL), then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. Attached 3D model (STL), then Named spreadsheet (csv name=), and a formula in another block using it
 
 [Bracket.stl](attachment:bracket.stl)
 ```csv name=costs
@@ -283,12 +293,12 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 29. Attached 3D model (STL), then Divider
+#### 30. Attached 3D model (STL), then Divider
 
 [Bracket.stl](attachment:bracket.stl)
 ---
 
-#### 30. Attached 3D model (STL), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. Attached 3D model (STL), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 [Bracket.stl](attachment:bracket.stl)
 Before the break.
@@ -300,98 +310,98 @@ After it, on a new page.
 
 And another.
 
-#### 31. Attached 3D model (STL), then Key: Value line
+#### 32. Attached 3D model (STL), then Key: Value line
 
 [Bracket.stl](attachment:bracket.stl)
 **Wi-Fi password:** correct-horse-battery
 
-#### 32. Attached 3D model (STL), then Mention
+#### 33. Attached 3D model (STL), then Mention
 
 [Bracket.stl](attachment:bracket.stl)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 33. Attached 3D model (STL), then Wiki link
+#### 34. Attached 3D model (STL), then Wiki link
 
 [Bracket.stl](attachment:bracket.stl)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 34. Attached 3D model (STL), then Symbols
+#### 35. Attached 3D model (STL), then Symbols
 
 [Bracket.stl](attachment:bracket.stl)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 35. Attached 3D model (STL), then GitHub links
+#### 36. Attached 3D model (STL), then GitHub links
 
 [Bracket.stl](attachment:bracket.stl)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 36. Attached 3D model (STL), then arXiv links
+#### 37. Attached 3D model (STL), then arXiv links
 
 [Bracket.stl](attachment:bracket.stl)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 37. Attached 3D model (STL), then Image
+#### 38. Attached 3D model (STL), then Image
 
 [Bracket.stl](attachment:bracket.stl)
 ![A sample picture](attachment:photo.png)
 
-#### 38. Attached 3D model (STL), then Drawing
+#### 39. Attached 3D model (STL), then Drawing
 
 [Bracket.stl](attachment:bracket.stl)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 39. Attached 3D model (STL), then File
+#### 40. Attached 3D model (STL), then File
 
 [Bracket.stl](attachment:bracket.stl)
 [Budget.csv](attachment:budget.csv)
 
-#### 40. Attached 3D model (STL), then Attached 3D model (STL)
+#### 41. Attached 3D model (STL), then Attached 3D model (STL)
 
 [Bracket.stl](attachment:bracket.stl)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 41. Attached 3D model (STL), then Terminal recording (.cast file)
+#### 42. Attached 3D model (STL), then Terminal recording (.cast file)
 
 [Bracket.stl](attachment:bracket.stl)
 [terminal.cast](attachment:terminal.cast)
 
-#### 42. Attached 3D model (STL), then Audio
+#### 43. Attached 3D model (STL), then Audio
 
 [Bracket.stl](attachment:bracket.stl)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 43. Attached 3D model (STL), then Video
+#### 44. Attached 3D model (STL), then Video
 
 [Bracket.stl](attachment:bracket.stl)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 44. Attached 3D model (STL), then Missing file
+#### 45. Attached 3D model (STL), then Missing file
 
 [Bracket.stl](attachment:bracket.stl)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 45. Attached 3D model (STL), then Card
+#### 46. Attached 3D model (STL), then Card
 
 [Bracket.stl](attachment:bracket.stl)
 ::: card
 Text in a card.
 :::
 
-#### 46. Attached 3D model (STL), then Callout (info)
+#### 47. Attached 3D model (STL), then Callout (info)
 
 [Bracket.stl](attachment:bracket.stl)
 :::i
 Text in an info callout.
 :::
 
-#### 47. Attached 3D model (STL), then Callout (warning, chosen icon)
+#### 48. Attached 3D model (STL), then Callout (warning, chosen icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 48. Attached 3D model (STL), then Callout (decision, no icon)
+#### 49. Attached 3D model (STL), then Callout (decision, no icon)
 
 [Bracket.stl](attachment:bracket.stl)
 :::^ icon=none

@@ -59,7 +59,7 @@ The plugin is in `src/plugins/latex/`: the editor's reading of LaTeX in `syntax.
 - `\begin{…}` and `\end{…}` on lines of their own shrink to a small gap until the cursor is on them.
 - Numbered environments (`equation`, `align`…) are drawn without numbers, and `\label` is left out of the math. References show the label's name, not a number.
 - `\multicolumn{2}{c}{…}` in a `tabular` spans its columns; `\multirow` shows its text; booktabs rules (`\toprule`…) and `\hline` are left out.
-- A cell starting with `=` stays as written: formulas are worked out in Markdown tables and spreadsheets only ([spreadsheets.md](spreadsheets.md)). Nor is there a spreadsheet block to put in a LaTeX note, as a ` ```csv ` block is in a Markdown one.
+- A cell starting with `=` stays as written: formulas are worked out in Markdown tables and spreadsheets only ([spreadsheets.md](spreadsheets.md)). Nor is there a spreadsheet block to put in a LaTeX note, as a ` ```csv ` block is in a Markdown one, or a typing drill, as a ` ```typing ` block is.
 - Math can use the note's own commands: `\newcommand{\R}{\mathbb{R}}`, `\newcommand{\abs}[1]{\lvert #1 \rvert}`, `\renewcommand`, `\def\x{…}` and `\DeclareMathOperator{\sinc}{sinc}`, anywhere in the note, preamble included.
 - Each line of the LaTeX is a line on screen: a paragraph hard-wrapped in the source shows wrapped there too. LaTeX joins them; lines doesn't.
 - Something that isn't closed (`\textbf{` with no `}`, an environment with no `\end`) is left as written rather than drawn, so a note never breaks while you type. A verbatim block that isn't closed runs to the end of the note.
