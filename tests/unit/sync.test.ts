@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { latexContent, markTitle } from "../../src/plugins/latex/text";
-import { beforeWrite, devices, drive, editElsewhere, fileOf, languages, notes, serialize } from "./sync";
+import { beforeWrite, devices, drive, editElsewhere, fileOf, languages, notes, serialize, sync } from "./sync";
 
 // LaTeX, its title read as the plugin reads it: a document's \title, or its first line of text.
 const latexTitle = (body: string) => {
@@ -223,5 +223,49 @@ describe("sync, of a note's file saved by another app", () => {
     expect(notes.get(id)!.note).toMatchObject({ body: "# Recipe\n\nflour\nsugar", pinned: true });
     await there.sync();
     expect(notes.get(id)!.note).toMatchObject({ body: "# Recipe\n\nflour\nsugar", pinned: true });
+  });
+});
+
+describe("sync, once every synced note was deleted on another device", () => {
+  /** A note synced to two devices and deleted for good on the other; one written here since. */
+  async function deletedElsewhere() {
+    const [here, there] = await devices(2);
+    const id = notes.add("# Only note");
+    await here.sync();
+    await there.sync();
+    await notes.deleteForever(id);
+    await there.sync();
+    await here.open();
+    notes.add("# Written here since");
+    await here.sync();
+    return id;
+  }
+
+  test("stops, deleting nothing, until the person says", async () => {
+    await deletedElsewhere();
+    await sync.syncNow();
+    expect(sync.status).toBe("error");
+    expect(sync.missing).toBe(1);
+    expect(bodies()).toEqual(["# Only note", "# Written here since"]);
+    expect(drive.size).toBe(0);
+  });
+
+  test("deletes them here too, if they were, and syncs on", async () => {
+    await deletedElsewhere();
+    await sync.deleteMissing();
+    await sync.syncNow();
+    expect(sync.status).toBe("idle");
+    expect(sync.missing).toBe(0);
+    expect(bodies()).toEqual(["# Written here since"]);
+    expect([...drive.values()].map((file) => file.text.split("\n").at(-1))).toEqual(["# Written here since"]);
+  });
+
+  test("or uploads them again", async () => {
+    await deletedElsewhere();
+    await sync.uploadMissing();
+    await sync.syncNow();
+    expect(sync.status).toBe("idle");
+    expect(bodies()).toEqual(["# Only note", "# Written here since"]);
+    expect(drive.size).toBe(2);
   });
 });

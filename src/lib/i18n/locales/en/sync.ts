@@ -135,7 +135,14 @@ export default {
   "sync.error.rekeyed": "Encryption was set up again on another device. Enter its new passphrase to keep syncing.",
   "sync.error.encrypted": "The notes there are encrypted. Enter the passphrase to sync them.",
   "sync.error.missing":
-    "The synced notes are missing from the remote, so nothing was changed here. If you cleared it on purpose, disconnect and connect again.",
+    "The synced notes are missing from the remote, so nothing was changed here. If they were deleted on another device, delete them here too; if not, check the drive or bucket, or upload them again.",
+  // What to do about that, below it.
+  "sync.missing.askDelete": "Delete them here too…",
+  "sync.missing.upload": "Upload them again",
+  "sync.missing.deleteHint":
+    "{count, plural, one {This deletes the synced note from this device, for good, unless it was edited here since it last synced.} other {This deletes the # synced notes from this device, for good, but for any edited here since they last synced.}}",
+  "sync.missing.delete": "{count, plural, one {Delete # note} other {Delete # notes}}",
+  "sync.missing.deleting": "Deleting…",
   // {file} is a synced file's path, as in notes/<id>.md.
   "sync.error.undecryptable": "{file} couldn’t be decrypted: it was changed, or encrypted with another key.",
   "sync.error.notSealed": "{file} isn’t an encrypted note.",

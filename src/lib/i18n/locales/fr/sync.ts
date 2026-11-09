@@ -123,7 +123,13 @@ export default {
     "Le chiffrement a été reconfiguré sur un autre appareil. Saisissez sa nouvelle phrase secrète pour continuer la synchronisation.",
   "sync.error.encrypted": "Les notes à cet emplacement sont chiffrées. Saisissez la phrase secrète pour les synchroniser.",
   "sync.error.missing":
-    "Les notes synchronisées sont absentes de l’emplacement distant : rien n’a été modifié ici. Si vous l’avez vidé volontairement, déconnectez-vous puis reconnectez-vous.",
+    "Les notes synchronisées sont absentes de l’emplacement distant : rien n’a été modifié ici. Si elles ont été supprimées sur un autre appareil, supprimez-les ici aussi ; sinon, vérifiez le disque ou le bucket, ou envoyez-les de nouveau.",
+  "sync.missing.askDelete": "Les supprimer ici aussi…",
+  "sync.missing.upload": "Les envoyer de nouveau",
+  "sync.missing.deleteHint":
+    "{count, plural, one {Cela supprime définitivement la note synchronisée de cet appareil, sauf si elle a été modifiée ici depuis sa dernière synchronisation.} other {Cela supprime définitivement les # notes synchronisées de cet appareil, sauf celles modifiées ici depuis leur dernière synchronisation.}}",
+  "sync.missing.delete": "{count, plural, one {Supprimer # note} other {Supprimer # notes}}",
+  "sync.missing.deleting": "Suppression…",
   "sync.error.undecryptable": "Impossible de déchiffrer {file} : il a été modifié ou chiffré avec une autre clé.",
   "sync.error.notSealed": "{file} n’est pas une note chiffrée.",
   "sync.error.unreachableApp": "Impossible de joindre le point de terminaison de stockage. Vérifiez l’URL et votre connexion.",

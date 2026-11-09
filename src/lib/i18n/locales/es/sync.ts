@@ -120,7 +120,13 @@ export default {
     "El cifrado se volvió a configurar en otro dispositivo. Introduce su nueva frase de contraseña para seguir sincronizando.",
   "sync.error.encrypted": "Las notas de allí están cifradas. Introduce la frase de contraseña para sincronizarlas.",
   "sync.error.missing":
-    "Las notas sincronizadas no están en el almacenamiento remoto, así que no se ha cambiado nada aquí. Si lo vaciaste a propósito, desconecta y vuelve a conectar.",
+    "Las notas sincronizadas no están en el almacenamiento remoto, así que no se ha cambiado nada aquí. Si se eliminaron en otro dispositivo, elimínalas aquí también; si no, revisa la unidad o el bucket, o vuelve a subirlas.",
+  "sync.missing.askDelete": "Eliminarlas aquí también…",
+  "sync.missing.upload": "Volver a subirlas",
+  "sync.missing.deleteHint":
+    "{count, plural, one {Esto elimina para siempre la nota sincronizada de este dispositivo, salvo si se editó aquí desde la última sincronización.} other {Esto elimina para siempre las # notas sincronizadas de este dispositivo, salvo las que se editaron aquí desde la última sincronización.}}",
+  "sync.missing.delete": "{count, plural, one {Eliminar # nota} other {Eliminar # notas}}",
+  "sync.missing.deleting": "Eliminando…",
   "sync.error.undecryptable": "No se ha podido descifrar {file}: se modificó o se cifró con otra clave.",
   "sync.error.notSealed": "{file} no es una nota cifrada.",
   "sync.error.unreachableApp": "No se ha podido acceder al endpoint de almacenamiento. Comprueba la URL y tu conexión.",
