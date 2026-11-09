@@ -6,6 +6,7 @@
   import { plugins } from "../../plugins/registry.svelte";
   import type { PaperStyle } from "../../plugins/types";
   import { hex, parse } from "../../themes/color";
+  import { shownScheme } from "../../themes/show.svelte";
   import { formatPercent, formatPixels, PAGE_OPACITY, PAPER_OPACITY, PAPER_SIZE, prefs, spokenPixels, type PaperColor, type PaperSpacing } from "../../prefs.svelte";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
@@ -65,10 +66,11 @@
     }
   }
 
-  /** A color of its own starts as the page is now, which its text reads on. */
+  /** A color of its own starts as the theme's page, which its text reads on; Monochrome and Invert change it as they do the theme's. */
   function choosePageColor(id: "theme" | "custom") {
-    const shown = parse(getComputedStyle(document.documentElement).getPropertyValue("--bg").trim());
-    if (id === "custom" && prefs.pageColor !== "custom" && shown) prefs.pageCustomColor = hex(shown);
+    const theme = plugins.theme(prefs.windowLook.theme);
+    const bg = parse(theme[shownScheme(theme).own].bg);
+    if (id === "custom" && prefs.pageColor !== "custom" && bg) prefs.pageCustomColor = hex(bg);
     prefs.pageColor = id;
   }
 
