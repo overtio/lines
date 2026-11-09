@@ -125,6 +125,25 @@ test("a page break is drawn as one, and the note's page splits at it over a back
   await app.page.waitForFunction(() => document.querySelectorAll(".cm-page-card").length === 2, null, { timeout: 5000 });
 });
 
+test("Enter at the start of an item's text puts an empty item above it, under a paragraph after a blank line", async () => {
+  const cases = [
+    ["Shopping:\n- ‸milk", "Shopping:\n\n- \n- ‸milk"],
+    ["Shopping:\n* ‸milk", "Shopping:\n\n* \n* ‸milk"],
+    ["Shopping:\n1. ‸milk\n2. eggs", "Shopping:\n\n1. \n2. ‸milk\n3. eggs"],
+    ["> Shopping:\n> - ‸milk", "> Shopping:\n>\n> - \n> - ‸milk"],
+    ["- bread\n- [x] ‸milk", "- bread\n- [ ] \n- [x] ‸milk"],
+    ["- bread\n  - ‸milk", "- bread\n  - \n  - ‸milk"],
+  ];
+  for (const [note, after] of cases) {
+    await app.open(note.replace("‸", ""));
+    await app.page.evaluate((pos) => window.testing.place(pos), note.indexOf("‸"));
+    await app.page.keyboard.press("Enter");
+    const head = await app.page.evaluate(() => window.testing.editor()!.state.selection.main.head);
+    const text = (await app.text())!;
+    expect(text.slice(0, head) + "‸" + text.slice(head)).toBe(after);
+  }
+});
+
 test("Copy what you select copies a selection made with the pointer, not with keys", async () => {
   if (engine() !== "chromium") return;
   await app.page.evaluate(() => (window.testing.prefs.copyOnSelect = true));
