@@ -3,8 +3,8 @@ import type { PaperLayer, PaperStyle, Plugin } from "../../lib/plugins/types";
 
 /*
  * Paper to write on (Settings → Paper): patterns drawn behind a note in the color and opacity chosen,
- * a fine line or dot every `--paper-step` (ruled lines under each row of text instead), textures as
- * faint as real paper's, from SVG noise, and backdrops behind the page, of soft glows of color.
+ * a fine line or dot every `--paper-step`, or under each line of text (ruled lines always), textures
+ * as faint as real paper's, from SVG noise, and backdrops behind the page, of soft glows of color.
  */
 
 const STEP = "var(--paper-step)";
@@ -82,36 +82,43 @@ const BACKDROPS: { id: string; light: Parameters<typeof glow>; dark: Parameters<
   },
 ];
 
+/** A row's rule along the bottom of each line of text, the height of its own line. */
+const rows = (color: string): PaperLayer => ({ image: `linear-gradient(to bottom, transparent calc(1lh - 1px), ${color} 0)`, size: "100% 1lh" });
+
 const styles = (): PaperStyle[] => [
   {
     id: "lines",
     name: t("plugins.paper.lines"),
     kind: "pattern",
-    perLine: true,
-    // A rule along the bottom of each row of text.
-    layers: () => [{ image: `linear-gradient(to bottom, transparent calc(1lh - 1px), ${ink()} 0)`, size: "100% 1lh" }],
+    lineLayers: () => [rows(ink())],
   },
   {
     id: "dots",
     name: t("plugins.paper.dots"),
     kind: "pattern",
     layers: () => [dots()],
+    // At each cell's lower left: where a row's rule and a column would cross.
+    lineLayers: () => [{ image: `radial-gradient(circle at 1.5px calc(1lh - 1.5px), ${ink(2.5)} 1.1px, transparent 1.6px)`, size: `${STEP} 1lh` }],
   },
   {
     id: "squares",
     name: t("plugins.paper.squares"),
     kind: "pattern",
     layers: () => [lines("bottom", ink(0.85), `${STEP} ${STEP}`), lines("right", ink(0.85), `${STEP} ${STEP}`)],
+    lineLayers: () => [rows(ink(0.85))],
+    columnLayers: () => [lines("right", ink(0.85), `${STEP} 100%`)],
   },
   {
     id: "graph",
     name: t("plugins.paper.graph"),
     kind: "pattern",
-    // A darker line every fifth, over the others.
+    // A darker line every fifth, over the others; following the text, every fifth column.
     layers: () => {
       const major = `calc(${STEP} * 5) calc(${STEP} * 5)`;
       return [lines("bottom", ink(1.15), major), lines("right", ink(1.15), major), lines("bottom", ink(0.5), `${STEP} ${STEP}`), lines("right", ink(0.5), `${STEP} ${STEP}`)];
     },
+    lineLayers: () => [rows(ink(0.5))],
+    columnLayers: () => [lines("right", ink(1.15), `calc(${STEP} * 5) 100%`), lines("right", ink(0.5), `${STEP} 100%`)],
   },
   {
     id: "isometric",

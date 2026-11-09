@@ -2239,14 +2239,25 @@
   background-image: var(--paper-dark);
 }
 
+/* From each line's own left edge, so columns line up down the note, through lists and callouts. */
 :root[data-paper-lines] .cm-editor.cm-page:not(.cm-sheet-note) .cm-line:not(.cm-lp-codeblock, .cm-lp-props-close) {
   background-image: var(--paper-lines);
   background-size: var(--paper-lines-size);
+  background-position: var(--paper-lines-position);
+  background-origin: padding-box;
+}
+
+/* A grid's columns, down the text column from its left edge and through headings, from its first line to its last. */
+:root[data-paper-columns] .cm-editor.cm-page:not(.cm-sheet-note) > .cm-scroller > .cm-content {
+  background-image: var(--paper-columns);
+  background-size: var(--paper-columns-size);
   background-origin: content-box;
+  background-clip: content-box;
 }
 
 /* Rows start below a heading's padding, which would otherwise be ruled too. */
 :root[data-paper-lines] .cm-editor.cm-page:not(.cm-sheet-note) .cm-line:is(.cm-lp-h, .cm-lp-title) {
+  background-origin: content-box;
   background-clip: content-box;
 }
 

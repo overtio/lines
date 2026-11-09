@@ -78,23 +78,26 @@ export interface PaperLayer {
 
 /**
  * Paper a note's page can look like (Settings → Paper): a pattern drawn behind the text, a texture
- * under it, or a backdrop behind the page, one of each at a time. Patterns draw in `--paper-color` (the theme's ink, its accent, or a
- * color chosen) at `--paper-opacity` (0 to 1: a line's, more for what's smaller), every
- * `--paper-step` (the spacing chosen), so they follow the theme; a texture is told the scheme it's
- * shown in, and so is a backdrop, which fills the space around the page (`background-size: cover`
- * for an image).
+ * under it, or a backdrop behind the page, one of each at a time. Patterns draw in `--paper-color`
+ * (the theme's ink, its accent, or a color chosen) at `--paper-opacity` (0 to 1: a line's, more for
+ * what's smaller), every `--paper-step`: a line of text, or the size chosen. A texture is told the
+ * scheme it's shown in, and so is a backdrop, which fills the space around the page.
  */
 export interface PaperStyle {
   id: string;
   /** In the app's language: "Dots". */
   name: string;
   kind: "pattern" | "texture" | "backdrop";
+  /** Drawn across the page (around it, for a backdrop). */
+  layers?(scheme: "light" | "dark"): PaperLayer[];
   /**
-   * Drawn under each line of the note rather than across the page, a tile every `1lh` (the line's
-   * own height): ruled lines the text always sits on, headings and wrapped lines too.
+   * Drawn under each line of the note instead, in tiles `1lh` high (the line's own height) and
+   * `--paper-step` wide: rows the text sits in, one per line, headings and wrapped lines too. Used
+   * while Spacing follows the text, and always by a pattern without `layers` (ruled lines).
    */
-  perLine?: boolean;
-  layers(scheme: "light" | "dark"): PaperLayer[];
+  lineLayers?(scheme: "light" | "dark"): PaperLayer[];
+  /** With `lineLayers`, what's drawn down the whole text column from its left edge, unbroken by lines: a grid's columns. */
+  columnLayers?(scheme: "light" | "dark"): PaperLayer[];
 }
 
 /**

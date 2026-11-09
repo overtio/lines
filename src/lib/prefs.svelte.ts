@@ -15,8 +15,8 @@ export type SwipeDirection = "fingers" | "reversed";
 export type Paper = "a4" | "letter";
 /** Which side of the window a pane goes on. */
 export type Side = "left" | "right";
-/** How far apart a paper pattern's lines and dots are (Settings → Paper), as a part of a line of text. */
-export type PaperSpacing = "small" | "medium" | "large";
+/** How far apart a paper pattern's lines and dots are (Settings → Paper): a row of cells for each line of text, or a size chosen. */
+export type PaperSpacing = "text" | "custom";
 /** What color a paper pattern is drawn in: the theme's ink or accent, or one of your own. */
 export type PaperColor = "ink" | "accent" | "custom";
 
@@ -155,6 +155,7 @@ interface Stored {
   paperPattern: string;
   paperTexture: string;
   paperSpacing: PaperSpacing;
+  paperSize: number;
   paperColor: PaperColor;
   /** The color of your own a pattern is drawn in, kept while another is chosen. */
   paperCustomColor: string;
@@ -210,6 +211,8 @@ export const SHEET_STATS = ["sum", "average", "min", "max", "count"] as const;
 export type SheetStat = (typeof SHEET_STATS)[number];
 
 export const OPACITY = { min: 0.3, max: 1, step: 0.01 };
+/** A paper pattern's own size, in px, when it doesn't follow the text. */
+export const PAPER_SIZE = { min: 8, max: 64, step: 1 };
 /** How strongly a paper pattern's lines are drawn over the page (dots, being small, a few times more). */
 export const PAPER_OPACITY = { min: 0.04, max: 0.6, step: 0.01 };
 /** How solid the page is over a backdrop: below 1 it shows through, blurred, never so much the text gets hard to read. */
@@ -263,7 +266,8 @@ const DEFAULTS: Stored = {
   paper: localPaper(),
   paperPattern: "none",
   paperTexture: "none",
-  paperSpacing: "medium",
+  paperSpacing: "text",
+  paperSize: 24,
   paperColor: "ink",
   paperCustomColor: "#3d7dd8",
   paperOpacity: 0.12,
@@ -374,7 +378,8 @@ function read(json?: string): Stored {
     paper: oneOf(raw.paper, ["a4", "letter"] as const, DEFAULTS.paper),
     paperPattern: id(raw.paperPattern, DEFAULTS.paperPattern),
     paperTexture: id(raw.paperTexture, DEFAULTS.paperTexture),
-    paperSpacing: oneOf(raw.paperSpacing, ["small", "medium", "large"] as const, DEFAULTS.paperSpacing),
+    paperSpacing: oneOf(raw.paperSpacing, ["text", "custom"] as const, DEFAULTS.paperSpacing),
+    paperSize: clamp(raw.paperSize, PAPER_SIZE.min, PAPER_SIZE.max, DEFAULTS.paperSize),
     paperColor: oneOf(raw.paperColor, ["ink", "accent", "custom"] as const, DEFAULTS.paperColor),
     paperCustomColor: color(raw.paperCustomColor, DEFAULTS.paperCustomColor),
     paperOpacity: clamp(raw.paperOpacity, PAPER_OPACITY.min, PAPER_OPACITY.max, DEFAULTS.paperOpacity),
@@ -436,6 +441,7 @@ class Prefs {
   paperPattern = $state(this.#initial.paperPattern);
   paperTexture = $state(this.#initial.paperTexture);
   paperSpacing = $state<PaperSpacing>(this.#initial.paperSpacing);
+  paperSize = $state(this.#initial.paperSize);
   paperColor = $state<PaperColor>(this.#initial.paperColor);
   paperCustomColor = $state(this.#initial.paperCustomColor);
   paperOpacity = $state(this.#initial.paperOpacity);
@@ -594,6 +600,7 @@ class Prefs {
       paperPattern: this.paperPattern,
       paperTexture: this.paperTexture,
       paperSpacing: this.paperSpacing,
+      paperSize: this.paperSize,
       paperColor: this.paperColor,
       paperCustomColor: this.paperCustomColor,
       paperOpacity: this.paperOpacity,
@@ -666,6 +673,7 @@ class Prefs {
     this.paperPattern = next.paperPattern;
     this.paperTexture = next.paperTexture;
     this.paperSpacing = next.paperSpacing;
+    this.paperSize = next.paperSize;
     this.paperColor = next.paperColor;
     this.paperCustomColor = next.paperCustomColor;
     this.paperOpacity = next.paperOpacity;

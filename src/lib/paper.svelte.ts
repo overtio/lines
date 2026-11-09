@@ -1,6 +1,6 @@
 import { plugins } from "./plugins/registry.svelte";
 import type { PaperStyle } from "./plugins/types";
-import { prefs, type PaperSpacing } from "./prefs.svelte";
+import { prefs } from "./prefs.svelte";
 import { css, parse } from "./themes/color";
 import { shownColor } from "./themes/show.svelte";
 import { announce, onAnnounce } from "./windows/channel";
@@ -8,16 +8,15 @@ import { announce, onAnnounce } from "./windows/channel";
 /*
  * The paper notes are written on (Settings → Paper): the pattern and texture chosen, from plugins,
  * set here as custom properties that editor.css draws behind every note's page, or under each of its
- * lines for a pattern drawn per line. A pattern's lines are a line of text apart, or three quarters
- * or one and a half of one, so they grow with the text, and in the color and opacity chosen. With a
+ * lines. Following the text, a pattern has a row of cells for each line, a line of text wide, so
+ * each bullet is in its own; or it's the size chosen. In the color and opacity chosen. With a
  * backdrop, the note is a page over it, and the paper is the page's.
  */
 
-export const PAPER_SPACINGS: Record<PaperSpacing, number> = { small: 0.75, medium: 1, large: 1.5 };
-
-/** Papers as CSS's background properties, the first over the next; none if none are chosen. */
-export function paperBackground(styles: (PaperStyle | undefined)[], scheme: "light" | "dark") {
-  const layers = styles.flatMap((style) => style?.layers(scheme) ?? []);
+/** Papers as CSS's background properties, the first over the next: across the page, under each line, or down the text column. */
+export function paperBackground(styles: (PaperStyle | undefined)[], scheme: "light" | "dark", where: "page" | "line" | "column" = "page") {
+  const drawn = { page: "layers", line: "lineLayers", column: "columnLayers" } as const;
+  const layers = styles.flatMap((style) => style?.[drawn[where]]?.(scheme) ?? []);
   if (!layers.length) return undefined;
   return {
     image: layers.map((layer) => layer.image).join(", "),
@@ -25,6 +24,9 @@ export function paperBackground(styles: (PaperStyle | undefined)[], scheme: "lig
     position: layers.map((layer) => layer.position ?? "0 0").join(", "),
   };
 }
+
+/** Whether a pattern is drawn under each line: while Spacing follows the text, or if it can't be drawn across the page. */
+export const drawnPerLine = (style: PaperStyle | undefined) => !!style?.lineLayers && (prefs.paperSpacing === "text" || !style.layers);
 
 const IMAGE_KEY = "lines.backdrop-image";
 /** The longest side a backdrop picture is kept at: sharp on a large screen, and small enough to keep. */
@@ -115,6 +117,9 @@ const PROPERTIES = [
   "--paper-position",
   "--paper-lines",
   "--paper-lines-size",
+  "--paper-lines-position",
+  "--paper-columns",
+  "--paper-columns-size",
   "--backdrop-light",
   "--backdrop-dark",
   "--backdrop-size",
@@ -144,22 +149,30 @@ function showPaper() {
   // Always set, for Settings' previews too.
   root.style.setProperty("--paper-color", paperColor());
   root.style.setProperty("--paper-opacity", String(prefs.paperOpacity));
+  // On the root with the images, where their var(--paper-step) is worked out: a line of text, or the size chosen.
+  root.style.setProperty("--paper-step", prefs.paperSpacing === "text" ? "calc(var(--editor-size) * var(--editor-line-height))" : `${prefs.paperSize}px`);
   showBackdrop(root);
   const pattern = plugins.paperStyle(prefs.paperPattern);
   const texture = plugins.paperStyle(prefs.paperTexture);
-  const lines = pattern?.perLine ? paperBackground([pattern], "light") : undefined;
-  const page = [pattern?.perLine ? undefined : pattern, texture];
+  const perLine = drawnPerLine(pattern);
+  const lines = perLine ? paperBackground([pattern], "light", "line") : undefined;
+  const columns = perLine ? paperBackground([pattern], "light", "column") : undefined;
+  const page = [perLine ? undefined : pattern, texture];
   const light = paperBackground(page, "light");
   const dark = paperBackground(page, "dark");
   root.toggleAttribute("data-paper", !!light);
   root.toggleAttribute("data-paper-lines", !!lines);
+  root.toggleAttribute("data-paper-columns", !!columns);
   if (lines) {
     root.style.setProperty("--paper-lines", lines.image);
     root.style.setProperty("--paper-lines-size", lines.size);
+    root.style.setProperty("--paper-lines-position", lines.position);
+  }
+  if (columns) {
+    root.style.setProperty("--paper-columns", columns.image);
+    root.style.setProperty("--paper-columns-size", columns.size);
   }
   if (!light || !dark) return;
-  // On the root with the images, where their var(--paper-step) is worked out, from the text's size and line height.
-  root.style.setProperty("--paper-step", `calc(var(--editor-size) * var(--editor-line-height) * ${PAPER_SPACINGS[prefs.paperSpacing]})`);
   // Light and dark differ only in a texture's color; the scheme shown picks one (editor.css).
   root.style.setProperty("--paper-light", light.image);
   root.style.setProperty("--paper-dark", dark.image);

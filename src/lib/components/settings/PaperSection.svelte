@@ -5,7 +5,7 @@
   import { backdrop, chooseBackdropImage, paperBackground } from "../../paper.svelte";
   import { plugins } from "../../plugins/registry.svelte";
   import type { PaperStyle } from "../../plugins/types";
-  import { formatPercent, PAGE_OPACITY, PAPER_OPACITY, prefs, type PaperColor, type PaperSpacing } from "../../prefs.svelte";
+  import { formatPercent, formatPixels, PAGE_OPACITY, PAPER_OPACITY, PAPER_SIZE, prefs, spokenPixels, type PaperColor, type PaperSpacing } from "../../prefs.svelte";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
   import ColorField from "../ui/ColorField.svelte";
@@ -15,9 +15,8 @@
   import Slider from "../ui/Slider.svelte";
 
   const spacings: { id: PaperSpacing; label: string }[] = [
-    { id: "small", label: t("settings.paperSmall") },
-    { id: "medium", label: t("settings.paperMedium") },
-    { id: "large", label: t("settings.paperLarge") },
+    { id: "text", label: t("settings.paperSpacingText") },
+    { id: "custom", label: t("settings.paperColorCustom") },
   ];
   const colors: { id: PaperColor; label: string }[] = [
     { id: "ink", label: t("settings.paperColorTheme") },
@@ -35,16 +34,17 @@
     { kind: "texture", title: t("settings.paperTexture"), none: t("settings.paperSmooth"), value: prefs.paperTexture, set: (id: string) => (prefs.paperTexture = id) },
   ]);
 
-  /** The pattern chosen draws its own spacing: ruled lines are each a line of text apart. */
-  const spaced = $derived(prefs.paperPattern !== "none" && !plugins.paperStyle(prefs.paperPattern)?.perLine);
+  /** A pattern that can be drawn across the page can have a size of its own; ruled lines always follow the text. */
+  const spaced = $derived(!!plugins.paperStyle(prefs.paperPattern)?.layers);
 
   /**
-   * A tile's preview: its paper at a small spacing (and line height, for a pattern drawn per line), in
+   * A tile's preview: its paper at a small spacing (and line height, for one drawn only per line), in
    * light and dark, of which the page's scheme picks one (the tile's class).
    */
   function preview(style: PaperStyle | undefined) {
-    const light = paperBackground([style], "light");
-    const dark = paperBackground([style], "dark");
+    const where = style?.layers ? "page" : "line";
+    const light = paperBackground([style], "light", where);
+    const dark = paperBackground([style], "dark", where);
     if (!light || !dark) return "";
     return `--paper-step: 9px; line-height: 9px; --tile-light: ${light.image}; --tile-dark: ${dark.image}; background-size: ${light.size}; background-position: ${light.position}`;
   }
@@ -113,6 +113,11 @@
           <FieldRow label={t("settings.paperSpacing")} note={t("settings.paperSpacingNote")}>
             <Segmented label={t("settings.paperSpacing")} options={spacings} value={prefs.paperSpacing} onselect={(id) => (prefs.paperSpacing = id)} />
           </FieldRow>
+          {#if prefs.paperSpacing === "custom"}
+            <FieldRow label={t("settings.paperSize")}>
+              <Slider class="w-60" bind:value={prefs.paperSize} {...PAPER_SIZE} label={t("settings.paperSize")} format={formatPixels} spoken={spokenPixels} />
+            </FieldRow>
+          {/if}
         {/if}
       {/if}
     </FieldGroup>
