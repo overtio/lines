@@ -156,6 +156,24 @@ test("Enter at the start of an item's text puts an empty item above it, under a 
   }
 });
 
+test("Tab and ⇧Tab number a numbered item again, and the items around it", async () => {
+  const cases = [
+    ["1. a\n2. b‸\n3. c", "Tab", "1. a\n   1. b\n2. c"],
+    ["1. a\n   1. b‸\n2. c", "Shift+Tab", "1. a\n2. b\n3. c"],
+    ["1. a\n   1. x\n2. b‸\n3. c", "Tab", "1. a\n   1. x\n   2. b\n2. c"],
+    ["1. a\n   1. b‸\n   2. c\n2. d", "Shift+Tab", "1. a\n2. b\n   1. c\n3. d"],
+    ["1. a\n   1. b‸\n      1. x\n   2. c\n2. d", "Shift+Tab", "1. a\n2. b\n   1. x\n   2. c\n3. d"],
+    ["> 1. a\n> 2. b‸\n> 3. c", "Tab", "> 1. a\n>    1. b\n> 2. c"],
+    ["1. a\n   1. ‸b", "Backspace", "1. a\n2. b"],
+  ];
+  for (const [note, key, after] of cases) {
+    await app.open(note.replace("‸", ""));
+    await app.page.evaluate((pos) => window.testing.place(pos), note.indexOf("‸"));
+    await app.page.keyboard.press(key);
+    expect(await app.text()).toBe(after);
+  }
+});
+
 test("Copy what you select copies a selection made with the pointer, not with keys", async () => {
   if (engine() !== "chromium") return;
   await app.page.evaluate(() => (window.testing.prefs.copyOnSelect = true));
