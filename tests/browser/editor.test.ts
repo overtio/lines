@@ -68,6 +68,18 @@ test("Check spelling turns the browser's spell checking off and on", async () =>
   expect(await app.page.locator(".editor-pane .cm-content").getAttribute("spellcheck")).toBe("false");
 });
 
+test("Enter on an empty item ends the list, when it's the second item too", async () => {
+  for (const marker of ["- ", "* ", "1. ", "- [ ] "]) {
+    await app.open("");
+    await app.page.evaluate(() => window.testing.place(0));
+    await app.page.keyboard.type(`${marker}one`);
+    await app.page.keyboard.press("Enter");
+    await app.page.keyboard.press("Enter");
+    await app.page.keyboard.type("after");
+    expect(await app.text()).toBe(`${marker}one\nafter`);
+  }
+});
+
 describe("line marks", () => {
   const marks = () => app.page.locator(".editor-pane .cm-marker").evaluateAll((bars) => bars.map((bar) => bar.getAttribute("title")));
 
