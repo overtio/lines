@@ -59,6 +59,18 @@ describe("paper", () => {
     await again.getByRole("button", { name: "Remove Image" }).click();
     await app.page.waitForFunction(() => !document.documentElement.hasAttribute("data-backdrop"));
   });
+
+  test("a page color of its own starts as the page was, under Invert too", async () => {
+    app = await openApp({ prefs: { paperBackdrop: "dawn", invert: true } });
+    await app.open("Some text");
+    const page = () => app.style(".editor-pane .cm-content", "--page-bg").then((color) => lightness(app.page, color));
+    const before = await page();
+    expect(before).toBeLessThan(0.1);
+    const settings = await app.settings("Paper");
+    await settings.getByRole("radiogroup", { name: "Color", exact: true }).last().getByRole("radio", { name: "Custom", exact: true }).click();
+    expect(await app.page.evaluate(() => window.testing.prefs.pageColor)).toBe("custom");
+    expect(await page()).toBeCloseTo(before, 2);
+  });
 });
 
 test("Scroll bars off takes them away everywhere", async () => {
