@@ -21,7 +21,7 @@
   import { speak } from "./lib/a11y";
   import { t } from "./lib/i18n/index.svelte";
   import { lock } from "./lib/lock/lock.svelte";
-  import { fileName } from "./lib/notes/export";
+  import { fileName } from "./lib/notes/fileName";
   import { lockedNotes } from "./lib/notes/locked.svelte";
   import { isClosed, notes } from "./lib/notes/store.svelte";
   import { plugins } from "./lib/plugins/registry.svelte";

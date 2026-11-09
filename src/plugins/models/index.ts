@@ -2,7 +2,7 @@ import type { EditorView } from "@codemirror/view";
 import { blockName, fenceAt } from "../../lib/editor/rendered";
 import { insert, named, SECTIONS } from "../../lib/editor/slashCommands";
 import { t } from "../../lib/i18n/index.svelte";
-import { fileName } from "../../lib/notes/export";
+import { fileName } from "../../lib/notes/fileName";
 import { plugins } from "../../lib/plugins/registry.svelte";
 import type { FileView, Plugin, Renderer, ViewedFile } from "../../lib/plugins/types";
 import { saveAndShow } from "../../lib/save";

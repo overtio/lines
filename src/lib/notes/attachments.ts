@@ -1,6 +1,7 @@
 import { isSealed, openRecord, sealRecord, vault } from "../lock/vault";
 import { isDesktopApp, isTauri, download, saveFile } from "../platform";
 import { announce } from "../windows/channel";
+import { fileName } from "./fileName";
 import { attachmentStore } from "./storage";
 import type { Note } from "./types";
 
@@ -242,12 +243,11 @@ export async function openAttachment(name: string, label: string) {
   }
 }
 
-/** What an attachment is called as a file: what the note calls it (`label`), made safe, with its extension. */
+/** What an attachment is called as a file: what the note calls it (`label`, without a width), made safe, with its extension. */
 export function attachmentFileName(name: string, label: string) {
   const ext = extensionOf(name);
-  // oxlint-disable-next-line no-control-regex -- control characters are what it takes out
-  label = label.replace(/[/\\:\u0000-\u001f]/g, "-").trim().replace(/^\.+/, "") || name;
-  return label.toLowerCase().endsWith(`.${ext}`) ? label : `${label}.${ext}`;
+  const safe = fileName(imageSize(label).alt, name);
+  return safe.toLowerCase().endsWith(`.${ext}`) ? safe : `${safe}.${ext}`;
 }
 
 /** Held by every tab lines is open in, so one can tell whether it's the only one. */

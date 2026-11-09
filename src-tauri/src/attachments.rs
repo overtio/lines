@@ -1,4 +1,5 @@
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU32, Ordering};
 
 use tauri::{ipc::InvokeBody, AppHandle, Manager};
 
@@ -87,16 +88,30 @@ fn stem(name: &str) -> &str {
   name.split_once('.').map_or(name, |(stem, _)| stem)
 }
 
-/// The name a note gives an attachment, made safe for a file name, and ending in its extension.
+/// Names Windows keeps for devices, which no file may have, whatever follows the first dot.
+const RESERVED: [&str; 4] = ["con", "prn", "aux", "nul"];
+
+/// The name a note gives an attachment, made safe for a file name on every system, and ending in its
+/// extension. The page sends one made safe already (`attachmentFileName`); this makes sure.
 fn file_name(shown: &str, name: &str) -> PathBuf {
   let ext = name.rsplit_once('.').map_or("", |(_, ext)| ext);
   let clean: String = shown
     .chars()
-    .map(|c| if c.is_control() || matches!(c, '/' | '\\' | ':') { '-' } else { c })
+    .map(|c| if c.is_control() || matches!(c, '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|') { '-' } else { c })
     .collect();
-  let clean = clean.trim().trim_start_matches('.');
-  let clean = if clean.is_empty() { name } else { clean };
-  if Path::new(clean).extension().is_some_and(|e| e.eq_ignore_ascii_case(ext)) {
+  let clean = clean.trim().trim_start_matches('.').trim_end_matches(['.', ' ']);
+  // Room for the extension within the 255 bytes a name may have.
+  let end = clean.char_indices().map(|(i, c)| i + c.len_utf8()).take_while(|&end| end <= 200).last().unwrap_or(0);
+  let clean = clean[..end].trim_end_matches(['.', ' ']);
+  let stem = clean.split('.').next().unwrap_or_default().to_lowercase();
+  let device = RESERVED.contains(&stem.as_str())
+    || (stem.len() == 4 && (stem.starts_with("com") || stem.starts_with("lpt")) && stem.ends_with(|c: char| c.is_ascii_digit()));
+  let clean = match clean {
+    "" => name.to_owned(),
+    _ if device => format!("_{clean}"),
+    _ => clean.to_owned(),
+  };
+  if Path::new(&clean).extension().is_some_and(|e| e.eq_ignore_ascii_case(ext)) {
     PathBuf::from(clean)
   } else {
     PathBuf::from(format!("{clean}.{ext}"))
@@ -105,17 +120,24 @@ fn file_name(shown: &str, name: &str) -> PathBuf {
 
 /// Attachments never change, so a copy that's already there is the same file.
 fn write_once(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
+  static WRITES: AtomicU32 = AtomicU32::new(0);
   if path.exists() {
     return Ok(());
   }
   let folder = path.parent().expect("a file in a folder");
   std::fs::create_dir_all(folder)?;
-  let temp = folder.join(".partial");
-  std::fs::write(&temp, bytes)?;
-  let mut permissions = std::fs::metadata(&temp)?.permissions();
+  // A name of its own, so neither a write that failed nor one under way gets in the way.
+  let temp = folder.join(format!(".partial-{}-{}", std::process::id(), WRITES.fetch_add(1, Ordering::Relaxed)));
+  if let Err(error) = std::fs::write(&temp, bytes).and_then(|()| std::fs::rename(&temp, path)) {
+    let _ = std::fs::remove_file(&temp);
+    // Unless another open of the same attachment wrote it first.
+    if !path.exists() {
+      return Err(error);
+    }
+  }
+  let mut permissions = std::fs::metadata(path)?.permissions();
   permissions.set_readonly(true);
-  std::fs::set_permissions(&temp, permissions)?;
-  std::fs::rename(&temp, path)
+  std::fs::set_permissions(path, permissions)
 }
 
 #[cfg(test)]
@@ -131,6 +153,12 @@ mod tests {
     assert_eq!(file_name("../../etc/passwd", name), PathBuf::from("-..-etc-passwd.pdf"));
     assert_eq!(file_name(" .hidden.pdf", name), PathBuf::from("hidden.pdf"));
     assert_eq!(file_name("", name), PathBuf::from(name));
+    assert_eq!(file_name("Q3: costs? <draft> | final.", name), PathBuf::from("Q3- costs- -draft- - final.pdf"));
+    assert_eq!(file_name("con", name), PathBuf::from("_con.pdf"));
+    assert_eq!(file_name("LPT1.backup", name), PathBuf::from("_LPT1.backup.pdf"));
+    assert_eq!(file_name("Console", name), PathBuf::from("Console.pdf"));
+    let long = file_name(&"日本語".repeat(40), name);
+    assert!(long.as_os_str().len() <= 255 && long.to_string_lossy().ends_with("語.pdf"));
     assert_eq!(stem(name), "3f9c0a1b2c3d4e5f60718293a4b5c6d7");
   }
 
@@ -156,6 +184,21 @@ mod tests {
       std::os::unix::fs::symlink(&program, dir.join("Notes.txt")).unwrap();
       assert!(runs(&dir.join("Notes.txt")));
     }
+    std::fs::remove_dir_all(&dir).unwrap();
+  }
+
+  #[test]
+  fn a_failed_write_leaves_nothing_in_the_way() {
+    let dir = std::env::temp_dir().join(format!("lines-attachment-fail-{}", std::process::id()));
+    // A name too long for any system fails to write…
+    assert!(write_once(&dir.join("b").join("x".repeat(300)), b"1").is_err());
+    // …and the next one, under a name that can be, still opens.
+    write_once(&dir.join("b").join("Report.pdf"), b"1").unwrap();
+    assert_eq!(std::fs::read_dir(dir.join("b")).unwrap().count(), 1);
+    let mut permissions = std::fs::metadata(dir.join("b").join("Report.pdf")).unwrap().permissions();
+    #[allow(clippy::permissions_set_readonly_false)]
+    permissions.set_readonly(false);
+    std::fs::set_permissions(dir.join("b").join("Report.pdf"), permissions).unwrap();
     std::fs::remove_dir_all(&dir).unwrap();
   }
 
