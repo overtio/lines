@@ -11,12 +11,16 @@ import { arrowsInto, drawnBlock, drawnBlocks, isEditing } from "./util";
  */
 
 export class PageBreakWidget extends WidgetType {
+  /** `preview`: drawn below its line while that's edited, rather than in its place. */
+  constructor(readonly preview: boolean) {
+    super();
+  }
   eq(other: WidgetType) {
-    return other instanceof PageBreakWidget;
+    return other instanceof PageBreakWidget && other.preview === this.preview;
   }
   toDOM() {
     const dom = document.createElement("div");
-    dom.className = "cm-page-break";
+    dom.className = this.preview ? "cm-page-break is-preview" : "cm-page-break";
     dom.setAttribute("role", "separator");
     dom.setAttribute("aria-label", t("editor.pageBreak"));
     // The gap between pages, which the page layer leaves out.
@@ -33,7 +37,8 @@ export class PageBreakWidget extends WidgetType {
   }
 }
 
-export const pageBreak = new PageBreakWidget();
+/** A page break drawn at `from`–`to`, its line: below it while it's edited (`editing`), else in its place. */
+export const pageBreakAt = (from: number, to: number, editing: boolean) => drawnBlock(new PageBreakWidget(editing), from, to, editing);
 
 const backdropChanged = StateEffect.define<null>();
 
@@ -54,7 +59,8 @@ const pages = layer({
   update: (update) =>
     update.docChanged || update.viewportChanged || update.geometryChanged || update.transactions.some((tr) => tr.effects.some((effect) => effect.is(backdropChanged))),
   markers(view) {
-    if (!document.documentElement.hasAttribute("data-backdrop")) return [];
+    // Only the main window's note pane has the backdrop, which the page is drawn over.
+    if (!document.documentElement.hasAttribute("data-backdrop") || !view.dom.closest(".editor-pane")) return [];
     const scroller = view.scrollDOM.getBoundingClientRect();
     const content = view.contentDOM.getBoundingClientRect();
     const left = content.left - scroller.left + view.scrollDOM.scrollLeft;
@@ -84,7 +90,7 @@ const markdownBreaks = drawnBlocks(
     if (node.name !== "CommentBlock" && node.name !== "HTMLBlock") return null;
     const line = state.doc.lineAt(node.from);
     if (!isPageBreak(line.text)) return null;
-    return drawnBlock(pageBreak, line.from, line.to, isEditing(state, line.from, line.to));
+    return pageBreakAt(line.from, line.to, isEditing(state, line.from, line.to));
   },
   { inside: ["Document"] },
 );

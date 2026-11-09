@@ -12,7 +12,8 @@
   import { customThemes } from "../../themes/custom.svelte";
   import { pictureName, themeFromPicture } from "../../themes/picture";
   import { readableFormats, readThemes } from "../../themes/import";
-  import { paneColors, schemeShown } from "../../themes/show.svelte";
+  import { paneColors } from "../../themes/css";
+  import { isDarkPane, schemeShown, shownScheme } from "../../themes/show.svelte";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
   import FieldGroup from "../ui/FieldGroup.svelte";
@@ -36,11 +37,11 @@
   const PANE_NAMES = { none: "settings.darkPanesNone", sidebar: "settings.darkPanesSidebar", list: "settings.darkPanesList", both: "settings.darkPanesBoth" } as const;
   const darkPanes = DARK_PANES.map((id) => ({ id, label: t(PANE_NAMES[id]) }));
 
-  /** A theme's tile: its colors for the scheme shown, and its sidebar's dark if Dark panes says so. */
+  /** A theme's tile: its colors for the scheme shown, and its sidebar's dark if Dark panes would darken it. */
   function tile(option: Theme) {
     const own = schemeShown(option, prefs.dark);
     const colors = option[own];
-    const dark = own === "light" && (prefs.darkPanes === "sidebar" || prefs.darkPanes === "both") ? paneColors(option, own, false) : colors;
+    const dark = isDarkPane("sidebar", option) ? paneColors(option, own, false) : colors;
     return { bg: colors.bg, text: colors.text, accent: colors.accent, sidebar: dark["bg-sidebar"], sidebarAccent: dark.accent };
   }
 
@@ -97,9 +98,17 @@
   /** The theme just made, whose name is ready to type over. */
   let made = $state<string | null>(null);
 
-  /** A theme of your own, to change, from the one showing: a copy of yours as it's kept, or a plugin's with its colors for Increased contrast. */
+  /**
+   * A theme of your own, to change, from the one showing: a copy of yours as it's kept, or a plugin's
+   * with its colors for Increased contrast; one with colors for one scheme only (Classic, Neon)
+   * keeps to that one.
+   */
   function newTheme() {
-    const { author, light, dark, moreContrast } = customThemes.get(theme) ?? shown;
+    const { author, light, dark, moreContrast } = customThemes.get(theme) ?? {
+      ...shown,
+      light: shown.scheme === "dark" ? undefined : shown.light,
+      dark: shown.scheme === "light" ? undefined : shown.dark,
+    };
     made = prefs.theme = customThemes.add({ name: t("settings.themeCopyName", { name: shown.name }), author, light, dark, moreContrast });
   }
 
@@ -122,10 +131,10 @@
     imported = importError = pictureError = null;
     fromPicture = null;
     try {
-      const made = await themeFromPicture(file, pictureName(file.name) || t("settings.themePictureName"));
-      prefs.theme = customThemes.add(made);
-      fromPicture = { name: made.name, file };
-      speak(t("settings.themeFromPicture", { name: made.name }));
+      const picked = await themeFromPicture(file, pictureName(file.name) || t("settings.themePictureName"));
+      prefs.theme = customThemes.add(picked);
+      fromPicture = { name: picked.name, file };
+      speak(t("settings.themeFromPicture", { name: picked.name }));
     } catch {
       pictureError = t("settings.themePictureError");
       speak(pictureError);
@@ -134,8 +143,13 @@
 
   async function useAsBackdrop() {
     if (!fromPicture) return;
-    await chooseBackdropImage(fromPicture.file);
-    fromPicture = null;
+    try {
+      await chooseBackdropImage(fromPicture.file);
+      fromPicture = null;
+    } catch {
+      pictureError = t("settings.backdropImageError");
+      speak(pictureError);
+    }
   }
 
   /** Adds the themes in files (or pasted text), and shows the first; says which it couldn't read. */
@@ -329,7 +343,7 @@
   <FieldRow label={t("settings.mode")} note={shown.scheme ? t(shown.scheme === "dark" ? "settings.themeOnlyDarkMode" : "settings.themeOnlyLightMode", { name: shown.name }) : null}>
     <Segmented label={t("settings.mode")} options={appearances} value={prefs.appearance} onselect={(id) => (prefs.appearance = id)} />
   </FieldRow>
-  <FieldRow label={t("settings.darkPanes")} note={t("settings.darkPanesNote")}>
+  <FieldRow label={t("settings.darkPanes")} note={t("settings.darkPanesNote")} dim={shownScheme(plugins.theme(prefs.windowLook.theme)).shown === "dark"}>
     <Segmented label={t("settings.darkPanes")} options={darkPanes} value={prefs.darkPanes} onselect={(id) => (prefs.darkPanes = id)} />
   </FieldRow>
   <FieldRow label={t("settings.contrast")} note={t("settings.contrastNote")}>

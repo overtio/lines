@@ -24,8 +24,8 @@ interface Group extends Lch {
 /** OKLab's a and b, from a hue and chroma. */
 const ab = ({ c, h }: Lch) => [c * Math.cos((h * Math.PI) / 180), c * Math.sin((h * Math.PI) / 180)];
 
-/** The picture's pixels as OKLab points (lightness, a, b), at most SIDE pixels on its longest side; see-through ones left out. */
-async function pixels(picture: Blob): Promise<number[][]> {
+/** A picture's pixels, as RGBA bytes, at most SIDE pixels on its longest side. */
+async function pixels(picture: Blob) {
   const bitmap = await createImageBitmap(picture);
   const scale = Math.min(1, SIDE / Math.max(bitmap.width, bitmap.height));
   const width = Math.max(1, Math.round(bitmap.width * scale));
@@ -36,14 +36,18 @@ async function pixels(picture: Blob): Promise<number[][]> {
   const context = canvas.getContext("2d", { willReadFrequently: true })!;
   context.drawImage(bitmap, 0, 0, width, height);
   bitmap.close();
-  const data = context.getImageData(0, 0, width, height).data;
-  const points: number[][] = [];
-  for (let i = 0; i < data.length; i += 4) {
+  return context.getImageData(0, 0, width, height).data;
+}
+
+/** RGBA bytes as OKLab points (lightness, a, b), see-through pixels left out. */
+function points(data: ArrayLike<number>): number[][] {
+  const found: number[][] = [];
+  for (let i = 0; i + 3 < data.length; i += 4) {
     if (data[i + 3] < 128) continue;
     const lch = toLch({ r: data[i], g: data[i + 1], b: data[i + 2], a: 1 });
-    points.push([lch.l, ...ab(lch)]);
+    found.push([lch.l, ...ab(lch)]);
   }
-  return points;
+  return found;
 }
 
 const distance = (a: number[], b: number[]) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
@@ -132,14 +136,17 @@ function reads(colors: ThemeColors, dark: boolean) {
   return isDark(bg) === dark && contrast(text, bg) >= 7 && contrast(accent, bg) >= 4.5;
 }
 
-/** A theme, light and dark, from `picture`'s colors, called `name`. Throws if the picture can't be read. */
-export async function themeFromPicture(picture: Blob, name: string): Promise<ThemeFile> {
-  const found = groups(await pixels(picture), GROUPS);
+/** A theme, light and dark, from a picture's pixels (RGBA bytes), called `name`. Throws if they can't make one. */
+export function themeFromPixels(data: ArrayLike<number>, name: string): ThemeFile {
+  const found = groups(points(data), GROUPS);
   if (!found.length) throw new Error("The picture has no colors to read");
   const [light, dark] = [false, true].map((dark) => themeColors(palette(found, dark)).colors);
   if (!reads(light, false) || !reads(dark, true)) throw new Error("The picture's colors don't make a readable theme");
   return { name, light, dark };
 }
+
+/** A theme, light and dark, from `picture`'s colors, called `name`. Throws if the picture can't be read. */
+export const themeFromPicture = async (picture: Blob, name: string) => themeFromPixels(await pixels(picture), name);
 
 /** For a picture called "Lake at dawn.jpg": "Lake at dawn". */
 export const pictureName = (fileName: string) => fileName.replace(/\.[a-z0-9]+$/i, "").replace(/[-_]+/g, " ").trim();

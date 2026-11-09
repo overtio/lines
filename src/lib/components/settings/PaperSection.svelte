@@ -2,9 +2,10 @@
   import { RadioGroup } from "bits-ui";
   import { t } from "../../i18n/index.svelte";
   import Icon from "../../icons/Icon.svelte";
-  import { backdrop, chooseBackdropImage, paperBackground } from "../../paper.svelte";
+  import { backdrop, chooseBackdropImage, paperBackground, removeBackdropImage } from "../../paper.svelte";
   import { plugins } from "../../plugins/registry.svelte";
   import type { PaperStyle } from "../../plugins/types";
+  import { hex, parse } from "../../themes/color";
   import { formatPercent, formatPixels, PAGE_OPACITY, PAPER_OPACITY, PAPER_SIZE, prefs, spokenPixels, type PaperColor, type PaperSpacing } from "../../prefs.svelte";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
@@ -16,7 +17,7 @@
 
   const spacings: { id: PaperSpacing; label: string }[] = [
     { id: "text", label: t("settings.paperSpacingText") },
-    { id: "custom", label: t("settings.paperColorCustom") },
+    { id: "custom", label: t("settings.paperSpacingCustom") },
   ];
   const colors: { id: PaperColor; label: string }[] = [
     { id: "ink", label: t("settings.paperColorTheme") },
@@ -62,6 +63,13 @@
     } catch {
       imageError = t("settings.backdropImageError");
     }
+  }
+
+  /** A color of its own starts as the page is now, which its text reads on. */
+  function choosePageColor(id: "theme" | "custom") {
+    const shown = parse(getComputedStyle(document.documentElement).getPropertyValue("--bg").trim());
+    if (id === "custom" && prefs.pageColor !== "custom" && shown) prefs.pageCustomColor = hex(shown);
+    prefs.pageColor = id;
   }
 
   /** Choosing Image with no picture yet asks for one first. */
@@ -128,7 +136,8 @@
 
 <FieldGroup title={t("settings.backdrop")} note={t("settings.backdropNote")} id="paper-backdrop">
   <div class="border-b border-line p-3 last:border-0">
-    <RadioGroup.Root value={prefs.paperBackdrop} onValueChange={chooseBackdrop} aria-labelledby="paper-backdrop" class={GRID}>
+    <!-- Bound both ways, so Image cancelled (no picture chosen) doesn't stay checked. -->
+    <RadioGroup.Root bind:value={() => prefs.paperBackdrop, chooseBackdrop} aria-labelledby="paper-backdrop" class={GRID}>
       <RadioGroup.Item value="none" class={ITEM}>
         <span class="{TILE} bg-surface" aria-hidden="true"></span>
         <span class={NAME}>{t("settings.backdropNone")}</span>
@@ -161,7 +170,10 @@
     </FieldRow>
   {:else if prefs.paperBackdrop === "image"}
     <FieldRow label={t("settings.backdropImage")} note={t("settings.backdropImageNote")}>
-      <Button onclick={() => picker?.click()}>{t("settings.backdropChoose")}</Button>
+      <div class="flex flex-wrap gap-2">
+        {#if backdrop.image}<Button variant="quiet" onclick={() => void removeBackdropImage()}>{t("settings.backdropRemove")}</Button>{/if}
+        <Button onclick={() => picker?.click()}>{t("settings.backdropChoose")}</Button>
+      </div>
     </FieldRow>
   {/if}
 </FieldGroup>
@@ -169,10 +181,10 @@
 {#if prefs.paperBackdrop !== "none"}
   <FieldGroup title={t("settings.page")} note={t("settings.pageNote")}>
     <FieldRow label={t("settings.paperColor")}>
-      <Segmented label={t("settings.paperColor")} options={pageColors} value={prefs.pageColor} onselect={(id) => (prefs.pageColor = id)} />
+      <Segmented label={t("settings.paperColor")} options={pageColors} value={prefs.pageColor} onselect={choosePageColor} />
     </FieldRow>
     {#if prefs.pageColor === "custom"}
-      <FieldRow label={t("settings.pageCustomColor")} for="page-custom-color">
+      <FieldRow label={t("settings.pageCustomColor")} note={t("settings.pageCustomColorNote")} for="page-custom-color">
         <ColorField id="page-custom-color" label={t("settings.pageCustomColor")} value={prefs.pageCustomColor} onchange={(color) => color && (prefs.pageCustomColor = color)} />
       </FieldRow>
     {/if}

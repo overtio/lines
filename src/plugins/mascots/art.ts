@@ -5,14 +5,13 @@ import type { Mascot } from "../../lib/plugins/types";
  * color from its palette (`.` see-through). Eyes are `e` and their shine `i`, which blinking closes.
  */
 
-type Art = Omit<Mascot, "id" | "name" | "description">;
+type Art = Omit<Mascot, "id" | "name" | "description" | "sounds">;
 
 /** An orange tabby: naps a lot, and pounces on the pointer. */
 export const cat: Art = {
   palette: { k: "#2b2633", b: "#f2a65a", B: "#d9823b", w: "#fff3e0", p: "#ff9eb1", e: "#2b2633" },
   lid: "b",
   moves: "walk",
-  sounds: ["mrrp", "meow", "prrr"],
   frames: {
     stand: [
       "................",
@@ -130,7 +129,6 @@ export const alien: Art = {
   palette: { k: "#1f2a1f", g: "#7bd88f", G: "#4fb168", e: "#1f2a1f", i: "#ffffff", y: "#ffe66d", p: "#ff9eb1" },
   lid: "g",
   moves: "float",
-  sounds: ["beep?", "bloop", "☆"],
   frames: {
     stand: [
       "................",
@@ -248,7 +246,6 @@ export const slime: Art = {
   palette: { k: "#2b2633", a: "accent", A: "accent-dark", w: "#ffffff", e: "#2b2633", p: "#ff9eb1" },
   lid: "a",
   moves: "hop",
-  sounds: ["boing", "blub", "~"],
   frames: {
     stand: [
       "................",
@@ -366,7 +363,6 @@ export const girl: Art = {
   palette: { k: "#2b2633", h: "accent", H: "accent-dark", s: "#ffe2cc", S: "#f5c4a5", e: "#3b2f5c", i: "#ffffff", w: "#ffffff", d: "#3b3f6b", D: "#2c2f52", r: "#e5484d", m: "#d9536a" },
   lid: "s",
   moves: "walk",
-  sounds: ["ganbatte!", "♪", "ehehe"],
   frames: {
     stand: [
       "................",

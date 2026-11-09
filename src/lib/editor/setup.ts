@@ -26,13 +26,13 @@ import { tables } from "./tables";
 import { typeTables } from "./typeTables";
 import { frontMatterField, missingNotes } from "./objects";
 import { markdownOutline, outlineCompartment } from "./outline.svelte";
-import { cheer } from "./util";
+import { cheer, selectedLines } from "./util";
 import { copyOnSelect } from "./copyOnSelect";
 import { Card, Highlight, Mention, Tag, TexMath, Underline } from "./syntax";
 import { t as message } from "../i18n/index.svelte";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
 import type { MarkdownAddition, NoteLanguage, PaperSource } from "../plugins/types";
-import { lineMarkers } from "./markers";
+import { lineMarkers, openedText } from "./markers";
 import { hiddenMarkdown } from "./hiddenMarkdown";
 import { markdownPageBreaks } from "./pageBreaks";
 import { markupMode } from "./markupMode";
@@ -77,22 +77,13 @@ const linedown = (additions: MarkdownAddition[]) =>
 /** Turn the selected lines into todos, or tick/untick them if they already are. */
 const toggleTodo: StateCommand = ({ state, dispatch }) => {
   if (state.readOnly) return false;
-  const { doc } = state;
   const changes = [];
-  const seen = new Set<number>();
-  for (const range of state.selection.ranges) {
-    // A selection that ends at the very start of a line (as a triple click does) stops before it.
-    const end = range.to > range.from && doc.lineAt(range.to).from === range.to ? range.to - 1 : range.to;
-    for (let n = doc.lineAt(range.from).number; n <= doc.lineAt(end).number; n++) {
-      if (seen.has(n)) continue;
-      seen.add(n);
-      const line = doc.line(n);
-      // Quote markers and indentation stay; a list marker becomes a checkbox.
-      const [, lead, marker = "", box] = /^((?:\s*>\s?)*\s*)([-*+] \[([ xX])\] |[-*+] |\d+[.)] )?/.exec(line.text)!;
-      const from = line.from + lead.length;
-      if (box) changes.push({ from: from + 3, to: from + 4, insert: box === " " ? "x" : " " });
-      else changes.push({ from, to: from + marker.length, insert: "- [ ] " });
-    }
+  for (const line of selectedLines(state)) {
+    // Quote markers and indentation stay; a list marker becomes a checkbox.
+    const [, lead, marker = "", box] = /^((?:\s*>\s?)*\s*)([-*+] \[([ xX])\] |[-*+] |\d+[.)] )?/.exec(line.text)!;
+    const from = line.from + lead.length;
+    if (box) changes.push({ from: from + 3, to: from + 4, insert: box === " " ? "x" : " " });
+    else changes.push({ from, to: from + marker.length, insert: "- [ ] " });
   }
   dispatch(state.update({ changes, scrollIntoView: true, userEvent: "input.format" }));
   if (changes.some((change) => change.insert === "x")) cheer();
@@ -345,6 +336,7 @@ export function createExtensions(onChange: () => void, format?: string): Extensi
       lang: "",
     }),
     formatCompartment.of(formatEditing(format)),
+    openedText,
     // The note's page, which the paper chosen in Settings → Paper is drawn on (editor.css).
     EditorView.editorAttributes.of({ class: "cm-page" }),
     cursor,

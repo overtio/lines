@@ -468,7 +468,8 @@ function build(view: EditorView): DecorationSet {
         }
 
         case "Mention": {
-          if (styleShows(node.from, node.to)) {
+          // Its source shows with the cursor in it, Hidden too: a chip can't be edited, only taken away.
+          if (touches(node.from, node.to)) {
             mark(node.from, node.to, "cm-lp-mention-source");
             return false;
           }

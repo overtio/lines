@@ -56,6 +56,14 @@
   color: var(--bg) !important;
 }
 
+/* Focus on what's chosen, in the color it's turned around to: the accent's ring would vanish into it. */
+@media not (forced-colors: active) {
+  :root[data-style="pixel"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-segment[data-state="checked"]):focus-visible {
+    outline: 2px solid var(--bg);
+    outline-offset: -4px;
+  }
+}
+
 /* Lines around what can be pressed or typed in, and around what floats. */
 :root[data-style="pixel"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select, .ui-field, .ui-segmented, .ui-card, .ui-menu, .ui-dialog) {
   border: var(--pixel-line);
@@ -131,7 +139,8 @@
 
 :root[data-style="pixel"] .ui-switch[data-state="checked"] .ui-switch-thumb {
   background: var(--bg);
-  translate: 2px 0;
+  /* The track's width, less its lines, padding and the knob. */
+  translate: 18px 0;
 }
 
 :root[data-style="pixel"] .ui-slider-track {
@@ -147,10 +156,11 @@
   box-shadow: none;
 }
 
-/* Scroll bars as a block on a line. Not while they're turned off. */
+/* Scroll bars as a block on a line. Not while they're turned off. Browsers draw them so only while neither width nor color is set. */
 :root[data-style="pixel"]:not([data-no-scrollbars]),
 :root[data-style="pixel"]:not([data-no-scrollbars]) * {
   scrollbar-color: auto;
+  scrollbar-width: auto;
 }
 
 :root[data-style="pixel"] ::-webkit-scrollbar {

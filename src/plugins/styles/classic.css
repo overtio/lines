@@ -17,7 +17,8 @@
   --sunken: inset -1px -1px var(--bevel-light), inset 1px 1px var(--bevel-mid), inset -2px -2px var(--bevel-soft), inset 2px 2px var(--bevel-dark);
   --thin-raised: inset -1px -1px var(--bevel-mid), inset 1px 1px var(--bevel-light);
   --thin-pressed: inset -1px -1px var(--bevel-light), inset 1px 1px var(--bevel-mid);
-  --title-bar: linear-gradient(90deg, var(--accent), color-mix(in oklch, var(--accent) 55%, white));
+  /* Lighter to the right, but not so light that the buttons on it (in the color text on the accent takes) don't read. */
+  --title-bar: linear-gradient(90deg, var(--accent), color-mix(in oklch, var(--accent) 80%, white));
 }
 
 :root[data-style="classic"] body {
@@ -79,8 +80,10 @@
   box-shadow: 0 0 0 1px var(--bevel-dark), var(--raised);
 }
 
-:root[data-style="classic"] .ui-button[data-variant="danger-primary"] {
-  color: var(--danger);
+:root[data-style="classic"] .ui-button[data-variant="danger-primary"],
+:root[data-style="classic"] .ui-button[data-variant="danger-primary"]:enabled:hover {
+  background: var(--danger);
+  color: var(--on-danger);
 }
 
 :root[data-style="classic"] .ui-button:is([data-variant="quiet"], [data-variant="danger"]) {
@@ -116,6 +119,14 @@
 :root[data-style="classic"] :is(.ui-button, .ui-icon-button, .ui-segment, .ui-option):focus-visible {
   outline: 1px dotted var(--text);
   outline-offset: -4px;
+}
+
+/* On a row in the accent, the dotted line in the color on it, which the accent's ring would vanish into. */
+@media not (forced-colors: active) {
+  :root[data-style="classic"] :is(.ui-note-row.selected, .ui-sidebar-row.active):focus-visible {
+    outline: 1px dotted var(--on-accent);
+    outline-offset: -4px;
+  }
 }
 
 /* Fields sunk into the panel, white inside. */
@@ -204,10 +215,11 @@
   box-shadow: var(--raised);
 }
 
-/* Scroll bars with arrow buttons, a raised thumb and a dotted track. Not while they're turned off. */
+/* Scroll bars with arrow buttons, a raised thumb and a dotted track. Not while they're turned off. Browsers draw them so only while neither width nor color is set. */
 :root[data-style="classic"]:not([data-no-scrollbars]),
 :root[data-style="classic"]:not([data-no-scrollbars]) * {
   scrollbar-color: auto;
+  scrollbar-width: auto;
 }
 
 :root[data-style="classic"] ::-webkit-scrollbar {
@@ -258,6 +270,27 @@
 
 :root[data-style="classic"] ::-webkit-scrollbar-button:single-button:horizontal:increment {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7'%3E%3Cpath d='M0 0l4 3.5L0 7z'/%3E%3C/svg%3E");
+}
+
+/* The arrows white on a dark panel. */
+:root[data-style="classic"][data-scheme="dark"] ::-webkit-scrollbar-button:single-button:vertical:decrement,
+:root[data-style="classic"] [data-scheme="dark"] ::-webkit-scrollbar-button:single-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath fill='%23fff' d='M3.5 0 7 4H0z'/%3E%3C/svg%3E");
+}
+
+:root[data-style="classic"][data-scheme="dark"] ::-webkit-scrollbar-button:single-button:vertical:increment,
+:root[data-style="classic"] [data-scheme="dark"] ::-webkit-scrollbar-button:single-button:vertical:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath fill='%23fff' d='M0 0h7L3.5 4z'/%3E%3C/svg%3E");
+}
+
+:root[data-style="classic"][data-scheme="dark"] ::-webkit-scrollbar-button:single-button:horizontal:decrement,
+:root[data-style="classic"] [data-scheme="dark"] ::-webkit-scrollbar-button:single-button:horizontal:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7'%3E%3Cpath fill='%23fff' d='M0 3.5 4 0v7z'/%3E%3C/svg%3E");
+}
+
+:root[data-style="classic"][data-scheme="dark"] ::-webkit-scrollbar-button:single-button:horizontal:increment,
+:root[data-style="classic"] [data-scheme="dark"] ::-webkit-scrollbar-button:single-button:horizontal:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7'%3E%3Cpath fill='%23fff' d='M0 0l4 3.5L0 7z'/%3E%3C/svg%3E");
 }
 
 /* In notes: checkboxes sunk into the page, headings plain. */

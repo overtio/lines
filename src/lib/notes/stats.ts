@@ -24,6 +24,8 @@ const sentenceSegmenter = "Segmenter" in Intl ? new Intl.Segmenter(undefined, { 
 export function plainLine(line: string): string {
   if (isPageBreak(line)) return "";
   return line
+    // Comments show nowhere: a line's mark (`<!-- mark green: check -->`) isn't part of its text, nor of a title.
+    .replace(/\s*<!--.*?-->/g, "")
     .replace(/^\s*\|(.*?)\|?\s*$/, (_, row: string) =>
       row.split(/(?<!\\)\|/).map((cell) => cell.trim().replace(/\\\|/g, "|")).join("\t"),
     )

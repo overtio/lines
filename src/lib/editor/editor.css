@@ -393,8 +393,8 @@
   opacity: 0.6;
 }
 
-/* Its Markdown, while it shows above it. */
-.cm-line:has(+ .cm-page-break) {
+/* Its Markdown, while it shows above it (only then: in its place, the line before it is any line). */
+.cm-line:has(+ .cm-page-break.is-preview) {
   font-family: var(--font-mono);
   font-size: 0.86em;
   color: var(--text-faint);
@@ -2493,6 +2493,32 @@
   color: var(--text-muted);
 }
 
+/*
+ * Over a backdrop, a code note is a page as a whole, its line numbers on it as a code editor's window
+ * has them: its scroller, which scrolls inside it, rather than its text alone, which the line
+ * numbers wouldn't line up with.
+ */
+:root[data-backdrop] .editor-pane .cm-editor.cm-page.cm-code-note > .cm-scroller {
+  margin: var(--page-gap);
+  border-radius: var(--radius-xl);
+  background-color: var(--page-bg);
+  box-shadow:
+    var(--card-shadow),
+    0 18px 60px rgb(0 0 0 / 0.16);
+  backdrop-filter: var(--page-blur);
+}
+
+:root[data-backdrop] .editor-pane .cm-editor.cm-page.cm-code-note > .cm-scroller > .cm-content {
+  flex-grow: 1;
+  width: auto;
+  min-height: 0;
+  margin: 0;
+}
+
+:root[data-backdrop] .editor-pane .cm-editor.cm-page.cm-code-note > .cm-scroller > .cm-content::before {
+  content: none;
+}
+
 .cm-editor.cm-code-note .cm-matchingBracket {
   background: var(--active);
   outline: 1px solid var(--border);
@@ -2562,7 +2588,8 @@
   }
 }
 
-:root[data-caret-effect="rainbow"] :is(.cm-cursor, .cm-caretEffects) {
+/* Only in the editor with the keyboard: it changes every frame. */
+:root[data-caret-effect="rainbow"] .cm-editor.cm-focused :is(.cm-cursor, .cm-caretEffects) {
   --caret-color: oklch(0.7 0.19 var(--caret-hue));
   animation: lines-caret-hue 3s linear infinite;
 }

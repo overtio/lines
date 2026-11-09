@@ -1,5 +1,5 @@
 import { syntaxTree } from "@codemirror/language";
-import { type EditorSelection, type EditorState, Prec, type Range, StateEffect, type StateEffectType, StateField, type Text, type Transaction } from "@codemirror/state";
+import { type EditorSelection, type EditorState, type Line, Prec, type Range, StateEffect, type StateEffectType, StateField, type Text, type Transaction } from "@codemirror/state";
 import { type Command, Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type WidgetType } from "@codemirror/view";
 import type { SyntaxNode, SyntaxNodeRef, Tree } from "@lezer/common";
 import { markupMode } from "./markupMode";
@@ -41,6 +41,17 @@ export function changesBetween(before: string, after: string) {
 
 /** Says something was done (a todo ticked, a typing drill finished) to whatever cares in the window (a mascot, lib/mascot/), as a window event. */
 export const cheer = () => dispatchEvent(new Event("lines:done"));
+
+/** The lines a selection covers, each once; a range ending at a line's very start (as a triple click selects) stops before it. */
+export function selectedLines(state: EditorState): Line[] {
+  const { doc } = state;
+  const lines = new Map<number, Line>();
+  for (const range of state.selection.ranges) {
+    const end = range.to > range.from && doc.lineAt(range.to).from === range.to ? range.to - 1 : range.to;
+    for (let n = doc.lineAt(range.from).number; n <= doc.lineAt(end).number; n++) if (!lines.has(n)) lines.set(n, doc.line(n));
+  }
+  return [...lines.values()];
+}
 
 /** Whether line `n` exists and has text on it. */
 export const hasText = (doc: Text, n: number) => n >= 1 && n <= doc.lines && !!doc.line(n).text.trim();
@@ -287,7 +298,7 @@ export const OWN_INPUT = ".cm-lp-own-input";
 /** Runs `click` once the button that went down in `event` comes up in the same place: unless it was a drag. */
 export function whenClicked(event: MouseEvent, click: () => void) {
   const { clientX, clientY } = event;
-  addEventListener("mouseup", (up) => Math.hypot(up.clientX - clientX, up.clientY - clientY) < 4 && click(), { once: true, capture: true });
+  window.addEventListener("mouseup", (up) => Math.hypot(up.clientX - clientX, up.clientY - clientY) < 4 && click(), { once: true, capture: true });
 }
 
 /**

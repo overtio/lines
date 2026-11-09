@@ -343,6 +343,10 @@
   cursor: var(--pointer-arrow), default;
 }
 
+:root[data-pointer] [contenteditable="true"] {
+  cursor: text;
+}
+
 :root[data-pointer] :is(a[href], button:enabled, [role="button"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [role="option"], [role="radio"], [role="tab"], [role="switch"], [role="checkbox"], summary, label[for], select, [data-href]) {
   cursor: var(--pointer-hand), pointer;
 }

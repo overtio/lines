@@ -16,8 +16,8 @@ import { insert, SECTIONS, type SlashCommand, slashMenu } from "../../lib/editor
 import { inOpenMath, MATH_COMMANDS, paragraphBefore, searchWords, TEXT_COMMANDS } from "../../lib/editor/texCommands";
 import { lazyLanguage } from "../../lib/editor/lazyLanguage";
 import { markupMode } from "../../lib/editor/markupMode";
-import { arrowsInto, drawnBlock, focusChanged, focused, isEditing } from "../../lib/editor/util";
-import { pageBreak, pagedNote } from "../../lib/editor/pageBreaks";
+import { arrowsInto, focusChanged, focused, isEditing } from "../../lib/editor/util";
+import { pageBreakAt, pagedNote } from "../../lib/editor/pageBreaks";
 import { LATEX_PAGE_BREAK } from "../../lib/notes/pageBreak";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
 import { type PaperLink, paperCommands } from "../../lib/editor/papers";
@@ -639,7 +639,7 @@ function build(state: EditorState, visible?: { from: number; to: number }): Deco
         if (layout.has(span)) {
           const line = doc.lineAt(span.from);
           const editing = isEditing(state, line.from, line.to);
-          add(drawnBlock(pageBreak, line.from, line.to, editing));
+          add(pageBreakAt(line.from, line.to, editing));
           if (editing) mark(span.from, span.to, "cm-lt-command", noSpellcheck);
           break;
         }
@@ -764,6 +764,9 @@ const events = EditorView.domEventHandlers({
 });
 
 // Pasting and dropping, as LaTeX
+
+/** Whether `pos` is in verbatim, where `%` is text rather than a comment (and so not a line mark). */
+export const inVerbatim = (state: EditorState, pos: number) => !!state.field(parsed, false)?.spans.some((s) => s.type === "verbatim" && s.from < pos && pos < s.to);
 
 /** Where a paste stays as it is: in verbatim, math, a table or a comment. */
 function literalAt(state: EditorState, pos: number) {
