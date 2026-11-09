@@ -10,7 +10,7 @@
   import { prefs } from "../prefs.svelte";
   import { objectsChanged } from "./objects";
   import { outline, outlineCompartment } from "./outline.svelte";
-  import { createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment } from "./setup";
+  import { createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment, spelling, spellingCompartment } from "./setup";
   import { symbolsChanged } from "./symbols";
   import { changesBetween } from "./util";
 
@@ -181,8 +181,12 @@
     untrack(() => applyFormat());
   });
 
-  /** Whether the note can be edited, and the outline beside it (Settings → Layout). */
-  const setUp = () => [readOnlyCompartment.reconfigure(readOnly(viewOnly)), outlineCompartment.reconfigure(prefs.outline ? outline : [])];
+  /** Whether the note can be edited, the outline beside it (Settings → Layout), and whether its spelling is checked (Settings → Editor). */
+  const setUp = () => [
+    readOnlyCompartment.reconfigure(readOnly(viewOnly)),
+    outlineCompartment.reconfigure(prefs.outline ? outline : []),
+    spellingCompartment.reconfigure(spelling(prefs.spellcheck)),
+  ];
 
   $effect(() => {
     void id;

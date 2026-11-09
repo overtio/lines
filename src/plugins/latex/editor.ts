@@ -966,7 +966,7 @@ export function latexEditing(): Extension {
   return built.editing;
 }
 
-/** LaTeX's highlighting, for a note shown as it's written (Settings → Editor → Markdown → Source), where nothing's drawn. */
+/** LaTeX's highlighting, for a note shown as it's written (Settings → Editor → Show Markdown → Source), where nothing's drawn. */
 const highlighting = languages.find((language) => language.name === "LaTeX");
 
 const editing = (papers: readonly PaperSource[], mode: MarkdownMode): Extension => [

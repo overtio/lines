@@ -269,7 +269,7 @@ const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[], m
   additions.flatMap((addition) => addition.editor ?? []),
 ];
 
-/** Markdown as written (Settings → Editor → Markdown → Source): its marks faint, what they do to text shown on it. */
+/** Markdown as written (Settings → Editor → Show Markdown → Source): its marks faint, what they do to text shown on it. */
 const sourceStyle = HighlightStyle.define([
   { tag: t.heading, fontWeight: "700" },
   { tag: t.strong, fontWeight: "700" },
@@ -320,14 +320,19 @@ export function readOnly(value: boolean): Extension {
   return [EditorState.readOnly.of(value), EditorView.editable.of(!value)];
 }
 
+export const spellingCompartment = new Compartment();
+
+/** Whether the system checks a note's spelling, and corrects it as you type (Settings → Editor). */
+export const spelling = (on: boolean): Extension =>
+  EditorView.contentAttributes.of(on ? { spellcheck: "true", autocorrect: "on" } : { spellcheck: "false", autocorrect: "off" });
+
 /** A note's editor, set up for its language (`format`) from the start. */
 export function createExtensions(onChange: () => void, format?: string): Extension[] {
   return [
     history(),
     EditorView.lineWrapping,
+    spellingCompartment.of(spelling(prefs.spellcheck)),
     EditorView.contentAttributes.of({
-      spellcheck: "true",
-      autocorrect: "on",
       autocapitalize: "sentences",
       "aria-label": message("editor.note"),
       // A note is in whatever language it's written in, not the app's: unknown, so screen readers

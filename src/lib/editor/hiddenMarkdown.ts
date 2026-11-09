@@ -5,12 +5,12 @@ import { INLINE_STYLES, livePreview } from "./livePreview";
 import { frontMatterField } from "./objects";
 
 /*
- * Hidden Markdown (Settings → Editor → Markdown), as in Bear or Notion: what only styles text, its
- * `**`, a heading's `#`, a list's marker, is typed and stays in the note but never shows, even under
- * the cursor (livePreview.ts). So the cursor never stops in it, where typing would break it: it goes
- * over it as over nothing, stays after a line's marks (on a heading's text, never before its `#`),
- * and at either end of styled text, outside it. Backspace and Delete beside marks take the text past
- * them; Backspace at the start of a heading's text makes it text again.
+ * Hidden Markdown (Settings → Editor → Show Markdown), as in Bear or Notion: what only styles
+ * text, its `**`, a heading's `#`, a list's marker, is typed and stays in the note but never shows,
+ * even under the cursor (livePreview.ts). So the cursor never stops in it, where typing would break
+ * it: it goes over it as over nothing, stays after a line's marks (on a heading's text, never before
+ * its `#`), and at either end of styled text, outside it. Backspace and Delete beside marks take the
+ * text past them; Backspace at the start of a heading's text makes it text again.
  */
 
 /** Marks hidden next to each other on a line, and where the cursor stops in them (`at`). */
