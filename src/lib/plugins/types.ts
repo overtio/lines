@@ -43,6 +43,8 @@ export interface Contributions {
   languages?: NoteLanguage[];
   /** Color themes, each with a light and a dark side. */
   themes?: Theme[];
+  /** Kinds of theme files made for other apps (VS Code, Base16, a terminal's) that lines can read themes from. */
+  themeFormats?: ThemeFormat[];
   /** Ways to draw the icons lines uses. */
   iconSets?: IconSet[];
   /** Engines that draw math, `$x^2$` or `\[…\]`, in notes of any language. */
@@ -189,6 +191,13 @@ export interface ThemeColors {
 export interface Theme {
   id: string;
   name: string;
+  /** Who made it, for a theme someone shared. */
+  author?: string;
+  /**
+   * For a theme with colors for one scheme only, as most made for other apps are: it's shown in
+   * that one whatever Settings → Theme → Light or dark says, and its `light` and `dark` are the same.
+   */
+  scheme?: "light" | "dark";
   /**
    * Made for low vision or color blindness: listed in a group of their own, and with faint text
    * readable enough for placeholders too.
@@ -198,6 +207,55 @@ export interface Theme {
   dark: ThemeColors;
   /** What changes with Settings → Theme → Contrast → Increased, or the device's Increase Contrast. */
   moreContrast?: { light?: Partial<ThemeColors>; dark?: Partial<ThemeColors> };
+}
+
+/**
+ * A kind of theme file made for another app, which lines reads themes from (Settings → Theme →
+ * Import). Several formats can share an extension (`.json`), so each says whether a file is its own.
+ */
+export interface ThemeFormat {
+  id: string;
+  /** What it's called where formats are listed: "VS Code". */
+  name: string;
+  /** The extensions its files have, without the dot; tried first for files with these. */
+  extensions: string[];
+  /** The themes in a file's text, or none if it isn't one of this format's. */
+  read(text: string, fileName: string): Promise<ImportedTheme[]>;
+}
+
+/** One theme as a file made for another app has it: colors for one scheme, light or dark. */
+export interface ImportedTheme {
+  name: string;
+  author?: string;
+  palette: Palette;
+}
+
+/**
+ * What a theme made for another app says its colors are for, as much of it as it has: lines works
+ * the rest out (`themeColors` in themes/palette.ts), and whether it's light or dark from its
+ * background. Any color CSS can read, or hex without the `#`.
+ */
+export interface Palette {
+  background: string;
+  foreground: string;
+  /** The panel beside the text, like an editor's file tree: lines' sidebar. */
+  sidebar?: string;
+  sidebarForeground?: string;
+  /** Menus, popovers and dialogs. */
+  elevated?: string;
+  /** Secondary text, and fainter text still (placeholders, line numbers). */
+  muted?: string;
+  faint?: string;
+  /** Links, buttons and what's chosen. */
+  accent?: string;
+  danger?: string;
+  success?: string;
+  warning?: string;
+  info?: string;
+  /** The colors of a terminal's palette, or Base16's. */
+  hues?: Partial<Record<"red" | "orange" | "yellow" | "green" | "cyan" | "blue" | "magenta", string>>;
+  /** What code is highlighted in. */
+  syntax?: Partial<Record<"keyword" | "string" | "number" | "comment" | "function" | "type", string>>;
 }
 
 /** What every icon set draws: one of lines' icons, at a size in pixels. */

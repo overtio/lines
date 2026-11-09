@@ -100,7 +100,7 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 ### Make it yours
 
 - **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. See [docs/plugins.md](docs/plugins.md).
-- **Sixteen themes**, each light and dark, including High Contrast and two for color blindness.
+- **Sixteen themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
 - **Fonts, text size, note width and spacing**, with a live preview; <kbd>⌘+</kbd> and <kbd>⌘−</kbd> size the text as you read. Notes can be narrow, medium, wide, any width between, or fill the window.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
 - **Fits any screen**: three columns on a desktop, a drawer on a tablet, a stack on a phone. Drag the columns to resize them.
@@ -139,6 +139,7 @@ Press <kbd>⌘/</kbd> to see them all. On Windows and Linux, use <kbd>Ctrl</kbd>
 | [Linedown](docs/linedown.md) | The Markdown lines reads and writes, including its few additions (callouts, highlights, tags…) |
 | [LaTeX notes](docs/latex.md) | What's drawn in notes written in LaTeX |
 | [Spreadsheets](docs/spreadsheets.md) | Formulas in tables, spreadsheet notes, and opening and saving CSV and Excel files |
+| [Themes](docs/themes.md) | Making, sharing and importing themes, and lines' theme files |
 | [Plugins](docs/plugins.md) | How lines is made of plugins, turning them off, and writing one |
 | [Sync](docs/sync.md) | How sync and encryption work |
 | [Storage](docs/storage.md) | Where the web app keeps your notes, and for how long |
@@ -261,14 +262,14 @@ src/
     unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
     github/                  Links to GitHub drawn short
     arxiv/                   Links to arXiv's papers drawn short, and searching arXiv for /paper (pacing requests as arXiv asks)
-    themes/                  The sixteen themes, as their colors
+    themes/                  The sixteen themes, as their colors, and the theme files of other apps it reads (formats/)
     lucide/  sf-symbols/     Icon sets
   lib/
     plugins/
       types.ts               What a plugin is and what it can add: formats, themes, icon sets, engines…
       registry.svelte.ts     The plugins, which are on (kept and shared between windows), and what they add
       plainText.ts           How a note shows while its format's plugin is off
-    themes.svelte.ts         The themes plugins add, as CSS; this window's theme
+    themes/                  The themes plugins add, as CSS, and this window's theme (show.svelte.ts); your own themes, their files, importing them, and working out colors
     editor/
       Editor.svelte          CodeMirror host; per-note undo history
       livePreview.ts         Hides Markdown and renders bullets, checkboxes, rules, images
@@ -382,7 +383,8 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 **Plugins**
 - [ ] More formats as plugins, drawn as you type, printed and exported: Org mode, AsciiDoc, WikiText (MediaWiki) and reStructuredText
 - [ ] Plugins made by others: a plugin format, installing one from Settings → Plugins, and running its code safely (the apps only run lines' own scripts now)
-- [ ] Themes and icon sets from a file, which need no code
+- [ ] Icon sets from a file, which need no code
+- [ ] Sync your themes between devices, and open a VS Code extension (`.vsix`) to pick its themes
 - [ ] More renderers for code blocks: Graphviz, PlantUML, D2, Vega-Lite charts, music in ABC
 - [ ] Circuit schematics written in [CircuiTikZ](https://ctan.org/pkg/circuitikz), drawn as you type: ` ```circuitikz ` blocks in Markdown notes, and `circuitikz` in LaTeX notes
 - [ ] Drawings (Excalidraw), code highlighting and symbols as plugins
