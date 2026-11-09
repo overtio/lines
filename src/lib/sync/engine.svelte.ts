@@ -126,10 +126,14 @@ function conflictCopy(note: Note): Note {
 const TITLE_LINES = 110;
 
 /**
- * The note's text with its title marked as a conflicted copy's, on the line its language reads the
- * title from: not a properties line, nor a spreadsheet's cells. Failing that, its first line with text.
+ * The note's text with its title marked as a conflicted copy's: where its language keeps the title
+ * (a LaTeX document's \title), or on the line it reads the title from: not a properties line, nor a
+ * spreadsheet's cells. Failing that, a Markdown note's first line with text; a note in another
+ * language is left as it is, rather than have a line changed that it may need as it is.
  */
 function markConflicted({ body, format }: Note): string {
+  const own = plugins.language(format).markTitle?.(body, (title) => t("sync.conflicted", { title }));
+  if (own) return own;
   const meta = (text: string) => plugins.meta(format, text);
   const plain = (text: string) => text.replace(/\s+/g, " ").trim();
   const lines = body.split("\n");
@@ -139,6 +143,7 @@ function markConflicted({ body, format }: Note): string {
     const text = marked(i);
     if (plain(meta(text).title) === wanted) return text;
   }
+  if (format) return body;
   const first = lines.findIndex((line) => line.trim());
   return first === -1 ? `# ${t("sync.conflictedCopy")}\n${body}` : marked(first);
 }

@@ -87,6 +87,15 @@ export function preambleField(preamble: string, field: "title" | "author"): stri
   return names.filter(Boolean).join(" · ") || null;
 }
 
+/** A whole document with what its `\title{…}` says changed by `mark`; null for a note without one. */
+export function markTitle(body: string, mark: (title: string) => string): string | null {
+  const begin = DOCUMENT_BEGIN.exec(body);
+  const match = begin && new RegExp(`\\\\title${ARGUMENT}`).exec(body.slice(0, begin.index));
+  if (!match) return null;
+  const end = match.index + match[0].length - 1;
+  return body.slice(0, end - match[1].length) + mark(match[1]) + body.slice(end);
+}
+
 /**
  * What a LaTeX note says: for a whole document, what's between \begin{document} and
  * \end{document}, and its \title; otherwise the whole note, with no title of its own.

@@ -6,7 +6,7 @@ import type { NoteMeta } from "../../lib/notes/types";
 import type { Plugin } from "../../lib/plugins/types";
 import { inVerbatim, latexEditing } from "./editor";
 import { printDocument } from "./print";
-import { latexContent, latexDocument, latexLine, latexLines, latexPlainText } from "./text";
+import { latexContent, latexDocument, latexLine, latexLines, latexPlainText, markTitle } from "./text";
 import { commentMarks } from "../../lib/editor/markers";
 
 /*
@@ -58,6 +58,7 @@ export const latex = (): Plugin => ({
         stats: (body) => countLines(latexLines(latexContent(body).text)),
         // In a comment, which LaTeX ignores.
         addTag: (body, tag) => addTagIn(body, tag, "%"),
+        markTitle,
         newNote: ({ tag }) => (tag ? `\n\n% #${tag}` : ""),
         // A document that compiles on its own, its images' \includegraphics pointing into `attachments`.
         file: (body, attachments) => latexDocument(attachments ? body.replaceAll(`{${ATTACHMENT_PATH}`, `{${attachments}`) : body),

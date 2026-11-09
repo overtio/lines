@@ -306,6 +306,12 @@ export interface NoteLanguage {
   stats(body: string): NoteStats;
   /** The note with `#tag` added, where this language keeps tags. */
   addTag(body: string, tag: string): string;
+  /**
+   * The note with its title changed by `mark`, given the title as written, where this language
+   * keeps one apart from the text (a LaTeX document's `\title{…}`); null for a note without one.
+   * For a conflicted copy's title: without it, the line the title is read from is marked.
+   */
+  markTitle?(body: string, mark: (title: string) => string): string | null;
   /** A new note's text, made in the sidebar's tag or type, if it was. */
   newNote(made: { tag?: string; type?: string }): string;
   /**
