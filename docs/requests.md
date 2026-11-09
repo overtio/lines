@@ -95,7 +95,7 @@ What lines can't do from a fetch, and the `hurl` program can: the HTTP version (
 ## curl
 
 - **Copy as curl** (Terminal's icon) copies requests as curl commands, with what variables can be filled in filled in: in an `http` block it's in the corner, between Send and Copy, and copies each request in the block; in a `.http` note it's after a request's **Send**, while the line's hovered, and copies that request. Copy copies the block's text as written.
-- A curl command pasted into a request (in a `.http` note, or an `http` block), as browsers' "Copy as cURL" and API docs give them, is written as the request it makes: its method, address, headers (`-H`, `-u` as `Authorization`, `-A`, `-b`, `-e`) and body (`-d`, `--data-raw`, `--json`; `-G` puts it in the address). Forms with files (`-F`) aren't.
+- A curl command pasted into a request (in a `.http` note, or an `http` block), as browsers' "Copy as cURL" and API docs give them, is written as the request it makes: its method, address, headers (`-H`, `-u` as `Authorization`, `-A`, `-b`, `-e`) and body (`-d`, `--data-raw`, `--json`, and `--data-urlencode`, encoded as curl encodes it; `-G` puts it in the address). Short options can run together, the last with its value in the same word, as curl reads them: `-XPUT`, `-sL`, `-H'Accept: …'`. Forms with files (`-F`) and data from a file (`--data-urlencode name@file`) aren't.
 
 ## Not yet
 
