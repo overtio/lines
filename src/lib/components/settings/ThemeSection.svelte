@@ -6,12 +6,13 @@
   import Icon from "../../icons/Icon.svelte";
   import type { IconName } from "../../icons/icons";
   import { DEFAULT_THEME, plugins } from "../../plugins/registry.svelte";
-  import { prefs, type Appearance, type Contrast } from "../../prefs.svelte";
+  import type { Theme } from "../../plugins/types";
+  import { DARK_PANES, prefs, type Appearance, type Contrast } from "../../prefs.svelte";
   import { chooseBackdropImage } from "../../paper.svelte";
   import { customThemes } from "../../themes/custom.svelte";
   import { pictureName, themeFromPicture } from "../../themes/picture";
   import { readableFormats, readThemes } from "../../themes/import";
-  import { schemeShown } from "../../themes/show.svelte";
+  import { paneColors, schemeShown } from "../../themes/show.svelte";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
   import FieldGroup from "../ui/FieldGroup.svelte";
@@ -32,6 +33,16 @@
     { id: "standard", label: t("settings.contrastStandard") },
     { id: "more", label: t("settings.contrastMore") },
   ];
+  const PANE_NAMES = { none: "settings.darkPanesNone", sidebar: "settings.darkPanesSidebar", list: "settings.darkPanesList", both: "settings.darkPanesBoth" } as const;
+  const darkPanes = DARK_PANES.map((id) => ({ id, label: t(PANE_NAMES[id]) }));
+
+  /** A theme's tile: its colors for the scheme shown, and its sidebar's dark if Dark panes says so. */
+  function tile(option: Theme) {
+    const own = schemeShown(option, prefs.dark);
+    const colors = option[own];
+    const dark = own === "light" && (prefs.darkPanes === "sidebar" || prefs.darkPanes === "both") ? paneColors(option, own, false) : colors;
+    return { bg: colors.bg, text: colors.text, accent: colors.accent, sidebar: dark["bg-sidebar"], sidebarAccent: dark.accent };
+  }
 
   /** Icon sets from the plugins turned on; one that can't work here (SF Symbols on the web) shows why. */
   const iconSets = $derived(
@@ -286,7 +297,7 @@
         {/if}
         <div class="grid grid-cols-[repeat(auto-fill,minmax(104px,1fr))] gap-2">
           {#each group.themes as option (option.id)}
-            {@const { bg, "bg-sidebar": sidebar, text, accent } = option[schemeShown(option, prefs.dark)]}
+            {@const { bg, text, accent, sidebar, sidebarAccent } = tile(option)}
             <RadioGroup.Item value={option.id} class="group flex flex-col gap-1.5 rounded-xl p-1 pb-1.5 text-center hover:bg-hover">
               <!-- In forced colors the previews keep each theme's own colors, and the chosen one an outline for its ring. -->
               <span
@@ -296,7 +307,7 @@
                 aria-hidden="true"
               >
                 <span class="w-[26%] pt-[9px] pl-[7px]" style:background={sidebar}>
-                  <span class="block size-[7px] rounded-full" style:background={accent}></span>
+                  <span class="block size-[7px] rounded-full" style:background={sidebarAccent}></span>
                 </span>
                 <span class="flex flex-1 flex-col gap-1.5 px-2.5 py-[11px]">
                   <span class="h-1 w-[60%] rounded-[2px] bg-current opacity-85"></span>
@@ -317,6 +328,9 @@
 <FieldGroup>
   <FieldRow label={t("settings.mode")} note={shown.scheme ? t(shown.scheme === "dark" ? "settings.themeOnlyDarkMode" : "settings.themeOnlyLightMode", { name: shown.name }) : null}>
     <Segmented label={t("settings.mode")} options={appearances} value={prefs.appearance} onselect={(id) => (prefs.appearance = id)} />
+  </FieldRow>
+  <FieldRow label={t("settings.darkPanes")} note={t("settings.darkPanesNote")}>
+    <Segmented label={t("settings.darkPanes")} options={darkPanes} value={prefs.darkPanes} onselect={(id) => (prefs.darkPanes = id)} />
   </FieldRow>
   <FieldRow label={t("settings.contrast")} note={t("settings.contrastNote")}>
     <Segmented label={t("settings.contrast")} options={contrasts} value={prefs.contrast} onselect={(id) => (prefs.contrast = id)} />

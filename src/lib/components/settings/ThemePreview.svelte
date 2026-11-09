@@ -1,7 +1,7 @@
 <script lang="ts">
   // A theme drawn small, as lines looks in it: the sidebar, the note list and a note with a tag, a
-  // link, code and a callout. `frame` gives it the theme's colors (a .theme-preview); lines of text
-  // are bars, so it reads the same in every language.
+  // link, code and a callout. `frame` gives it the theme's colors and their scheme (`data-scheme`);
+  // lines of text are bars, so it reads the same in every language.
   import type { HTMLAttributes } from "svelte/elements";
 
   let { frame }: { frame: HTMLAttributes<HTMLDivElement> } = $props();

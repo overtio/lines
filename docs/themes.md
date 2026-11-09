@@ -41,6 +41,10 @@ Each but Lines comes with a color theme made for it (Classic, Pixel and Neon, in
 
 Styles are plugins (the Styles plugin has these three), and a plugin can add more: what one can set, and how it reaches each part of the app, is in [plugins.md](plugins.md#what-a-plugin-can-add). Neon's glow and scan lines go with Increased contrast, and its grid while a paper is chosen. Styles change how lines looks, not what it prints: a note's PDF is black on white in every style.
 
+## Dark panes
+
+Settings → Theme → **Dark panes** shows the sidebar, the note list or both in the theme's dark colors while lines is light, so the note is a light page beside dark panes. It works with every theme: the panes take the theme's own dark colors (for a theme with light colors only, ones worked out from them as Make Dark Colors does), Increased contrast's too, and Monochrome and Invert change them as they do the rest of the window. A style keeps its shapes in them: Classic's bevels, Pixel's lines and Neon's glow are made from the panes' colors there. While lines is dark, the panes are dark anyway, and there's nothing for it to change. The theme picker's swatches show the sidebar dark while it's on.
+
 ## Monochrome and Invert
 
 Two switches in Settings → Theme change whatever theme is chosen, yours or lines' own:

@@ -12,6 +12,9 @@ export type WindowButtons = "hover" | "always";
 /** What of the main window its opacity makes see-through: all of it, the sidebar and the note list, or the sidebar. */
 export const SEE_THROUGH = ["window", "lists", "sidebar"] as const;
 export type SeeThrough = (typeof SEE_THROUGH)[number];
+/** Which panes show in the theme's dark colors while the window's light: none, the sidebar, the note list, or both. */
+export const DARK_PANES = ["none", "sidebar", "list", "both"] as const;
+export type DarkPanes = (typeof DARK_PANES)[number];
 /** Which way a note moves when swiped with two fingers on a trackpad. */
 export type SwipeDirection = "fingers" | "reversed";
 /** The paper a note's PDF is laid out on. */
@@ -152,6 +155,7 @@ interface Stored {
   /** Every color of the theme shown as a grey, or turned light for dark (themes/show.svelte.ts). */
   monochrome: boolean;
   invert: boolean;
+  darkPanes: DarkPanes;
   font: FontId;
   textSize: number;
   icons: string;
@@ -307,6 +311,7 @@ const DEFAULTS: Stored = {
   contrast: "system",
   monochrome: false,
   invert: false,
+  darkPanes: "none",
   font: "system",
   textSize: 17,
   icons: "lucide",
@@ -439,6 +444,7 @@ function read(json?: string): Stored {
     contrast: oneOf(raw.contrast, ["system", "standard", "more"] as const, DEFAULTS.contrast),
     monochrome: flag(raw.monochrome, DEFAULTS.monochrome),
     invert: flag(raw.invert, DEFAULTS.invert),
+    darkPanes: oneOf(raw.darkPanes, DARK_PANES, DEFAULTS.darkPanes),
     font: oneOf(raw.font, FONTS.map((f) => f.id), DEFAULTS.font),
     textSize: clamp(raw.textSize, TEXT_SIZE.min, TEXT_SIZE.max, DEFAULTS.textSize),
     icons: id(raw.icons, DEFAULTS.icons),
@@ -530,6 +536,7 @@ class Prefs {
   contrast = $state<Contrast>(this.#initial.contrast);
   monochrome = $state(this.#initial.monochrome);
   invert = $state(this.#initial.invert);
+  darkPanes = $state<DarkPanes>(this.#initial.darkPanes);
   font = $state<FontId>(this.#initial.font);
   textSize = $state(this.#initial.textSize);
   icons = $state(this.#initial.icons);
@@ -713,6 +720,7 @@ class Prefs {
       contrast: this.contrast,
       monochrome: this.monochrome,
       invert: this.invert,
+      darkPanes: this.darkPanes,
       font: this.font,
       textSize: this.textSize,
       icons: this.icons,
@@ -809,6 +817,7 @@ class Prefs {
     this.contrast = next.contrast;
     this.monochrome = next.monochrome;
     this.invert = next.invert;
+    this.darkPanes = next.darkPanes;
     this.font = next.font;
     this.textSize = next.textSize;
     this.icons = next.icons;

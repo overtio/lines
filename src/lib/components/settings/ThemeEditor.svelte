@@ -113,7 +113,6 @@
   const colors: Partial<ThemeColors> = $derived(theme?.[editing] ?? {});
   /** The colors on the preview and the swatches, which work out the rest from them as app.css does. */
   const frame = $derived({
-    class: "theme-preview",
     "data-scheme": editing,
     style: Object.entries(colors)
       .map(([key, value]) => `--${key}: ${value}`)

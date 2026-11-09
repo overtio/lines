@@ -4,7 +4,9 @@
  * the panel color lightened and darkened, so they follow whatever theme is chosen with it.
  */
 
-:root[data-style="classic"] {
+/* Made from the theme's colors, and made again in a part with its own (a pane shown dark). */
+:root[data-style="classic"],
+:root[data-style="classic"] [data-scheme] {
   --bevel-light: color-mix(in srgb, var(--bg-elevated), white 85%);
   --bevel-soft: color-mix(in srgb, var(--bg-elevated), white 45%);
   --bevel-mid: color-mix(in srgb, var(--bg-elevated), black 33%);
