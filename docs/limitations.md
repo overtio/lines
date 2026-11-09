@@ -195,7 +195,9 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 
 - Patterns and textures are for the screen: printing, PDFs and exports are on plain white.
 - Ruled lines go under each line of a note's text, so they run as wide as the text, not across the whole page, and start again below pictures, diagrams and code. Dots and squares are the page's own and don't line up with the text.
-- The paper is the same for every note, not chosen for each.
+- The paper and the backdrop are the same for every note, not chosen for each.
+- A backdrop is the main window's: floating notes and the Settings window are plain.
+- A picture chosen for the backdrop stays on the device it was chosen on (made no larger than 2400 pixels across), and doesn't sync or export.
 - Ruled lines need the `lh` unit: Safari 16.4 and macOS 13.3 or later, Chrome 109 or later. Earlier ones show the other patterns, and Lines as plain.
 
 ## Layout, tabs and the outline

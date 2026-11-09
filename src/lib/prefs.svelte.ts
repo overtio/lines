@@ -159,6 +159,16 @@ interface Stored {
   /** The color of your own a pattern is drawn in, kept while another is chosen. */
   paperCustomColor: string;
   paperOpacity: number;
+  /**
+   * Behind the page (Settings → Paper → Backdrop): "none", a backdrop's id from plugins, "color"
+   * (backdropColor), or "image" (one of your own, kept apart: lib/paper.svelte.ts).
+   */
+  paperBackdrop: string;
+  backdropColor: string;
+  /** The page over a backdrop: the theme's background or a color of your own, and how solid it is. */
+  pageColor: "theme" | "custom";
+  pageCustomColor: string;
+  pageOpacity: number;
   /** How a LaTeX note's PDF is made: by lines (as it draws the note), or a typesetter plugin's id ("tex"). */
   typesetter: string;
   /** The sidebar's and note list's widths, in pixels, as dragged (App.svelte), and their sides of the window. */
@@ -202,6 +212,8 @@ export type SheetStat = (typeof SHEET_STATS)[number];
 export const OPACITY = { min: 0.3, max: 1, step: 0.01 };
 /** How strongly a paper pattern's lines are drawn over the page (dots, being small, a few times more). */
 export const PAPER_OPACITY = { min: 0.04, max: 0.6, step: 0.01 };
+/** How solid the page is over a backdrop: below 1 it shows through, blurred, never so much the text gets hard to read. */
+export const PAGE_OPACITY = { min: 0.6, max: 1, step: 0.01 };
 
 /** How many days a new version may have to be out before lines updates to it (Settings → About → Updates). */
 export const UPDATE_WAITS = [0, 1, 3, 7, 14, 30] as const;
@@ -255,6 +267,11 @@ const DEFAULTS: Stored = {
   paperColor: "ink",
   paperCustomColor: "#3d7dd8",
   paperOpacity: 0.12,
+  paperBackdrop: "none",
+  backdropColor: "#2b2f38",
+  pageColor: "theme",
+  pageCustomColor: "#141414",
+  pageOpacity: 1,
   typesetter: "lines",
   sidebarWidth: 230,
   listWidth: 320,
@@ -361,6 +378,11 @@ function read(json?: string): Stored {
     paperColor: oneOf(raw.paperColor, ["ink", "accent", "custom"] as const, DEFAULTS.paperColor),
     paperCustomColor: color(raw.paperCustomColor, DEFAULTS.paperCustomColor),
     paperOpacity: clamp(raw.paperOpacity, PAPER_OPACITY.min, PAPER_OPACITY.max, DEFAULTS.paperOpacity),
+    paperBackdrop: id(raw.paperBackdrop, DEFAULTS.paperBackdrop),
+    backdropColor: color(raw.backdropColor, DEFAULTS.backdropColor),
+    pageColor: oneOf(raw.pageColor, ["theme", "custom"] as const, DEFAULTS.pageColor),
+    pageCustomColor: color(raw.pageCustomColor, DEFAULTS.pageCustomColor),
+    pageOpacity: clamp(raw.pageOpacity, PAGE_OPACITY.min, PAGE_OPACITY.max, DEFAULTS.pageOpacity),
     typesetter: id(raw.typesetter, DEFAULTS.typesetter),
     sidebarWidth: clamp(raw.sidebarWidth, PANE_WIDTHS.sidebar.min, PANE_WIDTHS.sidebar.max, DEFAULTS.sidebarWidth),
     listWidth: clamp(raw.listWidth, PANE_WIDTHS.list.min, PANE_WIDTHS.list.max, DEFAULTS.listWidth),
@@ -417,6 +439,11 @@ class Prefs {
   paperColor = $state<PaperColor>(this.#initial.paperColor);
   paperCustomColor = $state(this.#initial.paperCustomColor);
   paperOpacity = $state(this.#initial.paperOpacity);
+  paperBackdrop = $state(this.#initial.paperBackdrop);
+  backdropColor = $state(this.#initial.backdropColor);
+  pageColor = $state<"theme" | "custom">(this.#initial.pageColor);
+  pageCustomColor = $state(this.#initial.pageCustomColor);
+  pageOpacity = $state(this.#initial.pageOpacity);
   typesetter = $state(this.#initial.typesetter);
   sidebarWidth = $state(this.#initial.sidebarWidth);
   listWidth = $state(this.#initial.listWidth);
@@ -570,6 +597,11 @@ class Prefs {
       paperColor: this.paperColor,
       paperCustomColor: this.paperCustomColor,
       paperOpacity: this.paperOpacity,
+      paperBackdrop: this.paperBackdrop,
+      backdropColor: this.backdropColor,
+      pageColor: this.pageColor,
+      pageCustomColor: this.pageCustomColor,
+      pageOpacity: this.pageOpacity,
       typesetter: this.typesetter,
       sidebarWidth: this.sidebarWidth,
       listWidth: this.listWidth,
@@ -637,6 +669,11 @@ class Prefs {
     this.paperColor = next.paperColor;
     this.paperCustomColor = next.paperCustomColor;
     this.paperOpacity = next.paperOpacity;
+    this.paperBackdrop = next.paperBackdrop;
+    this.backdropColor = next.backdropColor;
+    this.pageColor = next.pageColor;
+    this.pageCustomColor = next.pageCustomColor;
+    this.pageOpacity = next.pageOpacity;
     this.typesetter = next.typesetter;
     this.sidebarWidth = next.sidebarWidth;
     this.listWidth = next.listWidth;
