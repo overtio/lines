@@ -78,8 +78,8 @@ export async function findCloudFolders(): Promise<CloudFolder[]> {
   return invoke<CloudFolder[]>("sync_folder_candidates");
 }
 
-/** The system folder picker; null if cancelled. */
-export async function pickFolder(): Promise<string | null> {
+/** The system folder picker, `prompt` on its button and `message` above; null if cancelled. */
+export async function pickFolder(prompt: string, message: string): Promise<string | null> {
   const { invoke } = await import("@tauri-apps/api/core");
-  return invoke<string | null>("sync_folder_pick");
+  return invoke<string | null>("sync_folder_pick", { prompt, message });
 }

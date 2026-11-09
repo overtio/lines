@@ -3,7 +3,7 @@ import { extractTags } from "../../lib/notes/parse";
 import { prefs } from "../../lib/prefs.svelte";
 import type { Cells } from "../../lib/plugins/types";
 import { el } from "../../lib/print/parts";
-import { parseCsv, sniffDelimiter, trimCells, writeCsv } from "../../lib/sheets/csv";
+import { csvText, parseCsv, sniffDelimiter, trimCells, writeCsv } from "../../lib/sheets/csv";
 import { type CellLook, cellShown, displayed } from "../../lib/sheets/display";
 
 /*
@@ -61,7 +61,7 @@ export function fileTitle(name: string) {
 
 /** A CSV or TSV file's cells, its delimiter (`;` in much of Europe) found from its first lines. */
 export function fileCells({ name, data }: { name: string; data: Uint8Array }): Cells {
-  const text = new TextDecoder().decode(data);
+  const text = csvText(data);
   return parseCsv(text, name.toLowerCase().endsWith(".tsv") ? "\t" : sniffDelimiter(text));
 }
 

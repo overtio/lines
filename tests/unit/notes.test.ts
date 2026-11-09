@@ -2,6 +2,7 @@ import { describe, expect, mock, test } from "bun:test";
 import { stubApp } from "./stubs";
 import { readPack } from "../../src/lib/sounds/mechvibes";
 import { parseHurl } from "../../src/plugins/http/hurl/parse";
+import { parseHttp } from "../../src/plugins/http/parse";
 import type { NoteLanguage } from "../../src/lib/plugins/types";
 
 stubApp();
@@ -43,10 +44,27 @@ describe("code notes", () => {
     expect(language("Shell").meta(tagged).title).toBe("echo hi");
   });
 
+  test("only the language's own comments are read: a C #include or 'use strict' is a title as written", () => {
+    expect(language("C").meta("#include <stdio.h>\n\nint main(void) {}").title).toBe("#include <stdio.h>");
+    expect(language("C++").meta("#pragma once\n\nclass A {};").title).toBe("#pragma once");
+    expect(language("JavaScript").meta("'use strict';\n\nconst a = 1;").title).toBe("'use strict';");
+    expect(language("Rust").meta("#[derive(Debug)]\nstruct A;").title).toBe("#[derive(Debug)]");
+    expect(language("C").meta("/* Parser */\n// #work\nint x;")).toMatchObject({ title: "Parser", tags: ["work"] });
+    expect(language("C").addTag("#include <stdio.h>", "work")).toBe("// #work\n#include <stdio.h>");
+    expect(language("SPARQL").meta("# People\nSELECT ?name WHERE {}").title).toBe("People");
+  });
+
   test("tags in a language whose comments close", () => {
     expect(language("CSS").addTag("/* Theme */\nbody {}", "web")).toBe("/* Theme */\n/* #web */\nbody {}");
     expect(language("CSS").addTag("/* #a */\nbody {}", "b")).toBe("/* #a #b */\nbody {}");
   });
+});
+
+test("a Hurl entry's title is the comment just above it, but not one of only tags", () => {
+  // As a note made under a tag starts, and as adding a tag writes one.
+  expect(parseHurl("# Sign in\n# #work #api\nPOST https://api.example.com/login\nHTTP 200").requests[0].title).toBe("Sign in");
+  expect(parseHurl("# \n# #work\nGET https://api.example.com/").requests[0].title).toBe("");
+  expect(parseHurl("# #1 priority\nGET https://api.example.com/").requests[0].title).toBe("#1 priority");
 });
 
 test("a Hurl body whose ``` isn't closed yet runs to the end of the note", () => {
@@ -54,6 +72,19 @@ test("a Hurl body whose ``` isn't closed yet runs to the end of the note", () =>
   const response = "GET https://example.com\nHTTP 200\n```\nok";
   expect(parseHurl(request).requests[0]).toMatchObject({ body: '{"name": "Ada"}\n', to: request.length });
   expect(parseHurl(response).requests[0]).toMatchObject({ expect: { body: "ok\n" }, to: response.length });
+});
+
+test("a request's body ends before the comments after it: a Hurl entry's title, say", () => {
+  const hurl = "# Create a user\nPOST https://example.com/users\n<user>ada</user>\n\n# Read it back\nGET https://example.com/users/ada\nHTTP 200";
+  const [create, read] = parseHurl(hurl).requests;
+  expect(create).toMatchObject({ body: "<user>ada</user>", to: hurl.indexOf("</user>") + "</user>".length });
+  expect(read.title).toBe("Read it back");
+  expect(parseHurl("POST https://example.com\n<user>ada</user>\n# Moved\nHTTP 302").requests[0]).toMatchObject({ body: "<user>ada</user>", expect: { status: 302 } });
+  expect(parseHurl("GET https://example.com\nHTTP 200\n<ok/>\n\n# Then\nGET https://example.com/2").requests[0].expect?.body).toBe("<ok/>");
+  const http = "### Create\nPOST https://example.com/users\nContent-Type: text/plain\n\nada\n\n# Try a longer name #todo\n\n### Read\nGET https://example.com/users/ada";
+  const { requests, comments } = parseHttp(http);
+  expect(requests[0]).toMatchObject({ body: "ada", to: http.indexOf("\nada") + "\nada".length });
+  expect(comments).toEqual(["Try a longer name #todo"]);
 });
 
 test("a line's comments, a line mark among them, aren't part of its text", () => {

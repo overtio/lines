@@ -13,6 +13,8 @@ const RESPONSE_LINE = /^HTTP(?:\/([\d.]+))?\s+(\d{3}|\*)$/;
 const SECTION = /^\[([A-Za-z]+)\]$/;
 const KEY_VALUE = /^((?:[\w.\-[\]@$]|\\.)+)\s*:\s?(.*)$/;
 const COMMENT = /^#\s?(.*)$/;
+/** A comment of nothing but tags, `# #work #api`: a note made under a tag has one, and it isn't a title. */
+const TAGS = /^(?:#[\p{L}\p{N}_/-]+\s*)+$/u;
 
 /** Section names, by alias. */
 const SECTIONS: Record<string, string> = {
@@ -218,10 +220,11 @@ function body(lines: string[], from: number, starts: (line: string) => boolean):
   }
   if (first.startsWith("file,")) return { text: null, last: from, file: true };
   if (/^(base64|hex),/.test(first)) return { text: null, last: from, unsupported: first.slice(0, first.indexOf(",")) };
-  // XML, or anything else: to the next entry, or response.
+  // XML, or anything else: to the next entry or response. The comments (and blank lines) just
+  // above that are its own: an entry's title, say.
   let last = from;
   while (last + 1 < lines.length && !starts(lines[last + 1])) last++;
-  while (last > from && !lines[last].trim()) last--;
+  while (last > from && (!lines[last].trim() || COMMENT.test(lines[last].trim()))) last--;
   return { text: lines.slice(from, last + 1).join("\n"), last, type: first.startsWith("<") ? "application/xml" : undefined };
 }
 
@@ -261,7 +264,7 @@ export function parseHurl(text: string): ReadText {
       if (comment) {
         const said = comment[1].trim();
         if (said) comments.push(said);
-        title = said;
+        if (!TAGS.test(said)) title = said;
       }
       continue;
     }

@@ -60,8 +60,7 @@
   const grid = $derived.by(() => {
     if (ui.layout === "narrow") return null;
     const panes = order.filter((pane) => pane !== "sidebar" || ui.layout === "wide");
-    const width = (pane: Pane) =>
-      pane === "editor" ? "minmax(0, 1fr)" : ui.focus || (pane === "sidebar" && !ui.sidebarOpen) ? "0px" : `var(--${pane}-w)`;
+    const width = (pane: Pane) => (pane === "editor" ? "minmax(0, 1fr)" : away(pane) ? "0px" : `var(--${pane}-w)`);
     return { areas: `"${panes.join(" ")}"`, columns: panes.map(width).join(" ") };
   });
 
@@ -97,6 +96,8 @@
   const wide = $derived(ui.layout === "wide");
   const narrow = $derived(ui.layout === "narrow");
   const focusMode = $derived(ui.focus && !narrow);
+  /** Whether a side pane has slid away: both in focus mode, the sidebar when it's closed. */
+  const away = (pane: Pane) => pane !== "editor" && (focusMode || (pane === "sidebar" && !ui.sidebarOpen));
 
   /*
    * How the panes are laid out (the panes slide in 320ms). Wide and medium: columns in the order
@@ -405,7 +406,8 @@
    */
   function cyclePane(back: boolean) {
     const elements = { sidebar: sidebarPane, list: listPane, editor: editorPane };
-    const panes = order.map((pane) => elements[pane]).filter((pane) => pane && !pane.inert && pane.offsetParent !== null);
+    // Not one that's slid away, which stays laid out but out of sight, where focus can't go.
+    const panes = order.filter((pane) => !away(pane)).map((pane) => elements[pane]).filter((pane) => pane && !pane.inert && pane.offsetParent !== null);
     if (!panes.length) return;
     const current = panes.findIndex((pane) => pane.contains(document.activeElement));
     const next = panes[(current + (back ? -1 : 1) + panes.length) % panes.length];
