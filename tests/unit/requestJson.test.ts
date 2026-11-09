@@ -13,6 +13,8 @@ describe("whole numbers past 2^53 in requests' JSON", () => {
     );
     const plain = `[{"a":[1,{"b":null}],"c":"x"},true]`;
     expect(indentJson(plain)).toBe(JSON.stringify(JSON.parse(plain), null, 2));
+    // Escapes read as they did: Python's json.dumps writes what isn't ASCII as `\u00e9`.
+    expect(indentJson(String.raw`{"name": "Caf\u00e9", "quote": "a \"b\" \/ c", "id": 1234567890123456789}`)).toBe(`{\n  "name": "Café",\n  "quote": "a \\"b\\" / c",\n  "id": ${ID}\n}`);
     expect(() => indentJson("{ not json")).toThrow();
   });
 

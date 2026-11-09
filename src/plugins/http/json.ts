@@ -13,7 +13,7 @@ function tokens(text: string) {
   return text.match(TOKEN) ?? [];
 }
 
-/** JSON indented by two spaces, as JSON.stringify indents it, with its strings and numbers as written. */
+/** JSON indented by two spaces, as JSON.stringify indents it, with its numbers as written. */
 export function indentJson(text: string): string {
   const list = tokens(text);
   const indents = ["\n"];
@@ -34,6 +34,8 @@ export function indentJson(text: string): string {
       out += newLine() + token;
     } else if (token === ",") out += `,${newLine()}`;
     else if (token === ":") out += ": ";
+    // A string's escapes read as JSON.stringify writes them: `\u00e9` as `é`.
+    else if (token.includes("\\")) out += JSON.stringify(JSON.parse(token));
     else out += token;
   }
   return out;
