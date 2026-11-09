@@ -34,7 +34,7 @@ import { fenceCode } from "./rendered";
 import { followClick, openHref } from "./links";
 import { drawMention, frontMatterField, objectsChanged, openMention, openTag, valueText } from "./objects";
 import { normalizeTag } from "../notes/parse";
-import { cheer } from "./util";
+import { cheer, viewSelectionInUse } from "./util";
 import { keyOf } from "../notes/properties";
 import { markupMode } from "./markupMode";
 import { plainLine } from "../notes/stats";
@@ -269,8 +269,8 @@ function build(view: EditorView): DecorationSet {
   const { doc } = state;
   const mode = state.facet(markupMode);
   if (mode === "source") return Decoration.none;
-  // When the editor isn't focused, render everything; while Markdown is all in sight, nothing hides it.
-  const selection = view.hasFocus ? state.selection.ranges : [];
+  // Out of the editor (and its find bar), render everything; while Markdown is all in sight, nothing hides it.
+  const selection = viewSelectionInUse(view) ? state.selection.ranges : [];
   const all = mode === "visible";
   const touches = (from: number, to: number) => all || selection.some((r) => r.from <= to && r.to >= from);
   const lineActive = (pos: number) => {

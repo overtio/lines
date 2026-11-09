@@ -48,6 +48,27 @@ describe("Show Markdown", () => {
   });
 });
 
+test("⌘F shows the match it's on where Markdown is drawn: in a table, a link's address, a diagram's code, a mark, LaTeX", async () => {
+  const notes = [
+    ["Intro\n\n| a | b |\n| - | - |\n| needle | 2 |\n\nEnd", "needle"],
+    ["Intro [text](https://needle.com) end", "needle"],
+    ["Intro\n\n```mermaid\ngraph TD\n  needle --> b\n```\n\nEnd", "needle"],
+    ["Intro **bold** end", "**"],
+    ["Intro \\href{https://needle.com}{text} end", "needle", "latex"],
+  ];
+  for (const [note, query, format] of notes) {
+    await app.open(note, format);
+    await app.page.evaluate(() => window.testing.place(0));
+    await app.page.keyboard.press(`${mod()}+F`);
+    await app.page.keyboard.type(query);
+    await app.page.keyboard.press("Enter");
+    const match = app.page.locator(".editor-pane .cm-searchMatch-selected");
+    await match.waitFor({ timeout: 2000 });
+    expect(await match.innerText()).toBe(query);
+    await app.page.keyboard.press("Escape");
+  }
+});
+
 test("Drag to move lines, off, shows no grip", async () => {
   await app.open("One\n\nTwo");
   const line = app.page.locator(".editor-pane .cm-line").first();
