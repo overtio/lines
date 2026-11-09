@@ -72,3 +72,36 @@ describe("sync, as another device writes the same note", () => {
     expect(bodies()).toEqual(["# Plan\n\nhere", "# Plan (conflicted copy)\n\nthere"]);
   });
 });
+
+describe("importing a note's file from a sync folder", () => {
+  test("brings the note back as it was, and never in place of one that's here", async () => {
+    const [here, there] = await devices(2);
+    const id = notes.add("# Trip\n\nRome");
+    notes.togglePin(id);
+    notes.setIcon(id, "archive");
+    await here.sync();
+    const { createdAt, updatedAt } = notes.get(id)!.note;
+    const file = () => new File([drive.get(fileOf(id))!.text], `${id}.md`);
+    await there.open();
+    await notes.importFiles([file()]);
+    expect(notes.entries.map(({ note }) => note)).toEqual([{ id, body: "# Trip\n\nRome", createdAt, updatedAt, pinned: true, trashed: false, icon: "archive" }]);
+    await notes.importFiles([file()]);
+    expect(notes.entries.map(({ note }) => note.body)).toEqual(["# Trip\n\nRome", "# Trip\n\nRome"]);
+    expect(notes.entries[0].note.id).not.toBe(id);
+  });
+
+  test("a locked note's comes in locked, not as its encrypted text", async () => {
+    const { noteKeys } = await import("../../src/lib/notes/noteKeys.svelte");
+    const { key } = await noteKeys.create("correct horse");
+    noteKeys.save({ key, touchId: false });
+    const [here, there] = await devices(2);
+    const id = notes.add("# Bank\n\nPIN 1234");
+    await notes.lock(id);
+    await here.sync();
+    const file = new File([drive.get(fileOf(id))!.text], `${id}.md`);
+    await there.open();
+    await notes.importFiles([file]);
+    expect(notes.get(id)!.note.locked?.sealed).toBeTruthy();
+    expect(notes.get(id)!.meta.title).toBe("Bank");
+  });
+});

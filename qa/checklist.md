@@ -519,6 +519,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 
 - [ ] Export makes a .zip of files named by title in their notes' formats (Markdown, LaTeX, spreadsheets as CSV with formulas), attachments in their folder, Trash in its folder when included
 - [ ] Settings → Export and Import → Import Files… makes notes of Markdown, LaTeX, CSV (comma, semicolon or tab; Excel for Windows' CSV keeps its accents and €), TSV and Excel files: a workbook's each visible sheet a note "Workbook – Sheet" (one sheet: just "Workbook"), formulas kept, formulas into other sheets as values; other files are listed as not imported
+- [ ] Importing a note's file from a sync folder (`lines/notes/<id>.md`) brings the note back as it was: its text without lines' header, pinned or in the trash, its dates, icon and format, locked (opening with its password); importing it again, or with that note still here, adds a second note rather than replace it
 - [ ] A LaTeX note exports as a .tex file wrapped in \documentclass … \end{document}, and compiles with pdflatex; the share menu says Copy LaTeX and Download LaTeX
 - [ ] Closed locked notes are left out, and the panel says how many
 - [ ] [Web] It downloads; [Desktop] it saves to Downloads and Show in Finder works

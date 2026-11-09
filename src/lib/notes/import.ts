@@ -1,10 +1,12 @@
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
+import { deserialize } from "../sync/format";
 import type { Note } from "./types";
 
 /*
  * Files made into notes (Settings → Export and Import → Import), each by the language its extension belongs
  * to: a Markdown file as a Markdown note, a CSV file or each sheet of an Excel workbook as a
- * spreadsheet note. A language reads a file its own way, or takes its text as it is.
+ * spreadsheet note. A language reads a file its own way, or takes its text as it is. A note's own
+ * file from a synced folder or bucket comes back as the note it is, by lines' header in it.
  */
 
 const extensionOf = (name: string) => name.slice(name.lastIndexOf(".") + 1).toLowerCase();
@@ -31,7 +33,9 @@ export async function notesFromFiles(files: File[]): Promise<{ notes: Note[]; sk
     const time = file.lastModified || Date.now();
     for (const body of bodies) {
       const note: Note = { id: crypto.randomUUID(), body, createdAt: time, updatedAt: time, pinned: false, trashed: false };
-      notes.push(language.id === DEFAULT_LANGUAGE ? note : { ...note, format: language.id });
+      const synced = !language.read && deserialize(body, note.id);
+      if (synced && synced.id !== note.id) notes.push(synced);
+      else notes.push(language.id === DEFAULT_LANGUAGE ? note : { ...note, format: language.id });
     }
   }
   return { notes, skipped };
