@@ -43,6 +43,16 @@ describe("code notes", () => {
     expect(language("Shell").meta(tagged).title).toBe("echo hi");
   });
 
+  test("only the language's own comments are read: a C #include or 'use strict' is a title as written", () => {
+    expect(language("C").meta("#include <stdio.h>\n\nint main(void) {}").title).toBe("#include <stdio.h>");
+    expect(language("C++").meta("#pragma once\n\nclass A {};").title).toBe("#pragma once");
+    expect(language("JavaScript").meta("'use strict';\n\nconst a = 1;").title).toBe("'use strict';");
+    expect(language("Rust").meta("#[derive(Debug)]\nstruct A;").title).toBe("#[derive(Debug)]");
+    expect(language("C").meta("/* Parser */\n// #work\nint x;")).toMatchObject({ title: "Parser", tags: ["work"] });
+    expect(language("C").addTag("#include <stdio.h>", "work")).toBe("// #work\n#include <stdio.h>");
+    expect(language("SPARQL").meta("# People\nSELECT ?name WHERE {}").title).toBe("People");
+  });
+
   test("tags in a language whose comments close", () => {
     expect(language("CSS").addTag("/* Theme */\nbody {}", "web")).toBe("/* Theme */\n/* #web */\nbody {}");
     expect(language("CSS").addTag("/* #a */\nbody {}", "b")).toBe("/* #a #b */\nbody {}");
