@@ -26,6 +26,15 @@ Most themes made for other apps are one or the other: Dracula is dark, Solarized
 
 Settings → Theme → Contrast → Increased works with your themes as with lines' own: their grey text, faint text, accent and tags are darkened (lightened in dark) until they reach the same contrast lines' themes do ([accessibility.md](accessibility.md)). lines works these out from your theme's colors each time they change, so there's nothing to set. A color written in a way lines can't read itself (`oklch()`, `var()`) is left as it is.
 
+## Monochrome and Invert
+
+Two switches in Settings → Theme change whatever theme is chosen, yours or lines' own:
+
+- **Monochrome** shows every color of the theme as a grey: the accent, tags, links, callouts, code, everything. Each grey is exactly as light as its color was (to WCAG's measure), so every bit of text has the contrast it had.
+- **Invert** turns the theme around, light for dark: a light theme becomes a dark one (white becomes black), a dark one light. Each color keeps its hue, and its lightness is mirrored so that any two colors are as far apart as before (each color's luminance plus 0.05 becomes 0.0525 divided by it): what read at 7:1 still reads at 7:1. Light or dark chooses which of the theme's colors are turned. Highlights stay bright, as they are in lines' dark themes.
+
+Both together give the theme in greys, turned. They apply on top of Increased contrast, in every window, and to diagrams, 3D models and recordings, which take the theme's colors. Pictures, and drawings' own pen colors, stay as they are. The theme picker's swatches and your theme's editor show the theme's own colors.
+
 ## Sharing a theme
 
 The share button beside your theme's name:

@@ -122,6 +122,9 @@ interface Stored {
   theme: string;
   appearance: Appearance;
   contrast: Contrast;
+  /** Every color of the theme shown as a grey, or turned light for dark (themes/show.svelte.ts). */
+  monochrome: boolean;
+  invert: boolean;
   font: FontId;
   textSize: number;
   icons: string;
@@ -206,6 +209,8 @@ const DEFAULTS: Stored = {
   theme: "lines",
   appearance: "system",
   contrast: "system",
+  monochrome: false,
+  invert: false,
   font: "system",
   textSize: 17,
   icons: "lucide",
@@ -297,6 +302,8 @@ function read(json?: string): Stored {
     theme: id(raw.theme, DEFAULTS.theme),
     appearance: oneOf(raw.appearance, APPEARANCES, DEFAULTS.appearance),
     contrast: oneOf(raw.contrast, ["system", "standard", "more"] as const, DEFAULTS.contrast),
+    monochrome: flag(raw.monochrome, DEFAULTS.monochrome),
+    invert: flag(raw.invert, DEFAULTS.invert),
     font: oneOf(raw.font, FONTS.map((f) => f.id), DEFAULTS.font),
     textSize: clamp(raw.textSize, TEXT_SIZE.min, TEXT_SIZE.max, DEFAULTS.textSize),
     icons: id(raw.icons, DEFAULTS.icons),
@@ -349,6 +356,8 @@ class Prefs {
   theme = $state(this.#initial.theme);
   appearance = $state<Appearance>(this.#initial.appearance);
   contrast = $state<Contrast>(this.#initial.contrast);
+  monochrome = $state(this.#initial.monochrome);
+  invert = $state(this.#initial.invert);
   font = $state<FontId>(this.#initial.font);
   textSize = $state(this.#initial.textSize);
   icons = $state(this.#initial.icons);
@@ -465,8 +474,6 @@ class Prefs {
   #apply() {
     const root = document.documentElement;
     root.dataset.font = this.font;
-    if (this.moreContrast) root.dataset.contrast = "more";
-    else delete root.dataset.contrast;
     const { style } = root;
     style.setProperty("--editor-size", `${this.textSize}px`);
     const s = this.spacing;
@@ -491,6 +498,8 @@ class Prefs {
       theme: this.theme,
       appearance: this.appearance,
       contrast: this.contrast,
+      monochrome: this.monochrome,
+      invert: this.invert,
       font: this.font,
       textSize: this.textSize,
       icons: this.icons,
@@ -548,6 +557,8 @@ class Prefs {
     this.theme = next.theme;
     this.appearance = next.appearance;
     this.contrast = next.contrast;
+    this.monochrome = next.monochrome;
+    this.invert = next.invert;
     this.font = next.font;
     this.textSize = next.textSize;
     this.icons = next.icons;

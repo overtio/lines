@@ -135,6 +135,10 @@ export default {
   "settings.contrastStandard": "Standard",
   "settings.contrastMore": "Increased",
   "settings.contrastNote": "Increased darkens grey text and borders, in every theme, so they’re easier to read. System follows Increase Contrast in your device’s accessibility settings.",
+  "settings.monochrome": "Monochrome",
+  "settings.monochromeNote": "Every color of the theme in grey, each as light as it was, so everything reads as well as before. Pictures in notes keep their colors.",
+  "settings.invert": "Invert",
+  "settings.invertNote": "The theme’s colors turned around, light for dark, each as far from the others as before. Light or dark chooses which of them are turned. Pictures in notes stay as they are.",
   "settings.icons": "Icons",
   "settings.sfSymbolsNote": "SF Symbols are available in the Mac and iPhone apps.",
   // Settings → Layout: which side the sidebar and the note list are on, tabs and the outline.

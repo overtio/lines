@@ -73,13 +73,13 @@ export function fenceAt(state: EditorState, pos: number): SyntaxNode | null {
 
 /** What drawings' colors depend on: one made in one look is drawn again in another. */
 export const lookKey = () => {
-  const { theme, scheme, font, contrast } = document.documentElement.dataset;
-  return `${theme} ${scheme} ${font} ${contrast ?? ""}`;
+  const { theme, scheme, font, contrast, filters } = document.documentElement.dataset;
+  return `${theme} ${scheme} ${font} ${contrast ?? ""} ${filters ?? ""}`;
 };
 
 /** Calls `callback` whenever the look changes, for what draws in the theme's colors without CSS. */
 export function onLookChange(callback: () => void) {
-  new MutationObserver(callback).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-scheme", "data-font", "data-contrast"] });
+  new MutationObserver(callback).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-scheme", "data-font", "data-contrast", "data-filters"] });
 }
 
 /* Drawing. */

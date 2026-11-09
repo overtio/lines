@@ -159,3 +159,28 @@ export function readableOn(color: Rgb, background: Rgb, ratio: number): Rgb {
   return isDark(background) ? WHITE : BLACK;
 }
 
+/** As CSS: `#rrggbb`, or `rgb()` with its alpha when it's see-through. */
+export const css = (color: Rgb) =>
+  color.a >= 1 ? hex(color) : `rgb(${[color.r, color.g, color.b].map(clamp).join(" ")} / ${Math.round(color.a * 1000) / 1000})`;
+
+/** The grey as light as `color` to WCAG, so it has the same contrast with any other color. */
+export function grey(color: Rgb): Rgb {
+  const value = clamp(gamma(luminance(color)));
+  return { r: value, g: value, b: value, a: color.a };
+}
+
+/**
+ * `color` turned around, white for black: its luminance mirrored so that any two colors turned
+ * have the contrast they had ((L + 0.05) becomes 0.0525 / (L + 0.05)), its hue and chroma kept.
+ */
+export function inverted(color: Rgb): Rgb {
+  const target = 0.0525 / (luminance(color) + 0.05) - 0.05;
+  const lch = toLch(color);
+  let [low, high] = [0, 1];
+  for (let step = 0; step < 24; step++) {
+    const middle = (low + high) / 2;
+    if (luminance(fromLch({ ...lch, l: middle })) < target) low = middle;
+    else high = middle;
+  }
+  return { ...fromLch({ ...lch, l: (low + high) / 2 }), a: color.a };
+}

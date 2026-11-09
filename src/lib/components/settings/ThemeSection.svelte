@@ -15,6 +15,7 @@
   import FieldGroup from "../ui/FieldGroup.svelte";
   import FieldRow from "../ui/FieldRow.svelte";
   import Segmented from "../ui/Segmented.svelte";
+  import Switch from "../ui/Switch.svelte";
   import { floating, option as menuOption } from "../ui/styles";
   import TextField from "../ui/TextField.svelte";
   import ThemeEditor from "./ThemeEditor.svelte";
@@ -215,6 +216,12 @@
   </FieldRow>
   <FieldRow label={t("settings.contrast")} note={t("settings.contrastNote")}>
     <Segmented label={t("settings.contrast")} options={contrasts} value={prefs.contrast} onselect={(id) => (prefs.contrast = id)} />
+  </FieldRow>
+  <FieldRow label={t("settings.monochrome")} note={t("settings.monochromeNote")}>
+    <Switch label={t("settings.monochrome")} checked={prefs.monochrome} onchange={(on) => (prefs.monochrome = on)} />
+  </FieldRow>
+  <FieldRow label={t("settings.invert")} note={t("settings.invertNote")}>
+    <Switch label={t("settings.invert")} checked={prefs.invert} onchange={(on) => (prefs.invert = on)} />
   </FieldRow>
   {#if iconSets.length > 1}
     <FieldRow label={t("settings.icons")} note={iconsUnavailable}>
