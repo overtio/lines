@@ -175,8 +175,8 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] A long `$$` equation scrolls sideways inside its block on a phone, the note's text staying within the window; an attached file deep in cards stays inside them, a long name cut with "…"
 - [ ] Opening a note from a mention (⌥↵ or ⌘-click) or with ⌘N while typing: moving into a table or diagram shows its Markdown, and selecting text shows the format toolbar, without clicking first
 - [ ] Languages highlight in the theme's colors, loading the first time they're used; unknown languages show plain
-- [ ] The copy button copies the code without its fences
-- [ ] The wand tidies JSON (long numbers keep every digit), SQL and Prettier languages, in one undo step
+- [ ] The copy button copies the code without its fences; in a list item or a quote, every line of it, without the indent or the `>`
+- [ ] The wand tidies JSON (long numbers keep every digit), SQL and Prettier languages, in one undo step; in a list item or a quote, the tidied code stays in it
 - [ ] A bad block shows "Couldn't format: …" for a few seconds; editing while it formats doesn't get overwritten
 - [ ] A mermaid block draws as a diagram (by Pele) in the theme's colors; clicking it shows the code with the diagram below, redrawn as you type
 - [ ] Flowcharts, sequence, class, state, ER, Gantt, pie, mindmap and timeline diagrams all draw; a label with `$$x^2$$` shows the math drawn; `click A href "…"` draws no link

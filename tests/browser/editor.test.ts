@@ -146,6 +146,47 @@ test("a code note has line numbers, a fixed-width font and its language's highli
   await app.page.waitForFunction(() => document.querySelectorAll(".editor-pane .cm-line span[class]").length > 2, null, { timeout: 5000 });
 });
 
+describe("a code block in a list item or a quote", () => {
+  const NOTES = ["- Item\n\n  ```\n  one\n    two\n  ```", "> ```\n> one\n>   two\n> ```"];
+
+  test("Copy copies every line of its code, without the item's indent or the >", async () => {
+    if (engine() !== "chromium") return;
+    for (const note of NOTES) {
+      await app.open(note);
+      await app.page.evaluate(() => navigator.clipboard.writeText("before"));
+      await app.page.locator(".editor-pane .cm-lp-code-copy").dispatchEvent("click");
+      await app.page.waitForFunction(async () => (await navigator.clipboard.readText()) !== "before");
+      expect(await app.page.evaluate(() => navigator.clipboard.readText())).toBe("one\n  two");
+    }
+  });
+
+  test("Format tidies all of it and keeps it in the item or the quote", async () => {
+    const cases = [
+      ['- Item\n\n  ```json\n  {"a": 1,\n  "b": 2}\n  ```\n\nAfter', '- Item\n\n  ```json\n  {\n    "a": 1,\n    "b": 2\n  }\n  ```\n\nAfter'],
+      ['> ```json\n> {"a": 1,\n> "b": 2}\n> ```\n\nAfter', '> ```json\n> {\n>   "a": 1,\n>   "b": 2\n> }\n> ```\n\nAfter'],
+    ];
+    for (const [note, formatted] of cases) {
+      await app.open(note);
+      await app.page.locator(".editor-pane .cm-lp-code-format").dispatchEvent("click");
+      await app.page.waitForFunction((note) => window.testing.text() !== note, note, { timeout: 2000 });
+      expect(await app.text()).toBe(formatted);
+    }
+  });
+
+  test("prints with every line", async () => {
+    for (const note of NOTES) {
+      await app.open(note);
+      await app.page.evaluate(() => window.testing.place(0));
+      await app.page.keyboard.press(`${mod()}+P`);
+      const code = app.page.getByRole("dialog").locator("pre.doc-code").first();
+      await code.waitFor();
+      expect(await code.innerText()).toBe("one\n  two");
+      await app.page.keyboard.press("Escape");
+      await app.page.getByRole("dialog").waitFor({ state: "hidden" });
+    }
+  });
+});
+
 describe("fixed", () => {
   test("⌘⇧M marks only where a mark follows text: not a code fence, a table's row or the properties", async () => {
     const note = "---\ntype: book\n---\n# Plan\n\n```\ncode\n```\n\n| a | b |\n| - | - |\n| 1 | 2 |\n\nText";
