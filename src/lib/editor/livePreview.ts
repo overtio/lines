@@ -1,5 +1,5 @@
 import { syntaxTree } from "@codemirror/language";
-import type { Range, Text } from "@codemirror/state";
+import { type Range, RangeSet, type Text } from "@codemirror/state";
 import {
   type Command,
   Decoration,
@@ -33,6 +33,7 @@ import { followClick, openHref } from "./links";
 import { drawMention, frontMatterField, objectsChanged, openMention, openTag, valueText } from "./objects";
 import { normalizeTag } from "../notes/parse";
 import { keyOf } from "../notes/properties";
+import { markupMode } from "./markupMode";
 import { plainLine } from "../notes/stats";
 import { t } from "../i18n/index.svelte";
 import { tagIcons, typeIcons } from "../notes/tagIcons.svelte";
@@ -41,7 +42,8 @@ import { tagIcons, typeIcons } from "../notes/tagIcons.svelte";
  * Live preview: the document is always plain Markdown, and this plugin only
  * decorates it. Markup is hidden unless the cursor is on (or touching) the
  * construct, so what you type is exactly what is stored — no conversions,
- * no block model, nothing to get out of sync.
+ * no block model, nothing to get out of sync. How much shows is a setting
+ * (markupMode.ts): all of it, or none of what only styles text.
  */
 
 /** A list bullet; its shape cycles with how deep the list is nested (dot, ring, square). */
@@ -249,7 +251,8 @@ const hidden = Decoration.replace({});
 /** What's drawn in a note's properties (its front matter): only what's within a line. */
 const IN_PROPERTIES = new Set(["Emphasis", "StrongEmphasis", "Strikethrough", "Highlight", "Underline", "InlineCode", "Link", "Autolink", "URL", "Tag", "Mention", "InlineMath"]);
 
-const INLINE_STYLES: Record<string, [cls: string, mark: string]> = {
+/** Text styled by marks around it: its class, and its marks' name. */
+export const INLINE_STYLES: Record<string, [cls: string, mark: string]> = {
   Emphasis: ["cm-lp-em", "EmphasisMark"],
   StrongEmphasis: ["cm-lp-strong", "EmphasisMark"],
   Strikethrough: ["cm-lp-strike", "StrikethroughMark"],
@@ -261,13 +264,19 @@ const INLINE_STYLES: Record<string, [cls: string, mark: string]> = {
 function build(view: EditorView): DecorationSet {
   const { state } = view;
   const { doc } = state;
-  // When the editor isn't focused, render everything.
+  const mode = state.facet(markupMode);
+  if (mode === "source") return Decoration.none;
+  // When the editor isn't focused, render everything; while Markdown is all in sight, nothing hides it.
   const selection = view.hasFocus ? state.selection.ranges : [];
-  const touches = (from: number, to: number) => selection.some((r) => r.from <= to && r.to >= from);
+  const all = mode === "visible";
+  const touches = (from: number, to: number) => all || selection.some((r) => r.from <= to && r.to >= from);
   const lineActive = (pos: number) => {
     const line = doc.lineAt(pos);
     return touches(line.from, line.to);
   };
+  // Hidden, what only styles text (`**`, a heading's `#`, a list's marker) doesn't show under the cursor either.
+  const styleShows = mode === "hidden" ? () => false : touches;
+  const styleLineShows = mode === "hidden" ? () => false : lineActive;
 
   const decos: Range<Decoration>[] = [];
   const hide = (from: number, to: number) => {
@@ -364,14 +373,14 @@ function build(view: EditorView): DecorationSet {
       if (name in INLINE_STYLES) {
         const [cls, markName] = INLINE_STYLES[name];
         mark(node.from, node.to, cls);
-        if (!touches(node.from, node.to)) hideChildren(node, markName);
+        if (!styleShows(node.from, node.to)) hideChildren(node, markName);
         return;
       }
 
       if (name.startsWith("ATXHeading")) {
         const level = name.slice(-1);
         heading(node.from, level);
-        if (lineActive(node.from)) return;
+        if (styleLineShows(node.from)) return;
         for (let c = node.firstChild; c; c = c.nextSibling) {
           if (c.name !== "HeaderMark") continue;
           if (c.from === node.from) hide(c.from, spaceAfter(c.to));
@@ -451,14 +460,14 @@ function build(view: EditorView): DecorationSet {
           const attributes: Record<string, string> = tag ? { "data-tag": tag } : {};
           decos.push(Decoration.mark({ class: "cm-lp-tag", attributes, inclusiveStart: true }).range(node.from, node.to));
           // Its `#` as an icon, unless the cursor is on it.
-          if (hash && !touches(node.from, node.to)) {
+          if (hash && !styleShows(node.from, node.to)) {
             decos.push(Decoration.replace({ widget: new TagIconWidget(tag ? tagIcons.get(tag) : "hash") }).range(hash.from, hash.to));
           }
           return false;
         }
 
         case "Mention": {
-          if (touches(node.from, node.to)) {
+          if (styleShows(node.from, node.to)) {
             mark(node.from, node.to, "cm-lp-mention-source");
             return false;
           }
@@ -497,7 +506,7 @@ function build(view: EditorView): DecorationSet {
             const end = spaceAfter(marker.to);
             const cls = checked ? "cm-lp-li cm-lp-task cm-lp-task-done" : "cm-lp-li cm-lp-task";
             decos.push(Decoration.line({ class: cls, attributes: { style } }).range(line.from));
-            if (!touches(listMark.from, marker.to)) {
+            if (!styleShows(listMark.from, marker.to)) {
               const label = plainLine(doc.sliceString(end, Math.min(task.to, line.to))).trim();
               decos.push(Decoration.replace({ widget: new CheckboxWidget(checked, label) }).range(listMark.from, end));
             } else {
@@ -509,7 +518,7 @@ function build(view: EditorView): DecorationSet {
           decos.push(Decoration.line({ class: "cm-lp-li", attributes: { style } }).range(line.from));
           const end = spaceAfter(listMark.to);
           const number = node.parent?.name === "OrderedList";
-          if (touches(listMark.from, listMark.to)) {
+          if (styleShows(listMark.from, listMark.to)) {
             mark(listMark.from, end, number ? "cm-lp-list-marker cm-lp-list-number" : "cm-lp-list-marker");
           } else if (number) {
             const widget = new NumberWidget(doc.sliceString(listMark.from, listMark.to));
@@ -527,11 +536,11 @@ function build(view: EditorView): DecorationSet {
           return;
 
         case "QuoteMark":
-          if (!lineActive(node.from)) hide(node.from, spaceAfter(node.to));
+          if (!styleLineShows(node.from)) hide(node.from, spaceAfter(node.to));
           return;
 
         case "HorizontalRule":
-          if (!lineActive(node.from)) {
+          if (!styleLineShows(node.from)) {
             decos.push(Decoration.replace({ widget: rule }).range(node.from, node.to));
           }
           return false;
@@ -741,9 +750,15 @@ export const openAtCursor: Command = (view) => {
 export const livePreview = ViewPlugin.fromClass(
   class {
     decorations: DecorationSet;
+    #atoms: RangeSet<Decoration> | undefined;
 
     constructor(view: EditorView) {
       this.decorations = build(view);
+    }
+
+    /** What's drawn in place of Markdown, which the cursor goes over in one step while Markdown is hidden (hiddenMarkdown.ts). */
+    get atoms() {
+      return (this.#atoms ??= this.decorations.update({ filter: (from, to, deco) => from < to && (deco === hidden || deco.spec.widget !== undefined) }));
     }
 
     update(update: ViewUpdate) {
@@ -757,6 +772,7 @@ export const livePreview = ViewPlugin.fromClass(
         syntaxTree(update.startState) !== syntaxTree(update.state)
       ) {
         this.decorations = build(update.view);
+        this.#atoms = undefined;
       }
     }
   },

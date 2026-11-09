@@ -149,6 +149,13 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Audio stops when another note opens: there's no player that carries on across notes.
 - Not tried yet on iPhone, iPad or Android.
 
+## Showing Markdown
+
+- Hidden Markdown (Settings → Editor → Markdown) hides what only styles text (`**`, `#`, `>`, list markers); links, images, math, mentions' sources, code fences, cards' `:::` and a note's properties still show their Markdown while the cursor is in them, as in Live, since there's no other way to change them yet (no link or math editor over the text).
+- Hidden, typing at either end of styled text writes outside it: to add to a bold word, type inside it, or ⌘B again. Return at the start of a heading's text puts a line above it; Backspace at a list item's text takes its marker, as Markdown's own Backspace does.
+- LaTeX notes follow Source, Visible and Live; with Hidden they show their commands as in Live.
+- Not tried yet with input methods that compose text (Japanese, Chinese, Korean) in Hidden, nor in the Mac app or on phones.
+
 ## Symbols
 
 - Only Markdown notes show `->` as →; LaTeX notes show what's typed (LaTeX has `\to` and `\neq` for these).

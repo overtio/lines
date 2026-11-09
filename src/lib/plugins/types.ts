@@ -193,7 +193,10 @@ export interface NoteLanguage {
   /** Its file extensions, the usual one first, which exports and downloads use. */
   extensions: string[];
   mimeType: string;
-  /** How the editor reads it and draws it as you type, and its keys and commands (CodeMirror extensions). */
+  /**
+   * How the editor reads it and draws it as you type, and its keys and commands (CodeMirror
+   * extensions): the same each time it's asked, unless they should change.
+   */
   editor(): Extension;
   /** What the note list, sidebar and search know of a note: its title, excerpt, tags, open todos… */
   meta(body: string): NoteMeta;

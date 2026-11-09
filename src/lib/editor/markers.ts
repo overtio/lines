@@ -2,6 +2,7 @@ import { type ChangeSpec, type EditorState, type Extension, RangeSetBuilder, Sta
 import { Decoration, type DecorationSet, EditorView, keymap, layer, type LayerMarker, ViewPlugin, type ViewUpdate } from "@codemirror/view";
 import { plugins } from "../plugins/registry.svelte";
 import type { LineMarker, MarkerColor, NoteLanguage } from "../plugins/types";
+import { markupMode } from "./markupMode";
 
 /*
  * Marks in a note's margin, as a code editor marks the lines changed: the note's own, written at the
@@ -165,6 +166,9 @@ export function lineMarkers(language: NoteLanguage): Extension {
         if (update.docChanged || update.selectionSet || update.focusChanged || update.viewportChanged) this.decorations = this.build(update.view);
       }
       build(view: EditorView) {
+        // With the note's markup in sight, they are too.
+        const mode = view.state.facet(markupMode);
+        if (mode === "source" || mode === "visible") return Decoration.none;
         const { written } = view.state.field(marks);
         const { doc } = view.state;
         const selection = view.hasFocus ? view.state.selection.ranges : [];

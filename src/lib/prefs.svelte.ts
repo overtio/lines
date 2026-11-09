@@ -17,6 +17,9 @@ export type Paper = "a4" | "letter";
 export type Side = "left" | "right";
 /** How far apart a paper pattern's lines and dots are (Settings → Paper): a row of cells for each line of text, or a size chosen. */
 export type PaperSpacing = "text" | "custom";
+/** How a note shows its Markdown (editor/markupMode.ts). */
+export const MARKDOWN_MODES = ["source", "visible", "live", "hidden"] as const;
+export type MarkdownMode = (typeof MARKDOWN_MODES)[number];
 /** What color a paper pattern is drawn in: the theme's ink or accent, or one of your own. */
 export type PaperColor = "ink" | "accent" | "custom";
 
@@ -186,6 +189,13 @@ interface Stored {
   outlineSide: Side;
   /** Scroll bars wherever something scrolls (off: none; scrolling still works). */
   scrollbars: boolean;
+  /**
+   * How Markdown shows in a note: as written and colored (source), styled with all of it in sight
+   * (visible), hidden but where you're writing (live), or never seen (hidden).
+   */
+  markdownMode: MarkdownMode;
+  /** A grip beside lines and blocks of a Markdown note that drags them somewhere else in it. */
+  dragBlocks: boolean;
   /** Notes show `->` as →, `!=` as ≠ and so on (notes/symbols.ts): in their text, and in code. */
   symbolsInText: boolean;
   symbolsInCode: boolean;
@@ -288,6 +298,8 @@ const DEFAULTS: Stored = {
   outline: false,
   outlineSide: "right",
   scrollbars: true,
+  markdownMode: "live",
+  dragBlocks: true,
   symbolsInText: true,
   symbolsInCode: true,
   sheetStats: ["sum", "average", "count"],
@@ -401,6 +413,8 @@ function read(json?: string): Stored {
     outline: flag(raw.outline, DEFAULTS.outline),
     outlineSide: oneOf(raw.outlineSide, SIDES, DEFAULTS.outlineSide),
     scrollbars: flag(raw.scrollbars, DEFAULTS.scrollbars),
+    markdownMode: oneOf(raw.markdownMode, MARKDOWN_MODES, DEFAULTS.markdownMode),
+    dragBlocks: flag(raw.dragBlocks, DEFAULTS.dragBlocks),
     symbolsInText: flag(raw.symbolsInText, DEFAULTS.symbolsInText),
     symbolsInCode: flag(raw.symbolsInCode, DEFAULTS.symbolsInCode),
     links: readLinks(raw.links),
@@ -464,6 +478,8 @@ class Prefs {
   outline = $state(this.#initial.outline);
   outlineSide = $state(this.#initial.outlineSide);
   scrollbars = $state(this.#initial.scrollbars);
+  markdownMode = $state(this.#initial.markdownMode);
+  dragBlocks = $state(this.#initial.dragBlocks);
   symbolsInText = $state(this.#initial.symbolsInText);
   symbolsInCode = $state(this.#initial.symbolsInCode);
   sheetStats = $state(this.#initial.sheetStats);
@@ -625,6 +641,8 @@ class Prefs {
       outline: this.outline,
       outlineSide: this.outlineSide,
       scrollbars: this.scrollbars,
+      markdownMode: this.markdownMode,
+      dragBlocks: this.dragBlocks,
       symbolsInText: this.symbolsInText,
       symbolsInCode: this.symbolsInCode,
       links: $state.snapshot(this.links),
@@ -699,6 +717,8 @@ class Prefs {
     this.outline = next.outline;
     this.outlineSide = next.outlineSide;
     this.scrollbars = next.scrollbars;
+    this.markdownMode = next.markdownMode;
+    this.dragBlocks = next.dragBlocks;
     this.symbolsInText = next.symbolsInText;
     this.symbolsInCode = next.symbolsInCode;
     if (next.sheetStats.join() !== this.sheetStats.join()) this.sheetStats = next.sheetStats;

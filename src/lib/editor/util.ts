@@ -2,6 +2,7 @@ import { syntaxTree } from "@codemirror/language";
 import { type EditorSelection, type EditorState, Prec, type Range, StateEffect, type StateEffectType, StateField, type Text, type Transaction } from "@codemirror/state";
 import { type Command, Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type WidgetType } from "@codemirror/view";
 import type { SyntaxNode, SyntaxNodeRef, Tree } from "@lezer/common";
+import { markupMode } from "./markupMode";
 
 /** The syntax node at `pos` and each node it's inside, innermost first. */
 export function* ancestors(state: EditorState, pos: number, side: -1 | 0 | 1 = 0): Generator<SyntaxNode> {
@@ -69,9 +70,12 @@ export const focusChanged = (tr: Transaction) => tr.effects.some((effect) => eff
 const touches = (selection: EditorSelection, from: number, to: number) =>
   selection.ranges.some((range) => (range.anchor >= from && range.anchor <= to) || (range.head >= from && range.head <= to));
 
-/** Whether the cursor, or either end of a selection, is in `from`–`to` of a focused editor. */
+/**
+ * Whether `from`–`to` shows its Markdown: where the cursor, or either end of a selection, is in a
+ * focused editor, or everywhere while Markdown is all in sight (markupMode.ts).
+ */
 export function isEditing(state: EditorState, from: number, to: number) {
-  return state.field(focused) && touches(state.selection, from, to);
+  return state.facet(markupMode) === "visible" || (state.field(focused) && touches(state.selection, from, to));
 }
 
 /**
@@ -191,6 +195,8 @@ export function drawnBlocks(
   const containers = new Set(inside);
   const collect = (state: EditorState, from: number, to: number) => {
     const blocks: Range<Decoration>[] = [];
+    // Markdown as written draws none.
+    if (state.facet(markupMode) === "source") return blocks;
     syntaxTree(state).iterate({
       from,
       to,

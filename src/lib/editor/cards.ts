@@ -7,6 +7,7 @@ import Icon from "../icons/Icon.svelte";
 import { ICONS, type IconName } from "../icons/icons";
 import { t } from "../i18n/index.svelte";
 import { ui } from "../ui.svelte";
+import { markupMode } from "./markupMode";
 import { ancestors, hasText } from "./util";
 
 /*
@@ -205,6 +206,7 @@ const cardLayer = layer({
     syntaxTree(update.startState) !== syntaxTree(update.state),
   markers(view) {
     const markers: RectangleMarker[] = [];
+    if (view.state.facet(markupMode) === "source") return markers;
     const content = view.contentDOM;
     const style = getComputedStyle(content);
     const scroller = view.scrollDOM.getBoundingClientRect();

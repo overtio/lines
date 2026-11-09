@@ -29,8 +29,11 @@ import { markdownOutline, outlineCompartment } from "./outline.svelte";
 import { Card, Highlight, Mention, Tag, TexMath, Underline } from "./syntax";
 import { t as message } from "../i18n/index.svelte";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
-import type { MarkdownAddition, PaperSource } from "../plugins/types";
+import type { MarkdownAddition, NoteLanguage, PaperSource } from "../plugins/types";
 import { lineMarkers } from "./markers";
+import { hiddenMarkdown } from "./hiddenMarkdown";
+import { markupMode } from "./markupMode";
+import { type MarkdownMode, prefs } from "../prefs.svelte";
 
 /**
  * The parser for a code block's language (```sql, ```ts…). Each language is loaded the first time
@@ -235,9 +238,10 @@ const phrases = EditorState.phrases.of({
 
 /**
  * What only a Markdown note's editor has: the parser, live preview, blocks, menus and keys, and
- * plugins' additions, with "/paper" for each source of papers.
+ * plugins' additions, with "/paper" for each source of papers; dragging lines if it's on, and
+ * hidden Markdown's cursor and keys while it's hidden.
  */
-const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[]): Extension => [
+const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[], mode: MarkdownMode, drag: boolean): Extension => [
   linedown(additions),
   frontMatterField,
   missingNotes,
@@ -248,12 +252,13 @@ const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[]): 
   typeTables,
   attachmentBlocks,
   cards,
-  dragBlocks,
+  drag ? dragBlocks : [],
   listKeymap,
   Prec.high(keymap.of(markdownKeymap)),
   // Before live preview, so its marks (a code span, a link) wrap the symbols inside them.
   symbols,
   livePreview,
+  mode === "hidden" ? hiddenMarkdown : [],
   slashCommands([...additions.flatMap((addition) => addition.commands ?? []), ...paperCommands(papers, markdownPaperLink)]),
   formatToolbar,
   fenceInput,
@@ -262,22 +267,50 @@ const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[]): 
   additions.flatMap((addition) => addition.editor ?? []),
 ];
 
-let built: { additions: MarkdownAddition[]; papers: PaperSource[]; editing: Extension } | undefined;
+/** Markdown as written (Settings → Editor → Markdown → Source): its marks faint, what they do to text shown on it. */
+const sourceStyle = HighlightStyle.define([
+  { tag: t.heading, fontWeight: "700" },
+  { tag: t.strong, fontWeight: "700" },
+  { tag: t.emphasis, fontStyle: "italic" },
+  { tag: t.strikethrough, textDecoration: "line-through" },
+  { tag: [t.link, t.special(t.url)], color: "var(--accent)" },
+  { tag: t.quote, color: "var(--text-muted)" },
+]);
 
-/** A Markdown note's editor (the Markdown plugin's), made again when plugins add something else to Markdown. */
+let built: { additions: MarkdownAddition[]; papers: PaperSource[]; mode: MarkdownMode; drag: boolean; editing: Extension } | undefined;
+
+/** A Markdown note's editor (the Markdown plugin's), made again when plugins add something else to Markdown, or its settings change. */
 export function markdownEditing(): Extension {
   const { markdown: additions, papers } = plugins;
-  if (built?.additions !== additions || built.papers !== papers) built = { additions, papers, editing: linedownEditing(additions, papers) };
+  const { markdownMode: mode, dragBlocks: drag } = prefs;
+  if (built?.additions !== additions || built.papers !== papers || built.mode !== mode || built.drag !== drag) {
+    built = { additions, papers, mode, drag, editing: linedownEditing(additions, papers, mode, drag) };
+  }
   return built.editing;
 }
 
 /** The editing for a note's language: Markdown, LaTeX… (each its plugin's), or none for plain text. */
 export const formatCompartment = new Compartment();
-/** A language's own editing, and the marks in the margin every language has (markers.ts). */
-export const formatEditing = (format = DEFAULT_LANGUAGE) => {
+
+/** Each language's editing as last made, so a note opened in it again isn't set up again. */
+const made = new WeakMap<NoteLanguage, { editor: Extension; mode: MarkdownMode; editing: Extension }>();
+
+/**
+ * A language's own editing, the marks in the margin every language has (markers.ts), and how its
+ * markup shows (markupMode.ts): as written, it's only colored.
+ */
+export function formatEditing(format = DEFAULT_LANGUAGE): Extension {
   const language = plugins.language(format);
-  return [language.editor(), lineMarkers(language)];
-};
+  const editor = language.editor();
+  const mode = prefs.markdownMode;
+  let found = made.get(language);
+  if (found?.editor !== editor || found.mode !== mode) {
+    const source = mode === "source" ? syntaxHighlighting(sourceStyle) : [];
+    found = { editor, mode, editing: [editor, lineMarkers(language), markupMode.of(mode), source] };
+    made.set(language, found);
+  }
+  return found.editing;
+}
 
 export const readOnlyCompartment = new Compartment();
 

@@ -27,11 +27,11 @@ The [web app](https://overtio.github.io/lines/app/) opens with a tour: one short
 
 ### Writing
 
-- **Live Markdown.** Type `**bold**`, `# Heading` or `- [ ] todo` and see it formatted. Put the cursor on a line to see its Markdown again.
+- **Live Markdown.** Type `**bold**`, `# Heading` or `- [ ] todo` and see it formatted. Put the cursor on a line to see its Markdown again, or choose in Settings to keep it all in sight, show it as written, or never show it at all, as in Bear or Notion.
 - **Slash commands.** Type `/` at the start of a line for headings, todos, tables, callouts, code, diagrams, math, images, drawings, today's date and more. <kbd>Tab</kbd> completes, like a shell.
 - **Format toolbar.** Select text to make it bold, italic, underlined, struck through, code or highlighted.
 - **Lists and todos.** <kbd>Tab</kbd> and <kbd>⇧Tab</kbd> nest list items. Click a checkbox to tick it; the Todo view gathers every note with open tasks.
-- **Drag to move.** Grab the grip beside any line, list item, heading, table or card to move it, or use <kbd>⌥↑</kbd> / <kbd>⌥↓</kbd>.
+- **Drag to move.** Grab the grip beside any line, list item, heading, table or card to move it, or use <kbd>⌥↑</kbd> / <kbd>⌥↓</kbd>. The grips can be turned off.
 - **Arrows and symbols.** `->` shows as →, `!=` as ≠, and so on, on screen only. The note keeps what you typed.
 - **Copy buttons** on values in `Key: Value` lines and on table cells.
 - **Marks in the margin.** <kbd>⌘⇧M</kbd> puts a colored bar beside lines, with what it means on pointing at it, as a code editor marks changed lines; it's an HTML comment other apps don't show. Plugins mark lines too: Changes marks what you've changed since opening a note.
