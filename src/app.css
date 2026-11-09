@@ -118,15 +118,18 @@
 
   /*
    * Window surfaces. In the Mac app, window opacity (Settings → Floating) makes them
-   * see-through, with the desktop blurred behind; elsewhere they're always solid.
+   * see-through, with the desktop blurred behind; elsewhere they're always solid. The main
+   * window can keep its note, or its note and note list, solid (`data-see-through`).
    */
   --window-alpha: 100%;
+  --list-alpha: var(--window-alpha);
+  --note-alpha: var(--window-alpha);
   /* Matches CORNER_RADIUS in src-tauri/src/window_style.rs. */
   --window-radius: 16px;
   /* The light inner edge macOS gives windows, for see-through ones that lose it. */
   --window-edge: rgba(255, 255, 255, 0.45);
-  --surface: color-mix(in srgb, var(--bg) var(--window-alpha), transparent);
-  --surface-list: color-mix(in srgb, var(--bg-list) var(--window-alpha), transparent);
+  --surface: color-mix(in srgb, var(--bg) var(--note-alpha), transparent);
+  --surface-list: color-mix(in srgb, var(--bg-list) var(--list-alpha), transparent);
   --surface-sidebar: color-mix(in srgb, var(--bg-sidebar) var(--window-alpha), transparent);
 
   /* Sliding panes and rows, and popovers opening. */
@@ -244,6 +247,14 @@
 
 :root[data-font="mono"] {
   --font-text: var(--font-mono);
+}
+
+:root[data-see-through] {
+  --note-alpha: 100%;
+}
+
+:root[data-see-through="sidebar"] {
+  --list-alpha: 100%;
 }
 
 :root[data-translucent] body {

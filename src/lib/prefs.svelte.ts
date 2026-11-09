@@ -9,6 +9,9 @@ export type Contrast = "system" | "standard" | "more";
 export type FontId = "system" | "serif" | "rounded" | "mono";
 /** Whether a floating note shows its close/minimize/zoom buttons all the time, or on hover. */
 export type WindowButtons = "hover" | "always";
+/** What of the main window its opacity makes see-through: all of it, the sidebar and the note list, or the sidebar. */
+export const SEE_THROUGH = ["window", "lists", "sidebar"] as const;
+export type SeeThrough = (typeof SEE_THROUGH)[number];
 /** Which way a note moves when swiped with two fingers on a trackpad. */
 export type SwipeDirection = "fingers" | "reversed";
 /** The paper a note's PDF is laid out on. */
@@ -143,6 +146,8 @@ interface Stored {
   /** See-through-ness and background blur of the main window and of floating notes (Mac app). */
   windowOpacity: number;
   windowBlur: boolean;
+  /** What of the main window is see-through; the rest stays solid. */
+  windowSeeThrough: SeeThrough;
   floatingOpacity: number;
   floatingBlur: boolean;
   /** Floating notes have the window shadow and outline (off: just the note). */
@@ -268,6 +273,7 @@ const DEFAULTS: Stored = {
   fullWidth: false,
   windowOpacity: 1,
   windowBlur: true,
+  windowSeeThrough: "window",
   floatingOpacity: 1,
   floatingBlur: true,
   floatingBorder: true,
@@ -383,6 +389,7 @@ function read(json?: string): Stored {
     fullWidth: flag(raw.fullWidth, DEFAULTS.fullWidth),
     windowOpacity: clamp(raw.windowOpacity, OPACITY.min, OPACITY.max, 1),
     windowBlur: flag(raw.windowBlur, true),
+    windowSeeThrough: oneOf(raw.windowSeeThrough, SEE_THROUGH, DEFAULTS.windowSeeThrough),
     floatingOpacity: clamp(raw.floatingOpacity, OPACITY.min, OPACITY.max, 1),
     floatingBlur: flag(raw.floatingBlur, true),
     floatingBorder: flag(raw.floatingBorder, true),
@@ -448,6 +455,7 @@ class Prefs {
   swipe = $state<SwipeDirection>(this.#initial.swipe);
   windowOpacity = $state(this.#initial.windowOpacity);
   windowBlur = $state(this.#initial.windowBlur);
+  windowSeeThrough = $state(this.#initial.windowSeeThrough);
   floatingOpacity = $state(this.#initial.floatingOpacity);
   floatingBlur = $state(this.#initial.floatingBlur);
   floatingBorder = $state(this.#initial.floatingBorder);
@@ -590,6 +598,9 @@ class Prefs {
     style.setProperty("--window-alpha", `${Math.round(opacity * 100)}%`);
     if (opacity < 1) root.dataset.translucent = "";
     else delete root.dataset.translucent;
+    // In the main window, maybe only its sidebar, or its sidebar and note list (app.css).
+    if (opacity < 1 && !isFloating && this.windowSeeThrough !== "window") root.dataset.seeThrough = this.windowSeeThrough;
+    else delete root.dataset.seeThrough;
     // The light inner edge belongs with the window's outline; without a border, neither.
     if (isFloating && !this.floatingBorder) root.dataset.borderless = "";
     else delete root.dataset.borderless;
@@ -611,6 +622,7 @@ class Prefs {
       fullWidth: this.fullWidth,
       windowOpacity: this.windowOpacity,
       windowBlur: this.windowBlur,
+      windowSeeThrough: this.windowSeeThrough,
       floatingOpacity: this.floatingOpacity,
       floatingBlur: this.floatingBlur,
       floatingBorder: this.floatingBorder,
@@ -687,6 +699,7 @@ class Prefs {
     this.fullWidth = next.fullWidth;
     this.windowOpacity = next.windowOpacity;
     this.windowBlur = next.windowBlur;
+    this.windowSeeThrough = next.windowSeeThrough;
     this.floatingOpacity = next.floatingOpacity;
     this.floatingBlur = next.floatingBlur;
     this.floatingBorder = next.floatingBorder;

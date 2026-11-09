@@ -2,7 +2,7 @@
   import { RadioGroup } from "bits-ui";
   import { t } from "../../i18n/index.svelte";
   import { plugins } from "../../plugins/registry.svelte";
-  import { formatPercent, OPACITY, prefs, windowLookAvailable, type Appearance, type WindowButtons } from "../../prefs.svelte";
+  import { formatPercent, OPACITY, prefs, windowLookAvailable, type Appearance, type SeeThrough, type WindowButtons } from "../../prefs.svelte";
   import { schemeShown } from "../../themes/show.svelte";
   import { canFloat } from "../../windows/floating";
   import FieldGroup from "../ui/FieldGroup.svelte";
@@ -16,6 +16,11 @@
     { id: "system", label: t("settings.appearanceSystem") },
     { id: "light", label: t("settings.appearanceLight") },
     { id: "dark", label: t("settings.appearanceDark") },
+  ];
+  const seeThrough: { id: SeeThrough; label: string }[] = [
+    { id: "window", label: t("settings.seeThroughWindow") },
+    { id: "lists", label: t("settings.seeThroughLists") },
+    { id: "sidebar", label: t("settings.seeThroughSidebar") },
   ];
   const windowButtons: { id: WindowButtons; label: string }[] = [
     { id: "hover", label: t("settings.windowButtonsHover") },
@@ -33,6 +38,9 @@
   <FieldGroup title={t("settings.mainWindow")}>
     <FieldRow label={t("settings.opacity")} note={t("settings.opacityNote")}>
       <Slider class="w-60" bind:value={prefs.windowOpacity} {...OPACITY} label={t("settings.opacity")} format={formatPercent} />
+    </FieldRow>
+    <FieldRow label={t("settings.seeThrough")} note={t("settings.seeThroughNote")} dim={prefs.windowOpacity === 1}>
+      <Segmented label={t("settings.seeThrough")} options={seeThrough} value={prefs.windowSeeThrough} onselect={(id) => (prefs.windowSeeThrough = id)} />
     </FieldRow>
     <FieldRow label={t("settings.blur")}>
       <Switch label={t("settings.blur")} checked={prefs.windowBlur} onchange={(on) => (prefs.windowBlur = on)} />

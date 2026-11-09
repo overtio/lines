@@ -185,6 +185,12 @@ export default {
   "settings.opacity": "Opacity",
   "settings.blur": "Blur what’s behind",
   "settings.opacityNote": "Below 100% opacity the desktop shows through the window.",
+  // Which parts of the main window its opacity makes see-through; the rest stays solid.
+  "settings.seeThrough": "See-through",
+  "settings.seeThroughWindow": "Whole window",
+  "settings.seeThroughLists": "Sidebar and list",
+  "settings.seeThroughSidebar": "Sidebar",
+  "settings.seeThroughNote": "What the opacity above makes see-through. The rest stays solid, so notes read as on a page.",
   "settings.floatingNotes": "Floating notes",
   // For screen readers: the group of theme swatches for floating notes, shown beside "Theme".
   "settings.floatingTheme": "Floating notes theme",
