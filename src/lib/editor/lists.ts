@@ -8,7 +8,7 @@ import { ancestors } from "./util";
  * taking its own sub-items along. The indentation is whatever Markdown needs for that (two
  * spaces under "- ", three under "1. "); the editor draws each level the same, wider step.
  * Backspace right after an item's marker moves a nested item out a level, and turns a top-level
- * one into plain text.
+ * one into plain text. Enter there puts an empty item above it.
  */
 
 /** The list item whose marker is on the cursor's line. */
@@ -28,6 +28,24 @@ function itemAt(state: EditorState): SyntaxNode | null {
 function markerColumn(doc: Text, item: SyntaxNode) {
   const mark = item.getChild("ListMark")!;
   return mark.from - doc.lineAt(mark.from).from;
+}
+
+/**
+ * The changes that number an ordered list's items from `item` on, starting at `number`, as far as
+ * they were numbered one after another.
+ */
+function renumber(doc: Text, item: SyntaxNode | null, number: number) {
+  const changes = [];
+  for (let last = -1; item; item = item.nextSibling) {
+    if (item.name !== "ListItem") continue;
+    const mark = item.getChild("ListMark")!;
+    const written = parseInt(doc.sliceString(mark.from, mark.to), 10);
+    if (last >= 0 && written !== last + 1) break;
+    last = written;
+    if (written !== number) changes.push({ from: mark.from, to: mark.to - 1, insert: String(number) });
+    number++;
+  }
+  return changes;
 }
 
 /** Quote markers a line starts with; indentation goes after them. */
@@ -90,9 +108,37 @@ function deleteMarker(view: EditorView) {
   return true;
 }
 
+/**
+ * Enter at the start of an item's text puts an empty item above it, the item keeping its checkbox
+ * as it was. Right under a paragraph, a blank line goes first: an empty item there would be read as
+ * part of the paragraph, and a `-` as a heading's underline.
+ */
+function itemAbove(view: EditorView) {
+  const { state } = view;
+  const { main } = state.selection;
+  const item = main.empty && state.selection.ranges.length === 1 && !state.readOnly ? itemAt(state) : null;
+  if (!item) return false;
+  const { doc } = state;
+  const mark = item.getChild("ListMark")!;
+  const line = doc.lineAt(mark.from);
+  const start = mark.to + AFTER_MARK.exec(doc.sliceString(mark.to, line.to))![0].length;
+  if (main.head !== start || !doc.sliceString(start, line.to).trim()) return false;
+  const list = item.parent!;
+  let before = list.prevSibling;
+  while (before?.name === "QuoteMark") before = before.prevSibling;
+  const underParagraph =
+    list.firstChild?.from === item.from && list.parent?.name !== "ListItem" && before?.name === "Paragraph" && doc.lineAt(before.to).number === line.number - 1;
+  const blank = underParagraph ? `${QUOTES.exec(line.text)![0].trimEnd()}\n` : "";
+  const changes = [{ from: line.from, to: line.from, insert: `${blank}${line.text.slice(0, start - line.from).replace(/\[[xX]\]/, "[ ]")}\n` }];
+  if (list.name === "OrderedList") changes.push(...renumber(doc, item, parseInt(doc.sliceString(mark.from, mark.to), 10) + 1));
+  view.dispatch({ changes, scrollIntoView: true, userEvent: "input" });
+  return true;
+}
+
 export const listKeymap = Prec.high(
   keymap.of([
     { key: "Tab", run: indentItem, shift: outdentItem },
     { key: "Backspace", run: deleteMarker },
+    { key: "Enter", run: itemAbove },
   ]),
 );

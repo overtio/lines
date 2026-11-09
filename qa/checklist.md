@@ -312,6 +312,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 
 - [ ] Tab nests a list item with its sub-items under the one above; Tab on the first item does nothing
 - [ ] ⇧Tab moves it back out; Backspace right after a marker moves it out, or turns it into text at the top level
+- [ ] Return at the start of an item's text puts an empty item above it (an empty checkbox for a todo, the numbers after it one more), in a quote too; right under a paragraph, a blank line goes before it and the paragraph stays a paragraph
 - [ ] The Todo section lists notes with open todos; ticking the last one removes the note from it
 - [ ] Hovering a line shows a grip on its left; it covers the line, a list item with its sub-items, or a whole heading, table, code block, quote or card
 - [ ] In a callout the grip sits left of the icon column, not over the icon
