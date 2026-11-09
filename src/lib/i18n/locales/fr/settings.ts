@@ -88,7 +88,7 @@ export default {
   "settings.themePictureError": "Impossible de lire les couleurs de cette image. Essayez un JPEG, PNG ou WebP.",
   "settings.themeNewFromLibrary": "Depuis {name}…",
   "settings.themeFetching": "Récupération de l’image depuis {name}…",
-  "settings.themeLibraryError": "Impossible de faire un thème de cette image : {name} ne l’a pas envoyée, ou elle ne peut pas être lue. Essaie-en une autre.",
+  "settings.themeLibraryError": "Impossible de faire un thème de cette image : {name} ne l’a pas envoyée, ou elle ne peut pas être lue. Essayez-en une autre.",
   "settings.themeCopyName": "{name} (copie)",
   "settings.themeImport": "Importer",
   "settings.themeImportFile": "Choisir un fichier…",
