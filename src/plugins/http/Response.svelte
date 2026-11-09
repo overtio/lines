@@ -10,6 +10,7 @@
   import { locale, t } from "../../lib/i18n/index.svelte";
   import { copyText } from "../../lib/platform";
   import { bodyView, type Shown } from "./body";
+  import { indentJson } from "./json";
   import type { Exchange, Received } from "./send.svelte";
 
   let {
@@ -42,7 +43,7 @@
     const { text, type } = response;
     if (/json/.test(type) || (!type && /^\s*[[{]/.test(text))) {
       try {
-        return { text: JSON.stringify(JSON.parse(text), null, 2), language: "json" };
+        return { text: indentJson(text), language: "json" };
       } catch {
         // Not JSON after all: as it came.
       }

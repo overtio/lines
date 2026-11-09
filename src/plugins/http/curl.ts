@@ -1,3 +1,5 @@
+import { indentJson } from "./json";
+
 /*
  * curl commands, to and from requests: "Copy as curl" writes one to run in a terminal, and a curl
  * command pasted into a request (as browsers' "Copy as cURL" and API docs give them) is read as the
@@ -181,7 +183,7 @@ export function readCurl(command: string): { asked: Asked; notes: string[] } | n
   if (body !== null && !header(headers, "Content-Type")) headers.push(["Content-Type", "application/x-www-form-urlencoded"]);
   if (body !== null && /json/i.test(header(headers, "Content-Type")?.[1] ?? "")) {
     try {
-      body = JSON.stringify(JSON.parse(body), null, 2);
+      body = indentJson(body);
     } catch {
       // Not JSON after all: as it was written.
     }

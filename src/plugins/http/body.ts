@@ -7,6 +7,7 @@ import { copyButton, destroyCopyButton } from "../../lib/editor/keyValue";
 import Icon from "../../lib/icons/Icon.svelte";
 import { highlightStyle } from "../../lib/editor/setup";
 import { t } from "../../lib/i18n/index.svelte";
+import { indentJson } from "./json";
 
 /*
  * A response's body, in an editor of its own that can't be changed: it draws only the lines in
@@ -73,7 +74,7 @@ const VALUES = new Set(["String", "Number", "True", "False", "Null", "Object", "
 function valueText(text: string) {
   try {
     const value: unknown = JSON.parse(text);
-    return typeof value === "string" ? value : typeof value === "object" && value !== null ? JSON.stringify(value, null, 2) : text;
+    return typeof value === "string" ? value : typeof value === "object" && value !== null ? indentJson(text) : text;
   } catch {
     return text;
   }
