@@ -80,7 +80,14 @@ export default {
   "settings.themeNote": "Make your own from any of them, or import one made for VS Code, Zed, Base16, a terminal or your desktop.",
   "settings.themesYours": "Your themes",
   "settings.themeNew": "New",
-  "settings.themeNewHint": "A theme of your own, starting from the one chosen",
+  "settings.themeNewHint": "A theme of your own, from the one chosen or from a picture",
+  "settings.themeNewFrom": "From {name}",
+  "settings.themeNewFromPicture": "From a Picture…",
+  // A theme made from a picture's colors, named after the picture; this when the picture has no name.
+  "settings.themePictureName": "From a picture",
+  "settings.themeFromPicture": "Made {name} from your picture's colors. Change any of them below.",
+  "settings.themePictureBackdrop": "Use the Picture as the Backdrop",
+  "settings.themePictureError": "Couldn't read the colors of that picture. Try a JPEG, PNG or WebP.",
   // The name of a theme made from another, until it's renamed.
   "settings.themeCopyName": "{name} Copy",
   "settings.themeImport": "Import",

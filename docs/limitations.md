@@ -164,6 +164,11 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - A picture of a note (PNG) is one long page, without its breaks.
 - With a pattern drawn in columns (squares, graph) over a backdrop, each page's columns run its full height, past the last line's row.
 
+## Themes from a picture
+
+- A picture is read in whatever formats the system can show (JPEG, PNG, WebP, GIF; HEIC in the Mac app and Safari); an animated one by its first frame.
+- The colors are worked out, not chosen by taste: a picture of many equal colors can give an accent that isn't the one you'd pick. Each color can be changed after.
+
 ## Styles
 
 - A style can't be made in Settings yet, only added by a plugin; a theme of your own can be used with any style.
