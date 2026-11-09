@@ -66,6 +66,17 @@ export function sniffDelimiter(text: string): string {
   return best;
 }
 
+/** A CSV file's text: UTF-8, or UTF-16 with its byte order mark, else Windows-1252, which Excel writes on Windows. */
+export function csvText(data: Uint8Array): string {
+  const utf16 = data[0] === 0xff && data[1] === 0xfe ? "utf-16le" : data[0] === 0xfe && data[1] === 0xff ? "utf-16be" : null;
+  if (utf16) return new TextDecoder(utf16).decode(data);
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(data);
+  } catch {
+    return new TextDecoder("windows-1252").decode(data);
+  }
+}
+
 /** Without the empty rows and columns at its end; rows already as wide as the rest are the same rows. */
 export function trimCells(cells: Cells): Cells {
   let rows = cells.length;

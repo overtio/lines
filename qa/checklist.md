@@ -516,7 +516,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 ## 18. Export and share
 
 - [ ] Export makes a .zip of files named by title in their notes' formats (Markdown, LaTeX, spreadsheets as CSV with formulas), attachments in their folder, Trash in its folder when included
-- [ ] Settings → Export and Import → Import Files… makes notes of Markdown, LaTeX, CSV (comma, semicolon or tab), TSV and Excel files: a workbook's each visible sheet a note "Workbook – Sheet" (one sheet: just "Workbook"), formulas kept, formulas into other sheets as values; other files are listed as not imported
+- [ ] Settings → Export and Import → Import Files… makes notes of Markdown, LaTeX, CSV (comma, semicolon or tab; Excel for Windows' CSV keeps its accents and €), TSV and Excel files: a workbook's each visible sheet a note "Workbook – Sheet" (one sheet: just "Workbook"), formulas kept, formulas into other sheets as values; other files are listed as not imported
 - [ ] A LaTeX note exports as a .tex file wrapped in \documentclass … \end{document}, and compiles with pdflatex; the share menu says Copy LaTeX and Download LaTeX
 - [ ] Closed locked notes are left out, and the panel says how many
 - [ ] [Web] It downloads; [Desktop] it saves to Downloads and Show in Finder works
