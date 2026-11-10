@@ -49,6 +49,8 @@ Plain Markdown, readable by any editor.
 
 A note with an icon has an `icon` line. A note in another format has a `format` line, followed by its text: `format: latex` and its LaTeX ([latex.md](latex.md)), or `format: spreadsheet` and its title and CSV ([spreadsheets.md](spreadsheets.md#its-text)).
 
+Importing such a file (Settings → Export and Import → Import Files…) brings the note back as it was, with its id, unless a note on the device has that id; then it comes in as a note of its own, so an import never replaces one.
+
 A note's own [properties](linedown.md#properties) are part of its text, so they come after this block, in a second one:
 
 ```markdown

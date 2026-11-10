@@ -672,6 +672,13 @@ class NotesStore {
   async importFiles(files: File[]) {
     const { notesFromFiles } = await import("./import");
     const { notes, skipped } = await notesFromFiles(files);
+    // A synced note's file keeps its id, unless a note here has it: an import never takes another's place.
+    const ids = new Set(this.entries.map((entry) => entry.note.id));
+    for (const note of notes) {
+      if (ids.has(note.id)) note.id = crypto.randomUUID();
+      ids.add(note.id);
+      noteKeys.notice(note);
+    }
     await this.insert(...notes);
     return { count: notes.length, skipped };
   }
