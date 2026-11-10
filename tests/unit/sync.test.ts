@@ -210,3 +210,18 @@ describe("sync, of a note changed on two devices", () => {
     });
   });
 });
+
+describe("sync, of a note's file saved by another app", () => {
+  test("with a byte order mark and Windows line endings: lines' own header isn't taken for the note's text", async () => {
+    const [here, there] = await devices(2);
+    const id = notes.add("# Recipe\n\nflour");
+    notes.togglePin(id);
+    await here.sync();
+    const { text } = drive.get(fileOf(id))!;
+    drive.set(fileOf(id), { text: `\uFEFF${text.replace("flour", "flour\nsugar").replaceAll("\n", "\r\n")}`, etag: "saved elsewhere" });
+    await here.sync();
+    expect(notes.get(id)!.note).toMatchObject({ body: "# Recipe\n\nflour\nsugar", pinned: true });
+    await there.sync();
+    expect(notes.get(id)!.note).toMatchObject({ body: "# Recipe\n\nflour\nsugar", pinned: true });
+  });
+});

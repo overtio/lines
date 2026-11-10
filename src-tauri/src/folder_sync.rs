@@ -159,16 +159,26 @@ pub async fn sync_folder_list(dir: String) -> Result<Vec<Entry>, String> {
 pub async fn sync_folder_read(dir: String, name: String) -> Result<Option<File>, String> {
   blocking(move || {
     let path = file(&dir, &name)?;
-    match std::fs::read_to_string(&path) {
-      Ok(text) => {
-        let meta = std::fs::metadata(&path).map_err(|e| describe(&path, e))?;
-        Ok(Some(File { text, etag: etag(&meta) }))
-      }
-      Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
-      Err(e) => Err(describe(&path, e)),
-    }
+    let Some(bytes) = read_file(&path)? else { return Ok(None) };
+    let meta = std::fs::metadata(&path).map_err(|e| describe(&path, e))?;
+    Ok(Some(File { text: decode(&bytes), etag: etag(&meta) }))
   })
   .await
+}
+
+/// A note's text however another app saved it, read as a browser reads a bucket's: UTF-8 without
+/// its byte order mark, anything that isn't UTF-8 replaced (�) rather than stop sync. Or UTF-16,
+/// with its byte order mark.
+fn decode(bytes: &[u8]) -> String {
+  let utf16 = |rest: &[u8], unit: fn([u8; 2]) -> u16| {
+    String::from_utf16_lossy(&rest.as_chunks::<2>().0.iter().map(|&pair| unit(pair)).collect::<Vec<_>>())
+  };
+  match bytes {
+    [0xEF, 0xBB, 0xBF, rest @ ..] => String::from_utf8_lossy(rest).into_owned(),
+    [0xFF, 0xFE, rest @ ..] => utf16(rest, u16::from_le_bytes),
+    [0xFE, 0xFF, rest @ ..] => utf16(rest, u16::from_be_bytes),
+    _ => String::from_utf8_lossy(bytes).into_owned(),
+  }
 }
 
 /// Writes a note and returns its new tag. Given the tag it's `expected` to have (empty for none),
@@ -489,6 +499,16 @@ mod tests {
       assert!(write("mine, edited", Some(&theirs)).await.unwrap().is_some());
       std::fs::remove_dir_all(&dir).unwrap();
     });
+  }
+
+  #[test]
+  fn reads_notes_another_app_saved() {
+    assert_eq!(decode("\u{feff}---\nid: a\n---\n# Café".as_bytes()), "---\nid: a\n---\n# Café");
+    // Latin-1, as an older editor saves it: read, not a stop.
+    assert_eq!(decode(b"# Caf\xe9"), "# Caf\u{fffd}");
+    let utf16 = |unit: fn(u16) -> [u8; 2], mark: [u8; 2]| mark.into_iter().chain("# Café".encode_utf16().flat_map(unit)).collect::<Vec<_>>();
+    assert_eq!(decode(&utf16(u16::to_le_bytes, [0xff, 0xfe])), "# Café");
+    assert_eq!(decode(&utf16(u16::to_be_bytes, [0xfe, 0xff])), "# Café");
   }
 
   #[test]
