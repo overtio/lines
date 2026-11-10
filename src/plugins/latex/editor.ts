@@ -17,7 +17,7 @@ import { insert, SECTIONS, type SlashCommand, slashMenu } from "../../lib/editor
 import { inOpenMath, MATH_COMMANDS, paragraphBefore, searchWords, TEXT_COMMANDS } from "../../lib/editor/texCommands";
 import { lazyLanguage } from "../../lib/editor/lazyLanguage";
 import { markupMode } from "../../lib/editor/markupMode";
-import { arrowsInto, focusChanged, focused, isEditing } from "../../lib/editor/util";
+import { arrowsInto, focused, isEditing, selectionInUse, selectionInUseChanged } from "../../lib/editor/util";
 import { pageBreakAt, pagedNote } from "../../lib/editor/pageBreaks";
 import { LATEX_PAGE_BREAK } from "../../lib/notes/pageBreak";
 import { TAG_NAME } from "../../lib/notes/tags";
@@ -353,8 +353,8 @@ function build(state: EditorState, visible?: { from: number; to: number }): Deco
   const mode = state.facet(markupMode);
   if (mode === "source") return Decoration.none;
   const { spans, title, macros, theorems, preamble, layout } = state.field(parsed);
-  // When the editor isn't focused, everything is drawn; while markup is all in sight, it all shows.
-  const selection = state.field(focused) ? state.selection.ranges : [];
+  // Out of the editor (and its find bar), everything is drawn; while markup is all in sight, it all shows.
+  const selection = selectionInUse(state) ? state.selection.ranges : [];
   const all = mode === "visible";
   const touches = (from: number, to: number) => all || selection.some((r) => r.from <= to && r.to >= from);
   const lineActive = (pos: number) => {
@@ -710,15 +710,15 @@ function build(state: EditorState, visible?: { from: number; to: number }): Deco
 const blocks = StateField.define<DecorationSet>({
   create: (state) => build(state),
   update(decos, tr) {
-    if (tr.docChanged || focusChanged(tr) || (tr.selection && (onLayout(tr.startState) || onLayout(tr.state)))) return build(tr.state);
+    if (tr.docChanged || selectionInUseChanged(tr) || (tr.selection && (onLayout(tr.startState) || onLayout(tr.state)))) return build(tr.state);
     return decos;
   },
   provide: (field) => EditorView.decorations.from(field),
 });
 
-/** Whether the cursor, or a selection, is on the lines of a span that changes the layout, or in a preamble, in a focused editor. */
+/** Whether the cursor, or a selection, is on the lines of a span that changes the layout, or in a preamble, while the selection is worked on. */
 function onLayout(state: EditorState) {
-  if (!state.field(focused)) return false;
+  if (!selectionInUse(state)) return false;
   const { doc, selection } = state;
   const { layout, preamble } = state.field(parsed);
   const on = (from: number, to: number) => selection.ranges.some((r) => r.from <= to && r.to >= from);
@@ -735,7 +735,7 @@ const inView = ViewPlugin.fromClass(
       this.decorations = build(view.state, view.viewport);
     }
     update(update: ViewUpdate) {
-      if (update.docChanged || update.viewportChanged || update.selectionSet || update.transactions.some(focusChanged)) {
+      if (update.docChanged || update.viewportChanged || update.selectionSet || update.transactions.some(selectionInUseChanged)) {
         this.decorations = build(update.state, update.view.viewport);
       }
     }

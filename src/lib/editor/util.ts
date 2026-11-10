@@ -1,4 +1,5 @@
 import { syntaxTree } from "@codemirror/language";
+import { searchPanelOpen } from "@codemirror/search";
 import { type EditorSelection, type EditorState, type Line, Prec, type Range, StateEffect, type StateEffectType, StateField, type Text, type Transaction } from "@codemirror/state";
 import { type Command, Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type WidgetType } from "@codemirror/view";
 import type { SyntaxNode, SyntaxNodeRef, Tree } from "@lezer/common";
@@ -78,18 +79,28 @@ export const focused = StateField.define<boolean>({
   provide: () => [EditorView.focusChangeEffect.of((_state, focusing) => setFocus.of(focusing)), focusAtStart(setFocus)],
 });
 
-export const focusChanged = (tr: Transaction) => tr.effects.some((effect) => effect.is(setFocus));
+/**
+ * Whether the selection is being worked on, so the Markdown it's on shows: in an editor that has
+ * focus, or while its find bar is open, the match it's on being the selection.
+ */
+export const selectionInUse = (state: EditorState) => !!state.field(focused, false) || searchPanelOpen(state);
+
+/** Whether a transaction starts or stops the selection being worked on. */
+export const selectionInUseChanged = (tr: Transaction) => selectionInUse(tr.startState) !== selectionInUse(tr.state);
+
+/** `selectionInUse` for what a view draws, in any editor: whether it has focus, or its find bar is open. */
+export const viewSelectionInUse = (view: EditorView) => view.hasFocus || searchPanelOpen(view.state);
 
 /** Whether the cursor, or either end of a selection, is in `from`–`to`. */
 const touches = (selection: EditorSelection, from: number, to: number) =>
   selection.ranges.some((range) => (range.anchor >= from && range.anchor <= to) || (range.head >= from && range.head <= to));
 
 /**
- * Whether `from`–`to` shows its Markdown: where the cursor, or either end of a selection, is in a
- * focused editor, or everywhere while Markdown is all in sight (markupMode.ts).
+ * Whether `from`–`to` shows its Markdown: where the cursor, or either end of a selection, is while
+ * it's being worked on (`selectionInUse`), or everywhere while Markdown is all in sight (markupMode.ts).
  */
 export function isEditing(state: EditorState, from: number, to: number) {
-  return state.facet(markupMode) === "visible" || (state.field(focused) && touches(state.selection, from, to));
+  return state.facet(markupMode) === "visible" || (selectionInUse(state) && touches(state.selection, from, to));
 }
 
 /**
@@ -151,8 +162,8 @@ const changed = new WeakMap<Transaction, Part[]>();
 
 /**
  * The parts of the note whose drawn blocks a transaction can change, each whole top-level blocks:
- * where the note or its parse changed, and, in a focused editor, around the cursor before and
- * after, which shows or hides a block's Markdown.
+ * where the note or its parse changed, and, while the selection is worked on (`selectionInUse`),
+ * around the cursor before and after, which shows or hides a block's Markdown.
  */
 function changedParts(tr: Transaction): Part[] {
   let parts = changed.get(tr);
@@ -174,10 +185,10 @@ function findParts(tr: Transaction): Part[] {
     const from = Math.min(blockBefore(tree, Math.min(parsed, tree.length)), tr.changes.mapPos(blockBefore(before, before.length)));
     parts.push({ from: doc.lineAt(notInBlock([tree], from)).from, to: doc.length });
   }
-  if (tr.docChanged || tr.selection || focusChanged(tr)) {
+  if (tr.docChanged || tr.selection || selectionInUseChanged(tr)) {
     const ends = (selection: EditorSelection, map: boolean) =>
       selection.ranges.flatMap((range) => [range.anchor, range.head]).map((pos) => (map ? tr.changes.mapPos(pos) : pos));
-    const cursors = [...(startState.field(focused) ? ends(startState.selection, true) : []), ...(state.field(focused) ? ends(state.selection, false) : [])];
+    const cursors = [...(selectionInUse(startState) ? ends(startState.selection, true) : []), ...(selectionInUse(state) ? ends(state.selection, false) : [])];
     for (const pos of cursors) {
       const line = doc.lineAt(pos);
       const block = tree.topNode.childAfter(line.from);

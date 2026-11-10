@@ -4,6 +4,7 @@ import { Decoration, type DecorationSet, EditorView, ViewPlugin, type ViewUpdate
 import { findSymbols } from "../notes/symbols";
 import { prefs } from "../prefs.svelte";
 import { frontMatterField } from "./objects";
+import { viewSelectionInUse } from "./util";
 
 /*
  * A Markdown note's `->` shown as →, `!=` as ≠ (notes/symbols.ts), in its text and its code as
@@ -53,8 +54,8 @@ function build(view: EditorView): DecorationSet {
   if (!text && !code) return Decoration.none;
   const { state } = view;
   const { doc } = state;
-  // When the editor isn't focused, every one shows.
-  const selection = view.hasFocus ? state.selection.ranges : [];
+  // Out of the editor (and its find bar), every one shows.
+  const selection = viewSelectionInUse(view) ? state.selection.ranges : [];
   const tree = syntaxTree(state);
   const front = state.field(frontMatterField, false);
   const frontEnd = front ? doc.line(front.lines).to : -1;

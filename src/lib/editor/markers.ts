@@ -4,7 +4,7 @@ import { Decoration, type DecorationSet, EditorView, keymap, layer, type LayerMa
 import { plugins } from "../plugins/registry.svelte";
 import type { LineMarker, MarkerColor, NoteLanguage } from "../plugins/types";
 import { markupMode } from "./markupMode";
-import { selectedLines } from "./util";
+import { selectedLines, viewSelectionInUse } from "./util";
 
 /*
  * Marks in a note's margin, as a code editor marks the lines changed: the note's own, written at the
@@ -229,7 +229,7 @@ export function lineMarkers(language: NoteLanguage): Extension {
         if (mode === "source" || mode === "visible") return Decoration.none;
         const written = writtenOn(view.state);
         const { doc } = view.state;
-        const selection = view.hasFocus ? view.state.selection.ranges : [];
+        const selection = viewSelectionInUse(view) ? view.state.selection.ranges : [];
         const builder = new RangeSetBuilder<Decoration>();
         for (const { from, to } of view.visibleRanges) {
           for (let pos = from; pos <= to; ) {
