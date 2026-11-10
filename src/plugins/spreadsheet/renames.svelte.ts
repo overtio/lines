@@ -127,7 +127,7 @@ const openNotes = () => [notes.selectedId, ui.side].filter((id) => id !== null);
 /** Takes up what's been renamed in the notes open since they were last looked at, then looks at those open now. */
 export function settle() {
   clearTimeout(timer);
-  void notes.flush();
+  notes.saveNow();
   const open = openNotes();
   let renamed = false;
   for (const [id, was] of seen) {

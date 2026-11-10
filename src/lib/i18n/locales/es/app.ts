@@ -38,6 +38,7 @@ export default {
   "app.listWidth": "Ancho de la lista de notas",
   "app.resizeHint": "Arrastra para cambiar el tamaño; doble clic para el ancho habitual",
   "app.loadError": "No se han podido cargar tus notas: {error}",
+  "app.saveError": "Tus cambios aún no se han guardado y lines lo sigue intentando. No lo cierres hasta que esto desaparezca. ({error})",
   "app.noSelection": "Selecciona una nota o crea una nueva.",
   "app.side": "Al lado: {title}",
   "app.sideSwap": "Intercambiar las dos notas",

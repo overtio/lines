@@ -44,6 +44,8 @@ export default {
   "app.resizeHint": "Drag to resize, double-click for the usual width",
   // {error} is the reason, as the system gives it (often in English).
   "app.loadError": "Your notes couldn’t be loaded: {error}",
+  // Over the note while saving fails, until it works again; {error} is the reason, as the system gives it.
+  "app.saveError": "Your changes aren’t saved yet, and lines keeps trying. Keep it open until this goes away. ({error})",
   // Where the note goes when none is open.
   "app.noSelection": "Select a note, or start a new one.",
   // A note open beside the selected one (Open to the Side), and its buttons.

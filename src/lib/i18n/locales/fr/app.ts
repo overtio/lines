@@ -38,6 +38,7 @@ export default {
   "app.listWidth": "Largeur de la liste des notes",
   "app.resizeHint": "Faites glisser pour redimensionner, double-cliquez pour la largeur habituelle",
   "app.loadError": "Impossible de charger vos notes : {error}",
+  "app.saveError": "Vos modifications ne sont pas encore enregistrées et lines continue d’essayer. Ne le fermez pas avant que ce message disparaisse. ({error})",
   "app.noSelection": "Sélectionnez une note ou créez-en une nouvelle.",
   "app.side": "À côté : {title}",
   "app.sideSwap": "Échanger les deux notes",
