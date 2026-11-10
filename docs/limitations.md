@@ -94,7 +94,7 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 
 - Diagrams are drawn by [Pele](https://pele.run), which reads Mermaid's syntax (up to Mermaid 12.1) but lays diagrams out its own way: they look different from GitHub's and other Mermaid apps'. Settings → Plugins → Diagrams (Mermaid) draws them with Mermaid itself instead.
 - Pele doesn't read Mermaid's themes or `themeVariables`, except the colors of charts' series: diagrams take the theme's colors. Colors set in a diagram (`style`, `classDef`) stay as written.
-- Links in diagrams (`click A href "…"`) aren't drawn as links, as one followed would open in lines' own window. HTML in labels shows as text, and icons (`fa:fa-car`) aren't drawn. ZenUML and Mermaid's other add-ons aren't drawn.
+- Links in diagrams (`click A href "…"`) aren't drawn as links, as one followed would open in lines' own window. In labels, HTML's bold, italic, underline, code, subscript and superscript (`<b>`, `<strong>`, `<i>`, `<em>`, `<u>`, `<code>`, `<sub>`, `<sup>`) and line breaks (`<br>`) are drawn; other tags are left out with their text kept (a link's, a `<span>`'s), and pictures aren't drawn. Icons (`fa:fa-car`) aren't drawn. ZenUML and Mermaid's other add-ons aren't drawn.
 - Math in a label (`$$x^2$$`) is drawn by the math plugin, KaTeX, and shows as written with it off.
 - Mermaid itself (about 5 MB) is still in the app, for the Diagrams (Mermaid) plugin, though it's off unless chosen. It can leave the download once plugins can be installed on their own ([#158](https://github.com/overtio/lines/issues/158)).
 
