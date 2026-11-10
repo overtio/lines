@@ -2,6 +2,26 @@
 
 What changed in each release of lines. Written by `bun scripts/release.mjs prepare` from the commits since the release before (docs/releasing.md).
 
+## [0.3.3](https://github.com/overtio/lines/compare/v0.3.2...v0.3.3) (2026-11-10)
+
+### Fixes
+
+- **sync:** with every synced note deleted elsewhere, Settings asks what to do instead of stopping ([#255](https://github.com/overtio/lines/pull/255))
+- **sync:** read note files another app saved with a byte order mark, or not in UTF-8, as notes ([#260](https://github.com/overtio/lines/pull/260))
+- **editor:** find shows the match it's on in a table, a link's address, a diagram or a mark ([#263](https://github.com/overtio/lines/pull/263))
+- **sync:** keep a pin, icon, trash or lock made while the note is edited elsewhere, with no copy ([#244](https://github.com/overtio/lines/pull/244))
+- **import:** a note's file from a sync folder comes back as that note, without lines' header as text ([#262](https://github.com/overtio/lines/pull/262))
+- **themes:** the Dot pointer and Comet trail follow your theme's accent as it changes, and contrast ([#261](https://github.com/overtio/lines/pull/261))
+- **latex:** a #include in a code listing or verbatim no longer tags the note ([#235](https://github.com/overtio/lines/pull/235))
+- **notes:** a note that fails to save is tried again, and a message says so until it's saved ([#252](https://github.com/overtio/lines/pull/252))
+- **i18n:** French says vous everywhere, as in the rest of lines, not tu in a few new messages ([#258](https://github.com/overtio/lines/pull/258))
+- **a11y:** closing the sidebar drawer with a click beside it gives focus back to what had it ([#257](https://github.com/overtio/lines/pull/257))
+- **notes:** tags and mentions in Hindi, Thai or Vietnamese are read whole, not cut at an accent ([#256](https://github.com/overtio/lines/pull/256))
+- **sync:** keep an edit another device saves while this one syncs, rather than write over it ([#232](https://github.com/overtio/lines/pull/232))
+- **editor:** tab and shift-tab on a numbered item number it and the items around it again ([#253](https://github.com/overtio/lines/pull/253))
+- **list:** ⌘⇧F puts focus in the search field from focus mode, and from an open note on a phone ([#251](https://github.com/overtio/lines/pull/251))
+- **sync:** a conflicted copy of a LaTeX document is titled in its \title, its preamble left intact ([#250](https://github.com/overtio/lines/pull/250))
+
 ## [0.3.2](https://github.com/overtio/lines/compare/v0.3.1...v0.3.2) (2026-11-09)
 
 ### Fixes
