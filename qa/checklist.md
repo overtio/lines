@@ -486,6 +486,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Sync runs after edits, every minute, on focus and when back online; the sidebar shows its status
 - [ ] An edit on two devices keeps the newer and adds a "(conflicted copy)"; a delete on one side deletes on the other; a conflicted copy of a note with properties keeps its type, and a spreadsheet's is marked on its title, not in a cell
 - [ ] Editing a note on two devices and syncing both at the same moment (Sync Now on each) keeps both edits, one as a "(conflicted copy)", in a bucket and in a cloud drive's folder
+- [ ] Pinning, an icon, moving to the trash or locking a note on one device while it's edited on another keeps both in one note, without a conflicted copy; a note locked on either stays locked, with the edit
 - [ ] [Web] With lines open in two tabs, sync runs in one pass at a time: a conflict makes one conflicted copy, not two; connecting or switching in one tab, the other follows; opening a second tab doesn't delete images the first could still bring back with ⌘Z
 - [ ] Images and files sync both ways, an empty file too [Desktop: through a cloud drive]
 - [ ] Folder sync keeps working offline; a bucket says Offline and catches up

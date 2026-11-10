@@ -67,6 +67,18 @@ function metaOf(note: Note): NoteMeta {
 
 const entryOf = (note: Note): Entry => ({ note, meta: metaOf(note) });
 
+/** A locked note, opened if its key is. */
+export async function opened(note: Note): Promise<Note> {
+  if (!note.locked) return note;
+  try {
+    const body = await noteKeys.open(note.locked);
+    if (body !== null) return { ...note, body, locked: { ...note.locked, open: true } };
+  } catch (error) {
+    console.error(`lines: couldn't open locked note ${note.id}`, error);
+  }
+  return note;
+}
+
 /** A note as it's stored and synced: a locked one without its Markdown. */
 export function stored(note: Note): Note {
   if (!note.locked) return note;
@@ -303,7 +315,7 @@ class NotesStore {
         if (isSite) this.selectedId = all[0]?.id ?? null;
       }
       for (const note of all) noteKeys.notice(note);
-      this.entries = await Promise.all(all.map(async (note) => entryOf(await this.#opened(note))));
+      this.entries = await Promise.all(all.map(async (note) => entryOf(await opened(note))));
       this.ready = true;
     } catch (error) {
       console.error("lines: couldn't load notes", error);
@@ -738,7 +750,7 @@ class NotesStore {
    */
   async applyRemote(incoming: Note) {
     noteKeys.notice(incoming);
-    const note = await this.#opened(incoming);
+    const note = await opened(incoming);
     if (this.#hasUnsaved(note.id)) return false;
     this.#put(entryOf(note));
     this.#changedOutside([note.id]);
@@ -764,7 +776,7 @@ class NotesStore {
     if (this.#hasUnsaved(id)) return;
     const found = await this.#storage.get(id);
     if (found) noteKeys.notice(found);
-    const note = found && (await this.#opened(found));
+    const note = found && (await opened(found));
     if (this.#hasUnsaved(id)) return;
     const current = this.get(id);
     if (!note) {
@@ -914,18 +926,6 @@ class NotesStore {
       this.entries = this.entries.map((e) => (e.note === note ? { note: sealed, meta: e.meta } : e));
     }
     return sealed;
-  }
-
-  /** A locked note, opened if its key is. */
-  async #opened(note: Note): Promise<Note> {
-    if (!note.locked) return note;
-    try {
-      const body = await noteKeys.open(note.locked);
-      if (body !== null) return { ...note, body, locked: { ...note.locked, open: true } };
-    } catch (error) {
-      console.error(`lines: couldn't open locked note ${note.id}`, error);
-    }
-    return note;
   }
 
   #discardIfBlank(id: string) {
