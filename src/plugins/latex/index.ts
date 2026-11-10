@@ -1,12 +1,12 @@
 import { t } from "../../lib/i18n/index.svelte";
 import { ATTACHMENT_PATH } from "../../lib/notes/attachments";
-import { addTagIn, extractTags } from "../../lib/notes/parse";
+import { addTagIn } from "../../lib/notes/parse";
 import { countLines } from "../../lib/notes/stats";
 import type { NoteMeta } from "../../lib/notes/types";
 import type { Plugin } from "../../lib/plugins/types";
 import { inVerbatim, latexEditing } from "./editor";
 import { printDocument } from "./print";
-import { latexContent, latexDocument, latexLine, latexLines, latexPlainText, markTitle } from "./text";
+import { latexContent, latexDocument, latexLine, latexLines, latexPlainText, latexTags, markTitle } from "./text";
 import { commentMarks } from "../../lib/editor/markers";
 
 /*
@@ -15,7 +15,7 @@ import { commentMarks } from "../../lib/editor/markers";
  * document that compiles.
  */
 
-/** A LaTeX note's title and excerpt come from its text as it reads; its tags can be in comments (`% #work`). */
+/** A LaTeX note's title and excerpt come from its text as it reads; its tags are in comments (`% #work`). */
 function meta(body: string): NoteMeta {
   const { text, title } = latexContent(body);
   // Lines are read only until there's a title and an excerpt, which in a long note are a few of them.
@@ -31,7 +31,7 @@ function meta(body: string): NoteMeta {
   return {
     title: lines[0] ?? "",
     excerpt: lines.slice(1).join(" ").slice(0, 200),
-    tags: extractTags(body),
+    tags: latexTags(body),
     hasOpenTodos: false,
     searchText: body.toLowerCase(),
     properties: [],
@@ -57,7 +57,7 @@ export const latex = (): Plugin => ({
         plainText: latexPlainText,
         stats: (body) => countLines(latexLines(latexContent(body).text)),
         // In a comment, which LaTeX ignores.
-        addTag: (body, tag) => addTagIn(body, tag, "%"),
+        addTag: (body, tag) => addTagIn(body, tag, "%", latexTags(body)),
         markTitle,
         newNote: ({ tag }) => (tag ? `\n\n% #${tag}` : ""),
         // A document that compiles on its own, its images' \includegraphics pointing into `attachments`.

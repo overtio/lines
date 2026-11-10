@@ -12,6 +12,8 @@ const { plainLine } = await import("../../src/lib/notes/stats");
 const { code } = await import("../../src/plugins/code");
 const { attachmentFileName, referencedAttachments } = await import("../../src/lib/notes/attachments");
 const { fileName } = await import("../../src/lib/notes/fileName");
+const { latexTags } = await import("../../src/plugins/latex/text");
+const { addTagIn } = await import("../../src/lib/notes/parse");
 
 const languages = code().contributes.languages as NoteLanguage[];
 const language = (name: string) => languages.find((each) => each.name === name)!;
@@ -65,6 +67,13 @@ test("a Hurl entry's title is the comment just above it, but not one of only tag
   expect(parseHurl("# Sign in\n# #work #api\nPOST https://api.example.com/login\nHTTP 200").requests[0].title).toBe("Sign in");
   expect(parseHurl("# \n# #work\nGET https://api.example.com/").requests[0].title).toBe("");
   expect(parseHurl("# #1 priority\nGET https://api.example.com/").requests[0].title).toBe("#1 priority");
+});
+
+test("a LaTeX note's tags are in its comments, not in verbatim or a code listing", () => {
+  const note = "Lab 3\n% #systems\n\n\\begin{lstlisting}[language=C]\n#include <stdio.h>\n% #not-a-tag\n\\end{lstlisting}\n\n\\begin{verbatim}\n#pragma once\n\\end{verbatim}\n\nA 100\\% #draft %#todo";
+  expect(latexTags(note)).toEqual(["systems", "todo"]);
+  // Added as a tag, though the listing has #include.
+  expect(addTagIn(note, "include", "%", latexTags(note))).toBe(`${note}\n\n% #include`);
 });
 
 test("a Hurl body whose ``` isn't closed yet runs to the end of the note", () => {

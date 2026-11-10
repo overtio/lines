@@ -93,7 +93,7 @@ A note that has a `\begin{document}` line is a whole document, as you'd download
 ## Title and tags
 
 - The title is the first line with text, as it reads: `\section{Trip to Rome}` is "Trip to Rome". It can be a plain line of text too. A whole document's title is its `\title`.
-- `#` isn't allowed in LaTeX text, so tags go in comments, where LaTeX ignores them: `% #travel`. A new note made under a tag starts with its tag that way when it's switched to LaTeX.
+- `#` isn't allowed in LaTeX text, so tags go in comments, where LaTeX ignores them: `% #travel`. Only those are tags: a `#include` in a code listing or verbatim isn't one. A new note made under a tag starts with its tag that way when it's switched to LaTeX.
 - LaTeX notes have no todos, so they don't show in the Todo view.
 
 ## Export

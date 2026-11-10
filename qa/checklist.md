@@ -591,7 +591,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] `/` shows the LaTeX commands (Section, Bullet list, Math, Table…), and each inserts its LaTeX; `/date` writes today in the app's language, as in a Markdown note
 - [ ] `\` opens the command menu in sections (Text, Environments); inside math, or after an unclosed `$`, it shows math commands instead; after `\\` and in verbatim it doesn't open
 - [ ] An environment picked after text starts on a new line; Tab moves through `\begin{tabular}{ll}`'s places
-- [ ] The list shows the title and excerpt without commands; `% #tag` tags the note; note info counts the words as they read
+- [ ] The list shows the title and excerpt without commands; `% #tag` tags the note, a `#include` in a `lstlisting` or `verbatim` doesn't; note info counts the words as they read
 - [ ] A LaTeX note syncs to another device as LaTeX (`format: latex` in its file)
 - [ ] Each of the LaTeX examples (Settings → Export and Import → Add LaTeX Examples) draws with no red math: the paper's preamble folds into its title and authors, clicking it shows the LaTeX; theorems are numbered (Lemma 1, Theorem 2), the proof ends with ∎, citations and references are chips, the bibliography is headed References
 - [ ] [Dev] Settings → Export and Import → Reset Notes to Defaults… asks in the panel (Delete and Reset, or Cancel), then leaves only the welcome note, the tour and the examples; it works in the Mac app; it's disabled while sync is on, and missing from release builds

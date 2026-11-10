@@ -42,12 +42,13 @@ const tagLine = (comment: string) =>
   new RegExp(`^${comment ? `${comment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[ \\t]*` : ""}(?:#${TAG_NAME}[ \\t]*)+$`, "u");
 
 /**
- * Adds `#tag` to a note's text, unless it has it: after the tags on its last line if that's a line
- * of tags, else on a line of its own at the end. In a language whose tags go in a comment, which it
- * then ignores (`% #work` in LaTeX), `comment` is what starts one.
+ * Adds `#tag` to a note's text, unless it has it (among `tags`, where its language reads them): after
+ * the tags on its last line if that's a line of tags, else on a line of its own at the end. In a
+ * language whose tags go in a comment, which it then ignores (`% #work` in LaTeX), `comment` is what
+ * starts one.
  */
-export function addTagIn(body: string, tag: string, comment = ""): string {
-  if (extractTags(body).includes(tag)) return body;
+export function addTagIn(body: string, tag: string, comment = "", tags = extractTags(body)): string {
+  if (tags.includes(tag)) return body;
   const text = body.replace(/\s+$/, "");
   const end = body.slice(text.length);
   const last = text.slice(text.lastIndexOf("\n") + 1);
