@@ -35,11 +35,12 @@
     return { bg, text, accent, font, round: style?.properties?.["radius-scale"] ?? "1" };
   }
 
-  /** The preset just chosen, and the look before it, to go back to. */
+  /** The preset just chosen, and the look to go back to: the one before the first chosen while Undo is offered. */
   let undo = $state<{ name: string; before: ReturnType<typeof presets.choose> } | null>(null);
 
   function choose(preset: Preset) {
-    undo = { name: preset.name, before: presets.choose(preset) };
+    const before = presets.choose(preset);
+    undo = { name: preset.name, before: undo?.before ?? before };
     speak(t("settings.presetChosen", { name: preset.name }));
   }
 

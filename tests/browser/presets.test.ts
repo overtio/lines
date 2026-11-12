@@ -9,7 +9,7 @@ afterEach(async () => {
 
 const presetsGroup = (settings: Awaited<ReturnType<App["settings"]>>) => settings.getByRole("radiogroup", { name: "Presets" });
 
-test("a preset brings its whole look, theme, shapes, cursor and pointer, and Undo takes it back; light or dark and text size stay", async () => {
+test("a preset brings its whole look, theme, shapes, cursor and pointer, and Undo goes back to the look before the first one tried; light or dark and text size stay", async () => {
   app = await openApp({ prefs: { textSize: 19, appearance: "dark" } });
   const settings = await app.settings("Presets");
   await presetsGroup(settings).getByRole("radio", { name: /^Pixel/ }).click();
@@ -18,6 +18,8 @@ test("a preset brings its whole look, theme, shapes, cursor and pointer, and Und
   expect(await app.root("pointer")).toBe("retro");
   expect(await app.page.evaluate(() => [window.testing.prefs.theme, window.testing.prefs.textSize, window.testing.prefs.appearance])).toEqual(["pixel", 19, "dark"]);
 
+  await presetsGroup(settings).getByRole("radio", { name: /^Void/ }).click();
+  expect(await app.root("style")).toBe("void");
   await settings.getByRole("button", { name: "Undo" }).click();
   expect(await app.root("style")).toBe("lines");
   expect(await app.root("caret-shape")).toBe("bar");
