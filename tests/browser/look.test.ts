@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { type App, choose, mod, noErrors, openApp, toggle } from "./app";
+import { type App, choose, engine, mod, noErrors, openApp, toggle } from "./app";
 import { png } from "./files";
 
 let app: App;
@@ -189,6 +189,104 @@ describe("themes", () => {
     await app.page.getByRole("menuitem", { name: /From Neon/ }).click();
     const theme = await app.page.evaluate(() => window.testing.plugins.theme(window.testing.prefs.theme));
     expect(theme.scheme).toBe("dark");
+  });
+});
+
+describe("the color picker", () => {
+  /** Settings → Typography's own heading color, its picker open. */
+  async function openPicker(headingCustomColor: string) {
+    app = await openApp({ prefs: { headingColor: "custom", headingCustomColor } });
+    await app.settings("Typography");
+    await app.page.getByRole("button", { name: "Choose a color for Your color" }).click();
+    const picker = app.page.getByRole("dialog", { name: "Choose a color for Your color" });
+    await picker.waitFor();
+    return picker;
+  }
+  const color = () => app.page.evaluate(() => window.testing.prefs.headingCustomColor);
+  /** Waits for focus to be on what has this name, as it moves there a moment after a picker opens or closes. */
+  const focusOn = (label: string) => app.page.waitForFunction((label) => document.activeElement?.getAttribute("aria-label") === label, label);
+
+  test("a swatch opens the theme's colors; one chosen by click or arrow key is the color at once, and Esc goes back to the swatch", async () => {
+    const picker = await openPicker("#3d7dd8");
+    // Opening it changes nothing; the color isn't one of the theme's, so none is chosen.
+    expect(await color()).toBe("#3d7dd8");
+    const swatches = picker.getByRole("radiogroup", { name: "Theme colors" });
+    expect((await swatches.getByRole("radio").evaluateAll((radios) => radios.map((radio) => radio.getAttribute("aria-label")))).slice(0, 4)).toEqual(["Accent", "Red", "Orange", "Yellow"]);
+    expect(await swatches.getByRole("radio", { checked: true }).count()).toBe(0);
+    await focusOn("Accent");
+
+    await swatches.getByRole("radio", { name: "Red", exact: true }).click();
+    expect(await color()).toBe("#d53c40");
+    await app.page.keyboard.press("ArrowRight");
+    expect(await color()).toBe("#c46800");
+    expect(await swatches.getByRole("radio", { name: "Orange", exact: true }).getAttribute("aria-checked")).toBe("true");
+    expect(await picker.getByRole("textbox", { name: "Your color" }).inputValue()).toBe("#c46800");
+
+    // An eyedropper only where the browser has one (not WebKit); nothing to add to, as no palette is yours yet.
+    const eyedropper = await app.page.evaluate(() => "EyeDropper" in window);
+    expect(await picker.getByRole("button", { name: "Pick a color from the screen" }).count()).toBe(eyedropper ? 1 : 0);
+    if (engine() === "webkit") expect(eyedropper).toBe(false);
+    expect(await picker.getByRole("button", { name: "Add to palette" }).count()).toBe(0);
+
+    await app.page.keyboard.press("Escape");
+    await picker.waitFor({ state: "detached" });
+    await focusOn("Choose a color for Your color");
+    expect(await app.page.getByRole("dialog").getByRole("heading", { name: "Typography" }).isVisible()).toBe(true);
+    // Enter opens it again, on the color chosen.
+    await app.page.keyboard.press("Enter");
+    await picker.waitFor();
+    await focusOn("Orange");
+  });
+
+  test("the saturation and brightness area and the hue, dragged or keyed, change the color as they go; a color typed moves them", async () => {
+    const picker = await openPicker("#336699");
+    const area = picker.getByRole("slider", { name: "Saturation and brightness" });
+    const hue = picker.getByRole("slider", { name: "Hue" });
+    expect(await area.getAttribute("aria-valuetext")).toBe("Saturation 67%, brightness 60%, #336699");
+    expect(await hue.getAttribute("aria-valuetext")).toBe("210°, #336699");
+
+    await area.focus();
+    await app.page.keyboard.press("ArrowUp");
+    expect(await color()).toBe("#33679c");
+    await app.page.keyboard.press("Shift+ArrowLeft");
+    expect(await area.getAttribute("aria-valuetext")).toBe("Saturation 57%, brightness 61%, #436f9c");
+    await hue.focus();
+    await app.page.keyboard.press("Shift+ArrowRight");
+    expect(await color()).toBe("#43609c");
+    await app.page.keyboard.press("ArrowRight");
+    expect(await hue.getAttribute("aria-valuetext")).toBe("221°, #435f9c");
+
+    // Dragged past its corner, the area stops at its edge: the hue at its fullest, then black.
+    const box = (await area.locator("..").boundingBox())!;
+    await app.page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await app.page.mouse.down();
+    await app.page.mouse.move(box.x + box.width + 40, box.y - 40, { steps: 4 });
+    expect(await color()).toBe("#0051ff");
+    await app.page.mouse.move(box.x - 40, box.y + box.height + 40, { steps: 4 });
+    expect(await color()).toBe("#000000");
+    await app.page.mouse.up();
+    await focusOn("Saturation and brightness");
+    // Black has no hue, but the slider keeps the one it had.
+    expect(await hue.getAttribute("aria-valuetext")).toBe("221°, #000000");
+
+    const text = picker.getByRole("textbox", { name: "Your color" });
+    await text.fill("rgb(0 128 0)");
+    expect(await color()).toBe("rgb(0 128 0)");
+    expect(await hue.getAttribute("aria-valuetext")).toBe("120°, #008000");
+    expect(await area.getAttribute("aria-valuetext")).toBe("Saturation 100%, brightness 50%, #008000");
+  });
+
+  test("in your theme's editor, it offers the colors of the theme being changed", async () => {
+    app = await openApp();
+    const settings = await app.settings("Theme");
+    await settings.getByRole("button", { name: "New" }).click();
+    await app.page.getByRole("menuitem", { name: /From Lines/ }).click();
+    await settings.getByRole("textbox", { name: "Accent", exact: true }).fill("#7c3aed");
+    await settings.getByRole("button", { name: "Choose a color for Text", exact: true }).click();
+    const picker = app.page.getByRole("dialog", { name: "Choose a color for Text" });
+    await picker.getByRole("radio", { name: "Accent", exact: true }).click();
+    const theme = await app.page.evaluate(() => window.testing.customThemes.get(window.testing.prefs.theme));
+    expect(theme?.light?.text).toBe("#7c3aed");
   });
 });
 

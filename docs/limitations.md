@@ -361,7 +361,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Increased contrast is worked out only from colors lines can read itself (hex and `rgb()`); a theme written with `oklch()` or `var()` keeps those colors with it.
 - GTK themes are read only as named colors (`@define-color`, or libadwaita's custom properties); colors made with GTK's functions (`mix()`, `shade()`, `alpha()`) are left out.
 - Monochrome and Invert change lines' colors, not pictures or drawings' pen colors; a color a theme writes in a way lines can't read itself (`oklch()`) is left as it is. Inverted, menus and cards (lighter than the note in a dark theme) are darker than the note, as in a negative.
-- The color picker is the system's (`<input type="color">`), which picks colors without transparency.
+- The color picker picks colors without transparency (one typed as text keeps its own), and its eyedropper, which picks a color from anywhere on the screen, is only in Chrome and Edge: Safari, Firefox and the Mac app have none to offer. Until themes have palettes, the colors it offers first are the theme's as it draws them, so with Monochrome or Invert on they're the greys or turned colors shown.
 - Dark panes: the theme's editor (Your themes) previews each scheme as it is, without them; on a phone, the strip under the status bar keeps the note's color over a dark note list.
 
 ## Plugins

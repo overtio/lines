@@ -371,6 +371,18 @@ const SCENES = [
     settings: section,
     shoot: "dialog",
   })),
+  ...["lines", "classic", "pixel", "neon"].map((style) => ({
+    id: `color-picker-${style}`,
+    title: `The color picker, in ${style[0].toUpperCase()}${style.slice(1)}`,
+    look: "Under Your color's swatch, in the style's own menu look: the theme's colors as round swatches in rows of eight, evenly spaced, the accent first and ringed as chosen; under them the square of saturation and brightness in the accent's hue, its thumb a white ring on the accent; the rainbow of hues, its thumb at the accent's hue; the color's hex in a field, the eyedropper beside it (Chromium only). Nothing cut off or crowded.",
+    prefs: { style, theme: style, headingColor: "custom" },
+    act: async (page) => {
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      await page.getByRole("dialog").getByRole("navigation").getByText("Typography", { exact: true }).click();
+      await page.getByRole("button", { name: "Choose a color for Your color" }).click();
+      await page.getByRole("dialog", { name: "Choose a color for Your color" }).getByRole("radio", { name: "Accent", exact: true }).click();
+    },
+  })),
   { id: "phone-dark-list", title: "Phone: a dark note list", look: "The list dark, its rows readable; the top of the screen not a light strip over it (a known gap, docs/limitations.md).", prefs: { darkPanes: "list" }, width: 390, height: 780, schemes: ["light"] },
   {
     id: "phone-typing",

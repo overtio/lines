@@ -190,3 +190,33 @@ export function inverted(color: Rgb): Rgb {
   }
   return { ...fromLch({ ...lch, l: (low + high) / 2 }), a: color.a };
 }
+
+/** Hue in degrees (0 to 360), saturation and value (0 to 1): how a color picker lays colors out. */
+export interface Hsv {
+  h: number;
+  s: number;
+  v: number;
+}
+
+/** A color as hue, saturation and value; a grey's hue is 0. */
+export function toHsv({ r, g, b }: Rgb): Hsv {
+  const [red, green, blue] = [r, g, b].map((channel) => Math.min(1, Math.max(0, channel / 255)));
+  const max = Math.max(red, green, blue);
+  const range = max - Math.min(red, green, blue);
+  let h = 0;
+  if (range) {
+    if (max === red) h = ((green - blue) / range + 6) % 6;
+    else if (max === green) h = (blue - red) / range + 2;
+    else h = (red - green) / range + 4;
+  }
+  return { h: h * 60, s: max ? range / max : 0, v: max };
+}
+
+/** A hue, saturation and value as an opaque color. */
+export function fromHsv({ h, s, v }: Hsv): Rgb {
+  const channel = (n: number) => {
+    const k = (n + h / 60) % 6;
+    return 255 * (v - v * s * Math.max(0, Math.min(k, 4 - k, 1)));
+  };
+  return { r: channel(5), g: channel(3), b: channel(1), a: 1 };
+}

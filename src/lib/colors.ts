@@ -1,6 +1,6 @@
 /*
  * The theme's colors as plain hex, for what draws with colors of its own rather than CSS: Mermaid's
- * diagrams, 3D models.
+ * diagrams, 3D models, and the color picker, which works on numbers.
  */
 
 let probe: HTMLElement | undefined;
