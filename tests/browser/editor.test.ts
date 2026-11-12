@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { type App, choose, engine, mod, noErrors, openApp, toggle } from "./app";
+import { type App, choose, clickMod, engine, mod, noErrors, openApp, toggle } from "./app";
 
 let app: App;
 beforeEach(async () => {
@@ -225,10 +225,13 @@ test("a click into a note that isn't focused keeps it where it was, though focus
     const view = window.testing.editor()!;
     const scroller = view.scrollDOM;
     view.contentDOM.blur();
-    scroller.scrollTop = 1500;
-    // Once the editor has drawn the lines scrolled to, which takes a frame or more on a slow machine.
+    // Scrolled down the way the editor scrolls itself, to a line, so it draws the lines there (setting
+    // scrollTop, it can take a while to).
+    const { scrollIntoView } = view.constructor as unknown as { scrollIntoView: (pos: number, options: { y: "start" }) => never };
+    view.dispatch({ effects: scrollIntoView(view.state.doc.line(120).from, { y: "start" }) });
     const below = () => [...view.contentDOM.querySelectorAll<HTMLElement>(".cm-line")].find((each) => each.getBoundingClientRect().top > scroller.getBoundingClientRect().top + 100);
-    for (let frames = 0; !below() && frames < 60; frames++) await new Promise(requestAnimationFrame);
+    for (let frames = 0; (scroller.scrollTop < 1000 || !below()) && frames < 60; frames++) await new Promise(requestAnimationFrame);
+    const scrolled = scroller.scrollTop;
     const line = below();
     if (!line) {
       const tops = [...view.contentDOM.querySelectorAll<HTMLElement>(".cm-line")].map((each) => Math.round(each.getBoundingClientRect().top));
@@ -248,7 +251,7 @@ test("a click into a note that isn't focused keeps it where it was, though focus
     scroller.dispatchEvent(new WheelEvent("wheel", { deltaY: 100 }));
     scroller.scrollTop = 900;
     await new Promise((resolve) => setTimeout(resolve, 50));
-    return { kept, focused: view.hasFocus, after: scroller.scrollTop, cursor: view.state.selection.main.empty, line: view.state.doc.lineAt(view.state.selection.main.head).text, clicked: line.textContent };
+    return { kept, scrolled, focused: view.hasFocus, after: scroller.scrollTop, cursor: view.state.selection.main.empty, line: view.state.doc.lineAt(view.state.selection.main.head).text, clicked: line.textContent };
   });
   if ("missing" in result) throw new Error(`No line drawn below the top after scrolling: ${JSON.stringify(result.missing)}`);
   expect(result.focused).toBe(true);
@@ -256,7 +259,8 @@ test("a click into a note that isn't focused keeps it where it was, though focus
   expect(result.cursor).toBe(true);
   expect(result.line).toBe(result.clicked);
   // Where it was, but for the editor measuring its lines again (a few pixels), not where focusing jumped it.
-  expect(Math.abs(result.kept - 1500)).toBeLessThan(40);
+  expect(result.scrolled).toBeGreaterThan(1000);
+  expect(Math.abs(result.kept - result.scrolled)).toBeLessThan(40);
   expect(result.after).toBe(900);
 });
 
@@ -822,7 +826,7 @@ describe("clicking a tag in a note", () => {
     expect(await clickTag(app)).toBe(true);
     await app.close();
     app = await openApp();
-    expect(await clickTag(app, [mod()])).toBe(false);
+    expect(await clickTag(app, [await clickMod(app.page)])).toBe(false);
   });
 
   test("does so too with settings saved before it did, unless they were changed", async () => {

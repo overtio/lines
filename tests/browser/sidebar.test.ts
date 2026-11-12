@@ -11,20 +11,31 @@ afterEach(async () => {
 const rows = (app: App) => app.page.getByRole("navigation", { name: "Library" }).locator(".row").allInnerTexts();
 
 /**
- * Right-clicks the sidebar's own empty space, below its rows, found where nothing's over it: rows are
- * as tall as the fonts make them, and where they fill the list, its space is at the end, scrolled to.
+ * Right-clicks the sidebar's own empty space, below its rows, found where no row or control is: rows
+ * are as tall as the fonts make them, and where they fill the list, its space is at the end, scrolled
+ * to. Tried again for a moment while the sidebar doesn't take the pointer yet (just after opening).
  */
 async function rightClickEmpty(app: App) {
   const list = app.page.getByRole("navigation", { name: "Library" }).locator(".overflow-y-auto");
-  const point = await list.evaluate(async (element) => {
-    element.scrollTop = element.scrollHeight;
-    await new Promise(requestAnimationFrame);
-    const box = element.getBoundingClientRect();
-    for (let y = box.bottom - 2; y > box.top; y -= 4) {
-      for (const x of [box.left + 12, box.left + box.width / 2]) if (document.elementFromPoint(x, y) === element) return { x, y };
-    }
-    return null;
-  });
+  const find = () =>
+    list.evaluate(async (element) => {
+      element.scrollTop = element.scrollHeight;
+      await new Promise(requestAnimationFrame);
+      const box = element.getBoundingClientRect();
+      for (let y = box.bottom - 2; y > box.top; y -= 4) {
+        for (const x of [box.left + 12, box.left + box.width / 2]) {
+          // The list, or something in it that isn't a row or a control: the press reaches the list's menu.
+          const hit = document.elementFromPoint(x, y);
+          if (hit && element.contains(hit) && !hit.closest("button, [role='button'], .row, input, a, [contenteditable]")) return { x, y };
+        }
+      }
+      return null;
+    });
+  let point = await find();
+  for (let tries = 0; !point && tries < 40; tries++) {
+    await app.page.waitForTimeout(50);
+    point = await find();
+  }
   expect(point).not.toBeNull();
   await app.page.mouse.click(point!.x, point!.y, { button: "right" });
 }
