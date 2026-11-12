@@ -134,7 +134,7 @@ export function moveBlock(state: EditorState, block: Block, k: number): Transact
   }
   const text = lines.join("\n");
 
-  // Take the lines out; between two blank lines, one of the blanks goes too.
+  // Take the lines out; between two blank lines, or a blank line and the note's start, one of the blanks goes too.
   const first = doc.line(block.first);
   const last = doc.line(block.last);
   let from = first.from;
@@ -142,14 +142,15 @@ export function moveBlock(state: EditorState, block: Block, k: number): Transact
   if (block.last === doc.lines) {
     from = Math.max(0, first.from - 1);
     to = last.to;
-  } else if (blank(block.first - 1) && blank(block.last + 1) && block.last + 1 < doc.lines) {
+  } else if ((block.first === 1 || blank(block.first - 1)) && blank(block.last + 1) && block.last + 1 < doc.lines) {
     to = doc.line(block.last + 1).to + 1;
   }
 
   // Tables and cards need blank lines around them: text right after a table would be a row of it.
+  // So does a line of text after a list, which would be part of its last item.
   const separate = block.kind === "card" || block.node?.name === "Table";
-  const padAbove =
-    k > 1 && !blank(k - 1) && (separate || blockEdge(state, doc.line(k - 1).to, ["Table", "Card"], true));
+  const after = block.kind === "line" ? ["Table", "Card", "BulletList", "OrderedList"] : ["Table", "Card"];
+  const padAbove = k > 1 && !blank(k - 1) && (separate || blockEdge(state, doc.line(k - 1).to, after, true));
   const padBelow =
     k <= doc.lines && !blank(k) && (separate || blockEdge(state, doc.line(k).from, ["Table", "Card"], false));
   let at: number;

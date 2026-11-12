@@ -83,7 +83,7 @@ test("Drag to move lines, off, shows no grip", async () => {
 });
 
 test("a line dragged by its grip to below another has its grip by it where it went, even moved over while it slides there", async () => {
-  await app.open("One\n\nTwo\n\nThree");
+  await app.open("One\nTwo\n\nThree");
   const page = app.page;
   const lines = page.locator(".editor-pane .cm-line");
   await lines.first().hover();
@@ -106,6 +106,21 @@ test("a line dragged by its grip to below another has its grip by it where it we
   await handle.waitFor({ state: "visible" });
   const [at, line] = [(await handle.boundingBox())!, (await moved.boundingBox())!];
   expect(Math.abs(at.y + at.height / 2 - (line.y + line.height / 2))).toBeLessThan(6);
+});
+
+test("a line dragged from the top to below a list stays apart from it, leaving no blank line at the top", async () => {
+  await app.open("Text\n\n- a\n  - b\n  - c");
+  const page = app.page;
+  const lines = page.locator(".editor-pane .cm-line");
+  await lines.first().hover();
+  const grip = (await page.locator(".editor-pane .cm-drag-handle").boundingBox())!;
+  const last = (await lines.last().boundingBox())!;
+  await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(grip.x + grip.width / 2, last.y + last.height - 2, { steps: 10 });
+  await page.mouse.up();
+  await page.waitForFunction(() => window.testing.text()?.endsWith("Text"));
+  expect(await app.text()).toBe("- a\n  - b\n  - c\n\nText");
 });
 
 test("a file dragged over a note shows a line where it'd go, above or below the line it's over, and goes there; not in code", async () => {
