@@ -1,17 +1,18 @@
 <script lang="ts">
-  // Changing a theme of your own: its name, each of its colors for light and dark with a preview,
-  // making the scheme it lacks, sharing it as a file, and deleting it.
+  // Changing a theme of your own: its name, each of its colors for light and dark with a preview
+  // (into its palette), making the scheme it lacks, sharing it as a file, and deleting it.
   import { onMount, tick } from "svelte";
   import { speak } from "../../a11y";
   import { PALETTE } from "../../palette";
   import { t } from "../../i18n/index.svelte";
   import { fileName } from "../../notes/fileName";
   import { reducedMotion } from "../../platform";
+  import { plugins } from "../../plugins/registry.svelte";
   import { prefs } from "../../prefs.svelte";
   import type { ThemeColors } from "../../plugins/types";
   import { customThemes } from "../../themes/custom.svelte";
   import { SCHEMES, THEME_FILE_EXTENSION, writeThemeFile } from "../../themes/file";
-  import { BASE_COLORS, otherScheme, type Scheme } from "../../themes/palette";
+  import { assigned, otherScheme, paletteOf, resolveTheme, type Scheme } from "../../themes/palette";
   import Button from "../ui/Button.svelte";
   import CardBlock from "./CardBlock.svelte";
   import { colorName } from "./colorNames";
@@ -103,7 +104,8 @@
       ],
     },
   ];
-  const needed = new Set<string>(BASE_COLORS);
+  /** What every theme has; the rest can be left for lines to work out from these (Auto). */
+  const needed = new Set(["bg", "text"]);
   const schemeOptions = [
     { id: "light" as const, label: t("settings.appearanceLight"), icon: "sun" as const },
     { id: "dark" as const, label: t("settings.appearanceDark"), icon: "moon" as const },
@@ -115,11 +117,15 @@
   /** The scheme chosen to change; until one is, the one showing. */
   let chosen = $state<Scheme | null>(null);
   const editing = $derived(schemes.length === 1 ? schemes[0] : (chosen ?? (prefs.dark ? "dark" : "light")));
-  const colors: Partial<ThemeColors> = $derived(theme?.[editing] ?? {});
-  /** The colors on the preview and the swatches, which work out the rest from them as app.css does. */
+  /** The palette the scheme being changed is drawn in. */
+  const palette = $derived(theme && plugins.palette(paletteOf(theme, editing)));
+  /** Each part's color as the theme gives it: its palette's, or one made from its others (`var(--accent)`). */
+  const colors: Partial<ThemeColors> = $derived(theme ? { ...theme.properties?.[editing], ...assigned(palette, theme[editing]) } : {});
+  /** The theme's colors, as lines works them out from its palettes, on the preview and the swatches, which app.css works the rest out from. */
+  const shown = $derived(theme && resolveTheme(theme, (each) => plugins.palette(each))[editing]);
   const frame = $derived({
     "data-scheme": editing,
-    style: Object.entries(colors)
+    style: Object.entries(shown ?? {})
       .map(([key, value]) => `--${key}: ${value}`)
       .join("; "),
   });
@@ -129,13 +135,13 @@
     const [only] = schemes;
     if (!theme) return;
     const missing = only === "dark" ? "light" : "dark";
-    customThemes.addScheme(id, missing, otherScheme(theme[only]!));
+    customThemes.addScheme(id, missing, otherScheme(resolveTheme(theme, (each) => plugins.palette(each))[only]), palette);
     chosen = missing;
     speak(t(missing === "light" ? "settings.themeMadeLight" : "settings.themeMadeDark"));
   }
 
-  /** The theme as a file to share, made when it's shared. */
-  const file = () => ({ name: `${fileName(theme!.name)}${THEME_FILE_EXTENSION}`, text: writeThemeFile($state.snapshot(theme!)) });
+  /** The theme as a file to share, with its palettes, made when it's shared. */
+  const file = () => ({ name: `${fileName(theme!.name)}${THEME_FILE_EXTENSION}`, text: writeThemeFile(customThemes.file(id)!) });
 
   /** Asking first, in the page: the Mac app's web view has no confirm(). */
   let confirming = $state(false);
@@ -208,7 +214,7 @@
             swatch="var(--{key})"
             {frame}
             optional={!needed.has(key)}
-            onchange={(value) => customThemes.setColor(id, editing, key, value)}
+            onchange={(value) => customThemes.setColor(id, editing, key, value, palette)}
           />
         </FieldRow>
       {/each}

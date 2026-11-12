@@ -3,18 +3,23 @@ import { stubApp } from "./stubs";
 import { readFileSync } from "node:fs";
 import { contrast, over, parse, toLch } from "../../src/lib/themes/color";
 import { MORE_CONTRAST } from "../../src/lib/themes/css";
-import { BASE_COLORS } from "../../src/lib/themes/palette";
-import type { AppStyle, Mascot, MascotPose, Theme, ThemeColors } from "../../src/lib/plugins/types";
+import { BASE_COLORS, paletteOf, resolveTheme } from "../../src/lib/themes/palette";
+import type { AppStyle, Contributions, Mascot, MascotPose, Theme, ThemeColors } from "../../src/lib/plugins/types";
 
 // Names are looked up in the app's language; here they're their keys.
 stubApp();
+const { contributions } = await import("../../src/plugins/themes/builtIn");
 const { themes } = await import("../../src/plugins/themes/themes");
 const { styles } = await import("../../src/plugins/styles");
 const { mascots } = await import("../../src/plugins/mascots");
 
-const all = themes();
+/** A plugin's themes as lines shows them, worked out from their palettes. */
+const shown = ({ themes = [], palettes = [] }: Contributions) => themes.map((theme) => resolveTheme(theme, (id) => palettes.find((palette) => palette.id === id)));
+const own = contributions(themes());
+const styled = styles().contributes;
+const all = shown(own);
 /** lines' themes and those the styles bring, and the schemes each shows: the one it has, or both. */
-const withStyles = [...all, ...(styles().contributes.themes ?? [])];
+const withStyles = [...all, ...shown(styled)];
 const shownSchemes = (theme: Theme) => (theme.scheme ? [theme.scheme] : (["light", "dark"] as const));
 const ratio = (colors: Partial<ThemeColors>, text: string, surface: string) => {
   const background = parse(colors[surface])!;
@@ -25,6 +30,27 @@ describe("built-in themes", () => {
   test("each has an id of its own, and every base color in light and dark", () => {
     expect(new Set(all.map((theme) => theme.id)).size).toBe(all.length);
     for (const theme of all) for (const scheme of ["light", "dark"] as const) for (const key of BASE_COLORS) expect(theme[scheme][key], `${theme.id} ${scheme} ${key}`).toBeString();
+  });
+
+  test("each is drawn in palettes of its own, of colors lines can shade, and every part in its scheme's", () => {
+    const palettes = [...own.palettes, ...styled.palettes!];
+    expect(new Set(palettes.map((palette) => palette.id)).size).toBe(palettes.length);
+    for (const palette of palettes) {
+      expect(new Set(palette.colors.map((color) => color.id)).size, `${palette.id}'s colors' ids`).toBe(palette.colors.length);
+      for (const { id, color } of palette.colors) expect(parse(color), `${palette.id} ${id}`).toBeDefined();
+    }
+    for (const theme of [...own.themes, ...styled.themes!]) {
+      for (const scheme of ["light", "dark"] as const) {
+        const palette = palettes.find((each) => each.id === paletteOf(theme, scheme));
+        expect(palette, `${theme.id} ${scheme}`).toBeDefined();
+        const ids = new Set(palette!.colors.map((color) => color.id));
+        for (const [part, id] of Object.entries(theme[scheme] ?? {})) expect(ids.has(id), `${theme.id} ${scheme} ${part}: ${id}`).toBe(true);
+      }
+    }
+  });
+
+  test("palettes have 32 colors at most, as Nord's and Gruvbox's: a theme's light and dark have one each where they share few", () => {
+    for (const palette of [...own.palettes, ...styled.palettes!]) expect(palette.colors.length, palette.id).toBeLessThanOrEqual(32);
   });
 
   // Grey and faint text are as each theme has them; Increased contrast is what makes them AA (below).
@@ -115,7 +141,9 @@ describe("themes' own highlighter, status and callout colors", () => {
     for (const theme of withStyles) {
       for (const scheme of shownSchemes(theme)) {
         for (const colors of [theme[scheme], { ...theme[scheme], ...theme.moreContrast?.[scheme] }]) {
-          if (!colors["on-accent"]) continue;
+          // app.css's own, white (the background in dark), which a few keep where it's short of it, as they always have.
+          const own = colors === theme[scheme] && contrast(parse(colors["on-accent"])!, parse(scheme === "dark" ? colors.bg : "#ffffff")!) === 1;
+          if (own) continue;
           const measured = ratio(colors, "on-accent", "accent");
           if (measured < 4.45) misses.push(`${theme.id} ${scheme}: ${colors["on-accent"]} on ${colors.accent} ${measured.toFixed(2)} < 4.5`);
         }

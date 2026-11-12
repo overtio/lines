@@ -1,15 +1,14 @@
 import type { Theme } from "../plugins/types";
 import { announce, onAnnounce } from "../windows/channel";
-import { moreContrastOf } from "./custom.svelte";
 import { isColor, SCHEMES } from "./file";
-import type { Scheme } from "./palette";
+import { moreContrast, type Scheme } from "./palette";
 
 /*
  * Picking colors: with it on (Settings → Theme), right-clicking anything in lines changes the
  * colors it's drawn in (components/ColorPicking.svelte). What's changed shows at once, over the
- * theme it was changed in, but isn't the theme's until it's saved in Settings → Theme, as a theme
- * of your own or into yours; each theme keeps its own changes until then, on this device and in
- * every window.
+ * theme it was changed in, but isn't the theme's until it's saved in Settings → Theme, into a theme
+ * of yours or a copy made yours, its colors into that theme's palette (custom.svelte.ts); each
+ * theme keeps its own changes until then, on this device and in every window.
  */
 
 const KEY = "lines.themeDrafts";
@@ -116,8 +115,8 @@ class ThemeDrafts {
       light,
       dark,
       moreContrast: {
-        light: changed("light") ? moreContrastOf(light) : theme.moreContrast?.light,
-        dark: changed("dark") ? moreContrastOf(dark) : theme.moreContrast?.dark,
+        light: changed("light") ? moreContrast(light) : theme.moreContrast?.light,
+        dark: changed("dark") ? moreContrast(dark) : theme.moreContrast?.dark,
       },
     };
   };

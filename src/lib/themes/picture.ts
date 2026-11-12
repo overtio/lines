@@ -1,3 +1,4 @@
+import type { SchemeNames } from "./file";
 import { groups, points, themeFromSwatches } from "./swatches";
 
 /*
@@ -24,11 +25,11 @@ async function pixels(picture: Blob) {
   return context.getImageData(0, 0, width, height).data;
 }
 
-/** A theme, light and dark, from a picture's pixels (RGBA bytes), called `name`. Throws if they can't make one. */
-export const themeFromPixels = (data: ArrayLike<number>, name: string) => themeFromSwatches(groups(points(data), GROUPS), name);
+/** A theme, light and dark, from a picture's pixels (RGBA bytes), called `name` (its palettes as `names` says, if it has one each). Throws if they can't make one. */
+export const themeFromPixels = (data: ArrayLike<number>, name: string, names?: SchemeNames) => themeFromSwatches(groups(points(data), GROUPS), name, names);
 
 /** A theme, light and dark, from `picture`'s colors, called `name`. Throws if the picture can't be read. */
-export const themeFromPicture = async (picture: Blob, name: string) => themeFromPixels(await pixels(picture), name);
+export const themeFromPicture = async (picture: Blob, name: string, names?: SchemeNames) => themeFromPixels(await pixels(picture), name, names);
 
 /** For a picture called "Lake at dawn.jpg": "Lake at dawn". */
 export const pictureName = (fileName: string) => fileName.replace(/\.[a-z0-9]+$/i, "").replace(/[-_]+/g, " ").trim();

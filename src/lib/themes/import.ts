@@ -1,20 +1,21 @@
 import { plugins } from "../plugins/registry.svelte";
 import type { ImportedTheme, ThemeColors } from "../plugins/types";
 import { parse } from "./color";
-import { readThemeFile, type ThemeFile } from "./file";
-import { type Scheme, themeColors } from "./palette";
+import { fromColors, readThemeFile, type ThemeFile } from "./file";
+import { schemePalettes } from "./names";
+import { importedColors, type Scheme } from "./palette";
 
 /*
  * Reading themes from a file: lines' own theme files, or another app's in any format a plugin reads
- * (VS Code's, Base16's, a terminal's…). A file with a light and a dark version of a theme makes one
- * theme with both.
+ * (VS Code's, Base16's, a terminal's…), each a palette of the colors it has and a theme drawn in
+ * them. A file with a light and a dark version of a theme makes one theme with both.
  */
 
 interface Variant {
   name: string;
   author?: string;
   scheme: Scheme;
-  colors: ThemeColors;
+  colors: Partial<ThemeColors>;
 }
 
 /** A theme's name without the scheme in it: "One" for "One Dark", "Solarized" for "Solarized (light)". */
@@ -33,17 +34,8 @@ function shared(a: string, b: string) {
 
 /** Light and dark versions of a theme as one theme with both; the rest each as their own. */
 function pair(variants: Variant[]): ThemeFile[] {
-  const single = (variant: Variant): ThemeFile => ({
-    name: variant.name,
-    author: variant.author,
-    [variant.scheme]: variant.colors,
-  });
-  const both = (light: Variant, dark: Variant, name: string): ThemeFile => ({
-    name,
-    author: light.author ?? dark.author,
-    light: light.colors,
-    dark: dark.colors,
-  });
+  const single = (variant: Variant) => fromColors(variant.name, variant.author, { [variant.scheme]: variant.colors });
+  const both = (light: Variant, dark: Variant, name: string) => fromColors(name, light.author ?? dark.author, { light: light.colors, dark: dark.colors }, schemePalettes);
   if (variants.length === 2 && variants[0].scheme !== variants[1].scheme) {
     const [light, dark] = variants[0].scheme === "light" ? variants : [variants[1], variants[0]];
     const name = light.name === dark.name ? light.name : family(light.name) === family(dark.name) ? family(light.name) : shared(light.name, dark.name);
@@ -75,7 +67,7 @@ export async function readThemes(text: string, fileName: string): Promise<ThemeF
   } catch {
     // Not JSON, or JSON with comments: one of the formats below.
   }
-  const own = readThemeFile(json);
+  const own = readThemeFile(json, schemePalettes);
   if (own) return [own];
   const ext = extension(fileName);
   const formats = plugins.themeFormats;
@@ -83,13 +75,13 @@ export async function readThemes(text: string, fileName: string): Promise<ThemeF
   const ordered = [...formats.filter((format) => format.extensions.includes(ext)), ...formats.filter((format) => !format.extensions.includes(ext))];
   for (const format of ordered) {
     const found: ImportedTheme[] = await format.read(text, fileName).catch(() => []);
-    const readable = found.filter(({ palette }) => parse(palette.background) && parse(palette.foreground));
+    const readable = found.filter(({ colors }) => parse(colors.background) && parse(colors.foreground));
     if (readable.length)
       return pair(
-        readable.map(({ name, author, palette }) => ({
+        readable.map(({ name, author, colors }) => ({
           name: name.trim() || fileName,
           author,
-          ...themeColors(palette),
+          ...importedColors(colors),
         })),
       );
   }

@@ -118,6 +118,8 @@ export default {
   "settings.themeFetching": "Récupération de l’image depuis {name}…",
   "settings.themeLibraryError": "Impossible de faire un thème de cette image : {name} ne l’a pas envoyée, ou elle ne peut pas être lue. Essayez-en une autre.",
   "settings.themeCopyName": "{name} (copie)",
+  "settings.paletteLight": "{name} clair",
+  "settings.paletteDark": "{name} sombre",
   "settings.themeImport": "Importer",
   "settings.themeImportFile": "Choisir un fichier",
   "settings.themeImportPaste": "Coller un thème",

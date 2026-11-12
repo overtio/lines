@@ -1,5 +1,5 @@
 import { colorful } from "../../../lib/themes/palette";
-import type { ImportedTheme, Palette } from "../../../lib/plugins/types";
+import type { ImportedColors, ImportedTheme } from "../../../lib/plugins/types";
 import { baseName, jsonc, plist } from "./parse";
 
 /* Code editors' themes: VS Code's, Zed's, and TextMate's (Sublime Text, bat). */
@@ -16,7 +16,7 @@ interface TokenRule {
 }
 
 /** The scopes code is highlighted by, in the order they're looked for, for each of lines' code colors. */
-const SCOPES: Record<keyof NonNullable<Palette["syntax"]>, string[]> = {
+const SCOPES: Record<keyof NonNullable<ImportedColors["syntax"]>, string[]> = {
   keyword: ["keyword", "keyword.control", "storage.type", "storage"],
   string: ["string", "string.quoted"],
   number: ["constant.numeric", "constant"],
@@ -26,7 +26,7 @@ const SCOPES: Record<keyof NonNullable<Palette["syntax"]>, string[]> = {
 };
 
 /** Code's colors from TextMate's rules (which VS Code's `tokenColors` are): the last rule naming a scope wins, as in TextMate. */
-function syntaxOf(rules: TokenRule[]): Palette["syntax"] {
+function syntaxOf(rules: TokenRule[]): ImportedColors["syntax"] {
   const colors = new Map<string, string>();
   for (const rule of rules) {
     const scopes = typeof rule.scope === "string" ? rule.scope.split(",") : (rule.scope ?? []);
@@ -59,7 +59,7 @@ export function vscode(text: string, fileName: string): ImportedTheme[] {
     {
       name: typeof theme.name === "string" ? theme.name : baseName(fileName),
       author: typeof theme.author === "string" ? theme.author : undefined,
-      palette: {
+      colors: {
         background,
         foreground,
         sidebar: colors["sideBar.background"] ?? colors["activityBar.background"],
@@ -115,7 +115,7 @@ export function zed(text: string): ImportedTheme[] {
       {
         name: theme.name,
         author,
-        palette: {
+        colors: {
           background,
           foreground,
           sidebar: style["panel.background"] ?? style["surface.background"],
@@ -162,7 +162,7 @@ export function textmate(text: string, fileName: string): ImportedTheme[] {
     {
       name: typeof theme.name === "string" ? theme.name : baseName(fileName),
       author: typeof theme.author === "string" ? theme.author : undefined,
-      palette: {
+      colors: {
         background,
         foreground,
         faint: syntax?.comment,

@@ -128,6 +128,9 @@ export default {
   "settings.themeLibraryError": "Couldn't make a theme of that picture: {name} didn't send it, or it can't be read. Try another.",
   // The name of a theme made from another, until it's renamed.
   "settings.themeCopyName": "{name} Copy",
+  // A theme's palettes, where its light and dark colors are one each: "Ocean Light", "Ocean Dark".
+  "settings.paletteLight": "{name} Light",
+  "settings.paletteDark": "{name} Dark",
   "settings.themeImport": "Import",
   "settings.themeImportFile": "Choose a File",
   "settings.themeImportPaste": "Paste a Theme",

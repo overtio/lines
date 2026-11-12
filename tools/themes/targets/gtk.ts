@@ -1,8 +1,8 @@
 import { hex, mix, readableOn, type Rgb } from "../../../src/lib/themes/color";
-import type { ThemeFile } from "../../../src/lib/themes/file";
+import type { Theme } from "../../../src/lib/plugins/types";
 import type { Scheme } from "../../../src/lib/themes/palette";
 import { alpha, type Colors, resolve } from "../colors";
-import { SCHEMES, type Written } from "./common";
+import { schemesOf, type Written } from "./common";
 
 /*
  * GTK's named colors, libadwaita's, which GNOME's apps and adw-gtk3 (for GTK 3 apps) draw with:
@@ -76,9 +76,9 @@ const variables = (colors: Record<string, string>, indent: string) =>
     .map(([name, value]) => `${indent}--${name.replace(/_/g, "-")}: ${value};`)
     .join("\n");
 
-export function gtk(theme: ThemeFile): Written {
-  const schemes = SCHEMES.filter((scheme) => theme[scheme]);
-  const colors = Object.fromEntries(schemes.map((scheme) => [scheme, named(resolve(theme[scheme]!, scheme), scheme)])) as Partial<Record<Scheme, Record<string, string>>>;
+export function gtk(theme: Theme): Written {
+  const schemes = schemesOf(theme);
+  const colors = Object.fromEntries(schemes.map((scheme) => [scheme, named(resolve(theme[scheme], scheme), scheme)])) as Partial<Record<Scheme, Record<string, string>>>;
   const first = colors.light ?? colors.dark!;
   const modern = [
     `/* ${theme.name}, for GTK 4 and libadwaita 1.6 or later: copy to ~/.config/gtk-4.0/gtk.css. Made with lines' theme tools. */`,

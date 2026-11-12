@@ -23,7 +23,7 @@ export function base16(text: string, fileName: string): ImportedTheme[] {
     {
       name: values.get("name") ?? values.get("scheme") ?? baseName(fileName),
       author: values.get("author"),
-      palette: {
+      colors: {
         background,
         foreground,
         sidebar: base(1),
@@ -70,7 +70,7 @@ export function kde(text: string, fileName: string): ImportedTheme[] {
   return [
     {
       name: general?.get("Name") ?? general?.get("ColorScheme") ?? baseName(fileName),
-      palette: {
+      colors: {
         background,
         foreground,
         sidebar: color("Window", "BackgroundNormal"),
@@ -115,7 +115,7 @@ export function gtk(text: string, fileName: string): ImportedTheme[] {
   return [
     {
       name: baseName(fileName),
-      palette: {
+      colors: {
         background,
         foreground,
         sidebar: get("sidebar_bg_color", "window_bg_color", "theme_bg_color"),

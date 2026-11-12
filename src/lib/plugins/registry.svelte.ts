@@ -1,11 +1,12 @@
 import { builtIn } from "../../plugins";
 import { customThemes } from "../themes/custom.svelte";
 import { themeDrafts } from "../themes/drafts.svelte";
+import { resolveTheme } from "../themes/palette";
 import { announce, onAnnounce } from "../windows/channel";
 import { plainTextLanguage } from "./plainText";
 import { soundPacks } from "../sounds/packs.svelte";
 import type { NoteMeta } from "../notes/types";
-import type { AppStyle, Contributions, EmbedLink, IconSet, KeyboardSound, NoteLanguage, Plugin, Theme } from "./types";
+import type { AppStyle, Contributions, EmbedLink, IconSet, KeyboardSound, NoteLanguage, Palette, Plugin, Theme, ThemeDefinition } from "./types";
 
 /*
  * The plugins lines has, which of them are on, and what the ones on add. Everything that asks for a
@@ -62,8 +63,15 @@ class Plugins {
   });
 
   readonly languages = $derived(this.#from("languages"));
-  /** The plugins' themes, then your own (themes/custom.svelte.ts), each with the colors changed in it and not saved yet (themes/drafts.svelte.ts). */
-  readonly themes = $derived([...this.#from("themes"), ...customThemes.themes].map(themeDrafts.over));
+  /** The plugins' palettes, then your own (themes/custom.svelte.ts). */
+  readonly palettes = $derived([...this.#from("palettes"), ...customThemes.palettes]);
+  /** The plugins' themes, then your own, as they're made: a palette and what each of its colors is for. */
+  readonly #definitions = $derived([...this.#from("themes"), ...customThemes.list]);
+  /**
+   * Every theme, as `theme()` gives it. Worked out the first time they're asked for together, as
+   * Settings lists them, rather than as lines starts, which shows only one.
+   */
+  readonly themes = $derived(this.#definitions.map((theme) => this.#shown(theme)));
   readonly themeFormats = $derived(this.#from("themeFormats"));
   readonly styles = $derived(this.#from("styles"));
   readonly fonts = $derived(this.#from("fonts"));
@@ -181,9 +189,22 @@ class Plugins {
     return this.all.find((plugin) => plugin.contributes.languages?.some((each) => each.id === language));
   }
 
+  /**
+   * The palette `id`: yours, or a plugin's, on or not, so a theme of yours drawn in one keeps its
+   * colors while that plugin's off.
+   */
+  palette(id: string): Palette | undefined {
+    return customThemes.palette(id) ?? this.all.flatMap((plugin) => plugin.contributes.palettes ?? []).find((palette) => palette.id === id);
+  }
+
+  /** A theme as lines shows it: worked out from its palettes (themes/palette.ts), with the colors changed in it and not saved yet (themes/drafts.svelte.ts). */
+  #shown(definition: ThemeDefinition): Theme {
+    return themeDrafts.over(resolveTheme(definition, (id) => this.palette(id)));
+  }
+
   /** The theme `id`, or lines' own while its plugin is off. */
   theme(id: string): Theme {
-    return this.themes.find((theme) => theme.id === id) ?? this.themes.find((theme) => theme.id === DEFAULT_THEME)!;
+    return this.#shown(this.#definitions.find((theme) => theme.id === id) ?? this.#definitions.find((theme) => theme.id === DEFAULT_THEME)!);
   }
 
   /** The keyboard `id` to hear as you type, or the first there is while its plugin is off or its pack is gone. */

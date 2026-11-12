@@ -111,7 +111,7 @@ Put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block), or, with Sp
 
 - **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. See [docs/plugins.md](docs/plugins.md).
 - **Presets**: the whole look in one, not just the colors. Classic, a desktop of the late 90s with bevels and a title bar; Pixel, one-bit and minimal in a pixel font; Neon, glowing lines on a grid; Adventure, a 2D adventure game's pixel art, with framed slots and grass; Aero, glossy 2000s glass; Brutalist, thick rules and big type; Constructivist, 1920s avant-garde posters in red, black and paper; Void, heavy minimalism, its toolbars out of sight until reached for and words in place of icons. Save your own (theme, type, paper, cursor and all) and share it as a file. See [docs/themes.md](docs/themes.md#presets).
-- **Twenty-six themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, bit by bit by right-clicking anything to change its color, or from a picture (a wallpaper's colors, read on your device), share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
+- **Twenty-six themes**, each light and dark, including High Contrast and two for color blindness, each a palette (Nord's, Solarized's, Catppuccin's, lines' own) and what its colors are for. **Make your own** from any of them, bit by bit by right-clicking anything to change its color, or from a picture (a wallpaper's colors, read on your device), share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
 - **Dark panes**: the sidebar, the note list or both in the theme's dark colors, while the note stays light. See [docs/themes.md](docs/themes.md#dark-panes).
 - **Monochrome and Invert**: any theme in greys, or turned light for dark, with the contrast it had.
 - **Paper to write on.** Ruled lines that every line of text sits on, and dots, squares or graph paper with a row of cells for each line (or any size you like), isometric paper, in your theme's colors or any color, as faint or strong as you like, and a grain or linen texture (Settings → Plugins → Paper).
@@ -306,7 +306,7 @@ src/
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
     keyboards/               Keyboards to hear as you type, made from sound (synth.ts)
     mascots/                 Companions in the window, as pixel art (art.ts); what they do is lib/mascot/
-    themes/                  The twenty-six themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
+    themes/                  The twenty-six themes, each a palette and what its colors are for (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
     fonts/                   Fonts to write notes in: IBM Plex Sans, Fira Sans and Agave
     styles/                  Whole looks beyond the colors, each a preset: Classic, Pixel, Neon, Puddle, Lightbulb, Adventure, Aero, Brutalist, Constructivist and Void, each a CSS file, its fonts, its colors and the settings it brings
     lucide/  sf-symbols/     Icon sets
@@ -316,7 +316,7 @@ src/
       registry.svelte.ts     The plugins, which are on (kept and shared between windows), and what they add
       plainText.ts           How a note shows while its format's plugin is off
     paper.svelte.ts          The paper chosen in Settings → Plugins → Paper, as custom properties editor.css draws
-    themes/                  The themes plugins add, as CSS (css.ts, which the website uses too), and this window's theme (show.svelte.ts) and style (styles.svelte.ts); presets (presets.svelte.ts); your own themes, their files, importing them, and working out colors
+    themes/                  Themes worked out from their palettes (palette.ts) as CSS (css.ts, which the website uses too), and this window's theme (show.svelte.ts) and style (styles.svelte.ts); presets (presets.svelte.ts); your own themes and palettes, their files, importing them, and colors' names
     editor/
       Editor.svelte          CodeMirror host; per-note undo history
       livePreview.ts         Hides Markdown and renders bullets, checkboxes, rules, images
@@ -441,6 +441,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] More formats as plugins, drawn as you type, printed and exported: Org mode, AsciiDoc, WikiText (MediaWiki) and reStructuredText
 - [ ] Plugins made by others: a plugin format, installing one from Settings → Plugins, and running its code safely (the apps only run lines' own scripts now)
 - [ ] Icon sets from a file, which need no code
+- [ ] Palettes in Settings: see, change and share them, and draw a theme of yours in any; the color picker offering the theme's palette
 - [ ] Sync your themes between devices, and open a VS Code extension (`.vsix`) to pick its themes
 - [ ] More renderers for code blocks: Graphviz, PlantUML, D2, Vega-Lite charts, music in ABC
 - [ ] Circuit schematics written in [CircuiTikZ](https://ctan.org/pkg/circuitikz), drawn as you type: ` ```circuitikz ` blocks in Markdown notes, and `circuitikz` in LaTeX notes

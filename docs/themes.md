@@ -4,29 +4,36 @@ lines comes with twenty-six themes, each light and dark, and presets that change
 
 Everything here is in Settings → Presets and Settings → Theme.
 
+## Palettes and themes
+
+A theme is a palette and what each of its colors is for. The palette is the theme's colors, as Nord is sixteen and Gruvbox a few more, each with a name, 32 at most; the theme says which of them each part of lines is drawn in, for light and dark: the note's background, the sidebar's, the text, the accent, tags, callouts, code and the rest. Where a theme's light and dark colors are each their own, it has a palette for each, as families of themes publish them: Catppuccin's Latte and Mocha, Dracula and Alucard, Ember Light and Ember Dark. Each of lines' themes has its own. Those made from a well-known palette (Nord, Solarized, Dracula, Catppuccin, Tokyo Night, Gruvbox, Everforest, Ayu, and Okabe–Ito's colors in Red-Green and Blue-Yellow) use its colors under their own names ("Polar Night 1", "base03", Catppuccin Mocha's "Mauve"), with any deepened or lightened ones lines' version needs; lines' own themes list their own colors, which lines names from how they look ("Teal", "Dark Gray", "Pale Pink"), in your language.
+
+Shades aren't listed: what a theme leaves out is worked out from the rest. The note list is between the note and the sidebar, secondary and faint text are worked out from the text, tags from the accent (readable on their chips), text on buttons in the accent and status colors to read on them, and app.css mixes borders, hovers, the selection and code's background from the text and the accent. A part that has to read is drawn in its palette color made just light or dark enough where the color itself falls short, its hue kept: danger 4.5:1 on the note and in menus; success, the callouts and the colors tags and events can be given 3:1, as icons need. Increased contrast's colors are worked out too, for every theme ([below](#increased-contrast)).
+
 ## Your own themes
 
-**New → From** the theme chosen makes a copy of it, under **Your themes**, and opens it to change below Light or dark, Contrast and Icons: its name, and its colors.
+**New → From** the theme chosen makes a copy of it, with a copy of its palette, both yours, under **Your themes**, and opens it to change below Light or dark, Contrast and Icons: its name, and its colors.
 
 **New → From Wallhaven** (in the apps, with the Wallhaven [plugin](plugins.md)) does the same with a wallpaper found on [Wallhaven](https://wallhaven.cc): search, pick one, and its colors are a theme, named after what you searched for, which it can be the backdrop of too. Only wallpapers Wallhaven marks safe for work are searched.
 
-**New → From a Picture** makes one from a picture's colors, a wallpaper or a photo, named after it, light and dark. The picture is read on this device, nothing is sent anywhere: its colors are grouped, its main tone tints the backgrounds (more of it the more colorful the picture, less in light, where a little goes a long way), its most vivid color that's also plentiful becomes the accent, and colors near red, green, blue and the rest color the callouts and code. The text reads at least 7:1 on the background, grey text 5:1 and the accent 4.5:1; a picture without color makes a theme in greys. **Use the Picture as the Backdrop** then puts it behind the page (Settings → Plugins → Paper → Backdrop). Like any of your themes, it can be changed color by color after.
+**New → From a Picture** makes one from a picture's colors, a wallpaper or a photo, named after it, light and dark. The picture is read on this device, nothing is sent anywhere: its colors are grouped, its main tone tints the backgrounds (more of it the more colorful the picture, less in light, where a little goes a long way), its most vivid color that's also plentiful becomes the accent, and colors near red, green, blue and the rest color the callouts and code; the colors it finds are the theme's palette. The text reads at least 7:1 on the background, grey text 5:1 and the accent 4.5:1; a picture without color makes a theme in greys. **Use the Picture as the Backdrop** then puts it behind the page (Settings → Plugins → Paper → Backdrop). Like any of your themes, it can be changed color by color after.
 
 - **Colors for** Light or Dark chooses which of its two sets of colors you're changing. The preview above the colors shows that set, as the sidebar, the note list and a note with a tag, a link, code and a callout; lines itself shows the set Light or dark asks for, as you change it.
 - Each color has a swatch, which opens lines' color picker, and its value as text, where you can type or paste any color CSS reads (`#7c3aed`, `rgb(124 58 237)`, `oklch(55% 0.2 290)`). The picker first offers the colors of the theme you're changing (its accent, the colors for tags, callouts and status, its text and backgrounds), each once, named by where the theme uses it; then a color of your own, by saturation and brightness, hue, as text, or, in Chrome and Edge, picked from anywhere on the screen with the eyedropper. A change shows as you drag. It's drawn in the theme's colors and the style's look, as menus are.
-- **Backgrounds, Text and Accent** are the colors every theme has. Borders, hovers, the selection, chips behind tags and code's background are mixed from them, the way lines' own themes work theirs out.
+- **Backgrounds, Text and Accent** are the colors every theme has. A background and text it must set; the others, left empty (Auto), are worked out from those ([above](#palettes-and-themes)). Borders, hovers, the selection, chips behind tags and code's background are mixed from them, the way lines' own themes work theirs out.
 - **More Colors** has the ones a theme can leave to lines: danger, success, pinned and highlights, the five callouts, the seven colors for tags and events, and code. Left empty (Auto), they're lines' own, and the swatch shows what that is; the arrow beside one empties it again.
+- A color set goes into the theme's palette: where the palette has the same color, the part is drawn in that one; otherwise the palette's color the part is drawn in changes, if nothing else in the theme is drawn in it, or a new color is added for it. So two parts in one color stay together until you change one of them, and nothing else changes with it.
 - **Delete** asks first, then shows Lines in its place.
 
 ### Changing colors by right-clicking
 
 Settings → Theme → **Change colors by right-clicking** changes a theme bit by bit, where you see it. While it's on, right-clicking anything in lines (or pressing the menu key, or ⇧F10, on what has focus) opens the theme's colors it's drawn in, in place of its menu: its text, its border, and what's behind it down to the window (a row's hover, then the sidebar). Each has a swatch that opens the color picker, with the theme's colors to choose from, and its value as text, to type or paste any color CSS reads, and an arrow to put the theme's own back. A change shows at once, everywhere that color is used.
 
-Changes wait to be saved: a bar at the bottom says how many there are, with **Save in Settings** and **Done** (which turns it off; the changes stay). In Settings → Theme, **Save as New Theme** makes a theme of your own from the theme with its changes, and shows it, its name ready to type over; in a theme of yours, **Save to** it puts them into it; **Discard Changes** asks, then puts the theme back as it was. Each theme keeps its own changes until then, on this device and in every window, through a restart.
+Changes wait to be saved: a bar at the bottom says how many there are, with **Save in Settings** and **Done** (which turns it off; the changes stay). In Settings → Theme, **Save as New Theme** makes a theme of your own from the theme with its changes (and a copy of its palette, with the colors changed in it), and shows it, its name ready to type over; in a theme of yours, **Save to** it puts them into it and its palette, as the editor does; **Discard Changes** asks, then puts the theme back as it was. Each theme keeps its own changes until then, on this device and in every window, through a restart.
 
 What's changed is the theme's color for the scheme showing (a pane shown dark by Dark panes changes its dark colors). Some colors are mixed from others: borders, hovers and code's background are a little of Lines and shading, the selection and tag chips a little of the accent; changing one sets it alone, as a color of its own. A part drawn in a color the theme doesn't have (a picture, a callout's tint) says so.
 
-Your themes are kept on this device, like the rest of Settings, and change in every window at once (Settings, floating notes) as you edit them. They don't sync between devices yet; share one as a file to have it on another.
+Your themes and their palettes are kept on this device, like the rest of Settings, and change in every window at once (Settings, floating notes) as you edit them. They don't sync between devices yet; share one as a file to have it on another. A theme of yours from before palettes is drawn in a palette of its own colors, each once, named after it (one for light and one for dark, if they're more than a palette has): it looks as it did, and nothing of it is lost. A color you change goes into the palette of the scheme you're changing.
 
 ### Themes with only light or dark colors
 
@@ -36,7 +43,7 @@ Most themes made for other apps are one or the other: Dracula is dark, Solarized
 
 ### Increased contrast
 
-Settings → Theme → Contrast → Increased works with your themes as with lines' own: their grey text, faint text, accent and tags are darkened (lightened in dark) until they reach the same contrast lines' themes do ([accessibility.md](accessibility.md)). lines works these out from your theme's colors each time they change, so there's nothing to set. A color written in a way lines can't read itself (`oklch()`, `var()`) is left as it is.
+Settings → Theme → Contrast → Increased works with your themes as with lines' own: their grey text, faint text, accent and tags are darkened (lightened in dark) until they reach the same contrast ([accessibility.md](accessibility.md)). lines works these out from every theme's colors, its own too, each time they change, so there's nothing to set.
 
 ## Presets
 
@@ -79,7 +86,7 @@ Your presets are kept on this device, like the rest of Settings, and in every wi
 
 The share button beside your preset's name has **Share** (your system's share sheet, where there is one), **Copy Preset** (its file's text, to paste into a message) and **Download Preset File** (`Late Night.lines-preset.json`). Whoever gets it adds it with **Import → Choose a File**, or **Import → Paste a Preset**, in Presets; it's added to their presets and chosen, and Undo puts back what they had.
 
-A preset's file is JSON: its `name`, `author` if you like, its `settings` by the names lines keeps them by, and, when its theme is one of your own, that theme as a theme file has it (`theme`), which is added to theirs (or the same one used, if they have it). A picture of your own behind the page isn't in the file: the backdrop comes as none. Settings missing from a file are lines' own, and one lines can't read is left out the same way, so a file from an older or newer lines still works. Themes, patterns, mascots and the like that come from a plugin are kept by their id: while that plugin is off, lines shows its own in their place.
+A preset's file is JSON: its `name`, `author` if you like, its `settings` by the names lines keeps them by, and, when its theme is one of your own, that theme as a theme file has it, palette and all (`theme`), which is added to theirs (or the same one used, if they have it). A picture of your own behind the page isn't in the file: the backdrop comes as none. Settings missing from a file are lines' own, and one lines can't read is left out the same way, so a file from an older or newer lines still works. Themes, patterns, mascots and the like that come from a plugin are kept by their id: while that plugin is off, lines shows its own in their place.
 
 Styles are plugins (the Styles plugin has the ten beside Lines), and a plugin can add more presets, with the settings each brings: what one can set, and how it reaches each part of the app, is in [plugins.md](plugins.md#what-a-plugin-can-add). Neon's glow and scan lines go with Increased contrast, and its grid while a paper is chosen. Presets change how lines looks, not what it prints: a note's PDF is black on white with every one.
 
@@ -107,7 +114,7 @@ Both together give the theme in greys, turned. They apply on top of Increased co
 
 ## Sharing a theme
 
-The share button beside your theme's name:
+The share button beside your theme's name shares it with its palettes, in one file:
 
 - **Share** sends the theme's file through your system's share sheet (AirDrop, Messages, Mail…), where there is one.
 - **Copy Theme** copies the file's text, to paste into a message.
@@ -117,45 +124,56 @@ Whoever gets it adds it with **Import → Choose a File**, or **Import → Paste
 
 ## lines' theme files
 
-A lines theme file is JSON: the theme's name, who made it if you like, and its colors for light, dark or both, by the names of app.css's custom properties without their `--`:
+A lines theme file is JSON: the theme's name, who made it if you like, its palette, and which of the palette's colors each part is drawn in, for light, dark or both, by the names of app.css's custom properties without their `--`:
 
 ```json
 {
   "name": "Dracula",
   "author": "Zeno Rocha",
+  "palette": {
+    "name": "Dracula",
+    "author": "Zeno Rocha",
+    "colors": [
+      { "id": "background", "name": "Background", "color": "#282a36" },
+      { "id": "current-line", "name": "Current Line", "color": "#44475a" },
+      { "id": "foreground", "name": "Foreground", "color": "#f8f8f2" },
+      { "id": "comment", "name": "Comment", "color": "#6272a4" },
+      { "id": "purple", "name": "Purple", "color": "#bd93f9" },
+      { "id": "pink", "name": "Pink", "color": "#ff79c6" },
+      { "id": "yellow", "name": "Yellow", "color": "#f1fa8c" }
+    ]
+  },
   "dark": {
-    "bg": "#282a36",
-    "bg-list": "#2d2f3b",
-    "bg-sidebar": "#21222c",
-    "bg-elevated": "#343746",
-    "text": "#f8f8f2",
-    "text-sidebar": "#e2e2dc",
-    "text-muted": "#a9aaab",
-    "text-faint": "#6272a4",
-    "accent": "#bd93f9",
-    "tag-text": "#bd93f9",
-    "ink": "#f8f8f2",
-    "syn-keyword": "#ff79c6",
-    "syn-string": "#f1fa8c"
+    "bg": "background",
+    "bg-elevated": "current-line",
+    "text": "foreground",
+    "text-faint": "comment",
+    "accent": "purple",
+    "syn-keyword": "pink",
+    "syn-string": "yellow"
   }
 }
 ```
 
-| Colors | What they are |
+A palette's colors each have an `id`, which the theme's parts refer to (lowercase letters, digits, `-` and `_`), a `name` if it has one of its own (otherwise lines names it from how it looks), and the `color`, hex or `rgb()`; any other color CSS reads is turned into one. A file can name one of lines' own palettes by its id instead (`"palette": "nord"`). A theme with a palette for each scheme has them as `"palette": { "light": …, "dark": … }`, each there or by id, and each scheme's parts refer to its own palette's colors.
+
+| Parts | What they are |
 |---|---|
 | `bg`, `bg-list`, `bg-sidebar`, `bg-elevated` | The note's background, the note list's, the sidebar's, and menus' and dialogs' |
 | `text`, `text-sidebar`, `text-muted`, `text-faint` | Text, the sidebar's, secondary (previews, notes in Settings) and faint (dates, counts, hints) |
 | `accent`, `tag-text` | Links, buttons and what's chosen; tags |
 | `ink` | What borders, hovers and code's background are mixed from: usually the text color |
-| `danger`, `success`, `pin`, `highlight-base` | Optional: deleting and errors, success, pinned notes, highlights |
-| `callout-info`, `callout-question`, `callout-warning`, `callout-error`, `callout-decision` | Optional: the callouts |
-| `palette-red`, `palette-orange`, `palette-yellow`, `palette-green`, `palette-blue`, `palette-purple`, `palette-gray` | Optional: the colors tags, types and events can be given (Icon and Color, or `color:` in a note), and marks in the margin; with the accent, eight. Each at least 3:1 against every background, as icons need |
-| `syn-keyword`, `syn-string`, `syn-number`, `syn-comment`, `syn-function`, `syn-type` | Optional: code |
-| `on-accent`, `on-danger`, `on-success`, `on-pin` | Optional: text on buttons of those colors |
+| `danger`, `success`, `pin`, `highlight-base` | Deleting and errors, success, pinned notes, highlights |
+| `callout-info`, `callout-question`, `callout-warning`, `callout-error`, `callout-decision` | The callouts |
+| `palette-red`, `palette-orange`, `palette-yellow`, `palette-green`, `palette-blue`, `palette-purple`, `palette-gray` | The colors tags, types and events can be given (Icon and Color, or `color:` in a note), and marks in the margin; with the accent, eight. Each at least 3:1 against every background, as icons need |
+| `syn-keyword`, `syn-string`, `syn-number`, `syn-comment`, `syn-function`, `syn-type` | Code |
+| `on-accent`, `on-danger`, `on-success`, `on-pin` | Text on buttons of those colors |
 
-The first eleven are needed for each set of colors the file has. Any other property app.css has can be set too, and `moreContrast` can hold a theme's own colors for Increased contrast (`{ "light": {…}, "dark": {…} }`), as lines' own themes do; without it, lines works them out. Values are colors CSS reads; anything else (a `url()`, say) is left out, so a theme can't load anything from the web.
+Each is optional but the background and text: what a theme leaves out is worked out from the rest, or is lines' own ([Palettes and themes](#palettes-and-themes)), and any other property app.css has can be given a color too. `properties` (`{ "light": {…}, "dark": {…} }`) can set the rest of how a theme draws, made only from its own colors: how much of one a mix takes (`"border": "color-mix(in srgb, var(--ink) 62%, transparent)"`, as High Contrast's strong borders), a part drawn as another is (`"callout-info": "var(--accent)"`), callouts' tint, a shadow. Anything else (a color of its own, a `url()`) is left out, so a theme can't load anything from the web.
 
-It's the same shape as a theme in a [plugin](plugins.md) (`Theme` in `src/lib/plugins/types.ts`), so a theme someone shares can become one of lines' own by adding an `id` to it in `src/plugins/themes/themes.ts`.
+Theme files from before palettes, with colors by part (and `moreContrast`, which lines works out now), still read: their colors become the theme's palette, or one for each scheme if they're more than 32.
+
+It's the same shape as a theme in a [plugin](plugins.md) (`ThemeDefinition` and `Palette` in `src/lib/plugins/types.ts`), so a theme someone shares can become one of lines' own by giving it an `id` in `src/plugins/themes/themes.ts`, its palette beside it.
 
 ### Why not Base16?
 
@@ -192,7 +210,7 @@ What lines takes from each:
 - **KDE**: the views' colors for the note, the windows' for the sidebar, the selection's for the accent, and the negative, neutral, positive, link and visited colors for the rest.
 - **GTK**: the view's colors for the note, the window's or sidebar's for the sidebar, the accent, popovers, and the error, warning and success colors, with libadwaita's palette (`blue_3`, `red_3`…) where the file has it.
 
-Whatever a theme doesn't have is worked out from what it does, as for your own: the note list between the note and the sidebar, secondary and faint text from the text, tags from the accent, made readable on their chips. Any of it can be changed after.
+The colors a theme has are its palette, each once, and whatever it doesn't have is worked out from them, as for your own: the note list between the note and the sidebar, secondary and faint text from the text, tags from the accent, made readable on their chips. Any of it can be changed after.
 
 A plugin can teach lines more formats ([plugins.md](plugins.md#what-a-plugin-can-add)).
 

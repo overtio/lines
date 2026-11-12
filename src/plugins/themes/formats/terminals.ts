@@ -15,7 +15,7 @@ function terminal(name: string, background: Color, foreground: Color, ansi: Colo
     {
       name,
       author,
-      palette: {
+      colors: {
         background,
         foreground,
         faint: ansi[8],

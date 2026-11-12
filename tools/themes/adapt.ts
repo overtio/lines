@@ -1,6 +1,7 @@
 import { basename } from "node:path";
 import { parseArgs } from "node:util";
-import { readThemeFile, THEME_FILE_EXTENSION, type ThemeFile, writeThemeFile } from "../../src/lib/themes/file";
+import type { Theme } from "../../src/lib/plugins/types";
+import { filePalette, readThemeFile, resolveFile, SCHEMES, THEME_FILE_EXTENSION, type ThemeFile, writeThemeFile } from "../../src/lib/themes/file";
 import { themeFromSwatches } from "../../src/lib/themes/swatches";
 import { run, save } from "./cli";
 import { readable } from "./colors";
@@ -10,8 +11,8 @@ import { slug, type Written } from "./targets/common";
 import { gtk } from "./targets/gtk";
 import { vscode } from "./targets/vscode";
 
-const TARGETS: Record<string, (theme: ThemeFile) => Written> = {
-  lines: (theme) => ({ [`${theme.name}${THEME_FILE_EXTENSION}`]: writeThemeFile(theme) }),
+const TARGETS: Record<string, (theme: Theme, file: ThemeFile) => Written> = {
+  lines: (_, file) => ({ [`${file.name}${THEME_FILE_EXTENSION}`]: writeThemeFile(file) }),
   vscode,
   gtk,
   base24,
@@ -47,10 +48,14 @@ run(async () => {
   if (unknown.length) throw new Error(`No target called ${unknown.join(", ")}: there's ${Object.keys(TARGETS).join(", ")}`);
   const json: unknown = await Bun.file(input).json().catch(() => undefined);
   const swatch = readSwatchFile(json);
-  const theme = swatch ? themeFromSwatches(swatch.swatches, swatch.name) : readThemeFile(json);
-  if (!theme) throw new Error(`${basename(input)} isn't a swatch or a lines theme file`);
-  if (values.name) theme.name = values.name;
-  const folder = values.out ?? slug(theme.name);
-  console.log(`${theme.name}:`);
-  for (const target of targets) await save(`${folder}/${target}`, TARGETS[target](theme));
+  const file = swatch ? themeFromSwatches(swatch.swatches, swatch.name) : readThemeFile(json);
+  if (!file) throw new Error(`${basename(input)} isn't a swatch or a lines theme file`);
+  // A palette of lines' own, by id, is in the app, not here.
+  const named = SCHEMES.map((scheme) => filePalette(file, scheme)).find((palette) => typeof palette === "string");
+  if (named) throw new Error(`${basename(input)} is drawn in lines' palette “${named}”: share it from lines with a palette of your own`);
+  if (values.name) file.name = values.name;
+  const theme = resolveFile(file);
+  const folder = values.out ?? slug(file.name);
+  console.log(`${file.name}:`);
+  for (const target of targets) await save(`${folder}/${target}`, TARGETS[target](theme, file));
 });

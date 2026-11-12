@@ -1,7 +1,7 @@
 import { hex, mix, type Rgb } from "../../../src/lib/themes/color";
-import type { ThemeFile } from "../../../src/lib/themes/file";
+import type { Theme } from "../../../src/lib/plugins/types";
 import { alpha, brighter, type Colors, hues, ramp, resolve } from "../colors";
-import { SCHEMES, slug, type Written } from "./common";
+import { schemesOf, slug, type Written } from "./common";
 
 /*
  * A VS Code extension with the theme's light and dark versions: copy its folder into
@@ -219,13 +219,13 @@ const semantic = (get: Colors) => ({
   "variable.readonly": hex(get("syn-number")),
 });
 
-export function vscode(theme: ThemeFile): Written {
+export function vscode(theme: Theme): Written {
   const id = slug(theme.name);
-  const schemes = SCHEMES.filter((scheme) => theme[scheme]);
+  const schemes = schemesOf(theme);
   const label = (scheme: string) => (schemes.length > 1 ? `${theme.name} ${scheme === "dark" ? "Dark" : "Light"}` : theme.name);
   const files: Written = {};
   for (const scheme of schemes) {
-    const get = resolve(theme[scheme]!, scheme);
+    const get = resolve(theme[scheme], scheme);
     const dark = scheme === "dark";
     files[`themes/${id}-${scheme}-color-theme.json`] = {
       $schema: "vscode://schemas/color-theme",

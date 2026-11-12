@@ -17,8 +17,8 @@ export type WindowMessage =
   | { type: "prefs"; prefs: string }
   /** The app's language was chosen (i18n/index.svelte.ts). */
   | { type: "language"; choice: string }
-  /** Your own themes changed (themes/custom.svelte.ts): all of them, as saved. */
-  | { type: "themes"; themes: string }
+  /** Your own themes and palettes changed (themes/custom.svelte.ts): all of them, as saved. */
+  | { type: "themes"; themes: string; palettes: string }
   /** Colors changed by right-clicking, not saved yet, or picking them turned on or off (themes/drafts.svelte.ts). */
   | { type: "theme-drafts"; drafts: string }
   /** Your own presets changed (themes/presets.svelte.ts): all of them, as saved. */

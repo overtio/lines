@@ -182,6 +182,72 @@ describe("themes", () => {
     await app.page.keyboard.press("Escape");
   });
 
+  test("New → From a theme copies its palette as yours, which a color changed in the editor goes into, the theme's own kept", async () => {
+    app = await openApp({ prefs: { theme: "nord" } });
+    const settings = await app.settings("Theme");
+    await settings.getByRole("button", { name: "New", exact: true }).click();
+    await app.page.getByRole("menuitem", { name: /From Nord/ }).click();
+    const field = settings.getByRole("textbox", { name: "Accent", exact: true });
+    await field.fill("#c01060");
+    await field.press("Enter");
+    expect(await app.page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--accent").trim())).toBe("#c01060");
+    const palettes = await app.page.evaluate(() => {
+      const { customThemes, plugins, prefs } = window.testing;
+      const colors = (id: string) => plugins.palette(id)!.colors.map((entry) => entry.color);
+      const { palette } = customThemes.get(prefs.theme)!;
+      return { copy: colors(typeof palette === "string" ? palette : palette.light), nord: colors("nord") };
+    });
+    expect(palettes.copy).toContain("#c01060");
+    expect(palettes.nord).not.toContain("#c01060");
+    expect(palettes.copy.length).toBeGreaterThanOrEqual(palettes.nord.length);
+    noErrors(app);
+  });
+
+  test("a theme made for another app imports as a palette of its colors, and a theme drawn in it", async () => {
+    app = await openApp();
+    const settings = await app.settings("Theme");
+    await settings.getByRole("button", { name: "Import", exact: true }).click();
+    const chooser = app.page.waitForEvent("filechooser");
+    await app.page.getByRole("menuitem", { name: "Choose a File" }).click();
+    const colors = ["2b303b", "343d46", "4f5b66", "65737e", "a7adba", "c0c5ce", "dfe1e8", "eff1f5", "bf616a", "d08770", "ebcb8b", "a3be8c", "96b5b4", "8fa1b3", "b48ead", "ab7967"];
+    const scheme = `system: "base16"\nname: "Ocean"\nauthor: "Chris Kempson"\nvariant: "dark"\npalette:\n${colors.map((color, i) => `  base0${i.toString(16).toUpperCase()}: "#${color}"`).join("\n")}\n`;
+    await (await chooser).setFiles({ name: "ocean.yaml", mimeType: "text/yaml", buffer: Buffer.from(scheme) });
+    await settings.getByText("Added Ocean.").waitFor();
+    const shown = await app.page.evaluate(() => {
+      const { customThemes, prefs } = window.testing;
+      const theme = customThemes.get(prefs.theme)!;
+      const palette = typeof theme.palette === "string" ? theme.palette : theme.palette.dark;
+      return { colors: customThemes.palette(palette)!.colors.map((entry) => entry.color), accent: getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() };
+    });
+    // Its blue for the accent, each color once.
+    expect(shown.accent).toBe("#8fa1b3");
+    expect(shown.colors).toContain("#8fa1b3");
+    expect(new Set(shown.colors).size).toBe(shown.colors.length);
+    noErrors(app);
+  });
+
+  test("a theme of yours kept before palettes is drawn in a palette of its colors, as it looked", async () => {
+    app = await openApp();
+    const old = { id: "custom-old1", name: "Old", light: { ...(await app.page.evaluate(() => window.testing.plugins.theme("lines").light)), accent: "oklch(55% 0.2 300)", "callout-info": "var(--accent)" } };
+    await app.page.evaluate((old) => {
+      localStorage.setItem("lines.themes", JSON.stringify([old]));
+      window.testing.prefs.theme = old.id;
+    }, old);
+    await app.page.reload();
+    await app.page.waitForFunction(() => window.testing?.notes.ready);
+    const shown = await app.page.evaluate(() => {
+      const root = getComputedStyle(document.documentElement);
+      const { customThemes } = window.testing;
+      return { theme: document.documentElement.dataset.theme, accent: root.getPropertyValue("--accent").trim(), info: root.getPropertyValue("--callout-info").trim(), palette: customThemes.palette("custom-old1")?.colors.length };
+    });
+    expect(shown.theme).toBe("custom-old1");
+    // The color CSS read, as the browser draws it, and what was drawn as the accent still is.
+    expect(shown.accent).toMatch(/^#[0-9a-f]{6}$/);
+    expect(shown.info).toBe(shown.accent);
+    expect(shown.palette).toBeGreaterThan(4);
+    noErrors(app);
+  });
+
   test("New → From a theme with colors for one scheme only copies that one", async () => {
     app = await openApp({ prefs: { theme: "neon" } });
     const settings = await app.settings("Theme");
@@ -285,8 +351,9 @@ describe("the color picker", () => {
     await settings.getByRole("button", { name: "Choose a color for Text", exact: true }).click();
     const picker = app.page.getByRole("dialog", { name: "Choose a color for Text" });
     await picker.getByRole("radio", { name: "Accent", exact: true }).click();
+    // Drawn in the palette's color the accent is.
     const theme = await app.page.evaluate(() => window.testing.customThemes.get(window.testing.prefs.theme));
-    expect(theme?.light?.text).toBe("#7c3aed");
+    expect(theme?.light?.text).toBe(theme?.light?.accent);
   });
 });
 
