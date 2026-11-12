@@ -2,6 +2,35 @@
 
 What changed in each release of lines. Written by `bun scripts/release.mjs prepare` from the commits since the release before (docs/releasing.md).
 
+## [0.4.2](https://github.com/overtio/lines/compare/v0.4.1...v0.4.2) (2026-11-12)
+
+### Fixes
+
+- **themes:** borders with Increased contrast reach 3:1 in every theme, as the docs promise ([#301](https://github.com/overtio/lines/pull/301))
+- **calendar:** screen readers hear "repeats" on a repeating event for the whole day too ([#296](https://github.com/overtio/lines/pull/296))
+- **themes:** aero's colored buttons keep their text readable, with no shine under it ([#290](https://github.com/overtio/lines/pull/290))
+- **calendar:** on the days the clocks change, the week's hours and event times aren't an hour off ([#287](https://github.com/overtio/lines/pull/287))
+- **themes:** constructivist's focus ring on the chosen row follows its slant, not cut off by it ([#300](https://github.com/overtio/lines/pull/300))
+- **settings:** search lists only settings, not messages shown once something's done ([#299](https://github.com/overtio/lines/pull/299))
+- **editor:** marking and unmarking a line keeps the line break at its end ([#279](https://github.com/overtio/lines/pull/279))
+- **themes:** void's field and switch lines darken with increased contrast ([#294](https://github.com/overtio/lines/pull/294))
+- **themes:** orange, yellow and grey tags read on the sidebars of classic and other themes ([#291](https://github.com/overtio/lines/pull/291))
+- **settings:** presets' undo goes back to your look after trying several in a row ([#286](https://github.com/overtio/lines/pull/286))
+- **themes:** text on the accent stays readable when increased contrast darkens the accent ([#282](https://github.com/overtio/lines/pull/282))
+- **themes:** increased contrast darkens puddle's and lightbulb's grey text and accent ([#278](https://github.com/overtio/lines/pull/278))
+- **notes:** a tag in a double-backtick span, indented code or an HTML comment isn't listed ([#295](https://github.com/overtio/lines/pull/295))
+- **calendar:** after renaming an event by keyboard, focus is back on the event rather than lost ([#293](https://github.com/overtio/lines/pull/293))
+- **calendar:** renaming an event to a name with $& or $$ in it keeps the name as typed ([#292](https://github.com/overtio/lines/pull/292))
+- **calendar:** an event stretched or moved to end at midnight keeps that end, rather than losing it ([#289](https://github.com/overtio/lines/pull/289))
+- **calendar:** ⌘Z after moving an event doesn't undo what was done to the note since ([#285](https://github.com/overtio/lines/pull/285))
+- **calendar:** the week and day show a note at two times on one day, instead of nothing at all ([#283](https://github.com/overtio/lines/pull/283))
+- **editor:** a line dragged below a list stays apart from it, and leaves no blank line at the top ([#288](https://github.com/overtio/lines/pull/288))
+- **editor:** ===x=== stays text instead of highlighting part of it ([#277](https://github.com/overtio/lines/pull/277))
+
+### Performance
+
+- **calendar:** counting the notes on a day with thousands of them doesn't slow to a crawl ([#298](https://github.com/overtio/lines/pull/298))
+
 ## [0.4.1](https://github.com/overtio/lines/compare/v0.4.0...v0.4.1) (2026-11-12)
 
 ### Fixes
