@@ -1,12 +1,16 @@
 import type { Theme, ThemeColors } from "../plugins/types";
 import { moreContrast, otherScheme, type Scheme } from "./palette";
 
-const ink = (percent: number) => `color-mix(in srgb, var(--ink) ${percent}%, transparent)`;
+/**
+ * Borders with Increased contrast: the faint text's color, which it makes 4.5:1 on every pane, a
+ * little lighter, for 3:1. A share of the ink isn't enough where the text itself is grey.
+ */
+const BORDER = "color-mix(in srgb, var(--text-faint) 85%, transparent)";
 
 /** What Increased contrast changes in every theme, light and dark, before each theme's own changes. */
 export const MORE_CONTRAST = {
-  light: { "text-sidebar": "var(--text)", border: ink(42), "card-border": ink(42) },
-  dark: { "text-sidebar": "var(--text)", border: ink(36), "card-border": ink(36) },
+  light: { "text-sidebar": "var(--text)", border: BORDER, "card-border": BORDER },
+  dark: { "text-sidebar": "var(--text)", border: BORDER, "card-border": BORDER },
 };
 
 export const other = (scheme: Scheme): Scheme => (scheme === "dark" ? "light" : "dark");
