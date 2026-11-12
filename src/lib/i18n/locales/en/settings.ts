@@ -221,11 +221,22 @@ export default {
   "picking.changed": "{count, plural, one {# color changed, not saved} other {# colors changed, not saved}}",
   "picking.save": "Save in Settings",
   "picking.done": "Done",
-  // A color's swatch, which opens the system's color picker.
+  // A color's swatch, which opens lines' color picker.
   "settings.colorPick": "Choose a color for {name}",
   // An optional color left empty, which follows from the theme's others.
   "settings.colorAuto": "Auto",
   "settings.colorReset": "Make {name} automatic",
+  // The color picker: the theme's colors as swatches, then a color of one's own.
+  "settings.colorSwatches": "Theme colors",
+  // The square where a color's saturation (across) and brightness (up) are chosen.
+  "settings.colorArea": "Saturation and brightness",
+  // What a screen reader hears on it: {color} is the color as hex (#3a7bd5).
+  "settings.colorAreaValue": "Saturation {saturation}%, brightness {brightness}%, {color}",
+  "settings.colorHue": "Hue",
+  // The hue in degrees, then the color as hex.
+  "settings.colorHueValue": "{degrees}°, {color}",
+  "settings.colorFromScreen": "Pick a color from the screen",
+  "settings.colorAdd": "Add to palette",
   // Light or dark: follow the device's.
   "settings.appearanceSystem": "System",
   "settings.appearanceLight": "Light",

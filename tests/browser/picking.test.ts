@@ -48,6 +48,30 @@ test("right-clicking the sidebar changes its color, which shows at once and save
   expect(await rootColor("bg-sidebar")).toBe("#336699");
 });
 
+test("a color's picker opens over the colors here, which stay open while it's used; Esc closes one, then the other", async () => {
+  app = await openApp();
+  await startPicking();
+
+  await app.page.locator('[data-pane="sidebar"]').click({ button: "right", position: { x: 120, y: 600 } });
+  const panel = app.page.getByRole("dialog", { name: "Colors here, in Lines" });
+  await panel.getByRole("button", { name: "Choose a color for Sidebar", exact: true }).click();
+  const picker = app.page.getByRole("dialog", { name: "Choose a color for Sidebar" });
+  await picker.getByRole("radio", { name: "Accent", exact: true }).click();
+  expect(await rootColor("bg-sidebar")).toBe("#0e7a7e");
+  // Clicking and dragging in it is inside the colors here too.
+  const area = (await picker.getByRole("slider", { name: "Saturation and brightness" }).locator("..").boundingBox())!;
+  await app.page.mouse.click(area.x + 4, area.y + 4);
+  expect(await rootColor("bg-sidebar")).not.toBe("#0e7a7e");
+  expect(await panel.isVisible()).toBe(true);
+
+  await app.page.keyboard.press("Escape");
+  await picker.waitFor({ state: "detached" });
+  expect(await panel.isVisible()).toBe(true);
+  await app.page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Choose a color for Sidebar");
+  await app.page.keyboard.press("Escape");
+  await panel.waitFor({ state: "detached" });
+});
+
 test("a note's row keeps its menu for after; while picking, its colors open, and discarding puts the theme back", async () => {
   app = await openApp();
   await app.open("# Groceries\n\nMilk");

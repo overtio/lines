@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { BLACK, contrast, grey, hex, inverted, isDark, luminance, over, parse, readableOn, WHITE } from "../../src/lib/themes/color";
+import { BLACK, contrast, fromHsv, grey, hex, inverted, isDark, luminance, over, parse, readableOn, toHsv, WHITE } from "../../src/lib/themes/color";
 import { MORE_CONTRAST, other, paneColors, rule, themeCss } from "../../src/lib/themes/css";
 import { moreContrast, otherScheme, themeColors } from "../../src/lib/themes/palette";
 import { pictureName, themeFromPixels } from "../../src/lib/themes/picture";
@@ -50,6 +50,21 @@ describe("color", () => {
     const pale = parse("#9fd8d8")!;
     expect(contrast(readableOn(pale, WHITE, 4.5), WHITE)).toBeGreaterThanOrEqual(4.5);
     expect(readableOn(BLACK, WHITE, 4.5)).toEqual(BLACK);
+  });
+
+  test("turns colors into hue, saturation and value, and back", () => {
+    const hsv = (value: string) => toHsv(parse(value)!);
+    expect(hsv("#ff0000")).toEqual({ h: 0, s: 1, v: 1 });
+    expect(hsv("#00ff00")).toEqual({ h: 120, s: 1, v: 1 });
+    expect(hsv("#ff00ff")).toEqual({ h: 300, s: 1, v: 1 });
+    const blue = hsv("#336699");
+    expect([blue.h, blue.s, blue.v].map((n) => Math.round(n * 1000) / 1000)).toEqual([210, 0.667, 0.6]);
+    // Greys have no hue, black no saturation either.
+    expect(hsv("#808080")).toEqual({ h: 0, s: 0, v: 128 / 255 });
+    expect(hsv("#000000")).toEqual({ h: 0, s: 0, v: 0 });
+    expect(hex(fromHsv({ h: 360, s: 1, v: 1 }))).toBe("#ff0000");
+    expect(hex(fromHsv({ h: 30, s: 0.5, v: 0.5 }))).toBe("#806040");
+    for (const value of ["#0e7a7e", "#d53c40", "#ffd60a", "#5b3fd1", "#ffffff", "#162120", "#97a4a2"]) expect(hex(fromHsv(hsv(value)))).toBe(value);
   });
 });
 
