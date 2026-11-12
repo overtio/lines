@@ -89,6 +89,21 @@ describe("themes' own highlighter, status and callout colors", () => {
       for (const scheme of shownSchemes(theme)) for (const key of NAMED) expect(theme[scheme][key], `${theme.id} ${scheme} ${key}`).toBeString();
   });
 
+  // app.css's white (the background, in dark) reads better on Increased contrast's darker (lighter) accent; a theme's own may not.
+  test("a theme's own text on the accent reads on it, with Increased contrast too: 4.5:1", () => {
+    const misses: string[] = [];
+    for (const theme of withStyles) {
+      for (const scheme of shownSchemes(theme)) {
+        for (const colors of [theme[scheme], { ...theme[scheme], ...theme.moreContrast?.[scheme] }]) {
+          if (!colors["on-accent"]) continue;
+          const measured = ratio(colors, "on-accent", "accent");
+          if (measured < 4.45) misses.push(`${theme.id} ${scheme}: ${colors["on-accent"]} on ${colors.accent} ${measured.toFixed(2)} < 4.5`);
+        }
+      }
+    }
+    expect(misses).toEqual([]);
+  });
+
   test("they read: danger 4.5:1 on the note and menus, icons 3:1, text on the highlighter and on status buttons", () => {
     const misses: string[] = [];
     for (const theme of withStyles) {

@@ -142,6 +142,8 @@ export function moreContrast(colors: ThemeColors): Partial<ThemeColors> {
     const reached = enough(toText) ? toText : reach(toText, on, ratio, dark ? WHITE : BLACK);
     if (hex(reached) !== hex(from)) changed[key] = hex(reached);
   }
+  // Text on the accent is chosen again for the accent it's moved to: the theme's own (or app.css's) if it still reads.
+  if (changed.accent) changed["on-accent"] = hex(textOn(parse(changed.accent)!, [color("on-accent") ?? (dark ? bg : WHITE), bg, text, WHITE, BLACK]));
   return changed;
 }
 

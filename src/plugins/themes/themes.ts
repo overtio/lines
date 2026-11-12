@@ -1292,6 +1292,7 @@ export const themes = (): Theme[] => [
         "text-muted": "#485252",
         "text-faint": "#58625f",
         accent: "#257557",
+        "on-accent": "#fdf6e3",
         "tag-text": "#267657",
       },
       dark: {
@@ -1381,6 +1382,7 @@ export const themes = (): Theme[] => [
         "text-muted": "#4f5357",
         "text-faint": "#606367",
         accent: "#a05a28",
+        "on-accent": "#fcfcfc",
         "tag-text": "#a15a09",
       },
       dark: {

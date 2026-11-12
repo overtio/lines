@@ -81,6 +81,7 @@ describe("palette", () => {
         expect(on(more["text-faint"], more[surface])).toBeGreaterThanOrEqual(4.5);
         expect(on(more.accent, more[surface])).toBeGreaterThanOrEqual(4.5);
       }
+      expect(on(more["on-accent"], more.accent)).toBeGreaterThanOrEqual(4.5);
     }
   });
 
@@ -133,6 +134,7 @@ describe("dark panes", () => {
     const colors = paneColors(only, "light", true);
     expect(isDark(parse(colors.bg)!)).toBe(true);
     expect(on(colors.text, colors["bg-sidebar"])).toBeGreaterThanOrEqual(9);
+    expect(on(colors["on-accent"], colors.accent)).toBeGreaterThanOrEqual(4.5);
   });
 });
 
