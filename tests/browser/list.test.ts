@@ -27,6 +27,18 @@ test("⌘⇧F puts focus in the search field from focus mode, and from an open n
   }
 });
 
+test("Esc in the search field clears it and puts focus on the open note's row", async () => {
+  app = await openApp();
+  const id = await app.open("Kept open");
+  await app.open("Another");
+  await app.page.evaluate((id) => window.testing.notes.select(id), id);
+  const search = app.page.getByRole("searchbox", { name: "Search notes" });
+  await search.fill("nothing like it");
+  await search.press("Escape");
+  await app.page.waitForFunction((id) => document.activeElement?.getAttribute("data-id") === id, id, { timeout: 2000 });
+  expect(await app.page.evaluate(() => window.testing.notes.query)).toBe("");
+});
+
 test("a note's menu is in sections: opening it, what it is and where it's kept, its text, and the Trash", async () => {
   app = await openApp();
   await app.open("# Groceries\n\nmilk");

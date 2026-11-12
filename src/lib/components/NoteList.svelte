@@ -182,7 +182,7 @@
       aria-label={t("list.searchLabel")}
       autocomplete="off"
       spellcheck="false"
-      onkeydown={(e) => e.key === "Escape" && ((notes.query = ""), e.currentTarget.blur())}
+      onkeydown={(e) => e.key === "Escape" && ((notes.query = ""), focusList())}
     />
     {#if notes.query}
       <!-- As tall as the field, and wide enough for a finger. -->
