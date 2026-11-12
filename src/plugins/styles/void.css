@@ -12,6 +12,12 @@
   --hairline: color-mix(in srgb, var(--ink) 12%, transparent);
 }
 
+/* With Increased contrast, fields' and switches' lines are as dark as faint text is then, 4.5:1. */
+:root[data-style="void"][data-contrast="more"],
+:root[data-style="void"][data-contrast="more"] [data-scheme] {
+  --hairline: var(--text-faint);
+}
+
 :root[data-style="void"] ::selection {
   background: color-mix(in srgb, var(--ink) 12%, transparent);
 }
