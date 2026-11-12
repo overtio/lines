@@ -34,6 +34,18 @@ export default {
   "picker.color.blue": "Blue",
   "picker.color.purple": "Purple",
   "picker.color.gray": "Gray",
+  // More of the words lines names a palette's colors by, from how each looks.
+  "picker.color.teal": "Teal",
+  "picker.color.pink": "Pink",
+  "picker.color.brown": "Brown",
+  "picker.color.black": "Black",
+  "picker.color.white": "White",
+  // {color} is one of the words above: "Dark Teal", "Light Pink", "Pale Blue".
+  "picker.color.dark": "Dark {color}",
+  "picker.color.light": "Light {color}",
+  "picker.color.pale": "Pale {color}",
+  // A palette's second color named alike, and the next, numbered: "Gray 2".
+  "picker.color.again": "{name} {count}",
   // Note info, under the toolbar's info button. "Written in" is followed by Markdown or LaTeX.
   "picker.writtenIn": "Written in",
   // A note whose format's plugin is off, or isn't on this device, shows as plain text.

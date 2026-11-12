@@ -48,7 +48,7 @@ let accent = "";
 function showPointer() {
   // Read after the theme's colors are set, which this effect follows: your own theme's as you change
   // them, and Increased contrast's as the system's setting changes too.
-  void plugins.themes;
+  void plugins.theme(prefs.windowLook.theme);
   void prefs.windowLook;
   void prefs.monochrome;
   void prefs.invert;

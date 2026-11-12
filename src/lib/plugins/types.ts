@@ -48,8 +48,10 @@ export interface Plugin {
 export interface Contributions {
   /** Markup languages notes can be written in. */
   languages?: NoteLanguage[];
-  /** Color themes, each with a light and a dark side. */
-  themes?: Theme[];
+  /** Color palettes: named lists of colors, which themes are drawn in. */
+  palettes?: Palette[];
+  /** Color themes, each a palette and which of its colors each part of lines is drawn in, light and dark. */
+  themes?: ThemeDefinition[];
   /** Whole looks for the app, beyond its colors: shapes, type, borders, shadows; each a preset (Settings → Presets). */
   styles?: AppStyle[];
   /** Fonts to write notes in (Settings → Typography → Font), beside your system's. */
@@ -409,25 +411,81 @@ export interface ThemeColors {
   [property: string]: string;
 }
 
-export interface Theme {
+/**
+ * A palette: the colors a theme is drawn in, as Nord's sixteen are, 4 to 32 of them as a rule. A
+ * theme says which is for what; their shades are worked out, not listed.
+ */
+export interface Palette {
+  /** Unique and lasting: what themes refer to it by. */
+  id: string;
+  name: string;
+  /** Who made it, for a well-known palette or one someone shared. */
+  author?: string;
+  colors: PaletteEntry[];
+}
+
+/** One of a palette's colors. */
+export interface PaletteEntry {
+  /** Lasting and never shown: what themes refer to it by, so renaming or changing it keeps them. */
+  id: string;
+  /** Its own name (Nord's "Polar Night 1"); without one, lines names it from its color ("Teal"). */
+  name?: string;
+  /** Hex or `rgb()`, as `parse` in themes/color.ts reads it, so lines can work out shades of it. */
+  color: string;
+}
+
+/** Which of a palette's colors each part of lines is drawn in: palette colors' ids, by ThemeColors' keys. */
+export type ThemeAssignment = Record<string, string>;
+
+/**
+ * A color theme as a plugin gives it, and as yours are kept: a palette, and for light, dark or both,
+ * which of its colors each part of lines is drawn in. The rest is worked out from those
+ * (themes/palette.ts, app.css), and the registry lists it as a Theme.
+ */
+export interface ThemeDefinition {
   id: string;
   name: string;
   /** Who made it, for a theme someone shared. */
   author?: string;
   /**
-   * For a theme with colors for one scheme only, as most made for other apps are: it's shown in
-   * that one whatever Settings → Theme → Light or dark says, and its `light` and `dark` are the same.
-   */
-  scheme?: "light" | "dark";
-  /**
    * Made for low vision or color blindness: listed in a group of their own, and with faint text
    * readable enough for placeholders too.
    */
+  accessible?: boolean;
+  /**
+   * Its palette's id; or one for each scheme, where its light and dark colors are separate palettes,
+   * as families of themes publish them (Catppuccin Latte and Mocha). Each scheme's parts are drawn in
+   * its own palette's colors.
+   */
+  palette: string | { light: string; dark: string };
+  /**
+   * Its parts' colors for a scheme. A theme with only one, as most made for other apps are, is shown
+   * in it whatever Settings → Theme → Light or dark says.
+   */
+  light?: ThemeAssignment;
+  dark?: ThemeAssignment;
+  /**
+   * Custom properties it sets beside its colors, made from them alone (`var(--ink)`): how much of a
+   * color a mix takes (`color-mix(in srgb, var(--ink) 62%, transparent)`), callouts' tint, shadows.
+   */
+  properties?: Partial<Record<"light" | "dark", Record<string, string>>>;
+}
+
+/** A theme as lines shows it: its definition, worked out into colors for light and dark. */
+export interface Theme {
+  id: string;
+  name: string;
+  /** Who made it, for a theme someone shared. */
+  author?: string;
+  /** For a theme with colors for one scheme only: it's shown in that one, and its `light` and `dark` are the same. */
+  scheme?: "light" | "dark";
   accessible?: boolean;
   light: ThemeColors;
   dark: ThemeColors;
   /** What changes with Settings → Theme → Contrast → Increased, or the device's Increase Contrast. */
   moreContrast?: { light?: Partial<ThemeColors>; dark?: Partial<ThemeColors> };
+  /** What it's made of: its palette, and which of its colors each part is drawn in. */
+  definition: ThemeDefinition;
 }
 
 /**
@@ -480,15 +538,15 @@ export interface ThemeFormat {
 export interface ImportedTheme {
   name: string;
   author?: string;
-  palette: Palette;
+  colors: ImportedColors;
 }
 
 /**
- * What a theme made for another app says its colors are for, as much of it as it has: lines works
- * the rest out (`themeColors` in themes/palette.ts), and whether it's light or dark from its
- * background. Any color CSS can read, or hex without the `#`.
+ * What a theme made for another app says its colors are for, as much of it as it has: lines makes
+ * a palette of them and works the rest out (`importedColors` in themes/palette.ts), and whether it's
+ * light or dark from its background. Any color CSS can read, or hex without the `#`.
  */
-export interface Palette {
+export interface ImportedColors {
   background: string;
   foreground: string;
   /** The panel beside the text, like an editor's file tree: lines' sidebar. */

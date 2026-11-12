@@ -32,8 +32,10 @@ test("the look saved as a preset of yours shows as changed once it is, updates, 
   // A theme of your own, which the preset's file takes along.
   await app.page.evaluate(() => {
     const { customThemes, plugins, prefs } = window.testing;
-    const lines = plugins.theme("lines");
-    prefs.theme = customThemes.add({ name: "Moss", light: { ...lines.light, accent: "#2f7d32" }, dark: { ...lines.dark, accent: "#7fd683" } });
+    const id = customThemes.copy(plugins.theme("lines").definition, (each) => plugins.palette(each), "Moss");
+    customThemes.setColor(id, "light", "accent", "#2f7d32");
+    customThemes.setColor(id, "dark", "accent", "#7fd683");
+    prefs.theme = id;
   });
   await settings.getByRole("button", { name: "Save as Preset" }).click();
   const name = settings.getByRole("textbox", { name: "Name" });

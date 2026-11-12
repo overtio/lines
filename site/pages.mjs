@@ -1,5 +1,6 @@
 import { lines } from "../src/plugins/themes/lines";
 import { themeCss } from "../src/lib/themes/css";
+import { resolveTheme } from "../src/lib/themes/palette";
 import { REPO, href, inline } from "./content.mjs";
 
 /*
@@ -8,7 +9,8 @@ import { REPO, href, inline } from "./content.mjs";
  * system is, and with more contrast when it asks for it, as the app is.
  */
 
-const THEME = themeCss([lines]);
+// Lines, worked out from its palettes for light and dark, written beside it.
+const THEME = themeCss([resolveTheme({ ...lines, palette: { light: "light", dark: "dark" } }, (scheme) => ({ id: scheme, name: lines.name, ...lines.palette[scheme] }))]);
 
 /*
  * Scripts the pages run, written here as functions and put in the pages as their source. Before the

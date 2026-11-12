@@ -16,6 +16,8 @@
   import { pictureName, themeFromPicture } from "../../themes/picture";
   import { readableFormats, readThemes } from "../../themes/import";
   import { paneColors } from "../../themes/css";
+  import { schemePalettes } from "../../themes/names";
+  import { paletteOf } from "../../themes/palette";
   import { isDarkPane, schemeShown, shownScheme } from "../../themes/show.svelte";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
@@ -64,13 +66,13 @@
   const iconsUnavailable = $derived(iconSets.flatMap((set) => set.availability ?? []).join(" ") || null);
   const previewIcons: IconName[] = ["notes", "tag", "pin", "trash"];
 
-  const yours = $derived(new Set(customThemes.themes.map((theme) => theme.id)));
+  const yours = $derived(new Set(customThemes.list.map((theme) => theme.id)));
   const builtIn = $derived(plugins.themes.filter((theme) => !yours.has(theme.id)));
   // The accessibility themes, then your own, come after the others under headings of their own, in the same group.
   const themeGroups = $derived([
     { heading: null, themes: builtIn.filter((theme) => !theme.accessible) },
     { heading: t("settings.themesAccessibility"), themes: builtIn.filter((theme) => theme.accessible) },
-    { heading: t("settings.themesYours"), themes: customThemes.themes },
+    { heading: t("settings.themesYours"), themes: plugins.themes.filter((theme) => yours.has(theme.id)) },
   ]);
   // What shows: the theme chosen, or Lines while the chosen one's plugin is off.
   const shown = $derived(plugins.theme(prefs.theme));
@@ -80,17 +82,15 @@
   let made = $state<string | null>(null);
 
   /**
-   * A theme of your own, to change, from the one showing: a copy of yours as it's kept, or a plugin's
-   * with its colors for Increased contrast; one with colors for one scheme only (Classic, Neon)
-   * keeps to that one.
+   * A theme of your own, to change, from the one showing: a copy of it, and of its palettes; one with
+   * colors for one scheme only (Classic, Neon) keeps to that one.
    */
+  function copyTheme({ name, definition }: Theme) {
+    return customThemes.copy(definition, (id) => plugins.palette(id), t("settings.themeCopyName", { name }));
+  }
+
   function newTheme() {
-    const { author, light, dark, moreContrast } = customThemes.get(theme) ?? {
-      ...shown,
-      light: shown.scheme === "dark" ? undefined : shown.light,
-      dark: shown.scheme === "light" ? undefined : shown.dark,
-    };
-    made = prefs.theme = customThemes.add({ name: t("settings.themeCopyName", { name: shown.name }), author, light, dark, moreContrast });
+    made = prefs.theme = copyTheme(shown);
   }
 
   const list = new Intl.ListFormat(locale, { type: "conjunction" });
@@ -121,7 +121,7 @@
     try {
       from.chosen?.(image);
       const picture = await from.picture(image);
-      const made = await themeFromPicture(picture, image.alt || from.name);
+      const made = await themeFromPicture(picture, image.alt || from.name, schemePalettes);
       prefs.theme = customThemes.add(made);
       fromPicture = { name: made.name, file: picture };
       speak(t("settings.themeFromPicture", { name: made.name }));
@@ -141,7 +141,7 @@
     imported = importError = pictureError = null;
     fromPicture = null;
     try {
-      const picked = await themeFromPicture(file, pictureName(file.name) || t("settings.themePictureName"));
+      const picked = await themeFromPicture(file, pictureName(file.name) || t("settings.themePictureName"), schemePalettes);
       prefs.theme = customThemes.add(picked);
       fromPicture = { name: picked.name, file };
       speak(t("settings.themeFromPicture", { name: picked.name }));
@@ -221,25 +221,27 @@
   /** Asking first, in the page, before the changes go. */
   let discarding = $state(false);
 
+  /** A theme's changes into a theme of yours, their colors into its palettes. */
+  function saveDraft(from: string, into: string) {
+    const draft = themeDrafts.of(from) ?? {};
+    for (const scheme of SCHEMES) {
+      const palette = plugins.palette(paletteOf(customThemes.get(into)!, scheme));
+      for (const [key, value] of Object.entries(draft[scheme] ?? {})) customThemes.setColor(into, scheme, key, value, palette);
+    }
+    themeDrafts.discard(from);
+  }
+
   /** The theme as it shows with its changes, as a theme of your own, shown in its place; its name ready to type over. */
   function saveAsNew() {
-    const { id, name, author, scheme, light, dark, moreContrast } = shown;
-    made = prefs.theme = customThemes.add({
-      name: t("settings.themeCopyName", { name }),
-      author,
-      light: scheme === "dark" ? undefined : light,
-      dark: scheme === "light" ? undefined : dark,
-      moreContrast,
-    });
-    themeDrafts.discard(id);
+    const { id } = shown;
+    made = prefs.theme = copyTheme(shown);
+    saveDraft(id, made);
     speak(t("settings.pickingSaved", { name: customThemes.get(made)!.name }));
   }
 
   /** The changes into the theme of yours they were made in. */
   function saveInto() {
-    const draft = themeDrafts.of(theme) ?? {};
-    for (const scheme of SCHEMES) for (const [key, value] of Object.entries(draft[scheme] ?? {})) customThemes.setColor(theme, scheme, key, value);
-    themeDrafts.discard(theme);
+    saveDraft(theme, theme);
     speak(t("settings.pickingSaved", { name: shown.name }));
   }
 

@@ -1,5 +1,5 @@
 import type { Theme, ThemeColors } from "../plugins/types";
-import { moreContrast, otherScheme, type Scheme } from "./palette";
+import { moreContrast, otherScheme, type Scheme, workOut } from "./palette";
 
 /**
  * Borders with Increased contrast: the faint text's color, which it makes 4.5:1 on every pane, a
@@ -22,7 +22,7 @@ export const other = (scheme: Scheme): Scheme => (scheme === "dark" ? "light" : 
  */
 export function paneColors(theme: Theme, own: Scheme, more: boolean): Partial<ThemeColors> {
   const scheme = other(own);
-  const colors = theme.scheme ? otherScheme(theme[own]) : theme[scheme];
+  const colors = theme.scheme ? workOut(otherScheme(theme[own])) : theme[scheme];
   if (!more) return colors;
   return { ...colors, ...MORE_CONTRAST[scheme], ...(theme.scheme ? moreContrast(colors) : theme.moreContrast?.[scheme]) };
 }

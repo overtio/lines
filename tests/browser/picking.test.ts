@@ -39,11 +39,22 @@ test("right-clicking the sidebar changes its color, which shows at once and save
   await settings.getByText("1 color changed in Lines").waitFor();
   await settings.getByRole("button", { name: "Save as New Theme" }).click();
   const saved = await app.page.evaluate(() => {
-    const { customThemes, prefs, themeDrafts } = window.testing;
-    return { theme: customThemes.get(prefs.theme), changed: themeDrafts.count("lines") };
+    const { customThemes, plugins, prefs, themeDrafts } = window.testing;
+    const theme = customThemes.get(prefs.theme);
+    const palette = customThemes.palette(typeof theme!.palette === "string" ? theme!.palette : theme!.palette.light)!;
+    return {
+      theme,
+      sidebar: palette.colors.find((entry) => entry.id === theme?.light?.["bg-sidebar"])?.color,
+      colors: palette.colors.length,
+      lines: plugins.palette("lines-light")!.colors.map((entry) => entry.color),
+      changed: themeDrafts.count("lines"),
+    };
   });
+  // A copy of Lines with a copy of its palette, the sidebar's color changed in it (only the sidebar's is that color); Lines' own as it was.
   expect(saved.theme?.name).toBe("Lines Copy");
-  expect(saved.theme?.light?.["bg-sidebar"]).toBe("#336699");
+  expect(saved.sidebar).toBe("#336699");
+  expect(saved.colors).toBe(saved.lines.length);
+  expect(saved.lines).not.toContain("#336699");
   expect(saved.changed).toBe(0);
   expect(await rootColor("bg-sidebar")).toBe("#336699");
 });

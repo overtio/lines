@@ -1,11 +1,17 @@
 import { describe, expect, test } from "bun:test";
-import { BLACK, contrast, fromHsv, grey, hex, inverted, isDark, luminance, over, parse, readableOn, toHsv, WHITE } from "../../src/lib/themes/color";
+import { BLACK, contrast, fromHsv, grey, hex, inverted, isDark, luminance, over, parse, readableOn, toHsv, toLch, WHITE } from "../../src/lib/themes/color";
 import { MORE_CONTRAST, other, paneColors, rule, themeCss } from "../../src/lib/themes/css";
-import { moreContrast, otherScheme, themeColors } from "../../src/lib/themes/palette";
+import { GOALS, importedColors, moreContrast, otherScheme, resolveTheme, workOut } from "../../src/lib/themes/palette";
+import { resolveFile } from "../../src/lib/themes/file";
 import { pictureName, themeFromPixels } from "../../src/lib/themes/picture";
-import type { Theme, ThemeColors } from "../../src/lib/plugins/types";
+import type { ImportedColors, Palette, Theme, ThemeColors } from "../../src/lib/plugins/types";
 
 const on = (a: string | undefined, b: string | undefined) => contrast(parse(a)!, parse(b)!);
+/** A theme made for another app as lines shows it, light or dark as its background is. */
+const themeColors = (imported: ImportedColors) => {
+  const { scheme, colors } = importedColors(imported);
+  return { scheme, colors: workOut(colors) };
+};
 
 describe("color", () => {
   test("reads the ways colors are written", () => {
@@ -68,27 +74,27 @@ describe("color", () => {
   });
 });
 
-/** Colors a few themes made for other apps have: one light, one dark, one with a pale accent. */
-const PALETTES = [
+/** What a few themes made for other apps say their colors are for: one light, one dark, one with a pale accent. */
+const IMPORTED = [
   { background: "#fdf6e3", foreground: "#657b83", accent: "#268bd2", hues: { red: "#dc322f", green: "#859900", yellow: "#b58900" } },
   { background: "#282a36", foreground: "#f8f8f2", accent: "#bd93f9", hues: { red: "#ff5555", green: "#50fa7b", yellow: "#f1fa8c" } },
   { background: "#ffffff", foreground: "#222222", accent: "#ffd60a" },
 ];
 
-describe("palette", () => {
+describe("a theme made for another app", () => {
   test("a theme from another app's colors reads: tags on their chips, text on accent buttons", () => {
-    for (const palette of PALETTES) {
-      const { scheme, colors } = themeColors(palette);
-      expect(scheme).toBe(isDark(parse(palette.background)!) ? "dark" : "light");
+    for (const imported of IMPORTED) {
+      const { scheme, colors } = themeColors(imported);
+      expect(scheme).toBe(isDark(parse(imported.background)!) ? "dark" : "light");
       const chip = over({ ...parse(colors.accent)!, a: scheme === "dark" ? 0.14 : 0.1 }, parse(colors.bg)!);
       expect(contrast(parse(colors["tag-text"])!, chip)).toBeGreaterThanOrEqual(4.5);
-      expect(on(colors["on-accent"], colors.accent)).toBeGreaterThanOrEqual(scheme === "light" && palette.accent === "#ffd60a" ? 4.5 : 3);
+      expect(on(colors["on-accent"], colors.accent)).toBeGreaterThanOrEqual(scheme === "light" && imported.accent === "#ffd60a" ? 4.5 : 3);
     }
   });
 
   test("Increased contrast reaches its ratios on the note, the list and the sidebar", () => {
-    for (const palette of PALETTES) {
-      const { colors } = themeColors(palette);
+    for (const imported of IMPORTED) {
+      const { colors } = themeColors(imported);
       const more = { ...colors, ...moreContrast(colors) } as ThemeColors;
       for (const surface of ["bg", "bg-list", "bg-sidebar"]) {
         expect(on(more.text, more[surface])).toBeGreaterThanOrEqual(9);
@@ -101,13 +107,85 @@ describe("palette", () => {
   });
 
   test("the other scheme's colors are the other way round, and read", () => {
-    for (const palette of PALETTES) {
-      const { scheme, colors } = themeColors(palette);
+    for (const imported of IMPORTED) {
+      const { scheme, colors } = themeColors(imported);
       const flipped = otherScheme(colors);
       expect(isDark(parse(flipped.bg)!)).toBe(scheme === "light");
       expect(on(flipped.text, flipped.bg)).toBeGreaterThanOrEqual(7);
       expect(on(flipped.accent, flipped.bg)).toBeGreaterThanOrEqual(3);
     }
+  });
+});
+
+describe("a theme's colors from its palette", () => {
+  const palette: Palette = {
+    id: "p",
+    name: "P",
+    colors: [
+      { id: "white", color: "#ffffff" },
+      { id: "ink", color: "#162120" },
+      { id: "teal", color: "#0e7a7e" },
+      { id: "pink", color: "#ff9cb0" },
+      { id: "green", color: "#1b7a3e" },
+      { id: "night", color: "#131819" },
+      { id: "snow", color: "#e3ebea" },
+    ],
+  };
+  const hue = (value: string) => toLch(parse(value)!).h;
+
+  test("parts drawn in a palette color have it exactly, and the rest are worked out from them", () => {
+    const colors = workOut({ bg: "#ffffff", text: "#162120", accent: "#0e7a7e" });
+    expect([colors.bg, colors.text, colors.accent]).toEqual(["#ffffff", "#162120", "#0e7a7e"]);
+    // The note list between the note and the sidebar, faint text from the text, tags readable on their chips.
+    for (const part of ["bg-list", "bg-sidebar", "bg-elevated", "text-sidebar", "text-muted", "text-faint", "tag-text", "ink", "on-accent"]) expect(colors[part], part).toBeString();
+    const chip = over({ ...parse(colors.accent)!, a: 0.1 }, WHITE);
+    expect(contrast(parse(colors["tag-text"])!, chip)).toBeGreaterThanOrEqual(4.5);
+    // Nothing to work a red from: app.css's.
+    expect(colors.danger).toBeUndefined();
+    expect(colors["palette-red"]).toBeUndefined();
+  });
+
+  test("a part that has to read is made just light or dark enough, its hue kept, when its color falls short", () => {
+    const colors = workOut({ bg: "#ffffff", text: "#162120", danger: "#ff9cb0", success: "#1b7a3e", "palette-red": "#ff9cb0" });
+    for (const [part, ratio] of [["danger", 4.5], ["palette-red", 3]] as const) {
+      const reached = on(colors[part], colors.bg);
+      expect(reached, part).toBeGreaterThanOrEqual(ratio);
+      expect(reached, part).toBeLessThan(ratio + 0.4);
+      expect(Math.abs(hue(colors[part]) - hue("#ff9cb0")), part).toBeLessThan(4);
+    }
+    expect(GOALS.danger.ratio).toBe(4.5);
+    // One that reads already is as it is, and text on it is chosen to read on it.
+    expect(colors.success).toBe("#1b7a3e");
+    expect(on(colors["on-danger"], colors.danger)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test("a theme's own properties are kept, and outrank what's worked out but not its colors", () => {
+    const colors = workOut({ bg: "#ffffff", text: "#162120", accent: "#0e7a7e", "callout-info": "#0e7a7e" }, { border: "color-mix(in srgb, var(--ink) 62%, transparent)", "tag-text": "var(--accent)", "callout-info": "var(--text)" });
+    expect(colors.border).toBe("color-mix(in srgb, var(--ink) 62%, transparent)");
+    expect(colors["tag-text"]).toBe("var(--accent)");
+    expect(colors["callout-info"]).toBe("#0e7a7e");
+  });
+
+  test("a theme's light and dark from its palette, Increased contrast's worked out, and one with a scheme of its own shown in it", () => {
+    const lookUp = (id: string) => (id === "p" ? palette : undefined);
+    const both = resolveTheme({ id: "t", name: "T", palette: "p", light: { bg: "white", text: "ink", accent: "teal" }, dark: { bg: "night", text: "snow", accent: "teal" } }, lookUp);
+    expect(both.scheme).toBeUndefined();
+    expect([both.light.bg, both.dark.bg]).toEqual(["#ffffff", "#131819"]);
+    expect(on(both.dark.accent, both.dark.bg)).toBeLessThan(4.5);
+    expect(on({ ...both.dark, ...both.moreContrast!.dark }.accent, both.dark.bg)).toBeGreaterThanOrEqual(4.5);
+    const dark = resolveTheme({ id: "d", name: "D", palette: "p", dark: { bg: "night", text: "snow" } }, lookUp);
+    expect(dark.scheme).toBe("dark");
+    expect(dark.light).toEqual(dark.dark);
+    // A color its palette hasn't, or a palette that's gone: worked out as if it weren't given.
+    expect(resolveTheme({ id: "g", name: "G", palette: "gone", light: { bg: "white", text: "ink" } }, lookUp).light.text).toBe("#000000");
+  });
+
+  test("a theme with a palette for each scheme draws each in its own", () => {
+    const night: Palette = { id: "night", name: "Night", colors: [{ id: "bg", color: "#131819" }, { id: "text", color: "#e3ebea" }] };
+    const day: Palette = { id: "day", name: "Day", colors: [{ id: "bg", color: "#ffffff" }, { id: "text", color: "#162120" }] };
+    const lookUp = (id: string) => [night, day].find((each) => each.id === id);
+    const theme = resolveTheme({ id: "t", name: "T", palette: { light: "day", dark: "night" }, light: { bg: "bg", text: "text" }, dark: { bg: "bg", text: "text" } }, lookUp);
+    expect([theme.light.bg, theme.light.text, theme.dark.bg, theme.dark.text]).toEqual(["#ffffff", "#162120", "#131819", "#e3ebea"]);
   });
 });
 
@@ -128,8 +206,8 @@ describe("theme CSS", () => {
 });
 
 describe("dark panes", () => {
-  const light = themeColors(PALETTES[0]).colors;
-  const dark = themeColors(PALETTES[1]).colors;
+  const light = themeColors(IMPORTED[0]).colors;
+  const dark = themeColors(IMPORTED[1]).colors;
   const both = { id: "both", name: "Both", light, dark, moreContrast: { dark: { text: "#ffffff" } } } as Theme;
 
   test("take the theme's colors for its other scheme", () => {
@@ -163,26 +241,26 @@ function picture(...colors: [string, number][]) {
 
 describe("a theme from a picture", () => {
   test("reads, light and dark: text 7:1, its accent 4.5:1", () => {
-    const sunset = themeFromPixels(picture(["#f28c38", 300], ["#6a3d9a", 400], ["#1d1b3a", 500], ["#ffd27a", 80]), "Sunset");
+    const sunset = resolveFile(themeFromPixels(picture(["#f28c38", 300], ["#6a3d9a", 400], ["#1d1b3a", 500], ["#ffd27a", 80]), "Sunset"));
     for (const [scheme, colors] of [["light", sunset.light], ["dark", sunset.dark]] as const) {
-      expect(isDark(parse(colors!.bg)!)).toBe(scheme === "dark");
-      expect(on(colors!.text, colors!.bg)).toBeGreaterThanOrEqual(7);
-      expect(on(colors!.accent, colors!.bg)).toBeGreaterThanOrEqual(4.5);
-      expect(on(colors!["text-muted"], colors!.bg)).toBeGreaterThanOrEqual(4.5);
+      expect(isDark(parse(colors.bg)!)).toBe(scheme === "dark");
+      expect(on(colors.text, colors.bg)).toBeGreaterThanOrEqual(7);
+      expect(on(colors.accent, colors.bg)).toBeGreaterThanOrEqual(4.5);
+      expect(on(colors["text-muted"], colors.bg)).toBeGreaterThanOrEqual(4.5);
     }
     expect(sunset.name).toBe("Sunset");
   });
 
   test("takes its accent from the picture's most vivid plentiful color", () => {
-    const forest = themeFromPixels(picture(["#2f5d34", 600], ["#a8c97f", 300], ["#d9d4c7", 400]), "Forest");
-    const { r, g, b } = parse(forest.light!.accent)!;
+    const forest = resolveFile(themeFromPixels(picture(["#2f5d34", 600], ["#a8c97f", 300], ["#d9d4c7", 400]), "Forest"));
+    const { r, g, b } = parse(forest.light.accent)!;
     expect(g).toBeGreaterThan(r);
     expect(g).toBeGreaterThan(b);
   });
 
   test("a picture without color makes a theme in greys", () => {
-    const grey = themeFromPixels(picture(["#202020", 200], ["#808080", 200], ["#e0e0e0", 200]), "Grey");
-    const { r, g, b } = parse(grey.light!.accent)!;
+    const grey = resolveFile(themeFromPixels(picture(["#202020", 200], ["#808080", 200], ["#e0e0e0", 200]), "Grey"));
+    const { r, g, b } = parse(grey.light.accent)!;
     expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(12);
   });
 

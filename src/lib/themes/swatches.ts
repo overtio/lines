@@ -1,14 +1,15 @@
-import type { Palette, ThemeColors } from "../plugins/types";
+import type { ImportedColors, ThemeColors } from "../plugins/types";
 import { contrast, fromLch, hex, isDark, type Lch, parse, readableOn, toLch } from "./color";
-import type { ThemeFile } from "./file";
-import { themeColors } from "./palette";
+import { fromColors, type SchemeNames, type ThemeFile } from "./file";
+import { importedColors, workOut } from "./palette";
 
 /*
  * A picture's colors, and a theme from them. Its pixels are grouped (k-means, in OKLab, where
  * distance is how different colors look); the main tone tints the backgrounds, light and dark, as
  * much as it's colorful; the most vivid color that's also plentiful is the accent; and colors near
  * red, green, blue and the rest color callouts and code. Text and accent are made to read on the
- * backgrounds; palette.ts does the rest, as for a theme from another app.
+ * backgrounds; palette.ts does the rest, as for a theme from another app, and the colors found
+ * make the theme's palette.
  *
  * Settings → Theme → New → From a Picture… uses it (picture.ts), and so does tools/themes, which
  * reads videos too and keeps more of the colors.
@@ -124,13 +125,13 @@ export function swatches(points: Float64Array, count: number): Swatch[] {
   return picked.map((i, at) => ({ ...fine[i], weight: weights[at] })).sort((x, y) => y.weight - x.weight);
 }
 
-/** Where each hue a palette names sits in OKLCH, in degrees. */
+/** Where each hue a theme names sits in OKLCH, in degrees. */
 const HUES = { red: 25, orange: 55, yellow: 100, green: 145, cyan: 200, blue: 255, magenta: 330 } as const;
 
 const apart = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
 
-/** The colors of a scheme's palette from a picture's swatches. */
-function palette(found: Swatch[], dark: boolean): Palette {
+/** What a scheme's colors are for, from a picture's swatches, as a theme made for another app says. */
+function colorsFor(found: Swatch[], dark: boolean): ImportedColors {
   const main = found[0];
   const colorful = found.filter((group) => group.c >= 0.05);
   // Plentiful and vivid: a bright sliver counts less than a wide wash of color.
@@ -151,7 +152,7 @@ function palette(found: Swatch[], dark: boolean): Palette {
       const group = near(hue);
       return group ? [[name, hex(readableOn(fromLch({ ...group, l: dark ? Math.max(group.l, 0.7) : Math.min(group.l, 0.6) }), bg, 3))]] : [];
     }),
-  ) as Palette["hues"];
+  ) as ImportedColors["hues"];
   return {
     background: hex(bg),
     foreground: shade(dark ? 0.93 : 0.23, Math.min(tint, 0.02)),
@@ -169,10 +170,10 @@ function reads(colors: ThemeColors, dark: boolean) {
   return isDark(bg) === dark && contrast(text, bg) >= 7 && contrast(accent, bg) >= 4.5;
 }
 
-/** A theme, light and dark, from a picture's swatches, called `name`. Throws if they can't make one. */
-export function themeFromSwatches(found: Swatch[], name: string): ThemeFile {
+/** A theme, light and dark, from a picture's swatches, called `name`, with a palette of the colors it found. Throws if they can't make one. */
+export function themeFromSwatches(found: Swatch[], name: string, names?: SchemeNames): ThemeFile {
   if (!found.length) throw new Error("The picture has no colors to read");
-  const [light, dark] = [false, true].map((dark) => themeColors(palette(found, dark)).colors);
-  if (!reads(light, false) || !reads(dark, true)) throw new Error("The picture's colors don't make a readable theme");
-  return { name, light, dark };
+  const [light, dark] = [false, true].map((dark) => importedColors(colorsFor(found, dark)).colors);
+  if (!reads(workOut(light), false) || !reads(workOut(dark), true)) throw new Error("The picture's colors don't make a readable theme");
+  return fromColors(name, undefined, { light, dark }, names);
 }

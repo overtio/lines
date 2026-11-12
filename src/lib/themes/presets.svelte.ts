@@ -4,14 +4,16 @@ import { prefs, readSettings, sameSpacing, type Stored } from "../prefs.svelte";
 import { announce, onAnnounce } from "../windows/channel";
 import { customThemes } from "./custom.svelte";
 import { readThemeFile, type ThemeFile } from "./file";
+import { schemePalettes } from "./names";
 
 /*
  * Presets (Settings → Presets): a whole look in one. The theme and the style (corners, type,
  * borders), with the rest of how lines looks: the text's font, spacing and width, the paper and
  * backdrop, the cursor and pointer, the mascot and the window's see-through-ness. Each style a
  * plugin has is one, with the settings it brings; your own are saved from what you have, kept on
- * this device with the other settings, and shared as a file, which takes a theme of your own along.
- * What's yours to see by stays yours: light or dark, contrast and the text's size aren't in one.
+ * this device with the other settings, and shared as a file, which takes a theme of your own along,
+ * palette and all. What's yours to see by stays yours: light or dark, contrast and the text's size
+ * aren't in one.
  */
 
 export const PRESET_KEYS = [
@@ -129,12 +131,11 @@ function read(json?: string): Preset[] {
   }
 }
 
-/** A preset's file, to save or send: with its theme, if it's one of your own, and without a picture of yours behind the page. */
+/** A preset's file, to save or send: with its theme and palette, if they're your own, and without a picture of yours behind the page. */
 export function writePresetFile({ name, author, settings }: Preset) {
   const written = pick(settings);
   if (written.paperBackdrop === "image") written.paperBackdrop = "none";
-  const own = customThemes.get(written.theme);
-  const theme = own && { name: own.name, author: own.author, light: own.light, dark: own.dark };
+  const theme = customThemes.file(written.theme);
   return `${JSON.stringify({ name, author, settings: written, theme }, null, 2)}\n`;
 }
 
@@ -150,7 +151,7 @@ export function readPresetFile(text: string): PresetFile | undefined {
   const { settings, theme } = raw as Record<string, unknown>;
   const { name, author } = readNames(raw as Record<string, unknown>);
   if (!name || !settings || typeof settings !== "object") return;
-  return { name, author, settings: presetSettings(settings as Record<string, unknown>), theme: theme ? readThemeFile(theme) : undefined };
+  return { name, author, settings: presetSettings(settings as Record<string, unknown>), theme: theme ? readThemeFile(theme, schemePalettes) : undefined };
 }
 
 class Presets {

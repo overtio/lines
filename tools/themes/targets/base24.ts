@@ -1,7 +1,7 @@
 import { hex } from "../../../src/lib/themes/color";
-import type { ThemeFile } from "../../../src/lib/themes/file";
+import type { Theme } from "../../../src/lib/plugins/types";
 import { brighter, hues, ramp, resolve } from "../colors";
-import { SCHEMES, slug, type Written } from "./common";
+import { schemesOf, slug, type Written } from "./common";
 
 /*
  * Base24 schemes (tinted-theming), a light and a dark one: the palette templates make themes of for
@@ -10,10 +10,10 @@ import { SCHEMES, slug, type Written } from "./common";
  * Base16's templates read it too.
  */
 
-export function base24(theme: ThemeFile): Written {
+export function base24(theme: Theme): Written {
   const files: Written = {};
-  for (const scheme of SCHEMES.filter((scheme) => theme[scheme])) {
-    const get = resolve(theme[scheme]!, scheme);
+  for (const scheme of schemesOf(theme)) {
+    const get = resolve(theme[scheme], scheme);
     const hue = hues(get);
     const { neutrals, background } = ramp(get);
     const colors = [

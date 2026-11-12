@@ -7,11 +7,10 @@ import { BASE_COLORS, type Scheme } from "./palette";
 
 /*
  * Themes come from plugins (lines' own are in plugins/themes), and your own (custom.svelte.ts). This
- * writes the colors of the ones on as CSS custom properties, which app.css builds on, and shows this
- * window's theme: the one chosen, or Lines while the plugin it's from is off, light or dark as
- * Settings says unless the theme has colors for only one, and in greys (Monochrome) or turned
- * around (Invert) if asked; and its sidebar and note list in its dark colors while it's light, if
- * Settings → Theme → Dark panes says.
+ * shows this window's theme, its colors as CSS custom properties that app.css builds on: the one
+ * chosen, or Lines while the plugin it's from is off, light or dark as Settings says unless the theme
+ * has colors for only one, and in greys (Monochrome) or turned around (Invert) if asked; and its
+ * sidebar and note list in its dark colors while it's light, if Settings → Theme → Dark panes says.
  */
 
 const style = document.createElement("style");
@@ -22,8 +21,9 @@ const panes = document.createElement("style");
 panes.id = "lines-dark-panes";
 style.after(panes);
 
-function showThemes() {
-  const css = themeCss(plugins.themes);
+/** The theme's colors, worked out from its palette as it's shown, and no other's. */
+function showColors(theme: Theme) {
+  const css = themeCss([theme]);
   if (style.textContent !== css) style.textContent = css;
 }
 
@@ -150,6 +150,8 @@ function showPanes(theme: Theme, own: Scheme, shown: Scheme) {
 
 function showTheme() {
   const { theme, own, shown } = look();
+  // The page has to have them before Monochrome and Invert read them.
+  showColors(theme);
   const root = document.documentElement;
   for (const name of filtered) root.style.removeProperty(`--${name}`);
   filtered = [];
@@ -177,15 +179,10 @@ function showHeadings() {
   else root.style.setProperty("--heading-color", headingColor === "accent" ? "var(--accent)" : ownColor(headingCustomColor, "var(--accent)"));
 }
 
-// Before the first paint, so there's no flash of another theme; then whenever they change. One
-// effect, as the page has to have the themes' colors before Monochrome and Invert read them.
-showThemes();
+// Before the first paint, so there's no flash of another theme; then whenever they change.
 showTheme();
 showHeadings();
 $effect.root(() => {
-  $effect(() => {
-    showThemes();
-    showTheme();
-  });
+  $effect(showTheme);
   $effect(showHeadings);
 });
