@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import type { Page } from "playwright";
 import { type App, choose, clickMod, engine, mod, noErrors, openApp, toggle } from "./app";
 
 let app: App;
@@ -561,6 +562,56 @@ test("a page break is drawn as one, and the note's page splits at it over a back
   expect(await app.page.locator(".editor-pane .cm-page-break").count()).toBe(1);
   await app.page.evaluate(() => (window.testing.prefs.paperBackdrop = "dawn"));
   await app.page.waitForFunction(() => document.querySelectorAll(".cm-page-card").length === 2, null, { timeout: 5000 });
+});
+
+describe("leaving the page", () => {
+  const bodyOf = (page: Page, id: string) => page.evaluate((id) => window.testing.notes.get(id)?.note.body, id);
+  const ready = (page: Page) => page.waitForFunction(() => window.testing?.notes.ready);
+
+  test("what's typed just before the page reloads, or its tab closes, is kept", async () => {
+    const id = await app.open("# Quick\n\nfirst");
+    await app.page.evaluate(() => window.testing.place());
+    await app.page.keyboard.type(" second");
+    await app.page.reload();
+    await ready(app.page);
+    expect(await bodyOf(app.page, id)).toBe("# Quick\n\nfirst second");
+
+    await app.page.evaluate((id) => window.testing.notes.select(id), id);
+    await app.page.waitForFunction(() => window.testing.text() === "# Quick\n\nfirst second");
+    await app.page.evaluate(() => window.testing.place());
+    await app.page.keyboard.type(" third");
+    await app.page.close({ runBeforeUnload: true });
+    const page = await app.page.context().newPage();
+    await page.goto(globalThis.lines.url);
+    await ready(page);
+    expect(await bodyOf(page, id)).toBe("# Quick\n\nfirst second third");
+    expect(await page.evaluate(() => Object.keys(localStorage).filter((key) => key.startsWith("lines.unsaved.")))).toEqual([]);
+  });
+
+  test("what was kept isn't stored over a later edit, nor over a note locked since", async () => {
+    const id = await app.open("# Later\n\nedited since");
+    const locked = await app.page.evaluate(async () => {
+      const id = crypto.randomUUID();
+      const key = { id: "key", changed: 0, kdf: "PBKDF2-SHA256", iterations: 1, salt: "", key: "" } as const;
+      const locked = { key, title: "Secret", files: [], sealed: "sealed" };
+      await window.testing.notes.insert({ id, body: "", locked, createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+      return id;
+    });
+    await app.page.evaluate(
+      ([id, locked]) => {
+        const note = window.testing.notes.get(id)!.note;
+        localStorage.setItem(`lines.unsaved.${id}`, JSON.stringify({ ...note, body: "# Earlier", updatedAt: note.updatedAt - 1000 }));
+        const unlocked = { ...window.testing.notes.get(locked)!.note, body: "# Secret\n\nin plain text", updatedAt: Date.now(), locked: undefined };
+        localStorage.setItem(`lines.unsaved.${locked}`, JSON.stringify(unlocked));
+      },
+      [id, locked],
+    );
+    await app.page.reload();
+    await ready(app.page);
+    expect(await bodyOf(app.page, id)).toBe("# Later\n\nedited since");
+    expect(await app.page.evaluate((id) => window.testing.notes.get(id)!.note.locked?.title, locked)).toBe("Secret");
+    expect(await app.page.evaluate(() => Object.keys(localStorage).filter((key) => key.startsWith("lines.unsaved.")))).toEqual([]);
+  });
 });
 
 test("Enter at the start of an item's text puts an empty item above it, under a paragraph after a blank line", async () => {

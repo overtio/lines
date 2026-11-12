@@ -25,6 +25,11 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - Notes kept only in the browser can be lost: clearing site data deletes them, the browser may evict them when the disk is low (lines doesn't ask for persistent storage), and Safari deletes them after 7 days without a visit.
 - The demo website shares its storage with every other site on `overtio.github.io`. It needs a domain of its own before people keep real notes there.
 
+## Closing and quitting
+
+- A note is stored a moment after the last key typed. Closing a tab or reloading before then keeps a copy in localStorage, stored at the next start. Not for locked notes, nor while the app lock is on, as localStorage can't be written encrypted that fast: those have only the write started as the page goes, which may not finish.
+- In the Mac app, Quit (⌘Q) waits for every window to store what's typed in it, three seconds at most, and closing the main window waits too. Quitting from the Dock, or logging out, still ends lines at once. Neither has been tried in the Mac app yet.
+
 ## The website
 
 The home page and the docs at https://overtio.github.io/lines/ (`site/`):

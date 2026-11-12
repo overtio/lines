@@ -68,6 +68,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] ⇧⌘\ with the cursor beside a bracket only toggles focus mode (it's also CodeMirror's "matching bracket")
 - [ ] [Mac] Ctrl+N in the editor makes a new note and doesn't also move the cursor down
 - [ ] [Web] [Chromium] When notes can't be saved (DevTools → Application → Storage → Simulate custom storage quota, a tiny one, then type): a message under the toolbar says so and why, in light and dark, and a screen reader hears it; lines keeps trying, and once the quota is back the message goes and what was typed is there after a reload
+- [ ] Typing and at once reloading or closing the tab [Web], quitting with ⌘Q [Mac], or closing the main window [Desktop] keeps what was typed, in Markdown, LaTeX and a floating note; a locked note's typing is kept by quitting too [Mac]
 
 ## 2. Format toolbar
 

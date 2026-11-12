@@ -31,6 +31,7 @@ With the app lock on, the notes and attachments in `lines` are encrypted (see [s
 | `lines.sync` | Where notes sync to: the folder (its name and an id for its handle) or the bucket and its keys. Encrypted while the app lock is on |
 | `lines.sync.leftovers` | Set only while encrypted copies are being removed after turning end-to-end encryption off |
 | `lines.seeded` | That the welcome note or feature tour has been added once, so deleting them doesn't bring them back |
+| `lines.unsaved.<id>` | A note typed in just before the page went (a tab closed or reloaded, lines quit), until it's in `lines`: stored at the next start unless what's there is newer. Never a locked note, nor anything while the app lock is on |
 | `lines.lock` | The app lock's settings, and its key locked with the passphrase |
 | `lines.lockedNotes` | Locked notes' key, locked with their password, and whether Touch ID opens them |
 
