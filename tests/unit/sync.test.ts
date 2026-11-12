@@ -127,6 +127,22 @@ describe("sync, of a note changed on two devices", () => {
     expect(listed().map((note) => note.body)).toEqual(["# Trip (conflicted copy)\n\nRome\nVenice", "# Trip\n\nRome\nFlorence"]);
   });
 
+  test("an edit sync brings in while another window types in the note keeps both, with a conflicted copy", async () => {
+    const [here, there] = await devices(2);
+    const id = notes.add("# Trip\n\nRome");
+    await here.sync();
+    await there.sync();
+    notes.update(id, "# Trip\n\nRome\nVenice");
+    await there.sync();
+    await here.sync();
+    // A floating note, still showing Rome, is typed in as it hears that sync stored Venice; its typing wins there.
+    notes.update(id, "# Trip\n\nRome\nFlorence");
+    await notes.reload(id, false);
+    await notes.flush();
+    await here.sync();
+    expect(listed().map((note) => note.body)).toEqual(["# Trip (conflicted copy)\n\nRome\nVenice", "# Trip\n\nRome\nFlorence"]);
+  });
+
   test("pinning a note, or giving it an icon and a color, while it's edited on another device keeps both, without a conflicted copy", async () => {
     const [here, there] = await devices(2);
     const id = notes.add("# Groceries\n\nmilk");

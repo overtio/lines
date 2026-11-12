@@ -856,6 +856,35 @@ describe("fixed", () => {
     await app.page.getByRole("button", { name: "Convert to Spreadsheet" }).click();
     expect(await app.text()).toBe("````csv\nFence\n```\n````\n\nAfter the table.");
   });
+
+  test("an edit sync brings in while the note is typed in another window is left for sync to keep too", async () => {
+    const id = await app.open("# Shared\n\nfirst");
+    // Another window (a floating note, here a tab of its own) with the note open, typing in it.
+    const other = await app.page.context().newPage();
+    await other.goto(globalThis.lines.url);
+    await other.waitForFunction(() => window.testing?.notes.ready);
+    await other.evaluate((id) => window.testing.notes.select(id), id);
+    await other.waitForFunction(() => window.testing.text() === "# Shared\n\nfirst");
+    await other.evaluate(() => window.testing.place());
+    await other.keyboard.type(" typed");
+    // This window's sync stores an edit from another device, and its sync record.
+    await app.page.evaluate(async (id) => {
+      const note = window.testing.notes.get(id)!.note;
+      await window.testing.notes.applyRemote({ ...note, body: "# Shared\n\nfirst\n\nfrom another device", updatedAt: note.updatedAt + 1 });
+      const db = await new Promise<IDBDatabase>((resolve) => (indexedDB.open("lines").onsuccess = (event) => resolve((event.target as IDBOpenDBRequest).result)));
+      const tx = db.transaction("sync", "readwrite");
+      tx.objectStore("sync").put({ id, etag: "synced", hash: "synced" });
+      await new Promise((resolve) => (tx.oncomplete = resolve));
+    }, id);
+    // The typing wins here, as it's stored, and the record goes: sync's next pass takes the note as
+    // changed on both sides, keeping the newer edit and the other as a conflicted copy.
+    await app.page.waitForFunction((id) => window.testing.notes.get(id)!.note.body === "# Shared\n\nfirst typed", id);
+    const record = await app.page.evaluate(async (id) => {
+      const db = await new Promise<IDBDatabase>((resolve) => (indexedDB.open("lines").onsuccess = (event) => resolve((event.target as IDBOpenDBRequest).result)));
+      return new Promise((resolve) => (db.transaction("sync").objectStore("sync").get(id).onsuccess = (event) => resolve((event.target as IDBRequest).result)));
+    }, id);
+    expect(record).toBeUndefined();
+  });
 });
 
 test("a nested tag shows as one as soon as its slash is typed, and files under the tag it's in", async () => {

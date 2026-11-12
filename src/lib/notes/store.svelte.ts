@@ -12,7 +12,7 @@ import { noteKeys } from "./noteKeys.svelte";
 import type { SampleSet } from "./samples";
 import { normalizeTag, renameTagIn, renameTypeIn } from "./parse";
 import { nameOf } from "./properties";
-import { IndexedDBStorage, type NoteStorage } from "./storage";
+import { IndexedDBStorage, syncRecords, type NoteStorage } from "./storage";
 import type { Filter, Note, NoteLock, NoteMeta, WrappedKey } from "./types";
 import { WELCOME_NOTE } from "./welcome";
 
@@ -145,6 +145,8 @@ class NotesStore {
   #saving = new Map<string, Promise<void>>();
   /** The notes `leave` kept in localStorage, until they're stored. */
   #kept = new Set<string>();
+  /** Notes sync changed in another window while they had unsaved edits here (`#typingWins`). */
+  #typedOverSync = new Set<string>();
   #changeListeners = new Set<() => void>();
   #flushers = new Set<() => void>();
   /**
@@ -870,11 +872,11 @@ class NotesStore {
    * here too: only the main window syncs, and this is how it hears about them.
    */
   async reload(id: string, local: boolean) {
-    if (this.#hasUnsaved(id)) return;
+    if (this.#typingWins(id, local)) return;
     const found = await this.#storage.get(id);
     if (found) noteKeys.notice(found);
     const note = found && (await opened(found));
-    if (this.#hasUnsaved(id)) return;
+    if (this.#typingWins(id, local)) return;
     const current = this.get(id);
     if (!note) {
       if (!current) return;
@@ -885,6 +887,17 @@ class NotesStore {
       if (current?.note.body !== note.body) this.#changedOutside([id]);
     }
     if (local) this.#notify();
+  }
+
+  /**
+   * Whether the note has unsaved edits here, which win over what another window stored. What sync
+   * stored (not `local`) isn't lost though: once the edits are stored, the note's sync record goes
+   * (`#save`), so the next pass takes it as changed on both sides and keeps the synced edit too.
+   */
+  #typingWins(id: string, local: boolean) {
+    if (!this.#hasUnsaved(id)) return false;
+    if (!local) this.#typedOverSync.add(id);
+    return true;
   }
 
   /** Puts the entry in place of its note's, or first if the note is new here. */
@@ -1024,6 +1037,11 @@ class NotesStore {
       const sealed = await Promise.all(notes.map((note) => (note.locked && !note.locked.sealed ? this.#seal(note) : note)));
       if (!sealed.length) return;
       await this.#storage.put(...sealed.map(stored));
+      const typedOver = sealed.map(({ id }) => id).filter((id) => this.#typedOverSync.has(id));
+      if (typedOver.length) {
+        await syncRecords.delete(...typedOver);
+        for (const id of typedOver) this.#typedOverSync.delete(id);
+      }
       for (const note of sealed) {
         this.#forgetKept(note);
         void announce({ type: "note", id: note.id, local: true });
