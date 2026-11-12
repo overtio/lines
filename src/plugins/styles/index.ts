@@ -53,6 +53,8 @@ const classicColors: ThemeColors = {
   "callout-question": "#800080",
   "callout-warning": "#6d6d00",
   "callout-decision": "#007676",
+  "palette-orange": "#a05400",
+  "palette-yellow": "#836100",
 };
 
 const neonColors: ThemeColors = {
@@ -271,6 +273,7 @@ const themes = (): Theme[] => [
       "syn-comment": "#857559",
       "syn-function": "#8a4fbf",
       "syn-type": "#875600",
+      "palette-orange": "#bf6500",
     },
     dark: {
       bg: "#1c2033",
@@ -464,6 +467,8 @@ const themes = (): Theme[] => [
       "syn-comment": "#6f665b",
       "syn-function": "#6d3a8a",
       "syn-type": "#9a5400",
+      "palette-orange": "#ba6200",
+      "palette-yellow": "#9d7500",
     },
     dark: {
       bg: "#161312",

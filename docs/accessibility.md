@@ -148,7 +148,7 @@ A spreadsheet's grid (`src/plugins/spreadsheet/Grid.svelte`, [spreadsheets.md](s
 
 The release checklist (`qa/checklist.md`) has a section for this: Lighthouse's accessibility audit, a pass with the keyboard alone, and one with VoiceOver.
 
-Every theme's highlighter, status and callout colors are its own (from its palette, or lines' own adjusted to it). `tests/unit/plugins.test.ts` checks that they still read: danger 4.5:1 on the note and in menus, success and callout icons 3:1, text 4.5:1 on the danger, success and pin buttons, and text on a highlight at 4.5:1 (or as much as the theme's text has on its background).
+Every theme's highlighter, status and callout colors are its own (from its palette, or lines' own adjusted to it). `tests/unit/plugins.test.ts` checks that they still read: danger 4.5:1 on the note and in menus, success and callout icons 3:1, text 4.5:1 on the danger, success and pin buttons, the colors tags, types and events can have 3:1 on every background, and text on a highlight at 4.5:1 (or as much as the theme's text has on its background).
 
 When a theme's colors change, its Increased-contrast colors (`moreContrast`, in `src/plugins/themes/`) need working out again: each one is the theme's own color mixed toward its text (then toward black, or white in dark) until it reaches its ratio against the note's, the list's and the sidebar's backgrounds.
 

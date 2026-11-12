@@ -114,6 +114,25 @@ describe("themes' own highlighter, status and callout colors", () => {
     }
     expect(misses).toEqual([]);
   });
+
+  test("the colors tags, types and events can have are 3:1 on every background, as icons need", () => {
+    // app.css's for a theme without its own: another of its colors, or app.css's orange and yellow.
+    const fallback = Object.fromEntries([...lightCss.matchAll(/--(palette-[a-z]+):\s*var\(--([a-z-]+)\);/g)].map((match) => [match[1], match[2]]));
+    const misses: string[] = [];
+    for (const theme of withStyles) {
+      for (const scheme of shownSchemes(theme)) {
+        const colors = effective(theme, scheme);
+        for (const key of ["red", "orange", "yellow", "green", "blue", "purple", "gray"].map((name) => `palette-${name}`)) {
+          colors[key] ??= colors[fallback[key]];
+          for (const surface of ["bg", "bg-list", "bg-sidebar", "bg-elevated"]) {
+            const measured = ratio(colors, key, surface);
+            if (measured < 2.95) misses.push(`${theme.id} ${scheme}: ${key} on ${surface} ${measured.toFixed(2)} < 3`);
+          }
+        }
+      }
+    }
+    expect(misses).toEqual([]);
+  });
 });
 
 describe("styles", () => {
