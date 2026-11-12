@@ -258,6 +258,76 @@ describe("themes", () => {
   });
 });
 
+describe("formatting's colors", () => {
+  /** The color the open note draws the text `text` in (its text node's, spaces aside), as the page writes colors. */
+  const colorOf = (text: string) =>
+    app.page.evaluate((text) => {
+      const walker = document.createTreeWalker(document.querySelector(".editor-pane .cm-content")!, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) if (walker.currentNode.textContent!.trim() === text) return getComputedStyle(walker.currentNode.parentElement!).color;
+      throw new Error(`No "${text}" in the note`);
+    }, text);
+  /** A color as the page writes it, worked out where the note is (`var(--accent)`). */
+  const resolved = (color: string) =>
+    app.page.evaluate((color) => {
+      const probe = document.createElement("span");
+      probe.style.color = color;
+      document.querySelector(".editor-pane")!.append(probe);
+      const shown = getComputedStyle(probe).color;
+      probe.remove();
+      return shown;
+    }, color);
+
+  test("left to the theme, each looks as it did: in the text's color around it, the sixth heading and quotes muted, links and list markers in the accent", async () => {
+    app = await openApp();
+    await app.open("# One\n\n###### Six\n\n**bold** *slanted* `code` ==marked== <u>under</u> ~~gone~~ [**strong link**](https://example.com)\n\n> **quoted**\n\n- item\n\n1. first\n\nEnd");
+    const [text, muted, accent] = await Promise.all(["var(--text)", "var(--text-muted)", "var(--accent)"].map(resolved));
+    for (const word of ["One", "bold", "slanted", "code", "marked", "under", "gone"]) expect(await colorOf(word), word).toBe(text);
+    expect(await colorOf("Six")).toBe(muted);
+    expect(await colorOf("quoted")).toBe(muted);
+    expect(await colorOf("strong link")).toBe(accent);
+    const bullet = await app.page.locator(".editor-pane .cm-lp-bullet").first().evaluate((bullet) => getComputedStyle(bullet, "::before").backgroundColor);
+    expect(bullet).toBe(accent);
+    expect(await app.style(".editor-pane .cm-lp-list-number", "color")).toBe(accent);
+    expect(await app.style(".editor-pane .cm-lp-link", "text-decoration-color")).toBe(await resolved("var(--accent-soft)"));
+
+    // As written, bold's marks are faint, and bold in a quote or a link is in its color too.
+    await app.page.evaluate(() => (window.testing.prefs.markdownMode = "source"));
+    await app.page.waitForFunction(() => !document.querySelector(".editor-pane .cm-lp-h1"));
+    for (const word of ["One", "bold", "slanted", "gone"]) expect(await colorOf(word), `${word} in Source`).toBe(text);
+    expect(await colorOf("**")).toBe(await resolved("var(--text-faint)"));
+    expect(await colorOf("~~")).toBe(await resolved("var(--text-faint)"));
+    expect(await colorOf("quoted")).toBe(muted);
+    expect(await colorOf("strong link")).toBe(accent);
+  });
+
+  test("a theme of your own colors headings by level, bold and links, in Live and Source; what's inside bold takes bold's; Heading color overrides it", async () => {
+    app = await openApp();
+    await app.page.evaluate(() => {
+      const { customThemes, plugins, prefs } = window.testing;
+      const id = customThemes.copy(plugins.theme("lines").definition, (each) => plugins.palette(each), "Formatted");
+      const colors = { "text-h1": "#c80000", "text-h2": "#007800", "text-bold": "#0000c8", "text-link": "#960096" };
+      for (const [part, color] of Object.entries(colors)) customThemes.setColor(id, "light", part, color);
+      prefs.theme = id;
+    });
+    await app.open("# Title\n\n## Part\n\n### Third\n\nSome **heavy *nested* words**, *leaning*, and a [link](https://example.com).\n\nEnd");
+    const text = await resolved("var(--text)");
+    const expected = { Title: "rgb(200, 0, 0)", Part: "rgb(0, 120, 0)", Third: text, heavy: "rgb(0, 0, 200)", leaning: text, link: "rgb(150, 0, 150)" };
+    for (const [word, color] of Object.entries(expected)) expect(await colorOf(word), word).toBe(color);
+    expect(await colorOf("nested")).toBe("rgb(0, 0, 200)");
+
+    await app.page.evaluate(() => (window.testing.prefs.markdownMode = "source"));
+    await app.page.waitForFunction(() => !document.querySelector(".editor-pane .cm-lp-h1"));
+    for (const [word, color] of Object.entries(expected)) expect(await colorOf(word), `${word} in Source`).toBe(color);
+
+    const settings = await app.settings("Typography");
+    await choose(settings, "Heading color", "Accent");
+    expect(await colorOf("Title")).toBe(await resolved("var(--accent)"));
+    expect(await colorOf("Part")).toBe(await resolved("var(--accent)"));
+    await choose(settings, "Heading color", "Theme");
+    expect(await colorOf("Title")).toBe("rgb(200, 0, 0)");
+  });
+});
+
 describe("the color picker", () => {
   /** Settings → Typography's own heading color, its picker open. */
   async function openPicker(headingCustomColor: string) {

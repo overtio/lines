@@ -293,14 +293,46 @@ const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[], m
   additions.flatMap((addition) => addition.editor ?? []),
 ];
 
-/** Markdown as written (Settings → Editor → Show Markdown → Source): its marks faint, what they do to text shown on it. */
+/** A color in Markdown shown as written, kept for bold, italics and strikethrough in it (below). */
+const around = (color: string) => ({ color, "--source-around": color });
+
+/**
+ * Markdown as written (Settings → Editor → Show Markdown → Source): its marks faint, what they do to
+ * text shown on it, in the theme's colors for each (editor.css). Text both bold and in a heading, a
+ * link or a quote has both on one element here, rather than one inside the other, and so do a mark
+ * and what it marks; so bold, italics and strikethrough come last, each in its color, or else the
+ * one it's in, or else, for their own marks (`**`), faint.
+ */
 const sourceStyle = HighlightStyle.define([
-  { tag: t.heading, fontWeight: "700", color: "var(--heading-color)" },
-  { tag: t.strong, fontWeight: "700" },
-  { tag: t.emphasis, fontStyle: "italic" },
-  { tag: t.strikethrough, textDecoration: "line-through" },
-  { tag: [t.link, t.special(t.url)], color: "var(--accent)" },
-  { tag: t.quote, color: "var(--text-muted)" },
+  // A table's header row; headings have a rule for their level.
+  { tag: t.heading, fontWeight: "700", ...around("var(--heading-color, var(--text))") },
+  ...[t.heading1, t.heading2, t.heading3, t.heading4, t.heading5, t.heading6].map((tag, i) => ({
+    tag,
+    fontWeight: "700",
+    ...around(`var(--heading-color, var(--text-h${i + 1}, var(--text)))`),
+  })),
+  { tag: [t.link, t.special(t.url)], ...around("var(--text-link)") },
+  { tag: t.special(t.link), ...around("var(--text-mention)") },
+  { tag: t.quote, ...around("var(--text-quote)") },
+  // As highlightStyle colors marks, which the rules below would otherwise outrank.
+  { tag: t.processingInstruction, "--source-mark": "var(--text-faint)" },
+  {
+    tag: t.strong,
+    fontWeight: "700",
+    color: "var(--text-bold, var(--source-around, var(--source-mark)))",
+    "--source-bold": "var(--text-bold)",
+  },
+  {
+    tag: t.emphasis,
+    fontStyle: "italic",
+    color: "var(--text-italic, var(--source-bold, var(--source-around, var(--source-mark))))",
+    "--source-italic": "var(--text-italic)",
+  },
+  {
+    tag: t.strikethrough,
+    textDecoration: "line-through",
+    color: "var(--text-strike, var(--source-italic, var(--source-bold, var(--source-around, var(--source-mark)))))",
+  },
 ]);
 
 let built: { additions: MarkdownAddition[]; papers: PaperSource[]; mode: MarkdownMode; drag: boolean; underlined: boolean; editing: Extension } | undefined;

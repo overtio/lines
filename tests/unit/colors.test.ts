@@ -106,13 +106,27 @@ describe("a theme made for another app", () => {
     }
   });
 
-  test("the other scheme's colors are the other way round, and read", () => {
+  test("Increased contrast brings the colors a theme gives formatting to 7:1 on the note, and leaves the rest to follow the text", () => {
+    for (const imported of IMPORTED) {
+      const { colors } = themeColors(imported);
+      const formatting = { "text-h1": colors.accent, "text-bold": "#e8a33d", "text-link": colors["text-faint"], "text-quote": isDark(parse(colors.bg)!) ? "#ffffff" : "#000000" };
+      const more = moreContrast({ ...colors, ...formatting });
+      for (const [key, color] of Object.entries(formatting)) expect(on(more[key] ?? color, colors.bg)).toBeGreaterThanOrEqual(7);
+      // One that reads already stays as it is, and formatting the theme leaves alone isn't given a color.
+      expect(more["text-quote"]).toBeUndefined();
+      expect(more["text-italic"]).toBeUndefined();
+    }
+  });
+
+  test("the other scheme's colors are the other way round, and read, the colors given formatting too", () => {
     for (const imported of IMPORTED) {
       const { scheme, colors } = themeColors(imported);
-      const flipped = otherScheme(colors);
+      const flipped = otherScheme({ ...colors, "text-h1": colors.accent });
       expect(isDark(parse(flipped.bg)!)).toBe(scheme === "light");
       expect(on(flipped.text, flipped.bg)).toBeGreaterThanOrEqual(7);
       expect(on(flipped.accent, flipped.bg)).toBeGreaterThanOrEqual(3);
+      expect(on(flipped["text-h1"], flipped.bg)).toBeGreaterThanOrEqual(4.5);
+      expect(flipped["text-bold"]).toBeUndefined();
     }
   });
 });

@@ -210,7 +210,13 @@
 }
 
 /* In notes: headings by weight and space, not size; small grey bullets; tags as plain grey words;
-   links in the text's color over a hairline in the accent. */
+   links in the text's color over a hairline in the accent. The links' and bullets' colors are set
+   as app.css sets them (at its weight, after it), so a theme's own colors for them still win. */
+:root:where([data-style="void"]) {
+  --text-link: var(--text);
+  --text-bullet: var(--text-faint);
+}
+
 :root[data-style="void"] .cm-lp-h {
   font-size: 1em;
   letter-spacing: 0;
@@ -223,7 +229,6 @@
 :root[data-style="void"] .cm-lp-bullet::before {
   width: 0.28em;
   height: 0.28em;
-  background: var(--text-faint);
 }
 
 :root[data-style="void"] .cm-lp-tag {
@@ -233,7 +238,6 @@
 }
 
 :root[data-style="void"] .cm-lp-link {
-  color: var(--text);
   text-decoration-color: var(--accent);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;

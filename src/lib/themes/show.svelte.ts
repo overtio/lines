@@ -3,6 +3,7 @@ import type { Theme, ThemeColors } from "../plugins/types";
 import { prefs } from "../prefs.svelte";
 import { css, grey, inverted, parse, type Rgb } from "./color";
 import { other, paneColors, rule, themeCss } from "./css";
+import { FORMATTING_COLORS } from "./formatting";
 import { BASE_COLORS, type Scheme } from "./palette";
 
 /*
@@ -71,6 +72,7 @@ const FILTERED = [
   "syn-comment",
   "syn-function",
   "syn-type",
+  ...FORMATTING_COLORS,
   "border",
   "hover",
   "active",
@@ -171,7 +173,7 @@ function showTheme() {
   document.querySelector('meta[name="theme-color"]:not([media])')?.setAttribute("content", bg);
 }
 
-/** Headings in the text's color, the accent, or a color of your own (Settings → Typography; editor.css). */
+/** Headings in the theme's colors for them, the accent, or a color of your own (Settings → Typography; editor.css). */
 function showHeadings() {
   const root = document.documentElement;
   const { headingColor, headingCustomColor } = prefs;

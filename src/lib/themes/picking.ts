@@ -1,4 +1,5 @@
 import { css, parse, type Rgb } from "./color";
+import { FORMATTING, FORMATTING_COLORS } from "./formatting";
 
 /*
  * What colors a part of lines is drawn in, by the theme's custom properties, to change by
@@ -6,7 +7,8 @@ import { css, parse, type Rgb } from "./color";
  * border, and what's behind it, layer by layer down to the first that isn't see-through (a row's
  * hover over the sidebar). Each is matched to the property it's drawn from, worked out where the
  * part is (a pane shown dark has its own), and named by the color a theme sets for it: the
- * sidebar's surface is its background, the highlight is mixed from Highlights.
+ * sidebar's surface is its background, the highlight is mixed from Highlights. Text in a note is
+ * the formatting it's in first (a bold word is Bold, then Text), to change that alone.
  */
 
 export type Role = "background" | "text" | "border";
@@ -34,7 +36,7 @@ const FROM: Record<Role, [string, string][]> = {
     ["surface-sidebar", "bg-sidebar"],
     ...["bg", "bg-list", "bg-sidebar", "bg-elevated", "accent", "danger", "success", "pin", "highlight-base", ...PALETTE].map((key): [string, string] => [key, key]),
   ],
-  text: ["text", "text-sidebar", "text-muted", "text-faint", "accent", "tag-text", "on-accent", "danger", "success", "pin", ...PALETTE, ...CALLOUTS, ...CODE].map((key) => [key, key]),
+  text: ["text", "text-sidebar", "text-muted", "text-faint", "accent", "tag-text", "on-accent", "danger", "success", "pin", ...PALETTE, ...CALLOUTS, ...CODE, ...FORMATTING_COLORS].map((key) => [key, key]),
   border: ["border", "card-border", "ink", "accent", "text", "tag-text", "danger"].map((key) => [key, key]),
 };
 
@@ -86,6 +88,27 @@ function match(el: Element, role: Role, color: Rgb, resolver: Resolver): string 
   }
 }
 
+/**
+ * The formatting in a note that draws `target`'s text in `color`, innermost first: each whose color
+ * is that, or that has none (app.css) and so is in the color of the text around it. Only as far out
+ * as the text is that color: a bold word in a link is Bold and Link, not the paragraph's too.
+ */
+function formattingAt(target: Element, color: Rgb, resolver: Resolver): string[] {
+  const keys: string[] = [];
+  for (let el: Element | null = target; el?.parentElement; el = el.parentElement) {
+    const style = getComputedStyle(el);
+    const shown = parse(style.color);
+    if (!shown || !near(shown, color)) break;
+    for (const [key, selector] of FORMATTING) {
+      if (!el.matches(selector)) continue;
+      const value = style.getPropertyValue(`--${key}`).trim();
+      const drawn = value ? resolver.color(value) : parse(getComputedStyle(el.parentElement).color);
+      if (drawn && near(drawn, color)) keys.push(key);
+    }
+  }
+  return keys;
+}
+
 /** The color of a background image that's one color all over, as a layer over a background is drawn (`linear-gradient(c, c)`). */
 function flat(image: string) {
   const [, from, to] = /^linear-gradient\(((?:rgba?|color)\([^)]*\)), ((?:rgba?|color)\([^)]*\))\)$/.exec(image) ?? [];
@@ -105,6 +128,8 @@ export function colorsAt(target: Element): FoundColor[] {
   };
   try {
     const style = getComputedStyle(target);
+    const text = parse(style.color);
+    if (text && text.a > 0) found.push(...formattingAt(target, text, resolver).map((key): FoundColor => ({ role: "text", key, shown: css(text) })));
     add(target, "text", style.color);
     if (parseFloat(style.borderTopWidth) > 0 && style.borderTopStyle !== "none") add(target, "border", style.borderTopColor);
     for (let el: Element | null = target; el; el = el.parentElement) {

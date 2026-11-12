@@ -216,13 +216,14 @@ describe("styles", () => {
   test("their CSS shows only while they're chosen: every rule starts with their :root", () => {
     for (const look of looks.filter((look) => look.css)) {
       const css = look.css!.replace(/\/\*[\s\S]*?\*\//g, "");
-      const root = `:root[data-style="${look.id}"]`;
+      // Or at app.css's weight, for what a theme's colors should still outrank (docs/plugins.md).
+      const roots = [`:root[data-style="${look.id}"]`, `:root:where([data-style="${look.id}"])`];
       for (const [, selectors] of css.matchAll(/(?:^|})\s*([^{}@]+?)\s*\{/g)) {
         // Split at the commas between selectors, not those inside :is() or :not().
         for (const selector of selectors.split(/,(?![^(]*\))/)) {
           // Keyframes' steps are inside an @keyframes block, which the pattern above skips.
           if (/^(from|to|\d+%)$/.test(selector.trim())) continue;
-          expect(selector.trim().startsWith(root), `${look.id}: ${selector.trim()}`).toBe(true);
+          expect(roots.some((root) => selector.trim().startsWith(root)), `${look.id}: ${selector.trim()}`).toBe(true);
         }
       }
     }

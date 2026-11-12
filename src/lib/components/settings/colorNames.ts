@@ -44,6 +44,18 @@ const NAMES: Record<string, () => string> = {
   "callout-error": () => t("editor.callout.error"),
   "callout-decision": () => t("editor.callout.decision"),
   ...Object.fromEntries(PALETTE.map((color) => [`palette-${color}`, () => t(`picker.color.${color}`)])),
+  ...Object.fromEntries([1, 2, 3, 4, 5, 6].map((level) => [`text-h${level}`, () => t("settings.color.textHeading", { level })])),
+  "text-bold": () => t("editor.format.bold"),
+  "text-italic": () => t("editor.format.italic"),
+  "text-strike": () => t("editor.format.strike"),
+  "text-underline": () => t("editor.format.underline"),
+  "text-highlight": () => t("settings.color.textHighlight"),
+  "text-code": () => t("settings.color.textCode"),
+  "text-link": () => t("settings.color.textLink"),
+  "text-mention": () => t("settings.color.textMention"),
+  "text-quote": () => t("settings.color.textQuote"),
+  "text-bullet": () => t("settings.color.textBullet"),
+  "text-number": () => t("settings.color.textNumber"),
 };
 
 /** A theme color's name, as Settings shows it. */

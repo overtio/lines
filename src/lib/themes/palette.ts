@@ -1,5 +1,6 @@
 import type { ImportedColors, Palette, Theme, ThemeAssignment, ThemeColors, ThemeDefinition } from "../plugins/types";
 import { BLACK, contrast, fromLch, hex, isDark, mix, over, parse, reach, readableOn, type Rgb, toLch, WHITE } from "./color";
+import { FORMATTING_COLORS } from "./formatting";
 
 /*
  * Working out a theme's colors. A theme is a palette and which of its colors each part of lines is
@@ -33,9 +34,6 @@ const STATUS = ["danger", "success", "pin"];
 const NEAR_BLACK: Rgb = { r: 20, g: 20, b: 20, a: 1 };
 const PIN_TEXT: Rgb = { r: 29, g: 28, b: 26, a: 1 };
 
-/** A note's formatting, each in a color of its own if a theme gives it one: headings, bold, links, code… */
-const FORMATTING = ["h1", "h2", "h3", "h4", "h5", "h6", "bold", "italic", "strike", "underline", "link", "code", "quote"].map((kind) => `text-${kind}`);
-
 /**
  * How well a part has to read against what it's drawn on, in every theme (docs/accessibility.md):
  * danger, and a note's formatting, as text, 4.5:1; success, the callouts and the colors tags and
@@ -44,7 +42,7 @@ const FORMATTING = ["h1", "h2", "h3", "h4", "h5", "h6", "bold", "italic", "strik
  */
 export const GOALS: Record<string, { ratio: number; on: readonly string[] }> = {
   danger: { ratio: 4.5, on: NOTE },
-  ...Object.fromEntries(FORMATTING.map((part) => [part, { ratio: 4.5, on: ["bg"] }])),
+  ...Object.fromEntries(FORMATTING_COLORS.map((part) => [part, { ratio: 4.5, on: ["bg"] }])),
   ...Object.fromEntries(["success", "callout-info", "callout-question", "callout-warning", "callout-decision"].map((part) => [part, { ratio: 3, on: NOTE }])),
   ...Object.fromEntries(["red", "orange", "yellow", "green", "blue", "purple", "gray"].map((name) => [`palette-${name}`, { ratio: 3, on: PANES }])),
   ...Object.fromEntries(STATUS.map((part) => [`on-${part}`, { ratio: 4.5, on: [part] }])),
@@ -225,7 +223,8 @@ function numbers(colors: Partial<ThemeColors>) {
 /**
  * The colors Increased contrast changes, worked out as lines' own themes' were (docs/accessibility.md):
  * each mixed toward the text, then toward black (white in dark), until it reaches its ratio against
- * the note's, the list's and the sidebar's backgrounds; links and tags on their tinted chips too.
+ * the note's, the list's and the sidebar's backgrounds; links and tags on their tinted chips too, and
+ * the colors a theme gives formatting in a note on the note's.
  */
 export function moreContrast(colors: ThemeColors): Partial<ThemeColors> {
   const color = numbers(colors);
@@ -241,6 +240,7 @@ export function moreContrast(colors: ThemeColors): Partial<ThemeColors> {
     ["text-faint", 4.5, backgrounds],
     ["accent", 4.5, [...backgrounds, ...chips]],
     ["tag-text", 4.5, chips],
+    ...FORMATTING_COLORS.map((key): [string, number, Rgb[]] => [key, 7, [bg]]),
   ];
   const changed: Partial<ThemeColors> = {};
   for (const [key, ratio, on] of goals) {
@@ -274,7 +274,7 @@ export function otherScheme(colors: ThemeColors): Partial<ThemeColors> {
     const value = color(key);
     return value && hex(readableOn(value, on, ratio));
   };
-  return importedColors({
+  const made = importedColors({
     background,
     foreground: neutral("text", toDark ? 0.93 : 0.22),
     accent: readable("accent", 3),
@@ -297,4 +297,10 @@ export function otherScheme(colors: ThemeColors): Partial<ThemeColors> {
       type: readable("syn-type", 4.5),
     },
   }).colors;
+  // The colors it gives formatting in a note, made readable there as code's are.
+  for (const key of FORMATTING_COLORS) {
+    const color = readable(key, 4.5);
+    if (color) made[key] = color;
+  }
+  return made;
 }

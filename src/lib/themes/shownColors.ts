@@ -1,13 +1,17 @@
 import { colorName } from "../components/settings/colorNames";
 import type { SwatchColor } from "../components/ui/Swatches.svelte";
 import { solid } from "../colors";
+import { FORMATTING_COLORS } from "./formatting";
 
 /*
  * The colors a color picker offers first, until themes have palettes: the theme's own, as they're
  * drawn where the picker opens (in Settings → Theme's editor, the theme being changed), each once.
  */
 
-/** In the order they're offered: the accent and the colors things can be given, then the theme's greys, text to background. */
+/**
+ * In the order they're offered: the accent and the colors things can be given, then the theme's
+ * greys, text to background; then colors of its own for formatting in a note (a heading's, bold's).
+ */
 const PARTS = [
   "accent",
   ...["red", "orange", "yellow", "green", "blue", "purple"].map((color) => `palette-${color}`),
@@ -26,6 +30,7 @@ const PARTS = [
   "bg-list",
   "bg",
   "bg-elevated",
+  ...FORMATTING_COLORS,
 ];
 
 /** The theme's distinct colors where `at` is, each named after the first part it's drawn in. */

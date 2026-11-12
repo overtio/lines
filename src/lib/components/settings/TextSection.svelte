@@ -30,9 +30,10 @@
   const SAMPLE = t("settings.previewNote");
   const fonts = $derived(noteFonts());
 
-  const HEADING_COLOR_NAMES = { text: "settings.headingColorText", accent: "settings.color.accent", custom: "settings.paperColorCustom" } as const;
+  // "text" is the theme's colors for each level, by its first name (prefs.svelte.ts).
+  const HEADING_COLOR_NAMES = { text: "settings.headingColorTheme", accent: "settings.color.accent", custom: "settings.paperColorCustom" } as const;
   const headingColors = HEADING_COLORS.map((id) => ({ id, label: t(HEADING_COLOR_NAMES[id]) }));
-  const headingSwatches: Record<HeadingColor, string> = $derived({ text: "var(--text)", accent: "var(--accent)", custom: prefs.headingCustomColor });
+  const headingSwatches: Record<HeadingColor, string> = $derived({ text: "var(--text-h1, var(--text))", accent: "var(--accent)", custom: prefs.headingCustomColor });
 
   let host: HTMLDivElement;
   let view: EditorView | undefined;

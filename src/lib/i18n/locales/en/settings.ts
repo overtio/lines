@@ -173,6 +173,8 @@ export default {
   // A theme's colors for tags, types, events and marks in the margin.
   "settings.themePalette": "Tags and events",
   "settings.themeCode": "Code",
+  "settings.themeFormatting": "Formatting",
+  "settings.themeFormattingNote": "In notes. Left on Auto, each is as lines draws it: most in the color of the text around them, links and bullets in the accent.",
   // Each color a theme sets: where it's seen.
   "settings.color.bg": "Note",
   "settings.color.bgList": "Note list",
@@ -209,6 +211,14 @@ export default {
   "settings.color.codeBg": "Code background",
   "settings.color.input": "Fields",
   "settings.color.onAccent": "Text on the accent",
+  "settings.color.textHeading": "Heading {level}",
+  "settings.color.textHighlight": "Highlighted text",
+  "settings.color.textCode": "Inline code",
+  "settings.color.textLink": "Links",
+  "settings.color.textMention": "Mentions",
+  "settings.color.textQuote": "Quotes",
+  "settings.color.textBullet": "Bullets",
+  "settings.color.textNumber": "List numbers",
   "settings.picking": "Change colors by right-clicking",
   "settings.pickingNote": "Right-click anything in lines (or press its menu key) to change the colors it's drawn in, a bit at a time. Changes show at once and wait here to be saved.",
   "settings.pickingChanged": "{count, plural, one {# color changed in {name}} other {# colors changed in {name}}}",
@@ -336,6 +346,8 @@ export default {
   "settings.headingColor": "Heading color",
   // Headings in the same color as the text.
   "settings.headingColorText": "Text",
+  // Headings in the theme's colors for each level: the text's, unless it gives them colors of their own.
+  "settings.headingColorTheme": "Theme",
   "settings.caret": "Text cursor",
   "settings.caretNote": "The line where you're writing, in notes.",
   "settings.caretTry": "A note to try the cursor in",
