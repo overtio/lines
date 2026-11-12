@@ -112,3 +112,27 @@ test("Lightbulb brings its colors, bold ink lines with a hard shadow, and a spar
   }
   app = await openApp();
 });
+
+test("Constructivist's focus ring on the chosen note follows its wedge's slant, inside it", async () => {
+  app = await openApp({ prefs: { style: "constructivist", theme: "constructivist" } });
+  const id = await app.open("A note");
+  // Esc in the search puts focus on the open note's row, by the keyboard, so its ring shows.
+  const search = app.page.getByRole("searchbox", { name: "Search notes" });
+  await search.fill("a");
+  await search.press("Escape");
+  await app.page.waitForFunction((id) => document.activeElement?.getAttribute("data-id") === id, id);
+  const row = app.page.locator(`.ui-note-row[data-id="${id}"]`);
+  const picture = (await app.page.screenshot({ clip: (await row.boundingBox())! })).toString("base64");
+  // Near its bottom, where the slant cuts furthest in, the ring's light line shows just inside it,
+  // short of the 14px the slant takes off (where the list shows past the wedge).
+  const ringed = await row.evaluate(async (_, picture) => {
+    const image = new Image();
+    image.src = `data:image/png;base64,${picture}`;
+    await image.decode();
+    const canvas = new OffscreenCanvas(image.width, image.height).getContext("2d")!;
+    canvas.drawImage(image, 0, 0);
+    const strip = canvas.getImageData(image.width - 30, image.height - 8, 16, 1).data;
+    return Array.from({ length: 16 }, (_, x) => strip.slice(x * 4, x * 4 + 3)).some((pixel) => pixel.every((value) => value > 200));
+  }, picture);
+  expect(ringed).toBe(true);
+});

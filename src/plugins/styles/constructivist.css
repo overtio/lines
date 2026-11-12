@@ -78,9 +78,20 @@
   outline-offset: -5px;
 }
 
+/* On a wedge, whose slant would cut a ring's right side, a frame that follows the slant instead. */
 @media not (forced-colors: active) {
   :root[data-style="constructivist"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-button[data-variant="primary"]):focus-visible {
-    outline-color: var(--on-accent);
+    position: relative;
+    outline: none;
+  }
+
+  :root[data-style="constructivist"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-button[data-variant="primary"]):focus-visible::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    background: var(--on-accent);
+    clip-path: polygon(evenodd, 0 0, 100% 0, calc(100% - 14px) 100%, 0 100%, 2px 2px, calc(100% - 3px) 2px, calc(100% - 16px) calc(100% - 2px), 2px calc(100% - 2px));
+    pointer-events: none;
   }
 }
 
