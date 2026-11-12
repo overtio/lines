@@ -27,6 +27,7 @@
   import Switch from "../ui/Switch.svelte";
   import { floating, option as menuOption } from "../ui/styles";
   import TextField from "../ui/TextField.svelte";
+  import PalettesGroup from "./PalettesGroup.svelte";
   import ThemeEditor from "./ThemeEditor.svelte";
 
   const appearances: { id: Appearance; label: string }[] = [
@@ -420,8 +421,8 @@
   {/if}
 </FieldGroup>
 
-{#if yours.has(theme)}
-  {#key theme}
-    <ThemeEditor id={theme} fresh={made === theme} ondelete={deleteTheme} />
-  {/key}
-{/if}
+{#key theme}
+  <ThemeEditor id={theme} fresh={made === theme} ondelete={deleteTheme} oncopy={newTheme} />
+{/key}
+
+<PalettesGroup />

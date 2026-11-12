@@ -1,5 +1,7 @@
 import type { Palette, PaletteEntry, ThemeColors, ThemeDefinition } from "../plugins/types";
+import { t } from "../i18n/index.svelte";
 import { announce, onAnnounce } from "../windows/channel";
+import { BLACK, difference, parse } from "./color";
 import { filePalette, PALETTE_SIZE, type PaletteFile, paletteColor, readPaletteFile, readThemeFile, sameTheme, SCHEMES, type ThemeFile } from "./file";
 import { schemePalettes } from "./names";
 import { paletteOf, type Scheme } from "./palette";
@@ -77,6 +79,12 @@ function newColor(palette: Palette, color: string): PaletteEntry {
 
 /** The palette color like `color`, or a new one. */
 const colorIn = (palette: Palette, color: string) => palette.colors.find((entry) => entry.color === color) ?? newColor(palette, color);
+
+/** The palette's color that looks most like `color`. */
+function nearest(palette: Palette, color: string) {
+  const seen = parse(color) ?? BLACK;
+  return palette.colors.reduce((best, entry) => (difference(parse(entry.color) ?? BLACK, seen) < difference(parse(best.color) ?? BLACK, seen) ? entry : best));
+}
 
 class CustomThemes {
   #stored = $state(readYours());
@@ -158,6 +166,111 @@ class CustomThemes {
     return this.add({ name, author, palette: palettes, light, dark, properties });
   }
 
+  /** Adds a palette of yours; gives its id. */
+  addPalette(palette: PaletteFile) {
+    const id = this.#addPalette($state.snapshot(palette) as PaletteFile);
+    this.#save();
+    return id;
+  }
+
+  /** Themes of yours drawn in palette `id`. */
+  themesIn(id: string) {
+    return this.#stored.themes.filter((theme) => SCHEMES.some((scheme) => paletteOf(theme, scheme) === id));
+  }
+
+  /**
+   * Deletes a palette of yours. Themes of yours drawn in it are drawn in `instead` (`palette` gives
+   * it by id), each part in its nearest color; without another to draw them in, it stays. Whether it went.
+   */
+  removePalette(id: string, instead?: string, palette?: (id: string) => Palette | undefined) {
+    const drawn = this.themesIn(id);
+    if (drawn.length && (!instead || instead === id || !palette?.(instead))) return false;
+    for (const theme of drawn) this.setPalette(theme.id, SCHEMES.filter((scheme) => paletteOf(theme, scheme) === id), instead!, palette!);
+    this.#stored.palettes = this.#stored.palettes.filter((each) => each.id !== id);
+    this.#save();
+    return true;
+  }
+
+  renamePalette(id: string, name: string) {
+    const palette = this.palette(id);
+    if (!palette || !name.trim() || palette.name === name.trim()) return;
+    palette.name = name.trim();
+    this.#save();
+  }
+
+  /** Changes a color of a palette of yours, which every part drawn in it follows. */
+  setPaletteColor(id: string, colorId: string, value: string) {
+    const entry = this.palette(id)?.colors.find((each) => each.id === colorId);
+    const color = paletteColor(value);
+    if (!entry || !color || entry.color === color) return;
+    entry.color = color;
+    this.#save();
+  }
+
+  /** Names a color of a palette of yours; an empty name leaves lines to name it from its look. */
+  nameColor(id: string, colorId: string, name: string) {
+    const entry = this.palette(id)?.colors.find((each) => each.id === colorId);
+    if (!entry || (entry.name ?? "") === name.trim()) return;
+    if (name.trim()) entry.name = name.trim().slice(0, 80);
+    else delete entry.name;
+    this.#save();
+  }
+
+  /** Adds a color to a palette of yours, unless it has it or all a palette has (32); gives its id. */
+  addColor(id: string, value: string) {
+    const palette = this.palette(id);
+    const color = paletteColor(value);
+    if (!palette || !color) return;
+    const had = palette.colors.find((entry) => entry.color === color);
+    if (had || palette.colors.length >= PALETTE_SIZE) return had?.id;
+    const entry = newColor(palette, color);
+    this.#save();
+    return entry.id;
+  }
+
+  /** Moves a color of a palette of yours a place earlier (-1) or later (1). */
+  moveColor(id: string, colorId: string, by: -1 | 1) {
+    const colors = this.palette(id)?.colors;
+    const at = colors?.findIndex((each) => each.id === colorId) ?? -1;
+    if (!colors || at < 0 || !colors[at + by]) return;
+    [colors[at], colors[at + by]] = [colors[at + by], colors[at]];
+    this.#save();
+  }
+
+  /** Takes a color out of a palette of yours (not its last): parts drawn in it are drawn in its nearest color left. */
+  removeColor(id: string, colorId: string) {
+    const palette = this.palette(id);
+    const entry = palette?.colors.find((each) => each.id === colorId);
+    if (!palette || !entry || palette.colors.length < 2) return;
+    palette.colors = palette.colors.filter((each) => each !== entry);
+    const instead = nearest(palette, entry.color).id;
+    for (const parts of this.#drawnIn(id)) for (const [part, each] of Object.entries(parts)) if (each === colorId) parts[part] = instead;
+    this.#save();
+  }
+
+  /**
+   * Draws a theme of yours, its scheme or both, in another palette (`palette` gives each by id): each
+   * part in the new palette's color nearest the one it had.
+   */
+  setPalette(themeId: string, schemes: readonly Scheme[], to: string, palette: (id: string) => Palette | undefined) {
+    const theme = this.get(themeId);
+    const target = palette(to);
+    if (!theme || !target?.colors.length) return;
+    for (const scheme of schemes) {
+      const parts = theme[scheme];
+      const before = palette(paletteOf(theme, scheme));
+      if (!parts) continue;
+      for (const [part, id] of Object.entries(parts)) {
+        const color = before?.colors.find((each) => each.id === id)?.color;
+        if (color) parts[part] = nearest(target, color).id;
+        else delete parts[part];
+      }
+    }
+    const [light, dark] = SCHEMES.map((scheme) => (schemes.includes(scheme) ? to : paletteOf(theme, scheme)));
+    theme.palette = light === dark ? light : { light, dark };
+    this.#save();
+  }
+
   /** Each scheme of yours drawn in palette `id`, by its parts. */
   #drawnIn(id: string) {
     return this.#stored.themes.flatMap((theme) => SCHEMES.filter((scheme) => paletteOf(theme, scheme) === id).map((scheme) => theme[scheme] ?? {}));
@@ -195,16 +308,35 @@ class CustomThemes {
     const id = paletteOf(theme, scheme);
     const own = this.palette(id);
     if (own) return own;
-    const copy = this.#addPalette({ name: from?.name ?? theme.name, author: from?.author, colors: $state.snapshot(from?.colors) ?? [] });
+    const name = t("settings.paletteCopyName", { name: from?.name ?? theme.name });
+    const copy = this.#addPalette({ name, author: from?.author, colors: $state.snapshot(from?.colors) ?? [] });
     theme.palette = typeof theme.palette === "string" ? copy : { ...theme.palette, [scheme]: copy };
     return this.palette(copy)!;
+  }
+
+  /** Draws a theme's scheme in a copy, yours to add to, of the plugin's palette `from` it's drawn in. */
+  ownPalette(id: string, scheme: Scheme, from: Palette | undefined) {
+    const theme = this.get(id);
+    if (!theme) return;
+    this.#ownPalette(theme, scheme, from);
+    this.#save();
+  }
+
+  /** Draws a theme's part, for a scheme, in one of its palette's colors (a plugin's palette's too), by its id. */
+  assign(id: string, scheme: Scheme, part: string, colorId: string) {
+    const theme = this.get(id);
+    const parts = theme?.[scheme];
+    if (!theme || !parts || (parts[part] === colorId && theme.properties?.[scheme]?.[part] === undefined)) return;
+    delete theme.properties?.[scheme]?.[part];
+    parts[part] = colorId;
+    this.#save();
   }
 
   /**
    * Draws a theme's part in `value` for a scheme, or takes it out (`undefined`) for lines to work it
    * out. The color is that scheme's palette's: the one it has that's the same, or the part's own
-   * changed while only this part is drawn in it, or else a new one. `palette` is that palette as the
-   * registry has it, copied as yours if it's a plugin's.
+   * changed while only this part is drawn in it, or else a new one, or its nearest once it has all a
+   * palette has. `palette` is that palette as the registry has it, copied as yours if it's a plugin's.
    */
   setColor(id: string, scheme: Scheme, part: string, value: string | undefined, palette?: Palette) {
     const theme = this.get(id);
@@ -226,7 +358,7 @@ class CustomThemes {
     if (same && same === current && property === undefined) return;
     const uses = this.#drawnIn(own.id).flatMap((parts) => Object.values(parts)).filter((each) => each === current?.id);
     if (!same && current && uses.length === 1) current.color = color;
-    else assignment[part] = (same ?? newColor(own, color)).id;
+    else assignment[part] = (same ?? (own.colors.length < PALETTE_SIZE ? newColor(own, color) : nearest(own, color))).id;
     this.#save();
   }
 

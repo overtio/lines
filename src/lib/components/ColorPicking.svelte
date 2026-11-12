@@ -9,7 +9,8 @@
   import { prefs } from "../prefs.svelte";
   import { other } from "../themes/css";
   import { themeDrafts } from "../themes/drafts.svelte";
-  import type { Scheme } from "../themes/palette";
+  import { paletteOf, type Scheme } from "../themes/palette";
+  import { addingTo, swatchesOf } from "../themes/paletteSwatches";
   import { colorsAt, type FoundColor } from "../themes/picking";
   import { shownScheme } from "../themes/show.svelte";
   import { ui } from "../ui.svelte";
@@ -57,6 +58,8 @@
   }
 
   const draft = $derived(picked && themeDrafts.of(theme.id)?.[picked.scheme]);
+  /** The palette the colors here are the theme's for: offered first, and added to if it's yours. */
+  const palette = $derived(picked ? plugins.palette(paletteOf(theme.definition, picked.scheme)) : undefined);
 </script>
 
 <!-- Out of the way while Settings shows over the notes. -->
@@ -109,6 +112,8 @@
               swatch={draft?.[key] ?? shown}
               placeholder={shown}
               optional
+              swatches={swatchesOf(palette)}
+              onadd={addingTo(palette)}
               onchange={(value) => themeDrafts.set(theme.id, picked!.scheme, key, value)}
             />
           {/each}

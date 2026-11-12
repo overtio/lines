@@ -101,6 +101,27 @@ export function readPaletteFile(json: unknown): PaletteFile | undefined {
 /** A palette as its file's text, to save or send. */
 export const writePaletteFile = ({ name, author, colors }: PaletteFile) => `${JSON.stringify({ name, author, colors }, null, 2)}\n`;
 
+/** The colors written in text, each once, as a palette keeps them: hex and `rgb()`, as many as a palette has. */
+export function colorsIn(text: string) {
+  const found = text.match(/#(?:[0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3,4})\b|rgba?\([^)]*\)/gi) ?? [];
+  return [...new Set(found.flatMap((each) => paletteColor(each) ?? []))].slice(0, PALETTE_SIZE);
+}
+
+/** A palette from colors, named `name`. */
+export const paletteOfColors = (name: string, colors: string[]): PaletteFile => ({ name, colors: colors.map((color, i) => ({ id: `c${i + 1}`, color })) });
+
+/** The palette in a file's text, or pasted: lines' palette file, or else the colors written in it, called `name`. */
+export function readPalette(text: string, name: string) {
+  let json: unknown;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    // Not a palette file: colors written some other way.
+  }
+  const colors = colorsIn(text);
+  return readPaletteFile(json) ?? (colors.length ? paletteOfColors(name, colors) : undefined);
+}
+
 /** Which palette colors a file's parts are drawn in, each checked: by its part, and one the palette has (if it's in the file). */
 function readAssignment(raw: unknown, palette: string | PaletteFile): ThemeAssignment | undefined {
   if (!raw || typeof raw !== "object") return;
@@ -147,12 +168,11 @@ export function fromColors(name: string, author: string | undefined, colors: Par
   }
   const schemes = SCHEMES.filter((scheme) => given[scheme]);
   const distinct = (of: readonly Scheme[]) => [...new Set(of.flatMap((scheme) => Object.values(given[scheme]!)))];
-  const palette = (called: string, list: string[]): PaletteFile => ({ name: called, colors: list.map((color, i) => ({ id: `c${i + 1}`, color })) });
   const split = schemes.length === 2 && distinct(schemes).length > PALETTE_SIZE;
   const theme: ThemeFile = {
     name,
     ...(author && { author }),
-    palette: split ? { light: palette(names(name).light, distinct(["light"])), dark: palette(names(name).dark, distinct(["dark"])) } : palette(name, distinct(schemes)),
+    palette: split ? { light: paletteOfColors(names(name).light, distinct(["light"])), dark: paletteOfColors(names(name).dark, distinct(["dark"])) } : paletteOfColors(name, distinct(schemes)),
   };
   for (const scheme of schemes) {
     const { colors: entries } = filePalette(theme, scheme) as PaletteFile;

@@ -1,6 +1,6 @@
 <script lang="ts">
-  // Sharing something of yours as a file (a theme, a preset): through the system's share sheet
-  // where it takes files, copied as text to paste into a message, or saved.
+  // Sharing something of yours as a file (a theme, a palette, a preset): through the system's share
+  // sheet where it takes files, copied as text to paste into a message, or saved.
   import { DropdownMenu } from "bits-ui";
   import { speak } from "../../a11y";
   import { t } from "../../i18n/index.svelte";
