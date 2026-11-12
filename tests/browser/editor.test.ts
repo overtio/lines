@@ -226,11 +226,13 @@ test("a click into a note that isn't focused keeps it where it was, though focus
     const scroller = view.scrollDOM;
     view.contentDOM.blur();
     scroller.scrollTop = 1500;
-    await new Promise(requestAnimationFrame);
+    // Once the editor has drawn the lines scrolled to, which takes a frame or more on a slow machine.
+    const below = () => [...view.contentDOM.querySelectorAll<HTMLElement>(".cm-line")].find((each) => each.getBoundingClientRect().top > scroller.getBoundingClientRect().top + 100);
+    for (let frames = 0; !below() && frames < 60; frames++) await new Promise(requestAnimationFrame);
+    const line = below()!;
     // As WebKit does in the Mac app: focusing the editor scrolls it, to where its cursor last was.
     const jump = () => (scroller.scrollTop = 200);
     view.contentDOM.addEventListener("focus", jump, { once: true });
-    const line = [...view.contentDOM.querySelectorAll<HTMLElement>(".cm-line")].find((each) => each.getBoundingClientRect().top > scroller.getBoundingClientRect().top + 100)!;
     const box = line.getBoundingClientRect();
     line.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, button: 0, detail: 1, clientX: box.left + 10, clientY: box.top + 5 }));
     line.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, cancelable: true, button: 0, detail: 1, clientX: box.left + 10, clientY: box.top + 5 }));
