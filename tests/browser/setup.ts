@@ -20,7 +20,9 @@ let server: PreviewServer;
 
 beforeAll(async () => {
   if (process.env.LINES_TEST_BUILD !== "0") await build({ root, mode: "test", logLevel: "error", build: { outDir, emptyOutDir: true } });
-  server = await preview({ root, mode: "test", logLevel: "error", build: { outDir }, preview: { port: 4327, strictPort: false, open: false } });
+  // A port of its own on 127.0.0.1: "localhost" can be IPv4 or IPv6, so another worktree's server
+  // on the same port number could answer this one's browser.
+  server = await preview({ root, mode: "test", logLevel: "error", build: { outDir }, preview: { host: "127.0.0.1", port: 0, open: false } });
   const engine = process.env.BROWSER === "webkit" ? "webkit" : "chromium";
   const browser = await (engine === "webkit" ? webkit : chromium).launch();
   globalThis.lines = { browser, url: server.resolvedUrls!.local[0], engine };
