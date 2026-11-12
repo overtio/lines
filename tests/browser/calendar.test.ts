@@ -151,6 +151,16 @@ test("dragging down the hours makes an event; dragging a note moves it, and ⌘Z
   // Back to Wednesday at 9.
   await page.keyboard.press(`${mod()}+z`);
   await page.getByRole("button", { name: /^Standup, 9:00/ }).waitFor();
+
+  // Moved, then tagged: ⌘Z doesn't take the move back, which would lose the tag too.
+  await dragIn(app, wed, 9 * 60 + 20, 11 * 60 + 20);
+  await page.getByRole("button", { name: /^Standup, 11:00/ }).waitFor();
+  const body = () => page.evaluate(() => window.testing.notes.entries.find((entry) => entry.meta.title === "Standup")!.note.body);
+  await page.evaluate(() => window.testing.notes.addTag([window.testing.notes.entries.find((entry) => entry.meta.title === "Standup")!.note.id], "work"));
+  const tagged = await body();
+  expect(tagged).toContain("work");
+  await page.keyboard.press(`${mod()}+z`);
+  expect(await body()).toBe(tagged);
 });
 
 test("All day makes events of whole days: a double-click for one, dragging across for several; Esc stops a drag", async () => {
