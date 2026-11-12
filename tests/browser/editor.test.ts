@@ -430,6 +430,26 @@ test("> typed over selected text quotes its lines, keeping them selected; ⌘Z t
   await app.page.waitForFunction(() => window.testing.text()?.includes("```\n>\n```"));
 });
 
+test("a slash command after a line's text makes it that block, leaving no space behind; a quoted line stays in its quote", async () => {
+  const cases = [
+    ["item", "/todo", "- [ ] item‸"],
+    ["> item", "/todo", "> - [ ] item‸"],
+    ["> item", "/heading", "> # item‸"],
+    ["> item", "/quote", "> item‸"],
+    ["- item", "/numbered", "1. item‸"],
+  ];
+  for (const [note, command, after] of cases) {
+    await app.open(note);
+    await app.page.evaluate(() => window.testing.place());
+    await app.page.keyboard.type(` ${command}`);
+    await app.page.locator(".cm-tooltip-autocomplete").waitFor();
+    await app.page.keyboard.press("Enter");
+    const head = await app.page.evaluate(() => window.testing.editor()!.state.selection.main.head);
+    const text = (await app.text())!;
+    expect(text.slice(0, head) + "‸" + text.slice(head)).toBe(after);
+  }
+});
+
 test("a #tag being typed offers the tags there are, the ones starting with it first; Enter writes the whole tag; not for a lone # or in code", async () => {
   await app.open("One #ideas and #work/meetings");
   await app.open("Two #ideas #idle");

@@ -347,7 +347,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Typing filters it (`/to` → Todo, `/checkbox` → Todo); no match closes it
 - [ ] ↑, ↓, Enter and clicking choose; Esc closes
 - [ ] Tab completes like a shell: `/to` + Tab makes a todo (one name left); `/he` + Tab becomes `/heading`; Tab again moves to the next heading and ⇧Tab back; Tab never indents the line while the menu is open
-- [ ] Each command does what it says: Text, Heading 1–3, Todo, Bullet list, Numbered list, Quote, Code block, Diagram, Math, Card, the five callouts, Table, Spreadsheet, Image, Photo, GIF, File, Drawing, Divider, Link, Tag, Mention, Type table, Properties, Date
+- [ ] Each command does what it says: Text, Heading 1–3, Todo, Bullet list, Numbered list, Quote, Code block, Diagram, Math, Card, the five callouts, Table, Spreadsheet, Image, Photo, GIF, File, Drawing, Divider, Link, Tag, Mention, Type table, Properties, Date. Typed after a line's text, Text, Heading, Todo, Bullet list and Numbered list make that line the block, leaving no space at its end; on a quoted line it stays in the quote (`> - [ ] item`), and Quote leaves it as it is
 - [ ] `/properties` in a note without properties adds `---`, `type: ` and `---` at the top with the cursor after `type: `; in a note with them, it adds a line at their end
 - [ ] Block commands replace a line's existing prefix rather than stacking; Divider under text adds a blank line so the text doesn't become a heading
 
