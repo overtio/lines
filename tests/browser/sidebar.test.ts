@@ -10,10 +10,15 @@ afterEach(async () => {
 /** The sidebar's rows, as their text reads, from the top. */
 const rows = (app: App) => app.page.getByRole("navigation", { name: "Library" }).locator(".row").allInnerTexts();
 
-/** Right-clicks the sidebar's own empty space, below its rows, found where nothing's over it (rows are as tall as the fonts make them). */
+/**
+ * Right-clicks the sidebar's own empty space, below its rows, found where nothing's over it: rows are
+ * as tall as the fonts make them, and where they fill the list, its space is at the end, scrolled to.
+ */
 async function rightClickEmpty(app: App) {
   const list = app.page.getByRole("navigation", { name: "Library" }).locator(".overflow-y-auto");
-  const point = await list.evaluate((element) => {
+  const point = await list.evaluate(async (element) => {
+    element.scrollTop = element.scrollHeight;
+    await new Promise(requestAnimationFrame);
     const box = element.getBoundingClientRect();
     for (let y = box.bottom - 2; y > box.top; y -= 4) {
       for (const x of [box.left + 12, box.left + box.width / 2]) if (document.elementFromPoint(x, y) === element) return { x, y };
