@@ -156,8 +156,8 @@ class NotesStore {
   #templates = new Map<string, { body: string; made: Made }>();
   /** Notes moved to the trash since the last edit, most recent last, for undo; those trashed together share a batch. */
   #trashed: { id: string; pinned: boolean; selected: boolean; batch: number }[] = [];
-  /** A note's text before it was last changed from outside its editor (moved on the Calendar), for undo. */
-  #edited: { id: string; body: string } | null = null;
+  /** A note's text before and after it was last changed from outside its editor (moved on the Calendar), for undo. */
+  #edited: { id: string; before: string; after: string } | null = null;
   #batch = 0;
   /** Where a ⇧-click range starts from: the note last ⌘-clicked, or the open one. */
   #anchor: string | null = null;
@@ -459,17 +459,17 @@ class NotesStore {
     const entry = this.get(id);
     if (!entry || entry.note.body === body) return;
     this.#trashed = [];
-    this.#edited = { id, body: entry.note.body };
+    this.#edited = { id, before: entry.note.body, after: body };
     this.#patch(id, { body, updatedAt: Date.now() });
     this.#changedOutside([id]);
   }
 
-  /** Puts back the note `edit` last changed, if nothing was done since. */
+  /** Puts back the note `edit` last changed, if it hasn't changed since (a tag added, a sync), which putting it back would lose. */
   undoEdit() {
     const edited = this.#edited;
     this.#edited = null;
-    if (!edited || !this.get(edited.id)) return false;
-    this.#patch(edited.id, { body: edited.body, updatedAt: Date.now() });
+    if (!edited || this.get(edited.id)?.note.body !== edited.after) return false;
+    this.#patch(edited.id, { body: edited.before, updatedAt: Date.now() });
     this.#changedOutside([edited.id]);
     return true;
   }
