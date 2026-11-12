@@ -241,6 +241,10 @@ export interface Stored {
   scrollbars: boolean;
   /** The sidebar's version badge and GitHub button (a downloaded update's restart button shows anyway). */
   sidebarAbout: boolean;
+  /** The title bars, and the sidebar's top and bottom, out of sight until the pointer or focus reaches them. */
+  hideBars: boolean;
+  /** Icons (off: buttons that are only an icon show its name, and the rest go, but for those that say something). */
+  showIcons: boolean;
   /**
    * How Markdown shows in a note: as written and colored (source), styled with all of it in sight
    * (visible), hidden but where you're writing (live), or never seen (hidden).
@@ -398,6 +402,8 @@ const DEFAULTS: Stored = {
   outlineSide: "right",
   scrollbars: true,
   sidebarAbout: true,
+  hideBars: false,
+  showIcons: true,
   markdownMode: "live",
   dragBlocks: true,
   underlinedHeadings: false,
@@ -554,6 +560,8 @@ function read(json?: string): Stored {
     outlineSide: oneOf(raw.outlineSide, SIDES, DEFAULTS.outlineSide),
     scrollbars: flag(raw.scrollbars, DEFAULTS.scrollbars),
     sidebarAbout: flag(raw.sidebarAbout, DEFAULTS.sidebarAbout),
+    hideBars: flag(raw.hideBars, DEFAULTS.hideBars),
+    showIcons: flag(raw.showIcons, DEFAULTS.showIcons),
     markdownMode: oneOf(raw.markdownMode, MARKDOWN_MODES, DEFAULTS.markdownMode),
     dragBlocks: flag(raw.dragBlocks, DEFAULTS.dragBlocks),
     underlinedHeadings: flag(raw.underlinedHeadings, DEFAULTS.underlinedHeadings),
@@ -653,6 +661,8 @@ class Prefs {
   outlineSide = $state(this.#initial.outlineSide);
   scrollbars = $state(this.#initial.scrollbars);
   sidebarAbout = $state(this.#initial.sidebarAbout);
+  hideBars = $state(this.#initial.hideBars);
+  showIcons = $state(this.#initial.showIcons);
   markdownMode = $state(this.#initial.markdownMode);
   dragBlocks = $state(this.#initial.dragBlocks);
   underlinedHeadings = $state(this.#initial.underlinedHeadings);
@@ -773,6 +783,8 @@ class Prefs {
     const root = document.documentElement;
     root.dataset.font = this.font;
     root.toggleAttribute("data-no-scrollbars", !this.scrollbars);
+    root.toggleAttribute("data-hide-bars", this.hideBars);
+    root.toggleAttribute("data-no-icons", !this.showIcons);
     const { style } = root;
     style.setProperty("--editor-size", `${this.textSize}px`);
     const s = this.spacing;
@@ -850,6 +862,8 @@ class Prefs {
       outlineSide: this.outlineSide,
       scrollbars: this.scrollbars,
       sidebarAbout: this.sidebarAbout,
+      hideBars: this.hideBars,
+      showIcons: this.showIcons,
       markdownMode: this.markdownMode,
       dragBlocks: this.dragBlocks,
       underlinedHeadings: this.underlinedHeadings,
@@ -957,6 +971,8 @@ class Prefs {
     this.outlineSide = next.outlineSide;
     this.scrollbars = next.scrollbars;
     this.sidebarAbout = next.sidebarAbout;
+    this.hideBars = next.hideBars;
+    this.showIcons = next.showIcons;
     this.markdownMode = next.markdownMode;
     this.dragBlocks = next.dragBlocks;
     this.underlinedHeadings = next.underlinedHeadings;

@@ -1,0 +1,194 @@
+/*
+ * Aero: glossy glass of the 2000s. Gel buttons with a shine across their top half, frosted
+ * see-through menus and dialogs, a sheen over the panes, and a sky glow with soft bubbles behind
+ * the note. The gloss is white over the theme's colors, so it follows whatever is chosen with it;
+ * Increased contrast makes the glass solid.
+ */
+
+/* Made from the theme's colors, and made again in a part with its own (a pane shown dark). */
+:root[data-style="aero"],
+:root[data-style="aero"] [data-scheme] {
+  --gloss: color-mix(in srgb, white 55%, transparent);
+  --gloss-edge: color-mix(in srgb, white 80%, transparent);
+  --sheen: color-mix(in srgb, white 45%, transparent);
+  --gel-edge: color-mix(in srgb, var(--ink) 22%, transparent);
+  --gel: linear-gradient(to bottom, var(--gloss) 0 48%, transparent 52%), linear-gradient(to bottom, var(--bg-elevated), color-mix(in srgb, var(--bg-elevated), var(--ink) 9%));
+  --gel-accent: linear-gradient(to bottom, color-mix(in srgb, white 38%, transparent) 0 48%, transparent 52%), linear-gradient(to bottom, color-mix(in srgb, var(--accent), white 18%), color-mix(in srgb, var(--accent), black 12%));
+  --chosen: linear-gradient(to bottom, color-mix(in srgb, var(--accent) 24%, transparent), color-mix(in srgb, var(--accent) 12%, transparent));
+  --glow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
+  --orb: radial-gradient(circle at 35% 30%, white, var(--bg-elevated) 55%, color-mix(in srgb, var(--bg-elevated), var(--ink) 12%));
+}
+
+/* The gloss is fainter on dark glass. */
+:root[data-style="aero"][data-scheme="dark"],
+:root[data-style="aero"] [data-scheme="dark"] {
+  --gloss: color-mix(in srgb, white 14%, transparent);
+  --gloss-edge: color-mix(in srgb, white 22%, transparent);
+  --sheen: color-mix(in srgb, white 6%, transparent);
+  --orb: radial-gradient(circle at 35% 30%, color-mix(in srgb, white 70%, var(--bg-elevated)), var(--bg-elevated) 60%);
+}
+
+/* A sheen down from the top of the panes. */
+:root[data-style="aero"] :is(.sidebar, .note-list) {
+  background-image: linear-gradient(to bottom, var(--sheen), transparent 160px);
+}
+
+:root[data-style="aero"] :is(.toolbar, .note-list > .titlebar) {
+  box-shadow: inset 0 -1px var(--gloss-edge);
+}
+
+/* Behind the note, a sky's glow from the top and bubbles rising in a corner, faint enough to read over. */
+:root[data-style="aero"]:not([data-paper]) .editor-pane {
+  background-image:
+    radial-gradient(circle at calc(100% - 90px) calc(100% - 110px), color-mix(in srgb, var(--accent) 7%, transparent) 0 46px, color-mix(in srgb, var(--accent) 18%, transparent) 47px 48px, transparent 49px),
+    radial-gradient(circle at calc(100% - 170px) calc(100% - 60px), color-mix(in srgb, var(--tag-text) 7%, transparent) 0 24px, color-mix(in srgb, var(--tag-text) 18%, transparent) 25px 26px, transparent 27px),
+    radial-gradient(circle at calc(100% - 60px) calc(100% - 220px), color-mix(in srgb, var(--accent) 6%, transparent) 0 16px, color-mix(in srgb, var(--accent) 16%, transparent) 17px 18px, transparent 19px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--accent) 9%, transparent), transparent 220px);
+}
+
+/* What's chosen: a glossy band in the accent. */
+:root[data-style="aero"] .ui-note-row.selected {
+  --layer: transparent;
+  background-image: var(--chosen);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent),
+    inset 0 1px 0 var(--gloss-edge);
+}
+
+:root[data-style="aero"] :is(.ui-sidebar-row.active, .ui-option[data-highlighted]) {
+  background: var(--chosen);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent),
+    inset 0 1px 0 var(--gloss-edge);
+}
+
+/* Gel buttons: a pill with a shine across its top half; the main one in the accent. */
+:root[data-style="aero"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select) {
+  border: 1px solid var(--gel-edge);
+  border-radius: 999px;
+  background: var(--gel);
+  color: var(--text);
+  box-shadow:
+    inset 0 1px 0 var(--gloss-edge),
+    0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+:root[data-style="aero"] .ui-button[data-variant="primary"] {
+  border-color: color-mix(in srgb, var(--accent), black 25%);
+  background: var(--gel-accent);
+  color: var(--on-accent);
+}
+
+:root[data-style="aero"] .ui-button[data-variant="danger-primary"] {
+  border-color: color-mix(in srgb, var(--danger), black 25%);
+  background: linear-gradient(to bottom, color-mix(in srgb, white 38%, transparent) 0 48%, transparent 52%), var(--danger);
+  color: var(--on-danger);
+}
+
+:root[data-style="aero"] :is(.ui-button, .ui-select):enabled:hover {
+  opacity: 1;
+  box-shadow:
+    inset 0 1px 0 var(--gloss-edge),
+    var(--glow);
+}
+
+:root[data-style="aero"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select):enabled:active {
+  filter: brightness(0.94);
+}
+
+/* Fields: a pill of glass, sunk a little, glowing while typed in. */
+:root[data-style="aero"] .ui-field {
+  border: 1px solid var(--gel-edge);
+  border-radius: 999px;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg-elevated), var(--ink) 4%), var(--bg-elevated));
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+:root[data-style="aero"] .ui-field:focus-within {
+  border-color: var(--accent);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.12),
+    var(--glow);
+}
+
+/* Menus and dialogs: frosted glass. */
+:root[data-style="aero"] :is(.ui-menu, .ui-dialog) {
+  border: 1px solid var(--gloss-edge);
+  background: linear-gradient(to bottom, var(--sheen), transparent 120px), color-mix(in srgb, var(--bg-elevated) 76%, transparent);
+  backdrop-filter: blur(24px) saturate(1.8);
+}
+
+:root[data-style="aero"] .ui-card {
+  border: 1px solid var(--gloss-edge);
+  background: linear-gradient(to bottom, var(--sheen), transparent 80px), color-mix(in srgb, var(--bg-elevated) 70%, transparent);
+}
+
+/* With Increased contrast, the glass is solid and the sheen gone. */
+:root[data-style="aero"][data-contrast="more"] :is(.ui-menu, .ui-dialog, .ui-card) {
+  background: var(--bg-elevated);
+  backdrop-filter: none;
+}
+
+:root[data-style="aero"][data-contrast="more"] :is(.sidebar, .note-list, .editor-pane) {
+  background-image: none;
+}
+
+:root[data-style="aero"] .ui-segmented {
+  border: 1px solid var(--gel-edge);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+:root[data-style="aero"] .ui-segment {
+  border-radius: 999px;
+}
+
+:root[data-style="aero"] .ui-segment[data-state="checked"] {
+  background: var(--gel);
+  box-shadow:
+    inset 0 1px 0 var(--gloss-edge),
+    0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Switches: a glossy track and an orb; sliders a groove and an orb. */
+:root[data-style="aero"] .ui-switch {
+  border: 1px solid var(--gel-edge);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ink) 10%, transparent), color-mix(in srgb, var(--ink) 4%, transparent));
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+:root[data-style="aero"] .ui-switch[data-state="checked"] {
+  border-color: color-mix(in srgb, var(--accent), black 25%);
+  background: var(--gel-accent);
+}
+
+:root[data-style="aero"] :is(.ui-switch-thumb, .ui-slider-thumb) {
+  border: 1px solid var(--gel-edge);
+  background: var(--orb);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-style="aero"] .ui-slider-track {
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-style="aero"] .ui-slider-track > * {
+  background: var(--gel-accent);
+}
+
+/* In notes: glossy boxes and tags. */
+:root[data-style="aero"] .cm-lp-checkbox {
+  border-color: var(--gel-edge);
+  background: var(--gel);
+  box-shadow: inset 0 1px 0 var(--gloss-edge);
+}
+
+:root[data-style="aero"] .cm-lp-checkbox.is-checked {
+  background: var(--gel-accent);
+}
+
+:root[data-style="aero"] .cm-lp-tag {
+  border-radius: 999px;
+  background: linear-gradient(to bottom, var(--gloss) 0 50%, transparent 50%), var(--tag-bg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tag-text) 30%, transparent);
+}

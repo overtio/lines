@@ -1,0 +1,274 @@
+/*
+ * Adventure: the pixel art of a 2D adventure game. Buttons, fields and groups of settings as framed
+ * slots with notched corners, lit from the top left; the chosen row a slot picked out in the accent;
+ * grass along the bottom of the title bars; headings that drop a hard shadow; a chunky pixel font,
+ * and motion in steps. Every color is made from the theme's, so it follows whatever is chosen with it.
+ */
+
+/* Made from the theme's colors, and made again in a part with its own (a pane shown dark). */
+:root[data-style="adventure"],
+:root[data-style="adventure"] [data-scheme] {
+  --frame: color-mix(in oklch, var(--bg-sidebar), black 62%);
+  --lit: color-mix(in srgb, var(--bg-elevated), white 30%);
+  --shade: color-mix(in srgb, var(--bg-elevated), black 26%);
+  --slot: inset 2px 2px var(--lit), inset -2px -2px var(--shade);
+  --slot-pressed: inset 2px 2px var(--shade), inset -2px -2px var(--lit);
+  --accent-slot: inset 2px 2px color-mix(in srgb, var(--accent), white 35%), inset -2px -2px color-mix(in srgb, var(--accent), black 30%);
+  --grass: var(--success);
+  --dirt: color-mix(in oklch, var(--pin), black 52%);
+  /* Corners cut a pixel step at a time, two steps deep. */
+  --notch: polygon(
+    0 4px,
+    2px 4px,
+    2px 2px,
+    4px 2px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 2px),
+    2px calc(100% - 2px),
+    2px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+}
+
+/* Aliased, and without ligatures, which the pixel font draws poorly. */
+:root[data-style="adventure"] body {
+  -webkit-font-smoothing: none;
+  font-variant-ligatures: none;
+}
+
+/* Things move in a few steps, as sprites do. */
+:root[data-style="adventure"] *,
+:root[data-style="adventure"] *::before,
+:root[data-style="adventure"] *::after {
+  transition-timing-function: steps(3, jump-end) !important;
+}
+
+:root[data-style="adventure"] .icon {
+  shape-rendering: crispEdges;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+/* Grass along the bottom of the title bars, tufts on top of it, dirt under it. */
+:root[data-style="adventure"] :is(.toolbar, .note-list > .titlebar) {
+  background-image:
+    linear-gradient(to top, var(--dirt) 0 2px, var(--grass) 2px 6px, transparent 6px),
+    repeating-linear-gradient(90deg, var(--grass) 0 2px, transparent 2px 6px, var(--grass) 6px 10px, transparent 10px 16px);
+  background-size:
+    100% 100%,
+    100% 8px;
+  background-position:
+    bottom,
+    left bottom;
+  background-repeat: no-repeat;
+}
+
+/* What's chosen: a slot picked out in the accent. */
+:root[data-style="adventure"] .ui-note-row.selected {
+  --layer: color-mix(in srgb, var(--accent) 16%, var(--bg-list));
+  box-shadow: inset 0 0 0 2px var(--accent), inset 4px 4px color-mix(in srgb, var(--accent) 10%, transparent);
+  clip-path: var(--notch);
+}
+
+:root[data-style="adventure"] :is(.ui-sidebar-row.active, .ui-option[data-highlighted]) {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  box-shadow: inset 0 0 0 2px var(--accent);
+  clip-path: var(--notch);
+}
+
+:root[data-style="adventure"] .ui-sidebar-row:not(.active):hover,
+:root[data-style="adventure"] .ui-note-row:not(.selected):hover {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ink) 18%, transparent);
+  clip-path: var(--notch);
+}
+
+/* Slots: what can be pressed or typed in, and groups of settings. A field keeps its corners: cut, it
+   would be drawn over the icon beside it (the search field's magnifier). */
+:root[data-style="adventure"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select, .ui-field, .ui-segmented, .ui-card) {
+  border: 2px solid var(--frame);
+  background: var(--bg-elevated);
+  box-shadow: var(--slot);
+}
+
+:root[data-style="adventure"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select, .ui-segmented, .ui-card) {
+  clip-path: var(--notch);
+}
+
+:root[data-style="adventure"] :is(.ui-button, .ui-select) {
+  color: var(--text);
+  font-weight: 700;
+}
+
+:root[data-style="adventure"] .ui-button[data-variant="primary"] {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: var(--accent-slot);
+}
+
+:root[data-style="adventure"] .ui-button[data-variant="danger-primary"] {
+  background: var(--danger);
+  color: var(--on-danger);
+  box-shadow: inset 2px 2px color-mix(in srgb, var(--danger), white 35%), inset -2px -2px color-mix(in srgb, var(--danger), black 30%);
+}
+
+:root[data-style="adventure"] :is(.ui-button, .ui-select):enabled:hover {
+  opacity: 1;
+  filter: brightness(1.08);
+}
+
+:root[data-style="adventure"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select):enabled:active,
+:root[data-style="adventure"] .ui-select[data-state="open"] {
+  box-shadow: var(--slot-pressed);
+  translate: 0 2px;
+}
+
+:root[data-style="adventure"] .ui-field {
+  background: var(--bg);
+  box-shadow: var(--slot-pressed);
+}
+
+:root[data-style="adventure"] .ui-field:focus-within {
+  border-color: var(--accent);
+}
+
+:root[data-style="adventure"] .ui-segmented {
+  padding: 2px;
+  background: var(--bg);
+  box-shadow: var(--slot-pressed);
+}
+
+:root[data-style="adventure"] .ui-segment[data-state="checked"] {
+  background: var(--bg-elevated);
+  box-shadow: var(--slot);
+  clip-path: var(--notch);
+}
+
+/* Cut corners would cut a ring outside them, so focus rings go inside. */
+:root[data-style="adventure"] :is(.ui-button, .ui-select, .ui-segment, .ui-note-row, .ui-sidebar-row, .ui-option):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -6px;
+}
+
+:root[data-style="adventure"] .ui-button:is([data-variant="primary"], [data-variant="danger-primary"]):focus-visible {
+  outline-color: var(--on-accent);
+}
+
+/* Menus and dialogs: framed, lit, and dropping a hard shadow. */
+:root[data-style="adventure"] :is(.ui-menu, .ui-dialog) {
+  border: 2px solid var(--frame);
+  background: var(--bg-elevated);
+  box-shadow: var(--slot), var(--shadow-menu);
+}
+
+:root[data-style="adventure"] .ui-dialog {
+  box-shadow: var(--slot), var(--shadow-dialog);
+}
+
+:root[data-style="adventure"] .ui-separator {
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--shade) 0 4px, transparent 4px 6px);
+}
+
+:root[data-style="adventure"] .ui-callout {
+  border: 2px solid currentColor;
+  clip-path: var(--notch);
+}
+
+/* Switches and sliders as blocks. */
+/* Round only by being pills, which the radius scale leaves round: squared off here. */
+:root[data-style="adventure"] :is(.ui-switch, .ui-switch-thumb, .ui-slider-thumb, .cm-lp-tag) {
+  border-radius: 0;
+}
+
+:root[data-style="adventure"] .ui-switch {
+  border: 2px solid var(--frame);
+  background: var(--bg);
+  box-shadow: var(--slot-pressed);
+}
+
+:root[data-style="adventure"] .ui-switch[data-state="checked"] {
+  background: var(--accent);
+}
+
+:root[data-style="adventure"] .ui-switch-thumb {
+  background: var(--bg-elevated);
+  box-shadow: var(--slot);
+}
+
+:root[data-style="adventure"] .ui-slider-track {
+  height: 6px;
+  background: var(--bg);
+  box-shadow:
+    0 0 0 2px var(--frame),
+    var(--slot-pressed);
+}
+
+:root[data-style="adventure"] .ui-slider-thumb {
+  width: 14px;
+  height: 20px;
+  border: 2px solid var(--frame);
+  background: var(--bg-elevated);
+  box-shadow: var(--slot);
+}
+
+/* Scroll bars as a framed block in a sunken slot. Not while they're turned off. Browsers draw them so only while neither width nor color is set. */
+:root[data-style="adventure"]:not([data-no-scrollbars]),
+:root[data-style="adventure"]:not([data-no-scrollbars]) * {
+  scrollbar-color: auto;
+  scrollbar-width: auto;
+}
+
+:root[data-style="adventure"] ::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+:root[data-style="adventure"] ::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+:root[data-style="adventure"] ::-webkit-scrollbar-thumb {
+  border: 2px solid var(--frame);
+  background: var(--bg-elevated);
+  box-shadow: var(--slot);
+}
+
+:root[data-style="adventure"] ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* In notes: headings that drop a hard shadow, square bullets, boxes as slots, tags as framed chips. */
+:root[data-style="adventure"] .cm-lp-h {
+  letter-spacing: 0;
+  text-shadow: 2px 2px 0 color-mix(in srgb, var(--ink) 16%, transparent);
+}
+
+:root[data-style="adventure"] .cm-lp-bullet::before {
+  border-radius: 0;
+}
+
+:root[data-style="adventure"] .cm-lp-checkbox {
+  border: 2px solid var(--frame);
+  border-radius: 0;
+}
+
+:root[data-style="adventure"] .cm-lp-checkbox:not(.is-checked) {
+  background: var(--bg);
+  box-shadow: var(--slot-pressed);
+}
+
+:root[data-style="adventure"] .cm-lp-tag {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tag-text) 45%, transparent);
+  clip-path: var(--notch);
+}

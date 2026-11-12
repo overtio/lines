@@ -36,4 +36,10 @@
   <FieldRow label={t("settings.scrollbars")} note={t("settings.scrollbarsNote")}>
     <Switch label={t("settings.scrollbars")} checked={prefs.scrollbars} onchange={(on) => (prefs.scrollbars = on)} />
   </FieldRow>
+  <FieldRow label={t("settings.hideBars")} note={t("settings.hideBarsNote")}>
+    <Switch label={t("settings.hideBars")} checked={prefs.hideBars} onchange={(on) => (prefs.hideBars = on)} />
+  </FieldRow>
+  <FieldRow label={t("settings.showIcons")} note={t("settings.showIconsNote")}>
+    <Switch label={t("settings.showIcons")} checked={prefs.showIcons} onchange={(on) => (prefs.showIcons = on)} />
+  </FieldRow>
 </FieldGroup>

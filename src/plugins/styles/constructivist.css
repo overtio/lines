@@ -1,0 +1,279 @@
+/*
+ * Constructivist: the graphic language of 1920s avant-garde posters. Red, black and paper; heavy
+ * condensed capitals; a red band driving along each title bar's black rule; the chosen row a red
+ * wedge; the main button cut on a slant; red bars under headings; and behind the note, a large
+ * circle crossed by a diagonal band. The text itself stays level: the diagonals are only decoration.
+ * Red is the theme's accent and black its text, so it follows whatever is chosen with it.
+ */
+
+/* Made from the theme's colors, and made again in a part with its own (a pane shown dark). */
+:root[data-style="constructivist"],
+:root[data-style="constructivist"] [data-scheme] {
+  --display: Oswald, "Arial Narrow", var(--font-ui);
+  --bar: 2px solid var(--text);
+  --wedge: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+}
+
+:root[data-style="constructivist"] *,
+:root[data-style="constructivist"] *::before,
+:root[data-style="constructivist"] *::after {
+  transition-duration: 0s !important;
+}
+
+:root[data-style="constructivist"] ::selection {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Titles as a poster's: condensed capitals. */
+:root[data-style="constructivist"] :is(#note-list-title, #settings-title, .ui-dialog h2) {
+  font-family: var(--display);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Under each title bar, a black rule and a red band on it, its end cut on a slant. */
+:root[data-style="constructivist"] :is(.toolbar, .note-list > .titlebar) {
+  background:
+    linear-gradient(to top, var(--text) 0 3px, transparent 3px) bottom / 100% 100% no-repeat,
+    linear-gradient(115deg, var(--accent) 0 calc(100% - 10px), transparent calc(100% - 10px)) left 0 bottom 3px / 38% 9px no-repeat;
+}
+
+/* Behind the note, a large circle crossed by a diagonal band, faint enough to read over. */
+:root[data-style="constructivist"]:not([data-paper]) .editor-pane {
+  background-image:
+    linear-gradient(150deg, transparent 0 74%, color-mix(in srgb, var(--accent) 8%, transparent) 74% 77.5%, transparent 77.5%),
+    radial-gradient(circle at calc(100% - 150px) calc(100% - 160px), color-mix(in srgb, var(--text) 6%, transparent) 0 120px, transparent 121px);
+}
+
+/* What's chosen: a red wedge. */
+:root[data-style="constructivist"] .ui-note-row.selected {
+  --layer: var(--accent);
+  clip-path: var(--wedge);
+}
+
+:root[data-style="constructivist"] :is(.ui-sidebar-row.active, .ui-option[data-highlighted]) {
+  background: var(--accent);
+  clip-path: var(--wedge);
+}
+
+:root[data-style="constructivist"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-option[data-highlighted]),
+:root[data-style="constructivist"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-option[data-highlighted]) * {
+  color: var(--on-accent) !important;
+}
+
+:root[data-style="constructivist"] .ui-note-row:not(.selected):hover {
+  --layer: transparent;
+  box-shadow: inset 4px 0 var(--text);
+}
+
+:root[data-style="constructivist"] .ui-sidebar-row:not(.active):hover {
+  background: transparent;
+  box-shadow: inset 4px 0 var(--text);
+}
+
+/* A wedge would cut a ring outside it, so focus rings go inside, in the color on what's chosen. */
+:root[data-style="constructivist"] :is(.ui-button, .ui-select, .ui-segment, .ui-note-row, .ui-sidebar-row, .ui-option):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -5px;
+}
+
+@media not (forced-colors: active) {
+  :root[data-style="constructivist"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-button[data-variant="primary"]):focus-visible {
+    outline-color: var(--on-accent);
+  }
+}
+
+/* Buttons: flat and square in condensed capitals, the main one a red wedge. */
+:root[data-style="constructivist"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select) {
+  border: var(--bar);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: none;
+}
+
+:root[data-style="constructivist"] .ui-button {
+  font-family: var(--display);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+:root[data-style="constructivist"] .ui-button[data-variant="primary"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  clip-path: var(--wedge);
+  padding-inline-end: 22px;
+}
+
+:root[data-style="constructivist"] .ui-button[data-variant="danger-primary"] {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: var(--on-danger);
+}
+
+:root[data-style="constructivist"] :is(.ui-button[data-variant="secondary"], .ui-select):enabled:hover {
+  opacity: 1;
+  background: var(--text);
+  color: var(--bg);
+}
+
+:root[data-style="constructivist"] .ui-button[data-variant="primary"]:enabled:hover {
+  opacity: 1;
+  filter: brightness(1.1);
+}
+
+/* Fields, menus and dialogs boxed in black; groups of settings with a red band along their top. */
+:root[data-style="constructivist"] :is(.ui-field, .ui-card, .ui-menu, .ui-dialog, .ui-segmented) {
+  border: var(--bar);
+}
+
+:root[data-style="constructivist"] .ui-field {
+  background: var(--bg);
+}
+
+:root[data-style="constructivist"] .ui-field:focus-within {
+  border-color: var(--accent);
+}
+
+:root[data-style="constructivist"] .ui-card {
+  box-shadow: inset 0 6px var(--accent);
+}
+
+:root[data-style="constructivist"] .ui-separator {
+  height: 3px;
+  background: var(--text);
+}
+
+:root[data-style="constructivist"] .ui-segmented {
+  padding: 0;
+  background: var(--bg);
+}
+
+:root[data-style="constructivist"] .ui-segment {
+  font-family: var(--display);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+:root[data-style="constructivist"] .ui-segment[data-state="checked"] {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: none;
+}
+
+:root[data-style="constructivist"] .ui-callout {
+  border: var(--bar);
+  border-left-width: 6px;
+}
+
+/* Switches and sliders as blocks. */
+/* Round only by being pills, which the radius scale leaves round: squared off here. */
+:root[data-style="constructivist"] :is(.ui-switch, .ui-switch-thumb, .ui-slider-thumb, .cm-lp-tag) {
+  border-radius: 0;
+}
+
+:root[data-style="constructivist"] .ui-switch {
+  border: var(--bar);
+  background: var(--bg);
+  height: 22px;
+  width: 40px;
+}
+
+:root[data-style="constructivist"] .ui-switch[data-state="checked"] {
+  background: var(--accent);
+}
+
+:root[data-style="constructivist"] .ui-switch-thumb {
+  background: var(--text);
+  box-shadow: none;
+}
+
+:root[data-style="constructivist"] .ui-switch[data-state="checked"] .ui-switch-thumb {
+  background: var(--on-accent);
+  /* The track's width, less its rules, padding and the knob. */
+  translate: 18px 0;
+}
+
+:root[data-style="constructivist"] .ui-slider-track {
+  height: 4px;
+  background: var(--text);
+}
+
+:root[data-style="constructivist"] .ui-slider-track > * {
+  background: var(--accent);
+}
+
+:root[data-style="constructivist"] .ui-slider-thumb {
+  width: 12px;
+  height: 22px;
+  border: 0;
+  background: var(--accent);
+  box-shadow: none;
+}
+
+/* Scroll bars as a black bar. Not while they're turned off. Browsers draw them so only while neither width nor color is set. */
+:root[data-style="constructivist"]:not([data-no-scrollbars]),
+:root[data-style="constructivist"]:not([data-no-scrollbars]) * {
+  scrollbar-color: auto;
+  scrollbar-width: auto;
+}
+
+:root[data-style="constructivist"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+:root[data-style="constructivist"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:root[data-style="constructivist"] ::-webkit-scrollbar-thumb {
+  background: var(--text);
+}
+
+:root[data-style="constructivist"] ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* In notes: headings in condensed capitals with a red bar under the first two; square red bullets;
+   tags as red stamps; boxes in black. */
+:root[data-style="constructivist"] .cm-lp-h {
+  font-family: var(--display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+:root[data-style="constructivist"] :is(.cm-lp-h1, .cm-lp-h2) {
+  text-transform: uppercase;
+  background: linear-gradient(var(--accent), var(--accent)) left bottom / 2.4em 0.14em no-repeat;
+}
+
+:root[data-style="constructivist"] .cm-lp-h1 {
+  font-size: 2.3em;
+  line-height: 1.08;
+}
+
+:root[data-style="constructivist"] .cm-lp-bullet::before {
+  border-radius: 0;
+}
+
+:root[data-style="constructivist"] .cm-lp-link {
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+:root[data-style="constructivist"] .cm-lp-tag {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+:root[data-style="constructivist"] .cm-lp-checkbox {
+  border: var(--bar);
+  border-radius: 0;
+}

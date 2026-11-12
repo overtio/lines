@@ -110,8 +110,8 @@ Put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block), or, with Sp
 ### Make it yours
 
 - **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. See [docs/plugins.md](docs/plugins.md).
-- **Presets**: the whole look in one, not just the colors. Classic, a desktop of the late 90s with bevels and a title bar; Pixel, one-bit and minimal in a pixel font; Neon, glowing lines on a grid. Save your own (theme, type, paper, cursor and all) and share it as a file. See [docs/themes.md](docs/themes.md#presets).
-- **Twenty-three themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, bit by bit by right-clicking anything to change its color, or from a picture (a wallpaper's colors, read on your device), share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
+- **Presets**: the whole look in one, not just the colors. Classic, a desktop of the late 90s with bevels and a title bar; Pixel, one-bit and minimal in a pixel font; Neon, glowing lines on a grid; Adventure, a 2D adventure game's pixel art, with framed slots and grass; Aero, glossy 2000s glass; Brutalist, thick rules and big type; Constructivist, 1920s avant-garde posters in red, black and paper; Void, heavy minimalism, its toolbars out of sight until reached for and words in place of icons. Save your own (theme, type, paper, cursor and all) and share it as a file. See [docs/themes.md](docs/themes.md#presets).
+- **Twenty-six themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, bit by bit by right-clicking anything to change its color, or from a picture (a wallpaper's colors, read on your device), share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
 - **Dark panes**: the sidebar, the note list or both in the theme's dark colors, while the note stays light. See [docs/themes.md](docs/themes.md#dark-panes).
 - **Monochrome and Invert**: any theme in greys, or turned light for dark, with the contrast it had.
 - **Paper to write on.** Ruled lines that every line of text sits on, and dots, squares or graph paper with a row of cells for each line (or any size you like), isometric paper, in your theme's colors or any color, as faint or strong as you like, and a grain or linen texture (Settings → Plugins → Paper).
@@ -122,7 +122,7 @@ Put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block), or, with Sp
 - **Typing sounds.** Hear a keyboard as you type: creamy or clacky linears, tactile, clicky, Topre, or a typewriter that rings its bell at Return. Or add a recorded one: any [Mechvibes](https://mechvibes.com) sound pack, from a .zip or its folder. Off to begin with.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
 - **Fits any screen**: three columns on a desktop, a drawer on a tablet, a stack on a phone. Drag the columns to resize them.
-- **Your layout.** Put the sidebar and the note list on the left or the right, each its own way, and turn on tabs for the notes you open, as in a code editor (Settings → Layout). Scroll bars can be turned off everywhere.
+- **Your layout.** Put the sidebar and the note list on the left or the right, each its own way, and turn on tabs for the notes you open, as in a code editor (Settings → Layout). Scroll bars can be turned off everywhere, the toolbars kept out of sight until you reach for them, and icons swapped for words.
 - **Outline.** Turn on short lines beside the note, on its right or left, one for each heading, darker for the part you're reading. Point at them to see the headings by name, and click one to glide there. Markdown and LaTeX notes both have it.
 - **Native touches**: SF Symbols on Apple devices, see-through windows on the Mac (all of the window, or only its sidebar, or its sidebar and note list), and Settings in its own window if you like.
 - **Updates itself** (desktop apps). A new version downloads in the background once it's been out a week, and installs when you quit lines, or straight away with Restart to update. Choose how long to wait, or turn it off, in Settings → About.
@@ -181,6 +181,7 @@ Also on the website: [overtio.github.io/lines/docs](https://overtio.github.io/li
 | [Performance](docs/performance.md) | How fast lines is with thousands of notes, and the benchmarks that check it |
 | [Translations](docs/translations.md) | How translations work, and adding a language |
 | [Releasing](docs/releasing.md) | Versions, release notes, and how the apps are built and published |
+| [Theme tools](docs/theme-tools.md) | Swatches of the colors in pictures and videos, and themes from them, or from lines' own, for VS Code, GTK and Base24 |
 
 ## Development
 
@@ -305,9 +306,9 @@ src/
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
     keyboards/               Keyboards to hear as you type, made from sound (synth.ts)
     mascots/                 Companions in the window, as pixel art (art.ts); what they do is lib/mascot/
-    themes/                  The twenty-three themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
+    themes/                  The twenty-six themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
     fonts/                   Fonts to write notes in: IBM Plex Sans, Fira Sans and Agave
-    styles/                  Whole looks beyond the colors, each a preset: Classic, Pixel, Neon, Puddle and Lightbulb, each a CSS file, its fonts, its colors and the settings it brings
+    styles/                  Whole looks beyond the colors, each a preset: Classic, Pixel, Neon, Puddle, Lightbulb, Adventure, Aero, Brutalist, Constructivist and Void, each a CSS file, its fonts, its colors and the settings it brings
     lucide/  sf-symbols/     Icon sets
   lib/
     plugins/
@@ -410,6 +411,7 @@ tests/                       Unit tests (unit/, bun test) and browser tests (bro
 scripts/bench.mjs            The benchmarks (bun run bench): builds, seeds 5,000 notes, drives WebKit and Chromium
 scripts/qa-shots.mjs         Pictures of lines for QA (bun run qa-shots), into qa/shots/ with a page to see them on
 scripts/release.mjs          Versions and release notes from the commits (docs/releasing.md)
+tools/themes/                Swatches from pictures and videos (swatch.ts) and themes for other apps (adapt.ts, targets/), docs/theme-tools.md
 .github/workflows/           Checks on every pull request, the release pull request, releases, the website
 ```
 

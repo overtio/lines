@@ -1,0 +1,250 @@
+/*
+ * Brutalist: the structure on show. Every border a solid line in the text's color, thick rules
+ * under the title bars, labels in uppercase monospace, the chosen row a solid block of the accent,
+ * buttons that turn inside out under the pointer, big tight headings, and no shadows, rounding or
+ * easing.
+ */
+
+/* Made from the theme's colors, and made again in a part with its own (a pane shown dark). */
+:root[data-style="brutalist"],
+:root[data-style="brutalist"] [data-scheme] {
+  --rule: 3px solid var(--text);
+  --label: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+:root[data-style="brutalist"] *,
+:root[data-style="brutalist"] *::before,
+:root[data-style="brutalist"] *::after {
+  transition-duration: 0s !important;
+}
+
+:root[data-style="brutalist"] .animate-pop-in {
+  animation: none;
+}
+
+:root[data-style="brutalist"] ::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Titles and labels in uppercase monospace. */
+:root[data-style="brutalist"] :is(#note-list-title, #settings-title, .ui-dialog h2) {
+  font-family: var(--label);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+:root[data-style="brutalist"] :is(.toolbar, .note-list > .titlebar) {
+  border-bottom: var(--rule);
+}
+
+/* What's chosen: a solid block of the accent. */
+:root[data-style="brutalist"] .ui-note-row.selected {
+  --layer: var(--accent);
+}
+
+:root[data-style="brutalist"] .ui-note-row:not(.selected):hover {
+  --layer: transparent;
+  box-shadow: inset 0 0 0 2px var(--text);
+}
+
+:root[data-style="brutalist"] :is(.ui-sidebar-row.active, .ui-option[data-highlighted]) {
+  background: var(--accent);
+}
+
+:root[data-style="brutalist"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-option[data-highlighted]),
+:root[data-style="brutalist"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-option[data-highlighted]) * {
+  color: var(--on-accent) !important;
+}
+
+:root[data-style="brutalist"] .ui-sidebar-row:not(.active):hover {
+  background: transparent;
+  text-decoration: underline 2px;
+  text-underline-offset: 3px;
+}
+
+/* Focus: a thick ring in the accent, and on what's in the accent, in the text on it. */
+:root[data-style="brutalist"] :is(.ui-button, .ui-icon-button, .ui-select, .ui-segment, .ui-switch, .ui-option, .ui-nav-item, .ui-note-row, .ui-sidebar-row):focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media not (forced-colors: active) {
+  :root[data-style="brutalist"] :is(.ui-note-row.selected, .ui-sidebar-row.active):focus-visible {
+    outline: 3px solid var(--on-accent);
+    outline-offset: -6px;
+  }
+}
+
+/* Buttons: boxed, in uppercase monospace, inside out under the pointer. */
+:root[data-style="brutalist"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select) {
+  border: var(--rule);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: none;
+}
+
+:root[data-style="brutalist"] .ui-button {
+  font-family: var(--label);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+:root[data-style="brutalist"] .ui-button[data-variant="primary"] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+:root[data-style="brutalist"] .ui-button[data-variant="danger-primary"] {
+  background: var(--danger);
+  color: var(--on-danger);
+}
+
+:root[data-style="brutalist"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select):enabled:hover {
+  opacity: 1;
+  background: var(--text);
+  color: var(--bg);
+}
+
+:root[data-style="brutalist"] .ui-icon-button:enabled:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+/* Fields, groups, menus and dialogs: boxed in a thick rule. */
+:root[data-style="brutalist"] :is(.ui-field, .ui-card, .ui-menu, .ui-dialog, .ui-segmented) {
+  border: var(--rule);
+  box-shadow: none;
+}
+
+:root[data-style="brutalist"] .ui-field {
+  background: var(--bg);
+}
+
+:root[data-style="brutalist"] .ui-field:focus-within {
+  border-color: var(--accent);
+}
+
+:root[data-style="brutalist"] .ui-separator {
+  height: 3px;
+  background: var(--text);
+}
+
+:root[data-style="brutalist"] .ui-segmented {
+  padding: 0;
+  background: var(--bg);
+}
+
+:root[data-style="brutalist"] .ui-segment {
+  font-family: var(--label);
+  text-transform: uppercase;
+}
+
+:root[data-style="brutalist"] .ui-segment[data-state="checked"] {
+  background: var(--text);
+  color: var(--bg);
+  box-shadow: none;
+}
+
+:root[data-style="brutalist"] .ui-callout {
+  border: var(--rule);
+}
+
+/* Switches and sliders as boxes. */
+/* Round only by being pills, which the radius scale leaves round: squared off here. */
+:root[data-style="brutalist"] :is(.ui-switch, .ui-switch-thumb, .ui-slider-thumb, .cm-lp-tag) {
+  border-radius: 0;
+}
+
+:root[data-style="brutalist"] .ui-switch {
+  border: var(--rule);
+  background: var(--bg);
+  height: 24px;
+  width: 44px;
+}
+
+:root[data-style="brutalist"] .ui-switch[data-state="checked"] {
+  background: var(--accent);
+}
+
+:root[data-style="brutalist"] .ui-switch-thumb {
+  background: var(--text);
+  box-shadow: none;
+}
+
+:root[data-style="brutalist"] .ui-switch[data-state="checked"] .ui-switch-thumb {
+  background: var(--on-accent);
+  /* The track's width, less its rules, padding and the knob. */
+  translate: 20px 0;
+}
+
+:root[data-style="brutalist"] .ui-slider-track {
+  height: 3px;
+  background: var(--text);
+}
+
+:root[data-style="brutalist"] .ui-slider-thumb {
+  width: 14px;
+  height: 22px;
+  border: var(--rule);
+  background: var(--bg);
+  box-shadow: none;
+}
+
+/* Scroll bars as a solid block. Not while they're turned off. Browsers draw them so only while neither width nor color is set. */
+:root[data-style="brutalist"]:not([data-no-scrollbars]),
+:root[data-style="brutalist"]:not([data-no-scrollbars]) * {
+  scrollbar-color: auto;
+  scrollbar-width: auto;
+}
+
+:root[data-style="brutalist"] ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+:root[data-style="brutalist"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:root[data-style="brutalist"] ::-webkit-scrollbar-thumb {
+  background: var(--text);
+}
+
+:root[data-style="brutalist"] ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* In notes: heavy, tight headings, the first big; thick links; boxed tags and checkboxes. */
+:root[data-style="brutalist"] .cm-lp-h {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+:root[data-style="brutalist"] .cm-lp-h1 {
+  font-size: 2.4em;
+  line-height: 1.05;
+}
+
+:root[data-style="brutalist"] .cm-lp-link {
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+:root[data-style="brutalist"] .cm-lp-bullet::before {
+  border-radius: 0;
+}
+
+:root[data-style="brutalist"] .cm-lp-tag {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--tag-text);
+  font-family: var(--label);
+  text-transform: uppercase;
+}
+
+:root[data-style="brutalist"] .cm-lp-checkbox {
+  border: var(--rule);
+  border-radius: 0;
+}

@@ -1,6 +1,6 @@
 # Themes
 
-lines comes with twenty-three themes, each light and dark, and presets that change the whole look beyond the colors: a 90s desktop, one-bit pixels, neon, a rainy day in a picture book, a spark of lightning. You can also make your own themes and presets, share them as files, and import themes made for other apps: VS Code, Zed, Base16, your terminal or your Linux desktop.
+lines comes with twenty-six themes, each light and dark, and presets that change the whole look beyond the colors: a 90s desktop, one-bit pixels, neon, a rainy day in a picture book, a spark of lightning, a pixel-art adventure game, glossy glass, brutalism, 1920s posters, heavy minimalism. You can also make your own themes and presets, share them as files, and import themes made for other apps: VS Code, Zed, Base16, your terminal or your Linux desktop.
 
 Everything here is in Settings → Presets and Settings → Theme.
 
@@ -40,7 +40,7 @@ Settings → Theme → Contrast → Increased works with your themes as with lin
 
 ## Presets
 
-A theme is colors. A preset is the whole look in one: the theme, and the style that goes with it (how round the corners are, the type, the lines and shadows, and what makes it itself), with the rest of how lines looks. Choosing one sets every setting it has; **Undo**, just after, puts back the look you had. Settings → Presets has six:
+A theme is colors. A preset is the whole look in one: the theme, and the style that goes with it (how round the corners are, the type, the lines and shadows, and what makes it itself), with the rest of how lines looks. Choosing one sets every setting it has; **Undo**, just after, puts back the look you had. Settings → Presets has eleven:
 
 - **Lines**: soft corners, quiet shadows and your system's font, as lines has always looked, and every other look setting as lines first has it.
 - **Classic**: a desktop of the late 90s. Raised and sunken bevels lit from the top left, a title bar with a gradient over the note list, the selection in the accent, square corners, Tahoma, scroll bars with arrow buttons, and the 90s pointer.
@@ -49,12 +49,18 @@ A theme is colors. A preset is the whole look in one: the theme, and the style t
 
 - **Puddle**: a rainy day in a picture book, in its colors: the rain blue most of it is drawn on for the sidebar, a sweater's seafoam for the note list and cream paper for the note (night rain in dark), a navy accent, tags in a coral wall's rose (on a pale coral chip), a beak's mustard for highlights, and tag colors from the same picture, deepened to read; crisp ink lines around what can be pressed or typed in, around what floats and around what's chosen; flat fills with no shadows, rounder corners, and the system's rounded font.
 - **Lightbulb**: a spark of lightning drawn as a cartoon, in five colors: lemon for the sidebar (and a paler lemon for the note list, near-white for the note), a red accent, tags in a deep cedar on a gold chip, lemon highlights, and black ink (lemon in dark, where the accent is lemon too and tags are a lighter red); bold ink lines around what can be pressed or typed in, around what floats and around what's chosen, hard shadows of the same ink under cards, menus and dialogs, round corners, and a thick cursor that throws sparks.
+- **Adventure**: the pixel art of a 2D adventure game. Buttons, fields and groups of settings are framed slots with notched corners, lit from the top left and pressed in when held; the chosen note and sidebar row are slots picked out in the accent; grass grows along the bottom of the title bars; headings in notes drop a hard shadow; a chunky pixel font (Pixelify Sans, with VT323 for code), and things move in steps rather than gliding.
+- **Aero**: glossy glass of the 2000s. Gel buttons with a shine across their top half, fields and switches as glossy pills with orbs for knobs, frosted see-through menus and dialogs, a sheen down the panes, and behind the note a sky's glow and a few soft bubbles in a corner (not with a paper). With Increased contrast the glass is solid and the sheen and sky gone.
+- **Brutalist**: the structure on show. Every border a solid line in the text's color, thick rules under the title bars and around fields, groups, menus and dialogs, titles and buttons in uppercase monospace, buttons that turn inside out under the pointer, the chosen row a solid block of the accent, a big tight first heading, and no shadows, rounding or easing. Its font is your system's Helvetica (Arial where there's none).
+- **Constructivist**: the graphic language of 1920s avant-garde posters. Red, black and paper; titles, buttons and headings in heavy condensed capitals (Oswald); under each title bar a black rule with a red band on it, cut on a slant; the chosen row a red wedge, and the main button too; groups of settings with a red band along their top, menus and dialogs dropping a red block of shadow; red bars under the first two levels of headings; and behind the note a large faint circle crossed by a diagonal band (not with a paper). The text stays level: the diagonals are only decoration.
+- **Void**: heavy minimalism, everything that isn't the words taken away. No lines, boxes, shadows or backgrounds behind rows; the panes apart only by space; one size of type for the whole app, and headings in notes the text's size, set apart by weight; buttons and choices as words; what's chosen in full black with a small dot in the accent, the rest grey; fields and switches as hairlines. Choosing it also turns on two settings from Settings → Layout that work in any style, Hide toolbars and Icons off ([Fewer things in sight](#fewer-things-in-sight)), which another preset turns off again.
 
-Each but Lines comes with a color theme made for it (Classic, Pixel, Neon, Puddle and Lightbulb, in the Themes list too). Anything can be changed after: another theme, and the style keeps its shapes in those colors (its bevels, lines and glows are made from the theme's own colors), or any other setting. A style that has its own font is notes' first font in Settings → Typography too, in place of the system's; the other fonts there still work with it.
+Each but Lines comes with a color theme made for it (Classic, Pixel, Neon, Puddle, Lightbulb, Adventure, Aero, Brutalist, Constructivist and Void, in the Themes list too). Anything can be changed after: another theme, and the style keeps its shapes in those colors (its bevels, lines and glows are made from the theme's own colors), or any other setting. A style that has its own font is notes' first font in Settings → Typography too, in place of the system's; the other fonts there still work with it.
 
 ### What a preset has
 
 - **Theme:** the theme (a theme of your own goes along in a preset's file), the style, Dark panes, Monochrome, Invert, the icons and headings' color.
+- **Layout:** Hide toolbars, and whether icons show.
 - **Typography:** the font, the spacing and the note's width.
 - **Paper:** the pattern, texture and their color, size and strength; the backdrop and the page over it.
 - **Cursor:** the text cursor's shape, width, color, blink, moving and effect; the pointer and what follows it.
@@ -75,11 +81,20 @@ The share button beside your preset's name has **Share** (your system's share sh
 
 A preset's file is JSON: its `name`, `author` if you like, its `settings` by the names lines keeps them by, and, when its theme is one of your own, that theme as a theme file has it (`theme`), which is added to theirs (or the same one used, if they have it). A picture of your own behind the page isn't in the file: the backdrop comes as none. Settings missing from a file are lines' own, and one lines can't read is left out the same way, so a file from an older or newer lines still works. Themes, patterns, mascots and the like that come from a plugin are kept by their id: while that plugin is off, lines shows its own in their place.
 
-Styles are plugins (the Styles plugin has the four beside Lines), and a plugin can add more presets, with the settings each brings: what one can set, and how it reaches each part of the app, is in [plugins.md](plugins.md#what-a-plugin-can-add). Neon's glow and scan lines go with Increased contrast, and its grid while a paper is chosen. Presets change how lines looks, not what it prints: a note's PDF is black on white with every one.
+Styles are plugins (the Styles plugin has the ten beside Lines), and a plugin can add more presets, with the settings each brings: what one can set, and how it reaches each part of the app, is in [plugins.md](plugins.md#what-a-plugin-can-add). Neon's glow and scan lines go with Increased contrast, and its grid while a paper is chosen. Presets change how lines looks, not what it prints: a note's PDF is black on white with every one.
+
+## Fewer things in sight
+
+Two settings in Settings → Layout take away what isn't the note, in any theme and style:
+
+- **Hide toolbars**: the bars over the note and the note list, and the sidebar's top and bottom (its button, the version and the footer), stay out of sight until the pointer comes near them, and show as soon as Tab moves into them. On a touch screen, with nothing to point with, they always show.
+- **Icons** off: a button that's only an icon shows its name in words instead (the toolbar's Lock note, Note info, Share…; Settings' Close), and other icons go: the sidebar's, Settings', those beside a button's words, the search field's magnifier. Those that say something stay: checkmarks, and the chevrons that show whether something is open (nested tags, Settings' groups). A note row's pinned and locked marks show as words (Pinned · Locked note · 8:37 PM), and a note's own icon goes. What's in a note keeps its icons, a block's buttons too.
+
+Settings → Editor → **Drag to move lines** off takes away the grip that shows beside the line or block you point at; lines and blocks still move with ⌥↑ and ⌥↓.
 
 ## Dark panes
 
-Settings → Theme → **Dark panes** shows the sidebar, the note list or both in the theme's dark colors while lines is light, so the note is a light page beside dark panes. It works with every theme: the panes take the theme's own dark colors (for a theme with light colors only, ones worked out from them as Make Dark Colors does), Increased contrast's too, and Monochrome and Invert change them as they do the rest of the window. A style keeps its shapes in them: Classic's bevels, Pixel's lines and Neon's glow are made from the panes' colors there. While lines is dark, the panes are dark anyway, and there's nothing for it to change. The theme picker's swatches show the sidebar dark while it's on.
+Settings → Theme → **Dark panes** shows the sidebar, the note list or both in the theme's dark colors while lines is light, so the note is a light page beside dark panes. It works with every theme: the panes take the theme's own dark colors (for a theme with light colors only, ones worked out from them as Make Dark Colors does), Increased contrast's too, and Monochrome and Invert change them as they do the rest of the window. A style keeps its shapes in them: Classic's bevels, Pixel's lines, Neon's glow, Adventure's slots and grass, Aero's gloss, Brutalist's rules and Constructivist's bands are made from the panes' colors there. While lines is dark, the panes are dark anyway, and there's nothing for it to change. The theme picker's swatches show the sidebar dark while it's on.
 
 ## Monochrome and Invert
 
@@ -180,3 +195,7 @@ What lines takes from each:
 Whatever a theme doesn't have is worked out from what it does, as for your own: the note list between the note and the sidebar, secondary and faint text from the text, tags from the accent, made readable on their chips. Any of it can be changed after.
 
 A plugin can teach lines more formats ([plugins.md](plugins.md#what-a-plugin-can-add)).
+
+## Themes for other apps
+
+lines' theme tools go the other way: they make themes for VS Code, GTK and Base24 from a lines theme, and swatches and themes from pictures and videos ([theme-tools.md](theme-tools.md)).
