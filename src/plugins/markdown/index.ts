@@ -21,16 +21,16 @@ import { markdownDocument } from "../../lib/print/markdown";
 const NOT_TEXT = new Set(["FencedCode", "CodeBlock", "InlineCode", "InlineMath", "MathBlock", "Table", "HTMLBlock", "CommentBlock", "SetextHeading1", "SetextHeading2"]);
 
 /**
- * Where `<!-- … -->` isn't a line mark: anywhere but the end of a paragraph's or a heading's text
- * (in a list or a quote too). In code it's text; after a fence, `$$`, a table's row, a divider or
- * the properties it would change what they are.
+ * Where `<!-- … -->` isn't a line mark: anywhere but the end of a paragraph's, a todo's or a
+ * heading's text (in a list or a quote too). In code it's text; after a fence, `$$`, a table's
+ * row, a divider or the properties it would change what they are.
  */
 function notMarkable(state: EditorState, pos: number) {
   const front = state.field(frontMatterField, false);
   if (front && state.doc.lineAt(pos).number <= front.lines) return true;
   for (let node: SyntaxNode | null = syntaxTree(state).resolveInner(pos, -1); node; node = node.parent) {
     if (NOT_TEXT.has(node.name)) return true;
-    if (node.name === "Paragraph" || node.name.startsWith("ATXHeading")) return false;
+    if (node.name === "Paragraph" || node.name === "Task" || node.name.startsWith("ATXHeading")) return false;
   }
   return true;
 }

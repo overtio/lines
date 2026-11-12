@@ -726,8 +726,8 @@ describe("a code block in a list item or a quote", () => {
 });
 
 describe("fixed", () => {
-  test("⌘⇧M marks only where a mark follows text: not a code fence, a table's row or the properties", async () => {
-    const note = "---\ntype: book\n---\n# Plan\n\n```\ncode\n```\n\n| a | b |\n| - | - |\n| 1 | 2 |\n\nText";
+  test("⌘⇧M marks only where a mark follows text, a todo's too: not a code fence, a table's row or the properties", async () => {
+    const note = "---\ntype: book\n---\n# Plan\n\n```\ncode\n```\n\n| a | b |\n| - | - |\n| 1 | 2 |\n\nText\n\n- [ ] Todo";
     await app.open(note);
     await app.page.evaluate(() => {
       const view = window.testing.editor()!;
@@ -736,10 +736,25 @@ describe("fixed", () => {
     });
     await app.page.keyboard.press(`${mod()}+Shift+M`);
     const marked = (await app.text())!.split("\n").filter((line) => line.includes("<!-- mark -->"));
-    expect(marked).toEqual(["# Plan <!-- mark -->", "Text <!-- mark -->"]);
+    expect(marked).toEqual(["# Plan <!-- mark -->", "Text <!-- mark -->", "- [ ] Todo <!-- mark -->"]);
     // And again, taken off.
     await app.page.keyboard.press(`${mod()}+Shift+M`);
     expect(await app.text()).toBe(note);
+  });
+
+  test("⌘↵ makes a todo only of text: a code line, a table's row and a heading stay as they are", async () => {
+    const note = "# Plan\n\n```js\nconst a = 1;\n```\n\n| a | b |\n| - | - |\n| 1 | 2 |\n\n> Text\n- [ ] Todo";
+    await app.open(note);
+    for (const line of ["# Plan", "const a = 1;", "| 1 | 2 |"]) {
+      await app.page.evaluate((at) => window.testing.place(at), note.indexOf(line) + 2);
+      await app.page.keyboard.press(`${mod()}+Enter`);
+      expect(await app.text()).toBe(note);
+    }
+    for (const line of ["- [ ] Todo", "> Text"]) {
+      await app.page.evaluate((at) => window.testing.place(at), note.indexOf(line) + 3);
+      await app.page.keyboard.press(`${mod()}+Enter`);
+    }
+    expect(await app.text()).toBe(note.replace("> Text", "> - [ ] Text").replace("- [ ] Todo", "- [x] Todo"));
   });
 
   test("⌘⇧M after a triple click marks that line, not the next too", async () => {
