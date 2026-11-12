@@ -107,7 +107,7 @@
         restore = takeFocus(el!);
       }}
       onCloseAutoFocus={(event) => event.preventDefault()}
-      class="{floating} min-w-[230px] px-3.5 py-3 text-sm"
+      class="{floating} max-w-[calc(100vw-16px)] min-w-[230px] px-3.5 py-3 text-sm"
     >
       {#if formats.length > 1 || unshown}
         <div class="mb-3 border-b border-line pb-3">

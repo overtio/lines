@@ -28,7 +28,7 @@
       {#if note}<p class="m-0 mt-0.5 text-xs leading-normal text-muted">{note}</p>{/if}
     </div>
     {#if children}
-      <div class={["flex min-w-0 items-center gap-2", stacked ? "w-full" : "shrink-0"]}>{@render children()}</div>
+      <div class={["flex min-w-0 items-center gap-2", stacked ? "w-full" : "max-w-full shrink-0"]}>{@render children()}</div>
     {/if}
   </div>
   {#if below}{@render below()}{/if}

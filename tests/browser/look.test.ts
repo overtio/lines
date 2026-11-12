@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { type App, choose, noErrors, openApp, toggle } from "./app";
+import { type App, choose, mod, noErrors, openApp, toggle } from "./app";
 import { png } from "./files";
 
 let app: App;
@@ -111,6 +111,38 @@ test("Fonts: IBM Plex Sans, Fira Sans and Agave come with lines, write notes in 
   await app.settings("Typography");
   expect(await fonts.getByRole("radio").count()).toBe(4);
   expect(await app.style(".editor-pane .cm-content", "font-family")).toStartWith("-apple-system");
+});
+
+describe("on a phone, in French", () => {
+  async function openFrench() {
+    app = await openApp({ width: 375 });
+    await app.page.evaluate(() => localStorage.setItem("lines.language", "fr"));
+    await app.page.reload();
+    await app.page.waitForFunction(() => window.testing?.notes.ready);
+  }
+
+  test("Settings fit: rows of choices, headings with buttons, and the shortcuts' keys", async () => {
+    await openFrench();
+    await app.page.keyboard.press(`${mod()}+/`);
+    const dialog = app.page.getByRole("dialog");
+    for (const section of ["shortcuts", "theme", "presets", "touches"]) {
+      if (section !== "shortcuts") {
+        await dialog.getByRole("button", { name: "Tous les réglages" }).click();
+        await dialog.locator(`#settings-nav-${section}`).click();
+      }
+      const past = await dialog.locator("section[aria-labelledby=settings-section-title]").evaluate((section) => section.parentElement!.scrollWidth - section.parentElement!.clientWidth);
+      expect(past, section).toBeLessThanOrEqual(0);
+    }
+  });
+
+  test("a note's info fits", async () => {
+    await openFrench();
+    await app.open("Some text");
+    await app.page.getByRole("button", { name: "Infos sur la note" }).click();
+    const info = await app.page.getByRole("dialog", { name: "Infos sur la note" }).boundingBox();
+    expect(info!.x).toBeGreaterThanOrEqual(0);
+    expect(info!.x + info!.width).toBeLessThanOrEqual(375);
+  });
 });
 
 describe("themes", () => {
