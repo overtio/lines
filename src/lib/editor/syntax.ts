@@ -157,6 +157,8 @@ export const Highlight: MarkdownConfig = {
       parse(cx, next, pos) {
         if (next !== EQUALS || cx.char(pos + 1) !== EQUALS || cx.char(pos + 2) === EQUALS) return -1;
         const before = charBefore(cx, pos);
+        // Nor the last two of a longer run: `===` doesn't open or close one.
+        if (before === EQUALS) return -1;
         const after = cx.char(pos + 2);
         const spaceBefore = before === -1 || isSpace(before);
         const spaceAfter = after === -1 || isSpace(after);
