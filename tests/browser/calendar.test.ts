@@ -403,6 +403,7 @@ test("the week's dates and controls are in the note's toolbar, at the top; with 
 test("an event repeats as chosen in its menu, shown each time it comes round, and stops", async () => {
   app = await openApp({ prefs: { calendarView: "week" } });
   const day = await dayIn(app);
+  await app.open(`---\ndate: ${day}\nrepeat: every week\n---\n# Gym`);
   await app.open(`---\nstart: ${day} 09:00\nend: ${day} 09:30\n---\n# Standup`);
   const page = app.page;
   await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: "Calendar" }).click();
@@ -417,9 +418,10 @@ test("an event repeats as chosen in its menu, shown each time it comes round, an
   await page.waitForFunction(() => window.testing.notes.entries[0].note.body.includes("repeat: every week"));
   expect(await body()).toBe(`---\nstart: ${day} 09:00\nend: ${day} 09:30\nrepeat: every week\n---\n# Standup`);
 
-  // Next week, and the one after: there too, said to repeat.
+  // Next week, and the one after: there too, said to repeat, as one for the whole day is.
   await page.getByRole("button", { name: "Next Week" }).click();
   await page.getByRole("button", { name: /^Standup, 9:00 – 9:30 AM, repeats/ }).waitFor();
+  await page.getByRole("list", { name: /^All day, / }).getByRole("button", { name: "Gym, repeats" }).waitFor();
   await page.getByRole("button", { name: "Next Week" }).click();
   const later = page.getByRole("button", { name: /^Standup, 9:00 – 9:30 AM, repeats/ });
   await later.waitFor();
