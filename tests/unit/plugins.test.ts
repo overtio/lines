@@ -67,6 +67,26 @@ describe("built-in themes", () => {
     }
     expect(misses).toEqual([]);
   });
+
+  test("Increased contrast's borders are 3:1 on every pane and in menus", () => {
+    const misses: string[] = [];
+    for (const theme of withStyles) {
+      for (const scheme of shownSchemes(theme)) {
+        const colors: Record<string, string> = { ...theme[scheme], ...MORE_CONTRAST[scheme], ...theme.moreContrast?.[scheme] };
+        if (!parse(colors.bg)) continue;
+        // A share of one of the theme's colors, `color-mix(in srgb, var(--text-faint) 85%, transparent)`, or a color of its own.
+        const [, key, share] = /var\(--([a-z-]+)\) (\d+)%/.exec(colors.border) ?? [];
+        const border = key ? { ...parse(colors[key])!, a: Number(share) / 100 } : parse(colors.border)!;
+        for (const surface of ["bg", "bg-list", "bg-sidebar", "bg-elevated"]) {
+          const background = parse(colors[surface]);
+          if (!background) continue;
+          const measured = contrast(over(border, background), background);
+          if (measured < 3) misses.push(`${theme.id} ${scheme}: border on ${surface} ${measured.toFixed(2)} < 3`);
+        }
+      }
+    }
+    expect(misses).toEqual([]);
+  });
 });
 
 describe("themes' own highlighter, status and callout colors", () => {
