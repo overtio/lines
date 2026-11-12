@@ -386,7 +386,8 @@ const SCENES = [
 const scenes = SCENES.filter((scene) => !only.length || only.some((word) => scene.id.includes(word)));
 
 if (!args.includes("--no-build")) await build({ root, mode: "test", logLevel: "error", build: { outDir, emptyOutDir: true } });
-const server = await preview({ root, mode: "test", logLevel: "error", build: { outDir }, preview: { port: 4337, strictPort: false, open: false } });
+// A port of its own, as the browser tests' (tests/browser/setup.ts).
+const server = await preview({ root, mode: "test", logLevel: "error", build: { outDir }, preview: { host: "127.0.0.1", port: 0, open: false } });
 const url = server.resolvedUrls.local[0];
 const browser = await (engine === "webkit" ? webkit : chromium).launch();
 
