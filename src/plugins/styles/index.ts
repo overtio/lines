@@ -11,6 +11,7 @@ import "@fontsource/share-tech-mono/400.css";
 import "@fontsource/vt323/400.css";
 import { t } from "../../lib/i18n/index.svelte";
 import type { AppStyle, Plugin, Theme, ThemeColors } from "../../lib/plugins/types";
+import { quiet } from "../themes/quiet";
 import adventure from "./adventure.css?raw";
 import aero from "./aero.css?raw";
 import brutalist from "./brutalist.css?raw";
@@ -43,6 +44,15 @@ const classicColors: ThemeColors = {
   accent: "#000080",
   "tag-text": "#000080",
   ink: "#000000",
+  "highlight-base": "#ffff00",
+  pin: "#808000",
+  "on-pin": "#000000",
+  danger: "#800000",
+  success: "#007b00",
+  "callout-info": "#0000ff",
+  "callout-question": "#800080",
+  "callout-warning": "#6d6d00",
+  "callout-decision": "#007676",
 };
 
 const neonColors: ThemeColors = {
@@ -57,6 +67,14 @@ const neonColors: ThemeColors = {
   accent: "#ff3cdc",
   "tag-text": "#24f0ff",
   ink: "#9fdcff",
+  "highlight-base": "#fff03c",
+  pin: "#ff9d3c",
+  danger: "#ff3c5a",
+  success: "#39ff88",
+  "callout-info": "#3c9dff",
+  "callout-question": "#a46bff",
+  "callout-warning": "#ff9d3c",
+  "callout-decision": "#24f0ff",
 };
 
 /**
@@ -79,6 +97,14 @@ const puddleColors: { light: ThemeColors; dark: ThemeColors } = {
     "tag-bg": "#f7e1dc",
     ink: "#14181a",
     "highlight-base": "#e5c460",
+    pin: "#9c4f22",
+    "on-pin": "#ffffff",
+    danger: "#a33b45",
+    success: "#555f1f",
+    "callout-info": "#1f4a85",
+    "callout-question": "#674a88",
+    "callout-warning": "#9c4f22",
+    "callout-decision": "#6d97a5",
     "palette-red": "#a33b45",
     "palette-orange": "#9c4f22",
     "palette-yellow": "#7d620c",
@@ -100,6 +126,13 @@ const puddleColors: { light: ThemeColors; dark: ThemeColors } = {
     "tag-text": "#f0a9a9",
     ink: "#f6f3e6",
     "highlight-base": "#e5c460",
+    pin: "#b77f5e",
+    danger: "#d19ea3",
+    success: "#888f62",
+    "callout-info": "#728db2",
+    "callout-question": "#9682ad",
+    "callout-warning": "#b77f5e",
+    "callout-decision": "#8cc2d4",
   },
 };
 
@@ -123,6 +156,14 @@ const lightbulbColors: { light: ThemeColors; dark: ThemeColors } = {
     "tag-bg": "#fde3b8",
     ink: "#000000",
     "highlight-base": "#fad61d",
+    pin: "#995400",
+    "on-pin": "#ffffff",
+    danger: "#b8240f",
+    success: "#46681c",
+    "callout-info": "#245089",
+    "callout-question": "#6c3f8c",
+    "callout-warning": "#995400",
+    "callout-decision": "#12866f",
     "palette-red": "#b8240f",
     "palette-orange": "#995400",
     "palette-yellow": "#7a6100",
@@ -145,6 +186,15 @@ const lightbulbColors: { light: ThemeColors; dark: ThemeColors } = {
     "tag-bg": "#3a1e14",
     ink: "#fad61d",
     "highlight-base": "#e19720",
+    pin: "#a06012",
+    "on-pin": "#ffffff",
+    danger: "#d17264",
+    success: "#5a7935",
+    "on-success": "#ffffff",
+    "callout-info": "#4e719f",
+    "callout-question": "#8560a0",
+    "callout-warning": "#a06012",
+    "callout-decision": "#3cc4a4",
   },
 };
 
@@ -173,6 +223,7 @@ const themes = (): Theme[] => [
       accent: "#000000",
       "tag-text": "#000000",
       ink: "#000000",
+      ...quiet.light,
     },
     dark: {
       bg: "#000000",
@@ -186,6 +237,7 @@ const themes = (): Theme[] => [
       accent: "#ffffff",
       "tag-text": "#ffffff",
       ink: "#ffffff",
+      ...quiet.dark,
     },
     moreContrast: { light: { "text-faint": "#767676" } },
   },
@@ -467,6 +519,7 @@ const themes = (): Theme[] => [
       accent: "#d1370b",
       "tag-text": "#5f5f5f",
       ink: "#111111",
+      ...quiet.light,
     },
     dark: {
       bg: "#0f0f0f",
@@ -480,6 +533,7 @@ const themes = (): Theme[] => [
       accent: "#ff7043",
       "tag-text": "#a0a0a0",
       ink: "#ededed",
+      ...quiet.dark,
     },
     moreContrast: {
       light: { "text-muted": "#595959", "text-faint": "#767676", accent: "#c9350b" },
