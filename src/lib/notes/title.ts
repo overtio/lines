@@ -18,7 +18,7 @@ export function retitled({ body, format }: Note, title: string): string | null {
   const lines = body.split("\n");
   const changed = (i: number, line: string) => [...lines.slice(0, i), line, ...lines.slice(i + 1)].join("\n");
   for (let i = 0; i < Math.min(lines.length, TITLE_LINES); i++) {
-    const line = old ? (lines[i].includes(old) ? lines[i].replace(old, title) : null) : /^#{1,6}\s*$/.test(lines[i]) ? `${lines[i].trim()} ${title}` : null;
+    const line = old ? (lines[i].includes(old) ? lines[i].replace(old, () => title) : null) : /^#{1,6}\s*$/.test(lines[i]) ? `${lines[i].trim()} ${title}` : null;
     if (line === null) continue;
     const text = changed(i, line);
     if (read(text) === title.trim()) return text;

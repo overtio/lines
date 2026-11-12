@@ -99,6 +99,15 @@ test("a request's body ends before the comments after it: a Hurl entry's title, 
   expect(comments).toEqual(["Try a longer name #todo"]);
 });
 
+test("a Hurl replace filter puts in its text as it's written, $ and all", async () => {
+  const { check } = await import("../../src/plugins/http/hurl/check");
+  const hurl = 'GET https://example.com\nHTTP 200\n[Captures]\nprice: body replace "{price}" "$&5"';
+  const answer = { status: 200, url: "https://example.com", headers: [], text: "{price}", bytes: new Uint8Array(), type: "text/plain", time: 0 };
+  const captured = new Map<string, unknown>();
+  await check(parseHurl(hurl).requests[0].expect!, { answer, variable: () => undefined, fill: (text) => text, say: (key) => key }, captured);
+  expect(captured.get("price")).toBe("$&5");
+});
+
 test("a line's comments, a line mark among them, aren't part of its text", () => {
   expect(plainLine("# Plan <!-- mark green: due -->")).toBe("Plan");
   expect(plainLine("Before <!-- note --> after")).toBe("Before after");

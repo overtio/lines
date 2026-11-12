@@ -225,7 +225,7 @@ function filter(value: unknown, spec: Filter, context: Context): unknown {
       return match?.[1];
     }
     case "replace":
-      return string().replaceAll(arg(0), arg(1));
+      return string().replaceAll(arg(0), () => arg(1));
     case "replaceRegex":
       return string().replace(new RegExp(regexOf(spec.args[0], context).source, "g"), arg(1));
     case "split":

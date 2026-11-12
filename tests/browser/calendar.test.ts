@@ -230,6 +230,17 @@ test("an event's menu renames it in place, gives it a color, and moves it to the
   await page.getByRole("button", { name: /^Design review, 10:00/ }).waitFor();
   expect(await body()).toBe(`---\ntype: event\ndate: ${day} 10:00\n---\n# Design review\n\nNotes`);
 
+  // A $ in the name is a $, not the old name put in again.
+  await page.getByRole("button", { name: /^Design review, 10:00/ }).click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Rename" }).click();
+  await field.fill("Pay $& $$");
+  await field.press("Enter");
+  await page.getByRole("button", { name: /^Pay \$& \$\$, 10:00/ }).waitFor();
+  await page.getByRole("button", { name: /^Pay \$& \$\$, 10:00/ }).click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Rename" }).click();
+  await field.fill("Design review");
+  await field.press("Enter");
+
   // Esc leaves it as it was.
   await page.getByRole("button", { name: /^Design review, 10:00/ }).click({ button: "right" });
   await page.getByRole("menuitem", { name: "Rename" }).click();
