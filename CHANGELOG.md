@@ -2,6 +2,14 @@
 
 What changed in each release of lines. Written by `bun scripts/release.mjs prepare` from the commits since the release before (docs/releasing.md).
 
+## [0.4.0](https://github.com/overtio/lines/compare/v0.3.3...v0.4.0) (2026-11-12)
+
+### Features
+
+- **themes:** give every theme its own highlight, mark, callout and status colors ([#269](https://github.com/overtio/lines/pull/269))
+- theme tools, Green World, Miku and Teto, five styles, and settings to hide toolbars and icons ([#268](https://github.com/overtio/lines/pull/268))
+- inbox, calendar, notes side by side, presets and styles, fonts, and plugin settings pages ([#264](https://github.com/overtio/lines/pull/264))
+
 ## [0.3.3](https://github.com/overtio/lines/compare/v0.3.2...v0.3.3) (2026-11-10)
 
 ### Fixes
