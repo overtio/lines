@@ -93,10 +93,21 @@ const SCENES = [
     schemes: ["light"],
   })),
   ...["ink", "indigo", "plum", "moss", "amber", "mono"].map((theme) => ({ id: `theme-${theme}`, title: `Theme: ${theme[0].toUpperCase()}${theme.slice(1)}`, look: "Text, links, tags and the chosen row read clearly; the accent stands out but isn't loud.", prefs: { theme }, note: PROSE })),
-  ...["classic", "pixel", "neon"].map((style) => ({
+  ...[
+    ["green-world", "Green World", "Violet backgrounds, the accent a leaf's green, tags magenta"],
+    ["miku", "Miku", "Cool grey backgrounds with a teal sidebar in dark, the accent teal, tags pink"],
+    ["teto", "Teto", "Warm near-black and blush backgrounds, the accent crimson, tags gold"],
+  ].map(([theme, name, colors]) => ({
+    id: `theme-${theme}`,
+    title: `Theme: ${name}`,
+    look: `${colors}; callouts and code in its own colors, each readable.`,
+    prefs: { theme },
+    note: `${PROSE}\n\n#garden\n\n:::info\nA callout, in the theme's blue.\n:::\n\n\`\`\`js\n// Code in its colors\nconst leaves = grow(3, "green");\n\`\`\``,
+  })),
+  ...["classic", "pixel", "neon", "adventure", "aero", "brutalist", "constructivist", "void"].map((style) => ({
     id: `style-${style}`,
     title: `Style: ${style[0].toUpperCase()}${style.slice(1)}`,
-    look: { classic: "Bevels lit from the top left, the title bar's gradient, white text on its light end still readable.", pixel: "2px lines, square corners, what's chosen turned around, the pixel font without broken letters.", neon: "Glowing headings and lines, the grid behind the note, scan lines faint." }[style],
+    look: { classic: "Bevels lit from the top left, the title bar's gradient, white text on its light end still readable.", pixel: "2px lines, square corners, what's chosen turned around, the pixel font without broken letters.", neon: "Glowing headings and lines, the grid behind the note, scan lines faint.", adventure: "Slots with notched pixel corners, the chosen row framed in the accent, grass under the title bars, headings with a hard shadow.", aero: "Gel buttons and a glossy chosen row, a sheen on the panes, the sky and bubbles behind the note faint under the text.", brutalist: "Solid rules between everything, uppercase monospace titles, the chosen row a block of the accent, a big tight heading.", constructivist: "Red bands on black rules under the title bars, the chosen row a red wedge, condensed capitals, a circle and diagonal faint behind the note.", void: "No lines or boxes, the title bars out of sight (the pointer is away), the chosen row in black with an accent dot, the rest grey but readable, headings the text's size." }[style],
     prefs: { style, theme: style },
     note: PROSE,
   })),
@@ -108,6 +119,17 @@ const SCENES = [
     settings: "Theme",
     shoot: "dialog",
   },
+  { id: "style-adventure-settings", title: "Adventure, in Settings", look: "Buttons, fields, switches and groups as framed slots; the chosen segment raised; focus rings inside the notched corners.", prefs: { style: "adventure", theme: "adventure" }, settings: "Theme", shoot: "dialog" },
+  { id: "style-aero-settings", title: "Aero, in Settings", look: "Gel buttons and switches, frosted dialog glass, fields as pills; everything readable.", prefs: { style: "aero", theme: "aero" }, settings: "Theme", shoot: "dialog" },
+  { id: "style-brutalist-settings", title: "Brutalist, in Settings", look: "Thick rules around groups and fields, uppercase monospace buttons, switches as boxes.", prefs: { style: "brutalist", theme: "brutalist" }, settings: "Editor", shoot: "dialog" },
+  { id: "style-constructivist-settings", title: "Constructivist, in Settings", look: "Groups with a red band on top, condensed capitals on buttons and segments, the chosen segment red, square switches whose knob reaches the end, the dialog's red shadow.", prefs: { style: "constructivist", theme: "constructivist" }, settings: "Editor", shoot: "dialog" },
+  { id: "hide-bars-no-icons", title: "Hide toolbars and no icons, in Void, the toolbar reached for", look: "The note list's title bar and the sidebar's edges out of sight; pointing at the note's toolbar brings it back, its buttons as words (Lock note, Share…) that fit without crowding; no icons in the sidebar; the search text lined up with the note titles.", prefs: { style: "void", theme: "void", hideBars: true, showIcons: false }, note: PROSE, act: (page) => page.hover("main.editor-pane .toolbar") },
+  { id: "no-icons-blocks", title: "No icons, a block's buttons", look: "A spreadsheet block's button beside it keeps its icon, in its round button, with no words spilling out.", prefs: { showIcons: false }, note: "# Costs\n\n```csv\nItem,Cost\nTea,4\nBread,3\n```\n\nEnd", act: (page) => page.hover(".cm-content .cm-lp-sheet, .cm-content table, .cm-content [class*=sheet]") },
+  { id: "no-icons-lines", title: "No icons, in Lines", look: "Buttons that were only an icon show their names, sized to their words, with Lines' hovers; no icons in the sidebar; the nested tags' chevron kept, turned open, clear of the count; the pinned note's row saying Pinned before its date, with no icons.", prefs: { showIcons: false }, note: `${PROSE}\n\n#idea/lenstica #idea/lines`, act: async (page) => {
+      await page.click(".sidebar button[aria-expanded]");
+      await page.click('main.editor-pane .toolbar button[aria-label="Pin to top"]');
+    } },
+  { id: "style-void-settings", title: "Void, in Settings", look: "Groups without boxes, buttons and choices as words (the chosen one black), hairline switches and fields, one size of type; everything still clearly a control.", prefs: { style: "void", theme: "void" }, settings: "Editor", shoot: "dialog" },
   { id: "style-pixel-settings", title: "Pixel, in Settings", look: "Each switch's knob all the way across when it's on; the chosen segment turned around.", prefs: { style: "pixel", theme: "pixel" }, settings: "Editor", shoot: "dialog" },
   ...["sidebar", "list", "both"].map((panes) => ({
     id: `dark-panes-${panes}`,

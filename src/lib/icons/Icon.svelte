@@ -3,7 +3,10 @@
   import { prefs } from "../prefs.svelte";
   import type { IconName } from "./icons";
 
-  /** One of lines' icons, drawn by the icon set chosen in Settings (or `set`), which comes from a plugin. */
+  /**
+   * One of lines' icons, drawn by the icon set chosen in Settings (or `set`), which comes from a plugin.
+   * `icon-<name>` says which it is, for styles.
+   */
   let {
     name,
     size = 18,
@@ -15,4 +18,4 @@
   const Drawn = $derived(plugins.iconSet(set ?? prefs.icons).component);
 </script>
 
-<Drawn {name} {size} {strokeWidth} class="icon {className}" />
+<Drawn {name} {size} {strokeWidth} class="icon icon-{name} {className}" />

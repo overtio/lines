@@ -348,6 +348,91 @@
 }
 
 /*
+ * Settings → Layout → Hide toolbars: with a pointer, the title bars and the sidebar's top and
+ * bottom stay out of sight until the pointer comes near them or focus moves into them. On a touch
+ * screen, with nothing to point with, they always show.
+ */
+@media (hover: hover) and (pointer: fine) {
+  :root[data-hide-bars] :is(.toolbar, .note-list > .titlebar) > *,
+  :root[data-hide-bars] .sidebar > :first-child,
+  :root[data-hide-bars] .sidebar > footer,
+  :root[data-hide-bars] .sidebar > :has(+ footer) {
+    opacity: 0;
+  }
+
+  :root[data-hide-bars] :is(.toolbar, .note-list > .titlebar):is(:hover, :focus-within) > *,
+  :root[data-hide-bars] .sidebar:is(:hover, :focus-within) > :is(:first-child, footer, :has(+ footer)) {
+    opacity: 1;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :root[data-hide-bars] :is(.toolbar, .note-list > .titlebar) > *,
+  :root[data-hide-bars] .sidebar > :is(:first-child, footer, :has(+ footer)) {
+    transition: opacity 400ms ease;
+  }
+}
+
+/*
+ * Settings → Layout → Icons off: none, but for those that say something (a checkmark, a chevron that
+ * shows whether something is open) and what's in a note. A button or link that was only an icon
+ * shows its name, in words: the one screen readers read; and a note row's pinned and locked marks,
+ * theirs. A note's own buttons (classes of CodeMirror's, `cm-…`) keep their icons: told by their own
+ * class rather than by being inside the editor, which WebKit doesn't check again once a button
+ * built outside it is put in.
+ */
+:root[data-no-icons] .icon:not(.icon-check, .icon-chevron-right, .icon-chevron-down, .icon-chevron-up, .cm-editor .icon) {
+  display: none;
+}
+
+:root[data-no-icons] .ui-note-row .icon + .sr-only {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip-path: none;
+  clip: auto;
+}
+
+:root[data-no-icons] .ui-note-row .icon + .sr-only::after {
+  content: "·";
+  margin-inline-start: 5px;
+}
+
+:root[data-no-icons] :is(button, a)[aria-label]:not([class*="cm-"]):has(> svg:only-child:not(.icon-chevron-right, .icon-chevron-down, .icon-chevron-up)) {
+  width: auto;
+  padding-inline: 6px;
+}
+
+:root[data-no-icons] :is(button, a)[aria-label]:not([class*="cm-"]):has(> svg:only-child:not(.icon-chevron-right, .icon-chevron-down, .icon-chevron-up)) > svg {
+  display: none;
+}
+
+:root[data-no-icons] :is(button, a)[aria-label]:not([class*="cm-"]):has(> svg:only-child:not(.icon-chevron-right, .icon-chevron-down, .icon-chevron-up))::after {
+  content: attr(aria-label);
+  white-space: nowrap;
+}
+
+/* The sidebar's version stays on one line, and the words beside it go under it when there's no room. */
+:root[data-no-icons] .sidebar > :has(+ footer) {
+  flex-wrap: wrap;
+}
+
+:root[data-no-icons] .sidebar > :has(+ footer) > * {
+  white-space: nowrap;
+}
+
+:root[data-no-icons] .sidebar > :has(+ footer) > button[aria-label]:has(> svg:only-child:not(.icon-chevron-right, .icon-chevron-down, .icon-chevron-up)) {
+  padding-inline-start: 0;
+}
+
+/* A field that made room for its icon (the search field's magnifier) lines its text up with the rows'. */
+:root[data-no-icons] .icon + .ui-field {
+  padding-left: 12px;
+}
+
+/*
  * The pointer (Settings → Cursor, cursors.svelte.ts): images of its own over the window, which
  * everything without a pointer of its own takes, and its hand over what's clicked. Fields and notes
  * keep the system's text cursor. What follows it about is drawn on a canvas over everything.

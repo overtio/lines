@@ -262,6 +262,10 @@ export default {
   "settings.sidebarAboutNote": "The version badge and the button to lines' source, at the bottom of the sidebar. Off, a new version ready to install still shows its restart button there.",
   "settings.scrollbars": "Scroll bars",
   "settings.scrollbarsNote": "Off hides them everywhere in lines. You can still scroll with a trackpad, a mouse wheel, touch or the keyboard.",
+  "settings.hideBars": "Hide toolbars",
+  "settings.hideBarsNote": "The bars over the note and the note list, and the sidebar's top and bottom, stay out of sight until you point near them or Tab to them. On a touch screen they always show.",
+  "settings.showIcons": "Icons",
+  "settings.showIconsNote": "Off, a button that's only an icon shows its name instead, a note's pinned and locked marks show as words, and other icons go, but for checkmarks and the arrows of what opens.",
   "settings.mainWindow": "Main window",
   // How see-through a window is.
   "settings.opacity": "Opacity",

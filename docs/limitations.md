@@ -224,7 +224,7 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 ## Styles
 
 - A style can't be made in Settings yet, only added by a plugin; a theme of your own can be used with any style.
-- Pixel's and Neon's fonts cover Latin (and Pixel's Cyrillic, Neon's Thai and Vietnamese); other writing shows in the fallback font. Classic uses Tahoma, which Linux usually lacks, so it falls back to Verdana or the system's sans.
+- Pixel's, Adventure's, Constructivist's and Neon's fonts cover Latin (and Pixel's, Adventure's and Constructivist's Cyrillic, Neon's Thai and Vietnamese); other writing shows in the fallback font. With Icons off (Settings → Layout), buttons that are only an icon show their names in words, which can crowd a narrow window's toolbar; a block's buttons inside a note keep their icons. Classic uses Tahoma, which Linux usually lacks, so it falls back to Verdana or the system's sans.
 - Classic's scroll bars with arrow buttons show where the system draws scroll bars that stay (Windows, Linux, or macOS set to show them always); overlay scroll bars stay the system's.
 - Printed pages and PDFs are black on white in every style, but in a style's own font while it's the first font (Settings → Typography).
 - Not tried in the Mac app yet, nor on phones.

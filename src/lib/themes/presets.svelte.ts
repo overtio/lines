@@ -21,6 +21,8 @@ export const PRESET_KEYS = [
   "monochrome",
   "invert",
   "icons",
+  "showIcons",
+  "hideBars",
   "headingColor",
   "headingCustomColor",
   "font",

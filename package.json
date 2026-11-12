@@ -11,7 +11,7 @@
     "build": "vite build",
     "build:site": "VITE_SITE=1 vite build --base ./ --outDir dist-site/app && bun site/build.mjs",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json && tsc -p tests/tsconfig.json",
+    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json && tsc -p tests/tsconfig.json && tsc -p tools/tsconfig.json",
     "lint": "oxlint --deny-warnings",
     "test": "bun test --preload ./tests/unit/setup.ts tests/unit",
     "test:browser": "bun test --preload ./tests/browser/setup.ts --timeout 30000 tests/browser",
@@ -22,6 +22,8 @@
     "i18n": "bun scripts/i18n-check.mjs",
     "tex-assets": "bun scripts/tex-assets.mjs",
     "openscad-assets": "bun scripts/openscad-assets.mjs",
+    "swatch": "bun tools/themes/swatch.ts",
+    "adapt-theme": "bun tools/themes/adapt.ts",
     "tauri": "tauri"
   },
   "dependencies": {
@@ -39,6 +41,7 @@
     "@fontsource/fira-sans": "^5.3.0",
     "@fontsource/ibm-plex-sans": "^5.3.0",
     "@fontsource/orbitron": "^5.3.0",
+    "@fontsource/oswald": "^5.3.0",
     "@fontsource/pixelify-sans": "^5.3.0",
     "@fontsource/share-tech-mono": "^5.3.0",
     "@fontsource/vt323": "^5.3.0",
