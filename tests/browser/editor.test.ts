@@ -466,6 +466,18 @@ test("Check spelling turns the browser's spell checking off and on", async () =>
   expect(await app.page.locator(".editor-pane .cm-content").getAttribute("spellcheck")).toBe("false");
 });
 
+test("⌘D isn't a note's, which has one selection, nor listed in Settings → Shortcuts", async () => {
+  await app.open("one two one");
+  await app.page.evaluate(() => {
+    window.testing.place(1);
+    addEventListener("keydown", (event) => ((window as { taken?: boolean }).taken = event.defaultPrevented));
+  });
+  await app.page.keyboard.press(`${mod()}+D`);
+  expect(await app.page.evaluate(() => [(window as { taken?: boolean }).taken, window.testing.editor()!.state.selection.main.empty])).toEqual([false, true]);
+  const settings = await app.settings("Shortcuts");
+  expect(await settings.getByText("Select the next match too").count()).toBe(0);
+});
+
 test("Enter on an empty item ends the list, when it's the second item too", async () => {
   for (const marker of ["- ", "* ", "1. ", "- [ ] "]) {
     await app.open("");

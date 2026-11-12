@@ -153,7 +153,6 @@ export const SHORTCUTS: ShortcutGroup[] = [
     shortcuts: [
       { action: "shortcuts.find", keys: ["Mod-f"], note: "shortcuts.inNote" },
       { action: "shortcuts.findNext", keys: ["Mod-g", "Mod-Shift-g"] },
-      { action: "shortcuts.selectNext", keys: ["Mod-d"] },
       { action: "shortcuts.goToLine", keys: ["Mod-Alt-g"] },
     ],
   },
