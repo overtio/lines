@@ -50,11 +50,12 @@ export function dayIn(value: string): Day | null {
   return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d ? match[0].trim().slice(0, 10) : null;
 }
 
-/** The time of day after a value's date, in minutes after midnight, if it has one. */
-export function timeIn(value: string): number | null {
+/** The time of day after a value's date, in minutes after midnight, if it has one; an `end`'s can be `24:00`, the day's end. */
+export function timeIn(value: string, end = false): number | null {
   const match = TIME.exec(value.trim());
   if (!match) return null;
   const [hours, minutes] = [Number(match[1]), Number(match[2])];
+  if (end && hours === 24 && minutes === 0) return DAY_MINUTES;
   return hours < 24 && minutes < 60 ? hours * 60 + minutes : null;
 }
 
@@ -105,7 +106,7 @@ export function spansOf(properties: Property[]): Span[] {
     if (key !== "date" && key !== "due" && key !== "start" && key !== "end") continue;
     const day = dayIn(property.value);
     if (!day) continue;
-    const span: Span = { key, from: day, to: day, ...withTime("start", timeIn(property.value)) };
+    const span: Span = { key, from: day, to: day, ...withTime("start", timeIn(property.value, key === "end")) };
     if (key === "start") start ??= span;
     else if (key === "end") end ??= span;
     else found.push(span);
@@ -426,7 +427,8 @@ export function itemsOn<E extends { note: Note; meta: NoteMeta }>(entries: reado
     for (const [nth, span] of spansIn(entry.meta.properties, from, to).entries()) {
       if (span.to < from || span.from > to) continue;
       if (span.from === span.to && span.start !== undefined) {
-        const start = span.start;
+        // An end alone at 24:00 is the day's last moment.
+        const start = Math.min(span.start, DAY_MINUTES - SHORTEST);
         const end = Math.min(DAY_MINUTES, Math.max(start + SHORTEST, span.end ?? start + USUAL_LENGTH));
         items.get(span.from)?.timed.push({ entry, span, nth, start, end, column: 0, columns: 1 });
       } else {
