@@ -5,7 +5,7 @@ import { t } from "../i18n/index.svelte";
 import { CALLOUTS, calloutOf } from "../editor/cards";
 import { shortLink } from "../editor/shortLinks";
 import { valueText } from "../editor/objects";
-import { Card, Highlight, Mention, Tag, TexMath, Underline } from "../editor/syntax";
+import { Card, headingSyntax, Highlight, Mention, Tag, TexMath, Underline } from "../editor/syntax";
 import { tableData } from "../editor/typeTables";
 import { fenceCode, fenceLanguage, renderedInfo } from "../editor/rendered";
 import { isUnsplashPhoto } from "../editor/unsplash";
@@ -28,15 +28,17 @@ import { el, type Parts } from "./parts";
 
 const linedown = (markdownLanguage.parser as MarkdownParser).configure([Tag, Highlight, Underline, Card, TexMath, Mention]);
 
-let withPlugins: { additions: MarkdownAddition[]; parser: MarkdownParser; printers: Map<string, MarkdownPrinter> } | undefined;
+let withPlugins: { additions: MarkdownAddition[]; underlined: boolean; parser: MarkdownParser; printers: Map<string, MarkdownPrinter> } | undefined;
 
-/** The parser and printers with what plugins add to Markdown, made again when that changes. */
+/** The parser and printers with what plugins add to Markdown, and underlined headings or not (Settings → Editor), made again when those change. */
 function additions() {
   const added = plugins.markdown;
-  if (withPlugins?.additions !== added) {
+  const underlined = prefs.underlinedHeadings;
+  if (withPlugins?.additions !== added || withPlugins.underlined !== underlined) {
     withPlugins = {
       additions: added,
-      parser: linedown.configure(added.flatMap((addition) => addition.syntax ?? [])),
+      underlined,
+      parser: linedown.configure([...headingSyntax(underlined), ...added.flatMap((addition) => addition.syntax ?? [])]),
       printers: new Map(added.flatMap((addition) => Object.entries(addition.print ?? {}))),
     };
   }

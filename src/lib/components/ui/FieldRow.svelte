@@ -17,7 +17,7 @@
   let { label, note, for: control, stacked = false, dim = false, children, below }: Props = $props();
 </script>
 
-<div class={["border-b border-line px-4 py-3 last:border-0", dim && "opacity-45"]}>
+<div class={["border-b border-line px-4 py-3 last:border-0", dim && "opacity-45"]} data-setting>
   <div class={["flex gap-x-4 gap-y-2.5", stacked ? "flex-col" : "flex-wrap items-center"]}>
     <div class={["min-w-0", !stacked && "flex-1 basis-48"]}>
       {#if control}

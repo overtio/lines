@@ -1,7 +1,7 @@
 import { syntaxTree } from "@codemirror/language";
 import { searchPanelOpen } from "@codemirror/search";
-import { type EditorSelection, type EditorState, type Line, Prec, type Range, StateEffect, type StateEffectType, StateField, type Text, type Transaction } from "@codemirror/state";
-import { type Command, Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type WidgetType } from "@codemirror/view";
+import { type EditorSelection, type EditorState, type Line, type SelectionRange, Prec, type Range, StateEffect, type StateEffectType, StateField, type Text, type Transaction } from "@codemirror/state";
+import { type Command, Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, type WidgetType } from "@codemirror/view";
 import type { SyntaxNode, SyntaxNodeRef, Tree } from "@lezer/common";
 import { markupMode } from "./markupMode";
 
@@ -95,12 +95,19 @@ export const viewSelectionInUse = (view: EditorView) => view.hasFocus || searchP
 const touches = (selection: EditorSelection, from: number, to: number) =>
   selection.ranges.some((range) => (range.anchor >= from && range.anchor <= to) || (range.head >= from && range.head <= to));
 
+/** Whether a selection takes in all of `from`–`to`, as a block's grip selects it. */
+export const covers = (range: SelectionRange, from: number, to: number) => !range.empty && range.from <= from && range.to >= to;
+
 /**
  * Whether `from`–`to` shows its Markdown: where the cursor, or either end of a selection, is while
  * it's being worked on (`selectionInUse`), or everywhere while Markdown is all in sight (markupMode.ts).
+ * With Markdown hidden, a selection taking in all of it selects what's drawn, which stays drawn.
  */
 export function isEditing(state: EditorState, from: number, to: number) {
-  return state.facet(markupMode) === "visible" || (selectionInUse(state) && touches(state.selection, from, to));
+  const mode = state.facet(markupMode);
+  if (mode === "visible") return true;
+  if (!selectionInUse(state) || !touches(state.selection, from, to)) return false;
+  return mode !== "hidden" || !state.selection.ranges.some((range) => covers(range, from, to));
 }
 
 /**
@@ -331,3 +338,70 @@ export const clickToShowCode = (selector: string, controls?: string) =>
       return true;
     },
   });
+
+/** A line with nothing in it but what's drawn in place of its text: a divider, a page break. */
+const drawnOnly = (dom: HTMLElement) =>
+  dom.classList.contains("cm-line") &&
+  [...dom.childNodes].some((node) => node instanceof HTMLElement && node.contentEditable === "false") &&
+  [...dom.childNodes].every((node) => node instanceof HTMLElement && (node.contentEditable === "false" || node.matches("br, .cm-widgetBuffer")));
+
+/**
+ * Something drawn in place of lines (a spreadsheet, a table, a diagram), or of a line's text (a
+ * divider), that a selection takes in all of, while the note has focus: marked `cm-block-selected`,
+ * tinted as selected, since the selection's own highlight doesn't show on it (with Markdown hidden
+ * it stays drawn; isEditing).
+ * A click on its row beside what's drawn (not in its cells, its grid, its buttons) selects all of
+ * it, as its grip does, rather than putting the cursor somewhere in its Markdown.
+ */
+const selectedBlockMarks = ViewPlugin.fromClass(
+  class {
+    constructor(readonly view: EditorView) {
+      this.mark();
+    }
+    update(update: ViewUpdate) {
+      if (update.selectionSet || update.docChanged || update.viewportChanged || update.focusChanged) this.mark();
+    }
+    mark() {
+      this.view.requestMeasure({
+        key: this,
+        read: (view) =>
+          [...view.contentDOM.children].flatMap((dom) => {
+            if (!(dom instanceof HTMLElement) || (dom.contentEditable !== "false" && !drawnOnly(dom))) return [];
+            const block = view.lineBlockAt(view.posAtDOM(dom));
+            const selected = view.hasFocus && view.state.selection.ranges.some((range) => covers(range, block.from, block.to));
+            return [{ dom, selected }];
+          }),
+        write: (blocks) => blocks.forEach(({ dom, selected }) => dom.classList.toggle("cm-block-selected", selected)),
+      });
+    }
+  },
+);
+
+/** What's beside a drawn block's content in its row: the block itself, or the room beside a table. */
+const BESIDE = ".cm-lp-table-wrap, .cm-lp-table-scroll";
+
+const selectOnClickBeside = ViewPlugin.fromClass(
+  class {
+    constructor(readonly view: EditorView) {
+      // On the content itself: a block that takes its own clicks (a grid) is passed over by the editor's handlers.
+      view.contentDOM.addEventListener("mousedown", this.down, true);
+    }
+    down = (event: MouseEvent) => {
+      const { view } = this;
+      const target = event.target;
+      if (event.button !== 0 || !(target instanceof HTMLElement)) return;
+      const root = target.parentElement === view.contentDOM ? target : target.matches(BESIDE) ? target.closest<HTMLElement>(".cm-content > *") : null;
+      if (!root || root.contentEditable !== "false") return;
+      const block = view.lineBlockAt(view.posAtDOM(root));
+      event.preventDefault();
+      event.stopPropagation();
+      view.dispatch({ selection: { anchor: block.from, head: block.to } });
+      view.focus();
+    };
+    destroy() {
+      this.view.contentDOM.removeEventListener("mousedown", this.down, true);
+    }
+  },
+);
+
+export const selectedBlocks = [selectedBlockMarks, selectOnClickBeside];

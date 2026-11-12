@@ -411,7 +411,17 @@ console.log(greeting);
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Code block (TypeScript), then Mention
+#### 33. Code block (TypeScript), then Score (Settings → Little Touches)
+
+```ts
+const greeting: string = "hello";
+console.log(greeting);
+```
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Code block (TypeScript), then Mention
 
 ```ts
 const greeting: string = "hello";
@@ -419,7 +429,7 @@ console.log(greeting);
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Code block (TypeScript), then Wiki link
+#### 35. Code block (TypeScript), then Wiki link
 
 ```ts
 const greeting: string = "hello";
@@ -427,7 +437,7 @@ console.log(greeting);
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Code block (TypeScript), then Symbols
+#### 36. Code block (TypeScript), then Symbols
 
 ```ts
 const greeting: string = "hello";
@@ -435,7 +445,7 @@ console.log(greeting);
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Code block (TypeScript), then GitHub links
+#### 37. Code block (TypeScript), then GitHub links
 
 ```ts
 const greeting: string = "hello";
@@ -443,7 +453,7 @@ console.log(greeting);
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Code block (TypeScript), then arXiv links
+#### 38. Code block (TypeScript), then arXiv links
 
 ```ts
 const greeting: string = "hello";
@@ -451,7 +461,7 @@ console.log(greeting);
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Code block (TypeScript), then Image
+#### 39. Code block (TypeScript), then Image
 
 ```ts
 const greeting: string = "hello";
@@ -459,7 +469,7 @@ console.log(greeting);
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 39. Code block (TypeScript), then Drawing
+#### 40. Code block (TypeScript), then Drawing
 
 ```ts
 const greeting: string = "hello";
@@ -467,7 +477,7 @@ console.log(greeting);
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Code block (TypeScript), then File
+#### 41. Code block (TypeScript), then File
 
 ```ts
 const greeting: string = "hello";
@@ -475,7 +485,7 @@ console.log(greeting);
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Code block (TypeScript), then Folder and file links
+#### 42. Code block (TypeScript), then Folder and file links
 
 ```ts
 const greeting: string = "hello";
@@ -483,7 +493,7 @@ console.log(greeting);
 ```
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Code block (TypeScript), then Attached 3D model (STL)
+#### 43. Code block (TypeScript), then Attached 3D model (STL)
 
 ```ts
 const greeting: string = "hello";
@@ -491,7 +501,7 @@ console.log(greeting);
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Code block (TypeScript), then Terminal recording (.cast file)
+#### 44. Code block (TypeScript), then Terminal recording (.cast file)
 
 ```ts
 const greeting: string = "hello";
@@ -499,7 +509,7 @@ console.log(greeting);
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Code block (TypeScript), then Audio
+#### 45. Code block (TypeScript), then Audio
 
 ```ts
 const greeting: string = "hello";
@@ -507,7 +517,7 @@ console.log(greeting);
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Code block (TypeScript), then Video
+#### 46. Code block (TypeScript), then Video
 
 ```ts
 const greeting: string = "hello";
@@ -515,7 +525,7 @@ console.log(greeting);
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Code block (TypeScript), then Missing file
+#### 47. Code block (TypeScript), then Missing file
 
 ```ts
 const greeting: string = "hello";
@@ -523,7 +533,7 @@ console.log(greeting);
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Code block (TypeScript), then Card
+#### 48. Code block (TypeScript), then Card
 
 ```ts
 const greeting: string = "hello";
@@ -533,7 +543,7 @@ console.log(greeting);
 Text in a card.
 :::
 
-#### 48. Code block (TypeScript), then Callout (info)
+#### 49. Code block (TypeScript), then Callout (info)
 
 ```ts
 const greeting: string = "hello";
@@ -543,7 +553,7 @@ console.log(greeting);
 Text in an info callout.
 :::
 
-#### 49. Code block (TypeScript), then Callout (warning, chosen icon)
+#### 50. Code block (TypeScript), then Callout (warning, chosen icon)
 
 ```ts
 const greeting: string = "hello";
@@ -553,7 +563,7 @@ console.log(greeting);
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Code block (TypeScript), then Callout (decision, no icon)
+#### 51. Code block (TypeScript), then Callout (decision, no icon)
 
 ```ts
 const greeting: string = "hello";

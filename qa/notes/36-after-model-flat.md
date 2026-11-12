@@ -411,7 +411,17 @@ translate([30, 10]) circle(8);
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Flat model (openscad block), then Mention
+#### 33. Flat model (openscad block), then Score (Settings → Little Touches)
+
+```openscad
+square(20);
+translate([30, 10]) circle(8);
+```
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Flat model (openscad block), then Mention
 
 ```openscad
 square(20);
@@ -419,7 +429,7 @@ translate([30, 10]) circle(8);
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Flat model (openscad block), then Wiki link
+#### 35. Flat model (openscad block), then Wiki link
 
 ```openscad
 square(20);
@@ -427,7 +437,7 @@ translate([30, 10]) circle(8);
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Flat model (openscad block), then Symbols
+#### 36. Flat model (openscad block), then Symbols
 
 ```openscad
 square(20);
@@ -435,7 +445,7 @@ translate([30, 10]) circle(8);
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Flat model (openscad block), then GitHub links
+#### 37. Flat model (openscad block), then GitHub links
 
 ```openscad
 square(20);
@@ -443,7 +453,7 @@ translate([30, 10]) circle(8);
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Flat model (openscad block), then arXiv links
+#### 38. Flat model (openscad block), then arXiv links
 
 ```openscad
 square(20);
@@ -451,7 +461,7 @@ translate([30, 10]) circle(8);
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Flat model (openscad block), then Image
+#### 39. Flat model (openscad block), then Image
 
 ```openscad
 square(20);
@@ -459,7 +469,7 @@ translate([30, 10]) circle(8);
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 39. Flat model (openscad block), then Drawing
+#### 40. Flat model (openscad block), then Drawing
 
 ```openscad
 square(20);
@@ -467,7 +477,7 @@ translate([30, 10]) circle(8);
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Flat model (openscad block), then File
+#### 41. Flat model (openscad block), then File
 
 ```openscad
 square(20);
@@ -475,7 +485,7 @@ translate([30, 10]) circle(8);
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Flat model (openscad block), then Folder and file links
+#### 42. Flat model (openscad block), then Folder and file links
 
 ```openscad
 square(20);
@@ -483,7 +493,7 @@ translate([30, 10]) circle(8);
 ```
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Flat model (openscad block), then Attached 3D model (STL)
+#### 43. Flat model (openscad block), then Attached 3D model (STL)
 
 ```openscad
 square(20);
@@ -491,7 +501,7 @@ translate([30, 10]) circle(8);
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Flat model (openscad block), then Terminal recording (.cast file)
+#### 44. Flat model (openscad block), then Terminal recording (.cast file)
 
 ```openscad
 square(20);
@@ -499,7 +509,7 @@ translate([30, 10]) circle(8);
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Flat model (openscad block), then Audio
+#### 45. Flat model (openscad block), then Audio
 
 ```openscad
 square(20);
@@ -507,7 +517,7 @@ translate([30, 10]) circle(8);
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Flat model (openscad block), then Video
+#### 46. Flat model (openscad block), then Video
 
 ```openscad
 square(20);
@@ -515,7 +525,7 @@ translate([30, 10]) circle(8);
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Flat model (openscad block), then Missing file
+#### 47. Flat model (openscad block), then Missing file
 
 ```openscad
 square(20);
@@ -523,7 +533,7 @@ translate([30, 10]) circle(8);
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Flat model (openscad block), then Card
+#### 48. Flat model (openscad block), then Card
 
 ```openscad
 square(20);
@@ -533,7 +543,7 @@ translate([30, 10]) circle(8);
 Text in a card.
 :::
 
-#### 48. Flat model (openscad block), then Callout (info)
+#### 49. Flat model (openscad block), then Callout (info)
 
 ```openscad
 square(20);
@@ -543,7 +553,7 @@ translate([30, 10]) circle(8);
 Text in an info callout.
 :::
 
-#### 49. Flat model (openscad block), then Callout (warning, chosen icon)
+#### 50. Flat model (openscad block), then Callout (warning, chosen icon)
 
 ```openscad
 square(20);
@@ -553,7 +563,7 @@ translate([30, 10]) circle(8);
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Flat model (openscad block), then Callout (decision, no icon)
+#### 51. Flat model (openscad block), then Callout (decision, no icon)
 
 ```openscad
 square(20);

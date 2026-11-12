@@ -475,7 +475,19 @@ function go() {
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Typing practice (typing block), then Mention
+#### 33. Typing practice (typing block), then Score (Settings → Little Touches)
+
+```typing
+It’s a “fine” day — type it.
+function go() {
+  return 1;
+}
+```
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Typing practice (typing block), then Mention
 
 ```typing
 It’s a “fine” day — type it.
@@ -485,7 +497,7 @@ function go() {
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Typing practice (typing block), then Wiki link
+#### 35. Typing practice (typing block), then Wiki link
 
 ```typing
 It’s a “fine” day — type it.
@@ -495,7 +507,7 @@ function go() {
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Typing practice (typing block), then Symbols
+#### 36. Typing practice (typing block), then Symbols
 
 ```typing
 It’s a “fine” day — type it.
@@ -505,7 +517,7 @@ function go() {
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Typing practice (typing block), then GitHub links
+#### 37. Typing practice (typing block), then GitHub links
 
 ```typing
 It’s a “fine” day — type it.
@@ -515,7 +527,7 @@ function go() {
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Typing practice (typing block), then arXiv links
+#### 38. Typing practice (typing block), then arXiv links
 
 ```typing
 It’s a “fine” day — type it.
@@ -525,7 +537,7 @@ function go() {
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Typing practice (typing block), then Image
+#### 39. Typing practice (typing block), then Image
 
 ```typing
 It’s a “fine” day — type it.
@@ -535,7 +547,7 @@ function go() {
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 39. Typing practice (typing block), then Drawing
+#### 40. Typing practice (typing block), then Drawing
 
 ```typing
 It’s a “fine” day — type it.
@@ -545,7 +557,7 @@ function go() {
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Typing practice (typing block), then File
+#### 41. Typing practice (typing block), then File
 
 ```typing
 It’s a “fine” day — type it.
@@ -555,7 +567,7 @@ function go() {
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Typing practice (typing block), then Folder and file links
+#### 42. Typing practice (typing block), then Folder and file links
 
 ```typing
 It’s a “fine” day — type it.
@@ -565,7 +577,7 @@ function go() {
 ```
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Typing practice (typing block), then Attached 3D model (STL)
+#### 43. Typing practice (typing block), then Attached 3D model (STL)
 
 ```typing
 It’s a “fine” day — type it.
@@ -575,7 +587,7 @@ function go() {
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Typing practice (typing block), then Terminal recording (.cast file)
+#### 44. Typing practice (typing block), then Terminal recording (.cast file)
 
 ```typing
 It’s a “fine” day — type it.
@@ -585,7 +597,7 @@ function go() {
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Typing practice (typing block), then Audio
+#### 45. Typing practice (typing block), then Audio
 
 ```typing
 It’s a “fine” day — type it.
@@ -595,7 +607,7 @@ function go() {
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Typing practice (typing block), then Video
+#### 46. Typing practice (typing block), then Video
 
 ```typing
 It’s a “fine” day — type it.
@@ -605,7 +617,7 @@ function go() {
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Typing practice (typing block), then Missing file
+#### 47. Typing practice (typing block), then Missing file
 
 ```typing
 It’s a “fine” day — type it.
@@ -615,7 +627,7 @@ function go() {
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Typing practice (typing block), then Card
+#### 48. Typing practice (typing block), then Card
 
 ```typing
 It’s a “fine” day — type it.
@@ -627,7 +639,7 @@ function go() {
 Text in a card.
 :::
 
-#### 48. Typing practice (typing block), then Callout (info)
+#### 49. Typing practice (typing block), then Callout (info)
 
 ```typing
 It’s a “fine” day — type it.
@@ -639,7 +651,7 @@ function go() {
 Text in an info callout.
 :::
 
-#### 49. Typing practice (typing block), then Callout (warning, chosen icon)
+#### 50. Typing practice (typing block), then Callout (warning, chosen icon)
 
 ```typing
 It’s a “fine” day — type it.
@@ -651,7 +663,7 @@ function go() {
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Typing practice (typing block), then Callout (decision, no icon)
+#### 51. Typing practice (typing block), then Callout (decision, no icon)
 
 ```typing
 It’s a “fine” day — type it.

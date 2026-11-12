@@ -1,0 +1,23 @@
+/*
+ * Lightbulb: a spark of lightning drawn as a cartoon. Bold ink lines around what can be pressed or
+ * typed in and around what floats, which casts a hard shadow of the same ink, as a sticker would;
+ * round corners. What's chosen is outlined in ink too. In dark the ink is the theme's lemon, lit.
+ */
+
+/* Made from the theme's colors, and made again in a part with its own (a pane shown dark). */
+:root[data-style="lightbulb"],
+:root[data-style="lightbulb"] [data-scheme] {
+  --lightbulb-line: 2px solid var(--ink);
+}
+
+:root[data-style="lightbulb"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select, .ui-field, .ui-segmented, .ui-card, .ui-menu, .ui-dialog, .ui-callout, .ui-switch) {
+  border: var(--lightbulb-line);
+}
+
+:root[data-style="lightbulb"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-segment[data-state="checked"]) {
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+:root[data-style="lightbulb"] .ui-switch-thumb {
+  box-shadow: 0 0 0 2px var(--ink);
+}

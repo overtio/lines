@@ -13,7 +13,7 @@ export default {
   "print.page": "Página {page} de {count}",
   "print.layingOut": "Componiendo las páginas…",
   "print.ready": "{count, plural, one {# página lista} other {# páginas listas}}",
-  "print.print": "Imprimir…",
+  "print.print": "Imprimir",
   "print.printHint": "Para guardar un PDF, elige Guardar como PDF en el cuadro de impresión.",
   "print.savePdf": "Guardar PDF",
   "print.png": "Guardar PNG",

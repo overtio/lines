@@ -1,5 +1,6 @@
 import type { Messages } from "../../index.svelte";
 import app from "./app";
+import calendar from "./calendar";
 import editor from "./editor";
 import http from "./http";
 import hurl from "./hurl";
@@ -19,6 +20,7 @@ import sync from "./sync";
 
 export default {
   ...app,
+  ...calendar,
   ...editor,
   ...http,
   ...hurl,

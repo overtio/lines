@@ -4,7 +4,7 @@ import { prefs } from "../prefs.svelte";
 import { soundPacks } from "./packs.svelte";
 
 /*
- * Typing sounds (Settings → Editor → Typing sounds): a keyboard's sound for each key pressed in this
+ * Typing sounds (Settings → Plugins → Keyboards): a keyboard's sound for each key pressed in this
  * window, and let go, as a mechanical keyboard makes them. One sound for each press, not for a held
  * key's repeats; each a little higher or lower than the last, as no two strokes sound the same. The
  * keyboard chosen is made (or decoded) as soon as it's chosen, so the first key isn't late; the

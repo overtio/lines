@@ -22,7 +22,8 @@ const NAMES: Record<string, string> = {
 
 /**
  * A color as CSS or another app writes it, or undefined: `#rgb`, `#rrggbbaa`, hex without the `#`
- * (Base16, foot) or after `0x` (Alacritty), `rgb()` and `rgba()`, and black, white and transparent.
+ * (Base16, foot) or after `0x` (Alacritty), `rgb()` and `rgba()`, black, white and transparent, and
+ * `color(srgb …)`, as browsers give a `color-mix()` they've worked out.
  */
 export function parse(text: string | undefined | null): Rgb | undefined {
   if (typeof text !== "string") return;
@@ -32,6 +33,11 @@ export function parse(text: string | undefined | null): Rgb | undefined {
     const full = hexDigits.length <= 4 ? [...hexDigits].map((digit) => digit + digit).join("") : hexDigits;
     const [r, g, b, a = 255] = full.match(/../g)!.map((pair) => parseInt(pair, 16));
     return { r, g, b, a: a / 255 };
+  }
+  const srgb = /^color\(srgb\s+([^)]*)\)$/.exec(value)?.[1].split(/[\s/]+/).filter(Boolean);
+  if (srgb) {
+    const [r, g, b, a = 1] = srgb.map((part) => (part.endsWith("%") ? parseFloat(part) / 100 : parseFloat(part)));
+    return [r, g, b, a].every(Number.isFinite) ? { r: r * 255, g: g * 255, b: b * 255, a: Math.min(1, Math.max(0, a)) } : undefined;
   }
   const args = /^rgba?\(([^)]*)\)$/
     .exec(value)?.[1]

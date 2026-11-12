@@ -29,6 +29,8 @@ import { drawnAsBlock, imageElement } from "./attachments";
 import { linkAttributes, localIcon } from "./localLinks";
 import { shortLink, ShortLinkWidget, type ShortLink } from "./shortLinks";
 import { CopyWidget, keyValue } from "./keyValue";
+import { ScoreWidget, scoreIn } from "./scores";
+import { prefs } from "../prefs.svelte";
 import { InlineMathWidget } from "./math";
 import { fenceCode } from "./rendered";
 import { followClick, openHref } from "./links";
@@ -39,7 +41,7 @@ import { keyOf } from "../notes/properties";
 import { markupMode } from "./markupMode";
 import { plainLine } from "../notes/stats";
 import { t } from "../i18n/index.svelte";
-import { tagIcons, typeIcons } from "../notes/tagIcons.svelte";
+import { tagLooks, typeLooks } from "../notes/looks.svelte";
 
 /*
  * Live preview: the document is always plain Markdown, and this plugin only
@@ -306,6 +308,18 @@ function build(view: EditorView): DecorationSet {
   const hideChildren = (node: SyntaxNode, name: string) => {
     for (let c = node.firstChild; c; c = c.nextSibling) if (c.name === name) hide(c.from, c.to);
   };
+  /**
+   * A value (of a "Key: Value" line, or a property): a score drawn as marks, but on the line being
+   * edited (scores.ts), and a button that copies it as it reads, without its Markdown, mentions as
+   * they show (Settings → Little Touches, both).
+   */
+  const drawValue = (from: number, to: number, written: string) => {
+    const score = prefs.scores !== "off" && !lineActive(from) ? scoreIn(written) : null;
+    if (score) decos.push(Decoration.replace({ widget: new ScoreWidget(score.score, score.of, prefs.scores as Exclude<typeof prefs.scores, "off">) }).range(from, to));
+    else mark(from, to, "cm-lp-kv-value");
+    const plain = valueText(written);
+    if (prefs.copyValues && plain) decos.push(Decoration.widget({ widget: new CopyWidget(plain, t("editor.copyValue", { value: plain })), side: 1 }).range(to));
+  };
   /** Marks the value of each "Key: Value" line from `from` to `to`, with a copy button after it. */
   const keyValues = (from: number, to: number) => {
     for (let pos = from; pos <= to; ) {
@@ -315,15 +329,7 @@ function build(view: EditorView): DecorationSet {
       // Later lines of a paragraph can start with a quote's ">" or indentation.
       const lead = /^[\s>]*/.exec(text)![0].length;
       const value = keyValue(text.slice(lead));
-      if (value) {
-        const valueFrom = start + lead + value.from;
-        const valueTo = start + lead + value.to;
-        mark(valueFrom, valueTo, "cm-lp-kv-value");
-        // What it copies is the value as it reads, without its Markdown, mentions as they show.
-        const plain = valueText(doc.sliceString(valueFrom, valueTo));
-        const widget = new CopyWidget(plain, t("editor.copyValue", { value: plain }));
-        decos.push(Decoration.widget({ widget, side: 1 }).range(valueTo));
-      }
+      if (value) drawValue(start + lead + value.from, start + lead + value.to, doc.sliceString(start + lead + value.from, start + lead + value.to));
       pos = line.to + 1;
     }
   };
@@ -384,19 +390,24 @@ function build(view: EditorView): DecorationSet {
         const level = name.slice(-1);
         heading(node.from, level);
         if (styleLineShows(node.from)) return;
-        for (let c = node.firstChild; c; c = c.nextSibling) {
-          if (c.name !== "HeaderMark") continue;
-          if (c.from === node.from) hide(c.from, spaceAfter(c.to));
-          else hide(doc.sliceString(c.from - 1, c.from) === " " ? c.from - 1 : c.from, c.to);
-        }
+        // Its `#`s at the start; `#`s at the end (CommonMark's closing ones) show, as the note list shows
+        // them, rather than hiding a `#` just typed there to start a tag.
+        const marks = node.getChild("HeaderMark");
+        if (marks?.from === node.from) hide(marks.from, spaceAfter(marks.to));
         return;
       }
 
       switch (name) {
         case "SetextHeading1":
-        case "SetextHeading2":
-          heading(node.from, name.slice(-1));
+        case "SetextHeading2": {
+          // Text underlined with `===` or `---` (Settings → Editor → Underlined headings), every line of it.
+          // Not while its underline is being typed, which a dash or two already is: the text above isn't
+          // a heading until it's done.
+          const underline = doc.lineAt(node.to);
+          if (selection.some((range) => range.empty && range.head >= underline.from && range.head <= underline.to)) return;
+          for (let pos = node.from; pos < underline.from; pos = doc.lineAt(pos).to + 1) heading(pos, name.slice(-1));
           return;
+        }
 
         case "Link": {
           const url = node.getChild("URL");
@@ -469,7 +480,7 @@ function build(view: EditorView): DecorationSet {
           decos.push(Decoration.mark({ class: "cm-lp-tag", attributes, inclusiveStart: true }).range(node.from, node.to));
           // Its `#` as an icon, unless the cursor is on it.
           if (hash && !styleShows(node.from, node.to)) {
-            decos.push(Decoration.replace({ widget: new TagIconWidget(tag ? tagIcons.get(tag) : "hash") }).range(hash.from, hash.to));
+            decos.push(Decoration.replace({ widget: new TagIconWidget(tag ? tagLooks.icon(tag) : "hash") }).range(hash.from, hash.to));
           }
           return false;
         }
@@ -672,14 +683,12 @@ function build(view: EditorView): DecorationSet {
       const valueTo = line.from + line.text.trimEnd().length;
       if (valueTo <= valueFrom) continue;
       if (keyOf(property.key) === "type") {
-        decos.push(Decoration.widget({ widget: new TypeIconWidget(typeIcons.get(property.value.trim().toLowerCase())), side: -1 }).range(valueFrom));
+        decos.push(Decoration.widget({ widget: new TypeIconWidget(typeLooks.icon(property.value.trim().toLowerCase())), side: -1 }).range(valueFrom));
         mark(valueFrom, valueTo, "cm-lp-prop-type");
         continue;
       }
-      // Hovering a value shows a button that copies it, as on a "Key: Value" line.
-      mark(valueFrom, valueTo, "cm-lp-kv-value");
-      const plain = valueText(property.value);
-      if (plain) decos.push(Decoration.widget({ widget: new CopyWidget(plain, t("editor.copyValue", { value: plain })), side: 1 }).range(valueTo));
+      // As a "Key: Value" line's: a score's marks, and a button that copies it on hovering.
+      drawValue(valueFrom, valueTo, property.value);
     }
   }
 

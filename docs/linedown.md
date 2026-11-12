@@ -10,7 +10,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 
 | Construct | Linedown | Standard? |
 |---|---|---|
-| Headings, emphasis, lists, quotes, code, links, images, rules | As in CommonMark | Yes |
+| Headings, emphasis, lists, quotes, code, links, images, rules | As in CommonMark, but for underlined headings (a setting) | Yes |
 | Tables, ~~strikethrough~~, `- [ ]` task lists, autolinks | As in GFM | GFM |
 | Highlight | `==text==` | No (also in Obsidian, Bear, Pandoc's `mark`) |
 | Line mark | `<!-- mark green: to check -->` at a line's end | Yes: an HTML comment, which other apps don't show |
@@ -30,7 +30,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Math | `$x^2$`, `$$` … `$$`, ` ```math ` code block | GitHub, GitLab, Obsidian, Pandoc |
 | Attachment | `![](../attachments/<hash>.png)`, `[Name.pdf](../attachments/<hash>.pdf)` | Yes (relative links) |
 | Folder or file on this computer | `[Projects](file:///Users/me/Projects/)`, `[Plan](file:///Users/me/plan.pdf)` | Yes (file URLs; Obsidian, VS Code and Typora open them too) |
-| Copyable value | `Key: Value` lines | Yes (plain text, read specially) |
+| Copyable value, score | `Key: Value` lines (`Rating: 4/5` as stars) | Yes (plain text, read specially) |
 | GitHub link | `https://github.com/owner/repo/issues/12` | Yes (an ordinary link, drawn short) |
 | Terminal recording | `[![asciicast](https://asciinema.org/a/<id>.svg)](https://asciinema.org/a/<id>)`, `[demo.cast](../attachments/<hash>.cast)` | Yes (asciinema's embed code: a linked image; a link) |
 | arXiv link | `https://arxiv.org/abs/1706.03762` | Yes (an ordinary link, drawn short) |
@@ -42,6 +42,12 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 ## Title
 
 A note has no separate title field: its title is its **first line with text on it**, with the Markdown taken off (`# Trip to Rome` → "Trip to Rome"). Card and callout fences (lines starting with `:::`) are skipped, and so are the note's [properties](#properties); a note with nothing after its properties takes its `title` or `name` property. The note list shows the following lines, without Markdown, as the excerpt.
+
+## Dividers and underlined headings
+
+`---` on a line of its own is a divider, under a line of text too: a heading is written with `#`. CommonMark also has headings written by underlining text, with `===` (an H1) or `---` (an H2) on the line under it, which make `---` typed under text turn that text into a heading. lines leaves them out unless **Settings → Editor → Underlined headings** is on, so `---` under text is a divider in lines, and `===` text. Another app that reads them may show such a note's text above `---` as a heading; a blank line between them keeps it a divider everywhere.
+
+With Underlined headings on, they're headings as CommonMark has them, every line of the text above the underline drawn as one, the underline as written; while the cursor's on the underline, the text above is drawn as text, as a dash or two being typed would already make it a heading.
 
 ## Highlight
 
@@ -76,7 +82,7 @@ The first chapter ends here.
 ## Chapter two
 ```
 
-It's drawn as a dashed line across the note, named; over a backdrop (Settings → Paper), as a gap between two pages, as Craft draws them. With the cursor on its line, its Markdown shows above it. The PDF and print start a new page at each (two in a row leave one empty); a picture of the note (PNG) is one long page, without them. lines also reads the empty `<div style="page-break-after: always"></div>` that Obsidian's, Typora's and VS Code's PDF exports break pages at, so notes from them keep theirs, though it needs a blank line after it: Markdown counts the lines after an HTML block's `<div>` as part of it up to a blank line. In a card, a list or a quote, either stays as written. Other apps show the comment as nothing, and break no pages at it.
+It's drawn as a dashed line across the note, named; over a backdrop (Settings → Plugins → Paper), as a gap between two pages, as Craft draws them. With the cursor on its line, its Markdown shows above it. The PDF and print start a new page at each (two in a row leave one empty); a picture of the note (PNG) is one long page, without them. lines also reads the empty `<div style="page-break-after: always"></div>` that Obsidian's, Typora's and VS Code's PDF exports break pages at, so notes from them keep theirs, though it needs a blank line after it: Markdown counts the lines after an HTML block's `<div>` as part of it up to a blank line. In a card, a list or a quote, either stays as written. Other apps show the comment as nothing, and break no pages at it.
 
 ## Underline
 
@@ -89,14 +95,15 @@ It's drawn as a dashed line across the note, named; over a backdrop (Settings �
 
 ## Tags
 
-`#tag` anywhere in a note files it under that tag in the sidebar. `#work/meetings` is a nested tag: it shows under `work` there. A tag is drawn with its icon in the sidebar in place of its `#` (a hash, unless one was chosen there), and the `#` shows again with the cursor on the tag. ⌘-click a tag (or ⌥↵ with the cursor on it) to list its notes, as choosing it in the sidebar does.
+`#tag` anywhere in a note files it under that tag in the sidebar. `#work/meetings` is a nested tag: it shows under `work` there. A tag is drawn with its icon in the sidebar in place of its `#` (a hash, unless one was chosen there), and in its color, if one was: the icon in it, on a tint of it, the name in the text's color, as the sidebar shows it; a nested tag has the color of the tag it's in until it's given its own, and the `#` shows again with the cursor on the tag. Click a tag (or ⌥↵ with the cursor on it) to list its notes, as choosing it in the sidebar does; ⌘-click puts the cursor in it, to change it (Settings → Editor → Links changes both).
 
 - A tag starts at the beginning of a line, after a space, or after `(`. It doesn't start in the middle of a word (`C#`), and not as a link's URL (`[x](#anchor)`).
-- It runs on while there are letters (with their accents and vowel signs), digits, `_`, `-` or `/`, in any script: `#café`, `#日本`, `#हिंदी`. A trailing `/` isn't part of it.
+- It runs on while there are letters (with their accents and vowel signs), digits, `_`, `-` or `/`, in any script: `#café`, `#日本`, `#हिंदी`. A trailing `/` shows as part of it, so `#work/` is drawn as a tag as soon as the slash is typed, but isn't part of its name: `#work/` is `#work`. Left that way, the slash goes once the cursor leaves the tag (one undo brings it back).
 - A run of only digits isn't a tag (`#1`, `#2024`), so numbered references stay as they are.
 - Tags are matched without case: `#Work` and `#work` are the same tag, shown in lowercase in the sidebar. An accent typed as a letter of its own or as a mark after one makes the same tag, and `#İstanbul` is `#istanbul`.
 - Tags inside code (inline or blocks) don't count.
-- `# Heading` (with a space) is a heading, not a tag. A line of only `#` (up to six, with nothing after) is text, where a tag is being typed, rather than CommonMark's empty heading: `# ` with its space is the heading.
+- As a tag's typed, a menu offers the tags you have: those starting with what's typed first (`#ide` → `ideas`), then those with a part that does (`#meet` → `work/meetings`), then any with it in them, each with its icon and how many notes have it. ↑ ↓ choose, Enter or Tab writes the whole tag, Esc closes it; typing on, or a space, carries on without it. A lone `#` doesn't open it, nor does code, a link or a heading's `# `.
+- `# Heading` (with a space) is a heading, not a tag. `## ` typed at the start of a heading's text changes its level, an H1 to an H2, rather than putting `##` in its text; ⌘Z just after leaves them as typed. So a `#` at the start of a heading's text isn't a tag (`# #Boo` is a heading reading `#Boo`), though one later in it is (`## Plan #work`). A `#` at a heading's end shows as typed, as the note list shows it (`# Plan #` reads "Plan #"), so typing a tag there shows it as it's typed, though other Markdown apps leave those `#`s out. A line of only `#` (up to six, with nothing after) is text, where a tag is being typed, rather than CommonMark's empty heading: `# ` with its space is the heading. A line of only a list's marker (`-`, `*`, `+`, `1.`) is text the same way, rather than an empty item: `- ` with its space is the item, so typing `-h` never shows a bullet on the way.
 
 ## Cards
 
@@ -340,6 +347,7 @@ Plate: 3WBZ56
 - The key is up to 40 characters, starting with a letter or digit, optionally in bold, followed by `:` and a space or tab.
 - The space after the colon keeps out times (`10:30`) and URLs (`https://…`).
 - Only the value is copied, without its Markdown.
+- A value that's a score, a whole number out of 2 to 10 (`Rating: 4/5`, `Score: 5 / 7`), is drawn as that many marks, so many filled: stars, hearts or circles, or as written (Settings → Little Touches, where the copy buttons can be turned off too). With the cursor on its line it's as written, to change. Properties' values are drawn the same.
 
 This changes nothing about the Markdown; it's only how lines draws the line.
 
@@ -360,7 +368,9 @@ company: @Overtio
 - The first line of the note has to be `---`, and the properties end at the next `---` (or `...`). Between them each line is `key: value` (or `key:` with its value on the lines after it), a YAML list item (`  - French`), an indented line that carries on the value above, a `#` comment or blank. Anything else, or no closing line, and the `---` is a divider like any other.
 - A key starts with a letter, digit or `_` and can have spaces (`Born on: 1815`). Quotes around a value are taken off; a list's items are read as one value, `English, French`. Nested YAML (maps in maps) is read as text.
 - They're drawn as a column of keys and their values, with a line under them. The `---` lines show only while the cursor is in the properties. Values can hold Markdown and mentions, and hovering one shows a copy button, as on a `Key: Value` line.
-- `type: person` puts the note under **Types → Person** in the sidebar. Types are matched without case, like tags. A type can have an icon (right-click it in the sidebar); notes of that type show it in the list unless they have their own, and so do mentions of them. Right-click → Rename… renames a type everywhere: the `type` of each of its notes and each `@type.…` of it (not in code, and not in locked notes). Notes keep their dates; renamed onto a type there already is, the two become one. Common types start with a fitting one (`person`, `company`, `project`, `meeting`, `book`, `place`…).
+- `type: person` puts the note under **Types → Person** in the sidebar. Types are matched without case, like tags. A type can have an icon and a color (right-click it in the sidebar → Icon and Color); notes of that type show the icon in the list unless they have their own, and so do mentions of them. Right-click → Rename renames a type everywhere: the `type` of each of its notes and each `@type.…` of it (not in code, and not in locked notes). Notes keep their dates; renamed onto a type there already is, the two become one. Common types start with a fitting one (`person`, `company`, `project`, `meeting`, `book`, `place`…).
+- `date`, `due`, `start` and `end` put the note on the **Calendar** (in the sidebar), when their value starts with a date written `2026-11-30` (a time after it, `2026-11-30 14:00`, is fine): on the day of its `date` and its `due`, and on every day from its `start` to its `end` (up to a year). A time after the date puts the note at that time in the Calendar's week and day: an hour long, or from its `start` to its `end` when both are on that day. Times are read as the clock reads them (24-hour, `14:00`), and anything after them, like seconds or a time zone, is read past. Other ways of writing a date are text to the Calendar. Keys are matched as above, so `Date` and `DUE` count too.
+- `repeat` makes it come round again on the Calendar, from its dates on, as you'd say it: `daily`, `every 3 days`, `every weekday`, `weekly`, `every 2 weeks`, `every monday and thursday`, `every 2 weeks on tue, fri`, `monthly` (on the same date, or the month's last day when it's shorter), `monthly on the last friday`, `every month on the 2nd tuesday`, `yearly`; and when it stops, `until 2027-03-01` or `10 times` (`every week until 2027-03-01`). Its own dates are the first time, as in other calendars, and each time after is as long as they are. The words are English, as the dates are numbers, whatever language lines is in; a value it can't read doesn't repeat. An event's menu on the Calendar (Repeat) writes the usual ones.
 - The note's title, excerpt, word count and plain text leave its properties out; search finds them.
 - Only Markdown notes have properties. Other apps that read front matter (Obsidian, Jekyll, Pandoc, static site generators) read these the same way.
 

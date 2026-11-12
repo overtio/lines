@@ -25,6 +25,7 @@ import { chooseFiles, chooseFolder, chooseImages } from "./attachments";
 import { newDrawing } from "./drawings";
 import { editProperties, type IconCompletion, mentionKeys, mentionSource } from "./objects";
 import { insertTable } from "./tables";
+import { tagSource } from "./tagCompletion";
 import { backslashSource, inOpenMath, MATH_COMMANDS, paragraphBefore, TEXT_COMMANDS } from "./texCommands";
 import { ancestors } from "./util";
 import { PAGE_BREAK } from "../notes/pageBreak";
@@ -376,10 +377,11 @@ function withAdded(commands: SlashCommand[], added: SlashCommand[]) {
 
 /**
  * Type "/" at the start of a line (or after a space) to turn it into a todo, quote, heading…, or
- * whatever plugins add (`added`); "\" in math for math commands; "@" to mention another note.
+ * whatever plugins add (`added`); "\" in math for math commands; "@" to mention another note; "#"
+ * and a letter for the tags you have.
  */
 export const slashCommands = (added: SlashCommand[]) => [
   // Before the menu, whose own keys are just as high in precedence.
   mentionKeys,
-  slashMenu(withAdded(COMMANDS, added), markdownMath, [mentionSource]),
+  slashMenu(withAdded(COMMANDS, added), markdownMath, [mentionSource, tagSource]),
 ];

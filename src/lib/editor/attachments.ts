@@ -1,7 +1,7 @@
 import { isolateHistory } from "@codemirror/commands";
 import { syntaxTree } from "@codemirror/language";
 import { EditorSelection, type EditorState, type Extension, Prec } from "@codemirror/state";
-import { EditorView, keymap, WidgetType } from "@codemirror/view";
+import { EditorView, keymap, ViewPlugin, WidgetType } from "@codemirror/view";
 import type { SyntaxNode, SyntaxNodeRef } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
@@ -714,11 +714,6 @@ const markdownWriter: AttachmentWriter = {
 const allowed = (writer: AttachmentWriter, state: EditorState, pos: number) => !state.readOnly && writer.allowed(state, pos);
 
 /**
- * Saves `files` and puts them at `from`–`to` (replacing any selection there), each on a line of
- * its own, with the cursor on the line after them so they show at once. `snap` puts them above
- * or below the line instead of splitting its text, as a drop does.
- */
-/**
  * Links to the folders called `names`, dropped from Finder, as `writer` writes links: their paths
  * are asked of the app (the page isn't told them), so only in the Mac app; elsewhere it says so.
  */
@@ -733,8 +728,21 @@ async function folderLinks(names: string[], writer: AttachmentWriter): Promise<s
   return links;
 }
 
-/** Saves `files` and puts them in at `from`–`to` (or a line of their own by `from`, with `snap`), with `links` (to folders) after them. */
-async function insertFiles(view: EditorView, writer: AttachmentWriter, files: File[], from: number, to = from, snap = false, links: Promise<string[]> = Promise.resolve([])) {
+/**
+ * Saves `files` and puts them at `from`–`to` (replacing any selection there), each on a line of
+ * its own, with the cursor on the line after them so they show at once, and `links` (to folders)
+ * after them. `snap`, as a drop does, puts them above or below the line at `from` instead of
+ * splitting its text.
+ */
+async function insertFiles(
+  view: EditorView,
+  writer: AttachmentWriter,
+  files: File[],
+  from: number,
+  to = from,
+  snap: "above" | "below" | false = false,
+  links: Promise<string[]> = Promise.resolve([]),
+) {
   const attached = (await Promise.all(files.map((file) => attach(file, writer)))).filter((text): text is string => !!text);
   const saved = [...attached, ...(await links)];
   if (!saved.length || !view.dom.isConnected) return;
@@ -744,9 +752,9 @@ async function insertFiles(view: EditorView, writer: AttachmentWriter, files: Fi
   to = Math.min(Math.max(to, from), doc.length);
   const markdown = saved.join("\n");
   if (snap) {
-    // Above or below the line, whichever edge is nearer; the cursor stays where it was.
+    // Above or below the line, as the drop line showed; the cursor stays where it was.
     const line = doc.lineAt(from);
-    const above = !line.text.trim() || from - line.from < line.to - from;
+    const above = snap === "above";
     const changes = view.state.changes(
       above ? { from: line.from, insert: markdown + "\n" } : { from: line.to, insert: "\n" + markdown },
     );
@@ -821,7 +829,7 @@ const pasteLink = (writer: AttachmentWriter, embeds: boolean) => EditorView.domE
   },
 });
 
-const dropAndPaste = (writer: AttachmentWriter) => EditorView.domEventHandlers({
+const pasting = (writer: AttachmentWriter) => EditorView.domEventHandlers({
   paste(event, view) {
     const data = event.clipboardData;
     const files = [...(data?.files ?? [])];
@@ -833,31 +841,6 @@ const dropAndPaste = (writer: AttachmentWriter) => EditorView.domEventHandlers({
     if (!allowed(writer, view.state, main.from)) return false;
     event.preventDefault();
     void insertFiles(view, writer, files, main.from, main.to);
-    return true;
-  },
-  dragover(event, view) {
-    if (!event.dataTransfer?.types.includes("Files") || view.state.readOnly) return false;
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "copy";
-    return true;
-  },
-  drop(event, view) {
-    // Folders are told apart now, while the drop's items can be read: they become links, the rest attachments.
-    const items = [...(event.dataTransfer?.items ?? [])].filter((item) => item.kind === "file");
-    const folders: string[] = [];
-    const files: File[] = [];
-    for (const item of items) {
-      const entry = item.webkitGetAsEntry?.();
-      const file = item.getAsFile();
-      if (entry?.isDirectory) folders.push(entry.name);
-      else if (file) files.push(file);
-    }
-    if (!items.length) files.push(...(event.dataTransfer?.files ?? []));
-    if (!files.length && !folders.length) return false;
-    event.preventDefault();
-    const pos = view.posAtCoords({ x: event.clientX, y: event.clientY }, false);
-    if (!allowed(writer, view.state, pos)) return true;
-    void insertFiles(view, writer, files, pos, pos, true, folderLinks(folders, writer));
     return true;
   },
 });
@@ -900,7 +883,117 @@ export function chooseFolder(writer = markdownWriter) {
 }
 
 /** Pasting and dropping files, and pasting links to Unsplash photos (and with `embeds` what plugins draw), written by `writer`. */
-export const attachmentPasting = (writer: AttachmentWriter, { embeds = false } = {}): Extension => [dropAndPaste(writer), pasteLink(writer, embeds)];
+/**
+ * Where files dragged over the note at `y` (on screen) would go: above or below the line there,
+ * whichever half of it that is (below the last, past the text); and where to draw that, halfway
+ * across the blank lines between it and the text beside it, in the note's own heights.
+ */
+function dropPlace(view: EditorView, y: number) {
+  const { doc } = view.state;
+  const block = view.lineBlockAtHeight(y - view.documentTop);
+  // A blank line takes them in its place.
+  const above = y < view.documentTop + (block.top + block.bottom) / 2 || !doc.lineAt(block.from).text.trim();
+  /** The nearest line with text from line `n` on, going `step` lines at a time; its block, if there is one. */
+  const text = (n: number, step: 1 | -1) => {
+    while (n >= 1 && n <= doc.lines && !doc.line(n).text.trim()) n += step;
+    return n >= 1 && n <= doc.lines ? view.lineBlockAt(doc.line(n).from) : null;
+  };
+  if (above) {
+    const before = text(doc.lineAt(block.from).number - 1, -1);
+    return { pos: doc.lineAt(block.from).from, side: "above" as const, y: before ? (before.bottom + block.top) / 2 : block.top - 4 };
+  }
+  const after = text(doc.lineAt(block.to).number + 1, 1);
+  return { pos: doc.lineAt(block.to).to, side: "below" as const, y: after ? (block.bottom + after.top) / 2 : block.bottom + 4 };
+}
+
+/**
+ * Files dragged over the note, from Finder or the desktop: a line between its lines shows where
+ * they'd go (where they can), and let go they go there, each on a line of its own; folders become
+ * links. Over the whole of the note, the room below its text too, before CodeMirror's own drop
+ * (which would put a file's text in).
+ */
+const fileDrops = (writer: AttachmentWriter) =>
+  ViewPlugin.fromClass(
+    class {
+      line = document.createElement("div");
+
+      constructor(readonly view: EditorView) {
+        this.line.className = "cm-drop-indicator";
+        this.line.hidden = true;
+        this.line.setAttribute("aria-hidden", "true");
+        view.scrollDOM.append(this.line);
+        view.dom.addEventListener("dragover", this.over, true);
+        view.dom.addEventListener("drop", this.drop, true);
+        view.dom.addEventListener("dragleave", this.leave);
+        window.addEventListener("dragend", this.hide);
+      }
+
+      /** Where a drag of files over the note would go, if it's files and they can go there. */
+      placeOf(event: DragEvent) {
+        if (!event.dataTransfer?.types.includes("Files")) return null;
+        const place = dropPlace(this.view, event.clientY);
+        return allowed(writer, this.view.state, place.pos) ? place : null;
+      }
+
+      over = (event: DragEvent) => {
+        if (!event.dataTransfer?.types.includes("Files")) return;
+        event.preventDefault();
+        const place = this.placeOf(event);
+        event.dataTransfer.dropEffect = place ? "copy" : "none";
+        if (!place) return this.hide();
+        const { view } = this;
+        const content = view.contentDOM;
+        const style = getComputedStyle(content);
+        const box = content.getBoundingClientRect();
+        const scroller = view.scrollDOM.getBoundingClientRect();
+        const left = box.left + parseFloat(style.paddingLeft) - scroller.left + view.scrollDOM.scrollLeft;
+        const width = content.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        const top = view.documentTop + place.y - scroller.top + view.scrollDOM.scrollTop - 1;
+        this.line.style.transform = `translate(${left}px, ${top}px)`;
+        this.line.style.width = `${width}px`;
+        this.line.hidden = false;
+      };
+
+      drop = (event: DragEvent) => {
+        if (!event.dataTransfer?.types.includes("Files")) return;
+        event.preventDefault();
+        this.hide();
+        const place = this.placeOf(event);
+        if (!place) return;
+        // Folders are told apart now, while the drop's items can be read: they become links, the rest attachments.
+        const items = [...event.dataTransfer.items].filter((item) => item.kind === "file");
+        const folders: string[] = [];
+        const files: File[] = [];
+        for (const item of items) {
+          const entry = item.webkitGetAsEntry?.();
+          const file = item.getAsFile();
+          if (entry?.isDirectory) folders.push(entry.name);
+          else if (file) files.push(file);
+        }
+        if (!items.length) files.push(...event.dataTransfer.files);
+        if (!files.length && !folders.length) return;
+        void insertFiles(this.view, writer, files, place.pos, place.pos, place.side, folderLinks(folders, writer));
+      };
+
+      leave = (event: DragEvent) => {
+        if (!this.view.dom.contains(event.relatedTarget as Node | null)) this.hide();
+      };
+
+      hide = () => {
+        this.line.hidden = true;
+      };
+
+      destroy() {
+        this.view.dom.removeEventListener("dragover", this.over, true);
+        this.view.dom.removeEventListener("drop", this.drop, true);
+        this.view.dom.removeEventListener("dragleave", this.leave);
+        window.removeEventListener("dragend", this.hide);
+        this.line.remove();
+      }
+    },
+  );
+
+export const attachmentPasting = (writer: AttachmentWriter, { embeds = false } = {}): Extension => [pasting(writer), fileDrops(writer), pasteLink(writer, embeds)];
 
 export const attachmentBlocks: Extension = [
   focused,

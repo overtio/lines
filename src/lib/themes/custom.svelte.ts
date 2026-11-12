@@ -32,7 +32,7 @@ function read(json?: string): CustomTheme[] {
 
 /** Increased contrast's colors for a theme's, kept while a color is changed a step at a time, as only it changes. */
 const worked = new Map<string, Partial<ThemeColors>>();
-function moreContrastOf(colors: ThemeColors) {
+export function moreContrastOf(colors: ThemeColors) {
   const key = JSON.stringify(colors);
   let more = worked.get(key);
   if (!more) {
@@ -84,6 +84,12 @@ class CustomThemes {
 
   get(id: string) {
     return this.#list.find((theme) => theme.id === id);
+  }
+
+  /** The id of one of yours with this name and these colors, if there is one. */
+  find({ name, light, dark }: ThemeFile) {
+    const colors = JSON.stringify([light, dark]);
+    return this.#list.find((theme) => theme.name === name && JSON.stringify([theme.light, theme.dark]) === colors)?.id;
   }
 
   /** Adds a theme; gives its id. */

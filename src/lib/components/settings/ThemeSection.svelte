@@ -5,12 +5,14 @@
   import { locale, t } from "../../i18n/index.svelte";
   import Icon from "../../icons/Icon.svelte";
   import type { IconName } from "../../icons/icons";
-  import { DEFAULT_THEME, plugins } from "../../plugins/registry.svelte";
+  import { plugins } from "../../plugins/registry.svelte";
   import type { FoundImage, PictureLibrary, Theme } from "../../plugins/types";
   import WebImagePicker from "../../editor/WebImagePicker.svelte";
   import { DARK_PANES, prefs, type Appearance, type Contrast } from "../../prefs.svelte";
   import { chooseBackdropImage } from "../../paper.svelte";
   import { customThemes } from "../../themes/custom.svelte";
+  import { themeDrafts } from "../../themes/drafts.svelte";
+  import { SCHEMES } from "../../themes/file";
   import { pictureName, themeFromPicture } from "../../themes/picture";
   import { readableFormats, readThemes } from "../../themes/import";
   import { paneColors } from "../../themes/css";
@@ -62,27 +64,6 @@
   const iconsUnavailable = $derived(iconSets.flatMap((set) => set.availability ?? []).join(" ") || null);
   const previewIcons: IconName[] = ["notes", "tag", "pin", "trash"];
 
-  const styleShown = $derived(plugins.style(prefs.style)?.id ?? "");
-
-  /**
-   * A style, with its colors if it brings some; leaving one whose colors still show goes back to
-   * lines' own, so its colors don't stay behind with another look.
-   */
-  function chooseStyle(id: string) {
-    const before = plugins.style(prefs.style);
-    const next = plugins.style(id);
-    prefs.style = id;
-    if (next?.theme) prefs.theme = next.theme;
-    else if (before?.theme && prefs.theme === before.theme) prefs.theme = DEFAULT_THEME;
-  }
-
-  /** The colors a style's tile shows, those choosing it would: its own, or the chosen theme's (lines' own in place of a style's). */
-  function styleColors(themeId: string | undefined) {
-    const own = plugins.style(prefs.style)?.theme;
-    const colors = plugins.theme(themeId ?? (own && prefs.theme === own ? DEFAULT_THEME : prefs.theme));
-    return colors[schemeShown(colors, prefs.dark)];
-  }
-
   const yours = $derived(new Set(customThemes.themes.map((theme) => theme.id)));
   const builtIn = $derived(plugins.themes.filter((theme) => !yours.has(theme.id)));
   // The accessibility themes, then your own, come after the others under headings of their own, in the same group.
@@ -95,7 +76,6 @@
   const shown = $derived(plugins.theme(prefs.theme));
   const theme = $derived(shown.id);
   const themeHeading = $props.id();
-  const styleHeading = `${themeHeading}-style`;
   /** The theme just made, whose name is ready to type over. */
   let made = $state<string | null>(null);
 
@@ -230,9 +210,43 @@
     if (prefs.floatingTheme === id) prefs.floatingTheme = "same";
     prefs.theme = "lines";
     customThemes.remove(id);
+    themeDrafts.discard(id);
     speak(t("settings.themeDeleted", { name }));
     await tick();
     document.getElementById(themeHeading)?.focus();
+  }
+
+  /** Colors changed by right-clicking in the theme showing, not saved yet. */
+  const changed = $derived(themeDrafts.count(theme));
+  /** Asking first, in the page, before the changes go. */
+  let discarding = $state(false);
+
+  /** The theme as it shows with its changes, as a theme of your own, shown in its place; its name ready to type over. */
+  function saveAsNew() {
+    const { id, name, author, scheme, light, dark, moreContrast } = shown;
+    made = prefs.theme = customThemes.add({
+      name: t("settings.themeCopyName", { name }),
+      author,
+      light: scheme === "dark" ? undefined : light,
+      dark: scheme === "light" ? undefined : dark,
+      moreContrast,
+    });
+    themeDrafts.discard(id);
+    speak(t("settings.pickingSaved", { name: customThemes.get(made)!.name }));
+  }
+
+  /** The changes into the theme of yours they were made in. */
+  function saveInto() {
+    const draft = themeDrafts.of(theme) ?? {};
+    for (const scheme of SCHEMES) for (const [key, value] of Object.entries(draft[scheme] ?? {})) customThemes.setColor(theme, scheme, key, value);
+    themeDrafts.discard(theme);
+    speak(t("settings.pickingSaved", { name: shown.name }));
+  }
+
+  function discard() {
+    discarding = false;
+    themeDrafts.discard(theme);
+    speak(t("settings.pickingDiscarded"));
   }
 </script>
 
@@ -285,33 +299,6 @@
     <WebImagePicker library={from} x={library.x} y={library.y} onchoose={(image) => void themeFromLibrary(from, image)} onclose={() => (library = null)} />
   {/if}
 {/snippet}
-
-{#if plugins.styles.length > 1}
-  <FieldGroup title={t("settings.style")} note={t("settings.styleNote")} id={styleHeading}>
-    <div class="p-3">
-      <RadioGroup.Root value={styleShown} onValueChange={chooseStyle} aria-labelledby={styleHeading} class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-2">
-        {#each plugins.styles as option (option.id)}
-          {@const { bg, text, accent } = styleColors(option.theme)}
-          {@const round = option.properties?.["radius-scale"] ?? "1"}
-          <RadioGroup.Item value={option.id} class="group flex flex-col gap-1 rounded-xl p-1 pb-1.5 text-left hover:bg-hover">
-            <!-- In forced colors the previews keep each style's own colors, and the chosen one an outline for its ring. -->
-            <span
-              class="flex h-16 items-center gap-3 overflow-hidden rounded-lg px-3.5 inset-ring inset-ring-line transition-shadow forced-color-adjust-none group-data-[state=checked]:ring-2 group-data-[state=checked]:ring-accent group-data-[state=checked]:inset-ring-0 forced-colors:group-data-[state=checked]:outline-2 forced-colors:group-data-[state=checked]:outline-[HighlightText]"
-              style:background={bg}
-              style:color={text}
-              aria-hidden="true"
-            >
-              <span class="text-[26px] leading-none" style:font-family={option.font?.family ?? "system-ui, sans-serif"}>Aa</span>
-              <span class="h-3 flex-1" style:background={accent} style:border-radius="calc(6px * {round})"></span>
-            </span>
-            <span class="px-1 text-sm font-medium text-fg">{option.name}</span>
-            {#if option.description}<span class="px-1 text-xs leading-snug text-muted">{option.description}</span>{/if}
-          </RadioGroup.Item>
-        {/each}
-      </RadioGroup.Root>
-    </div>
-  </FieldGroup>
-{/if}
 
 <FieldGroup title={t("settings.themes")} note={t("settings.themeNote")} action={themeActions} id={themeHeading}>
   {#if pasting || imported || importError || fromPicture || pictureError || fetching}
@@ -377,6 +364,26 @@
     </RadioGroup.Root>
     <p class="m-0 mt-3 px-1 text-xs leading-normal text-muted">{t("settings.themesAccessibilityNote")}</p>
   </div>
+</FieldGroup>
+
+<FieldGroup>
+  <FieldRow label={t("settings.picking")} note={t("settings.pickingNote")}>
+    <Switch label={t("settings.picking")} checked={themeDrafts.picking} onchange={(on) => (themeDrafts.picking = on)} />
+  </FieldRow>
+  {#if changed}
+    <FieldRow label={t("settings.pickingChanged", { count: changed, name: shown.name })} note={t("settings.pickingChangedNote")}>
+      <div class="flex flex-wrap items-center justify-end gap-1">
+        {#if discarding}
+          <Button variant="quiet" onclick={() => (discarding = false)}>{t("settings.cancel")}</Button>
+          <Button variant="danger-primary" onclick={discard}>{t("settings.pickingDiscard")}</Button>
+        {:else}
+          <Button variant="quiet" onclick={() => (discarding = true)}>{t("settings.pickingDiscard")}</Button>
+          {#if yours.has(theme)}<Button onclick={saveInto}>{t("settings.pickingSaveInto", { name: shown.name })}</Button>{/if}
+          <Button variant="primary" onclick={saveAsNew}>{t("settings.pickingSaveNew")}</Button>
+        {/if}
+      </div>
+    </FieldRow>
+  {/if}
 </FieldGroup>
 
 <FieldGroup>

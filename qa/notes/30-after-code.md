@@ -411,7 +411,17 @@ plain code
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Code block, then Mention
+#### 33. Code block, then Score (Settings → Little Touches)
+
+```
+plain code
+  indented line
+```
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Code block, then Mention
 
 ```
 plain code
@@ -419,7 +429,7 @@ plain code
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Code block, then Wiki link
+#### 35. Code block, then Wiki link
 
 ```
 plain code
@@ -427,7 +437,7 @@ plain code
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Code block, then Symbols
+#### 36. Code block, then Symbols
 
 ```
 plain code
@@ -435,7 +445,7 @@ plain code
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Code block, then GitHub links
+#### 37. Code block, then GitHub links
 
 ```
 plain code
@@ -443,7 +453,7 @@ plain code
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Code block, then arXiv links
+#### 38. Code block, then arXiv links
 
 ```
 plain code
@@ -451,7 +461,7 @@ plain code
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Code block, then Image
+#### 39. Code block, then Image
 
 ```
 plain code
@@ -459,7 +469,7 @@ plain code
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 39. Code block, then Drawing
+#### 40. Code block, then Drawing
 
 ```
 plain code
@@ -467,7 +477,7 @@ plain code
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Code block, then File
+#### 41. Code block, then File
 
 ```
 plain code
@@ -475,7 +485,7 @@ plain code
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Code block, then Folder and file links
+#### 42. Code block, then Folder and file links
 
 ```
 plain code
@@ -483,7 +493,7 @@ plain code
 ```
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Code block, then Attached 3D model (STL)
+#### 43. Code block, then Attached 3D model (STL)
 
 ```
 plain code
@@ -491,7 +501,7 @@ plain code
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Code block, then Terminal recording (.cast file)
+#### 44. Code block, then Terminal recording (.cast file)
 
 ```
 plain code
@@ -499,7 +509,7 @@ plain code
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Code block, then Audio
+#### 45. Code block, then Audio
 
 ```
 plain code
@@ -507,7 +517,7 @@ plain code
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Code block, then Video
+#### 46. Code block, then Video
 
 ```
 plain code
@@ -515,7 +525,7 @@ plain code
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Code block, then Missing file
+#### 47. Code block, then Missing file
 
 ```
 plain code
@@ -523,7 +533,7 @@ plain code
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Code block, then Card
+#### 48. Code block, then Card
 
 ```
 plain code
@@ -533,7 +543,7 @@ plain code
 Text in a card.
 :::
 
-#### 48. Code block, then Callout (info)
+#### 49. Code block, then Callout (info)
 
 ```
 plain code
@@ -543,7 +553,7 @@ plain code
 Text in an info callout.
 :::
 
-#### 49. Code block, then Callout (warning, chosen icon)
+#### 50. Code block, then Callout (warning, chosen icon)
 
 ```
 plain code
@@ -553,7 +563,7 @@ plain code
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Code block, then Callout (decision, no icon)
+#### 51. Code block, then Callout (decision, no icon)
 
 ```
 plain code

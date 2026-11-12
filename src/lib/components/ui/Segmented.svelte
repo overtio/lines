@@ -18,6 +18,7 @@
     onselect,
     label,
     stacked = false,
+    columns,
     content,
     class: className,
   }: {
@@ -29,6 +30,8 @@
     label: string;
     /** Each option's content is stacked, e.g. a sample over its name. */
     stacked?: boolean;
+    /** Options in rows of this many, for more than fit side by side. */
+    columns?: number;
     /** Custom content for an option, in place of its icon and label. */
     content?: Snippet<[Option]>;
     class?: string;
@@ -40,15 +43,19 @@
   onValueChange={(id) => id && onselect(id as T)}
   orientation="horizontal"
   aria-label={label}
-  class={["ui-segmented flex gap-0.5 rounded-lg bg-input p-[3px]", className]}
+  class={["ui-segmented gap-0.5 rounded-lg bg-input p-[3px]", columns ? "grid" : "flex", className]}
+  style={columns ? `grid-template-columns: repeat(${columns}, minmax(0, 1fr))` : undefined}
 >
   {#each options as option (option.id)}
     <RadioGroup.Item
       value={option.id}
       disabled={option.disabled}
       class={[
-        "ui-segment flex min-h-[30px] flex-1 items-center justify-center rounded-md text-sm font-medium whitespace-nowrap text-muted transition-colors enabled:hover:text-fg data-disabled:opacity-45 data-[state=checked]:bg-panel data-[state=checked]:text-fg data-[state=checked]:shadow-segment coarse:min-h-11",
+        "ui-segment flex min-h-[30px] flex-1 items-center rounded-md text-sm font-medium text-muted transition-colors enabled:hover:text-fg data-disabled:opacity-45 data-[state=checked]:bg-panel data-[state=checked]:text-fg data-[state=checked]:shadow-segment coarse:min-h-11",
         stacked ? "flex-col px-1 py-1.5" : "gap-2 px-2.5",
+        // In rows, a long name can take two lines rather than run past its option, under its row's samples.
+        columns ? "text-center text-balance" : "whitespace-nowrap",
+        columns && stacked ? "justify-start" : "justify-center",
       ]}
     >
       {#if content}

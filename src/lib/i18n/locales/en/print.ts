@@ -14,7 +14,7 @@ export default {
   "print.layingOut": "Laying out pages…",
   "print.ready": "{count, plural, one {# page} other {# pages}}, ready",
   // Opens the system's print dialog, which saves PDFs too.
-  "print.print": "Print…",
+  "print.print": "Print",
   "print.printHint": "To save a PDF, choose Save as PDF in the print dialog.",
   "print.savePdf": "Save PDF",
   "print.png": "Save PNG",

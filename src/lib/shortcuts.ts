@@ -35,6 +35,7 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.newNote", keys: ["Mod-n"], only: "app" },
       { action: "shortcuts.newNote", keys: ["Alt-n"], only: "web" },
       { action: "shortcuts.search", keys: ["Mod-Shift-f"] },
+      { action: "shortcuts.searchSettings", keys: ["Mod-f"], note: "shortcuts.inSettings" },
       { action: "shortcuts.sidebar", keys: ["Mod-\\"] },
       { action: "shortcuts.focus", keys: ["Mod-Shift-\\"] },
       { action: "shortcuts.list", keys: ["Mod-/"] },
@@ -57,8 +58,15 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.pickOne", keys: ["Mod-click"], note: "shortcuts.inList" },
       { action: "shortcuts.pickRange", keys: ["Shift-click", "Shift-ArrowUp", "Shift-ArrowDown"], note: "shortcuts.inList" },
       { action: "shortcuts.openBeside", keys: ["Alt-click"], note: "shortcuts.inList" },
+      { action: "shortcuts.openBelow", keys: ["Alt-Shift-click"], note: "shortcuts.inList" },
       { action: "shortcuts.pickAll", keys: ["Mod-a"], note: "shortcuts.inList" },
       { action: "shortcuts.trashPicked", keys: ["Backspace"], note: "shortcuts.inList" },
+      { action: "shortcuts.calendarDays", keys: ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"], note: "shortcuts.inCalendar" },
+      { action: "shortcuts.calendarWeek", keys: ["Home", "End"], note: "shortcuts.inCalendar" },
+      { action: "shortcuts.calendarMonths", keys: ["PageUp", "PageDown"], note: "shortcuts.inCalendar" },
+      { action: "shortcuts.calendarYears", keys: ["Shift-PageUp", "Shift-PageDown"], note: "shortcuts.inCalendar" },
+      { action: "shortcuts.calendarNewNote", keys: ["Enter"], note: "shortcuts.inCalendar" },
+      { action: "shortcuts.moveRow", keys: ["Alt-ArrowUp", "Alt-ArrowDown"], note: "shortcuts.inSidebar" },
       { action: "shortcuts.menu", keys: ["Shift-F10"] },
       { action: "shortcuts.openAtCursor", keys: ["Alt-Enter"], note: "shortcuts.inNote" },
       { action: "shortcuts.openLink", keys: ["Mod-click"], note: "shortcuts.linksSetting" },
@@ -168,7 +176,7 @@ const MAC_SYMBOLS: Record<string, string> = { Ctrl: "⌃", Alt: "⌥", Shift: "�
 /** And Windows and Linux's order, as they write them: Ctrl+Alt+Shift. */
 const OTHER_ORDER = ["Mod", "Ctrl", "Alt", "Shift"];
 
-const MAC_KEYS: Record<string, string> = { Enter: "↵", Tab: "⇥", Backspace: "⌫", ArrowUp: "↑", ArrowDown: "↓", ArrowLeft: "←", ArrowRight: "→" };
+const MAC_KEYS: Record<string, string> = { Enter: "↵", Tab: "⇥", Backspace: "⌫", ArrowUp: "↑", ArrowDown: "↓", ArrowLeft: "←", ArrowRight: "→", PageUp: "⇞", PageDown: "⇟" };
 const ARROWS: Record<string, string> = { ArrowUp: "↑", ArrowDown: "↓", ArrowLeft: "←", ArrowRight: "→" };
 
 /** A key as printed on keyboards in the app's language ("Intro", "Entrée"), or as itself. */
@@ -185,6 +193,8 @@ function keyName(key: string, on: System): string {
     Space: "shortcuts.key.space",
     Home: "shortcuts.key.home",
     End: "shortcuts.key.end",
+    PageUp: "shortcuts.key.pageUp",
+    PageDown: "shortcuts.key.pageDown",
     Backspace: "shortcuts.key.backspace",
   };
   if (named[key]) return t(named[key]);
@@ -232,6 +242,8 @@ export function speakKeys(keys: Keys, on: System): string {
     Space: "shortcuts.key.space",
     Home: "shortcuts.key.home",
     End: "shortcuts.key.end",
+    PageUp: "shortcuts.key.pageUp",
+    PageDown: "shortcuts.key.pageDown",
     Backspace: "shortcuts.key.backspace",
     click: "shortcuts.key.click",
     drag: "shortcuts.key.drag",

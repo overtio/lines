@@ -10,7 +10,7 @@ import type { CaretPlace } from "../editor/cursor";
 import { frame, sizeOf } from "./draw";
 
 /*
- * A mascot (Settings → Mascot) living in the main window. It walks along the bottom of the note,
+ * A mascot (Settings → Plugins → Mascots) living in the main window. It walks along the bottom of the note,
  * sits and looks about, and falls asleep when you've been away a while. When you type it hops up
  * beside the line you're writing: in the note's margin if there's room, or else at the end of the
  * sentence, shuffling along as it grows (editor/cursor.ts says where that is); it bobs along with

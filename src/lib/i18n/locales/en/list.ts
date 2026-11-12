@@ -32,8 +32,7 @@ export default {
   "list.trash": "Move to Trash",
   "list.float": "Open in Floating Window",
   "list.unfloat": "Close Floating Window",
-  "list.addIcon": "Add Icon…",
-  "list.changeIcon": "Change Icon…",
+  "list.iconAndColor": "Icon and Color",
   "list.lock": "Lock Note",
   "list.lockNow": "Lock Now",
   "list.removeLock": "Remove Lock",
@@ -50,11 +49,21 @@ export default {
   "list.copied": "Copied",
   // Several notes picked in the list (⌘-click, ⇧-click, ⌘A), and acting on them together.
   "list.pickedCount": "{count, plural, one {# note selected} other {# notes selected}}",
+  // A note's menu: out of the Inbox, sorted; or back into it, to sort later.
+  "list.file": "Mark as Filed",
+  "list.toInbox": "Move to Inbox",
+  "list.didFile": "Filed",
+  "list.didInbox": "Moved to Inbox",
+  // A note dropped on a type in the sidebar: {type} is its name, "Person".
+  "list.didType": "Now a {type}",
+  "list.didFileMany": "{count, plural, one {Filed # note} other {Filed # notes}}",
+  "list.didInboxMany": "{count, plural, one {Moved # note to Inbox} other {Moved # notes to Inbox}}",
+  "list.inboxEmpty": "Nothing to sort.",
   // Said after a row's title by screen readers, when it's among the notes picked.
   "list.picked": "Selected",
   // The menu of the picked notes: its name.
   "list.pickedMenu": "{count, plural, one {# note} other {# notes}}",
-  "list.addTag": "Add Tag…",
+  "list.addTag": "Add Tag",
   "list.clearPicks": "Clear selection",
   "list.pickedActions": "Selected notes",
   "list.didTrashMany": "{count, plural, one {# note moved to the Trash} other {# notes moved to the Trash}}",
@@ -76,4 +85,5 @@ export default {
   // The folder trashed notes go in, in an export.
   "list.trashFolder": "Trash",
   "list.openBeside": "Open to the Side",
+  "list.openBelow": "Open Below",
 };

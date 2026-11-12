@@ -2,8 +2,6 @@ import type { Translation } from "../../format";
 import type en from "../en/sync";
 
 export default {
-  "sync.intro":
-    "Synchronisez vos notes entre vos appareils. Chaque note est enregistrée sous forme de fichier Markdown (ou chiffrée, si vous l’activez plus bas), et vos notes restent aussi sur cet appareil : lines fonctionne donc hors ligne.",
   "sync.syncingWith": "Synchronisation avec {place}…",
   "sync.offline": "Hors ligne. Les modifications seront synchronisées lorsque vous serez de nouveau en ligne.",
   "sync.syncedWith": "Synchronisé avec {place} {date}",

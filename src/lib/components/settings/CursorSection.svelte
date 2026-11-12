@@ -5,7 +5,7 @@
   import { EditorView } from "@codemirror/view";
   import { createExtensions } from "../../editor/setup";
   import { type MessageKey, t } from "../../i18n/index.svelte";
-  import { CARET_BLINKS, CARET_COLORS, CARET_EFFECTS, CARET_MOTIONS, CARET_SHAPES, POINTER_STYLES, POINTER_TRAILS, prefs } from "../../prefs.svelte";
+  import { CARET_BLINKS, CARET_COLORS, CARET_EFFECTS, CARET_MOTIONS, CARET_SHAPES, CARET_WIDTHS, POINTER_STYLES, POINTER_TRAILS, prefs } from "../../prefs.svelte";
   import ColorField from "../ui/ColorField.svelte";
   import FieldGroup from "../ui/FieldGroup.svelte";
   import FieldRow from "../ui/FieldRow.svelte";
@@ -16,6 +16,8 @@
     thick: "settings.caretThick",
     block: "settings.caretBlock",
     underline: "settings.caretUnderline",
+    letter: "settings.caretWidthLetter",
+    even: "settings.caretWidthEven",
     accent: "settings.color.accent",
     text: "settings.headingColorText",
     custom: "settings.paperColorCustom",
@@ -58,6 +60,11 @@
   <FieldRow label={t("settings.caretShape")}>
     <Segmented label={t("settings.caretShape")} options={options(CARET_SHAPES)} value={prefs.caretShape} onselect={(id) => (prefs.caretShape = id)} />
   </FieldRow>
+  {#if prefs.caretShape === "block" || prefs.caretShape === "underline"}
+    <FieldRow label={t("settings.caretWidth")} note={t("settings.caretWidthNote")}>
+      <Segmented label={t("settings.caretWidth")} options={options(CARET_WIDTHS)} value={prefs.caretWidth} onselect={(id) => (prefs.caretWidth = id)} />
+    </FieldRow>
+  {/if}
   <FieldRow label={t("settings.caretColor")}>
     <Segmented label={t("settings.caretColor")} options={options(CARET_COLORS)} value={prefs.caretColor} onselect={(id) => (prefs.caretColor = id)}>
       {#snippet content(option)}

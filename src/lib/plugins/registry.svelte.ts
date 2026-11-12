@@ -1,5 +1,6 @@
 import { builtIn } from "../../plugins";
 import { customThemes } from "../themes/custom.svelte";
+import { themeDrafts } from "../themes/drafts.svelte";
 import { announce, onAnnounce } from "../windows/channel";
 import { plainTextLanguage } from "./plainText";
 import { soundPacks } from "../sounds/packs.svelte";
@@ -37,6 +38,9 @@ function read(): Record<string, boolean> {
   return {};
 }
 
+/** A plugin off at first that its notes turn on (`keepLanguagesInUse`). */
+const comesWithItsNotes = (plugin: Plugin) => !plugin.enabledByDefault && !!plugin.contributes.languages?.length;
+
 class Plugins {
   #all: readonly Plugin[] | undefined;
   #choices = $state(read());
@@ -58,10 +62,11 @@ class Plugins {
   });
 
   readonly languages = $derived(this.#from("languages"));
-  /** The plugins' themes, then your own (themes/custom.svelte.ts). */
-  readonly themes = $derived([...this.#from("themes"), ...customThemes.themes]);
+  /** The plugins' themes, then your own (themes/custom.svelte.ts), each with the colors changed in it and not saved yet (themes/drafts.svelte.ts). */
+  readonly themes = $derived([...this.#from("themes"), ...customThemes.themes].map(themeDrafts.over));
   readonly themeFormats = $derived(this.#from("themeFormats"));
   readonly styles = $derived(this.#from("styles"));
+  readonly fonts = $derived(this.#from("fonts"));
   readonly iconSets = $derived(this.#from("iconSets"));
   readonly mathEngines = $derived(this.#from("math"));
   readonly renderers = $derived(this.#from("renderers"));
@@ -114,8 +119,8 @@ class Plugins {
       if (!each || seen.has(each)) return;
       seen.add(each);
       if (!each.required && this.isOn(each) !== on) {
-        // Back to its default: nothing to remember.
-        if (on === each.enabledByDefault) delete choices[each.id];
+        // Back to its default: nothing to remember. But one that comes on with its notes is kept off.
+        if (on === each.enabledByDefault && !comesWithItsNotes(each)) delete choices[each.id];
         else choices[each.id] = on;
       }
       if (!on) return;
@@ -131,6 +136,17 @@ class Plugins {
       // Storage that can't be written: the choice lasts until lines restarts.
     }
     void announce({ type: "plugins", choices });
+  }
+
+  /**
+   * Plugins off at first (Spreadsheet Notes) that notes here are written in, from another device,
+   * an import or the feature tour, turned on, so none of those opens as text; not one turned off by choice.
+   */
+  keepLanguagesInUse(languages: ReadonlySet<string>) {
+    for (const plugin of this.all) {
+      if (!comesWithItsNotes(plugin) || plugin.id in this.#choices) continue;
+      if (plugin.contributes.languages?.some((language) => languages.has(language.id))) this.setOn(plugin, true);
+    }
   }
 
   /** The language a note shows in: its own while its plugin runs, plain text otherwise. */
@@ -175,12 +191,12 @@ class Plugins {
     return this.keyboardSounds.find((keyboard) => keyboard.id === id) ?? this.keyboardSounds[0];
   }
 
-  /** The style `id` (Settings → Theme → Style), or lines' own while its plugin is off. */
+  /** The style `id` (a preset's: Settings → Presets), or lines' own while its plugin is off. */
   style(id: string): AppStyle | undefined {
     return this.styles.find((style) => style.id === id) ?? this.styles.find((style) => style.id === DEFAULT_STYLE);
   }
 
-  /** The paper style `id` (Settings → Paper), if its plugin is on. */
+  /** The paper style `id` (Settings → Plugins → Paper), if its plugin is on. */
   paperStyle(id: string) {
     return this.paperStyles.find((style) => style.id === id);
   }

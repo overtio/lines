@@ -87,6 +87,13 @@ export function themeColors(palette: Palette): {
     "syn-function": read(syntax.function ?? hues.blue),
     "syn-type": read(syntax.type ?? hues.yellow ?? hues.cyan),
   };
+  // Its own red, green and the rest for tags, types and events (colors.ts), readable as icons are (3:1).
+  const backgrounds = [bg, colors["bg-list"]!, sidebar, colors["bg-elevated"]!];
+  const named = { red: hues.red, orange: hues.orange, yellow: hues.yellow, green: hues.green, blue: hues.blue, purple: hues.magenta };
+  for (const [name, hue] of Object.entries(named)) {
+    const color = read(hue);
+    if (color) colors[`palette-${name}`] = backgrounds.reduce((each, background) => readableOn(each, background, 3), color);
+  }
   for (const status of ["danger", "success", "pin"]) {
     const color = colors[status];
     if (color) colors[`on-${status}`] = textOn(color, [WHITE, { r: 20, g: 20, b: 20, a: 1 }]);

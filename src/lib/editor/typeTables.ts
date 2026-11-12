@@ -6,7 +6,7 @@ import Icon from "../icons/Icon.svelte";
 import type { IconName } from "../icons/icons";
 import { keyOf, mentionKey, propertyOf, readTypeRef, type TypeRef, typeLabel, typeRefOf } from "../notes/properties";
 import { notes } from "../notes/store.svelte";
-import { typeIcons } from "../notes/tagIcons.svelte";
+import { typeLooks } from "../notes/looks.svelte";
 import { t } from "../i18n/index.svelte";
 import { ui } from "../ui.svelte";
 import { windowLabel } from "../windows/channel";
@@ -64,7 +64,7 @@ export function tableData(ref: TypeRef): TableData {
   const type = entries[0]?.meta.type ?? ref.type;
   return {
     type,
-    icon: typeIcons.get(type),
+    icon: typeLooks.icon(type),
     chosen: ref.columns,
     columns,
     others: all.filter((column) => !shown.has(keyOf(column.key))),

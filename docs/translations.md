@@ -34,7 +34,7 @@ A language can ship partly translated; what's missing shows in English.
 - **Plurals** use ICU's form: `"{count, plural, one {# note} other {# notes}}"`. `#` is the number. Use the categories the language has ([CLDR plural rules](https://www.unicode.org/cldr/charts/latest/supplemental/language_plural_rules.html)): `one` and `other` for English and Spanish; French's `one` covers 0 and 1; Russian or Polish add `few` and `many`. `=0 {No notes}` matches an exact number.
 - **Whole sentences** are one message. Code never joins messages into a sentence, since word order differs between languages.
 - **Leave as they are:** "lines" (always lowercase), product and service names (iCloud Drive, Touch ID, S3, Markdown, LaTeX, Unsplash, GitHub), file extensions, and Markdown or LaTeX syntax in a message (`#tag`, `/`, `\section`).
-- **Punctuation:** "…" (one character) on a menu item that asks for more before acting, as in "Rename…". Typographic quotes and apostrophes: “ ” ’ in English, « » with narrow no-break spaces and ’ in French, “ ” or « » in Spanish.
+- **Punctuation:** no "…" on a menu item, even one that asks for more before acting ("Rename"); a button that does has one (one character), as in "Choose a Folder…". Typographic quotes and apostrophes: “ ” ’ in English, « » with narrow no-break spaces and ’ in French, “ ” or « » in Spanish.
 - **Voice:** as Apple writes its own apps in each language. Spanish uses tú; French uses vous. Settings is "Ajustes" in Spanish and "Réglages" in French.
 - **Labels for screen readers** (`aria-label`) are messages too: say what a button does ("Hide sidebar"), not what it looks like.
 

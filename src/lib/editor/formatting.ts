@@ -60,8 +60,8 @@ export type FormatId = keyof typeof FORMATS;
 /** Whatever a line starts with before its text: indentation, `#`, `>`, list markers, a checkbox. */
 const LINE_PREFIX = /^\s*(?:(?:#{1,6}|>|[-*+](?:\s+\[[ xX]\])?|\d+[.)])(?:\s+|$))*/;
 
-/** Lines that are all markup: code fences, card fences, a table's |---| row. */
-const MARKUP_LINE = /^\s*(?:`{3,}|~{3,}|:{3,}|\|?\s*:?-+:?\s*\|[\s|:-]*$)/;
+/** Lines that are all markup: code fences, card fences, a table's |---| row, a divider. */
+const MARKUP_LINE = /^\s*(?:`{3,}|~{3,}|:{3,}|\|?\s*:?-+:?\s*\|[\s|:-]*$|(?:-[ \t]*){3,}$|(?:\*[ \t]*){3,}$|(?:_[ \t]*){3,}$)/;
 
 /** Code blocks, where formatting markers would just be text. */
 const CODE_BLOCKS = new Set(["FencedCode", "CodeBlock"]);

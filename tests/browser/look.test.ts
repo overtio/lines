@@ -91,6 +91,28 @@ test("Heading color: the accent colors every heading", async () => {
   expect(await lightness(app.page, heading)).toBeCloseTo(await lightness(app.page, accent), 2);
 });
 
+test("Fonts: IBM Plex Sans, Fira Sans and Agave come with lines, write notes in them, and go back to the system's with their plugin off", async () => {
+  app = await openApp();
+  await app.open("# Title\n\nText");
+  const settings = await app.settings("Typography");
+  const fonts = settings.getByRole("radiogroup", { name: "Font" });
+  for (const [name, id] of [["IBM Plex Sans", "ibm-plex-sans"], ["Fira Sans", "fira-sans"], ["Agave", "agave"]]) {
+    await fonts.getByRole("radio", { name }).click();
+    expect(await app.root("font")).toBe(id);
+    // Chrome quotes a name with spaces in it, WebKit doesn't.
+    expect((await app.style(".editor-pane .cm-content", "font-family")).replaceAll('"', "")).toStartWith(`${name},`);
+    // Its files are there, and load: regular and bold.
+    const loaded = await app.page.evaluate(async (name) => (await Promise.all([`16px "${name}"`, `bold 16px "${name}"`].map((font) => document.fonts.load(font, "Aa")))).map((faces) => faces.length), name);
+    expect(loaded.every((count) => count > 0)).toBe(true);
+  }
+
+  const plugins = await app.settings("All Plugins");
+  await toggle(plugins, "Fonts", false);
+  await app.settings("Typography");
+  expect(await fonts.getByRole("radio").count()).toBe(4);
+  expect(await app.style(".editor-pane .cm-content", "font-family")).toStartWith("-apple-system");
+});
+
 describe("themes", () => {
   test("each of the new ones shows, light and dark", async () => {
     for (const scheme of ["light", "dark"] as const) {
@@ -112,19 +134,19 @@ describe("themes", () => {
     const settings = await app.settings("Theme");
     await settings.getByRole("button", { name: "New" }).click();
     const chooser = app.page.waitForEvent("filechooser");
-    await app.page.getByRole("menuitem", { name: "From a Picture…" }).click();
+    await app.page.getByRole("menuitem", { name: "From a Picture" }).click();
     await (await chooser).setFiles({ name: "Sunset_over-sea.png", mimeType: "image/png", buffer: png(48, 32, (x, y) => (y < 14 ? [240, 140 - x, 60] : [40, 30 + x, 90])) });
     await settings.getByText("Sunset over sea", { exact: false }).first().waitFor();
     expect(await app.root("theme")).toStartWith("custom");
   });
 
-  test("Wallhaven is the apps': on the web it says so, and New has no From Wallhaven…", async () => {
+  test("Wallhaven is the apps': on the web it says so, and New has no From Wallhaven", async () => {
     app = await openApp();
-    const plugins = await app.settings("Plugins");
+    const plugins = await app.settings("All Plugins");
     expect(await plugins.getByText("Needs the lines app: Wallhaven's site doesn't answer web pages.").isVisible()).toBe(true);
     const theme = await app.settings("Theme");
     await theme.getByRole("button", { name: "New" }).click();
-    expect(await app.page.getByRole("menuitem", { name: "From Wallhaven…" }).count()).toBe(0);
+    expect(await app.page.getByRole("menuitem", { name: "From Wallhaven" }).count()).toBe(0);
     await app.page.keyboard.press("Escape");
   });
 
@@ -141,7 +163,7 @@ describe("themes", () => {
 describe("styles", () => {
   test("Classic squares the corners; Pixel's switch knob goes all the way across", async () => {
     app = await openApp();
-    const settings = await app.settings("Theme");
+    const settings = await app.settings("Presets");
     await settings.getByRole("radio", { name: /^Classic/ }).first().click();
     expect(await app.root("style")).toBe("classic");
     expect(await app.style(".ui-card", "border-top-left-radius")).toBe("0px");

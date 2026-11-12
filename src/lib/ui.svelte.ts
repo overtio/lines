@@ -1,13 +1,19 @@
+import type { PaletteColor } from "./palette";
 import type { SettingsSection } from "./components/settings/sections";
 import type { IconName } from "./icons/icons";
-import { PANE_WIDTHS, prefs } from "./prefs.svelte";
+import { prefs } from "./prefs.svelte";
 
 /** The narrowest the open note gets, beside the sidebar and note list or a note open beside it. */
 export const NOTE_MIN = 360;
 
 export type Layout = "wide" | "medium" | "narrow";
 
-export type MenuItem = { label: string; icon?: IconName; danger?: boolean; run: () => void } | "separator";
+/** A menu's item, or a line between groups of them. One with `checked` is a choice, marked while it's the one made. */
+export type MenuItem = { label: string; icon?: IconName; danger?: boolean; checked?: boolean; run: () => void } | "separator";
+
+/** A menu in sections, a line between each; a section with nothing in it isn't one. */
+export const menuSections = (...sections: Exclude<MenuItem, "separator">[][]): MenuItem[] =>
+  sections.filter((section) => section.length).flatMap((section, i): MenuItem[] => (i ? ["separator", ...section] : section));
 
 export interface Menu {
   /** Where to open, in viewport coordinates. */
@@ -33,6 +39,13 @@ export interface IconTarget {
   fallback: IconName;
   icon: () => IconName | null;
   set: (icon: IconName | null) => void;
+  /** For something that can have a color too (a tag, a type): its color, and choosing one; null for none. */
+  color?: {
+    get: () => PaletteColor | null;
+    set: (color: PaletteColor | null) => void;
+    /** What it has with no color of its own: a nested tag's from the tag it's in (`from`). */
+    inherited?: { color: PaletteColor; from: string };
+  };
   /** For something that can have no icon at all (a callout): whether it has none, and choosing none. */
   none?: { active: () => boolean; set: () => void };
   /** Where to open, in viewport coordinates. */
@@ -59,10 +72,9 @@ class UIState {
   sidebarOpen = $state(this.layout === "wide");
   /** Focus mode: just the note, with the sidebar and note list tucked away. */
   focus = $state(false);
-  /** The note open beside the selected one (Open to the Side), shown while there's room (`besideFits`). */
-  side = $state<string | null>(null);
-  /** How wide the note's pane is (App.svelte), which decides whether a note fits beside the open one. */
+  /** How wide and tall the note's place is (App.svelte), which decides whether a note fits beside the open one (panes.svelte.ts). */
   editorWidth = $state(0);
+  editorHeight = $state(0);
   /** The open Settings tab, or null when Settings is closed. */
   settings = $state<SettingsSection | null>(null);
   menu = $state.raw<Menu | null>(null);
@@ -93,11 +105,6 @@ class UIState {
   get sidebarToggle(): "list" | "editor" | null {
     if ((this.layout === "wide" && this.sidebarOpen) || (this.focus && this.layout !== "narrow")) return null;
     return this.layout === "narrow" || prefs.listSide === prefs.sidebarSide ? "list" : "editor";
-  }
-
-  /** A note can show beside the open one: not on a phone, and with room for both. */
-  get besideFits() {
-    return this.layout !== "narrow" && this.editorWidth >= NOTE_MIN + PANE_WIDTHS.side.min;
   }
 
   toggleSidebar() {

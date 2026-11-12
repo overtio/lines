@@ -1,7 +1,5 @@
 /** Plugins (Settings → Plugins), and what lines' own plugins are called and do. */
 export default {
-  "plugins.intro":
-    "Most of lines is plugins: the formats notes are written in, what draws math and diagrams, and its looks. Turn off what you don’t use. A note in a format that’s off shows as plain text, and nothing in it changes.",
   // Groups in the list.
   "plugins.groupFormats": "Formats",
   "plugins.groupEngines": "Engines",
@@ -9,13 +7,17 @@ export default {
   "plugins.groupMore": "More",
   "plugins.alwaysOn": "Always on",
   "plugins.needs": "Needs {names}, which is off.",
+  "plugins.openSettings": "{name} Settings",
+  "plugins.offSettings": "Turn {name} on to change its settings.",
   // How a note shows while its format's plugin is off.
   "plugins.plainText": "Plain Text",
   // lines' own plugins. Markdown, LaTeX, Lucide and SF Symbols are names, not translated.
   "plugins.markdown.description": "Notes written in Markdown, formatted as you type, with lines’ additions: callouts, highlights, tags and mentions.",
   "plugins.latex.description": "Notes written in LaTeX, drawn as you type, and exported as documents that compile.",
   "plugins.spreadsheet": "Spreadsheets",
-  "plugins.spreadsheet.description": "Notes that are spreadsheets: cells and formulas, kept as CSV. Opens CSV and Excel files, and downloads as either. In Markdown notes, ```csv blocks are spreadsheets too.",
+  "plugins.spreadsheet.description": "In Markdown notes, ```csv blocks are spreadsheets: cells and formulas, with the keys you know from Excel and Numbers. /spreadsheet starts one.",
+  "plugins.spreadsheetNotes": "Spreadsheet Notes",
+  "plugins.spreadsheetNotes.description": "Notes that are a whole spreadsheet, kept as CSV, whose cells other spreadsheets' formulas can use. Opens CSV and Excel files, and downloads as either.",
   "plugins.http": "API Requests",
   "plugins.http.description": "Sends requests written in the .http format or Hurl’s, from .http and .hurl notes and ```http and ```hurl blocks in Markdown notes, shows their responses, and checks what Hurl entries assert. Adds /request and /hurl; a curl command pasted into a request becomes one.",
   "plugins.secrets": "Secrets",
@@ -37,7 +39,9 @@ export default {
   "plugins.themes": "Themes",
   "plugins.themes.description": "Lines and twenty-two more, including High Contrast and two for color blindness. Reads themes made for VS Code, Zed, Base16, terminals and Linux desktops too.",
   "plugins.styles": "Styles",
-  "plugins.styles.description": "Whole looks for the app beyond its colors: Classic, a desktop of the 90s; Pixel, one-bit and minimal; and Neon. Each comes with colors of its own.",
+  "plugins.styles.description": "Whole looks for the app beyond its colors: Classic, a desktop of the 90s; Pixel, one-bit and minimal; Neon; Puddle, a rainy day in a picture book; and Lightbulb, a spark of lightning drawn as a cartoon. Each comes with colors of its own.",
+  "plugins.fonts": "Fonts",
+  "plugins.fonts.description": "Fonts to write notes in, beside your system's: IBM Plex Sans, Fira Sans and Agave, a monospaced one. They come with lines, so notes look the same on every computer.",
   "plugins.keyboards": "Keyboards",
   "plugins.keyboards.description": "Keyboards to hear as you type, made from sound: deep and creamy, clacky, tactile, clicky, Topre, and a typewriter with its bell.",
   // Keyboards to hear as you type, and what each sounds like.
@@ -74,18 +78,20 @@ export default {
   "mascot.cheer3": "Look at you go!",
   "mascot.cheer4": "So many words!",
   "mascot.done": "Done!",
-  // What each style is like, under its name in Settings → Theme → Style.
+  // What each style is like, under its name in Settings → Presets.
   "styles.lines": "Soft corners, quiet shadows and your system's font.",
   "styles.classic": "A desktop of the late 90s: bevels, a title bar, square corners.",
   "styles.pixel": "One-bit and minimal: a pixel font, hard shadows, nothing round.",
   "styles.neon": "A city at night: glowing lines, a grid, scan lines.",
+  "styles.puddle": "A rainy day in a picture book: cream paper, flat colors, crisp ink lines, a rounded hand.",
+  "styles.lightbulb": "A spark of lightning drawn as a cartoon: lemon and red, bold ink lines, hard shadows, a sparking cursor.",
   "plugins.changes": "Changes",
   "plugins.changes.description": "Marks the lines you change in a note beside them, as a code editor does: added in green, changed in blue, and where lines were taken out in red. Since the note was opened.",
   "plugins.changes.added": "Added",
   "plugins.changes.changed": "Changed",
   "plugins.changes.removed": "Taken out",
   "plugins.paper": "Paper",
-  "plugins.paper.description": "Paper to write on: ruled lines, dots, squares, graph or isometric paper behind notes, in the theme’s colors or one chosen, grain or linen under them, and backdrops behind the page. Chosen in Settings → Paper.",
+  "plugins.paper.description": "Paper to write on: ruled lines, dots, squares, graph or isometric paper behind notes, in the theme’s colors or one chosen, grain or linen under them, and backdrops behind the page.",
   "plugins.paper.lines": "Lines",
   "plugins.paper.dots": "Dots",
   "plugins.paper.squares": "Squares",

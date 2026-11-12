@@ -1,5 +1,6 @@
 import type { LockedKey } from "../crypto";
 import type { IconName } from "../icons/icons";
+import type { PaletteColor } from "../palette";
 import type { Property } from "./properties";
 
 export interface Note {
@@ -10,8 +11,12 @@ export interface Note {
   updatedAt: number;
   pinned: boolean;
   trashed: boolean;
+  /** In the Inbox: new, and not sorted yet. */
+  inbox?: boolean;
   /** An icon chosen for the note, shown before its title in the list. */
   icon?: IconName;
+  /** A color chosen for the note: its icon's in the list, and its event's and dot's on the Calendar (palette.ts). */
+  color?: PaletteColor;
   /**
    * The language it's written in, by the id of a language a plugin adds ("latex"), for a note not
    * written in Markdown. Kept even while that plugin is off, or not on this device.
@@ -59,9 +64,12 @@ export interface NoteMeta {
 }
 
 export type Filter =
+  | { kind: "inbox" }
   | { kind: "all" }
   | { kind: "todo" }
   | { kind: "untagged" }
   | { kind: "trash" }
   | { kind: "tag"; tag: string }
-  | { kind: "type"; type: string };
+  | { kind: "type"; type: string }
+  /** The Calendar, on one day (`YYYY-MM-DD`, see calendar.ts): the notes on it. */
+  | { kind: "calendar"; day: string };

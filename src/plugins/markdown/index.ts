@@ -54,8 +54,12 @@ export const markdown = (): Plugin => ({
         plainText,
         stats: noteStats,
         addTag: (body, tag) => addTagIn(body, tag),
-        // Ready for its title, after its tag, or its type (as its properties).
-        newNote: ({ tag, type }) => (tag ? `# \n\n#${tag}` : type ? `---\ntype: ${type}\n---\n# ` : "# "),
+        // Ready for its title, after its tag, or its type and other properties.
+        newNote: ({ tag, type, properties }) => {
+          if (tag) return `# \n\n#${tag}`;
+          const lines = Object.entries({ ...(type && { type }), ...properties }).map(([key, value]) => `${key}: ${value}`);
+          return lines.length ? `---\n${lines.join("\n")}\n---\n# ` : "# ";
+        },
         file: (body, attachments) => (attachments ? body.replaceAll(`](${ATTACHMENT_PATH}`, `](${attachments}`) : body),
         print: markdownDocument,
         // An HTML comment, which Markdown apps don't show.

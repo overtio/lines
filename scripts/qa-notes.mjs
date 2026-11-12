@@ -101,6 +101,7 @@ const ELEMENTS = [
     md: 'Before the break.\n\n<!-- pagebreak -->\nAfter it, on a new page.\n\n<div style="page-break-after: always"></div>\n\nAnd another.',
   },
   { id: "key-value", name: "Key: Value line", md: "**Wi-Fi password:** correct-horse-battery" },
+  { id: "score", name: "Score (Settings → Little Touches)", md: "Rating: 4/5\nScore: 7 / 10\nNot a score: 12/20" },
   { id: "mention", name: "Mention", md: "Ask @[QA · Ada] at @[QA · Ada].email." },
   { id: "wiki-link", name: "Wiki link", md: "Ask [[QA · Ada]], or [[QA · Ada|her]]." },
   {
@@ -207,10 +208,11 @@ note(
   "Tags and highlights",
   "Edge cases for tags, highlights and underlines. Check each line against what it says should happen, and the tags in the sidebar under qa.",
   [
-    `${label(1, "Tags")}\n\n- #qa/plain is a tag\n- #qa/nested/deeper is a nested tag\n- (#qa/in-brackets) is a tag\n- #qa/trailing-slash/ is a tag without the slash\n- #QA/Upper is the same tag as #qa/upper\n- #qa/café, #qa/日本 and #qa/हिंदी are tags\n- C# is not a tag\n- #123 is not a tag\n- [a link](#anchor) is not a tag\n- \`#qa/in-code\` is not a tag`,
+    `${label(1, "Tags")}\n\n- #qa/plain is a tag\n- #qa/nested/deeper is a nested tag\n- (#qa/in-brackets) is a tag\n- #qa/trailing-slash/ is a tag, drawn with its slash, and in the sidebar as qa/trailing-slash (no slash); put the cursor at its end and move away, and the slash goes (⌘Z brings it back)\n- #QA/Upper is the same tag as #qa/upper\n- #qa/café, #qa/日本 and #qa/हिंदी are tags\n- C# is not a tag\n- #123 is not a tag\n- [a link](#anchor) is not a tag\n- \`#qa/in-code\` is not a tag`,
     `${label(2, "Tags in code blocks")}\n\n\`\`\`\n#qa/not-a-tag in a code block\n\`\`\``,
     `${label(3, "Highlights")}\n\n- ==highlighted==\n- a == b is not a highlight\n- ===three equals=== is not a highlight\n- ==highlight across **bold** text==\n- == spaced == is not a highlight`,
     `${label(4, "Underlines")}\n\n- <u>underlined</u>\n- <U>underlined in capitals</U>\n- <u>underline across **bold** and ==highlighted== text</u>\n- **bold with <u>underlined</u> inside**\n- a lone <u> stays as typed\n- <u class="x">a tag with an attribute</u> is not an underline\n- \`<u>in code</u>\` is not an underline`,
+    `${label(5, "Tags at the start of a heading")}\n\n## #qa/heading-start\n\nThe heading above reads \`#qa/heading-start\` as its text, not a tag: no qa/heading-start in the sidebar, as \`## \` typed over a heading's text makes it an H2.\n\n## A heading with #qa/heading-later\n\nThis heading's tag, later in it, is a tag.`,
   ],
   "tags",
 );
@@ -276,7 +278,7 @@ note(
     `${label(6, "Image inside a line of text")}\n\nText with ![a picture](attachment:photo.png) inside it.`,
     `${label(7, "Picture from the web")}\n\n![A memo emoji](https://github.githubassets.com/images/icons/emoji/unicode/1f4dd.png)`,
     `${label(8, "Empty lines between paragraphs")}\n\nOne.\n\n\n\nTwo, after three empty lines.`,
-    `${label(9, "Setext heading")}\n\nText followed by dashes\n---`,
+    `${label(9, "Dashes under text: a divider, the text a paragraph (both lines a heading with Settings → Editor → Underlined headings on)")}\n\nText on two lines,\nfollowed by dashes\n---`,
     `${label(10, "Hard line break")}\n\nLine with two trailing spaces  \nnext line.`,
     `${label(11, "HTML")}\n\n<b>HTML is shown as text</b>`,
     `${label(12, "Fence in a code block in a card")}\n\n::: card\n\`\`\`\n:::\n\`\`\`\nThe ::: in the code above doesn't close the card; this line is still in it.\n:::`,
@@ -290,7 +292,7 @@ note(
     `${label(20, "LaTeX that KaTeX can't read")}\n\nShown red, as written, with the reason on hover: $\\frac{1}{$\n\n$$\n\\begin{matrix} a\n$$`,
     `${label(21, "Math code block")}\n\n\`\`\`math\n\\begin{aligned}\na &= b + c \\\\\nd &= e\n\\end{aligned}\n\`\`\``,
     `${label(22, "Empty math block")}\n\n$$\n$$`,
-    `${label(23, "A line of only #")}\n\n#\n\nThe # above is text, not an empty heading; a tag is typed this way.`,
+    `${label(23, "A line of only # or -")}\n\n#\n\n-\n\nThe # and the - above are text, not an empty heading and list item: a tag and a list item are typed this way.`,
     `${label(24, "Recording from asciinema.org, by its embed code")}\n\n[![asciicast](https://asciinema.org/a/1271559.svg)](https://asciinema.org/a/1271559)`,
     `${label(25, "asciinema's preview alone plays too")}\n\n![asciicast](https://asciinema.org/a/1271559.png)`,
     `${label(26, "Starting at 0:10, twice as fast")}\n\n[![asciicast](https://asciinema.org/a/1271559.svg)](https://asciinema.org/a/1271559?t=0:10&speed=2)`,
@@ -395,6 +397,14 @@ notes.push(
   {
     file: "18-object-company.md",
     text: "---\ntype: qa-company\nwebsite: https://example.com\nfounded: 1843\n---\n# QA · Company\n\nAnother object, of the type qa-company. Check: right-click Qa-company in the sidebar and change its icon; it changes here, in the list, and on every mention of this note.\n\n#qa/objects\n",
+  },
+  {
+    file: "18b-dated.md",
+    text: "---\ndue: 2026-12-01\nstart: 2026-12-24 18:00\nend: 2026-12-26\n---\n# QA · Dated\n\nA note with dates in its properties (notes/calendar.ts). Check: in the Calendar, December 2026 has a dot on the 1st (its due date) and on the 24th, 25th and 26th (from its start to its end, the time read past); choosing any of those days lists this note, and choosing the 2nd doesn't. Then right-click it in the list → Icon and Color → Purple: its dots and its event in the week turn purple, whatever color qa/objects is given; No Color takes them back to qa/objects' color, or the accent.\n\n#qa/objects\n",
+  },
+  {
+    file: "18c-repeating.md",
+    text: "---\nstart: 2026-11-02 09:00\nend: 2026-11-02 09:15\nrepeat: every weekday until 2026-12-31\n---\n# QA · Repeating\n\nA note that repeats (notes/calendar.ts). Check: in the Calendar, November and December 2026 have it on every weekday from Monday the 2nd at 9:00 to 9:15, with the repeat mark after its title, and none on weekends or in January; right-click one in the week → Repeat has Every Weekday checked; dragging Friday's to 10:00 moves them all to 10:00, starting from the 2nd.\n\n#qa/objects\n",
   },
 );
 

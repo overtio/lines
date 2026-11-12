@@ -9,7 +9,7 @@ Edge cases for tags, highlights and underlines. Check each line against what it 
 - #qa/plain is a tag
 - #qa/nested/deeper is a nested tag
 - (#qa/in-brackets) is a tag
-- #qa/trailing-slash/ is a tag without the slash
+- #qa/trailing-slash/ is a tag, drawn with its slash, and in the sidebar as qa/trailing-slash (no slash); put the cursor at its end and move away, and the slash goes (⌘Z brings it back)
 - #QA/Upper is the same tag as #qa/upper
 - #qa/café, #qa/日本 and #qa/हिंदी are tags
 - C# is not a tag
@@ -40,3 +40,13 @@ Edge cases for tags, highlights and underlines. Check each line against what it 
 - a lone <u> stays as typed
 - <u class="x">a tag with an attribute</u> is not an underline
 - `<u>in code</u>` is not an underline
+
+#### 5. Tags at the start of a heading
+
+## #qa/heading-start
+
+The heading above reads `#qa/heading-start` as its text, not a tag: no qa/heading-start in the sidebar, as `## ` typed over a heading's text makes it an H2.
+
+## A heading with #qa/heading-later
+
+This heading's tag, later in it, is a tag.

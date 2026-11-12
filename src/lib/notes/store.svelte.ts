@@ -1,9 +1,12 @@
 import type { IconName } from "../icons/icons";
+import type { PaletteColor } from "../palette";
 import { isSite } from "../platform";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
-import type { NoteLanguage } from "../plugins/types";
+import type { Made, NoteLanguage } from "../plugins/types";
+import { prefs } from "../prefs.svelte";
 import { untrack } from "svelte";
 import { announce } from "../windows/channel";
+import { isOn } from "./calendar";
 import { noteKeys } from "./noteKeys.svelte";
 import type { SampleSet } from "./samples";
 import { normalizeTag, renameTagIn, renameTypeIn } from "./parse";
@@ -143,9 +146,11 @@ class NotesStore {
    * What new notes started as, so one left untouched can be discarded like a blank one, and the
    * tag or type they were made in, to start them again in another language.
    */
-  #templates = new Map<string, { body: string; made: { tag?: string; type?: string } }>();
+  #templates = new Map<string, { body: string; made: Made }>();
   /** Notes moved to the trash since the last edit, most recent last, for undo; those trashed together share a batch. */
   #trashed: { id: string; pinned: boolean; selected: boolean; batch: number }[] = [];
+  /** A note's text before it was last changed from outside its editor (moved on the Calendar), for undo. */
+  #edited: { id: string; body: string } | null = null;
   #batch = 0;
   /** Where a ⇧-click range starts from: the note last ⌘-clicked, or the open one. */
   #anchor: string | null = null;
@@ -207,24 +212,27 @@ class NotesStore {
         if (!note.trashed) return false;
       } else {
         if (note.trashed) return false;
+        if (f.kind === "inbox" && !note.inbox) return false;
         if (f.kind === "todo" && !meta.hasOpenTodos) return false;
         if (f.kind === "untagged" && meta.tags.length) return false;
         if (f.kind === "tag" && !matchesTag(meta.tags, f.tag)) return false;
         if (f.kind === "type" && meta.type !== f.type) return false;
+        if (f.kind === "calendar" && !isOn(note, meta, f.day, prefs.calendarEdited)) return false;
       }
       return terms.every((t) => meta.searchText.includes(t));
     });
   });
 
   counts = $derived.by(() => {
-    let all = 0, todo = 0, untagged = 0, trash = 0;
+    let inbox = 0, all = 0, todo = 0, untagged = 0, trash = 0;
     for (const { note, meta } of this.entries) {
       if (note.trashed) { trash++; continue; }
       all++;
+      if (note.inbox) inbox++;
       if (meta.hasOpenTodos) todo++;
       if (!meta.tags.length) untagged++;
     }
-    return { all, todo, untagged, trash };
+    return { inbox, all, todo, untagged, trash };
   });
 
   /**
@@ -239,6 +247,17 @@ class NotesStore {
     }
     return [...counts].sort(([a], [b]) => a.localeCompare(b)).map(([t, n]) => `${t}\t${n}`).join("\n");
   });
+
+  /** Every tag and how many notes have it, nested ones by their whole path (`work/meetings`), in order. */
+  tags = $derived(
+    this.#tagSignature
+      .split("\n")
+      .filter(Boolean)
+      .map((line) => {
+        const [path, count] = line.split("\t");
+        return { path, count: Number(count) };
+      }),
+  );
 
   tagTree = $derived.by(() => {
     const root: TagNode[] = [];
@@ -358,12 +377,16 @@ class NotesStore {
     }
   }
 
-  /** Makes a new note and opens it, ready to type its title; `body` is what it starts as, if not the usual. */
-  create(body?: string): string {
+  /**
+   * Makes a new note and opens it, ready to type its title; `body` is what it starts as, if not the
+   * usual, and `made` what it's made as, if not what the list shown gives it. Not `open`, it's made
+   * where it is, for its title to be typed there (an event on the Calendar).
+   */
+  create(body?: string, made?: Made, { open = true } = {}): string {
     const now = Date.now();
     const f = this.filter;
-    // Made under a tag it has the tag; made under a type, it's one of that type.
-    const made = f.kind === "tag" ? { tag: f.tag } : f.kind === "type" ? { type: f.type } : {};
+    // Made under a tag it has the tag; made under a type, it's one of that type; made on a day, it's dated that day.
+    made ??= f.kind === "tag" ? { tag: f.tag } : f.kind === "type" ? { type: f.type } : f.kind === "calendar" ? { properties: { date: f.day } } : {};
     const note: Note = {
       id: crypto.randomUUID(),
       body: body ?? plugins.language().newNote(made),
@@ -371,13 +394,16 @@ class NotesStore {
       updatedAt: now,
       pinned: false,
       trashed: false,
+      ...(prefs.newNotes === "inbox" && { inbox: true }),
     };
     this.#templates.set(note.id, { body: note.body, made });
     if (this.filter.kind === "trash") this.filter = { kind: "all" };
     this.query = "";
     this.entries = [entryOf(note), ...this.entries];
-    this.pendingFocus = note.id;
-    this.select(note.id);
+    if (open) {
+      this.pendingFocus = note.id;
+      this.select(note.id);
+    }
     this.#notify();
     return note.id;
   }
@@ -385,7 +411,28 @@ class NotesStore {
   update(id: string, body: string) {
     // Typing makes the editor's own undo the one ⌘Z should reach.
     this.#trashed = [];
+    this.#edited = null;
     this.#patch(id, { body, updatedAt: Date.now() });
+  }
+
+  /** Changes a note's text from outside its editor, as moving it on the Calendar does; ⌘Z puts it back. */
+  edit(id: string, body: string) {
+    const entry = this.get(id);
+    if (!entry || entry.note.body === body) return;
+    this.#trashed = [];
+    this.#edited = { id, body: entry.note.body };
+    this.#patch(id, { body, updatedAt: Date.now() });
+    this.#changedOutside([id]);
+  }
+
+  /** Puts back the note `edit` last changed, if nothing was done since. */
+  undoEdit() {
+    const edited = this.#edited;
+    this.#edited = null;
+    if (!edited || !this.get(edited.id)) return false;
+    this.#patch(edited.id, { body: edited.body, updatedAt: Date.now() });
+    this.#changedOutside([edited.id]);
+    return true;
   }
 
   /** The picked notes still in the list, in its order. */
@@ -466,6 +513,7 @@ class NotesStore {
   /** Moves these notes to the trash together; ⌘Z brings them all back. */
   trashMany(ids: string[]) {
     const batch = ++this.#batch;
+    this.#edited = null;
     const trashing = ids.map((id) => this.get(id)?.note).filter((note): note is Note => !!note && !note.trashed);
     for (const { id, pinned } of trashing) this.#trashed.push({ id, pinned, selected: this.selectedId === id, batch });
     this.#unpick(trashing.map((note) => note.id));
@@ -548,6 +596,10 @@ class NotesStore {
     this.#patch(id, { icon: icon ?? undefined });
   }
 
+  setColor(id: string, color: PaletteColor | null) {
+    this.#patch(id, { color: color ?? undefined });
+  }
+
   /**
    * Writes the note in another language, by its id. Its text stays as it is, except a new note's,
    * which starts again the way that language starts one (in LaTeX, without Markdown's "# ", and a
@@ -571,6 +623,11 @@ class NotesStore {
 
   trash(id: string) {
     this.trashMany([id]);
+  }
+
+  /** Puts these notes in the Inbox, or takes them out of it (filed). */
+  setInbox(ids: string[], inbox: boolean) {
+    this.#patch(ids.filter((id) => !!this.get(id)?.note.inbox !== inbox), { inbox });
   }
 
   /** Brings back the notes most recently moved to the trash (together), if nothing was edited since. */
@@ -689,6 +746,8 @@ class NotesStore {
     for (const note of notes) {
       if (ids.has(note.id)) note.id = crypto.randomUUID();
       ids.add(note.id);
+      // New here, so to be sorted, as a note made here is.
+      if (prefs.newNotes === "inbox") note.inbox = true;
       noteKeys.notice(note);
     }
     await this.insert(...notes);

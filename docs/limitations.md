@@ -213,6 +213,13 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - A picture is read in whatever formats the system can show (JPEG, PNG, WebP, GIF; HEIC in the Mac app and Safari); an animated one by its first frame.
 - The colors are worked out, not chosen by taste: a picture of many equal colors can give an accent that isn't the one you'd pick. Each color can be changed after.
 
+## Changing colors by right-clicking
+
+- It works in the main window only, not in a floating note or Settings in a window of its own (which show the changes, though).
+- It's made for a mouse or trackpad, or a keyboard's menu key: on a phone or tablet it may not open.
+- A color is matched to the theme's by its value: where two of the theme's colors are the same (code's background and a field's), lines goes by what the part is, and can name the other. With Monochrome or Invert on, colors are picked as the theme has them and shown through those.
+- A part drawn in a gradient, a picture or a mix of colors (a callout's tint, a scroll bar) isn't matched; the color it's made from can be changed in Settings → Theme's editor once saved.
+
 ## Styles
 
 - A style can't be made in Settings yet, only added by a plugin; a theme of your own can be used with any style.
@@ -220,6 +227,12 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Classic's scroll bars with arrow buttons show where the system draws scroll bars that stay (Windows, Linux, or macOS set to show them always); overlay scroll bars stay the system's.
 - Printed pages and PDFs are black on white in every style, but in a style's own font while it's the first font (Settings → Typography).
 - Not tried in the Mac app yet, nor on phones.
+
+## Fonts
+
+- IBM Plex Sans, Fira Sans and Agave cover Latin, Greek, Cyrillic and Vietnamese; other writing shows in the fallback font. They come in regular and bold (Plex and Fira with their italics); weights between are the nearest of those, and Agave's italic is its regular slanted.
+- Code is in the code font whichever is chosen; Agave isn't one to choose for code yet.
+- Not tried in the Mac app yet.
 
 ## Symbols
 
@@ -259,10 +272,47 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - Types have no schema: a new note made under a type starts with only its `type`, not the keys other notes of that type use.
 - Only Markdown notes have properties and mentions; in a LaTeX note `@` and `---` are text.
 - A type table shows values; it can't edit them (open the note), filter its rows, or keep a sort. Its values are text, so sorting is by text (numbers within it compare as numbers: 9 before 10). It shows on screen only: in an export or another app it's the `@type.…` line.
-- The icon chosen for a type is kept on the device, like a tag's, so other devices show the default.
 - A locked note can be mentioned by its title, but its properties can't be read, even while it's open.
 - A synced note's file has two front matter blocks: lines' own (id, dates…) and then the note's properties, as part of its text. Apps that read front matter see the first.
 - A synced note's file is read as UTF-8 (or UTF-16, with its byte order mark). One another app saved in another encoding, such as Latin-1, shows its other characters as �, and keeps them so once the note is edited here.
+
+## Calendar
+
+- The week and day show beside the note list, so not on a phone, where the Calendar is the month and the day's notes. A narrow window makes the week's columns cramped.
+- Times are read 24-hour (`14:00`), as the clock reads them; a time zone after one is read past, so `T14:00Z` is 2 PM here. Something spanning several days, with times or not, shows under All day rather than across the hours.
+- Making an event at an hour or of whole days, and moving or stretching one, is by pointer: a mouse, trackpad or pen, not a finger, which scrolls the hours. By keyboard, a note is made for a day and its times typed in its properties. Only the last move can be undone (⌘Z), and only until something else is done.
+- An event made on the Calendar and left without a title is gone, as an empty new note is.
+- The list beside the week shows the chosen day's notes in the list's usual order, with when they were edited, not their times.
+- Only dates written `2026-11-30` (perhaps with a time after) count, in a `date`, `due`, `start` or `end` property; which properties count can't be chosen yet, and dates in a note's text or on todos aren't read.
+- Only Markdown notes have properties, so LaTeX notes, spreadsheets and other formats show on a day only with Notes made or edited that day on (Settings → General). A note made on a day in one of those formats isn't dated.
+- "Edited that day" is the day a note was last changed: lines doesn't keep each day a note was changed.
+- Repeating is for the whole series: one time can't be moved, changed or skipped on its own, and a repeating event is dragged to another time, not another day (change its dates for that). A `repeat` is written in English words (`every monday`), whatever language lines is in, and RFC 5545 rules (`FREQ=WEEKLY;BYDAY=MO`) aren't read yet. A monthly one on the 29th to 31st comes on a shorter month's last day.
+- Colors are the theme's eight (a note's own, or its type's or tag's), not any color. A day in the month shows a dot for each of three colors at most, and on the chosen day, filled in the accent, they're all the accent's text color.
+- A colored tag's name is in the text's color on a tint of its color: in Solarized's light colors that's a little under 4.5:1 (4.3:1 at least), as its text is under 5:1 on its own; Increased contrast makes it more.
+- Your calendars' events (EventKit, `.ics` subscriptions) and a feed of your dates for other calendar apps aren't there yet ([#77](https://github.com/overtio/lines/issues/77)).
+
+## Panes
+
+- The panes the notes are split into last while lines is open; they aren't kept after it's closed. The open note's pane stays where it is (its toolbar with it): others are moved around it, or swapped into it.
+- A note or pane is dragged with a mouse, trackpad or pen, not a finger; by keyboard, Open to the Side, Open Below and Swap do the same.
+
+## Inbox
+
+- Notes leave the Inbox only by Mark as Filed (or Move to Inbox puts them back); tagging one or giving it a type doesn't file it. Notebooks to file them into are planned ([#75](https://github.com/overtio/lines/issues/75)).
+- The Inbox lists notes in the list's usual order, newest first, not oldest first as inboxes are often worked through.
+- A trashed note in the Inbox is still in it when restored.
+
+## The sidebar's layout
+
+- The order of the sidebar's rows, what's hidden and which sections are folded are kept on each device, not synced (tags' and types' icons and colors are synced).
+- Rows are dragged within their own list: places between the sections of places, but types and tags stay in Types and Tags; a tag can't be dragged into another to nest it (rename it for that).
+- A section that's only a gap can't be dragged among the others; name it to move it, then take the name off.
+- Notes can't be hidden, so there's always a way back to every note.
+
+## Dragging notes out
+
+- One note at a time: the one dragged, not every picked note. Its images and files don't go with it.
+- In the Mac app and in Chrome and Edge it's a file; in Safari and Firefox, and the Linux app, it's the note's text (use Download in the share menu for a file).
 
 ## Paper
 
@@ -354,7 +404,7 @@ What isn't done yet is in [secrets.md](secrets.md#not-yet).
 - A callout's border and tint stay as subtle in High Contrast as elsewhere (the border is its color at 24%); the strong borders are the panes', cards' and fields'.
 - The forced-colors rules (Windows' contrast themes) are written to the CSS spec and haven't been tried on Windows yet, nor with Chrome's forced-colors emulation.
 - Not tried yet with VoiceOver on iPhone, TalkBack or NVDA; only with Chrome's audits and the keyboard.
-- Icon names (in the icon picker's search and tooltips) are English in every language.
+- Icon names, and the words the icon picker's search finds them by ("money", "finance"), are English in every language.
 - Errors from the desktop app's own code (folders, the window) are English, inside a translated sentence.
 - The welcome note, the feature tour and the examples are English. A note's text isn't translated, and the date `/date` writes is in the app's language.
 - Changing the language starts lines again.
@@ -415,4 +465,3 @@ What isn't done yet is in [secrets.md](secrets.md#not-yet).
 - [ ] Remove attachments from sync storage once no note uses them
 - [ ] Backlinks, and updating mentions when a note is renamed
 - [ ] Types with a template: the keys a new note of the type starts with
-- [ ] Sync the icons chosen for tags and types

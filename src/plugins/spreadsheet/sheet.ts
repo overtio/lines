@@ -72,7 +72,7 @@ export const blockNameText = (text: string) => text.replace(/[/'"![\]]/g, "").tr
 /** Numbers, money and dates, which line up on the right. */
 const NUMBER = /^(?:[-+]?[$€£¥]?\s*[\d.,]+%?|\d{4}-\d{2}-\d{2})$/;
 
-/** How cells show what's in them, as Settings → Editor → Spreadsheets says. */
+/** How cells show what's in them, as Settings → Plugins → Spreadsheets says. */
 export const sheetLook = (): CellLook => ({
   dates: prefs.sheetDates,
   money: prefs.sheetMoney,

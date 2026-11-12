@@ -6,7 +6,7 @@ import { arrowsInto, drawnBlock, drawnBlocks, isEditing } from "./util";
 
 /*
  * Page breaks (notes/pageBreak.ts), where a printed note or its PDF goes on to a new page. Over a
- * backdrop (Settings → Paper) they split the note's page in two, as Craft's do; otherwise they're a
+ * backdrop (Settings → Plugins → Paper) they split the note's page in two, as Craft's do; otherwise they're a
  * dashed line, named.
  */
 

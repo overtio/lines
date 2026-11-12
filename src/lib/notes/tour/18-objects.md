@@ -11,7 +11,11 @@ known for: The first computer program
 # Ada Lovelace
 ```
 
-The next note, @[Ada Lovelace], is one. Its type puts it under **Types → Person** in the sidebar, and right-click a type there to give it an icon. A new note made under a type starts as one of that type.
+The next note, @[Ada Lovelace], is one. Its type puts it under **Types → Person** in the sidebar, and right-click a type there to give it an icon and a color. A new note made under a type starts as one of that type.
+
+## On the Calendar
+
+A `date` or `due` property puts a note on that day in the **Calendar** in the sidebar, and a `start` and `end` on every day between. Write the date as `2026-11-30`, with a time after it if you like (`2026-11-30 14:00`), and the week and day there show the note at that time. Drag down the hours there to make an event, or across All day for whole days, or drag one to move it. Choose a day to list its notes, or press ↵ on a day for a note dated that day. Events take their type's or tag's color, or one of their own: right-click a note in the list → Icon and Color. A `repeat` property makes one come round again (`repeat: every monday and thursday`), or right-click it there → Repeat.
 
 ## Mentions
 

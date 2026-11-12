@@ -1,7 +1,11 @@
 import { EditorView } from "@codemirror/view";
 import { notes } from "../lib/notes/store.svelte";
+import { panes } from "../lib/panes.svelte";
 import { plugins } from "../lib/plugins/registry.svelte";
 import { prefs } from "../lib/prefs.svelte";
+import { customThemes } from "../lib/themes/custom.svelte";
+import { themeDrafts } from "../lib/themes/drafts.svelte";
+import { presets, writePresetFile } from "../lib/themes/presets.svelte";
 
 /*
  * What the browser tests (tests/browser/) use inside the page, in builds made with `--mode test`
@@ -9,8 +13,9 @@ import { prefs } from "../lib/prefs.svelte";
  * format with any text.
  */
 
+/** The open note's editor, in its pane wherever the others are (Panes.svelte). */
 const editor = () => {
-  const dom = document.querySelector<HTMLElement>(".editor-pane .cm-editor");
+  const dom = document.querySelector<HTMLElement>('.editor-pane [data-pane-content="main"] .cm-editor');
   return dom ? EditorView.findFromDOM(dom) : null;
 };
 
@@ -25,8 +30,13 @@ async function until(ready: () => unknown, timeout = 10_000) {
 
 const testing = {
   notes,
+  panes,
   plugins,
   prefs,
+  customThemes,
+  themeDrafts,
+  presets,
+  writePresetFile,
   editor,
   until,
   /** The open note's text. */

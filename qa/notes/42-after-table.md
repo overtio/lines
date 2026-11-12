@@ -411,7 +411,17 @@ And another.
 | longer cell text | `code` | 22 |
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Table, then Mention
+#### 33. Table, then Score (Settings → Little Touches)
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Table, then Mention
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -419,7 +429,7 @@ And another.
 | longer cell text | `code` | 22 |
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Table, then Wiki link
+#### 35. Table, then Wiki link
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -427,7 +437,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 | longer cell text | `code` | 22 |
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Table, then Symbols
+#### 36. Table, then Symbols
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -435,7 +445,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 | longer cell text | `code` | 22 |
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Table, then GitHub links
+#### 37. Table, then GitHub links
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -443,7 +453,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 | longer cell text | `code` | 22 |
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Table, then arXiv links
+#### 38. Table, then arXiv links
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -451,7 +461,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Table, then Image
+#### 39. Table, then Image
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -459,7 +469,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 ![A sample picture](attachment:photo.png)
 
-#### 39. Table, then Drawing
+#### 40. Table, then Drawing
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -467,7 +477,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Table, then File
+#### 41. Table, then File
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -475,7 +485,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Table, then Folder and file links
+#### 42. Table, then Folder and file links
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -483,7 +493,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Table, then Attached 3D model (STL)
+#### 43. Table, then Attached 3D model (STL)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -491,7 +501,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 | longer cell text | `code` | 22 |
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Table, then Terminal recording (.cast file)
+#### 44. Table, then Terminal recording (.cast file)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -499,7 +509,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 | longer cell text | `code` | 22 |
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Table, then Audio
+#### 45. Table, then Audio
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -507,7 +517,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 | longer cell text | `code` | 22 |
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Table, then Video
+#### 46. Table, then Video
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -515,7 +525,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 | longer cell text | `code` | 22 |
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Table, then Missing file
+#### 47. Table, then Missing file
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -523,7 +533,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 | longer cell text | `code` | 22 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Table, then Card
+#### 48. Table, then Card
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -533,7 +543,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 Text in a card.
 :::
 
-#### 48. Table, then Callout (info)
+#### 49. Table, then Callout (info)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -543,7 +553,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 49. Table, then Callout (warning, chosen icon)
+#### 50. Table, then Callout (warning, chosen icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -553,7 +563,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Table, then Callout (decision, no icon)
+#### 51. Table, then Callout (decision, no icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |

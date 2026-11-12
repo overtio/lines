@@ -347,91 +347,99 @@ And another.
 **Wi-Fi password:** correct-horse-battery
 :::
 
-#### 33. Mention in a card
+#### 33. Score (Settings → Little Touches) in a card
+
+::: card
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+:::
+
+#### 34. Mention in a card
 
 ::: card
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 
-#### 34. Wiki link in a card
+#### 35. Wiki link in a card
 
 ::: card
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 
-#### 35. Symbols in a card
+#### 36. Symbols in a card
 
 ::: card
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::
 
-#### 36. GitHub links in a card
+#### 37. GitHub links in a card
 
 ::: card
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::
 
-#### 37. arXiv links in a card
+#### 38. arXiv links in a card
 
 ::: card
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::
 
-#### 38. Image in a card
+#### 39. Image in a card
 
 ::: card
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 39. Drawing in a card
+#### 40. Drawing in a card
 
 ::: card
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 40. File in a card
+#### 41. File in a card
 
 ::: card
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 41. Folder and file links in a card
+#### 42. Folder and file links in a card
 
 ::: card
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 :::
 
-#### 42. Attached 3D model (STL) in a card
+#### 43. Attached 3D model (STL) in a card
 
 ::: card
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 43. Terminal recording (.cast file) in a card
+#### 44. Terminal recording (.cast file) in a card
 
 ::: card
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 44. Audio in a card
+#### 45. Audio in a card
 
 ::: card
 [Chime.mp3](attachment:chime.mp3)
 :::
 
-#### 45. Video in a card
+#### 46. Video in a card
 
 ::: card
 [Sky.mp4](attachment:sky.mp4)
 :::
 
-#### 46. Missing file in a card
+#### 47. Missing file in a card
 
 ::: card
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 47. Card in a card
+#### 48. Card in a card
 
 ::: card
 ::: card
@@ -439,7 +447,7 @@ Text in a card.
 :::
 :::
 
-#### 48. Callout (info) in a card
+#### 49. Callout (info) in a card
 
 ::: card
 :::i
@@ -447,7 +455,7 @@ Text in an info callout.
 :::
 :::
 
-#### 49. Callout (warning, chosen icon) in a card
+#### 50. Callout (warning, chosen icon) in a card
 
 ::: card
 :::! icon=flag
@@ -455,7 +463,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 50. Callout (decision, no icon) in a card
+#### 51. Callout (decision, no icon) in a card
 
 ::: card
 :::^ icon=none

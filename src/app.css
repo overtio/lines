@@ -19,7 +19,7 @@
   --radius-*: initial;
   --shadow-*: initial;
 
-  /* Scaled by --radius-scale, which a style (Settings → Theme → Style) sets to square them off. */
+  /* Scaled by --radius-scale, which a style (a preset's: Settings → Presets) sets to square them off. */
   --radius-sm: calc(6px * var(--radius-scale));
   --radius-md: calc(8px * var(--radius-scale));
   --radius-lg: calc(10px * var(--radius-scale));
@@ -154,7 +154,9 @@
   --code-bg: color-mix(in srgb, var(--ink) 5%, transparent);
   --accent-soft: color-mix(in srgb, var(--accent) 35%, transparent);
   --selection: color-mix(in srgb, var(--accent) 18%, transparent);
-  --tag-bg: color-mix(in srgb, var(--accent) 10%, transparent);
+  /* How much of a tag's color its pill is tinted with: the accent's, or one chosen (editor/tagColors.ts). */
+  --tag-tint: 10%;
+  --tag-bg: color-mix(in srgb, var(--accent) var(--tag-tint), transparent);
   --scrollbar: color-mix(in srgb, var(--ink) 20%, transparent);
   --card-bg: color-mix(in srgb, var(--ink) 2.5%, var(--bg-elevated));
   --card-border: color-mix(in srgb, var(--ink) 9%, transparent);
@@ -170,6 +172,15 @@
   --callout-error: var(--danger);
   --callout-decision: #12866f;
   --callout-tint: 7%;
+  /* The colors a tag, a type, an event or a mark in the margin can be given, besides the accent
+     (palette.ts): at least 3:1 against every background, as icons need. A theme sets its own. */
+  --palette-red: var(--danger);
+  --palette-orange: #c46800;
+  --palette-yellow: #a17800;
+  --palette-green: var(--success);
+  --palette-blue: var(--callout-info);
+  --palette-purple: var(--callout-question);
+  --palette-gray: var(--text-muted);
   /* Text on an accent-colored button: white on light themes, the background on dark ones. */
   --on-accent: #ffffff;
   /* Text on the danger, success and pin colors (swipe actions, Delete buttons). The pin's orange is
@@ -204,7 +215,8 @@
   --code-bg: color-mix(in srgb, var(--ink) 6%, transparent);
   --accent-soft: color-mix(in srgb, var(--accent) 40%, transparent);
   --selection: color-mix(in srgb, var(--accent) 25%, transparent);
-  --tag-bg: color-mix(in srgb, var(--accent) 14%, transparent);
+  --tag-tint: 14%;
+  --tag-bg: color-mix(in srgb, var(--accent) var(--tag-tint), transparent);
   --scrollbar: color-mix(in srgb, var(--ink) 22%, transparent);
   --card-bg: color-mix(in srgb, var(--ink) 4%, var(--bg-elevated));
   --card-border: color-mix(in srgb, var(--ink) 8%, transparent);
@@ -217,6 +229,8 @@
   --callout-warning: #f5a524;
   --callout-decision: #3cc4a4;
   --callout-tint: 11%;
+  --palette-orange: #f5a524;
+  --palette-yellow: #f5c518;
   --on-accent: var(--bg);
   /* Dark themes' status colors are light, so dark text reads on them (white was below 3:1). Near
      black rather than the background, which in some themes (Nord) is too grey for 4.5:1. */

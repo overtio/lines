@@ -15,6 +15,7 @@ import { showFormulas } from "../sheets/formulas";
 import { plugins } from "../plugins/registry.svelte";
 import { symbolsChanged } from "./symbols";
 import { withSymbols } from "../notes/symbols";
+import { normalizeTag } from "../notes/parse";
 import { prefs } from "../prefs.svelte";
 import { t } from "../i18n/index.svelte";
 import { addActions, fencedBlock, removeActions } from "./rendered";
@@ -360,7 +361,7 @@ export const tablePasting = (write: (rows: string[][]) => string, keep: (state: 
 // Rendering
 
 /** A cell's formatted text: plain strings, math, or styled spans around more of the same. */
-type Inline = string | { tex: string; display: boolean } | { cls: string; href?: string; children: Inline[] };
+type Inline = string | { tex: string; display: boolean } | { cls: string; href?: string; tag?: string; children: Inline[] };
 
 const STYLES: Record<string, string> = {
   Emphasis: "cm-lp-em",
@@ -387,6 +388,7 @@ function inlines(doc: Text, parent: SyntaxNode, from: number, to: number): Inlin
       const marks = c.getChildren("MathMark");
       if (marks.length === 2) out.push({ tex: doc.sliceString(marks[0].to, marks[1].from), display: marks[0].to - marks[0].from === 2 });
     }
+    else if (c.name === "Tag") out.push({ cls: STYLES.Tag, tag: normalizeTag(doc.sliceString(c.from + 1, c.to)) ?? undefined, children: inlines(doc, c, c.from, c.to) });
     else if (c.name in STYLES) out.push({ cls: STYLES[c.name], children: inlines(doc, c, c.from, c.to) });
     else if (c.name === "Link" || c.name === "Image") {
       const url = c.getChild("URL");
@@ -430,6 +432,8 @@ function renderInline(parent: HTMLElement, content: Inline[], view: EditorView, 
     const span = document.createElement("span");
     span.className = item.cls;
     if (item.href) span.dataset.href = item.href;
+    // Named, for its color (tagColors.ts).
+    if (item.tag) span.dataset.tag = item.tag;
     renderInline(span, item.children, view, code || item.cls === "cm-lp-code");
     parent.append(span);
   }

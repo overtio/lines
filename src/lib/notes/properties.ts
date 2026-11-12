@@ -156,3 +156,31 @@ export function readTypeRef(text: string): TypeRef | null {
 export function typeRefOf(type: string, columns: string[] | null) {
   return `@type.${type.replace(/\s+/g, "_")}${columns ? `(${columns.join(", ")})` : ""}`;
 }
+
+/**
+ * The note with its properties changed: each key set to its value (as written, on the line it was
+ * on, keeping how its key was written), or taken out where the value is null. New ones go at the
+ * end of the properties, which are made if the note has none.
+ */
+export function setProperties(body: string, changes: Record<string, string | null>): string {
+  const front = frontMatter(body);
+  const lines = body.split("\n");
+  const added: string[] = [];
+  const found = new Map<string, Property>();
+  for (const property of front?.properties ?? []) if (!found.has(keyOf(property.key))) found.set(keyOf(property.key), property);
+  const edits: { property: Property; value: string | null }[] = [];
+  for (const [key, value] of Object.entries(changes)) {
+    const property = found.get(keyOf(key));
+    if (property) edits.push({ property, value });
+    else if (value !== null) added.push(`${key}: ${value}`);
+  }
+  // From the bottom up, so the lines above keep their numbers.
+  for (const { property, value } of edits.sort((a, b) => b.property.line - a.property.line)) {
+    lines.splice(property.line - 1, property.end - property.line + 1, ...(value === null ? [] : [`${property.key}: ${value}`]));
+  }
+  if (!added.length) return lines.join("\n");
+  if (!front) return ["---", ...added, "---", ...lines].join("\n");
+  const removed = edits.reduce((sum, { property, value }) => sum + (property.end - property.line + 1) - (value === null ? 0 : 1), 0);
+  lines.splice(front.lines - 1 - removed, 0, ...added);
+  return lines.join("\n");
+}

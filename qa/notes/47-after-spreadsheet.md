@@ -475,7 +475,19 @@ Total, =SUM(B2:B3)
 ```
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Spreadsheet (csv block), then Mention
+#### 33. Spreadsheet (csv block), then Score (Settings → Little Touches)
+
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Spreadsheet (csv block), then Mention
 
 ```csv
 Item, Cost
@@ -485,7 +497,7 @@ Total, =SUM(B2:B3)
 ```
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Spreadsheet (csv block), then Wiki link
+#### 35. Spreadsheet (csv block), then Wiki link
 
 ```csv
 Item, Cost
@@ -495,7 +507,7 @@ Total, =SUM(B2:B3)
 ```
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Spreadsheet (csv block), then Symbols
+#### 36. Spreadsheet (csv block), then Symbols
 
 ```csv
 Item, Cost
@@ -505,7 +517,7 @@ Total, =SUM(B2:B3)
 ```
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Spreadsheet (csv block), then GitHub links
+#### 37. Spreadsheet (csv block), then GitHub links
 
 ```csv
 Item, Cost
@@ -515,7 +527,7 @@ Total, =SUM(B2:B3)
 ```
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Spreadsheet (csv block), then arXiv links
+#### 38. Spreadsheet (csv block), then arXiv links
 
 ```csv
 Item, Cost
@@ -525,7 +537,7 @@ Total, =SUM(B2:B3)
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Spreadsheet (csv block), then Image
+#### 39. Spreadsheet (csv block), then Image
 
 ```csv
 Item, Cost
@@ -535,7 +547,7 @@ Total, =SUM(B2:B3)
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 39. Spreadsheet (csv block), then Drawing
+#### 40. Spreadsheet (csv block), then Drawing
 
 ```csv
 Item, Cost
@@ -545,7 +557,7 @@ Total, =SUM(B2:B3)
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Spreadsheet (csv block), then File
+#### 41. Spreadsheet (csv block), then File
 
 ```csv
 Item, Cost
@@ -555,7 +567,7 @@ Total, =SUM(B2:B3)
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Spreadsheet (csv block), then Folder and file links
+#### 42. Spreadsheet (csv block), then Folder and file links
 
 ```csv
 Item, Cost
@@ -565,7 +577,7 @@ Total, =SUM(B2:B3)
 ```
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Spreadsheet (csv block), then Attached 3D model (STL)
+#### 43. Spreadsheet (csv block), then Attached 3D model (STL)
 
 ```csv
 Item, Cost
@@ -575,7 +587,7 @@ Total, =SUM(B2:B3)
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Spreadsheet (csv block), then Terminal recording (.cast file)
+#### 44. Spreadsheet (csv block), then Terminal recording (.cast file)
 
 ```csv
 Item, Cost
@@ -585,7 +597,7 @@ Total, =SUM(B2:B3)
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Spreadsheet (csv block), then Audio
+#### 45. Spreadsheet (csv block), then Audio
 
 ```csv
 Item, Cost
@@ -595,7 +607,7 @@ Total, =SUM(B2:B3)
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Spreadsheet (csv block), then Video
+#### 46. Spreadsheet (csv block), then Video
 
 ```csv
 Item, Cost
@@ -605,7 +617,7 @@ Total, =SUM(B2:B3)
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Spreadsheet (csv block), then Missing file
+#### 47. Spreadsheet (csv block), then Missing file
 
 ```csv
 Item, Cost
@@ -615,7 +627,7 @@ Total, =SUM(B2:B3)
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Spreadsheet (csv block), then Card
+#### 48. Spreadsheet (csv block), then Card
 
 ```csv
 Item, Cost
@@ -627,7 +639,7 @@ Total, =SUM(B2:B3)
 Text in a card.
 :::
 
-#### 48. Spreadsheet (csv block), then Callout (info)
+#### 49. Spreadsheet (csv block), then Callout (info)
 
 ```csv
 Item, Cost
@@ -639,7 +651,7 @@ Total, =SUM(B2:B3)
 Text in an info callout.
 :::
 
-#### 49. Spreadsheet (csv block), then Callout (warning, chosen icon)
+#### 50. Spreadsheet (csv block), then Callout (warning, chosen icon)
 
 ```csv
 Item, Cost
@@ -651,7 +663,7 @@ Total, =SUM(B2:B3)
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Spreadsheet (csv block), then Callout (decision, no icon)
+#### 51. Spreadsheet (csv block), then Callout (decision, no icon)
 
 ```csv
 Item, Cost

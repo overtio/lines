@@ -111,12 +111,31 @@ async function read(file: { name: string; data: Uint8Array }) {
   return [sheetBody(title, fileCells(file))];
 }
 
+/** Spreadsheets in notes: ```csv blocks, a grid of cells and formulas, and /spreadsheet to start one. */
 export const spreadsheet = (): Plugin => ({
   id: "spreadsheet",
   name: t("plugins.spreadsheet"),
   description: t("plugins.spreadsheet.description"),
   icon: "sheet",
   enabledByDefault: true,
+  settings: () => import("./SpreadsheetSettings.svelte"),
+  contributes: {
+    renderers: [sheetBlock()],
+    markdown: [sheetCommand()],
+  },
+});
+
+/**
+ * Notes that are a spreadsheet, kept as CSV, which open CSV files and Excel workbooks. Off at
+ * first; on for anyone who has one (registry.svelte.ts `keepLanguagesInUse`), so none opens as text.
+ */
+export const spreadsheetNotes = (): Plugin => ({
+  id: "spreadsheet-notes",
+  name: t("plugins.spreadsheetNotes"),
+  description: t("plugins.spreadsheetNotes.description"),
+  icon: "sheet",
+  enabledByDefault: false,
+  requires: ["spreadsheet"],
   contributes: {
     languages: [
       {
@@ -144,7 +163,5 @@ export const spreadsheet = (): Plugin => ({
         read,
       },
     ],
-    renderers: [sheetBlock()],
-    markdown: [sheetCommand()],
   },
 });

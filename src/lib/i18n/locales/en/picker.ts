@@ -13,12 +13,27 @@ export default {
   "picker.groupBasics": "Basics",
   "picker.groupSigns": "Signs",
   "picker.groupWork": "Work & study",
+  "picker.groupMoney": "Money & shopping",
   "picker.groupTech": "Tech",
   "picker.groupHome": "Home & life",
   "picker.groupPeople": "People & health",
   "picker.groupCreative": "Creative",
   "picker.groupTravel": "Travel & places",
   "picker.groupNature": "Nature",
+  // The colors a tag, a type or an event can be given, in the icon picker (and a theme's, in Settings).
+  "picker.colors": "Colors",
+  // No color of its own: a tag's or type's icon as the sidebar shows it, an event in the accent.
+  "picker.noColor": "No Color",
+  // A nested tag with no color of its own has the one of the tag it's in, {name} ("#work").
+  "picker.sameAs": "Same as {name}",
+  "picker.color.accent": "Accent",
+  "picker.color.red": "Red",
+  "picker.color.orange": "Orange",
+  "picker.color.yellow": "Yellow",
+  "picker.color.green": "Green",
+  "picker.color.blue": "Blue",
+  "picker.color.purple": "Purple",
+  "picker.color.gray": "Gray",
   // Note info, under the toolbar's info button. "Written in" is followed by Markdown or LaTeX.
   "picker.writtenIn": "Written in",
   // A note whose format's plugin is off, or isn't on this device, shows as plain text.

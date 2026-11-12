@@ -39,6 +39,14 @@ export function deletePicked() {
   speak(t("list.didDeleteMany", { count: ids.length }));
 }
 
+/** Takes them all out of the Inbox (filed), or puts them in it if none is there. */
+export function inboxPicked() {
+  const entries = notes.pickedEntries;
+  const file = entries.some((entry) => entry.note.inbox);
+  notes.setInbox(pickedIds(), !file);
+  speak(t(file ? "list.didFileMany" : "list.didInboxMany", { count: entries.length }));
+}
+
 /** Opens the box to add a tag to them, at a point (or under a button, with `align: "end"`). */
 export function tagPicked(x: number, y: number, align?: "start" | "end") {
   ui.tagPrompt = { ids: pickedIds(), x, y, align };

@@ -14,8 +14,8 @@ const root = document.documentElement;
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
 function showCaret() {
-  const { caretShape, caretColor, caretCustomColor, caretBlink, caretMotion, caretEffect } = prefs;
-  Object.assign(root.dataset, { caretShape, caretBlink, caretMotion, caretEffect });
+  const { caretShape, caretWidth, caretColor, caretCustomColor, caretBlink, caretMotion, caretEffect } = prefs;
+  Object.assign(root.dataset, { caretShape, caretWidth, caretBlink, caretMotion, caretEffect });
   root.style.setProperty("--caret-color", caretColor === "custom" ? ownColor(caretCustomColor, "var(--accent)") : caretColor === "text" ? "var(--text)" : "var(--accent)");
 }
 

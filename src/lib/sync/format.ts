@@ -1,4 +1,5 @@
 import { ICONS, type IconName } from "../icons/icons";
+import { isPaletteColor } from "../palette";
 import { isWrappedKey } from "../notes/noteKeys.svelte";
 import { DEFAULT_LANGUAGE } from "../plugins/registry.svelte";
 import type { Note, NoteLock } from "../notes/types";
@@ -14,11 +15,12 @@ import type { Note, NoteLock } from "../notes/types";
  *   pinned: false
  *   trashed: false
  *   icon: rocket
+ *   color: green
  *   format: latex
  *   ---
  *   # My note
  *
- * `icon` is only there for a note that has one, and `format` for a note not written in Markdown
+ * `inbox: true` is only there for a note in the Inbox, `icon` and `color` for a note that has one, and `format` for a note not written in Markdown
  * (the id of its language, which a plugin adds), so other notes stay byte for byte as they were.
  * A language this device doesn't have is kept as it is.
  *
@@ -40,7 +42,9 @@ export function serialize(note: Note): string {
     `updated: ${new Date(note.updatedAt).toISOString()}`,
     `pinned: ${note.pinned}`,
     `trashed: ${note.trashed}`,
+    ...(note.inbox ? ["inbox: true"] : []),
     ...(note.icon ? [`icon: ${note.icon}`] : []),
+    ...(note.color ? [`color: ${note.color}`] : []),
     ...(note.format ? [`format: ${note.format}`] : []),
     ...(lock ? [`locked: ${JSON.stringify(lock)}`] : []),
     "---",
@@ -67,6 +71,7 @@ export function deserialize(text: string, fallbackId: string): Note {
     return Number.isNaN(ms) ? Date.now() : ms;
   };
   const icon = fields.get("icon");
+  const color = fields.get("color");
   const format = fields.get("format");
   const body = match ? text.slice(match[0].length) : text;
   const locked = readLock(fields.get("locked"), body);
@@ -77,7 +82,9 @@ export function deserialize(text: string, fallbackId: string): Note {
     updatedAt: time("updated"),
     pinned: fields.get("pinned") === "true",
     trashed: fields.get("trashed") === "true",
+    ...(fields.get("inbox") === "true" ? { inbox: true } : {}),
     ...(icon && icon in ICONS ? { icon: icon as IconName } : {}),
+    ...(isPaletteColor(color) ? { color } : {}),
     ...(isLanguage(format) ? { format } : {}),
     ...(locked ? { locked } : {}),
   };

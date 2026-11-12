@@ -16,6 +16,9 @@ describe("color", () => {
     expect(parse("rgb(10 20 30 / 50%)")).toEqual({ r: 10, g: 20, b: 30, a: 0.5 });
     expect(parse("rgba(10, 20, 30, 0.25)")).toEqual({ r: 10, g: 20, b: 30, a: 0.25 });
     expect(parse("transparent")?.a).toBe(0);
+    // As browsers give a color-mix() they've worked out.
+    expect(parse("color(srgb 1 0.5 0 / 0.045)")).toEqual({ r: 255, g: 127.5, b: 0, a: 0.045 });
+    expect(parse("color(srgb 0 0 0)")).toEqual({ r: 0, g: 0, b: 0, a: 1 });
     for (const unreadable of ["oklch(50% 0.1 200)", "var(--x)", "", "#ggg", undefined, null]) expect(parse(unreadable)).toBeUndefined();
   });
 

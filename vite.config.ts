@@ -1,5 +1,5 @@
 import { createReadStream, readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig, type EnvironmentModuleNode, type Plugin } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
@@ -69,9 +69,53 @@ function excalidrawFonts(): Plugin {
   };
 }
 
+/** Settings' files: a section's each, named for it (`ThemeSection.svelte`), and the parts they're made of. */
+const SETTINGS = fileURLToPath(new URL("src/lib/components/settings/", import.meta.url));
+/** Plugins' folders, where a plugin's own page of settings is named for it (`MascotsSettings.svelte`). */
+const PLUGINS = fileURLToPath(new URL("src/plugins/", import.meta.url));
+
+/**
+ * What Settings' search looks through (components/settings/search.ts), as `virtual:settings-search`:
+ * the messages each section shows, by its id, read from its file and the files of its parts, so
+ * a setting added to one is found without listing it anywhere else. A plugin's page is
+ * `plugin:<its id>`, the id from its file's name (`SfSymbolsSettings.svelte` is `sf-symbols`'s).
+ */
+function settingsSearch(): Plugin {
+  const id = "virtual:settings-search";
+  const resolved = `\0${id}`;
+  return {
+    name: "lines:settings-search",
+    resolveId: (source) => (source === id ? resolved : undefined),
+    load(module) {
+      if (module !== resolved) return;
+      const keysOf = (path: string, seen: Set<string>): string[] => {
+        if (seen.has(path)) return [];
+        seen.add(path);
+        this.addWatchFile(path);
+        // Not what's only said aloud as something happens (`speak(t("settings.themeCopied"))`).
+        const source = readFileSync(path, "utf8").replace(/speak\([^\n]*/g, "");
+        const keys = [...source.matchAll(/"([a-z][A-Za-z]*\.[A-Za-z0-9_.-]+)"/g)].map((found) => found[1]);
+        const parts = [...source.matchAll(/from "\.\/([A-Za-z]+\.svelte)"/g)].flatMap((found) => keysOf(join(dirname(path), found[1]), seen));
+        return [...keys, ...parts];
+      };
+      const own = readdirSync(SETTINGS)
+        .filter((file) => file.endsWith("Section.svelte"))
+        .map((file) => [file.slice(0, -"Section.svelte".length).toLowerCase(), join(SETTINGS, file)]);
+      const pluginPages = readdirSync(PLUGINS, { recursive: true, encoding: "utf8" })
+        .filter((file) => file.endsWith("Settings.svelte"))
+        .map((file) => {
+          const name = basename(file, "Settings.svelte");
+          return [`plugin:${name.replace(/(?<=.)([A-Z])/g, "-$1").toLowerCase()}`, join(PLUGINS, file)];
+        });
+      const index = Object.fromEntries([...own, ...pluginPages].map(([section, path]) => [section, [...new Set(keysOf(path, new Set()))]]));
+      return `export default ${JSON.stringify(index)};`;
+    },
+  };
+}
+
 // https://v2.tauri.app/start/frontend/vite/
 export default defineConfig({
-  plugins: [svelte(), tailwindcss(), reloadOnStateChange(), excalidrawFonts()],
+  plugins: [svelte(), tailwindcss(), reloadOnStateChange(), excalidrawFonts(), settingsSearch()],
   define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   clearScreen: false,
   server: {

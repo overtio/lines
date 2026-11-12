@@ -25,7 +25,7 @@ const BLOCKS: Record<string, Block> = {
 /** Code (and LaTeX), where these characters are just text. */
 const CODE = new Set(["FencedCode", "CodeBlock", "InlineCode", "InlineMath", "MathBlock"]);
 
-function inCode(state: EditorState, pos: number) {
+export function inCode(state: EditorState, pos: number) {
   for (const node of ancestors(state, pos, -1)) {
     if (CODE.has(node.name)) return true;
   }

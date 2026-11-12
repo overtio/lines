@@ -1,6 +1,7 @@
 import { syntaxTree } from "@codemirror/language";
 import { type ChangeSpec, type EditorState, type Extension, RangeSetBuilder, StateEffect, StateField, type Text } from "@codemirror/state";
 import { Decoration, type DecorationSet, EditorView, keymap, layer, type LayerMarker, ViewPlugin, type ViewUpdate } from "@codemirror/view";
+import { PALETTE, paletteVar } from "../palette";
 import { plugins } from "../plugins/registry.svelte";
 import type { LineMarker, MarkerColor, NoteLanguage } from "../plugins/types";
 import { markupMode } from "./markupMode";
@@ -13,18 +14,6 @@ import { selectedLines, viewSelectionInUse } from "./util";
  * Lines next to each other marked alike make one bar.
  */
 
-/** Each color as the theme has it. */
-export const MARKER_COLORS: Record<MarkerColor, string> = {
-  accent: "var(--accent)",
-  red: "var(--danger)",
-  orange: "var(--callout-warning)",
-  yellow: "var(--highlight-base)",
-  green: "var(--success)",
-  blue: "var(--callout-info)",
-  purple: "var(--callout-question)",
-  gray: "var(--text-faint)",
-};
-
 const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
@@ -33,7 +22,7 @@ const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
  * comment can't follow (LaTeX's `\%` isn't one), and `skip` says where a line's end isn't text (code).
  */
 export function commentMarks(open: string, close: string, { notAfter, skip }: { notAfter?: string; skip?: (state: EditorState, pos: number) => boolean } = {}): NoteLanguage["lineMarks"] {
-  const names = Object.keys(MARKER_COLORS).join("|");
+  const names = PALETTE.join("|");
   const before = notAfter ? `(?<!${escape(notAfter)})` : "";
   // The line's last comment (none after it), whose label doesn't run past its end.
   const last = `(?!.*${escape(open)})`;
@@ -170,7 +159,7 @@ class Bar implements LayerMarker {
     bar.style.left = `${this.left}px`;
     bar.style.top = `${this.top}px`;
     bar.style.height = `${this.height}px`;
-    bar.style.setProperty("--marker", MARKER_COLORS[this.color]);
+    bar.style.setProperty("--marker", paletteVar(this.color));
     if (this.label) bar.title = this.label;
     else bar.removeAttribute("title");
   }

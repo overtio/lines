@@ -1,22 +1,30 @@
 # Themes
 
-lines comes with twenty-three themes, each light and dark, and styles that change the whole look beyond the colors: a 90s desktop, one-bit pixels, neon. You can also make your own themes, share them as a file, and import themes made for other apps: VS Code, Zed, Base16, your terminal or your Linux desktop.
+lines comes with twenty-three themes, each light and dark, and presets that change the whole look beyond the colors: a 90s desktop, one-bit pixels, neon, a rainy day in a picture book, a spark of lightning. You can also make your own themes and presets, share them as files, and import themes made for other apps: VS Code, Zed, Base16, your terminal or your Linux desktop.
 
-Everything here is in Settings → Theme.
+Everything here is in Settings → Presets and Settings → Theme.
 
 ## Your own themes
 
 **New → From** the theme chosen makes a copy of it, under **Your themes**, and opens it to change below Light or dark, Contrast and Icons: its name, and its colors.
 
-**New → From Wallhaven…** (in the apps, with the Wallhaven [plugin](plugins.md)) does the same with a wallpaper found on [Wallhaven](https://wallhaven.cc): search, pick one, and its colors are a theme, named after what you searched for, which it can be the backdrop of too. Only wallpapers Wallhaven marks safe for work are searched.
+**New → From Wallhaven** (in the apps, with the Wallhaven [plugin](plugins.md)) does the same with a wallpaper found on [Wallhaven](https://wallhaven.cc): search, pick one, and its colors are a theme, named after what you searched for, which it can be the backdrop of too. Only wallpapers Wallhaven marks safe for work are searched.
 
-**New → From a Picture…** makes one from a picture's colors, a wallpaper or a photo, named after it, light and dark. The picture is read on this device, nothing is sent anywhere: its colors are grouped, its main tone tints the backgrounds (more of it the more colorful the picture, less in light, where a little goes a long way), its most vivid color that's also plentiful becomes the accent, and colors near red, green, blue and the rest color the callouts and code. The text reads at least 7:1 on the background, grey text 5:1 and the accent 4.5:1; a picture without color makes a theme in greys. **Use the Picture as the Backdrop** then puts it behind the page (Settings → Paper → Backdrop). Like any of your themes, it can be changed color by color after.
+**New → From a Picture** makes one from a picture's colors, a wallpaper or a photo, named after it, light and dark. The picture is read on this device, nothing is sent anywhere: its colors are grouped, its main tone tints the backgrounds (more of it the more colorful the picture, less in light, where a little goes a long way), its most vivid color that's also plentiful becomes the accent, and colors near red, green, blue and the rest color the callouts and code. The text reads at least 7:1 on the background, grey text 5:1 and the accent 4.5:1; a picture without color makes a theme in greys. **Use the Picture as the Backdrop** then puts it behind the page (Settings → Plugins → Paper → Backdrop). Like any of your themes, it can be changed color by color after.
 
 - **Colors for** Light or Dark chooses which of its two sets of colors you're changing. The preview above the colors shows that set, as the sidebar, the note list and a note with a tag, a link, code and a callout; lines itself shows the set Light or dark asks for, as you change it.
 - Each color has a swatch, which opens your system's color picker, and its value as text, where you can type or paste any color CSS reads (`#7c3aed`, `rgb(124 58 237)`, `oklch(55% 0.2 290)`).
 - **Backgrounds, Text and Accent** are the colors every theme has. Borders, hovers, the selection, chips behind tags and code's background are mixed from them, the way lines' own themes work theirs out.
-- **More Colors** has the ones a theme can leave to lines: danger, success, pinned and highlights, the five callouts, and code. Left empty (Auto), they're lines' own, and the swatch shows what that is; the arrow beside one empties it again.
+- **More Colors** has the ones a theme can leave to lines: danger, success, pinned and highlights, the five callouts, the seven colors for tags and events, and code. Left empty (Auto), they're lines' own, and the swatch shows what that is; the arrow beside one empties it again.
 - **Delete** asks first, then shows Lines in its place.
+
+### Changing colors by right-clicking
+
+Settings → Theme → **Change colors by right-clicking** changes a theme bit by bit, where you see it. While it's on, right-clicking anything in lines (or pressing the menu key, or ⇧F10, on what has focus) opens the theme's colors it's drawn in, in place of its menu: its text, its border, and what's behind it down to the window (a row's hover, then the sidebar). Each has a swatch for your system's color picker and its value as text, to type or paste any color CSS reads, and an arrow to put the theme's own back. A change shows at once, everywhere that color is used.
+
+Changes wait to be saved: a bar at the bottom says how many there are, with **Save in Settings** and **Done** (which turns it off; the changes stay). In Settings → Theme, **Save as New Theme** makes a theme of your own from the theme with its changes, and shows it, its name ready to type over; in a theme of yours, **Save to** it puts them into it; **Discard Changes** asks, then puts the theme back as it was. Each theme keeps its own changes until then, on this device and in every window, through a restart.
+
+What's changed is the theme's color for the scheme showing (a pane shown dark by Dark panes changes its dark colors). Some colors are mixed from others: borders, hovers and code's background are a little of Lines and shading, the selection and tag chips a little of the accent; changing one sets it alone, as a color of its own. A part drawn in a color the theme doesn't have (a picture, a callout's tint) says so.
 
 Your themes are kept on this device, like the rest of Settings, and change in every window at once (Settings, floating notes) as you edit them. They don't sync between devices yet; share one as a file to have it on another.
 
@@ -30,18 +38,44 @@ Most themes made for other apps are one or the other: Dracula is dark, Solarized
 
 Settings → Theme → Contrast → Increased works with your themes as with lines' own: their grey text, faint text, accent and tags are darkened (lightened in dark) until they reach the same contrast lines' themes do ([accessibility.md](accessibility.md)). lines works these out from your theme's colors each time they change, so there's nothing to set. A color written in a way lines can't read itself (`oklch()`, `var()`) is left as it is.
 
-## Styles
+## Presets
 
-A theme is colors. A style is the rest of the look: how round the corners are, the type, the lines and shadows, and what makes it itself. Settings → Theme → Style has four:
+A theme is colors. A preset is the whole look in one: the theme, and the style that goes with it (how round the corners are, the type, the lines and shadows, and what makes it itself), with the rest of how lines looks. Choosing one sets every setting it has; **Undo**, just after, puts back the look you had. Settings → Presets has six:
 
-- **Lines**: soft corners, quiet shadows and your system's font, as lines has always looked.
-- **Classic**: a desktop of the late 90s. Raised and sunken bevels lit from the top left, a title bar with a gradient over the note list, the selection in the accent, square corners, Tahoma, scroll bars with arrow buttons.
-- **Pixel**: one-bit and minimal. A pixel font (Pixelify Sans, with VT323 for code), 2px lines, hard shadows a pressed button drops, what's chosen turned around, square everything, and things changing at once rather than easing.
-- **Neon**: a city at night. Lines and text that glow in the accent and the tags' color, a faint grid behind the note and scan lines over everything, headings in a wide display face (Orbitron), buttons with their corners cut.
+- **Lines**: soft corners, quiet shadows and your system's font, as lines has always looked, and every other look setting as lines first has it.
+- **Classic**: a desktop of the late 90s. Raised and sunken bevels lit from the top left, a title bar with a gradient over the note list, the selection in the accent, square corners, Tahoma, scroll bars with arrow buttons, and the 90s pointer.
+- **Pixel**: one-bit and minimal. A pixel font (Pixelify Sans, with VT323 for code), 2px lines, hard shadows a pressed button drops, what's chosen turned around, square everything, things changing at once rather than easing, a block cursor and the 90s pointer.
+- **Neon**: a city at night. Lines and text that glow in the accent and the tags' color, a faint grid behind the note and scan lines over everything, headings in a wide display face (Orbitron), buttons with their corners cut, a thick glowing cursor and a comet behind the pointer.
 
-Each but Lines comes with a color theme made for it (Classic, Pixel and Neon, in the Themes list too), chosen with it. Any other theme can be chosen after, and the style keeps its shapes in those colors: its bevels, lines and glows are made from the theme's own colors. Choosing another style while a style's colors still show goes back to Lines' colors. A style that has its own font is notes' first font in Settings → Typography too, in place of the system's; the other fonts there still work with it.
+- **Puddle**: a rainy day in a picture book, in its colors: the rain blue most of it is drawn on for the sidebar, a sweater's seafoam for the note list and cream paper for the note (night rain in dark), a navy accent, tags in a coral wall's rose (on a pale coral chip), a beak's mustard for highlights, and tag colors from the same picture, deepened to read; crisp ink lines around what can be pressed or typed in, around what floats and around what's chosen; flat fills with no shadows, rounder corners, and the system's rounded font.
+- **Lightbulb**: a spark of lightning drawn as a cartoon, in five colors: lemon for the sidebar (and a paler lemon for the note list, near-white for the note), a red accent, tags in a deep cedar on a gold chip, lemon highlights, and black ink (lemon in dark, where the accent is lemon too and tags are a lighter red); bold ink lines around what can be pressed or typed in, around what floats and around what's chosen, hard shadows of the same ink under cards, menus and dialogs, round corners, and a thick cursor that throws sparks.
 
-Styles are plugins (the Styles plugin has these three), and a plugin can add more: what one can set, and how it reaches each part of the app, is in [plugins.md](plugins.md#what-a-plugin-can-add). Neon's glow and scan lines go with Increased contrast, and its grid while a paper is chosen. Styles change how lines looks, not what it prints: a note's PDF is black on white in every style.
+Each but Lines comes with a color theme made for it (Classic, Pixel, Neon, Puddle and Lightbulb, in the Themes list too). Anything can be changed after: another theme, and the style keeps its shapes in those colors (its bevels, lines and glows are made from the theme's own colors), or any other setting. A style that has its own font is notes' first font in Settings → Typography too, in place of the system's; the other fonts there still work with it.
+
+### What a preset has
+
+- **Theme:** the theme (a theme of your own goes along in a preset's file), the style, Dark panes, Monochrome, Invert, the icons and headings' color.
+- **Typography:** the font, the spacing and the note's width.
+- **Paper:** the pattern, texture and their color, size and strength; the backdrop and the page over it.
+- **Cursor:** the text cursor's shape, width, color, blink, moving and effect; the pointer and what follows it.
+- **Mascot:** which, and how big.
+- **Window** (Mac app): how see-through it is, the blur behind it, and what of it is see-through.
+
+What's yours to see by stays as you set it, whichever preset you choose: Light or dark, Contrast and the text's size.
+
+### Your presets
+
+**Save as Preset** keeps the look you have now as a preset of your own, under **Your presets**, named for the one it came from, its name ready to type over. Change anything after choosing a preset and it says so, with **Back to** it, and, for one of yours, **Update Preset** to keep the change in it. Below a preset of yours are its name, to change, the share button and **Delete**.
+
+Your presets are kept on this device, like the rest of Settings, and in every window at once. They don't sync between devices yet; share one as a file to have it on another.
+
+### Sharing a preset
+
+The share button beside your preset's name has **Share** (your system's share sheet, where there is one), **Copy Preset** (its file's text, to paste into a message) and **Download Preset File** (`Late Night.lines-preset.json`). Whoever gets it adds it with **Import → Choose a File**, or **Import → Paste a Preset**, in Presets; it's added to their presets and chosen, and Undo puts back what they had.
+
+A preset's file is JSON: its `name`, `author` if you like, its `settings` by the names lines keeps them by, and, when its theme is one of your own, that theme as a theme file has it (`theme`), which is added to theirs (or the same one used, if they have it). A picture of your own behind the page isn't in the file: the backdrop comes as none. Settings missing from a file are lines' own, and one lines can't read is left out the same way, so a file from an older or newer lines still works. Themes, patterns, mascots and the like that come from a plugin are kept by their id: while that plugin is off, lines shows its own in their place.
+
+Styles are plugins (the Styles plugin has the four beside Lines), and a plugin can add more presets, with the settings each brings: what one can set, and how it reaches each part of the app, is in [plugins.md](plugins.md#what-a-plugin-can-add). Neon's glow and scan lines go with Increased contrast, and its grid while a paper is chosen. Presets change how lines looks, not what it prints: a note's PDF is black on white with every one.
 
 ## Dark panes
 
@@ -60,11 +94,11 @@ Both together give the theme in greys, turned. They apply on top of Increased co
 
 The share button beside your theme's name:
 
-- **Share…** sends the theme's file through your system's share sheet (AirDrop, Messages, Mail…), where there is one.
+- **Share** sends the theme's file through your system's share sheet (AirDrop, Messages, Mail…), where there is one.
 - **Copy Theme** copies the file's text, to paste into a message.
 - **Download Theme File** saves it: `Dracula.lines-theme.json`.
 
-Whoever gets it adds it with **Import → Choose a File…**, or **Import → Paste a Theme…** for text they copied. Themes of other apps are imported the same way, and several files can be chosen at once.
+Whoever gets it adds it with **Import → Choose a File**, or **Import → Paste a Theme** for text they copied. Themes of other apps are imported the same way, and several files can be chosen at once.
 
 ## lines' theme files
 
@@ -100,6 +134,7 @@ A lines theme file is JSON: the theme's name, who made it if you like, and its c
 | `ink` | What borders, hovers and code's background are mixed from: usually the text color |
 | `danger`, `success`, `pin`, `highlight-base` | Optional: deleting and errors, success, pinned notes, highlights |
 | `callout-info`, `callout-question`, `callout-warning`, `callout-error`, `callout-decision` | Optional: the callouts |
+| `palette-red`, `palette-orange`, `palette-yellow`, `palette-green`, `palette-blue`, `palette-purple`, `palette-gray` | Optional: the colors tags, types and events can be given (Icon and Color, or `color:` in a note), and marks in the margin; with the accent, eight. Each at least 3:1 against every background, as icons need |
 | `syn-keyword`, `syn-string`, `syn-number`, `syn-comment`, `syn-function`, `syn-type` | Optional: code |
 | `on-accent`, `on-danger`, `on-success`, `on-pin` | Optional: text on buttons of those colors |
 
@@ -138,7 +173,7 @@ What lines takes from each:
 
 - **Editors** (VS Code, Zed, TextMate): the editor's background and text, the side bar or panel for lines' sidebar, menus, secondary and faint text, the accent (the first that's a color rather than a grey of buttons, focus, links and badges, in VS Code), error, warning and success colors, the terminal's colors, and code's colors from the scopes that keywords, strings, numbers, comments, functions and types are highlighted by.
 - **Base16 and Base24**: each color as the [styling guide](https://github.com/tinted-theming/home/blob/main/styling.md) uses it: `base00` the background, `base01` the sidebar, `base03` faint text and comments, `base04` secondary text, `base05` text, `base08` to `base0E` red, orange, yellow, green, cyan, blue (the accent) and magenta, and code's colors as Base16's templates use them.
-- **Terminals**: the background and text, and the sixteen ANSI colors: blue for the accent, red for danger, green for success, and the others for callouts and code; bright black for faint text and comments.
+- **Terminals**: the background and text, and the sixteen ANSI colors: blue for the accent, red for danger, green for success, the others for callouts and code, and red, yellow, green, blue and magenta (as purple) for tags' and events' colors, each made readable on the backgrounds; bright black for faint text and comments.
 - **KDE**: the views' colors for the note, the windows' for the sidebar, the selection's for the accent, and the negative, neutral, positive, link and visited colors for the rest.
 - **GTK**: the view's colors for the note, the window's or sidebar's for the sidebar, the accent, popovers, and the error, warning and success colors, with libadwaita's palette (`blue_3`, `red_3`…) where the file has it.
 

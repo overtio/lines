@@ -2,7 +2,7 @@ import type { BlockContext, InlineContext, Line, MarkdownConfig } from "@lezer/m
 import { tags as t } from "@lezer/highlight";
 import { TAG_CHAR } from "../notes/tags";
 
-const HASH = 35, EQUALS = 61, SLASH = 47, OPEN_PAREN = 40;
+const HASH = 35, EQUALS = 61, OPEN_PAREN = 40;
 
 function isSpace(code: number) {
   return code === 32 || code === 9 || code === 10 || code === 13 || code === 160;
@@ -12,9 +12,15 @@ function charBefore(cx: InlineContext, pos: number) {
   return pos === cx.offset ? -1 : cx.char(pos - 1);
 }
 
+/** A heading whose text starts with `#`s and then a word: `# #Boo`, as `## ` is typed over an H1's text. */
+const HEADING_HASHES = /^(#{1,6})[ \t]+#+(?=[^\s#])/;
+const isBlank = (char: string | undefined) => char === " " || char === "\t";
+
 /**
  * Bear-style `#tag` and `#nested/tag`. A line of only `#` is where one is being typed, so it's text
- * rather than an empty heading; a heading needs the space after its `#`.
+ * rather than an empty heading; a heading needs the space after its `#`. Nor is `#` at the start of
+ * a heading's text a tag (notes/parse.ts reads tags the same way): it's `##` being typed there,
+ * to make the heading an H2 (headingLevel.ts), not a tag to show and list.
  */
 export const Tag: MarkdownConfig = {
   defineNodes: [
@@ -23,12 +29,50 @@ export const Tag: MarkdownConfig = {
   ],
   parseBlock: [
     {
+      // A line of only a list's marker (`-`, `*`, `+`, `1.`) is one being typed, `-h` say: text, as
+      // a line of only `#` is, rather than an empty item's bullet there until the next letter.
+      // The space after it makes the item (as Enter's empty one has).
+      name: "BareListMark",
+      before: "BulletList",
+      parse(cx, line) {
+        if (!/^(?:[-*+]|\d{1,9}[.)])$/.test(line.text.slice(line.pos))) return false;
+        const from = cx.lineStart + line.pos;
+        cx.addElement(cx.elt("Paragraph", from, cx.lineStart + line.text.length));
+        cx.nextLine();
+        return true;
+      },
+    },
+    {
       name: "BareHash",
       before: "ATXHeading",
       parse(cx, line) {
         if (!/^#{1,6}$/.test(line.text.slice(line.pos))) return false;
         const from = cx.lineStart + line.pos;
         cx.addElement(cx.elt("Paragraph", from, cx.lineStart + line.text.length));
+        cx.nextLine();
+        return true;
+      },
+    },
+    {
+      name: "HeadingHashes",
+      before: "ATXHeading",
+      // As CommonMark's ATX heading is read, with its text read after the `#`s that start it.
+      parse(cx, line) {
+        const found = HEADING_HASHES.exec(line.text.slice(line.pos));
+        if (!found) return false;
+        const { text, pos } = line;
+        const size = found[1].length;
+        const from = cx.lineStart + pos;
+        let endOfSpace = text.length;
+        while (endOfSpace > pos && isBlank(text[endOfSpace - 1])) endOfSpace--;
+        // A closing run of `#`s, after a space, is marks too.
+        let after = endOfSpace;
+        while (after > pos && text[after - 1] === "#") after--;
+        if (after === endOfSpace || after === pos || !isBlank(text[after - 1])) after = text.length;
+        const start = pos + found[0].length;
+        const children = [cx.elt("HeaderMark", from, from + size), ...cx.parser.parseInline(text.slice(start, after), cx.lineStart + start)];
+        if (after < text.length) children.push(cx.elt("HeaderMark", cx.lineStart + after, cx.lineStart + endOfSpace));
+        cx.addElement(cx.elt(`ATXHeading${size}`, from, cx.lineStart + text.length, children));
         cx.nextLine();
         return true;
       },
@@ -49,8 +93,9 @@ export const Tag: MarkdownConfig = {
           if (!TAG_CHAR.test(char)) break;
           end += char.length;
         }
-        while (end > pos + 1 && cx.char(end - 1) === SLASH) end--;
-        if (end === pos + 1 || /^\d+$/.test(cx.slice(pos + 1, end))) return -1;
+        // A slash at its end stays in it, so `#idea/` shows as a tag in `idea` as it's typed; its name leaves it out (normalizeTag).
+        const name = cx.slice(pos + 1, end).replace(/\/+$/, "");
+        if (!name || /^\d+$/.test(name)) return -1;
         return cx.addElement(cx.elt("Tag", pos, end, [cx.elt("TagMark", pos, pos + 1)]));
       },
     },
@@ -123,6 +168,13 @@ export const Highlight: MarkdownConfig = {
 
 const LESS_THAN = 60;
 const UnderlineDelim = { resolve: "Underline", mark: "UnderlineMark" };
+
+/**
+ * CommonMark's underlined (Setext) headings, text with `===` or `---` under it, only if Settings →
+ * Editor → Underlined headings says: otherwise `---` under text is a divider, as it is anywhere
+ * else, and `===` text, and a heading is written with `#`.
+ */
+export const headingSyntax = (underlined: boolean): MarkdownConfig[] => (underlined ? [] : [{ remove: ["SetextHeading"] }]);
 
 /**
  * `<u>underlined</u>` text: HTML's underline, which other Markdown apps show too. The two tags
