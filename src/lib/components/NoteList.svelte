@@ -1,29 +1,17 @@
-<script lang="ts" module>
-  /** Today's date, so "Today" and "Yesterday" roll over at midnight, even if the app sits idle. */
-  let today = $state(new Date().toDateString());
-
-  function tick() {
-    today = new Date().toDateString();
-    const midnight = new Date();
-    midnight.setHours(24, 0, 0, 0);
-    setTimeout(tick, midnight.getTime() - Date.now() + 1000);
-  }
-  tick();
-  // Timers stall while a laptop sleeps.
-  document.addEventListener("visibilitychange", () => (today = new Date().toDateString()));
-</script>
-
 <script lang="ts">
   import { flushSync, untrack } from "svelte";
   import { speak } from "../a11y";
-  import { t } from "../i18n/index.svelte";
+  import { locale, t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
+  import { dateOf } from "../notes/calendar";
   import { typeLabel } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
   import { isApple, newNoteKey } from "../platform";
-  import { deletePicked, pinPicked, restorePicked, tagPicked, trashPicked } from "../notes/picked";
+  import { deletePicked, inboxPicked, pinPicked, restorePicked, tagPicked, trashPicked } from "../notes/picked";
   import { prefs } from "../prefs.svelte";
+  import { today } from "../today.svelte";
   import { ui } from "../ui.svelte";
+  import CalendarMonth from "./CalendarMonth.svelte";
   import { ListWindow } from "./listWindow.svelte";
   import NoteRow from "./NoteRow.svelte";
   import SidebarToggle from "./SidebarToggle.svelte";
@@ -35,7 +23,8 @@
     const f = notes.filter;
     if (f.kind === "tag") return `#${f.tag}`;
     if (f.kind === "type") return typeLabel(f.type);
-    return { all: t("sidebar.notes"), todo: t("sidebar.todo"), untagged: t("sidebar.untagged"), trash: t("sidebar.trash") }[f.kind];
+    if (f.kind === "calendar") return t("sidebar.calendar");
+    return { inbox: t("sidebar.inbox"), all: t("sidebar.notes"), todo: t("sidebar.todo"), untagged: t("sidebar.untagged"), trash: t("sidebar.trash") }[f.kind];
   });
 
   /**
@@ -60,7 +49,7 @@
   }
 
   // Only a new day re-renders the rows' dates; a new Date for each edit would redo every row.
-  const now = $derived(new Date(today));
+  const now = $derived(dateOf(today.day));
 
   /** The space between rows, where their divider is (the styles below). */
   const ROW_GAP = 6;
@@ -217,6 +206,7 @@
         <IconButton icon="trash" iconSize={16} danger label={t("list.deleteForever")} onclick={deletePicked} />
       {:else}
         {@const pin = picked.some((e) => !e.note.pinned)}
+        {@const file = picked.some((e) => e.note.inbox)}
         <IconButton
           icon="hash"
           iconSize={16}
@@ -227,6 +217,7 @@
           }}
         />
         <IconButton icon={pin ? "pin" : "pin-off"} iconSize={16} label={pin ? t("list.pin") : t("list.unpin")} onclick={pinPicked} />
+        <IconButton icon={file ? "archive" : "inbox"} iconSize={16} label={file ? t("list.file") : t("list.toInbox")} onclick={inboxPicked} />
         <IconButton
           icon="trash"
           iconSize={16}
@@ -251,11 +242,17 @@
     </div>
   {/if}
 
+  {#if notes.filter.kind === "calendar"}
+    <CalendarMonth day={notes.filter.day} today={today.day} />
+  {/if}
+
   {#if notes.ready && !notes.visible.length}
     <p class="mx-6 my-8 text-center text-base text-faint">
       {#if notes.query}{t("list.noMatches", { query: notes.query })}{:else if notes.filter.kind === "trash"}{t(
           "list.trashIsEmpty",
-        )}{:else}{t("list.noNotes")}{/if}
+        )}{:else if notes.filter.kind === "inbox"}{t("list.inboxEmpty")}{:else if notes.filter.kind === "calendar"}{t("calendar.nothing", {
+          date: dateOf(notes.filter.day).toLocaleDateString(locale, { weekday: "long", month: "long", day: "numeric" }),
+        })}{:else}{t("list.noNotes")}{/if}
     </p>
   {/if}
 

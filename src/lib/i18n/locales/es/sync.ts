@@ -2,8 +2,6 @@ import type { Translation } from "../../format";
 import type en from "../en/sync";
 
 export default {
-  "sync.intro":
-    "Sincroniza tus notas entre dispositivos. Cada nota se guarda como un archivo Markdown (o cifrada, si lo activas más abajo), y tus notas también se quedan en este dispositivo, así que lines funciona sin conexión.",
   "sync.syncingWith": "Sincronizando con {place}…",
   "sync.offline": "Sin conexión. Los cambios se sincronizarán cuando vuelvas a estar en línea.",
   "sync.syncedWith": "Sincronizado con {place} {date}",

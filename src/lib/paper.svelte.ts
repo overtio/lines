@@ -7,7 +7,7 @@ import { ownColor } from "./themes/show.svelte";
 import { announce, onAnnounce } from "./windows/channel";
 
 /*
- * The paper notes are written on (Settings → Paper): the pattern and texture chosen, from plugins,
+ * The paper notes are written on (Settings → Plugins → Paper): the pattern and texture chosen, from plugins,
  * set here as custom properties that editor.css draws behind every note's page, or under each of its
  * lines. Following the text, a pattern has a row of cells for each line, a line of text wide, so
  * each bullet is in its own; or it's the size chosen. In the color and opacity chosen. With a

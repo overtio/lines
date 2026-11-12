@@ -1,8 +1,6 @@
 /** Sync: cloud drives, folders, buckets, end-to-end encryption, and sync's messages. */
 export default {
   /* Settings → Sync. */
-  "sync.intro":
-    "Sync your notes across devices. Each note is saved as a Markdown file (or encrypted, if you turn that on below), and your notes stay on this device too, so lines works offline.",
   // {place} is the drive or bucket, as in “iCloud Drive” or “my-notes”.
   "sync.syncingWith": "Syncing with {place}…",
   "sync.offline": "Offline. Changes will sync when you’re back online.",

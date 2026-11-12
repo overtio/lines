@@ -7,6 +7,7 @@ import "./lib/paper.svelte";
 // Before the styles, whose rules come after it in the page and outrank it.
 import "./lib/editor/editor.css";
 import "./lib/themes/styles.svelte";
+import "./lib/themes/fonts.svelte";
 import "./lib/sounds/typing.svelte";
 import "./lib/cursors.svelte";
 import "./lib/mascot/pet.svelte";
@@ -29,6 +30,19 @@ import { ui } from "./lib/ui.svelte";
 import { updates } from "./lib/updates.svelte";
 
 if (isMacApp) document.documentElement.dataset.platform = "mac-app";
+
+// Something dragged in and let go where nothing takes it (the editor takes files and text, the panes
+// and the sidebar a note: panes.svelte.ts) is dropped nowhere, not opened in lines' place. Text
+// fields take what they take.
+for (const type of ["dragover", "drop"] as const) {
+  addEventListener(type, (event) => {
+    const target = event.target as Element | null;
+    const editable = target?.closest("[contenteditable]")?.getAttribute("contenteditable");
+    if (event.defaultPrevented || target?.closest("input, textarea") || editable === "true" || editable === "") return;
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = "none";
+  });
+}
 
 if (isTauri) {
   // The webview's own right-click menu (Reload, Inspect Element) isn't part of the app. Keep it

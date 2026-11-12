@@ -81,6 +81,369 @@ test("Drag to move lines, off, shows no grip", async () => {
   expect(await app.page.locator(".cm-drag-handle:visible").count()).toBe(0);
 });
 
+test("a line dragged by its grip to below another has its grip by it where it went, even moved over while it slides there", async () => {
+  await app.open("One\n\nTwo\n\nThree");
+  const page = app.page;
+  const lines = page.locator(".editor-pane .cm-line");
+  await lines.first().hover();
+  const handle = page.locator(".editor-pane .cm-drag-handle");
+  const grip = (await handle.boundingBox())!;
+  const below = (await lines.filter({ hasText: "Three" }).boundingBox())!;
+  await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(grip.x + grip.width / 2, below.y + below.height + 4, { steps: 10 });
+  await page.mouse.up();
+  // Over the moved line as it slides.
+  const target = { x: below.x + 20, y: below.y + below.height / 2 };
+  for (let i = 0; i < 4; i++) {
+    await page.mouse.move(target.x + i, target.y + 1);
+    await page.waitForTimeout(30);
+  }
+  await page.waitForFunction(() => window.testing.text()?.trimEnd().endsWith("One"));
+  const moved = lines.filter({ hasText: /^One$/ });
+  await page.waitForFunction(() => !document.querySelector(".editor-pane .cm-line")?.getAnimations().length);
+  await handle.waitFor({ state: "visible" });
+  const [at, line] = [(await handle.boundingBox())!, (await moved.boundingBox())!];
+  expect(Math.abs(at.y + at.height / 2 - (line.y + line.height / 2))).toBeLessThan(6);
+});
+
+test("a file dragged over a note shows a line where it'd go, above or below the line it's over, and goes there; not in code", async () => {
+  await app.open("First paragraph\n\nSecond paragraph\n\n```\ncode\n```");
+  const page = app.page;
+  /** Drags a picture over (and, with `drop`, onto) the line reading `text`, at `fy` of its height; where the drop line shows (on screen), if it does. */
+  const drag = (text: string, fy: number, drop = false) =>
+    page.evaluate(
+      ({ text, fy, drop }) => {
+        const line = [...document.querySelectorAll<HTMLElement>(".editor-pane .cm-line")].find((each) => each.textContent === text)!;
+        const box = line.getBoundingClientRect();
+        const data = new DataTransfer();
+        // A real picture, one pixel, which WebKit reads as one.
+        const png = Uint8Array.from(atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="), (char) => char.charCodeAt(0));
+        data.items.add(new File([png], "dot.png", { type: "image/png" }));
+        const at = { clientX: box.left + 20, clientY: box.top + box.height * fy, bubbles: true, cancelable: true, dataTransfer: data };
+        line.dispatchEvent(new DragEvent("dragover", at));
+        const indicator = document.querySelector<HTMLElement>(".editor-pane .cm-drop-indicator")!;
+        const shown = indicator.hidden ? null : indicator.getBoundingClientRect().top;
+        if (drop) line.dispatchEvent(new DragEvent("drop", at));
+        return shown;
+      },
+      { text, fy, drop },
+    );
+
+  const [first, second] = await Promise.all(["First paragraph", "Second paragraph"].map(async (text) => (await page.locator(".editor-pane .cm-line").filter({ hasText: text }).boundingBox())!));
+  // The lower half of the first line: a line between it and the second.
+  const below = (await drag("First paragraph", 0.8))!;
+  expect(below).toBeGreaterThan(first.y + first.height - 1);
+  expect(below).toBeLessThan(second.y);
+  // Not into code, where it can't go: no line.
+  expect(await drag("code", 0.5)).toBeNull();
+  // The upper half of the second: above it, and dropped, it goes there. (WebKit here can't save the
+  // dropped picture, so the drop's checked in Chromium.)
+  const dropping = engine() === "chromium";
+  const above = (await drag("Second paragraph", 0.2, dropping))!;
+  expect(above).toBeGreaterThan(first.y + first.height - 1);
+  expect(above).toBeLessThan(second.y);
+  if (dropping) await page.waitForFunction(() => /^First paragraph\n\n!\[[^\]]*\]\([^)]+\)\nSecond paragraph/.test(window.testing.text() ?? ""));
+});
+
+test("list items pasted on an empty item take its place at its level, not a list inside it; on an empty line, at its indentation", async () => {
+  /** Pastes `text` into a note reading `body`, its cursor at the end; the note after. */
+  const paste = async (body: string, text: string) => {
+    await app.open(body);
+    await app.page.evaluate(() => window.testing.place());
+    await app.page.evaluate((text) => {
+      const data = new DataTransfer();
+      data.setData("text/plain", text);
+      document.querySelector(".editor-pane [data-pane-content='main'] .cm-content")!.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
+    }, text);
+    return app.text();
+  };
+  // Copied from a level down, the next line from the top: both at the empty item's level.
+  expect(await paste("- Support\n- Find\n- ", "  - Add setting\n- Have a setting\n")).toBe("- Support\n- Find\n- Add setting\n- Have a setting");
+  // On a nested empty item: there, with what was nested under it still under it.
+  expect(await paste("- A\n  - ", "- x\n  - y")).toBe("- A\n  - x\n    - y");
+  // A to-do pasted on a bullet keeps its box.
+  expect(await paste("- A\n- ", "- [ ] Call")).toBe("- A\n- [ ] Call");
+  // On an empty line, from its start.
+  expect(await paste("Text\n\n", "    - x\n      - y")).toBe("Text\n\n- x\n  - y");
+  // In a line with text, as pasted.
+  expect(await paste("- Keep ", "- x")).toBe("- Keep - x");
+});
+
+test("with Markdown hidden, a spreadsheet selected whole by its grip stays a grid, tinted as selected; with it live, its CSV shows", async () => {
+  const body = "Before\n\n```csv\nType,Amount\nFed,100\n```\n\nAfter";
+  const page = app.page;
+  /** Clicks the grip of the block drawn in place of the CSV, selecting all of it. */
+  const select = async () => {
+    const grid = page.locator(".editor-pane .cm-content > [contenteditable=false]").first();
+    await grid.hover();
+    const handle = page.locator(".editor-pane .cm-drag-handle");
+    await handle.waitFor({ state: "visible" });
+    await handle.click();
+    return grid;
+  };
+  await page.evaluate(() => (window.testing.prefs.markdownMode = "hidden"));
+  await app.open(body);
+  await select();
+  await page.waitForFunction(() => !window.testing.editor()!.state.selection.main.empty);
+  await page.waitForFunction(() => document.querySelector(".editor-pane .cm-block-selected"));
+  expect(await page.locator(".editor-pane .cm-line").filter({ hasText: "Type,Amount" }).count()).toBe(0);
+
+  await page.evaluate(() => (window.testing.prefs.markdownMode = "live"));
+  await app.open(body);
+  await select();
+  await page.locator(".editor-pane .cm-line").filter({ hasText: "Type,Amount" }).waitFor();
+});
+
+test("with Markdown hidden, a click beside a spreadsheet or table selects it whole, drawn and tinted, rather than opening its Markdown", async () => {
+  await app.page.evaluate(() => (window.testing.prefs.markdownMode = "hidden"));
+  const page = app.page;
+  const raw = () => page.locator(".editor-pane .cm-line").filter({ hasText: /Type,Amount|\|---/ }).count();
+  const selected = () => page.evaluate(() => { const { main } = window.testing.editor()!.state.selection; return [main.from, main.to]; });
+
+  await app.open("Before\n\n```csv\nType,Amount\nFed,100\n```\n\nAfter");
+  const sheet = (await page.locator(".editor-pane .cm-content > .cm-sheet").boundingBox())!;
+  await page.mouse.click(sheet.x + sheet.width - 30, sheet.y + sheet.height / 2);
+  await page.locator(".editor-pane .cm-block-selected").waitFor();
+  expect(await selected()).toEqual([8, 38]);
+  expect(await raw()).toBe(0);
+
+  // Beside a table narrower than the note: its row's room, not a cell.
+  await app.open("Before\n\n| A | B |\n|---|---|\n| 1 | 2 |\n\nAfter");
+  await page.evaluate(() => {
+    window.testing.place(0);
+    document.querySelector(".editor-pane .cm-lp-table-wrap")!.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, button: 0 }));
+  });
+  await page.locator(".editor-pane .cm-block-selected").waitFor();
+  expect(await raw()).toBe(0);
+});
+
+test("a click into a note that isn't focused keeps it where it was, though focusing it scrolls; the wheel after it still scrolls", async () => {
+  await app.open("# Long\n\n" + Array.from({ length: 120 }, (_, i) => `Line ${i} of the note.`).join("\n\n"));
+  const page = app.page;
+  const result = await page.evaluate(async () => {
+    const view = window.testing.editor()!;
+    const scroller = view.scrollDOM;
+    view.contentDOM.blur();
+    scroller.scrollTop = 1500;
+    await new Promise(requestAnimationFrame);
+    // As WebKit does in the Mac app: focusing the editor scrolls it, to where its cursor last was.
+    const jump = () => (scroller.scrollTop = 200);
+    view.contentDOM.addEventListener("focus", jump, { once: true });
+    const line = [...view.contentDOM.querySelectorAll<HTMLElement>(".cm-line")].find((each) => each.getBoundingClientRect().top > scroller.getBoundingClientRect().top + 100)!;
+    const box = line.getBoundingClientRect();
+    line.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, button: 0, detail: 1, clientX: box.left + 10, clientY: box.top + 5 }));
+    line.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, cancelable: true, button: 0, detail: 1, clientX: box.left + 10, clientY: box.top + 5 }));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const kept = scroller.scrollTop;
+    // The person's own scroll, after: it stays.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    scroller.dispatchEvent(new WheelEvent("wheel", { deltaY: 100 }));
+    scroller.scrollTop = 900;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    return { kept, focused: view.hasFocus, after: scroller.scrollTop, cursor: view.state.selection.main.empty, line: view.state.doc.lineAt(view.state.selection.main.head).text, clicked: line.textContent };
+  });
+  expect(result.focused).toBe(true);
+  // A cursor where it was clicked, not a selection from where the press was before the jump.
+  expect(result.cursor).toBe(true);
+  expect(result.line).toBe(result.clicked);
+  // Where it was, but for the editor measuring its lines again (a few pixels), not where focusing jumped it.
+  expect(Math.abs(result.kept - 1500)).toBeLessThan(40);
+  expect(result.after).toBe(900);
+});
+
+test("a drag that starts in text already selected selects from where it started to where it ends, smoothly", async () => {
+  await app.open("One two three four five six seven eight nine ten eleven twelve");
+  const page = app.page;
+  const line = (await page.locator(".editor-pane .cm-line").first().boundingBox())!;
+  const y = line.y + line.height / 2;
+  // Select a stretch by dragging, then drag again from inside it, leftward.
+  await page.mouse.move(line.x + 300, y);
+  await page.mouse.down();
+  await page.mouse.move(line.x + 150, y, { steps: 6 });
+  await page.mouse.up();
+  await page.mouse.move(line.x + 220, y);
+  await page.mouse.down();
+  const heads: number[] = [];
+  for (const x of [200, 160, 120, 80, 40]) {
+    await page.mouse.move(line.x + x, y, { steps: 3 });
+    heads.push(await page.evaluate(() => window.testing.editor()!.state.selection.main.head));
+  }
+  await page.mouse.up();
+  const { anchor, head } = await page.evaluate(() => {
+    const { main } = window.testing.editor()!.state.selection;
+    return { anchor: main.anchor, head: main.head };
+  });
+  // The end follows the pointer leftward, never jumping back; the start stays put.
+  expect(heads).toEqual([...heads].sort((a, b) => b - a));
+  expect(head).toBeLessThan(anchor);
+  expect(anchor - head).toBeGreaterThan(10);
+});
+
+test("a note's properties have no grip, and a line dragged above them lands just below them", async () => {
+  await app.open("---\ntype: event\ndate: 2026-11-12\n---\n\n# Boo\n\nText");
+  const page = app.page;
+  const handle = page.locator(".editor-pane .cm-drag-handle");
+  const property = page.locator(".editor-pane .cm-line").filter({ hasText: "2026-11-12" }).first();
+  await property.hover();
+  await page.waitForTimeout(100);
+  expect(await handle.isVisible()).toBe(false);
+
+  const text = page.locator(".editor-pane .cm-line").filter({ hasText: /^Text$/ });
+  await text.hover();
+  await handle.waitFor({ state: "visible" });
+  const grip = (await handle.boundingBox())!;
+  const top = (await page.locator(".editor-pane .cm-line").first().boundingBox())!;
+  await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(grip.x + grip.width / 2, top.y - 20, { steps: 10 });
+  await page.mouse.up();
+  await page.waitForFunction(() => window.testing.text() !== "---\ntype: event\ndate: 2026-11-12\n---\n\n# Boo\n\nText");
+  expect(await app.text()).toStartWith("---\ntype: event\ndate: 2026-11-12\n---\n");
+  expect((await app.text())!.indexOf("Text")).toBeLessThan((await app.text())!.indexOf("# Boo"));
+});
+
+test("a list's marker typed alone stays text until its space, so -h never shows a bullet on the way; Enter's empty item still has one", async () => {
+  await app.open("Text\n\n");
+  const page = app.page;
+  const bullets = () => page.locator(".editor-pane .cm-lp-bullet, .editor-pane .cm-lp-list-marker").count();
+  await page.evaluate(() => window.testing.place());
+  for (const key of ["-", "h"]) {
+    await page.keyboard.type(key);
+    expect(await bullets()).toBe(0);
+  }
+  expect(await app.text()).toBe("Text\n\n-h");
+  await page.keyboard.press("Enter");
+  await page.keyboard.type("- one");
+  await page.waitForFunction(() => document.querySelectorAll(".editor-pane .cm-lp-bullet, .editor-pane .cm-lp-list-marker").length === 1);
+  // Enter on the item: a new empty one, its bullet showing.
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(() => document.querySelectorAll(".editor-pane .cm-lp-bullet, .editor-pane .cm-lp-list-marker").length === 2);
+});
+
+test("a # at a heading's end shows, as the note list shows it, Markdown hidden or live, the cursor elsewhere or on it", async () => {
+  for (const mode of ["live", "hidden"] as const) {
+    await app.page.evaluate((mode) => (window.testing.prefs.markdownMode = mode), mode);
+    await app.open("# Test Delet #\n\nText");
+    const title = app.page.locator(".editor-pane .cm-line").first();
+    await app.page.evaluate(() => window.testing.place());
+    await app.page.waitForFunction(() => document.querySelector(".editor-pane .cm-line")?.textContent?.trim() === "Test Delet #");
+    await app.page.evaluate(() => window.testing.place(14));
+    expect((await title.textContent())?.endsWith("Delet #")).toBe(true);
+  }
+});
+
+test("## typed at the start of an H1's text makes it an H2, never a tag on the way, # back an H1; ⌘Z leaves them as typed; not in code", async () => {
+  await app.open("# Boo\n\nText\n\n```python\n# x\n```");
+  await app.page.evaluate(() => window.testing.place(2));
+  // On the way, `# #Boo` is still the H1, with `#Boo` its text: not a tag, shown or listed.
+  await app.page.keyboard.type("#");
+  await app.page.waitForFunction(() => window.testing.text()?.startsWith("# #Boo\n"));
+  const first = app.page.locator(".editor-pane .cm-line").first();
+  expect(await first.getAttribute("class")).toContain("cm-lp-h1");
+  expect(await first.locator(".cm-lp-tag").count()).toBe(0);
+  expect(await app.page.evaluate(() => window.testing.notes.selected?.meta.tags)).toEqual([]);
+  await app.page.keyboard.type("# ");
+  await app.page.waitForFunction(() => window.testing.text()?.startsWith("## Boo\n"));
+  await app.page.keyboard.type("# ");
+  await app.page.waitForFunction(() => window.testing.text()?.startsWith("# Boo\n"));
+  await app.page.keyboard.press(`${mod()}+z`);
+  await app.page.waitForFunction(() => window.testing.text()?.startsWith("## # Boo\n"));
+  // A comment in code stays as typed.
+  const comment = await app.page.evaluate(() => window.testing.text()!.indexOf("# x") + 2);
+  await app.page.evaluate((pos) => window.testing.place(pos), comment);
+  await app.page.keyboard.type("## ");
+  await app.page.waitForFunction(() => window.testing.text()?.includes("# ## x"));
+});
+
+test("--- under text is a divider and the text no heading, unless Underlined headings is on: then all its lines are, not while the dashes are typed", async () => {
+  await app.open("# Lines\n\nCalm space.\nBuilt in Boston.\n");
+  await app.page.evaluate(() => window.testing.place());
+  await app.page.keyboard.type("---");
+  await app.page.evaluate(() => window.testing.place(0));
+  await app.page.locator(".editor-pane .cm-lp-hr").waitFor();
+  expect(await app.page.locator(".editor-pane .cm-line.cm-lp-h2").count()).toBe(0);
+  expect(await app.page.evaluate(() => window.testing.text())).toBe("# Lines\n\nCalm space.\nBuilt in Boston.\n---");
+
+  const settings = await app.settings("Editor");
+  await toggle(settings, "Underlined headings", true);
+  await app.closeSettings();
+  await app.page.waitForFunction(() => document.querySelectorAll(".editor-pane .cm-line.cm-lp-h2").length === 2);
+  expect(await app.page.locator(".editor-pane .cm-lp-hr").count()).toBe(0);
+  // On its underline, being typed, the text isn't a heading yet.
+  await app.page.evaluate(() => window.testing.place());
+  await app.page.waitForFunction(() => document.querySelectorAll(".editor-pane .cm-line.cm-lp-h2").length === 0);
+});
+
+test("with Markdown hidden, the cursor on a divider is as tall as text, not hidden in its line", async () => {
+  await app.page.evaluate(() => (window.testing.prefs.markdownMode = "hidden"));
+  await app.open("Above\n\n---\n\nBelow");
+  await app.page.evaluate(() => window.testing.place(10));
+  await app.page.locator(".editor-pane .cm-lp-hr").waitFor();
+  const height = await app.page.evaluate(() => document.querySelector(".editor-pane .cm-cursor")!.getBoundingClientRect().height);
+  expect(height).toBeGreaterThan(15);
+});
+
+test("a divider chosen by its grip looks chosen, with Markdown hidden, and has no toolbar for text", async () => {
+  await app.page.evaluate(() => (window.testing.prefs.markdownMode = "hidden"));
+  await app.open("Above\n\n---\n\nBelow");
+  await app.page.evaluate(() => window.testing.place(0));
+  const divider = app.page.locator(".editor-pane .cm-lp-hr");
+  await divider.hover();
+  await app.page.locator(".editor-pane .cm-drag-handle").click();
+  await app.page.locator(".editor-pane .cm-line.cm-block-selected .cm-lp-hr").waitFor();
+  expect(await app.page.evaluate(() => window.testing.editor()!.state.selection.main.toJSON())).toEqual({ anchor: 7, head: 10 });
+  expect(await app.page.getByRole("toolbar").count()).toBe(0);
+});
+
+test("> typed over selected text quotes its lines, keeping them selected; ⌘Z takes it back; in code it types over", async () => {
+  await app.open("Title\n\nOne line\n\nand another\n\n```\ncode\n```");
+  await app.page.evaluate(() => {
+    const view = window.testing.editor()!;
+    view.focus();
+    view.dispatch({ selection: { anchor: 11, head: 25 } });
+  });
+  await app.page.keyboard.type(">");
+  await app.page.waitForFunction(() => window.testing.text()?.startsWith("Title\n\n> One line\n>\n> and another\n"));
+  expect(await app.page.evaluate(() => window.testing.editor()!.state.sliceDoc(window.testing.editor()!.state.selection.main.from, window.testing.editor()!.state.selection.main.to))).toBe("line\n>\n> and anot");
+  await app.page.keyboard.press(`${mod()}+z`);
+  await app.page.waitForFunction(() => window.testing.text()?.startsWith("Title\n\nOne line\n\nand another\n"));
+
+  const code = await app.page.evaluate(() => window.testing.text()!.indexOf("code"));
+  await app.page.evaluate((from) => window.testing.editor()!.dispatch({ selection: { anchor: from, head: from + 4 } }), code);
+  await app.page.keyboard.type(">");
+  await app.page.waitForFunction(() => window.testing.text()?.includes("```\n>\n```"));
+});
+
+test("a #tag being typed offers the tags there are, the ones starting with it first; Enter writes the whole tag; not for a lone # or in code", async () => {
+  await app.open("One #ideas and #work/meetings");
+  await app.open("Two #ideas #idle");
+  await app.open("Three\n\n`code`\n");
+  await app.page.evaluate(() => window.testing.place(5));
+  await app.page.keyboard.type(" #");
+  // A lone # waits for a letter.
+  expect(await app.page.getByRole("option").count()).toBe(0);
+  await app.page.keyboard.type("id");
+  await app.page.getByRole("option").first().waitFor();
+  expect(await app.page.getByRole("option").allTextContents()).toEqual(["ideas2", "idle1"]);
+  await app.page.keyboard.type("e");
+  await app.page.getByRole("option", { name: /idle/ }).waitFor({ state: "detached" });
+  await app.page.keyboard.press("Enter");
+  await app.page.waitForFunction(() => window.testing.text()?.startsWith("Three #ideas\n"));
+
+  await app.page.keyboard.type(" #meet");
+  await app.page.getByRole("option", { name: /work\/meetings/ }).waitFor();
+  await app.page.keyboard.press("Enter");
+  await app.page.waitForFunction(() => window.testing.text()?.startsWith("Three #ideas #work/meetings\n"));
+
+  // In code, a # is a #.
+  const code = await app.page.evaluate(() => window.testing.text()!.indexOf("code"));
+  await app.page.evaluate((pos) => window.testing.place(pos), code);
+  await app.page.keyboard.type(" #id");
+  await app.page.waitForTimeout(200);
+  expect(await app.page.getByRole("option").count()).toBe(0);
+});
+
 test("Check spelling turns the browser's spell checking off and on", async () => {
   await app.open("Speling");
   expect(await app.page.locator(".editor-pane .cm-content").getAttribute("spellcheck")).toBe("true");
@@ -322,7 +685,7 @@ describe("fixed", () => {
   });
 
   test("Changes marks what's changed since opening: kept when Settings change, gone on opening again", async () => {
-    const plugins = await app.settings("Plugins");
+    const plugins = await app.settings("All Plugins");
     await toggle(plugins, "Changes", true);
     await app.closeSettings();
     const first = await app.open("One\nTwo");
@@ -401,4 +764,88 @@ describe("fixed", () => {
     await app.page.getByRole("button", { name: "Convert to Spreadsheet" }).click();
     expect(await app.text()).toBe("````csv\nFence\n```\n````\n\nAfter the table.");
   });
+});
+
+test("a nested tag shows as one as soon as its slash is typed, and files under the tag it's in", async () => {
+  await app.open("# Plan\n\n");
+  await app.page.evaluate(() => window.testing.place());
+  await app.page.keyboard.type("#idea/", { delay: 20 });
+  const tag = app.page.locator(".editor-pane .cm-lp-tag");
+  await tag.waitFor();
+  expect(await tag.innerText()).toContain("idea/");
+  await app.page.waitForFunction(() => window.testing.notes.entries[0].meta.tags.join() === "idea");
+  await app.page.keyboard.type("app");
+  await app.page.waitForFunction(() => document.querySelector(".editor-pane .cm-lp-tag")?.textContent?.includes("idea/app"));
+});
+
+test("a tag left ending in its slash loses it once the cursor leaves, and undo brings it back", async () => {
+  await app.open("# Plan\n\n");
+  const page = app.page;
+  await page.evaluate(() => window.testing.place());
+  await page.keyboard.type("#idea/", { delay: 20 });
+  // Still in it: the slash stays.
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowRight");
+  expect(await app.text()).toBe("# Plan\n\n#idea/");
+  // Moved away: it's gone.
+  await page.keyboard.press("ArrowUp");
+  await page.waitForFunction(() => window.testing.text() === "# Plan\n\n#idea");
+  await page.keyboard.press(`${mod()}+z`);
+  await page.waitForFunction(() => window.testing.text() === "# Plan\n\n#idea/");
+  // A space after it is moving on too.
+  await page.evaluate(() => window.testing.place());
+  await page.keyboard.type(" next");
+  await page.waitForFunction(() => window.testing.text() === "# Plan\n\n#idea next");
+});
+
+describe("clicking a tag in a note", () => {
+  /** Clicks the tag `#idea` in the open note: whether that showed its notes, rather than putting the cursor in it. */
+  async function clickTag(app: App, modifiers: ("Meta" | "Control")[] = []) {
+    await app.open("# Plan\n\nSee #idea here");
+    await app.page.locator(".editor-pane .cm-lp-tag").click({ modifiers });
+    await app.page.waitForTimeout(100);
+    return app.page.evaluate(() => window.testing.notes.filter.kind === "tag");
+  }
+  const old = { web: { click: "edit", modClick: "open", modShiftClick: "copy" }, tag: { click: "edit", modClick: "open", modShiftClick: "open" } };
+
+  test("shows its notes; ⌘-click puts the cursor in it", async () => {
+    expect(await clickTag(app)).toBe(true);
+    await app.close();
+    app = await openApp();
+    expect(await clickTag(app, [mod()])).toBe(false);
+  });
+
+  test("does so too with settings saved before it did, unless they were changed", async () => {
+    await app.close();
+    app = await openApp({ prefs: { links: old } });
+    expect(await clickTag(app)).toBe(true);
+    await app.close();
+    app = await openApp({ prefs: { links: { ...old, tag: { click: "edit", modClick: "edit", modShiftClick: "open" } } } });
+    expect(await clickTag(app)).toBe(false);
+  });
+});
+
+test("a score on a Key: Value line or in the properties is drawn as marks, as Little Touches says; the copy buttons can go", async () => {
+  await app.open("---\nrating: 3/5\n---\n# Film\n\nScore: 4/7\n\nEnd");
+  const page = app.page;
+  // The cursor elsewhere, at the end.
+  await page.evaluate(() => window.testing.place());
+  const score = page.locator(".editor-pane .cm-lp-score[aria-label='4 out of 7']");
+  await score.waitFor();
+  expect(await score.locator(".cm-lp-score-mark").count()).toBe(7);
+  expect(await score.locator(".cm-lp-score-mark.is-filled").count()).toBe(4);
+  expect(await score.getAttribute("class")).toContain("cm-lp-score-stars");
+  await page.locator(".editor-pane .cm-lp-score[aria-label='3 out of 5']").waitFor();
+  expect(await page.locator(".editor-pane .cm-lp-copy").count()).toBe(2);
+
+  // Hearts, then as written, and no copy buttons, from Settings.
+  const settings = await app.settings("Little Touches");
+  await choose(settings, "Scores", "Hearts");
+  await page.locator(".editor-pane .cm-lp-score-hearts[aria-label='4 out of 7']").waitFor();
+  await choose(settings, "Scores", "As Written");
+  await toggle(settings, "Copy buttons on values", false);
+  await app.closeSettings();
+  await page.locator(".editor-pane .cm-lp-score").first().waitFor({ state: "detached" });
+  expect(await page.locator(".editor-pane .cm-content").innerText()).toContain("Score: 4/7");
+  expect(await page.locator(".editor-pane .cm-lp-copy").count()).toBe(0);
 });

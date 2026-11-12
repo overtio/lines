@@ -7,13 +7,15 @@ import Icon from "../icons/Icon.svelte";
 import { t } from "../i18n/index.svelte";
 import { reducedMotion } from "../platform";
 import { CALLOUT_GUTTER, CARD_PAD, calloutOf, cardInset } from "./cards";
+import { frontMatterField } from "./objects";
 import { ancestors } from "./util";
 
 /*
  * Drag handles: hovering a line or block shows a grip to its left, and dragging the grip moves
  * it. A plain line moves on its own; a list item moves with its sub-items; a heading, code block,
  * table, quote or card (by its ::: line) moves whole. Things can't be dropped inside a code block,
- * table or quote.
+ * table or quote. A note's properties stay at its top: they have no grip, and nothing goes above
+ * or among them.
  */
 
 interface Block {
@@ -35,10 +37,13 @@ const BLOCKS = new Set([
   ...[1, 2, 3, 4, 5, 6].map((n) => `ATXHeading${n}`),
 ]);
 
+/** How many lines the note's properties take at its top, `---` to `---`; 0 without. */
+const propertyLines = (state: EditorState) => state.field(frontMatterField, false)?.lines ?? 0;
+
 /** What hovering or dragging line `n` picks up: the line, or the block it's part of. */
 function blockAt(state: EditorState, n: number): Block | null {
   const line = state.doc.line(n);
-  if (!line.text.trim()) return null;
+  if (!line.text.trim() || n <= propertyLines(state)) return null;
   const start = line.from + /^\s*/.exec(line.text)![0].length;
   let quote: SyntaxNode | null = null;
   let item: SyntaxNode | null = null;
@@ -80,11 +85,11 @@ function spanning(state: EditorState, k: number) {
   return nodes;
 }
 
-/** Whether the boundary above line `b` is in the note and not inside a code block, table or quote. */
+/** Whether the boundary above line `b` is in the note, below its properties, and not inside a code block, table or quote. */
 const droppable = (state: EditorState, b: number) =>
-  b >= 1 && b <= state.doc.lines + 1 && !spanning(state, b).some((n) => ATOMIC.has(n.name));
+  b > propertyLines(state) && b <= state.doc.lines + 1 && !spanning(state, b).some((n) => ATOMIC.has(n.name));
 
-/** The nearest boundary to `k` that's not inside a code block, table or quote. */
+/** The nearest boundary to `k` that's below the properties and not inside a code block, table or quote. */
 function snap(state: EditorState, k: number) {
   const ok = (b: number) => droppable(state, b);
   for (let d = 0; d <= state.doc.lines; d++) {
@@ -203,9 +208,10 @@ function drawn(view: EditorView) {
 
 /**
  * Moves `block` to the boundary above line `k`, and slides it and the lines it passed from where
- * they were drawn to where they are now, rather than leaving them to jump there.
+ * they were drawn to where they are now, rather than leaving them to jump there. Done once they're
+ * there.
  */
-function drop(view: EditorView, block: Block, k: number) {
+async function drop(view: EditorView, block: Block, k: number) {
   const spec = moveBlock(view.state, block, k);
   if (!spec) return;
   const still = reducedMotion.matches;
@@ -228,6 +234,7 @@ function drop(view: EditorView, block: Block, k: number) {
   });
   const count = block.last - block.first + 1;
   const inverted = tr.changes.invertedDesc;
+  const slides: Animation[] = [];
 
   for (const { el, line } of drawn(view)) {
     const moved = line >= first && line < first + count;
@@ -242,7 +249,7 @@ function drop(view: EditorView, block: Block, k: number) {
     const was = before.get(old);
     if (was === undefined) {
       // It was scrolled out of sight: fade in where it lands.
-      if (moved) el.animate([{ opacity: 0.35 }, { opacity: 1 }], SLIDE);
+      if (moved) slides.push(el.animate([{ opacity: 0.35 }, { opacity: 1 }], SLIDE));
       continue;
     }
     const by = was - el.getBoundingClientRect().top;
@@ -250,8 +257,10 @@ function drop(view: EditorView, block: Block, k: number) {
     const start: Keyframe = { transform: `translateY(${by}px)` };
     // The block comes back from the dimmed look it had while dragged.
     if (moved) start.opacity = 0.35;
-    el.animate([start, { transform: "none", opacity: 1 }], SLIDE);
+    slides.push(el.animate([start, { transform: "none", opacity: 1 }], SLIDE));
   }
+  // Cancelled (the lines drawn again) is there too.
+  await Promise.allSettled(slides.map((slide) => slide.finished));
 }
 
 /* The handle and the drop line. */
@@ -344,6 +353,10 @@ const handles = ViewPlugin.fromClass(
     icon: Record<string, unknown>;
     block: Block | null = null;
     drag: Drag | null = null;
+    /** Lines sliding to where a drop put them: the handle waits for them to get there. */
+    sliding = false;
+    /** Where the pointer last was over the note, up and down, if it's still over it. */
+    pointerY: number | null = null;
     frame = 0;
     /** The drop line's place and width in the scroller, and when it last moved. */
     glide = { x: new Spring(), y: new Spring(), width: new Spring(), shown: new Spring(), time: 0 };
@@ -396,18 +409,26 @@ const handles = ViewPlugin.fromClass(
     }
 
     hover = (event: MouseEvent) => {
-      const { view } = this;
-      if (this.drag || event.buttons || view.state.readOnly || !fine.matches) return;
+      this.pointerY = event.clientY;
+      if (this.drag || this.sliding || event.buttons || this.view.state.readOnly || !fine.matches) return;
       if (this.handle.contains(event.target as Node)) return;
-      const line = this.lineAtY(event.clientY);
+      this.showAt(event.clientY);
+    };
+
+    /** The handle by the block at this height, if there's one. */
+    showAt(clientY: number) {
+      const { view } = this;
+      const line = this.lineAtY(clientY);
       const block = line ? blockAt(view.state, view.state.doc.lineAt(line.from).number) : null;
       if (!block) return this.hide();
       if (this.block && block.first === this.block.first && block.last === this.block.last && !this.handle.hidden) return;
       this.show(block);
-    };
+    }
 
     leave = (event: MouseEvent) => {
-      if (!this.drag && !this.handle.contains(event.relatedTarget as Node)) this.hide();
+      if (this.handle.contains(event.relatedTarget as Node)) return;
+      this.pointerY = null;
+      if (!this.drag) this.hide();
     };
 
     show(block: Block) {
@@ -600,7 +621,15 @@ const handles = ViewPlugin.fromClass(
         view.focus();
         return;
       }
-      if (drag.target !== null) drop(view, drag.block, drag.target);
+      if (drag.target === null) return;
+      // While the lines slide, a handle would be put by where they're drawn on the way, not where
+      // they end up: it shows once they're there, by the block under the pointer (the one dropped).
+      this.pointerY = drag.lastY;
+      this.sliding = true;
+      void drop(view, drag.block, drag.target).finally(() => {
+        this.sliding = false;
+        if (this.handle.isConnected && this.pointerY !== null && !this.drag && !view.state.readOnly && fine.matches) this.showAt(this.pointerY);
+      });
     };
 
     cancel = () => this.stop();

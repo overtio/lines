@@ -4,6 +4,7 @@ import { arxiv } from "./arxiv";
 import { asciinema } from "./asciinema";
 import { changesPlugin } from "./changes";
 import { code } from "./code";
+import { fonts } from "./fonts";
 import { giphy } from "./giphy";
 import { wallhaven } from "./wallhaven";
 import { github } from "./github";
@@ -19,7 +20,7 @@ import { paper } from "./paper";
 import { pele } from "./pele";
 import { secrets } from "./secrets";
 import { sfSymbols } from "./sf-symbols";
-import { spreadsheet } from "./spreadsheet";
+import { spreadsheet, spreadsheetNotes } from "./spreadsheet";
 import { tex } from "./tex";
 import { keyboardSounds } from "./keyboards";
 import { mascots } from "./mascots";
@@ -38,6 +39,7 @@ export const builtIn = (): Plugin[] => [
   markdown(),
   latex(),
   spreadsheet(),
+  spreadsheetNotes(),
   requests(),
   code(),
   secrets(),
@@ -59,6 +61,7 @@ export const builtIn = (): Plugin[] => [
   changesPlugin(),
   themes(),
   styles(),
+  fonts(),
   paper(),
   keyboardSounds(),
   mascots(),

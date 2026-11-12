@@ -315,98 +315,105 @@ And another.
 **Wi-Fi password:** correct-horse-battery
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Key: Value line, then Mention
+#### 33. Key: Value line, then Score (Settings → Little Touches)
+
+**Wi-Fi password:** correct-horse-battery
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Key: Value line, then Mention
 
 **Wi-Fi password:** correct-horse-battery
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Key: Value line, then Wiki link
+#### 35. Key: Value line, then Wiki link
 
 **Wi-Fi password:** correct-horse-battery
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Key: Value line, then Symbols
+#### 36. Key: Value line, then Symbols
 
 **Wi-Fi password:** correct-horse-battery
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Key: Value line, then GitHub links
+#### 37. Key: Value line, then GitHub links
 
 **Wi-Fi password:** correct-horse-battery
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Key: Value line, then arXiv links
+#### 38. Key: Value line, then arXiv links
 
 **Wi-Fi password:** correct-horse-battery
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Key: Value line, then Image
+#### 39. Key: Value line, then Image
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample picture](attachment:photo.png)
 
-#### 39. Key: Value line, then Drawing
+#### 40. Key: Value line, then Drawing
 
 **Wi-Fi password:** correct-horse-battery
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Key: Value line, then File
+#### 41. Key: Value line, then File
 
 **Wi-Fi password:** correct-horse-battery
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Key: Value line, then Folder and file links
+#### 42. Key: Value line, then Folder and file links
 
 **Wi-Fi password:** correct-horse-battery
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Key: Value line, then Attached 3D model (STL)
+#### 43. Key: Value line, then Attached 3D model (STL)
 
 **Wi-Fi password:** correct-horse-battery
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Key: Value line, then Terminal recording (.cast file)
+#### 44. Key: Value line, then Terminal recording (.cast file)
 
 **Wi-Fi password:** correct-horse-battery
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Key: Value line, then Audio
+#### 45. Key: Value line, then Audio
 
 **Wi-Fi password:** correct-horse-battery
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Key: Value line, then Video
+#### 46. Key: Value line, then Video
 
 **Wi-Fi password:** correct-horse-battery
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Key: Value line, then Missing file
+#### 47. Key: Value line, then Missing file
 
 **Wi-Fi password:** correct-horse-battery
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Key: Value line, then Card
+#### 48. Key: Value line, then Card
 
 **Wi-Fi password:** correct-horse-battery
 ::: card
 Text in a card.
 :::
 
-#### 48. Key: Value line, then Callout (info)
+#### 49. Key: Value line, then Callout (info)
 
 **Wi-Fi password:** correct-horse-battery
 :::i
 Text in an info callout.
 :::
 
-#### 49. Key: Value line, then Callout (warning, chosen icon)
+#### 50. Key: Value line, then Callout (warning, chosen icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Key: Value line, then Callout (decision, no icon)
+#### 51. Key: Value line, then Callout (decision, no icon)
 
 **Wi-Fi password:** correct-horse-battery
 :::^ icon=none

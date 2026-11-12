@@ -411,7 +411,17 @@ And another.
 3. Third
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Numbered list, then Mention
+#### 33. Numbered list, then Score (Settings → Little Touches)
+
+1. First
+2. Second
+   1. Nested
+3. Third
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Numbered list, then Mention
 
 1. First
 2. Second
@@ -419,7 +429,7 @@ And another.
 3. Third
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Numbered list, then Wiki link
+#### 35. Numbered list, then Wiki link
 
 1. First
 2. Second
@@ -427,7 +437,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 3. Third
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Numbered list, then Symbols
+#### 36. Numbered list, then Symbols
 
 1. First
 2. Second
@@ -435,7 +445,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 3. Third
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Numbered list, then GitHub links
+#### 37. Numbered list, then GitHub links
 
 1. First
 2. Second
@@ -443,7 +453,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 3. Third
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Numbered list, then arXiv links
+#### 38. Numbered list, then arXiv links
 
 1. First
 2. Second
@@ -451,7 +461,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Numbered list, then Image
+#### 39. Numbered list, then Image
 
 1. First
 2. Second
@@ -459,7 +469,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 ![A sample picture](attachment:photo.png)
 
-#### 39. Numbered list, then Drawing
+#### 40. Numbered list, then Drawing
 
 1. First
 2. Second
@@ -467,7 +477,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Numbered list, then File
+#### 41. Numbered list, then File
 
 1. First
 2. Second
@@ -475,7 +485,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Numbered list, then Folder and file links
+#### 42. Numbered list, then Folder and file links
 
 1. First
 2. Second
@@ -483,7 +493,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Numbered list, then Attached 3D model (STL)
+#### 43. Numbered list, then Attached 3D model (STL)
 
 1. First
 2. Second
@@ -491,7 +501,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 3. Third
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Numbered list, then Terminal recording (.cast file)
+#### 44. Numbered list, then Terminal recording (.cast file)
 
 1. First
 2. Second
@@ -499,7 +509,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 3. Third
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Numbered list, then Audio
+#### 45. Numbered list, then Audio
 
 1. First
 2. Second
@@ -507,7 +517,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 3. Third
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Numbered list, then Video
+#### 46. Numbered list, then Video
 
 1. First
 2. Second
@@ -515,7 +525,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 3. Third
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Numbered list, then Missing file
+#### 47. Numbered list, then Missing file
 
 1. First
 2. Second
@@ -523,7 +533,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 3. Third
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Numbered list, then Card
+#### 48. Numbered list, then Card
 
 1. First
 2. Second
@@ -533,7 +543,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 Text in a card.
 :::
 
-#### 48. Numbered list, then Callout (info)
+#### 49. Numbered list, then Callout (info)
 
 1. First
 2. Second
@@ -543,7 +553,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 49. Numbered list, then Callout (warning, chosen icon)
+#### 50. Numbered list, then Callout (warning, chosen icon)
 
 1. First
 2. Second
@@ -553,7 +563,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Numbered list, then Callout (decision, no icon)
+#### 51. Numbered list, then Callout (decision, no icon)
 
 1. First
 2. Second

@@ -347,91 +347,99 @@ And another.
 > two lines.
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Quote, then Mention
+#### 33. Quote, then Score (Settings → Little Touches)
+
+> A quote that runs over
+> two lines.
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Quote, then Mention
 
 > A quote that runs over
 > two lines.
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Quote, then Wiki link
+#### 35. Quote, then Wiki link
 
 > A quote that runs over
 > two lines.
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Quote, then Symbols
+#### 36. Quote, then Symbols
 
 > A quote that runs over
 > two lines.
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Quote, then GitHub links
+#### 37. Quote, then GitHub links
 
 > A quote that runs over
 > two lines.
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Quote, then arXiv links
+#### 38. Quote, then arXiv links
 
 > A quote that runs over
 > two lines.
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Quote, then Image
+#### 39. Quote, then Image
 
 > A quote that runs over
 > two lines.
 ![A sample picture](attachment:photo.png)
 
-#### 39. Quote, then Drawing
+#### 40. Quote, then Drawing
 
 > A quote that runs over
 > two lines.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Quote, then File
+#### 41. Quote, then File
 
 > A quote that runs over
 > two lines.
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Quote, then Folder and file links
+#### 42. Quote, then Folder and file links
 
 > A quote that runs over
 > two lines.
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Quote, then Attached 3D model (STL)
+#### 43. Quote, then Attached 3D model (STL)
 
 > A quote that runs over
 > two lines.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Quote, then Terminal recording (.cast file)
+#### 44. Quote, then Terminal recording (.cast file)
 
 > A quote that runs over
 > two lines.
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Quote, then Audio
+#### 45. Quote, then Audio
 
 > A quote that runs over
 > two lines.
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Quote, then Video
+#### 46. Quote, then Video
 
 > A quote that runs over
 > two lines.
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Quote, then Missing file
+#### 47. Quote, then Missing file
 
 > A quote that runs over
 > two lines.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Quote, then Card
+#### 48. Quote, then Card
 
 > A quote that runs over
 > two lines.
@@ -439,7 +447,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 Text in a card.
 :::
 
-#### 48. Quote, then Callout (info)
+#### 49. Quote, then Callout (info)
 
 > A quote that runs over
 > two lines.
@@ -447,7 +455,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 49. Quote, then Callout (warning, chosen icon)
+#### 50. Quote, then Callout (warning, chosen icon)
 
 > A quote that runs over
 > two lines.
@@ -455,7 +463,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Quote, then Callout (decision, no icon)
+#### 51. Quote, then Callout (decision, no icon)
 
 > A quote that runs over
 > two lines.

@@ -13,21 +13,68 @@ import { EditorView, layer, RectangleMarker, ViewPlugin, type ViewUpdate } from 
  */
 
 /** The page's attributes the cursor's look is in, which draw it again when they change. */
-const LOOK = ["data-caret-shape", "data-caret-motion", "data-caret-effect"];
+const LOOK = ["data-caret-shape", "data-caret-width", "data-caret-motion", "data-caret-effect"];
 const lookChanged = StateEffect.define<null>();
 const root = document.documentElement.dataset;
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
-/** How wide the character at `pos` is, for a block or underline over it. */
+/** How far past hidden markup (`**`, a link's address) to look for the character drawn next. */
+const HIDDEN_REACH = 400;
+
+/**
+ * How wide the character drawn at `pos` is, for a block or underline over it: up to the next
+ * position drawn further along, past markup that's hidden (none wide), as before the `**` of bold.
+ * With none after it on its row (the end of a line), the one before it, in the same type: a
+ * heading's cursor as wide as a heading's letter; after a space, as wide as a letter would be. On
+ * an empty line too.
+ */
 function characterWidth(view: EditorView, pos: number) {
   const line = view.state.doc.lineAt(pos);
-  if (pos < line.to) {
-    const here = view.coordsAtPos(pos, 1);
-    const next = view.coordsAtPos(pos + 1, -1);
-    if (here && next && next.top === here.top && next.left > here.left) return next.left - here.left;
+  const here = pos < line.to && view.coordsAtPos(pos, 1);
+  if (here) {
+    for (let next = pos + 1; next <= Math.min(line.to, pos + HIDDEN_REACH); next++) {
+      const at = view.coordsAtPos(next, -1);
+      // Wrapped onto the next line: the character's the last of its row.
+      if (!at || at.top !== here.top) break;
+      if (at.left > here.left) return at.left - here.left;
+    }
   }
-  return view.defaultCharacterWidth;
+  const end = view.coordsAtPos(pos, -1);
+  if (end) {
+    for (let before = pos - 1; before >= Math.max(line.from, pos - HIDDEN_REACH); before--) {
+      const at = view.coordsAtPos(before, 1);
+      if (!at || at.top !== end.top) break;
+      if (at.left < end.left) {
+        const width = end.left - at.left;
+        return /\s/.test(view.state.doc.sliceString(before, before + 1)) ? Math.max(width, letterWidth(view, pos)) : width;
+      }
+    }
+  }
+  return letterWidth(view, pos);
 }
+
+const measure = document.createElement("canvas").getContext("2d");
+const letters = new Map<string, number>();
+
+/** How wide a letter (an `n`) is in the type at `pos`, as big as a heading's, on screen. */
+function letterWidth(view: EditorView, pos: number) {
+  const { node } = view.domAtPos(pos);
+  const element = node instanceof Element ? node : node.parentElement;
+  const fallback = view.defaultCharacterWidth;
+  if (!element || !measure) return fallback;
+  const style = getComputedStyle(element);
+  const font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+  let width = letters.get(font);
+  if (width === undefined) {
+    measure.font = font;
+    width = measure.measureText("n").width;
+    letters.set(font, width);
+  }
+  return width || fallback;
+}
+
+/** How thick an underline cursor is: thicker under bigger text, as an underline is. */
+const underline = (height: number) => Math.max(2, Math.round(height / 14));
 
 /** The primary cursor, in the shape chosen: CodeMirror's bar, or a box as wide as the character. */
 function caret(view: EditorView, className: string) {
@@ -40,8 +87,10 @@ function caret(view: EditorView, className: string) {
   if (!bar) return undefined;
   const shape = root.caretShape;
   if (shape !== "block" && shape !== "underline") return bar;
-  const width = characterWidth(view, main.head);
-  return shape === "block" ? new RectangleMarker(className, bar.left, bar.top, width, bar.height) : new RectangleMarker(className, bar.left, bar.top + bar.height - 2, width, 2);
+  const width = root.caretWidth === "even" ? letterWidth(view, main.head) : characterWidth(view, main.head);
+  if (shape === "block") return new RectangleMarker(className, bar.left, bar.top, width, bar.height);
+  const thick = underline(bar.height);
+  return new RectangleMarker(className, bar.left, bar.top + bar.height - thick, width, thick);
 }
 
 const cursorLayer = layer({

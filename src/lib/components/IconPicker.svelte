@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { Popover } from "bits-ui";
+  import { Popover, RadioGroup } from "bits-ui";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
-  import { ICONS, TAG_ICON_GROUPS, type IconName } from "../icons/icons";
+  import { ICON_WORDS, ICONS, TAG_ICON_GROUPS, type IconName } from "../icons/icons";
+  import { PALETTE, type PaletteColor, paletteVar } from "../palette";
   import { pointAt, takeFocus } from "../popover";
   import { ui } from "../ui.svelte";
   import Button from "./ui/Button.svelte";
@@ -17,14 +18,17 @@
   const picker = $derived(ui.iconPicker);
   const current = $derived(picker?.icon() ?? null);
   const none = $derived(picker?.none?.active() ?? false);
-  // Matches Lucide and SF Symbol names, which between them cover the obvious synonyms.
-  // Searching shows every match as one group.
+  const color = $derived(picker?.color?.get() ?? null);
+  const inherited = $derived(picker?.color?.inherited);
+  /** The color it shows in: its own, or the one it has from the tag it's in. */
+  const shown = $derived(color ?? inherited?.color ?? null);
+  // Matches Lucide's and SF Symbols' names and the words each is for ("money" finds the banknote).
+  // Searching shows every match, once, as one group.
   const groups = $derived.by(() => {
-    const q = query.trim().toLowerCase().replace(/\s+/g, "-");
+    const q = query.trim().toLowerCase().replace(/\s+/g, " ");
     if (!q) return TAG_ICON_GROUPS;
-    const matches = TAG_ICON_GROUPS.flatMap((group) => group.icons).filter(
-      (name) => name.includes(q) || ICONS[name][1].replace(/\./g, "-").includes(q),
-    );
+    const found = (name: IconName) => [name, ICONS[name][1], ICON_WORDS[name] ?? ""].join(" ").replace(/[.-]/g, " ").includes(q);
+    const matches = [...new Set(TAG_ICON_GROUPS.flatMap((group) => group.icons))].filter(found);
     return [{ name: "", icons: matches }];
   });
 
@@ -119,9 +123,14 @@
       class="{floating} w-[min(calc(var(--cell)*8+2px*7+20px),calc(100vw-16px))] p-2.5 [--cell:34px] coarse:[--cell:44px]"
     >
       {#if picker}
-        <header class="-mt-0.5 mb-2 ml-1 flex items-center justify-between gap-2">
+        <header class="-mt-0.5 mb-2 ml-1 flex items-center justify-between gap-2" style:--look={shown && paletteVar(shown)}>
           <span class="flex min-w-0 items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
-            <Icon name={current ?? picker.fallback} size={15} strokeWidth={1.75} class="shrink-0 text-accent {none ? 'opacity-35' : ''}" />
+            <Icon
+              name={current ?? picker.fallback}
+              size={15}
+              strokeWidth={1.75}
+              class="shrink-0 {shown ? 'text-(--look)' : 'text-accent'} {none ? 'opacity-35' : ''}"
+            />
             <span class="truncate">{picker.label}</span>
           </span>
           <span class="flex shrink-0 gap-0.5">
@@ -131,6 +140,40 @@
             <Button variant="quiet" onclick={() => choose(null)} disabled={!current && !none}>{t("picker.reset")}</Button>
           </span>
         </header>
+        {#if picker.color}
+          {@const choose = picker.color.set}
+          <!-- Chosen as it's clicked, the picker staying open for an icon too. -->
+          <RadioGroup.Root
+            value={color ?? "none"}
+            onValueChange={(value) => choose(value === "none" ? null : (value as PaletteColor))}
+            orientation="horizontal"
+            aria-label={t("picker.colors")}
+            class="mb-2 flex items-center justify-between px-0.5"
+          >
+            {#each ["none", ...PALETTE] as const as each (each)}
+              {@const name = each !== "none" ? t(`picker.color.${each}`) : inherited ? t("picker.sameAs", { name: `#${inherited.from}` }) : t("picker.noColor")}
+              <RadioGroup.Item
+                value={each}
+                aria-label={name}
+                title={name}
+                class="grid size-7 place-items-center rounded-full p-1 inset-ring-2 inset-ring-transparent focus-visible:outline-offset-1 data-[state=checked]:inset-ring-(--look) coarse:size-9"
+                style="--look: {each !== 'none' ? paletteVar(each) : inherited ? paletteVar(inherited.color) : 'var(--text-muted)'}"
+              >
+                {#if each === "none" && inherited}
+                  <!-- A ring in the color it has from the tag it's in: none of its own. -->
+                  <span class="size-full rounded-full inset-ring-[3px] inset-ring-(--look) forced-color-adjust-none" aria-hidden="true"></span>
+                {:else if each === "none"}
+                  <!-- A ring with a line across it: no color of its own. -->
+                  <span class="relative size-full overflow-hidden rounded-full inset-ring-1 inset-ring-(--text-faint)" aria-hidden="true">
+                    <span class="absolute top-1/2 left-1/2 h-px w-[140%] -translate-1/2 -rotate-45 bg-faint"></span>
+                  </span>
+                {:else}
+                  <span class="size-full rounded-full bg-(--look) forced-color-adjust-none" aria-hidden="true"></span>
+                {/if}
+              </RadioGroup.Item>
+            {/each}
+          </RadioGroup.Root>
+        {/if}
         <TextField
           type="search"
           icon="search"

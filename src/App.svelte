@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from "./lib/icons/Icon.svelte";
+  import ColorPicking from "./lib/components/ColorPicking.svelte";
   import ContextMenu from "./lib/components/ContextMenu.svelte";
   import NoteList from "./lib/components/NoteList.svelte";
   import Sidebar from "./lib/components/Sidebar.svelte";
@@ -12,7 +13,12 @@
   import PdfPreview from "./lib/components/PdfPreview.svelte";
   import PaneResizer from "./lib/components/PaneResizer.svelte";
   import SaveError from "./lib/components/SaveError.svelte";
+  import Panes from "./lib/components/Panes.svelte";
+  import DragLabel from "./lib/components/DragLabel.svelte";
+  import { paneContent } from "./lib/components/paneContent";
   import SideNote from "./lib/components/SideNote.svelte";
+  import CalendarDays from "./lib/components/CalendarDays.svelte";
+  import CalendarHeader from "./lib/components/CalendarHeader.svelte";
   import SidebarToggle from "./lib/components/SidebarToggle.svelte";
   import TabBar from "./lib/components/TabBar.svelte";
   import Button from "./lib/components/ui/Button.svelte";
@@ -22,6 +28,7 @@
   import { speak } from "./lib/a11y";
   import { t } from "./lib/i18n/index.svelte";
   import { lock } from "./lib/lock/lock.svelte";
+  import { noteFile } from "./lib/notes/dragOut";
   import { fileName } from "./lib/notes/fileName";
   import { lockedNotes } from "./lib/notes/locked.svelte";
   import { isClosed, notes } from "./lib/notes/store.svelte";
@@ -29,6 +36,8 @@
   import { canPrint, copyText, isApple, isNewNoteShortcut, newNoteKey } from "./lib/platform";
   import { saveAndShow } from "./lib/save";
   import { NOTE_MIN, ui, type MenuItem } from "./lib/ui.svelte";
+  import { MAIN } from "./lib/panes";
+  import { panes } from "./lib/panes.svelte";
   import { openSettings } from "./lib/windows/settings.svelte";
   import { PANE_WIDTHS, prefs } from "./lib/prefs.svelte";
   import { canFloat, floatingOpen, toggleFloating } from "./lib/windows/floating";
@@ -148,6 +157,8 @@
   ]);
 
   const selected = $derived(notes.selected);
+  /** The day whose week or day is in the note's place: on the Calendar, with no note open, beside the list. */
+  const calendarDay = $derived(!selected && !notes.loadError && notes.ready && notes.filter.kind === "calendar" && !narrow ? notes.filter.day : null);
   /** A locked note that isn't open shows the password prompt instead of its text. */
   const closed = $derived(!!selected && isClosed(selected.note));
 
@@ -224,24 +235,27 @@
   });
 
   /*
-   * A note open beside the selected one (SideNote.svelte), where there's room for both. Never the
-   * same note in both (neither editor would see the other's typing): selecting the one beside
-   * closes it. Trashed or deleted, it goes.
+   * Notes open in panes beside the selected one (Panes.svelte). Never the same note in two (neither
+   * editor would see the other's typing): selecting one that's in a pane closes its pane. Trashed or
+   * deleted, it goes.
    */
-  const beside = $derived.by(() => {
-    const entry = ui.side && ui.besideFits && ui.side !== notes.selectedId ? notes.get(ui.side) : undefined;
-    return entry && !entry.note.trashed ? entry : null;
-  });
   $effect(() => {
-    if (ui.side && notes.ready && (ui.side === notes.selectedId || !notes.get(ui.side) || notes.get(ui.side)!.note.trashed)) untrack(() => (ui.side = null));
+    if (!notes.ready) return;
+    const gone = panes.ids.filter((id) => id === notes.selectedId || !notes.get(id) || notes.get(id)!.note.trashed);
+    if (gone.length) untrack(() => gone.forEach((id) => panes.close(id)));
   });
-  /** As wide as dragged, leaving the main note at least NOTE_MIN. */
-  const sideMax = $derived(Math.max(PANE_WIDTHS.side.min, Math.min(PANE_WIDTHS.side.max, ui.editorWidth - NOTE_MIN)));
-  const sideWidth = $derived(Math.min(prefs.sideWidth, sideMax));
 
   // Tabs turned off: they go with them.
   $effect(() => {
     if (!prefs.tabs) untrack(() => tabs.clear());
+  });
+
+  // Notes in a language whose plugin is off at first (spreadsheet notes), here at load or come since
+  // (synced, imported, the tour): its plugin comes on, so they don't open as text.
+  $effect(() => {
+    if (!notes.ready) return;
+    void notes.entries.length;
+    untrack(() => plugins.keepLanguagesInUse(new Set(notes.entries.flatMap((entry) => entry.note.format ?? []))));
   });
 
   function toggleInfo(event: MouseEvent) {
@@ -273,12 +287,13 @@
       { label: t("app.copyPlainText"), icon: "file-text", run: () => copy(language.plainText(body)) },
     );
     const filename = fileName(title);
+    const file = noteFile(selected.note, title);
     items.push(
       "separator",
       {
         label: t("app.downloadSource", { language: source }),
         icon: "download",
-        run: () => void saveAndShow(`${filename}.${language.extensions[0]}`, async () => new TextEncoder().encode(language.file(body)), `${language.mimeType};charset=utf-8`),
+        run: () => void saveAndShow(file.name, async () => new TextEncoder().encode(file.text), file.type),
       },
       // Other files it can be, like a spreadsheet's Excel workbook.
       ...(language.exports ?? []).map((download) => ({
@@ -360,8 +375,9 @@
     const target = event.target as HTMLElement;
     if (!(event.metaKey || event.ctrlKey) || event.shiftKey || event.altKey || event.key.toLowerCase() !== "z") return;
     if (target.matches("input, textarea")) return;
-    if (!notes.undoTrash()) return;
-    speak(t("list.didRestore"));
+    const undone = notes.undoTrash() ? t("list.didRestore") : notes.undoEdit() ? t("calendar.didUndo") : null;
+    if (!undone) return;
+    speak(undone);
     event.preventDefault();
     // Keeps the editor from also undoing its last change.
     event.stopPropagation();
@@ -542,9 +558,15 @@
     inert={narrow && !selected}
     bind:this={editorPane}
     bind:clientWidth={ui.editorWidth}
+    bind:clientHeight={ui.editorHeight}
   >
-    <!-- The selected note, and beside it the one opened to the side. -->
-    <div class="flex min-h-0 min-w-0 flex-1 flex-col">
+    <!--
+      What each pane shows (Panes.svelte brings it into its place, paneContent.ts): the selected note's,
+      with the toolbar, its note or the Calendar's week; and each note's opened beside it.
+    -->
+    <div class="hidden">
+    <div data-pane-wrapper={MAIN}>
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col" {@attach paneContent(MAIN)}>
       <header class="toolbar flex h-(--titlebar-h) shrink-0 items-center gap-1 px-3 pt-(--titlebar-pad-top)" data-tauri-drag-region>
         {#if ui.sidebarToggle === "editor" && prefs.sidebarSide === "left"}
           <SidebarToggle />
@@ -552,6 +574,9 @@
         {#if narrow}
           <IconButton icon="chevron-left" iconSize={22} label={t("app.backToNotes")} onclick={() => notes.select(null)} />
         {:else if selected || ui.focus}
+          {#if selected && notes.filter.kind === "calendar"}
+            <IconButton icon="calendar" iconSize={17} label={t("calendar.back")} onclick={() => notes.select(null)} />
+          {/if}
           <IconButton
             icon={ui.focus ? "minimize-2" : "maximize-2"}
             iconSize={16}
@@ -563,6 +588,11 @@
         {/if}
         {#if tabs.shown}
           <TabBar />
+        {:else if calendarDay}
+          <!-- The Calendar's dates and controls, at the top of the week or day in the note's place. -->
+          <div class="flex min-w-0 flex-1 items-center gap-2 self-stretch pl-2" data-tauri-drag-region>
+            <CalendarHeader day={calendarDay} />
+          </div>
         {:else}
           <div class="flex-1 self-stretch" data-tauri-drag-region></div>
         {/if}
@@ -635,6 +665,8 @@
           <Icon name="circle-alert" size={36} strokeWidth={1.25} />
           <p class="m-0 text-md" role="alert">{t("app.loadError", { error: notes.loadError })}</p>
         </div>
+      {:else if calendarDay}
+        <CalendarDays day={calendarDay} header={tabs.shown} />
       {:else if notes.ready}
         <div class={placeholder}>
           <Icon name="feather" size={36} strokeWidth={1.25} />
@@ -645,24 +677,16 @@
         </div>
       {/if}
     </div>
-    {#if beside}
-      <PaneResizer
-        label={t("app.sideWidth")}
-        width={sideWidth}
-        min={PANE_WIDTHS.side.min}
-        max={sideMax}
-        initial={PANE_WIDTHS.side.initial}
-        side="right"
-        offset={sideWidth}
-        onresize={(width) => (prefs.sideWidth = width)}
-        ondrag={(dragging) => (resizing = dragging)}
-      />
-      <div class="flex min-h-0 shrink-0" style:width="{sideWidth}px">
-        <SideNote id={beside.note.id} />
-      </div>
-    {/if}
+    </div>
+    {#each panes.ids as id (id)}
+      <div data-pane-wrapper={id}><div class="flex min-h-0 min-w-0 flex-1" {@attach paneContent(id)}><SideNote {id} top={panes.top.has(id)} /></div></div>
+    {/each}
+    </div>
+    <!-- The note's place, split into panes: the selected note's, and others opened beside it, where there's room. -->
+    <Panes tree={panes.shownTree} ondrag={(dragging) => (resizing = dragging)} />
   </main>
 </div>
+<DragLabel />
 
 {#if infoAnchor && selected && !closed}
   <NoteInfo entry={selected} anchor={infoAnchor} onclose={closeInfo} />
@@ -676,5 +700,6 @@
   {/key}
 {/if}
 <ContextMenu />
+<ColorPicking />
 <IconPicker />
 <TagPrompt />

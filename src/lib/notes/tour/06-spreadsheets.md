@@ -18,7 +18,7 @@ Average, =AVERAGE(B2:B4)
 
 ## Spreadsheet notes
 
-A whole note can be a spreadsheet: switch one in its ⓘ panel, or import a CSV file or an Excel workbook from Settings → Export and Import. The next note, **Trip budget**, is one.
+A whole note can be a spreadsheet, with Spreadsheet Notes on in Settings → Plugins (on already, with this tour): switch one in its ⓘ panel, or import a CSV file or an Excel workbook from Settings → Export and Import. The next note, **Trip budget**, is one.
 
 Formulas can use other spreadsheets' cells, as Excel's use other sheets. This one takes the trip's total from that note, and changes when it does:
 
@@ -29,6 +29,6 @@ Saved so far, $500
 Still to save, =B2-B3
 ```
 
-Type `='` in a cell for a list of the spreadsheets it can use, or open Trip budget beside this note (⌥-click it in the list) and click its cells. Settings → Editor → Spreadsheets sets how money, dates and numbers below zero show.
+Type `='` in a cell for a list of the spreadsheets it can use, or open Trip budget beside this note (⌥-click it in the list) and click its cells. Settings → Plugins → Spreadsheets sets how money, dates and numbers below zero show.
 
 #tour

@@ -106,7 +106,8 @@
   white-space: nowrap;
   background: var(--code-bg);
   border-radius: calc(6px * var(--radius-scale));
-  padding: 0.1em 0.4em;
+  /* A little more below than above: a name's lowercase letters sit low in their line's box. */
+  padding: 0.06em 0.4em 0.16em;
   font-size: 0.92em;
   font-weight: 500;
 }
@@ -129,18 +130,65 @@
   color: var(--tag-text);
   background: var(--tag-bg);
   border-radius: calc(6px * var(--radius-scale));
-  padding: 0.1em 0.4em;
+  /* A little more below than above: a name's lowercase letters sit low in their line's box. */
+  padding: 0.06em 0.4em 0.16em;
   font-size: 0.92em;
   font-weight: 500;
   cursor: pointer;
 }
 
+/* In a heading, as big as the heading's text, its `#` icon as big as its name (below). */
+.cm-lp-h .cm-lp-tag {
+  font-size: 1em;
+}
+
 /* Its `#` (livePreview.ts), as an icon a little apart from the name. */
+/* A score (`Rating: 4/5`) drawn as marks (scores.ts): those it has filled in its color, the rest faint. */
+.cm-lp-score {
+  display: inline-flex;
+  gap: 0.12em;
+  vertical-align: -0.12em;
+  --score: var(--accent);
+}
+
+.cm-lp-score-stars {
+  --score: var(--palette-yellow);
+}
+
+.cm-lp-score-hearts {
+  --score: var(--palette-red);
+}
+
+.cm-lp-score-mark {
+  display: inline-flex;
+  color: var(--text-faint);
+}
+
+.cm-lp-score-mark .icon {
+  width: 1em;
+  height: 1em;
+}
+
+.cm-lp-score-mark.is-filled {
+  color: var(--score);
+}
+
+/* Lucide's icons are outlines, filled in here; another set's shows in the color alone. */
+.cm-lp-score-mark.is-filled svg {
+  fill: currentColor;
+}
+
 .cm-lp-tag-icon {
   display: inline-flex;
-  margin-right: 0.15em;
+  margin-right: 0.3em;
   vertical-align: -0.1em;
   opacity: 0.7;
+}
+
+/* As big as the tag's name, whatever its size. */
+.cm-lp-tag-icon .icon {
+  width: 0.85em;
+  height: 0.85em;
 }
 
 /* A link to a folder or file on this computer (localLinks.ts): its icon in front, in the link's color. */
@@ -366,13 +414,14 @@
   color: var(--text-muted);
 }
 
+/* As tall as text, its line across the middle, so the cursor beside it (Hidden, where it's never the `---`) is too. */
 .cm-lp-hr {
+  --hr-color: var(--border);
   display: inline-block;
   width: 100%;
-  height: 1px;
+  height: 1.25em;
   vertical-align: middle;
-  background: var(--border);
-  box-shadow: 0 0 0 0.5px var(--border);
+  background: linear-gradient(var(--hr-color), var(--hr-color)) center / 100% 2px no-repeat;
 }
 
 /*
@@ -746,6 +795,26 @@
 
 .cm-drop-indicator[hidden] {
   display: none;
+}
+
+/* Something drawn in place of lines, all of it selected (a block's grip, a selection across it): tinted as selected text is (util.ts). */
+.cm-content > .cm-block-selected {
+  position: relative;
+}
+
+.cm-content > .cm-block-selected::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: calc(8px * var(--radius-scale));
+  background: var(--selection);
+  pointer-events: none;
+}
+
+/* A line that's only drawn (a divider): a band around what's drawn, not the line's whole height. */
+.cm-content > .cm-line.cm-block-selected::after {
+  inset: calc(50% - 7px) -3px;
+  border-radius: calc(5px * var(--radius-scale));
 }
 
 .cm-line.cm-drag-source {
@@ -2046,7 +2115,7 @@
   }
 
   .cm-lp-hr {
-    background: CanvasText;
+    --hr-color: CanvasText;
   }
 
   .cm-lp-codeblock {
@@ -2079,6 +2148,11 @@
 .cm-editor.cm-sheet-note .cm-content {
   max-width: none;
   padding-bottom: var(--editor-pad-top);
+}
+
+/* The title set well apart from the formula bar and grid under it, which are close to each other. */
+.cm-editor.cm-sheet-note .cm-line.cm-lp-title {
+  padding-bottom: calc(var(--title-gap) + 0.5em) !important;
 }
 
 /* Scrolling stops at the grid's edges, without the bounce past them, and doesn't move the note around it. */
@@ -2280,7 +2354,7 @@
 }
 
 /*
- * The paper chosen in Settings → Paper (lib/paper.svelte.ts), behind the note and scrolling with it,
+ * The paper chosen in Settings → Plugins → Paper (lib/paper.svelte.ts), behind the note and scrolling with it,
  * and a pattern drawn per line under each line's own rows. Not behind a spreadsheet note's grid, nor
  * on lines that draw a background of their own (code blocks, the line closing properties).
  */
@@ -2318,7 +2392,7 @@
 }
 
 /*
- * A backdrop (Settings → Paper → Backdrop) fills the main window's note pane, under its toolbar too,
+ * A backdrop (Settings → Plugins → Paper → Backdrop) fills the main window's note pane, under its toolbar too,
  * in a layer of its own that Monochrome can turn grey, and each note there is a page over it.
  */
 :root[data-backdrop] .editor-pane {

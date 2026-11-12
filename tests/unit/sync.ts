@@ -24,6 +24,8 @@ mock.module("../../src/lib/i18n/index.svelte", () => ({
 }));
 mock.module("../../src/lib/print/parts", () => ({ el: () => null }));
 mock.module("../../src/lib/a11y", () => ({ speak: () => {} }));
+// Settings, which read the page's storage: only what the notes store asks for.
+mock.module("../../src/lib/prefs.svelte", () => ({ prefs: { calendarEdited: false } }));
 mock.module("../../src/lib/windows/channel", () => ({ announce: async () => {}, onAnnounce: async () => () => {}, windowLabel: () => "main" }));
 // A folder on the web is the browser's to give.
 mock.module("../../src/lib/sync/browserFolder", () => ({ BrowserFolderRemote: null, isBrowserFolder: () => false }));

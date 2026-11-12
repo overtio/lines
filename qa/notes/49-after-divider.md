@@ -315,98 +315,105 @@ And another.
 ---
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Divider, then Mention
+#### 33. Divider, then Score (Settings → Little Touches)
+
+---
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Divider, then Mention
 
 ---
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Divider, then Wiki link
+#### 35. Divider, then Wiki link
 
 ---
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Divider, then Symbols
+#### 36. Divider, then Symbols
 
 ---
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Divider, then GitHub links
+#### 37. Divider, then GitHub links
 
 ---
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Divider, then arXiv links
+#### 38. Divider, then arXiv links
 
 ---
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Divider, then Image
+#### 39. Divider, then Image
 
 ---
 ![A sample picture](attachment:photo.png)
 
-#### 39. Divider, then Drawing
+#### 40. Divider, then Drawing
 
 ---
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Divider, then File
+#### 41. Divider, then File
 
 ---
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Divider, then Folder and file links
+#### 42. Divider, then Folder and file links
 
 ---
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Divider, then Attached 3D model (STL)
+#### 43. Divider, then Attached 3D model (STL)
 
 ---
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Divider, then Terminal recording (.cast file)
+#### 44. Divider, then Terminal recording (.cast file)
 
 ---
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Divider, then Audio
+#### 45. Divider, then Audio
 
 ---
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Divider, then Video
+#### 46. Divider, then Video
 
 ---
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Divider, then Missing file
+#### 47. Divider, then Missing file
 
 ---
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Divider, then Card
+#### 48. Divider, then Card
 
 ---
 ::: card
 Text in a card.
 :::
 
-#### 48. Divider, then Callout (info)
+#### 49. Divider, then Callout (info)
 
 ---
 :::i
 Text in an info callout.
 :::
 
-#### 49. Divider, then Callout (warning, chosen icon)
+#### 50. Divider, then Callout (warning, chosen icon)
 
 ---
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Divider, then Callout (decision, no icon)
+#### 51. Divider, then Callout (decision, no icon)
 
 ---
 :::^ icon=none

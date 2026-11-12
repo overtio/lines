@@ -1,6 +1,7 @@
 import { type ChangeSpec, type EditorState, Prec, type Text } from "@codemirror/state";
-import { type EditorView, keymap } from "@codemirror/view";
+import { EditorView, keymap } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";
+import { inCode } from "./fences";
 import { ancestors } from "./util";
 
 /*
@@ -9,7 +10,8 @@ import { ancestors } from "./util";
  * spaces under "- ", three under "1. "); the editor draws each level the same, wider step.
  * Numbered items are numbered again, in the list they leave and the one they join.
  * Backspace right after an item's marker moves a nested item out a level, and turns a top-level
- * one into plain text. Enter there puts an empty item above it.
+ * one into plain text. Enter there puts an empty item above it. List items pasted on an empty one
+ * take its place, at its level (listPaste).
  */
 
 /** The list item whose marker is on the cursor's line. */
@@ -175,3 +177,42 @@ export const listKeymap = Prec.high(
     { key: "Enter", run: itemAbove },
   ]),
 );
+
+/** The start of a line that's a list item: its indentation, then its marker (a checkbox too) and the space after. */
+const ITEM_START = /^([ \t]*)((?:[-*+]|\d+[.)])(?:[ \t]+\[[ xX]\])?[ \t]+)/;
+const indentOf = (line: string) => /^[ \t]*/.exec(line)![0].length;
+
+/**
+ * List items pasted on an empty item, as copied from another list: they take its place, rather
+ * than going inside it (`- - Copied`, a list in an item), and however deep they were nested where
+ * they came from, the first starts at its level and the rest keep their places under it. Pasted on
+ * an empty line, they start at its indentation the same way.
+ */
+export const listPaste = EditorView.domEventHandlers({
+  paste(event, view) {
+    const data = event.clipboardData;
+    const text = data?.getData("text/plain");
+    const { state } = view;
+    const { main } = state.selection;
+    if (!data || !text || data.files.length || state.readOnly || !main.empty) return false;
+    const lines = text.replace(/\r\n?/g, "\n").replace(/\n+$/, "").split("\n");
+    const first = ITEM_START.exec(lines[0]);
+    if (!first) return false;
+    const line = state.doc.lineAt(main.head);
+    const before = line.text.slice(0, main.head - line.from);
+    const item = ITEM_START.exec(before);
+    // Right after an empty item's marker, or on a line with nothing on it.
+    const empty = !line.text.slice(main.head - line.from).trim() && (item?.[0] === before || !before.trim());
+    if (!empty || inCode(state, main.head)) return false;
+    const indent = item ? item[1] : before;
+    const base = first[1].length;
+    const insert = lines.map((each) => (each.trim() ? indent + " ".repeat(Math.max(0, indentOf(each) - base)) + each.trimStart() : "")).join("\n");
+    view.dispatch({
+      changes: { from: line.from, to: main.head, insert },
+      selection: { anchor: line.from + insert.length },
+      scrollIntoView: true,
+      userEvent: "input.paste",
+    });
+    return true;
+  },
+});

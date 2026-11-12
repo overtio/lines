@@ -9,13 +9,18 @@
   import { lockedNotes } from "../notes/locked.svelte";
   import { isClosed, notes, type Entry } from "../notes/store.svelte";
   import { longPress } from "../longPress";
-  import { copyText, isApple, reducedMotion } from "../platform";
-  import { deletePicked, pinPicked, restorePicked, tagPicked, trashPicked } from "../notes/picked";
+  import { coarsePointer, copyText, isApple, isMacApp, reducedMotion } from "../platform";
+  import { dragNoteOut, handNoteOut } from "../notes/dragOut";
+  import { deletePicked, inboxPicked, pinPicked, restorePicked, tagPicked, trashPicked } from "../notes/picked";
   import { menuPoint } from "../popover";
   import { prefs } from "../prefs.svelte";
-  import { typeIcons } from "../notes/tagIcons.svelte";
-  import { ui } from "../ui.svelte";
+  import { iconColor, iconOf, typeLooks } from "../notes/looks.svelte";
+  import { paletteVar } from "../palette";
+  import { menuSections, ui } from "../ui.svelte";
+  import type { Direction } from "../panes";
+  import { panes } from "../panes.svelte";
   import { canFloat, floatingOpen, toggleFloating } from "../windows/floating";
+  import { followPointer } from "./followPointer";
 
   let {
     entry,
@@ -78,8 +83,8 @@
 
   const id = $derived(entry.note.id);
   /** The icon of its type (`type: person`), which a note of that type has unless it has its own. */
-  const typeIcon = $derived(entry.meta.type ? typeIcons.get(entry.meta.type) : undefined);
-  const icon = $derived(entry.note.icon ?? typeIcon);
+  const typeIcon = $derived(entry.meta.type ? typeLooks.icon(entry.meta.type) : undefined);
+  const icon = $derived(iconOf(entry));
 
   // Swipe right for the leading action and left for the trailing one, like Mail.
   const leading = $derived<Action>(
@@ -235,6 +240,8 @@
   }
 
   function perform(action: Action) {
+    // Going already: a second press of its action (still under the pointer) doesn't start it over.
+    if (leaving) return;
     dragging = false;
     // The row moves or goes away, perhaps with focus in it (given back by the menu as it closed):
     // focus stays in the list, and screen readers hear what happened.
@@ -276,6 +283,30 @@
     });
   }
 
+  /**
+   * Dragging the note with the mouse in the Mac app, followed here (panes.svelte.ts): into the
+   * panes, or onto a sidebar row, until it leaves the window, where macOS drags it on as a file
+   * (dragOut.ts). In a browser, the browser drags it (ondragstart, below).
+   */
+  function followDrag(event: PointerEvent) {
+    const stop = followPointer(event, {
+      move: ({ clientX: x, clientY: y }, first) => {
+        if (first) {
+          suppressClick = true;
+          panes.startDrag("note", id);
+        }
+        if (x > 0 && y > 0 && x < innerWidth - 1 && y < innerHeight - 1) return panes.follow(x, y);
+        stop();
+        panes.handedOut();
+        handNoteOut(entry.note, entry.meta.title || t("list.untitled"))
+          .catch((error) => console.error("lines: couldn't drag the note out", error))
+          .finally(() => panes.endDrag());
+      },
+      drop: () => panes.drop(),
+      cancel: () => panes.endDrag(),
+    });
+  }
+
   // Touch and pens drag the row. Mice right-click instead, and trackpads scroll sideways (below).
   let gesture: {
     pointerId: number;
@@ -289,7 +320,10 @@
   } | null = null;
 
   function onpointerdown(event: PointerEvent) {
+    // A row on its way out isn't swiped, dragged or picked.
+    if (leaving) return;
     suppressClick = false;
+    if (isMacApp && event.pointerType !== "touch" && event.button === 0 && !event.ctrlKey && !isClosed(entry.note)) followDrag(event);
     if (event.pointerType === "mouse" || event.button !== 0) return;
     const { pointerId, clientX: x, clientY: y, timeStamp } = event;
     gesture = { pointerId, x, y, from: 0, horizontal: false, lastX: x, lastT: timeStamp, velocity: 0 };
@@ -382,6 +416,7 @@
   });
 
   function onclick(event: MouseEvent) {
+    if (leaving) return;
     if (suppressClick) {
       suppressClick = false;
       return;
@@ -390,9 +425,9 @@
     // ⌘-click (Ctrl-click elsewhere; on a Mac that's a right-click) picks it along with others,
     // ⇧-click every note from the last one clicked. A click on its own picks just this one.
     if (isApple ? event.metaKey : event.ctrlKey) return notes.togglePick(id);
+    // ⌥-click (Alt-click elsewhere) opens it beside the one that's open, ⌥⇧-click below it.
+    if (event.altKey && canOpen[event.shiftKey ? "down" : "right"]) return openBeside(event.shiftKey ? "down" : "right");
     if (event.shiftKey) return notes.pickRange(id);
-    // ⌥-click (Alt-click elsewhere) opens it beside the one that's open.
-    if (event.altKey && canOpenBeside) return openBeside();
     notes.clearPicks();
     notes.select(id);
     // Opened from the keyboard (Enter or Space, which click with no pointer: detail 0), the note's
@@ -441,6 +476,9 @@
               ? { label: t("list.pin"), icon: "pin", run: pinPicked }
               : { label: t("list.unpin"), icon: "pin-off", run: pinPicked },
             { label: t("list.addTag"), icon: "hash", run: () => tagPicked(x, y) },
+            entries.some((e) => e.note.inbox)
+              ? { label: t("list.file"), icon: "archive", run: inboxPicked }
+              : { label: t("list.toInbox"), icon: "inbox", run: inboxPicked },
             "separator",
             { label: t("list.trash"), icon: "trash", danger: true, run: trashPicked },
           ],
@@ -448,12 +486,22 @@
     });
   }
 
-  /** Whether it can open beside the selected note: where there's room, not in the Trash, and not the selected note itself. */
-  const canOpenBeside = $derived(ui.besideFits && !entry.note.trashed && notes.selectedId !== id);
+  /** Puts it in the Inbox, or takes it out (filed). */
+  function fileOne(inbox: boolean) {
+    notes.setInbox([id], inbox);
+    speak(t(inbox ? "list.didInbox" : "list.didFile"));
+  }
 
-  function openBeside() {
+  /** Whether it can open in a pane to the right of or below the one last used: where there's room, not in the Trash, and not the selected note itself. */
+  const canOpen = $derived({
+    right: panes.fits("right") && !entry.note.trashed && notes.selectedId !== id,
+    down: panes.fits("down") && !entry.note.trashed && notes.selectedId !== id,
+  });
+
+  function openBeside(direction: Direction) {
     notes.clearPicks();
-    if (notes.selectedId) ui.side = id;
+    // Beside the open note, or the Calendar's week, which is where a note would be; else it's the one open.
+    if (notes.selectedId || notes.filter.kind === "calendar") panes.open(id, direction);
     else notes.select(id);
   }
 
@@ -467,39 +515,48 @@
       x,
       y,
       label: entry.meta.title || t("list.untitled"),
-      items: [
-        { label: leading.menuLabel, icon: leading.icon, run: () => perform(leading) },
-        ...(canOpenBeside ? [{ label: t("list.openBeside"), icon: "columns-2" as const, run: openBeside }] : []),
-        ...(canFloat && !entry.note.trashed
-          ? [
-              {
-                label: floatingOpen.has(id) ? t("list.unfloat") : t("list.float"),
-                icon: "picture-in-picture-2" as const,
-                run: () => toggleFloating(id),
-              },
-            ]
-          : []),
-        {
-          label: entry.note.icon ? t("list.changeIcon") : t("list.addIcon"),
-          icon: "smile",
-          run: () =>
-            (ui.iconPicker = {
-              key: `note:${id}`,
-              label: entry.meta.title || t("list.untitled"),
-              fallback: typeIcon ?? "file-text",
-              icon: () => notes.get(id)?.note.icon ?? null,
-              set: (icon) => notes.setIcon(id, icon),
-              x,
-              y,
-            }),
-        },
-        ...lockItems(),
-        ...(isClosed(entry.note)
-          ? []
-          : [{ label: t("list.copyText"), icon: "copy" as const, run: () => void copyText(entry.note.body).then(() => speak(t("list.copied"))) }]),
-        "separator",
-        { label: trailing.menuLabel, icon: trailing.icon, danger: true, run: () => perform(trailing) },
-      ],
+      // Opening it; what it is and where it's kept; keeping and copying its text; and the Trash.
+      items: menuSections(
+        [
+          ...(canOpen.right ? [{ label: t("list.openBeside"), icon: "columns-2" as const, run: () => openBeside("right") }] : []),
+          ...(canOpen.down ? [{ label: t("list.openBelow"), icon: "rows-2" as const, run: () => openBeside("down") }] : []),
+          ...(canFloat && !entry.note.trashed
+            ? [{ label: floatingOpen.has(id) ? t("list.unfloat") : t("list.float"), icon: "picture-in-picture-2" as const, run: () => toggleFloating(id) }]
+            : []),
+        ],
+        [
+          { label: leading.menuLabel, icon: leading.icon, run: () => perform(leading) },
+          {
+            label: t("list.iconAndColor"),
+            icon: "smile",
+            run: () =>
+              (ui.iconPicker = {
+                key: `note:${id}`,
+                label: entry.meta.title || t("list.untitled"),
+                fallback: typeIcon ?? "file-text",
+                icon: () => notes.get(id)?.note.icon ?? null,
+                set: (icon) => notes.setIcon(id, icon),
+                color: { get: () => notes.get(id)?.note.color ?? null, set: (color) => notes.setColor(id, color) },
+                x,
+                y,
+              }),
+          },
+          ...(entry.note.trashed
+            ? []
+            : [
+                entry.note.inbox
+                  ? { label: t("list.file"), icon: "archive" as const, run: () => fileOne(false) }
+                  : { label: t("list.toInbox"), icon: "inbox" as const, run: () => fileOne(true) },
+              ]),
+        ],
+        [
+          ...lockItems(),
+          ...(isClosed(entry.note)
+            ? []
+            : [{ label: t("list.copyText"), icon: "copy" as const, run: () => void copyText(entry.note.body).then(() => speak(t("list.copied"))) }]),
+        ],
+        [{ label: trailing.menuLabel, icon: trailing.icon, danger: true, run: () => perform(trailing) }],
+      ),
       onclose: () => (menuOpen = false),
     });
   }
@@ -540,7 +597,7 @@
     <button
       bind:this={item}
       class={[
-        "item ui-note-row relative z-1 flex w-full touch-pan-y flex-col gap-[3px] rounded-lg bg-[image:linear-gradient(var(--layer),var(--layer))] px-3 pt-3 pb-[11px] text-left text-fg [-webkit-touch-callout:none]",
+        "item ui-note-row relative z-1 flex w-full touch-pan-y flex-col select-none gap-[3px] rounded-lg bg-[image:linear-gradient(var(--layer),var(--layer))] px-3 pt-3 pb-[11px] text-left text-fg [-webkit-touch-callout:none]",
         lit ? "selected [--layer:var(--active)]" : "[--layer:transparent] hover:[--layer:var(--hover)]",
         swiped && "bg-list",
         menuTarget && "inset-ring-2 inset-ring-accent",
@@ -558,10 +615,19 @@
       {onpointermove}
       {onpointerup}
       onpointercancel={onpointerup}
+      draggable={!isMacApp && !coarsePointer.matches && !isClosed(entry.note)}
+      ondragstart={(event) => {
+        // Out of lines, a copy of its file; over the notes' panes, a note to open there.
+        dragNoteOut(event, entry.note, entry.meta.title || t("list.untitled"));
+        panes.startDrag("note", id);
+      }}
       {@attach longPress(onlongpress)}
     >
-      <span class={["flex min-w-0 items-center gap-1.5 text-md leading-[1.35] font-semibold whitespace-nowrap", !entry.meta.title && "text-faint"]}>
-        {#if icon}<Icon name={icon} size={15} strokeWidth={2} class="flex-none text-accent" />{/if}
+      <span
+        class={["flex min-w-0 items-center gap-1.5 text-md leading-[1.35] font-semibold whitespace-nowrap", !entry.meta.title && "text-faint"]}
+        style:--look={icon && paletteVar(iconColor(entry) ?? "accent")}
+      >
+        {#if icon}<Icon name={icon} size={15} strokeWidth={2} class="flex-none text-(--look)" />{/if}
         <span class="truncate">{entry.meta.title || t("list.untitled")}</span>
         {#if picked && notes.picked.size}<span class="sr-only">, {t("list.picked")}</span>{/if}
       </span>

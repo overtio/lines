@@ -30,7 +30,7 @@ Add a tag anywhere in a note, like #getting-started. Nested tags work too: #line
 
 ## People, projects and other objects
 
-Start a note with \`/properties\` to give it a type, like \`type: person\`, and other properties. It shows under Types in the sidebar. Mention any note with \`@\` and its title (or \`[[\` for a wiki link), and show its properties with \`@Name.key\`. \`@type.person\` on a line of its own is a table of every person.
+Start a note with \`/properties\` to give it a type, like \`type: person\`, and other properties. It shows under Types in the sidebar. Mention any note with \`@\` and its title (or \`[[\` for a wiki link), and show its properties with \`@Name.key\`. \`@type.person\` on a line of its own is a table of every person. A \`date\` or \`due\` property, like \`date: 2026-11-30\`, puts the note on that day in the Calendar.
 
 ## Callouts and cards
 

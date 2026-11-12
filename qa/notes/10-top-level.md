@@ -283,81 +283,87 @@ And another.
 
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Mention at the top level
+#### 33. Score (Settings → Little Touches) at the top level
+
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Mention at the top level
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Wiki link at the top level
+#### 35. Wiki link at the top level
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Symbols at the top level
+#### 36. Symbols at the top level
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. GitHub links at the top level
+#### 37. GitHub links at the top level
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. arXiv links at the top level
+#### 38. arXiv links at the top level
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Image at the top level
+#### 39. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 39. Drawing at the top level
+#### 40. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. File at the top level
+#### 41. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Folder and file links at the top level
+#### 42. Folder and file links at the top level
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Attached 3D model (STL) at the top level
+#### 43. Attached 3D model (STL) at the top level
 
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Terminal recording (.cast file) at the top level
+#### 44. Terminal recording (.cast file) at the top level
 
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Audio at the top level
+#### 45. Audio at the top level
 
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Video at the top level
+#### 46. Video at the top level
 
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Missing file at the top level
+#### 47. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Card at the top level
+#### 48. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 48. Callout (info) at the top level
+#### 49. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 49. Callout (warning, chosen icon) at the top level
+#### 50. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Callout (decision, no icon) at the top level
+#### 51. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

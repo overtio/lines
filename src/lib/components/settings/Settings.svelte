@@ -1,35 +1,42 @@
 <script lang="ts">
   import { Dialog } from "bits-ui";
-  import { SvelteSet } from "svelte/reactivity";
+  import { SvelteMap, SvelteSet } from "svelte/reactivity";
   import { tick, type Component } from "svelte";
   import { t } from "../../i18n/index.svelte";
   import Icon from "../../icons/Icon.svelte";
+  import { reducedMotion } from "../../platform";
   import { ui } from "../../ui.svelte";
   import { closeSettings } from "../../windows/settings.svelte";
   import IconButton from "../ui/IconButton.svelte";
   import NavItem from "../ui/NavItem.svelte";
+  import TextField from "../ui/TextField.svelte";
   import AboutSection from "./AboutSection.svelte";
   import EditorSection from "./EditorSection.svelte";
   import ExportSection from "./ExportSection.svelte";
   import FloatingSection from "./FloatingSection.svelte";
   import GeneralSection from "./GeneralSection.svelte";
   import LayoutSection from "./LayoutSection.svelte";
-  import PaperSection from "./PaperSection.svelte";
+  import PresetsSection from "./PresetsSection.svelte";
+  import PluginPage from "./PluginPage.svelte";
   import PluginsSection from "./PluginsSection.svelte";
   import PrivacySection from "./PrivacySection.svelte";
+  import { searchSettings, type Found } from "./search";
   import { sectionList, sections, type Section, type SettingsGroup, type SettingsSection } from "./sections";
   import ShortcutsSection from "./ShortcutsSection.svelte";
   import SyncSection from "./SyncSection.svelte";
   import TextSection from "./TextSection.svelte";
   import CursorSection from "./CursorSection.svelte";
-  import MascotSection from "./MascotSection.svelte";
+  import TouchesSection from "./TouchesSection.svelte";
   import ThemeSection from "./ThemeSection.svelte";
 
   /*
-   * Settings: its sections listed down the side, some under a heading (Appearance, Data) that opens
-   * and closes, and the one chosen beside them, each a few groups of settings. A dialog over the
+   * Settings: its sections listed down the side, some under a heading (Appearance, Plugins, Data)
+   * that opens and closes, and the one chosen beside them, each a few groups of settings; under
+   * Plugins, the list of them and a page for each plugin with settings of its own. A dialog over the
    * notes, or in the desktop apps the whole of a window of its own. Narrow, the list and a section
-   * take turns: choosing a section opens it, and Back returns.
+   * take turns: choosing a section opens it, and Back returns. Above the list, a search (⌘F) through
+   * every section's settings (search.ts): what it finds stands in for the list, and choosing one
+   * opens its section on it, lit up a moment.
    */
 
   /** Shown as the whole of the Settings window (desktop apps) rather than as a dialog. */
@@ -37,14 +44,14 @@
 
   const all = sections();
   const list = sectionList(all);
-  const SHOWN: Record<SettingsSection, Component> = {
+  const SHOWN: Partial<Record<SettingsSection, Component>> = {
     general: GeneralSection,
+    presets: PresetsSection,
     theme: ThemeSection,
-    paper: PaperSection,
     layout: LayoutSection,
     text: TextSection,
     cursor: CursorSection,
-    mascot: MascotSection,
+    touches: TouchesSection,
     editor: EditorSection,
     floating: FloatingSection,
     plugins: PluginsSection,
@@ -54,6 +61,12 @@
     shortcuts: ShortcutsSection,
     about: AboutSection,
   };
+
+  /** The plugins' pages, loaded as Settings opens, by section. */
+  const pages = new SvelteMap<SettingsSection, Component>();
+  const loading = new Map(
+    all.flatMap(({ id, plugin }) => (plugin?.settings ? [[id, plugin.settings().then(({ default: page }) => void pages.set(id, page))] as const] : [])),
+  );
 
   const current = $derived(all.find((section) => section.id === ui.settings) ?? all[0]);
   const Shown = $derived(SHOWN[current.id]);
@@ -112,6 +125,73 @@
     items[next]?.focus();
   }
 
+  let query = $state("");
+  let searchField = $state<HTMLInputElement>();
+  const searching = $derived(!!query.trim());
+  const found = $derived(searchSettings(query, all));
+
+  /** Where `text` shows in `root`: the setting's row it's in, or else the deepest element that's all of it. */
+  function placeOf(root: HTMLElement, text: string) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const element = walker.currentNode.parentElement;
+      if (element?.textContent?.trim() === text && element.checkVisibility()) return element.closest<HTMLElement>("[data-setting]") ?? element;
+    }
+  }
+
+  /** Opens the section a result is in, on the setting: scrolled to, lit up a moment, and its control focused. */
+  async function show(result: Found) {
+    await openSection(result.section.id);
+    if (result.text === result.section.title) return;
+    // Once the section's drawn (a plugin's page once it's loaded).
+    await loading.get(result.section.id);
+    await tick();
+    await new Promise(requestAnimationFrame);
+    const place = body && placeOf(body, result.text);
+    if (!place) return;
+    place.scrollIntoView({ block: "center", behavior: reducedMotion.matches ? "instant" : "smooth" });
+    place.animate([{ backgroundColor: "color-mix(in srgb, var(--accent) 16%, transparent)" }, { backgroundColor: "transparent" }], { duration: 1800, easing: "ease-in" });
+    place.querySelector<HTMLElement>(":is(input, button, select, textarea, [tabindex]):not([tabindex='-1'], :disabled)")?.focus({ preventScroll: true });
+  }
+
+  /** In the search: ↓ goes to what it found, Enter opens the first, Esc empties it (and only then closes Settings). */
+  function onSearchKeydown(event: KeyboardEvent) {
+    if (event.key === "ArrowDown" && found.length) {
+      event.preventDefault();
+      document.querySelector<HTMLElement>("[data-settings-found]")?.focus();
+    } else if (event.key === "Enter" && found.length) {
+      event.preventDefault();
+      void show(found[0]);
+    } else if (event.key === "Escape" && query) {
+      event.preventDefault();
+      event.stopPropagation();
+      query = "";
+    }
+  }
+
+  /** Through what the search found with ↑ and ↓, and back up into the search from the first. */
+  function moveInFound(event: KeyboardEvent) {
+    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+    event.preventDefault();
+    const items = [...document.querySelectorAll<HTMLElement>("[data-settings-found]")];
+    const at = items.indexOf(event.currentTarget as HTMLElement) + (event.key === "ArrowDown" ? 1 : -1);
+    (at < 0 ? searchField : items[Math.min(at, items.length - 1)])?.focus();
+  }
+
+  /** ⌘F (Ctrl+F) searches Settings, wherever focus is in it. */
+  async function onKeydown(event: KeyboardEvent) {
+    if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey || event.key.toLowerCase() !== "f") return;
+    event.preventDefault();
+    event.stopPropagation();
+    // Narrow, with a section showing, back to the list the search is over.
+    if (!searchField?.checkVisibility()) {
+      listing = true;
+      await tick();
+    }
+    searchField?.focus();
+    searchField?.select();
+  }
+
   /** Narrow, back to the list, with focus on the section that was open. */
   async function showList() {
     listing = true;
@@ -167,7 +247,9 @@
 
 {#snippet content()}
   <h2 id="settings-title" class="sr-only">{t("settings.title")}</h2>
-  <div class="@container flex min-h-0 flex-1">
+  <!-- Not a control: ⌘F from anywhere in Settings reaches its search. -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="@container flex min-h-0 flex-1" onkeydown={onKeydown}>
     <div
       class={[
         "flex w-56 shrink-0 flex-col border-r border-line bg-sidebar @max-[640px]:w-full @max-[640px]:border-r-0",
@@ -181,7 +263,47 @@
           <IconButton class="hidden @max-[640px]:grid" icon="x" label={t("settings.close")} onclick={() => onOpenChange(false)} />
         {/if}
       </div>
-      <nav aria-label={t("settings.sections")} class="min-h-0 flex-1 overflow-y-auto px-3 pb-3">
+      <div class="px-3 pb-2">
+        <TextField
+          bind:value={query}
+          bind:input={searchField}
+          type="search"
+          icon="search"
+          placeholder={t("settings.searchPlaceholder")}
+          aria-label={t("settings.search")}
+          autocomplete="off"
+          spellcheck="false"
+          onkeydown={onSearchKeydown}
+        />
+      </div>
+      <p class="sr-only" aria-live="polite">{searching ? (found.length ? t("settings.searchCount", { count: found.length }) : t("settings.searchNone", { query: query.trim() })) : ""}</p>
+      {#if searching}
+        <div class="min-h-0 flex-1 overflow-y-auto px-3 pb-3">
+          {#if found.length}
+            <ul class="flex flex-col gap-0.5" aria-label={t("settings.searchResults")}>
+              {#each found as result (`${result.section.id}:${result.text}`)}
+                <li>
+                  <button
+                    type="button"
+                    class="flex w-full flex-col items-start gap-0.5 rounded-md px-2.5 py-1.5 text-left text-sm text-fg hover:bg-hover"
+                    data-settings-found
+                    onclick={() => void show(result)}
+                    onkeydown={moveInFound}
+                  >
+                    <span class="line-clamp-2">{result.text}</span>
+                    {#if result.text !== result.section.title}
+                      <span class="flex items-center gap-1 text-xs text-muted"><Icon name={result.section.icon} size={12} class="shrink-0" />{result.section.title}</span>
+                    {/if}
+                  </button>
+                </li>
+              {/each}
+            </ul>
+          {:else}
+            <p class="m-0 px-2.5 py-1.5 text-sm text-muted" aria-hidden="true">{t("settings.searchNone", { query: query.trim() })}</p>
+          {/if}
+        </div>
+      {/if}
+      <nav aria-label={t("settings.sections")} class={["min-h-0 flex-1 overflow-y-auto px-3 pb-3", searching && "hidden"]}>
         <ul class="flex flex-col gap-0.5">
           {#each list as entry (entry.kind === "group" ? entry.id : entry.section.id)}
             <li class="flex flex-col gap-0.5">
@@ -204,7 +326,8 @@
                     <Icon name="chevron-down" size={14} class="shrink-0 transition-transform duration-150 {open ? '' : '-rotate-90'}" />
                   {/snippet}
                 </NavItem>
-                <ul id="settings-group-{entry.id}" class={["flex flex-col gap-0.5", !open && "hidden"]}>
+                <!-- In from the group, its sections' icons under its name. -->
+                <ul id="settings-group-{entry.id}" class={["flex flex-col gap-0.5 pl-6.5", !open && "hidden"]}>
                   {#each entry.sections as section (section.id)}
                     <li>{@render item(section)}</li>
                   {/each}
@@ -229,8 +352,11 @@
       <!-- Positioned, so text hidden for screen readers (position: absolute) scrolls with it rather than stretching it. -->
       <div bind:this={body} class="relative min-h-0 flex-1 overflow-y-auto overscroll-contain select-text">
         <section aria-labelledby="settings-section-title" class="mx-auto flex max-w-[680px] flex-col gap-7 px-6 pt-1 pb-8 @max-[640px]:px-4">
-          {#if current.about}<p class="m-0 -mb-2 px-1 text-sm leading-normal text-muted">{current.about}</p>{/if}
-          <Shown />
+          {#if current.plugin}
+            <PluginPage plugin={current.plugin} page={pages.get(current.id)} />
+          {:else if Shown}
+            <Shown />
+          {/if}
         </section>
       </div>
     </div>

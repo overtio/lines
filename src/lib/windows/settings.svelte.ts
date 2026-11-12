@@ -1,14 +1,16 @@
+import { tick } from "svelte";
 import { t } from "../i18n/index.svelte";
 import type { LockSettings } from "../lock/lock.svelte";
 import type { NotesPassword } from "../notes/noteKeys.svelte";
 import { isDesktopApp } from "../platform";
+import { prefs, type SettingsOpens } from "../prefs.svelte";
 import { sectionOf, type SettingsSection } from "../components/settings/sections";
 import { ui } from "../ui.svelte";
 import { announce, onAnnounce, windowLabel } from "./channel";
 
 /*
- * Settings in the desktop apps is a window of its own (labelled "settings"), elsewhere a dialog
- * over the notes. The window shows the same panels, but the main window is the one that syncs,
+ * Settings is a dialog over the notes, or in the desktop apps, if chosen (Settings → General), a
+ * window of its own (labelled "settings"). The window shows the same panels, but the main window is the one that syncs,
  * locks and keeps the list: what those panels ask of sync, the app lock, locked notes and the note
  * list is done there (`forwardToMain`), and sync's state comes back to show (`serveSettings`).
  */
@@ -21,9 +23,9 @@ export const isSettingsWindow = windowLabel() === SETTINGS_LABEL;
 /** The section the Settings window opens on, from its address. */
 export const initialSection = () => sectionOf(new URLSearchParams(location.search).get("section"));
 
-/** Opens Settings on a section: its own window in the desktop apps (brought forward if open), a dialog elsewhere. */
+/** Opens Settings on a section: a dialog over the notes, or its own window (brought forward if open) where that's chosen. */
 export async function openSettings(section: SettingsSection = "general") {
-  if (!isDesktopApp) {
+  if (!isDesktopApp || prefs.settingsOpens === "overlay") {
     ui.settings = section;
     return;
   }
@@ -53,6 +55,23 @@ export async function openSettings(section: SettingsSection = "general") {
     trafficLightPosition: new LogicalPosition(20, 28),
   });
   void window.once("tauri://error", (event) => console.error("lines: couldn't open the Settings window", event.payload));
+}
+
+/**
+ * Settings to open this way from now on, and moved there now, on General where this is chosen: the
+ * window closes and the dialog opens over the notes in the main window, or the other way round.
+ */
+export async function setSettingsOpens(where: SettingsOpens) {
+  prefs.settingsOpens = where;
+  // Saved and sent to the other windows first.
+  await tick();
+  if (isSettingsWindow && where === "overlay") {
+    await announce({ type: "open-settings", section: "general" });
+    await closeSettings();
+  } else if (!isSettingsWindow && where === "window" && ui.settings) {
+    ui.settings = null;
+    await openSettings("general");
+  }
 }
 
 /** Closes Settings: the window, or the dialog. */
@@ -142,6 +161,7 @@ export function serveSettings(targets: Record<string, Target>, syncState: () => 
   });
   void onAnnounce(async (message) => {
     if (message.type === "sync-ask") tell();
+    if (message.type === "open-settings") ui.settings = sectionOf(message.section);
     if (message.type !== "call" || !FORWARDED[message.target]?.includes(message.method)) return;
     try {
       const method = methods(targets[message.target])[message.method] as Method;

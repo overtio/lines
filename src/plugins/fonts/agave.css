@@ -1,0 +1,16 @@
+/* Agave (github.com/blobject/agave, release 39), under the SIL Open Font License (agave/LICENSE). */
+@font-face {
+  font-family: Agave;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./agave/Agave-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: Agave;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./agave/Agave-Bold.ttf") format("truetype");
+}

@@ -443,7 +443,18 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Line marks, then Mention
+#### 33. Line marks, then Score (Settings → Little Touches)
+
+Marked as the accent. <!-- mark -->
+Two lines marked green, one bar. <!-- mark green: ready -->
+The second of them. <!-- mark green: ready -->
+Red, with a label to point at. <!-- mark red: to fix -->
+- A list item, marked purple. <!-- mark purple -->
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Line marks, then Mention
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -452,7 +463,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Line marks, then Wiki link
+#### 35. Line marks, then Wiki link
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -461,7 +472,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Line marks, then Symbols
+#### 36. Line marks, then Symbols
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -470,7 +481,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Line marks, then GitHub links
+#### 37. Line marks, then GitHub links
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -479,7 +490,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Line marks, then arXiv links
+#### 38. Line marks, then arXiv links
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -488,7 +499,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Line marks, then Image
+#### 39. Line marks, then Image
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -497,7 +508,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 ![A sample picture](attachment:photo.png)
 
-#### 39. Line marks, then Drawing
+#### 40. Line marks, then Drawing
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -506,7 +517,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Line marks, then File
+#### 41. Line marks, then File
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -515,7 +526,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Line marks, then Folder and file links
+#### 42. Line marks, then Folder and file links
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -524,7 +535,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Line marks, then Attached 3D model (STL)
+#### 43. Line marks, then Attached 3D model (STL)
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -533,7 +544,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Line marks, then Terminal recording (.cast file)
+#### 44. Line marks, then Terminal recording (.cast file)
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -542,7 +553,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Line marks, then Audio
+#### 45. Line marks, then Audio
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -551,7 +562,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Line marks, then Video
+#### 46. Line marks, then Video
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -560,7 +571,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Line marks, then Missing file
+#### 47. Line marks, then Missing file
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -569,7 +580,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Line marks, then Card
+#### 48. Line marks, then Card
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -580,7 +591,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 Text in a card.
 :::
 
-#### 48. Line marks, then Callout (info)
+#### 49. Line marks, then Callout (info)
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -591,7 +602,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 Text in an info callout.
 :::
 
-#### 49. Line marks, then Callout (warning, chosen icon)
+#### 50. Line marks, then Callout (warning, chosen icon)
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
@@ -602,7 +613,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Line marks, then Callout (decision, no icon)
+#### 51. Line marks, then Callout (decision, no icon)
 
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->

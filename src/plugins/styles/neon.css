@@ -1,7 +1,7 @@
 /*
  * Neon: a city at night. Lines and text that glow in the accent and the tags' color, a faint grid
  * and scan lines, headings in a wide display face, buttons with their corners cut. The glow and the
- * scan lines go with Increased contrast, and the grid with a paper chosen in Settings → Paper.
+ * scan lines go with Increased contrast, and the grid with a paper chosen in Settings → Plugins → Paper.
  */
 
 /* Made from the theme's colors, and made again in a part with its own (a pane shown dark). */
@@ -24,8 +24,8 @@
   background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ink) 3.5%, transparent) 0 1px, transparent 1px 3px);
 }
 
-/* A grid behind the note. */
-:root[data-style="neon"]:not([data-paper]) .editor-pane {
+/* A grid behind the note; not behind the Calendar's week, which has lines of its own. */
+:root[data-style="neon"]:not([data-paper]) .editor-pane:not(:has(.calendar-days)) {
   background-image:
     linear-gradient(color-mix(in srgb, var(--tag-text) 5%, transparent) 1px, transparent 1px),
     linear-gradient(90deg, color-mix(in srgb, var(--tag-text) 5%, transparent) 1px, transparent 1px);

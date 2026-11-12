@@ -290,4 +290,6 @@ export default {
   "editor.a11y.codeEnd": "End of code",
   // A rendered table's button: turns it into a ```csv block, drawn as a spreadsheet.
   "editor.toSpreadsheet": "Convert to Spreadsheet",
+  // A score drawn as stars or hearts (Settings → Little Touches), as a screen reader says it.
+  "editor.score": "{score} out of {of}",
 };

@@ -24,14 +24,14 @@ export default {
   "app.unpin": "Unpin",
   "app.trash": "Move to Trash",
   // The share menu. "Share…" opens the system's share sheet.
-  "app.shareSheet": "Share…",
+  "app.shareSheet": "Share",
   "app.copySource": "Copy {language}",
   "app.copyPlainText": "Copy Plain Text",
   "app.downloadSource": "Download {language}",
   "app.saveFailed": "Couldn’t save {filename}.",
   "app.previewPdf": "Preview as PDF",
-  "app.exportPdf": "Export as PDF…",
-  "app.exportPng": "Export as PNG…",
+  "app.exportPdf": "Export as PDF",
+  "app.exportPng": "Export as PNG",
   // Tabs (Settings → Layout): their list, their menu, and a preview tab, which the next note opened replaces.
   "app.tabs": "Open notes",
   "app.keepTab": "Keep Open",
@@ -51,6 +51,9 @@ export default {
   // A note open beside the selected one (Open to the Side), and its buttons.
   "app.side": "Beside: {title}",
   "app.sideSwap": "Swap the two notes",
+  // Beside the Calendar's week rather than a note: the note goes in the week's place.
+  "app.sideInCalendar": "Open in Place of the Calendar",
+  "app.paneMove": "Drag to move this note",
   "app.sideClose": "Close this note",
-  "app.sideWidth": "Width of the note beside",
+  "app.paneSize": "Size of the panes",
 };

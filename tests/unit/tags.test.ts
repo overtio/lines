@@ -17,6 +17,11 @@ test("a tag in a script with combining marks is read whole, the same tag however
   expect(cleanTagInput("हिंदी नोट्स")).toBe("हिंदी-नोट्स");
 });
 
+test("a # at the start of a heading's text, ## being typed there, isn't a tag; one later in it, or on a line of its own, is", () => {
+  expect(extractTags("# #Boo\n\n## Plan #work\n#home\n  # #not")).toEqual(["home", "work"]);
+  expect(renameTagIn("# #work\n#work", "work", "job")).toBe("# #work\n#job");
+});
+
 test("renaming one keeps how the rest of a nested tag was written", () => {
   expect(renameTagIn("#İstanbul/Food and #Work/Meetings", "istanbul", "travel")).toBe("#travel/Food and #Work/Meetings");
   expect(renameTagIn("#हिंदी/नोट्स", "हिंदी", "hindi")).toBe("#hindi/नोट्स");

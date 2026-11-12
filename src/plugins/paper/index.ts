@@ -2,7 +2,7 @@ import { t, type MessageKey } from "../../lib/i18n/index.svelte";
 import type { PaperLayer, PaperStyle, Plugin } from "../../lib/plugins/types";
 
 /*
- * Paper to write on (Settings → Paper): patterns drawn behind a note in the color and opacity chosen,
+ * Paper to write on (Settings → Plugins → Paper): patterns drawn behind a note in the color and opacity chosen,
  * a fine line or dot every `--paper-step`, or under each line of text (ruled lines always), textures
  * as faint as real paper's, from SVG noise, and backdrops behind the page, of soft glows of color.
  */
@@ -158,5 +158,6 @@ export const paper = (): Plugin => ({
   description: t("plugins.paper.description"),
   icon: "notebook-text",
   enabledByDefault: true,
+  settings: () => import("./PaperSettings.svelte"),
   contributes: { paperStyles: styles() },
 });

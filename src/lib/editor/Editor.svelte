@@ -5,7 +5,8 @@
   import { frontMatter } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
   import type { Note } from "../notes/types";
-  import { tagIcons, typeIcons } from "../notes/tagIcons.svelte";
+  import { looks } from "../notes/looks.svelte";
+  import { tagColorCss, tagColorSheet } from "./tagColors";
   import { plugins } from "../plugins/registry.svelte";
   import { prefs } from "../prefs.svelte";
   import { objectsChanged } from "./objects";
@@ -178,10 +179,11 @@
     untrack(() => applyFormat(true));
   });
 
-  // Markdown shown another way, or dragging turned on or off (Settings → Editor).
+  // Markdown shown another way, dragging or underlined headings turned on or off (Settings → Editor).
   $effect(() => {
     void prefs.markdownMode;
     void prefs.dragBlocks;
+    void prefs.underlinedHeadings;
     untrack(() => applyFormat());
   });
 
@@ -199,11 +201,18 @@
     untrack(() => view?.dispatch({ effects }));
   });
 
-  // Mentions show other notes' titles, icons and properties, and tags their icons; draw them again when those change.
+  // Tags in the colors chosen for them in the sidebar, in every note in this window.
+  $effect(() => {
+    tagColorSheet().textContent = tagColorCss(looks.looks);
+  });
+
+  // Mentions show other notes' titles, icons and properties, and tags their icons and colors; values
+  // their scores and copy buttons (Settings → Little Touches). Draw them again when those change.
   $effect(() => {
     void notes.objectsSignature;
-    void typeIcons.signature();
-    void tagIcons.signature();
+    void looks.looks;
+    void prefs.scores;
+    void prefs.copyValues;
     untrack(() => view?.dispatch({ effects: objectsChanged.of(null) }));
   });
 

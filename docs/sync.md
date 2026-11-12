@@ -48,7 +48,7 @@ trashed: false
 Plain Markdown, readable by any editor.
 ```
 
-A note with an icon has an `icon` line. A note in another format has a `format` line, followed by its text: `format: latex` and its LaTeX ([latex.md](latex.md)), or `format: spreadsheet` and its title and CSV ([spreadsheets.md](spreadsheets.md#its-text)).
+A note in the Inbox has an `inbox: true` line, and loses it once filed. A note with an icon has an `icon` line, and one with a color a `color` line. A note in another format has a `format` line, followed by its text: `format: latex` and its LaTeX ([latex.md](latex.md)), or `format: spreadsheet` and its title and CSV ([spreadsheets.md](spreadsheets.md#its-text)).
 
 Importing such a file (Settings → Export and Import → Import Files…) brings the note back as it was, with its id, unless a note on the device has that id; then it comes in as a note of its own, so an import never replaces one.
 
@@ -73,7 +73,7 @@ On each sync, lines compares every note with what it last exchanged with the buc
 | Changed on this device | Uploaded |
 | Changed on another device | Downloaded, including into an open editor |
 | Edited on both | The newer edit wins, and the other is saved as a separate note titled “… (conflicted copy)”, its properties and type kept (a spreadsheet's mark goes on its title line, not in its cells, and a LaTeX document's in its `\title`; a note in another format whose title can't be marked that way keeps its text as it is). Nothing is lost. |
-| Edited on one, pinned, moved to the trash, given an icon or locked on the other | Both kept, in one note: pinning and the rest don't count as edits. A note locked on either device stays locked, the edit inside it (or, on a device that doesn't have the password, the edit as a conflicted copy) |
+| Edited on one, pinned, moved to the trash, filed or put in the Inbox, given an icon or locked on the other | Both kept, in one note: pinning and the rest don't count as edits. A note locked on either device stays locked, the edit inside it (or, on a device that doesn't have the password, the edit as a conflicted copy) |
 | Deleted on one device | Deleted on the others, unless another device edited it in the meantime, in which case the edit wins |
 
 Images and files in notes sit next to them, named after their content and keeping their extension:
@@ -84,6 +84,8 @@ Images and files in notes sit next to them, named after their content and keepin
 ```
 
 A note shows an image as `![](../attachments/<hash>.png)` and links a file as `[Report.pdf](../attachments/<hash>.pdf)`, so the folder reads correctly in other Markdown apps too. Since a name always means the same bytes, there's nothing to merge: each sync uploads the attachments your notes use that the bucket lacks, and downloads the ones this device lacks. Every device keeps a copy of every attachment, so large files take room everywhere. One no note uses any more is removed from the device at the next launch (one where lines isn't open in another tab, which could still bring it back with undo), but stays in the bucket for now.
+
+The icons and colors chosen for tags and types are one small file beside the notes, `<bucket>/<folder>/library.json` (encrypted like a note when encryption is on). Each choice keeps when it was made, so devices merge them one by one, the later winning: an icon chosen for a tag on the phone and a color for a type on the Mac both stay. A choice undone is kept as undone, so that syncs too. Icons chosen before they synced are the device's until another device chooses for the same tag or type.
 
 Only one sync pass runs at a time, even with lines open in several browser tabs, so a conflict makes one copy, not one per tab.
 

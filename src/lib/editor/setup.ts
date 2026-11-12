@@ -11,11 +11,14 @@ import { cards } from "./cards";
 import { codeLanguage } from "./codeLanguages";
 import { cursor } from "./cursor";
 import { dragBlocks } from "./dragBlocks";
+import { focusInPlace } from "./focusInPlace";
 import { fenceInput } from "./fences";
+import { headingLevelInput } from "./headingLevel";
+import { quoteInput } from "./quotes";
 import { find } from "./find.svelte";
 import { attachmentBlocks } from "./attachments";
 import { formatToolbar, toggleFormat } from "./formatting";
-import { listKeymap } from "./lists";
+import { listKeymap, listPaste } from "./lists";
 import { livePreview, openAtCursor } from "./livePreview";
 import { mathBlocks } from "./math";
 import { markdownPaperLink, paperCommands } from "./papers";
@@ -26,14 +29,15 @@ import { tables } from "./tables";
 import { typeTables } from "./typeTables";
 import { frontMatterField, missingNotes } from "./objects";
 import { markdownOutline, outlineCompartment } from "./outline.svelte";
-import { cheer, selectedLines } from "./util";
+import { cheer, selectedBlocks, selectedLines } from "./util";
 import { copyOnSelect } from "./copyOnSelect";
-import { Card, Highlight, Mention, Tag, TexMath, Underline } from "./syntax";
+import { Card, headingSyntax, Highlight, Mention, Tag, TexMath, Underline } from "./syntax";
 import { t as message } from "../i18n/index.svelte";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
 import type { MarkdownAddition, NoteLanguage, PaperSource } from "../plugins/types";
 import { lineMarkers, openedText } from "./markers";
 import { hiddenMarkdown } from "./hiddenMarkdown";
+import { dropTagSlash } from "./tagSlash";
 import { markdownPageBreaks } from "./pageBreaks";
 import { markupMode } from "./markupMode";
 import { type MarkdownMode, prefs } from "../prefs.svelte";
@@ -57,7 +61,7 @@ function codeParser(info: string): Parser | null {
  * and JavaScript parsers up front. Sharing `markdownLanguage.data` keeps list continuation on
  * Enter working.
  */
-const linedown = (additions: MarkdownAddition[]) =>
+const linedown = (additions: MarkdownAddition[], underlined: boolean) =>
   new Language(
     markdownLanguage.data,
     (markdownLanguage.parser as MarkdownParser).configure([
@@ -67,6 +71,7 @@ const linedown = (additions: MarkdownAddition[]) =>
       Card,
       TexMath,
       Mention,
+      ...headingSyntax(underlined),
       parseCode({ codeParser }),
       ...additions.flatMap((addition) => addition.syntax ?? []),
     ]),
@@ -245,8 +250,8 @@ const phrases = EditorState.phrases.of({
  * plugins' additions, with "/paper" for each source of papers; dragging lines if it's on, and
  * hidden Markdown's cursor and keys while it's hidden.
  */
-const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[], mode: MarkdownMode, drag: boolean): Extension => [
-  linedown(additions),
+const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[], mode: MarkdownMode, drag: boolean, underlined: boolean): Extension => [
+  linedown(additions, underlined),
   frontMatterField,
   missingNotes,
   pasteURLAsLink,
@@ -255,18 +260,23 @@ const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[], m
   mathBlocks,
   typeTables,
   attachmentBlocks,
+  selectedBlocks,
   markdownPageBreaks,
   cards,
   drag ? dragBlocks : [],
   listKeymap,
+  listPaste,
   Prec.high(markdownKeymap),
   // Before live preview, so its marks (a code span, a link) wrap the symbols inside them.
   symbols,
   livePreview,
+  dropTagSlash,
   mode === "hidden" ? hiddenMarkdown : [],
   slashCommands([...additions.flatMap((addition) => addition.commands ?? []), ...paperCommands(papers, markdownPaperLink)]),
   formatToolbar,
   fenceInput,
+  headingLevelInput,
+  quoteInput,
   formattingKeymap,
   markdownOutline,
   additions.flatMap((addition) => addition.editor ?? []),
@@ -282,14 +292,14 @@ const sourceStyle = HighlightStyle.define([
   { tag: t.quote, color: "var(--text-muted)" },
 ]);
 
-let built: { additions: MarkdownAddition[]; papers: PaperSource[]; mode: MarkdownMode; drag: boolean; editing: Extension } | undefined;
+let built: { additions: MarkdownAddition[]; papers: PaperSource[]; mode: MarkdownMode; drag: boolean; underlined: boolean; editing: Extension } | undefined;
 
 /** A Markdown note's editor (the Markdown plugin's), made again when plugins add something else to Markdown, or its settings change. */
 export function markdownEditing(): Extension {
   const { markdown: additions, papers } = plugins;
-  const { markdownMode: mode, dragBlocks: drag } = prefs;
-  if (built?.additions !== additions || built.papers !== papers || built.mode !== mode || built.drag !== drag) {
-    built = { additions, papers, mode, drag, editing: linedownEditing(additions, papers, mode, drag) };
+  const { markdownMode: mode, dragBlocks: drag, underlinedHeadings: underlined } = prefs;
+  if (built?.additions !== additions || built.papers !== papers || built.mode !== mode || built.drag !== drag || built.underlined !== underlined) {
+    built = { additions, papers, mode, drag, underlined, editing: linedownEditing(additions, papers, mode, drag, underlined) };
   }
   return built.editing;
 }
@@ -346,9 +356,10 @@ export function createExtensions(onChange: () => void, format?: string): Extensi
     }),
     formatCompartment.of(formatEditing(format)),
     openedText,
-    // The note's page, which the paper chosen in Settings → Paper is drawn on (editor.css).
+    // The note's page, which the paper chosen in Settings → Plugins → Paper is drawn on (editor.css).
     EditorView.editorAttributes.of({ class: "cm-page" }),
     cursor,
+    focusInPlace,
     syntaxHighlighting(highlightStyle),
     find,
     highlightSelectionMatches(),

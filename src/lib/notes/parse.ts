@@ -3,8 +3,11 @@ import { plainLine } from "./stats";
 import { TAG_CHAR, TAG_NAME } from "./tags";
 import type { NoteMeta } from "./types";
 
-/** A tag starts a line, follows a space, or follows "(" (but not a link's "](", which is a URL). */
-const TAG_RE = new RegExp(`(^|\\s|(?<!\\])\\()#(${TAG_NAME})`, "gu");
+/**
+ * A tag starts a line, follows a space, or follows "(" (but not a link's "](", which is a URL); not
+ * at the start of a heading's text, where it's `##` being typed (editor/syntax.ts).
+ */
+const TAG_RE = new RegExp(`(^|\\s|(?<!\\])\\()(?<!^[ \\t]{0,3}#{1,6}[ \\t]+)#(${TAG_NAME})`, "gmu");
 /** A code block, indented or not. One that's never closed runs to the end, as in Markdown. */
 const FENCE_RE = /^[ \t]*(`{3,}|~{3,})[\s\S]*?(?:^[ \t]*\1|(?![\s\S]))/gm;
 const INLINE_CODE_RE = /`[^`\n]*`/g;

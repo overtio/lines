@@ -19,9 +19,11 @@
     /** Attributes for the swatch's frame, such as the custom properties `swatch` reads. */
     frame?: HTMLAttributes<HTMLSpanElement>;
     optional?: boolean;
+    /** What the empty field shows: "Auto" unless said. */
+    placeholder?: string;
     onchange: (value: string | undefined) => void;
   };
-  let { label, value, id, swatch, frame, optional = false, onchange }: Props = $props();
+  let { label, value, id, swatch, frame, optional = false, placeholder, onchange }: Props = $props();
 
   /** What's typed, while it's being typed: it only becomes the color once it is one. */
   let draft = $state<string | null>(null);
@@ -66,7 +68,7 @@
   <TextField
     {id}
     value={draft ?? value ?? ""}
-    placeholder={optional ? t("settings.colorAuto") : undefined}
+    placeholder={placeholder ?? (optional ? t("settings.colorAuto") : undefined)}
     aria-invalid={invalid}
     spellcheck="false"
     autocomplete="off"

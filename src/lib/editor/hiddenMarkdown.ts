@@ -46,9 +46,8 @@ function runsOn(state: EditorState, line: Line): Run[] {
       if (LEADS.has(ref.name)) {
         if (ref.name !== "HeaderMark") leads.set(ref.from, { to: spaceAfter(ref.to), heading: false });
         else if (!parent.name.startsWith("ATXHeading")) return;
+        // A heading's `#`s at its start; those at its end show (livePreview.ts).
         else if (ref.from === parent.from) leads.set(ref.from, { to: spaceAfter(ref.to), heading: true });
-        // A heading's closing `#`s, and the space before them.
-        else marks.push({ from: doc.sliceString(ref.from - 1, ref.from) === " " ? ref.from - 1 : ref.from, to: ref.to, closing: true });
         return;
       }
       const style = INLINE_STYLES[parent.name];

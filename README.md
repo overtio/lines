@@ -33,7 +33,7 @@ The [web app](https://overtio.github.io/lines/app/) opens with a tour: one short
 - **Lists and todos.** <kbd>Tab</kbd> and <kbd>⇧Tab</kbd> nest list items. Click a checkbox to tick it; the Todo view gathers every note with open tasks.
 - **Drag to move.** Grab the grip beside any line, list item, heading, table or card to move it, or use <kbd>⌥↑</kbd> / <kbd>⌥↓</kbd>. The grips can be turned off.
 - **Arrows and symbols.** `->` shows as →, `!=` as ≠, and so on, on screen only. The note keeps what you typed.
-- **Copy buttons** on values in `Key: Value` lines and on table cells.
+- **Copy buttons** on values in `Key: Value` lines and on table cells, and **scores** like `Rating: 4/5` drawn as stars, hearts or circles (Settings → Little Touches, where either can be turned off).
 - **Page breaks.** `/page break` starts a new page in the PDF, and over a backdrop splits the note into pages, as Craft does.
 - **Marks in the margin.** <kbd>⌘⇧M</kbd> puts a colored bar beside lines, with what it means on pointing at it, as a code editor marks changed lines; it's an HTML comment other apps don't show. Plugins mark lines too: Changes marks what you've changed since opening a note.
 - **Find and replace** in a note (<kbd>⌘F</kbd>), matching case, whole words or a regular expression.
@@ -53,7 +53,7 @@ The [web app](https://overtio.github.io/lines/app/) opens with a tour: one short
 - **Links to folders on your computer.** Drop a folder from Finder onto a note, or type `/folder`, for a link that opens it in Finder; links to files open them in their apps. See [docs/linedown.md](docs/linedown.md#folders-and-files-on-your-computer).
 - **Images, files, audio and video.** Paste or drop them in. Drag an image's or video's corner to resize it. Audio and video play right in the note, and audio keeps playing while you scroll and write.
 - **Photos and GIFs from the web.** `/unsplash` searches Unsplash's free photos and `/giphy` GIPHY's GIFs, and puts the one you pick in the note.
-- **Wallpapers from Wallhaven.** In the apps, `/wallhaven` searches [Wallhaven](https://wallhaven.cc)'s wallpapers and keeps the one you pick with the note; Settings → Theme → New → From Wallhaven… makes a theme of a wallpaper's colors, and puts it behind your notes. See [docs/themes.md](docs/themes.md#your-own-themes).
+- **Wallpapers from Wallhaven.** In the apps, `/wallhaven` searches [Wallhaven](https://wallhaven.cc)'s wallpapers and keeps the one you pick with the note; Settings → Theme → New → From Wallhaven makes a theme of a wallpaper's colors, and puts it behind your notes. See [docs/themes.md](docs/themes.md#your-own-themes).
 - **Research papers.** `/paper` searches [arXiv](https://arxiv.org) by title, author or topic and links to the paper you pick by its title, in Markdown and LaTeX notes (in the apps). More sources of papers can be added as plugins.
 - **API requests.** Write requests in an ` ```http ` block (`/request`) and send them from the note, a lighter Postman or Bruno: variables, one request using another's response, curl commands pasted in or copied out. The `.http` format JetBrains' IDEs, VS Code and Visual Studio read, so a whole note of requests opens there too, or [Hurl](https://hurl.dev)'s, whose captures and asserts check each response. See [docs/requests.md](docs/requests.md).
 - **Terminal recordings** from [asciinema](https://asciinema.org) play right in the note, in your theme's colors. Paste a recording's link, or drop in a `.cast` file.
@@ -65,7 +65,7 @@ Switch a note to LaTeX from its ⓘ panel and write `\section`, theorems, citati
 
 ### Spreadsheets
 
-Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block). Formulas are worked out by [IronCalc](https://www.ironcalc.com). See [docs/spreadsheets.md](docs/spreadsheets.md).
+Put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block), or, with Spreadsheet Notes on in Settings → Plugins, make a whole note a spreadsheet from its ⓘ panel. Formulas are worked out by [IronCalc](https://www.ironcalc.com). See [docs/spreadsheets.md](docs/spreadsheets.md).
 
 - **Works like Excel**: its keys, functions suggested as you type, cells pointed at with the mouse or the arrow keys, copy and paste with other apps, sorting, and rows and columns inserted with formulas that follow.
 - **Fill and move.** Drag the selection's corner to carry on a series (1, 2 → 3, 4; Monday → Tuesday), or hold cells a moment and drag them elsewhere.
@@ -76,13 +76,17 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 
 ### Organizing
 
-- **Tags, not folders.** Write `#tag` or `#nested/tag` anywhere in a note. Give tags icons, and rename them everywhere at once.
+- **Tags, not folders.** Write `#tag` or `#nested/tag` anywhere in a note, or drag a note onto a tag (or a type, the Inbox, the Trash) in the sidebar. Give tags and types icons and colors, synced to your other devices, and rename them everywhere at once.
 - **Objects and mentions.** Give a note properties and a type (`type: person`) and it's listed under Types. Type `@` or `[[` to mention another note, `@Ada.email` to show one of its properties, and `@type.recipe` for a table of every recipe.
+- **Inbox.** New notes and imports land in the Inbox, first in the sidebar, until you file them (or send new notes straight to Notes, in Settings).
+- **Calendar.** Notes on their days: a `date` or `due` in a note's properties, or every day from its `start` to its `end`. Its row counts what's on today. Events repeat (`repeat: every weekday`, `monthly on the last friday until 2027-06-01`, or from an event's menu). Events in their colors: a note's own, or its type's or tag's. A month above the list, and beside it the week or the day by the hour, with notes at their times (`date: 2026-11-30 14:00`). Drag down the hours to make an event, or across All day for one of whole days, drag one to another time or day, or its edge to change how long it is (<kbd>⌘Z</kbd> moves it back). Choose a day for its notes, or press <kbd>↵</kbd> on a day for a note dated that day.
+- **A sidebar your way.** Put Inbox, Notes, Calendar and the rest in sections of your own, named or just a gap, with dividers between them where you like, fold Types and Tags away, sort them by name or by how many notes, hide any row (Show Hidden brings it back), make rows small or big tiles with their count, one by one or a section at once, and drag rows and sections into the order you like.
+- **Drag a note out** of the list onto Finder, the desktop or another app for a copy of it as a file.
 - **Note icons**, shown before the title in the list.
 - **Fast search** across every note.
 - **Pin, trash, restore.** Right-click, long-press or swipe a note.
 - **Several notes at once.** <kbd>⌘</kbd>-click, <kbd>⇧</kbd>-click or <kbd>⌘A</kbd> in the list, then tag, pin or trash them together.
-- **Two notes side by side.** Open to the Side (or <kbd>⌥</kbd>-click in the list) opens a note beside the one you're in, to read one while writing the other; swap them, or drag the line between them.
+- **Notes side by side, and above and below.** Open to the Side or Open Below (or <kbd>⌥</kbd>-click and <kbd>⌥⇧</kbd>-click in the list) opens a note beside the one you're in, to read one while writing another; split as many times as there's room, one on top and two at the bottom, swap any with the open note, and drag the lines between them. Or drag a note from the list onto a pane, by its edge to open it beside or in its middle to open it there, and drag panes around by their grips.
 - **Floating notes** (desktop apps). Pop a note into its own small window that can stay on top.
 
 ### Export and share
@@ -106,21 +110,21 @@ Switch a note to a spreadsheet from its ⓘ panel, or put one in a Markdown note
 ### Make it yours
 
 - **Plugins.** Like a code editor, lines is a small core with plugins around it: the formats notes are written in, what draws math and diagrams, ways to make a PDF, themes and icons. Turn off what you don't use in Settings → Plugins; nothing in your notes changes. See [docs/plugins.md](docs/plugins.md).
-- **Styles**: the whole look, not just the colors. Classic, a desktop of the late 90s with bevels and a title bar; Pixel, one-bit and minimal in a pixel font; Neon, glowing lines on a grid. Each with colors of its own, or any theme's. See [docs/themes.md](docs/themes.md#styles).
-- **Twenty-three themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, or from a picture (a wallpaper's colors, read on your device), share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
+- **Presets**: the whole look in one, not just the colors. Classic, a desktop of the late 90s with bevels and a title bar; Pixel, one-bit and minimal in a pixel font; Neon, glowing lines on a grid. Save your own (theme, type, paper, cursor and all) and share it as a file. See [docs/themes.md](docs/themes.md#presets).
+- **Twenty-three themes**, each light and dark, including High Contrast and two for color blindness. **Make your own** from any of them, bit by bit by right-clicking anything to change its color, or from a picture (a wallpaper's colors, read on your device), share it as a file, or import one made for VS Code, Zed, Base16, iTerm2, Alacritty, Kitty, Ghostty and other terminals, or KDE and GTK. See [docs/themes.md](docs/themes.md).
 - **Dark panes**: the sidebar, the note list or both in the theme's dark colors, while the note stays light. See [docs/themes.md](docs/themes.md#dark-panes).
 - **Monochrome and Invert**: any theme in greys, or turned light for dark, with the contrast it had.
-- **Paper to write on.** Ruled lines that every line of text sits on, and dots, squares or graph paper with a row of cells for each line (or any size you like), isometric paper, in your theme's colors or any color, as faint or strong as you like, and a grain or linen texture (Settings → Paper).
-- **A backdrop behind the page.** Put a soft gradient, a color or a picture of your own behind your notes, which then sit on it as pages, solid or frosted like glass (Settings → Paper → Backdrop).
-- **Fonts, text size, note width and spacing**, and headings in the accent or a color of your own, with a live preview; <kbd>⌘+</kbd> and <kbd>⌘−</kbd> size the text as you read. Notes can be narrow, medium, wide, any width between, or fill the window.
+- **Paper to write on.** Ruled lines that every line of text sits on, and dots, squares or graph paper with a row of cells for each line (or any size you like), isometric paper, in your theme's colors or any color, as faint or strong as you like, and a grain or linen texture (Settings → Plugins → Paper).
+- **A backdrop behind the page.** Put a soft gradient, a color or a picture of your own behind your notes, which then sit on it as pages, solid or frosted like glass (Settings → Plugins → Paper → Backdrop).
+- **Fonts, text size, note width and spacing**, with a live preview: your system's font, a serif, rounded or monospaced one, or IBM Plex Sans, Fira Sans or Agave, which come with lines; headings in the accent or a color of your own; <kbd>⌘+</kbd> and <kbd>⌘−</kbd> size the text as you read. Notes can be narrow, medium, wide, any width between, or fill the window.
 - **A mascot.** A cat, an alien, a slime in your accent or a pixel girl, in pixel art, that walks along the bottom of your note, hops up to sit at the end of the sentence you're writing, cheers you on, naps when you're away, pounces on the pointer, and can be picked up and dropped. Plugins can add their own.
-- **Cursors.** A text cursor as a bar, a thick one, a block or an underline, in the accent or any color, blinking, fading or steady, that glides or trails where it goes as some terminals' do, glows, turns through the rainbow or throws sparks as you type. And a pointer of 90s pixels or a dot in the accent, with a comet's tail or sparkles behind it.
+- **Cursors.** A text cursor as a bar, a thick one, a block or an underline (as wide as the letter it's on, or always even), in the accent or any color, blinking, fading or steady, that glides or trails where it goes as some terminals' do, glows, turns through the rainbow or throws sparks as you type. And a pointer of 90s pixels or a dot in the accent, with a comet's tail or sparkles behind it.
 - **Typing sounds.** Hear a keyboard as you type: creamy or clacky linears, tactile, clicky, Topre, or a typewriter that rings its bell at Return. Or add a recorded one: any [Mechvibes](https://mechvibes.com) sound pack, from a .zip or its folder. Off to begin with.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
 - **Fits any screen**: three columns on a desktop, a drawer on a tablet, a stack on a phone. Drag the columns to resize them.
 - **Your layout.** Put the sidebar and the note list on the left or the right, each its own way, and turn on tabs for the notes you open, as in a code editor (Settings → Layout). Scroll bars can be turned off everywhere.
 - **Outline.** Turn on short lines beside the note, on its right or left, one for each heading, darker for the part you're reading. Point at them to see the headings by name, and click one to glide there. Markdown and LaTeX notes both have it.
-- **Native touches**: SF Symbols on Apple devices, see-through windows on the Mac (all of the window, or only its sidebar, or its sidebar and note list), and Settings in its own window.
+- **Native touches**: SF Symbols on Apple devices, see-through windows on the Mac (all of the window, or only its sidebar, or its sidebar and note list), and Settings in its own window if you like.
 - **Updates itself** (desktop apps). A new version downloads in the background once it's been out a week, and installs when you quit lines, or straight away with Restart to update. Choose how long to wait, or turn it off, in Settings → About.
 - **English, Spanish and French**, following your system or chosen in Settings. See [docs/translations.md](docs/translations.md) to add a language.
 - **Accessible.** Everything works from the keyboard and with a screen reader, at large text sizes, with reduced motion and with increased contrast. See [docs/accessibility.md](docs/accessibility.md).
@@ -139,7 +143,7 @@ Press <kbd>⌘/</kbd> to see them all. On Windows and Linux, use <kbd>Ctrl</kbd>
 | <kbd>⌘↵</kbd> | Make a todo, or tick it |
 | <kbd>⌘⇧M</kbd> | Mark lines in the margin, or take their marks off |
 | <kbd>Tab</kbd> <kbd>⇧Tab</kbd> | Nest or un-nest a list item; next or previous table cell |
-| <kbd>⌘-click</kbd> or <kbd>⌥↵</kbd> | Open a link, mention, tag or file (Settings → Editor → Links sets what click, ⌘-click and ⇧⌘-click do) |
+| <kbd>⌘-click</kbd> or <kbd>⌥↵</kbd> | Open a link, mention or file; a tag opens with a click, and ⌘-click edits it (Settings → Editor → Links sets what click, ⌘-click and ⇧⌘-click do) |
 | <kbd>⌘-click</kbd> <kbd>⇧-click</kbd> <kbd>⌘A</kbd> | Select several notes in the list (<kbd>⌫</kbd> moves them to the Trash) |
 | <kbd>⌘\\</kbd> | Show or hide the sidebar |
 | <kbd>⇧⌘\\</kbd> | Focus mode |
@@ -302,15 +306,16 @@ src/
     keyboards/               Keyboards to hear as you type, made from sound (synth.ts)
     mascots/                 Companions in the window, as pixel art (art.ts); what they do is lib/mascot/
     themes/                  The twenty-three themes, as their colors (Lines, the default, in lines.ts), and the theme files of other apps it reads (formats/)
-    styles/                  Whole looks beyond the colors: Classic, Pixel and Neon, each a CSS file, its fonts and its colors
+    fonts/                   Fonts to write notes in: IBM Plex Sans, Fira Sans and Agave
+    styles/                  Whole looks beyond the colors, each a preset: Classic, Pixel, Neon, Puddle and Lightbulb, each a CSS file, its fonts, its colors and the settings it brings
     lucide/  sf-symbols/     Icon sets
   lib/
     plugins/
       types.ts               What a plugin is and what it can add: formats, themes, icon sets, engines…
       registry.svelte.ts     The plugins, which are on (kept and shared between windows), and what they add
       plainText.ts           How a note shows while its format's plugin is off
-    paper.svelte.ts          The paper chosen in Settings → Paper, as custom properties editor.css draws
-    themes/                  The themes plugins add, as CSS (css.ts, which the website uses too), and this window's theme (show.svelte.ts) and style (styles.svelte.ts); your own themes, their files, importing them, and working out colors
+    paper.svelte.ts          The paper chosen in Settings → Plugins → Paper, as custom properties editor.css draws
+    themes/                  The themes plugins add, as CSS (css.ts, which the website uses too), and this window's theme (show.svelte.ts) and style (styles.svelte.ts); presets (presets.svelte.ts); your own themes, their files, importing them, and working out colors
     editor/
       Editor.svelte          CodeMirror host; per-note undo history
       livePreview.ts         Hides Markdown and renders bullets, checkboxes, rules, images
@@ -339,6 +344,7 @@ src/
       fences.ts              Closes ``` and ::: fences as you type them; ` or : wraps a selection
       lists.ts               Tab / Shift-Tab nesting for list items; Backspace after a marker
       keyValue.ts            Copy buttons for Key: Value lines
+      scores.ts              Scores (`Rating: 4/5`) drawn as stars, hearts or circles
       syntax.ts              #tag, ==highlight==, <u>underline</u>, ::: card, $math$ and @mention / [[wiki link]] parser extensions
       objects.ts             Properties, @mentions and their menus; creating a mentioned note
       typeTables.ts          Tables of a type's notes (@type.recipe)
@@ -419,7 +425,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] Google Drive on the web and phones: sign in with Google (Drive API; needs an OAuth client ID)
 - [ ] Proton Drive on the web and phones, once Proton opens its Drive SDK to third-party apps
 - [ ] Show notes by title in synced folders, for browsing them in Finder
-- [ ] Sync the icons chosen for tags and types (each device keeps its own for now)
+- [x] Sync the icons chosen for tags and types, and their colors
 - [ ] Remove attachments from sync storage once no note uses them (they're only cleaned up on the device for now)
 
 **Security**
@@ -458,6 +464,8 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] Moving cells and resizing blocks with a finger
 
 **Notes**
+- [ ] Notebooks to file Inbox notes into, nested, beside tags ([#75](https://github.com/overtio/lines/issues/75))
+- [ ] Calendar: events across several days drawn across the hours, todos with due dates, your calendars' events and meeting notes from them, and a feed of your dates for other calendar apps ([#77](https://github.com/overtio/lines/issues/77))
 - [ ] Backlinks: the notes that mention this one
 - [ ] Renaming a note updates the mentions of it
 - [ ] Drawings in LaTeX notes (`\includegraphics` of a drawing, as a PDF for TeX)
@@ -520,9 +528,9 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [x] Spreadsheets: formulas in tables, spreadsheet notes and ` ```csv ` blocks, worked out by IronCalc; CSV and Excel files in and out
 - [x] Formulas that use other notes' spreadsheets, and follow them when they're renamed
 - [x] Find and replace in a note
-- [x] Two notes side by side (Open to the Side)
+- [x] Notes side by side and one above another, split as often as there's room (Open to the Side, Open Below)
 - [x] Photos and GIFs from the web (`/unsplash`, `/giphy`)
-- [x] Settings in a window of its own in the desktop apps
+- [x] Settings in a window of its own in the desktop apps, or over the notes (the first choice)
 
 </details>
 

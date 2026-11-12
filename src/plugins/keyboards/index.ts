@@ -86,5 +86,6 @@ export const keyboardSounds = (): Plugin => ({
   description: t("plugins.keyboards.description"),
   icon: "keyboard",
   enabledByDefault: true,
+  settings: () => import("./KeyboardsSettings.svelte"),
   contributes: { keyboardSounds: keyboards() },
 });

@@ -315,98 +315,105 @@ And another.
 ## Heading two
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Heading 2, then Mention
+#### 33. Heading 2, then Score (Settings → Little Touches)
+
+## Heading two
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+
+#### 34. Heading 2, then Mention
 
 ## Heading two
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Heading 2, then Wiki link
+#### 35. Heading 2, then Wiki link
 
 ## Heading two
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Heading 2, then Symbols
+#### 36. Heading 2, then Symbols
 
 ## Heading two
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. Heading 2, then GitHub links
+#### 37. Heading 2, then GitHub links
 
 ## Heading two
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. Heading 2, then arXiv links
+#### 38. Heading 2, then arXiv links
 
 ## Heading two
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Heading 2, then Image
+#### 39. Heading 2, then Image
 
 ## Heading two
 ![A sample picture](attachment:photo.png)
 
-#### 39. Heading 2, then Drawing
+#### 40. Heading 2, then Drawing
 
 ## Heading two
 ![A sample drawing](attachment:drawing.svg)
 
-#### 40. Heading 2, then File
+#### 41. Heading 2, then File
 
 ## Heading two
 [Budget.csv](attachment:budget.csv)
 
-#### 41. Heading 2, then Folder and file links
+#### 42. Heading 2, then Folder and file links
 
 ## Heading two
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Heading 2, then Attached 3D model (STL)
+#### 43. Heading 2, then Attached 3D model (STL)
 
 ## Heading two
 [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Heading 2, then Terminal recording (.cast file)
+#### 44. Heading 2, then Terminal recording (.cast file)
 
 ## Heading two
 [terminal.cast](attachment:terminal.cast)
 
-#### 44. Heading 2, then Audio
+#### 45. Heading 2, then Audio
 
 ## Heading two
 [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Heading 2, then Video
+#### 46. Heading 2, then Video
 
 ## Heading two
 [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Heading 2, then Missing file
+#### 47. Heading 2, then Missing file
 
 ## Heading two
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Heading 2, then Card
+#### 48. Heading 2, then Card
 
 ## Heading two
 ::: card
 Text in a card.
 :::
 
-#### 48. Heading 2, then Callout (info)
+#### 49. Heading 2, then Callout (info)
 
 ## Heading two
 :::i
 Text in an info callout.
 :::
 
-#### 49. Heading 2, then Callout (warning, chosen icon)
+#### 50. Heading 2, then Callout (warning, chosen icon)
 
 ## Heading two
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 50. Heading 2, then Callout (decision, no icon)
+#### 51. Heading 2, then Callout (decision, no icon)
 
 ## Heading two
 :::^ icon=none

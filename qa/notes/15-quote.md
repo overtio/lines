@@ -283,81 +283,87 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 
 > **Wi-Fi password:** correct-horse-battery
 
-#### 33. Mention in a quote
+#### 33. Score (Settings → Little Touches) in a quote
+
+> Rating: 4/5
+> Score: 7 / 10
+> Not a score: 12/20
+
+#### 34. Mention in a quote
 
 > Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 34. Wiki link in a quote
+#### 35. Wiki link in a quote
 
 > Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 35. Symbols in a quote
+#### 36. Symbols in a quote
 
 > Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 36. GitHub links in a quote
+#### 37. GitHub links in a quote
 
 > Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 37. arXiv links in a quote
+#### 38. arXiv links in a quote
 
 > Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 38. Image in a quote (stays Markdown here)
+#### 39. Image in a quote (stays Markdown here)
 
 > ![A sample picture](attachment:photo.png)
 
-#### 39. Drawing in a quote (stays Markdown here)
+#### 40. Drawing in a quote (stays Markdown here)
 
 > ![A sample drawing](attachment:drawing.svg)
 
-#### 40. File in a quote (stays Markdown here)
+#### 41. File in a quote (stays Markdown here)
 
 > [Budget.csv](attachment:budget.csv)
 
-#### 41. Folder and file links in a quote
+#### 42. Folder and file links in a quote
 
 > See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 42. Attached 3D model (STL) in a quote
+#### 43. Attached 3D model (STL) in a quote
 
 > [Bracket.stl](attachment:bracket.stl)
 
-#### 43. Terminal recording (.cast file) in a quote
+#### 44. Terminal recording (.cast file) in a quote
 
 > [terminal.cast](attachment:terminal.cast)
 
-#### 44. Audio in a quote (stays Markdown here)
+#### 45. Audio in a quote (stays Markdown here)
 
 > [Chime.mp3](attachment:chime.mp3)
 
-#### 45. Video in a quote (stays Markdown here)
+#### 46. Video in a quote (stays Markdown here)
 
 > [Sky.mp4](attachment:sky.mp4)
 
-#### 46. Missing file in a quote (stays Markdown here)
+#### 47. Missing file in a quote (stays Markdown here)
 
 > [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 47. Card in a quote
+#### 48. Card in a quote
 
 > ::: card
 > Text in a card.
 > :::
 
-#### 48. Callout (info) in a quote
+#### 49. Callout (info) in a quote
 
 > :::i
 > Text in an info callout.
 > :::
 
-#### 49. Callout (warning, chosen icon) in a quote
+#### 50. Callout (warning, chosen icon) in a quote
 
 > :::! icon=flag
 > Text in a warning callout with the flag icon.
 > :::
 
-#### 50. Callout (decision, no icon) in a quote
+#### 51. Callout (decision, no icon) in a quote
 
 > :::^ icon=none
 > Text in a decision callout with no icon.

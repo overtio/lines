@@ -2,6 +2,7 @@ use tauri::Manager;
 
 mod attachments;
 mod devtools;
+mod drag_out;
 mod export;
 mod folder_sync;
 mod local_links;
@@ -27,6 +28,7 @@ pub fn run() {
     .invoke_handler(tauri::generate_handler![
       attachments::open_attachment,
       devtools::toggle_devtools,
+      drag_out::drag_note_out,
       export::save_export,
       folder_sync::sync_folder_candidates,
       folder_sync::sync_folder_list,

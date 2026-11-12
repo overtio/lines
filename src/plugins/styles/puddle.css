@@ -1,0 +1,27 @@
+/*
+ * Puddle: a picture book on a rainy day. Cream paper, flat colors, and crisp ink lines around
+ * what can be pressed or typed in and around what floats, as a drawing's are; no shadows. What's
+ * chosen is outlined in ink too.
+ */
+
+/* Made from the theme's colors, and made again in a part with its own (a pane shown dark). */
+:root[data-style="puddle"],
+:root[data-style="puddle"] [data-scheme] {
+  --puddle-line: 1.5px solid var(--ink);
+}
+
+:root[data-style="puddle"] :is(.ui-button:not([data-variant="quiet"], [data-variant="danger"]), .ui-select, .ui-field, .ui-segmented, .ui-card, .ui-menu, .ui-dialog, .ui-callout) {
+  border: var(--puddle-line);
+}
+
+:root[data-style="puddle"] :is(.ui-note-row.selected, .ui-sidebar-row.active, .ui-segment[data-state="checked"]) {
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+
+:root[data-style="puddle"] .ui-switch {
+  border: var(--puddle-line);
+}
+
+:root[data-style="puddle"] .ui-switch-thumb {
+  box-shadow: 0 0 0 1.5px var(--ink);
+}

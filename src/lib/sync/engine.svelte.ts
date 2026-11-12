@@ -3,7 +3,10 @@ import { fromBase64, lockKey, randomBytes, toBase64, unlockKey } from "../crypto
 import { t } from "../i18n/index.svelte";
 import { readSecret, writeSecret } from "../lock/vault";
 import { attachmentNames, getAttachment, putAttachment, usedAttachments } from "../notes/attachments";
+import { LOOKS_FILE, readLooks, writeLooks } from "../notes/looks";
+import { looks } from "../notes/looks.svelte";
 import { noteKeys } from "../notes/noteKeys.svelte";
+import { TITLE_LINES } from "../notes/title";
 import { isBlank, notes, opened } from "../notes/store.svelte";
 import { syncRecords, type SyncRecord } from "../notes/storage";
 import type { Note } from "../notes/types";
@@ -50,6 +53,8 @@ async function connect(config: SyncConfig) {
  *
  * Attachments (images and files) are named after their content, so they never change: each pass uploads the ones the
  * notes here show that the remote lacks, and downloads the ones they show that this device lacks.
+ *
+ * Tags' and types' icons and colors are one file, `library.json`, merged choice by choice (looks.ts).
  *
  * With end-to-end encryption on (see sealed.ts), the same happens through a SealedRemote. Turning
  * it on or off rewrites the whole remote, so it's never half one and half the other for long:
@@ -123,9 +128,6 @@ function conflictCopy(note: Note): Note {
   return { ...copy, body: markConflicted(note), ...(note.locked ? { locked: { ...note.locked, sealed: "" } } : {}) };
 }
 
-/** How far down a note its title is looked for: past the longest properties. */
-const TITLE_LINES = 110;
-
 /**
  * The note's text with its title marked as a conflicted copy's: where its language keeps the title
  * (a LaTeX document's \title), or on the line it reads the title from: not a properties line, nor a
@@ -150,14 +152,14 @@ function markConflicted({ body, format }: Note): string {
 }
 
 /** A note's text, format and lock: all it says but its dates and what `merge` takes apart from them; hashed. */
-const textOf = (note: Note) => hash(serialize({ ...note, updatedAt: 0, pinned: false, trashed: false, icon: undefined }));
+const textOf = (note: Note) => hash(serialize({ ...note, updatedAt: 0, pinned: false, trashed: false, inbox: undefined, icon: undefined, color: undefined }));
 
 /** What a sync record keeps of a note as synced, so `merge` can tell later what each side changed. */
-const baseOf = (note: Note) => ({ text: textOf(note), pinned: note.pinned, trashed: note.trashed, icon: note.icon });
+const baseOf = (note: Note) => ({ text: textOf(note), pinned: note.pinned, trashed: note.trashed, inbox: note.inbox, icon: note.icon, color: note.color });
 
 /**
  * A note changed on both sides since it was synced as `base`, made one: its text from the side that
- * edited it, its pin, trash and icon from the side that changed each (pinning or locking it isn't an
+ * edited it, its pin, trash, Inbox, icon and color from the side that changed each (pinning or locking it isn't an
  * edit). Text edited on both sides is the newer edit's, and the other comes back as `older`, for a
  * conflicted copy. A lock on either side stays: sync never turns a locked note back into plain text.
  */
@@ -178,10 +180,12 @@ async function merge(here: Note, there: Note, base: SyncRecord | undefined): Pro
     else [text, other] = [other, text];
   }
   // Here's if both changed it. A record from before lines kept these doesn't say: as the side whose text is kept.
-  const pick = <K extends "pinned" | "trashed" | "icon">(field: K) =>
-    (base?.text ? here[field] !== base[field] : text === here) ? here[field] : there[field];
+  // Not in the Inbox is written as no field at all, so it's the same as false.
+  const same = (a: unknown, b: unknown) => a === b || (!a && !b);
+  const pick = <K extends "pinned" | "trashed" | "inbox" | "icon" | "color">(field: K) =>
+    (base?.text ? !same(here[field], base[field]) : text === here) ? here[field] : there[field];
   return {
-    merged: { ...text, pinned: pick("pinned"), trashed: pick("trashed"), icon: pick("icon") },
+    merged: { ...text, pinned: pick("pinned"), trashed: pick("trashed"), inbox: pick("inbox"), icon: pick("icon"), color: pick("color") },
     older: edited(other) ? other : undefined,
   };
 }
@@ -233,6 +237,7 @@ class SyncEngine {
 
   start() {
     notes.onLocalChange(() => this.schedule());
+    looks.onChange(() => this.schedule());
     window.addEventListener("online", () => void this.syncNow());
     window.addEventListener("offline", () => this.config && (this.status = "offline"));
     window.addEventListener("focus", () => {
@@ -298,6 +303,7 @@ class SyncEngine {
       await writeKeyFile(store, root, file);
       // Every note goes up again, encrypted; the plain copies are removed after.
       await this.#switch({ ...config, encryption: { id, key: toBase64(raw) } });
+      await store.delete(root + LOOKS_FILE);
     });
   }
 
@@ -322,6 +328,8 @@ class SyncEngine {
       if (file?.id === config.encryption.id) {
         // Everything comes here first, since the encrypted copies are about to go.
         await this.#pass(config);
+        const { remote } = await connect(config);
+        await store.delete(await remote.fileKey!(root + LOOKS_FILE));
         // Without the key file, other devices stop before they'd see notes go missing.
         await store.delete(root + KEY_FILE);
         localStorage.setItem(LEFTOVERS_KEY, "1");
@@ -591,7 +599,19 @@ class SyncEngine {
       // device still has its notes, and uploads them encrypted once it has the passphrase.
       await pool(listed.filter((object) => object.key.endsWith(".md")), (object) => store.delete(object.key));
     }
+    await this.#syncLooks(remote, root);
     await this.#syncAttachments(remote, store, attachmentDir, !!config.encryption);
+  }
+
+  /** Brings in other devices' icons and colors, and writes back the merge if it's new to them. */
+  async #syncLooks(remote: Remote, root: string) {
+    const key = root + LOOKS_FILE;
+    const there = await remote.get(key);
+    if (there) looks.merge(readLooks(there.text));
+    const text = writeLooks(looks.looks);
+    if (text === there?.text) return;
+    // Not over a version written since (false): the next pass merges that in.
+    if ((await remote.put(key, text, there ? (there.etag ?? undefined) : null)) === false) this.schedule();
   }
 
   async #syncAttachments(remote: Remote, store: Remote, dir: string, encrypted: boolean) {

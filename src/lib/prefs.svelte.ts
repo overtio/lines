@@ -6,7 +6,8 @@ import { announce, onAnnounce, windowLabel } from "./windows/channel";
 export type Appearance = "system" | "light" | "dark";
 /** Standard colors, or text and borders darkened for contrast (each theme's `moreContrast`); "system" follows the device's Increase Contrast. */
 export type Contrast = "system" | "standard" | "more";
-export type FontId = "system" | "serif" | "rounded" | "mono";
+/** One of FONTS, or a font a plugin brings (themes/fonts.svelte.ts). */
+export type FontId = string;
 /** Whether a floating note shows its close/minimize/zoom buttons all the time, or on hover. */
 export type WindowButtons = "hover" | "always";
 /** What of the main window its opacity makes see-through: all of it, the sidebar and the note list, or the sidebar. */
@@ -17,12 +18,25 @@ export const DARK_PANES = ["none", "sidebar", "list", "both"] as const;
 export type DarkPanes = (typeof DARK_PANES)[number];
 /** Which way a note moves when swiped with two fingers on a trackpad. */
 export type SwipeDirection = "fingers" | "reversed";
+/** Where new notes go: the Inbox, to be sorted later, or straight among the rest. */
+export const NEW_NOTES = ["inbox", "notes"] as const;
+export type NewNotes = (typeof NEW_NOTES)[number];
+/** The day the Calendar's weeks start on: where the language says, or a chosen one. */
+export const WEEK_STARTS = ["auto", "monday", "sunday", "saturday"] as const;
+export type WeekStart = (typeof WEEK_STARTS)[number];
+/** What the Calendar shows beside its month, while no note is open: a week or a day, by the hour. */
+export const CALENDAR_VIEWS = ["week", "day"] as const;
+export type CalendarView = (typeof CALENDAR_VIEWS)[number];
 /** The paper a note's PDF is laid out on. */
 export type Paper = "a4" | "letter";
 /** Which side of the window a pane goes on. */
 export type Side = "left" | "right";
-/** How far apart a paper pattern's lines and dots are (Settings → Paper): a row of cells for each line of text, or a size chosen. */
+/** How far apart a paper pattern's lines and dots are (Settings → Plugins → Paper): a row of cells for each line of text, or a size chosen. */
 export type PaperSpacing = "text" | "custom";
+/** How a score (`Rating: 4/5`) is drawn: as marks of one of these kinds, or as written (editor/scores.ts). */
+export const SCORE_STYLES = ["stars", "hearts", "circles", "off"] as const;
+export type ScoreStyle = (typeof SCORE_STYLES)[number];
+
 /** How a note shows its Markdown (editor/markupMode.ts). */
 export const MARKDOWN_MODES = ["source", "visible", "live", "hidden"] as const;
 export type MarkdownMode = (typeof MARKDOWN_MODES)[number];
@@ -30,6 +44,8 @@ export type MarkdownMode = (typeof MARKDOWN_MODES)[number];
 export type PaperColor = "ink" | "accent" | "custom";
 /** The text cursor (Settings → Cursor, cursors.svelte.ts): its shape, color, blink, how it moves, and what it does as you type. */
 export const CARET_SHAPES = ["bar", "thick", "block", "underline"] as const;
+/** How wide a block or underline is: the letter it's on, or always a letter's width. */
+export const CARET_WIDTHS = ["letter", "even"] as const;
 export const CARET_COLORS = ["accent", "text", "custom"] as const;
 export const CARET_BLINKS = ["smooth", "steps", "off"] as const;
 export const CARET_MOTIONS = ["jump", "glide", "trail"] as const;
@@ -146,10 +162,14 @@ export function sameSpacing(a: Spacing, b: Spacing) {
  * Themes, icon sets and typesetters come from plugins, so they're kept by id as chosen, even while
  * their plugin is off; lines shows its own until it's on again (plugins/registry.svelte.ts).
  */
-interface Stored {
+export interface Stored {
   theme: string;
-  /** The app's style (Settings → Theme → Style), a plugin's, by id. */
+  /** The app's shapes, type and borders beside its colors, a plugin's style, by id: what a preset brings. */
   style: string;
+  /** The preset last chosen (Settings → Presets, themes/presets.svelte.ts), by id. */
+  preset: string;
+  /** Where Settings opens in the desktop apps (windows/settings.svelte.ts). */
+  settingsOpens: SettingsOpens;
   appearance: Appearance;
   contrast: Contrast;
   /** Every color of the theme shown as a grey, or turned light for dark (themes/show.svelte.ts). */
@@ -160,6 +180,11 @@ interface Stored {
   textSize: number;
   icons: string;
   swipe: SwipeDirection;
+  weekStart: WeekStart;
+  calendarView: CalendarView;
+  newNotes: NewNotes;
+  /** The Calendar also shows notes on the day they were made or last edited, not only by their dates. */
+  calendarEdited: boolean;
   spacing: Spacing;
   /** How wide a note's text runs before wrapping, in px; or all the room there is, with the side margins kept. */
   noteWidth: number;
@@ -190,7 +215,7 @@ interface Stored {
   paperCustomColor: string;
   paperOpacity: number;
   /**
-   * Behind the page (Settings → Paper → Backdrop): "none", a backdrop's id from plugins, "color"
+   * Behind the page (Settings → Plugins → Paper → Backdrop): "none", a backdrop's id from plugins, "color"
    * (backdropColor), or "image" (one of your own, kept apart: lib/paper.svelte.ts).
    */
   paperBackdrop: string;
@@ -205,7 +230,6 @@ interface Stored {
   sidebarWidth: number;
   listWidth: number;
   /** The note open beside another's width, as dragged. */
-  sideWidth: number;
   sidebarSide: Side;
   listSide: Side;
   /** Open notes show as tabs above the note (tabs.svelte.ts). */
@@ -215,6 +239,8 @@ interface Stored {
   outlineSide: Side;
   /** Scroll bars wherever something scrolls (off: none; scrolling still works). */
   scrollbars: boolean;
+  /** The sidebar's version badge and GitHub button (a downloaded update's restart button shows anyway). */
+  sidebarAbout: boolean;
   /**
    * How Markdown shows in a note: as written and colored (source), styled with all of it in sight
    * (visible), hidden but where you're writing (live), or never seen (hidden).
@@ -222,6 +248,11 @@ interface Stored {
   markdownMode: MarkdownMode;
   /** A grip beside lines and blocks of a Markdown note that drags them somewhere else in it. */
   dragBlocks: boolean;
+  /**
+   * Text with `===` or `---` under it is a heading, as CommonMark reads it (Setext). Off, as lines
+   * has it first, `---` there is a divider and `===` text.
+   */
+  underlinedHeadings: boolean;
   /** The system checks notes' spelling, and corrects it as you type (code and math never). */
   spellcheck: boolean;
   /** Text selected in a note with the pointer is copied when it's let go, as in a terminal (editor/copyOnSelect.ts). */
@@ -231,6 +262,7 @@ interface Stored {
   keyboardSound: string;
   typingVolume: number;
   caretShape: (typeof CARET_SHAPES)[number];
+  caretWidth: (typeof CARET_WIDTHS)[number];
   caretColor: (typeof CARET_COLORS)[number];
   caretCustomColor: string;
   caretBlink: (typeof CARET_BLINKS)[number];
@@ -248,6 +280,10 @@ interface Stored {
   /** Notes show `->` as →, `!=` as ≠ and so on (notes/symbols.ts): in their text, and in code. */
   symbolsInText: boolean;
   symbolsInCode: boolean;
+  /** Little Touches: a copy button on hovering a `Key: Value` line's value, or a property's. */
+  copyValues: boolean;
+  /** Little Touches: a value like `5/7` drawn as marks, five of seven filled; or as written. */
+  scores: ScoreStyle;
   links: LinkClicks;
   /** What selecting several cells of a spreadsheet shows of them (none: nothing). */
   sheetStats: SheetStat[];
@@ -285,6 +321,10 @@ export const PAGE_OPACITY = { min: 0.6, max: 1, step: 0.01 };
 export const UPDATE_WAITS = [0, 1, 3, 7, 14, 30] as const;
 export type UpdateWait = (typeof UPDATE_WAITS)[number];
 
+/** Where Settings opens in the desktop apps: over the notes, as on the web, or in a window of its own. */
+export const SETTINGS_OPENS = ["overlay", "window"] as const;
+export type SettingsOpens = (typeof SETTINGS_OPENS)[number];
+
 /** Window opacity and blur only exist where windows can be see-through: the Mac app. */
 export const windowLookAvailable = isMacApp;
 
@@ -307,6 +347,8 @@ const KEY = "lines.prefs";
 const DEFAULTS: Stored = {
   theme: "lines",
   style: "lines",
+  preset: "lines",
+  settingsOpens: "overlay",
   appearance: "system",
   contrast: "system",
   monochrome: false,
@@ -316,6 +358,10 @@ const DEFAULTS: Stored = {
   textSize: 17,
   icons: "lucide",
   swipe: "fingers",
+  weekStart: "auto",
+  calendarView: "week",
+  newNotes: "inbox",
+  calendarEdited: false,
   spacing: DEFAULT_SPACING,
   noteWidth: 720,
   fullWidth: false,
@@ -345,15 +391,16 @@ const DEFAULTS: Stored = {
   typesetter: "lines",
   sidebarWidth: 230,
   listWidth: 320,
-  sideWidth: 520,
   sidebarSide: "left",
   listSide: "left",
   tabs: false,
   outline: false,
   outlineSide: "right",
   scrollbars: true,
+  sidebarAbout: true,
   markdownMode: "live",
   dragBlocks: true,
+  underlinedHeadings: false,
   spellcheck: true,
   copyOnSelect: false,
   typingSounds: false,
@@ -361,6 +408,7 @@ const DEFAULTS: Stored = {
   typingVolume: 0.5,
   headingColor: "text",
   caretShape: "bar",
+  caretWidth: "letter",
   caretColor: "accent",
   caretCustomColor: "#e5484d",
   caretBlink: "steps",
@@ -374,6 +422,8 @@ const DEFAULTS: Stored = {
   headingCustomColor: "#3d7dd8",
   symbolsInText: true,
   symbolsInCode: true,
+  copyValues: true,
+  scores: "stars",
   sheetStats: ["sum", "average", "count"],
   sheetDates: "medium",
   sheetMoney: "symbol",
@@ -387,16 +437,22 @@ const DEFAULTS: Stored = {
   updateWait: 7,
   links: {
     web: { click: "edit", modClick: "open", modShiftClick: "copy" },
-    tag: { click: "edit", modClick: "open", modShiftClick: "open" },
+    // A click on a tag shows its notes; ⌘-click puts the cursor in it, to change it.
+    tag: { click: "open", modClick: "edit", modShiftClick: "open" },
     mention: { click: "edit", modClick: "open", modShiftClick: "newTab" },
   },
 };
+
+/**
+ * Which saved preferences these are, to bring older ones up to date as they're read: 2, from when
+ * a click on a tag opened it (before, it put the cursor in it, and ⌘-click opened it).
+ */
+const VERSION = 2;
 
 /** How narrow and wide the sidebar and note list can be dragged, and where double-clicking puts them back. */
 export const PANE_WIDTHS = {
   sidebar: { min: 180, max: 420, initial: DEFAULTS.sidebarWidth },
   list: { min: 240, max: 560, initial: DEFAULTS.listWidth },
-  side: { min: 300, max: 1400, initial: DEFAULTS.sideWidth },
 };
 
 const clamp = (value: unknown, min: number, max: number, fallback: number) =>
@@ -413,8 +469,11 @@ const APPEARANCES: Appearance[] = ["system", "light", "dark"];
 const SIDES: Side[] = ["left", "right"];
 
 /** Each kind of link's action for each click, where it's one that kind can do. */
-function readLinks(raw: unknown): LinkClicks {
-  const stored = (raw ?? {}) as Record<string, Record<string, unknown> | undefined>;
+function readLinks(raw: unknown, version: number): LinkClicks {
+  const stored = { ...((raw ?? {}) as Record<string, Record<string, unknown> | undefined>) };
+  // Saved before a click opened a tag, and still as they were then: as they are now, with the rest.
+  const { tag } = stored;
+  if (version < 2 && tag?.click === "edit" && tag.modClick === "open" && tag.modShiftClick === "open") delete stored.tag;
   return Object.fromEntries(
     (Object.keys(LINK_ACTIONS) as LinkKind[]).map((kind) => [
       kind,
@@ -423,7 +482,7 @@ function readLinks(raw: unknown): LinkClicks {
   ) as LinkClicks;
 }
 
-/** A plugin's theme, icon set or typesetter, by id. */
+/** A plugin's theme, icon set, typesetter or font, by id. */
 const id = (value: unknown, fallback: string) => (typeof value === "string" && /^[a-z0-9][a-z0-9-]*$/.test(value) ? value : fallback);
 /** A CSS color, short enough to be one someone chose rather than anything else. */
 const color = (value: unknown, fallback: string) => (typeof value === "string" && value.length <= 120 && CSS.supports("color", value) ? value : fallback);
@@ -440,15 +499,22 @@ function read(json?: string): Stored {
   return {
     theme: id(raw.theme, DEFAULTS.theme),
     style: id(raw.style, DEFAULTS.style),
+    // Before presets, the style chosen was the preset of it.
+    preset: id(raw.preset, id(raw.style, DEFAULTS.preset)),
+    settingsOpens: oneOf(raw.settingsOpens, SETTINGS_OPENS, DEFAULTS.settingsOpens),
     appearance: oneOf(raw.appearance, APPEARANCES, DEFAULTS.appearance),
     contrast: oneOf(raw.contrast, ["system", "standard", "more"] as const, DEFAULTS.contrast),
     monochrome: flag(raw.monochrome, DEFAULTS.monochrome),
     invert: flag(raw.invert, DEFAULTS.invert),
     darkPanes: oneOf(raw.darkPanes, DARK_PANES, DEFAULTS.darkPanes),
-    font: oneOf(raw.font, FONTS.map((f) => f.id), DEFAULTS.font),
+    font: id(raw.font, DEFAULTS.font),
     textSize: clamp(raw.textSize, TEXT_SIZE.min, TEXT_SIZE.max, DEFAULTS.textSize),
     icons: id(raw.icons, DEFAULTS.icons),
     swipe: oneOf(raw.swipe, ["fingers", "reversed"] as const, DEFAULTS.swipe),
+    weekStart: oneOf(raw.weekStart, WEEK_STARTS, DEFAULTS.weekStart),
+    calendarView: oneOf(raw.calendarView, CALENDAR_VIEWS, DEFAULTS.calendarView),
+    newNotes: oneOf(raw.newNotes, NEW_NOTES, DEFAULTS.newNotes),
+    calendarEdited: flag(raw.calendarEdited, DEFAULTS.calendarEdited),
     spacing: Object.fromEntries(
       SPACING_FIELDS.map(({ key, min, max }) => [key, clamp(spacing[key], min, max, DEFAULT_SPACING[key])]),
     ) as unknown as Spacing,
@@ -481,15 +547,16 @@ function read(json?: string): Stored {
     typesetter: id(raw.typesetter, DEFAULTS.typesetter),
     sidebarWidth: clamp(raw.sidebarWidth, PANE_WIDTHS.sidebar.min, PANE_WIDTHS.sidebar.max, DEFAULTS.sidebarWidth),
     listWidth: clamp(raw.listWidth, PANE_WIDTHS.list.min, PANE_WIDTHS.list.max, DEFAULTS.listWidth),
-    sideWidth: clamp(raw.sideWidth, PANE_WIDTHS.side.min, PANE_WIDTHS.side.max, DEFAULTS.sideWidth),
     sidebarSide: oneOf(raw.sidebarSide, SIDES, DEFAULTS.sidebarSide),
     listSide: oneOf(raw.listSide, SIDES, DEFAULTS.listSide),
     tabs: flag(raw.tabs, DEFAULTS.tabs),
     outline: flag(raw.outline, DEFAULTS.outline),
     outlineSide: oneOf(raw.outlineSide, SIDES, DEFAULTS.outlineSide),
     scrollbars: flag(raw.scrollbars, DEFAULTS.scrollbars),
+    sidebarAbout: flag(raw.sidebarAbout, DEFAULTS.sidebarAbout),
     markdownMode: oneOf(raw.markdownMode, MARKDOWN_MODES, DEFAULTS.markdownMode),
     dragBlocks: flag(raw.dragBlocks, DEFAULTS.dragBlocks),
+    underlinedHeadings: flag(raw.underlinedHeadings, DEFAULTS.underlinedHeadings),
     spellcheck: flag(raw.spellcheck, DEFAULTS.spellcheck),
     copyOnSelect: flag(raw.copyOnSelect, DEFAULTS.copyOnSelect),
     typingSounds: flag(raw.typingSounds, DEFAULTS.typingSounds),
@@ -497,6 +564,7 @@ function read(json?: string): Stored {
     typingVolume: clamp(raw.typingVolume, TYPING_VOLUME.min, TYPING_VOLUME.max, DEFAULTS.typingVolume),
     headingColor: oneOf(raw.headingColor, HEADING_COLORS, DEFAULTS.headingColor),
     caretShape: oneOf(raw.caretShape, CARET_SHAPES, DEFAULTS.caretShape),
+    caretWidth: oneOf(raw.caretWidth, CARET_WIDTHS, DEFAULTS.caretWidth),
     caretColor: oneOf(raw.caretColor, CARET_COLORS, DEFAULTS.caretColor),
     caretCustomColor: color(raw.caretCustomColor, DEFAULTS.caretCustomColor),
     caretBlink: oneOf(raw.caretBlink, CARET_BLINKS, DEFAULTS.caretBlink),
@@ -510,7 +578,9 @@ function read(json?: string): Stored {
     headingCustomColor: color(raw.headingCustomColor, DEFAULTS.headingCustomColor),
     symbolsInText: flag(raw.symbolsInText, DEFAULTS.symbolsInText),
     symbolsInCode: flag(raw.symbolsInCode, DEFAULTS.symbolsInCode),
-    links: readLinks(raw.links),
+    copyValues: flag(raw.copyValues, DEFAULTS.copyValues),
+    scores: oneOf(raw.scores, SCORE_STYLES, DEFAULTS.scores),
+    links: readLinks(raw.links, typeof raw.version === "number" ? raw.version : 1),
     sheetStats: Array.isArray(raw.sheetStats) ? SHEET_STATS.filter((stat) => (raw.sheetStats as unknown[]).includes(stat)) : DEFAULTS.sheetStats,
     sheetDates: oneOf(raw.sheetDates, DATE_STYLES, DEFAULTS.sheetDates),
     sheetMoney: oneOf(raw.sheetMoney, MONEY_STYLES, DEFAULTS.sheetMoney),
@@ -525,6 +595,9 @@ function read(json?: string): Stored {
   };
 }
 
+/** Settings as stored ones are read: each checked, and those missing or wrong lines' own. */
+export const readSettings = (raw: Record<string, unknown>): Stored => read(JSON.stringify({ version: VERSION, ...raw }));
+
 const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const contrastQuery = window.matchMedia("(prefers-contrast: more)");
 
@@ -532,6 +605,8 @@ class Prefs {
   #initial = read();
   theme = $state(this.#initial.theme);
   style = $state(this.#initial.style);
+  preset = $state(this.#initial.preset);
+  settingsOpens = $state<SettingsOpens>(this.#initial.settingsOpens);
   appearance = $state<Appearance>(this.#initial.appearance);
   contrast = $state<Contrast>(this.#initial.contrast);
   monochrome = $state(this.#initial.monochrome);
@@ -541,6 +616,10 @@ class Prefs {
   textSize = $state(this.#initial.textSize);
   icons = $state(this.#initial.icons);
   swipe = $state<SwipeDirection>(this.#initial.swipe);
+  weekStart = $state<WeekStart>(this.#initial.weekStart);
+  calendarView = $state<CalendarView>(this.#initial.calendarView);
+  newNotes = $state<NewNotes>(this.#initial.newNotes);
+  calendarEdited = $state(this.#initial.calendarEdited);
   windowOpacity = $state(this.#initial.windowOpacity);
   windowBlur = $state(this.#initial.windowBlur);
   windowSeeThrough = $state(this.#initial.windowSeeThrough);
@@ -567,15 +646,16 @@ class Prefs {
   typesetter = $state(this.#initial.typesetter);
   sidebarWidth = $state(this.#initial.sidebarWidth);
   listWidth = $state(this.#initial.listWidth);
-  sideWidth = $state(this.#initial.sideWidth);
   sidebarSide = $state(this.#initial.sidebarSide);
   listSide = $state(this.#initial.listSide);
   tabs = $state(this.#initial.tabs);
   outline = $state(this.#initial.outline);
   outlineSide = $state(this.#initial.outlineSide);
   scrollbars = $state(this.#initial.scrollbars);
+  sidebarAbout = $state(this.#initial.sidebarAbout);
   markdownMode = $state(this.#initial.markdownMode);
   dragBlocks = $state(this.#initial.dragBlocks);
+  underlinedHeadings = $state(this.#initial.underlinedHeadings);
   spellcheck = $state(this.#initial.spellcheck);
   copyOnSelect = $state(this.#initial.copyOnSelect);
   typingSounds = $state(this.#initial.typingSounds);
@@ -583,6 +663,7 @@ class Prefs {
   typingVolume = $state(this.#initial.typingVolume);
   headingColor = $state(this.#initial.headingColor);
   caretShape = $state(this.#initial.caretShape);
+  caretWidth = $state(this.#initial.caretWidth);
   caretColor = $state(this.#initial.caretColor);
   caretCustomColor = $state(this.#initial.caretCustomColor);
   caretBlink = $state(this.#initial.caretBlink);
@@ -596,6 +677,8 @@ class Prefs {
   headingCustomColor = $state(this.#initial.headingCustomColor);
   symbolsInText = $state(this.#initial.symbolsInText);
   symbolsInCode = $state(this.#initial.symbolsInCode);
+  copyValues = $state(this.#initial.copyValues);
+  scores = $state(this.#initial.scores);
   sheetStats = $state(this.#initial.sheetStats);
   sheetDates = $state(this.#initial.sheetDates);
   sheetMoney = $state(this.#initial.sheetMoney);
@@ -716,6 +799,8 @@ class Prefs {
     const stored: Stored = {
       theme: this.theme,
       style: this.style,
+      preset: this.preset,
+      settingsOpens: this.settingsOpens,
       appearance: this.appearance,
       contrast: this.contrast,
       monochrome: this.monochrome,
@@ -725,6 +810,10 @@ class Prefs {
       textSize: this.textSize,
       icons: this.icons,
       swipe: this.swipe,
+      weekStart: this.weekStart,
+      calendarView: this.calendarView,
+      newNotes: this.newNotes,
+      calendarEdited: this.calendarEdited,
       spacing: $state.snapshot(this.spacing),
       noteWidth: this.noteWidth,
       fullWidth: this.fullWidth,
@@ -754,15 +843,16 @@ class Prefs {
       typesetter: this.typesetter,
       sidebarWidth: this.sidebarWidth,
       listWidth: this.listWidth,
-      sideWidth: this.sideWidth,
       sidebarSide: this.sidebarSide,
       listSide: this.listSide,
       tabs: this.tabs,
       outline: this.outline,
       outlineSide: this.outlineSide,
       scrollbars: this.scrollbars,
+      sidebarAbout: this.sidebarAbout,
       markdownMode: this.markdownMode,
       dragBlocks: this.dragBlocks,
+      underlinedHeadings: this.underlinedHeadings,
       spellcheck: this.spellcheck,
       copyOnSelect: this.copyOnSelect,
       typingSounds: this.typingSounds,
@@ -770,6 +860,7 @@ class Prefs {
       typingVolume: this.typingVolume,
       headingColor: this.headingColor,
       caretShape: this.caretShape,
+      caretWidth: this.caretWidth,
       caretColor: this.caretColor,
       caretCustomColor: this.caretCustomColor,
       caretBlink: this.caretBlink,
@@ -783,6 +874,8 @@ class Prefs {
       headingCustomColor: this.headingCustomColor,
       symbolsInText: this.symbolsInText,
       symbolsInCode: this.symbolsInCode,
+      copyValues: this.copyValues,
+      scores: this.scores,
       links: $state.snapshot(this.links),
       sheetStats: $state.snapshot(this.sheetStats),
       sheetDates: this.sheetDates,
@@ -796,7 +889,7 @@ class Prefs {
       autoUpdate: this.autoUpdate,
       updateWait: this.updateWait,
     };
-    return JSON.stringify(stored);
+    return JSON.stringify({ version: VERSION, ...stored });
   }
 
   #save(json: string) {
@@ -813,6 +906,8 @@ class Prefs {
     const next = read(json);
     this.theme = next.theme;
     this.style = next.style;
+    this.preset = next.preset;
+    this.settingsOpens = next.settingsOpens;
     this.appearance = next.appearance;
     this.contrast = next.contrast;
     this.monochrome = next.monochrome;
@@ -822,6 +917,10 @@ class Prefs {
     this.textSize = next.textSize;
     this.icons = next.icons;
     this.swipe = next.swipe;
+    this.weekStart = next.weekStart;
+    this.calendarView = next.calendarView;
+    this.newNotes = next.newNotes;
+    this.calendarEdited = next.calendarEdited;
     if (!sameSpacing(this.spacing, next.spacing)) this.spacing = next.spacing;
     this.noteWidth = next.noteWidth;
     this.fullWidth = next.fullWidth;
@@ -851,15 +950,16 @@ class Prefs {
     this.typesetter = next.typesetter;
     this.sidebarWidth = next.sidebarWidth;
     this.listWidth = next.listWidth;
-    this.sideWidth = next.sideWidth;
     this.sidebarSide = next.sidebarSide;
     this.listSide = next.listSide;
     this.tabs = next.tabs;
     this.outline = next.outline;
     this.outlineSide = next.outlineSide;
     this.scrollbars = next.scrollbars;
+    this.sidebarAbout = next.sidebarAbout;
     this.markdownMode = next.markdownMode;
     this.dragBlocks = next.dragBlocks;
+    this.underlinedHeadings = next.underlinedHeadings;
     this.spellcheck = next.spellcheck;
     this.copyOnSelect = next.copyOnSelect;
     this.typingSounds = next.typingSounds;
@@ -880,6 +980,8 @@ class Prefs {
     this.headingCustomColor = next.headingCustomColor;
     this.symbolsInText = next.symbolsInText;
     this.symbolsInCode = next.symbolsInCode;
+    this.copyValues = next.copyValues;
+    this.scores = next.scores;
     if (next.sheetStats.join() !== this.sheetStats.join()) this.sheetStats = next.sheetStats;
     this.sheetDates = next.sheetDates;
     this.sheetMoney = next.sheetMoney;

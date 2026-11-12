@@ -4,7 +4,7 @@ import type { Cells, FindSheet, FormulaEngine } from "../../lib/plugins/types";
 import { isFormula } from "../../lib/sheets/cells";
 import { writeCsv } from "../../lib/sheets/csv";
 import { loadFormulas } from "../../lib/sheets/formulas";
-import { ui } from "../../lib/ui.svelte";
+import { panes } from "../../lib/panes.svelte";
 import { blockNames, rewriteBlocks, sheetFinder } from "./links";
 import { readSheet } from "./sheet";
 
@@ -121,8 +121,8 @@ async function follow() {
   });
 }
 
-/** The notes open in this window: the selected one, and the one beside it. */
-const openNotes = () => [notes.selectedId, ui.side].filter((id) => id !== null);
+/** The notes open in this window: the selected one, and those in panes beside it. */
+const openNotes = () => [notes.selectedId, ...panes.ids].filter((id) => id !== null);
 
 /** Takes up what's been renamed in the notes open since they were last looked at, then looks at those open now. */
 export function settle() {
@@ -166,7 +166,7 @@ notes.onLocalChange(() => {
 $effect.root(() => {
   $effect(() => {
     void notes.selectedId;
-    void ui.side;
+    void panes.tree;
     settleIn(0);
   });
 });

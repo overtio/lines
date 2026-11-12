@@ -6,7 +6,6 @@
   import { plugins } from "../../plugins/registry.svelte";
   import {
     DEFAULT_SPACING,
-    FONTS,
     formatPixels,
     HEADING_COLORS,
     type HeadingColor,
@@ -20,6 +19,7 @@
     TEXT_SIZE,
     type Spacing,
   } from "../../prefs.svelte";
+  import { noteFonts } from "../../themes/fonts.svelte";
   import Button from "../ui/Button.svelte";
   import ColorField from "../ui/ColorField.svelte";
   import FieldGroup from "../ui/FieldGroup.svelte";
@@ -28,6 +28,7 @@
   import Slider from "../ui/Slider.svelte";
 
   const SAMPLE = t("settings.previewNote");
+  const fonts = $derived(noteFonts());
 
   const HEADING_COLOR_NAMES = { text: "settings.headingColorText", accent: "settings.color.accent", custom: "settings.paperColorCustom" } as const;
   const headingColors = HEADING_COLORS.map((id) => ({ id, label: t(HEADING_COLOR_NAMES[id]) }));
@@ -84,14 +85,15 @@
     <Segmented
       class="w-full"
       label={t("settings.font")}
-      options={FONTS.map((font) => ({ id: font.id, label: font.id === "system" ? (plugins.style(prefs.style)?.font?.name ?? font.name) : font.name }))}
+      options={fonts.map((font) => ({ id: font.id, label: font.id === "system" ? (plugins.style(prefs.style)?.font?.name ?? font.name) : font.name }))}
       value={prefs.font}
       onselect={(id) => (prefs.font = id)}
       stacked
+      columns={4}
     >
       {#snippet content(option)}
-        <span class="text-[20px] leading-[1.3] font-normal" aria-hidden="true" style:font-family={FONTS.find((font) => font.id === option.id)!.family}>Aa</span>
-        <span class="text-xs">{option.label}</span>
+        <span class="text-[20px] leading-[1.3] font-normal" aria-hidden="true" style:font-family={fonts.find((font) => font.id === option.id)!.family}>Aa</span>
+        <span class="text-xs leading-tight">{option.label}</span>
       {/snippet}
     </Segmented>
   </FieldRow>

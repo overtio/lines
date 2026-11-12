@@ -54,9 +54,10 @@ One.
 
 Two, after three empty lines.
 
-#### 9. Setext heading
+#### 9. Dashes under text: a divider, the text a paragraph (both lines a heading with Settings → Editor → Underlined headings on)
 
-Text followed by dashes
+Text on two lines,
+followed by dashes
 ---
 
 #### 10. Hard line break
@@ -139,11 +140,13 @@ d &= e
 $$
 $$
 
-#### 23. A line of only #
+#### 23. A line of only # or -
 
 #
 
-The # above is text, not an empty heading; a tag is typed this way.
+-
+
+The # and the - above are text, not an empty heading and list item: a tag and a list item are typed this way.
 
 #### 24. Recording from asciinema.org, by its embed code
 

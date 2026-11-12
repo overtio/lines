@@ -4,6 +4,7 @@ import type { EditorView } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";
 import type { MarkdownConfig } from "@lezer/markdown";
 import type { Component } from "svelte";
+import type { PaletteColor } from "../palette";
 import type { SlashCommand } from "../editor/slashCommands";
 import type { IconName } from "../icons/icons";
 import type { NoteStats } from "../notes/stats";
@@ -34,6 +35,12 @@ export interface Plugin {
   /** Whether it can work here (SF Symbols, only in the Apple apps), and if not, where it does. */
   available?: boolean;
   availability?: string;
+  /**
+   * Its own page in Settings, under Plugins: the settings it brings, shown below its switch while
+   * it's on. Loaded the first time Settings opens. Named `<Id>Settings.svelte` (`MascotsSettings`),
+   * its words are found by Settings' search.
+   */
+  settings?: () => Promise<{ default: Component }>;
   contributes: Contributions;
 }
 
@@ -43,8 +50,10 @@ export interface Contributions {
   languages?: NoteLanguage[];
   /** Color themes, each with a light and a dark side. */
   themes?: Theme[];
-  /** Whole looks for the app, beyond its colors: shapes, type, borders, shadows (Settings → Theme → Style). */
+  /** Whole looks for the app, beyond its colors: shapes, type, borders, shadows; each a preset (Settings → Presets). */
   styles?: AppStyle[];
+  /** Fonts to write notes in (Settings → Typography → Font), beside your system's. */
+  fonts?: NoteFont[];
   /** Kinds of theme files made for other apps (VS Code, Base16, a terminal's) that lines can read themes from. */
   themeFormats?: ThemeFormat[];
   /** Ways to draw the icons lines uses. */
@@ -71,12 +80,22 @@ export interface Contributions {
   paperStyles?: PaperStyle[];
   /** What marks lines in a note's margin, as a code editor marks the lines changed. */
   markers?: MarkerSource[];
-  /** Keyboards to hear as you type (Settings → Editor → Typing sounds). */
+  /** Keyboards to hear as you type (Settings → Plugins → Keyboards). */
   keyboardSounds?: KeyboardSound[];
-  /** Companions that live in the window, walk about and keep you company as you write (Settings → Mascot). */
+  /** Companions that live in the window, walk about and keep you company as you write (Settings → Plugins → Mascots). */
   mascots?: Mascot[];
   /** Pictures on the web to make a theme from, and the backdrop (Settings → Theme → New → From …). */
   pictureLibraries?: PictureLibrary[];
+}
+
+/** A font to write notes in, which the plugin brings with it (`@font-face`) so it's there on every computer. */
+export interface NoteFont {
+  /** Lowercase letters, digits and dashes. */
+  id: string;
+  /** What it's called: "IBM Plex Sans". */
+  name: string;
+  /** Its CSS font-family, with fonts to fall back on. */
+  family: string;
 }
 
 /** The poses a mascot is drawn in. */
@@ -133,8 +152,8 @@ export interface KeyClip {
   duration?: number;
 }
 
-/** The colors a line can be marked in: the theme's accent, or one of its status and callout colors. */
-export type MarkerColor = "accent" | "red" | "orange" | "yellow" | "green" | "blue" | "purple" | "gray";
+/** The colors a line can be marked in: the theme's accent, or one of its palette (palette.ts). */
+export type MarkerColor = PaletteColor;
 
 /** Lines marked in the margin beside a note. */
 export interface LineMarker {
@@ -173,7 +192,7 @@ export interface PaperLayer {
 }
 
 /**
- * Paper a note's page can look like (Settings → Paper): a pattern drawn behind the text, a texture
+ * Paper a note's page can look like (Settings → Plugins → Paper): a pattern drawn behind the text, a texture
  * under it, or a backdrop behind the page, one of each at a time. Patterns draw in `--paper-color`
  * (the theme's ink, its accent, or a color chosen) at `--paper-opacity` (0 to 1: a line's, more for
  * what's smaller), every `--paper-step`: a line of text, or the size chosen. A texture is told the
@@ -284,6 +303,16 @@ export interface PaperSource {
   search(query: string, page: number, signal: AbortSignal): Promise<SearchPage<Paper>>;
 }
 
+/**
+ * Where a new note was made: under a tag or a type in the sidebar, or on the Calendar, which gives
+ * it properties (`date`, or an event's `type`, `start` and `end`).
+ */
+export interface Made {
+  tag?: string;
+  type?: string;
+  properties?: Record<string, string>;
+}
+
 /** A markup language notes can be written in. Nothing in lines outside its plugin knows how it reads. */
 export interface NoteLanguage {
   /** What a note written in it keeps as its format, here and in synced files: "latex". */
@@ -312,8 +341,8 @@ export interface NoteLanguage {
    * For a conflicted copy's title: without it, the line the title is read from is marked.
    */
   markTitle?(body: string, mark: (title: string) => string): string | null;
-  /** A new note's text, made in the sidebar's tag or type, if it was. */
-  newNote(made: { tag?: string; type?: string }): string;
+  /** A new note's text, made in the sidebar's tag or type, or on a day of the Calendar, if it was. */
+  newNote(made: Made): string;
   /**
    * A note as a file of its own, the way exports and downloads write it: as it is, unless the
    * language needs more to stand alone. With `attachments`, links to its images and files point
@@ -413,6 +442,11 @@ export interface AppStyle {
   description?: string;
   /** The color theme it's made with, chosen with it; any other can be chosen after. */
   theme?: string;
+  /**
+   * Its preset's other settings, by their names in lines' settings (docs/themes.md lists them):
+   * `{ caretShape: "block", pointerStyle: "retro" }`. Those it leaves out are lines' own.
+   */
+  settings?: Record<string, unknown>;
   /** Its own font, for the app and as notes' first font in Settings → Typography: what it's called, and its CSS font-family. */
   font?: { name: string; family: string };
   /**

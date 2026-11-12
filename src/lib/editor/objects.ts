@@ -29,7 +29,7 @@ import {
 import { plainLine } from "../notes/stats";
 import { locale, t } from "../i18n/index.svelte";
 import { type Entry, notes } from "../notes/store.svelte";
-import { typeIcons } from "../notes/tagIcons.svelte";
+import { typeLooks } from "../notes/looks.svelte";
 import { speak } from "../a11y";
 import { announce, windowLabel } from "../windows/channel";
 import { ancestors } from "./util";
@@ -56,7 +56,7 @@ export const objectsChanged = StateEffect.define<null>();
 
 /** The icon a note shows where it's mentioned: its own, its type's, or a page. */
 export function iconOf({ note, meta }: Entry): IconName {
-  return note.icon ?? (meta.type ? typeIcons.get(meta.type) : "file-text");
+  return note.icon ?? (meta.type ? typeLooks.icon(meta.type) : "file-text");
 }
 
 /**
@@ -140,7 +140,7 @@ export function drawMention(text: string): { widget: MentionWidget } | { missing
     const label = typeLabel(ref.type);
     if (!count) return { missing: t("editor.mention.noneOfType", { type: ref.type }) };
     const tip = t("editor.mention.type", { type: label, count });
-    return { widget: new MentionWidget("", label, typeIcons.get(notes.ofType(ref.type)[0].meta.type), tip, ref.type) };
+    return { widget: new MentionWidget("", label, typeLooks.icon(notes.ofType(ref.type)[0].meta.type), tip, ref.type) };
   }
   const mention = readMention(text);
   const entry = mention && notes.find(mention.name);
@@ -212,7 +212,7 @@ export function mentionSource(context: CompletionContext): CompletionResult | nu
     const query = typingKey[3].toLowerCase().replace(/_/g, " ");
     const options = notes.types
       .filter(({ type }) => type.startsWith(query))
-      .map(({ type, count }): IconCompletion => ({ label: type.replace(/\s+/g, "_"), detail: count.toLocaleString(locale), icon: typeIcons.get(type) }));
+      .map(({ type, count }): IconCompletion => ({ label: type.replace(/\s+/g, "_"), detail: count.toLocaleString(locale), icon: typeLooks.icon(type) }));
     return options.length ? { from: context.pos - typingKey[3].length, filter: false, options } : null;
   }
   if (typingKey) {

@@ -235,4 +235,5 @@ export default {
   "editor.a11y.codeStart": "Code",
   "editor.a11y.codeEnd": "Fin du code",
   "editor.toSpreadsheet": "Convertir en feuille de calcul",
+  "editor.score": "{score} sur {of}",
 } satisfies Translation<typeof en>;

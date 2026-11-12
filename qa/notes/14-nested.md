@@ -411,7 +411,17 @@ And another.
 :::
 :::
 
-#### 33. Mention in a callout in a card
+#### 33. Score (Settings → Little Touches) in a callout in a card
+
+::: card
+:::!
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+:::
+:::
+
+#### 34. Mention in a callout in a card
 
 ::: card
 :::!
@@ -419,7 +429,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 :::
 :::
 
-#### 34. Wiki link in a callout in a card
+#### 35. Wiki link in a callout in a card
 
 ::: card
 :::!
@@ -427,7 +437,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::
 :::
 
-#### 35. Symbols in a callout in a card
+#### 36. Symbols in a callout in a card
 
 ::: card
 :::!
@@ -435,7 +445,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 :::
 :::
 
-#### 36. GitHub links in a callout in a card
+#### 37. GitHub links in a callout in a card
 
 ::: card
 :::!
@@ -443,7 +453,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 :::
 :::
 
-#### 37. arXiv links in a callout in a card
+#### 38. arXiv links in a callout in a card
 
 ::: card
 :::!
@@ -451,7 +461,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 38. Image in a callout in a card
+#### 39. Image in a callout in a card
 
 ::: card
 :::!
@@ -459,7 +469,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 39. Drawing in a callout in a card
+#### 40. Drawing in a callout in a card
 
 ::: card
 :::!
@@ -467,7 +477,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 40. File in a callout in a card
+#### 41. File in a callout in a card
 
 ::: card
 :::!
@@ -475,7 +485,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 41. Folder and file links in a callout in a card
+#### 42. Folder and file links in a callout in a card
 
 ::: card
 :::!
@@ -483,7 +493,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 42. Attached 3D model (STL) in a callout in a card
+#### 43. Attached 3D model (STL) in a callout in a card
 
 ::: card
 :::!
@@ -491,7 +501,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 43. Terminal recording (.cast file) in a callout in a card
+#### 44. Terminal recording (.cast file) in a callout in a card
 
 ::: card
 :::!
@@ -499,7 +509,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 44. Audio in a callout in a card
+#### 45. Audio in a callout in a card
 
 ::: card
 :::!
@@ -507,7 +517,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 45. Video in a callout in a card
+#### 46. Video in a callout in a card
 
 ::: card
 :::!
@@ -515,7 +525,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 46. Missing file in a callout in a card
+#### 47. Missing file in a callout in a card
 
 ::: card
 :::!
@@ -523,7 +533,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 47. Card in a callout in a card
+#### 48. Card in a callout in a card
 
 ::: card
 :::!
@@ -533,7 +543,7 @@ Text in a card.
 :::
 :::
 
-#### 48. Callout (info) in a callout in a card
+#### 49. Callout (info) in a callout in a card
 
 ::: card
 :::!
@@ -543,7 +553,7 @@ Text in an info callout.
 :::
 :::
 
-#### 49. Callout (warning, chosen icon) in a callout in a card
+#### 50. Callout (warning, chosen icon) in a callout in a card
 
 ::: card
 :::!
@@ -553,7 +563,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 50. Callout (decision, no icon) in a callout in a card
+#### 51. Callout (decision, no icon) in a callout in a card
 
 ::: card
 :::!

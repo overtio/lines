@@ -19,6 +19,10 @@ export type WindowMessage =
   | { type: "language"; choice: string }
   /** Your own themes changed (themes/custom.svelte.ts): all of them, as saved. */
   | { type: "themes"; themes: string }
+  /** Colors changed by right-clicking, not saved yet, or picking them turned on or off (themes/drafts.svelte.ts). */
+  | { type: "theme-drafts"; drafts: string }
+  /** Your own presets changed (themes/presets.svelte.ts): all of them, as saved. */
+  | { type: "presets"; presets: string }
   /** A plugin was turned on or off (plugins/registry.svelte.ts): which are, by choice. */
   | { type: "plugins"; choices: Record<string, boolean> }
   /** A picture chosen for the backdrop (lib/paper.svelte.ts), or taken away: read again from where it's kept. */
@@ -41,6 +45,8 @@ export type WindowMessage =
   | { type: "notes-ask" }
   /** The Settings window should show this tab (see settings.svelte.ts). */
   | { type: "settings-section"; section: string }
+  /** Settings to open in the main window, over the notes: the Settings window was just set to open there instead. */
+  | { type: "open-settings"; section: string }
   /** The Settings window asks the main window to do something, and hears how it went. */
   | { type: "call"; id: string; target: string; method: string; args: unknown[] }
   | { type: "reply"; id: string; result?: unknown; error?: string; state: import("./settings.svelte").LockState }
