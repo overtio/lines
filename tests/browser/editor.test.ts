@@ -601,6 +601,17 @@ describe("line marks", () => {
     await app.page.keyboard.press(`${mod()}+Shift+M`);
     expect(await app.text()).toBe("Some line");
   });
+
+  test("⇧⌘M on a line ending in a line break (two spaces) goes before them, and taken off leaves them", async () => {
+    for (const [format, mark] of [[undefined, "<!-- mark -->"], ["latex", "% mark"]]) {
+      await app.open("Line  \nnext", format);
+      await app.page.evaluate(() => window.testing.place(2));
+      await app.page.keyboard.press(`${mod()}+Shift+M`);
+      expect(await app.text()).toBe(`Line ${mark}  \nnext`);
+      await app.page.keyboard.press(`${mod()}+Shift+M`);
+      expect(await app.text()).toBe("Line  \nnext");
+    }
+  });
 });
 
 test("a page break is drawn as one, and the note's page splits at it over a backdrop", async () => {

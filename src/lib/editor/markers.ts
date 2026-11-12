@@ -287,8 +287,10 @@ export function lineMarkers(language: NoteLanguage): Extension {
     const unmark = lines.every((line) => written.has(line.from));
     const changes = lines.flatMap((line): ChangeSpec[] => {
       const at = written.get(line.from);
-      if (unmark) return [{ from: at!, to: line.to }];
-      return at !== undefined ? [] : [{ from: line.to, insert: ` ${write()}` }];
+      // Before the spaces a line may end with, which make a line break in Markdown, and they stay.
+      const end = line.from + line.text.trimEnd().length;
+      if (unmark) return [{ from: at!, to: end }];
+      return at !== undefined ? [] : [{ from: end, insert: ` ${write()}` }];
     });
     view.dispatch({ changes, userEvent: unmark ? "delete.mark" : "input.mark" });
     return true;
