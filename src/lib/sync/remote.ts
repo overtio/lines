@@ -5,7 +5,8 @@
 export interface Remote {
   /** Every object under `prefix`, with a tag that changes whenever its content does. */
   list(prefix: string): Promise<RemoteObject[]>;
-  get(key: string): Promise<{ text: string; etag: string | null } | null>;
+  /** `writtenAs`: the key it was written under, for a drive's copy of a note beside it (see sealed.ts). */
+  get(key: string, writtenAs?: string): Promise<{ text: string; etag: string | null } | null>;
   /**
    * Returns the new tag, if known. Given the tag it's `expected` to have (null for none: a new one),
    * writes only if it still has it, and returns false if not: another device wrote it since.

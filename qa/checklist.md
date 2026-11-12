@@ -546,6 +546,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] [Web] With lines open in two tabs, sync runs in one pass at a time: a conflict makes one conflicted copy, not two; connecting or switching in one tab, the other follows; opening a second tab doesn't delete images the first could still bring back with ⌘Z
 - [ ] Images and files sync both ways, an empty file too [Desktop: through a cloud drive]
 - [ ] Folder sync keeps working offline; a bucket says Offline and catches up
+- [ ] [Desktop] A drive's own copy of a note beside it (`<id> (… conflicted copy …).md`, `<id> 2.md`, `<id> (1).md`, `<id>-MacBook.md`, made by editing a note on two computers while the drive is offline) comes in as a "(conflicted copy)" note on both, and the drive's file is gone from the folder
 
 ## 15. Encryption
 

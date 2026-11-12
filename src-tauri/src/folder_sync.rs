@@ -4,7 +4,8 @@
 //!
 //! Images go in an `attachments` folder beside `notes`, as `<hash>.<ext>` files.
 //!
-//! File names are checked to be plain names of those kinds; the folder is whatever the page passes.
+//! File names are checked to be plain names of those kinds, or a drive's copy of one; the folder is
+//! whatever the page passes.
 
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
@@ -144,7 +145,7 @@ pub async fn sync_folder_list(dir: String) -> Result<Vec<Entry>, String> {
         // Reading it finds nothing until it's here, so it's picked up on a later pass.
         request_download(&dir.join(real));
         entries.push(Entry { name: real.to_string(), etag: PLACEHOLDER.into() });
-      } else if valid_name(&name)
+      } else if synced_name(&name)
         && let Ok(meta) = entry.metadata()
       {
         entries.push(Entry { name, etag: etag(&meta) });
@@ -326,7 +327,7 @@ fn folder(dir: &str) -> Result<PathBuf, String> {
 }
 
 fn file(dir: &str, name: &str) -> Result<PathBuf, String> {
-  if !valid_name(name) {
+  if !synced_name(name) {
     return Err(format!("Not a note or attachment: {name}"));
   }
   Ok(folder(dir)?.join(name))
@@ -342,9 +343,21 @@ pub(crate) fn valid_name(name: &str) -> bool {
     && name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
 }
 
+/// A plain name (`valid_name`), or the name of a drive's own copy of such a file, which it keeps
+/// beside it when it can't merge two versions: `<id> 2.md` (iCloud), `<id> (1).md` (Google Drive),
+/// `<id> (MacBook's conflicted copy 2026-11-09).md` (Dropbox). OneDrive's, `<id>-MacBook.md`, is plain.
+fn synced_name(name: &str) -> bool {
+  if valid_name(name) {
+    return true;
+  }
+  let Some((stem, ext)) = name.rsplit_once('.') else { return false };
+  let Some((original, _)) = stem.split_once(' ') else { return false };
+  valid_name(&format!("{original}.{ext}")) && !name.contains(['/', '\\', ':']) && !name.chars().any(char::is_control)
+}
+
 /// iCloud Drive stands in for files it hasn't downloaded with `.<name>.icloud`.
 fn icloud_placeholder(name: &str) -> Option<&str> {
-  name.strip_prefix('.')?.strip_suffix(".icloud").filter(|real| valid_name(real))
+  name.strip_prefix('.')?.strip_suffix(".icloud").filter(|real| synced_name(real))
 }
 
 /// Modification time and size: changes whenever the file does, including when the drive
@@ -427,6 +440,20 @@ mod tests {
     assert_eq!(percent_decode("%2"), None);
     assert_eq!(icloud_placeholder(".abc.md.icloud"), Some("abc.md"));
     assert_eq!(icloud_placeholder("abc.md"), None);
+  }
+
+  #[test]
+  fn drives_copies_of_notes() {
+    let id = "6f1c2b3a-1234-4abc-9def-0123456789ab";
+    for copy in [" 2.md", " (1).md", " (MacBook's conflicted copy 2026-11-09).md", " (Oleksandr’s MacBook Pro’s conflicted copy).enc"] {
+      assert!(synced_name(&format!("{id}{copy}")), "{copy}");
+    }
+    assert_eq!(icloud_placeholder(&format!(".{id} 2.md.icloud")), Some(&*format!("{id} 2.md")));
+    for not in [" ../escape.md", " a\\b.md", " a:b.md", " 2.TXT", " \n.md"] {
+      assert!(!synced_name(&format!("{id}{not}")), "{not}");
+    }
+    assert!(!synced_name(".hidden 2.md"));
+    assert!(!synced_name(" 2.md"));
   }
 
   #[test]
@@ -528,6 +555,12 @@ mod tests {
     sync_folder_delete(d.clone(), "a.md".into()).await.unwrap();
     assert!(sync_folder_read(d.clone(), "a.md".into()).await.unwrap().is_none());
     assert!(sync_folder_write(d.clone(), "../x.md".into(), "no".into(), None).await.is_err());
+    // A drive's copy of a note is listed, read and deleted.
+    write_atomic(&dir.join("a (1).md"), b"theirs").unwrap();
+    assert_eq!(sync_folder_list(d.clone()).await.unwrap()[0].name, "a (1).md");
+    assert_eq!(sync_folder_read(d.clone(), "a (1).md".into()).await.unwrap().unwrap().text, "theirs");
+    sync_folder_delete(d.clone(), "a (1).md".into()).await.unwrap();
+    assert!(sync_folder_list(d.clone()).await.unwrap().is_empty());
     // An empty attachment is there; a missing one isn't.
     let empty = dir.join("3f9c0a1b2c3d4e5f60718293a4b5c6d7.txt");
     write_atomic(&empty, b"").unwrap();
