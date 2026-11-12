@@ -70,6 +70,11 @@ test("search finds a setting in any section, in its words or a choice's, and ope
   await found.first().waitFor();
   await search.fill("zzqx");
   await settings.getByText("Nothing in Settings matches “zzqx”.").first().waitFor();
+  // Nor what it says only once something's done, which it couldn't lead to.
+  for (const done of ["preset copied", "passphrase changed"]) {
+    await search.fill(done);
+    await settings.getByText(`Nothing in Settings matches “${done}”.`).first().waitFor();
+  }
   await search.press("Escape");
   expect(await search.inputValue()).toBe("");
   await settings.getByRole("navigation", { name: "Settings sections" }).waitFor();

@@ -92,8 +92,10 @@ function settingsSearch(): Plugin {
         if (seen.has(path)) return [];
         seen.add(path);
         this.addWatchFile(path);
-        // Not what's only said aloud as something happens (`speak(t("settings.themeCopied"))`).
-        const source = readFileSync(path, "utf8").replace(/speak\([^\n]*/g, "");
+        // Not what's only said or shown once something happens, which search couldn't lead to: said aloud
+        // (`speak(t("settings.themeCopied"))`), a message set when something's done or goes wrong
+        // (`pictureError = t(…)`), a button's words while it's busy, and a share menu's, shown once it's open.
+        const source = readFileSync(path, "utf8").replace(/(speak\(|\b\w+ = t\(|\b(busyLabel|copyLabel|copied|downloadLabel)=\{)[^\n]*/g, "");
         const keys = [...source.matchAll(/"([a-z][A-Za-z]*\.[A-Za-z0-9_.-]+)"/g)].map((found) => found[1]);
         const parts = [...source.matchAll(/from "\.\/([A-Za-z]+\.svelte)"/g)].flatMap((found) => keysOf(join(dirname(path), found[1]), seen));
         return [...keys, ...parts];
