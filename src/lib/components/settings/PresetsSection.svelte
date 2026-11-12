@@ -136,7 +136,7 @@
 </script>
 
 {#snippet actions()}
-  <div class="flex items-center gap-1">
+  <div class="flex flex-wrap items-center justify-end gap-1">
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
         {#snippet child({ props })}

@@ -91,7 +91,7 @@ Decision
 
 /*
  * Each scene: a note (and its format), Settings to start with, what to open, what to photograph,
- * and what a person should see in it. `schemes` defaults to light and dark.
+ * and what a person should see in it. `schemes` defaults to light and dark, `language` to English.
  */
 const SCENES = [
   { id: "paper-lines", title: "Paper: ruled lines", look: "Every line of text, wrapped lines and headings too, sits on a rule; the rules end at the text's width; none under code.", prefs: { paperPattern: "lines" }, note: PROSE },
@@ -381,6 +381,45 @@ const SCENES = [
     height: 780,
   },
   { id: "phone-backdrop", title: "Phone: a backdrop", look: "Room around the page, nothing scrolls sideways.", prefs: { paperBackdrop: "dawn" }, note: PROSE, width: 390, height: 780 },
+  {
+    id: "phone-settings-shortcuts",
+    title: "Phone: Settings → Shortcuts, in French",
+    look: "Every row inside its card, nothing scrolls sideways; keys that don't fit beside their action go onto more lines, each with its « ou ».",
+    language: "fr",
+    width: 390,
+    height: 780,
+    act: async (page) => {
+      await page.keyboard.press("ControlOrMeta+/");
+      await page.getByRole("dialog").locator('[id="shortcuts-shortcuts.group.sheets"]').scrollIntoViewIfNeeded();
+    },
+    shoot: "dialog",
+  },
+  {
+    id: "phone-settings-theme",
+    title: "Phone: Settings → Theme, in Spanish",
+    look: "Dark panes' four choices on two lines inside the card, not past its edge; the other rows as they were.",
+    language: "es",
+    width: 390,
+    height: 780,
+    act: async (page) => {
+      await page.keyboard.press("ControlOrMeta+/");
+      const dialog = page.getByRole("dialog");
+      await dialog.getByRole("button", { name: "Todos los ajustes" }).click();
+      await dialog.locator("#settings-nav-theme").click();
+      await dialog.getByRole("radiogroup", { name: "Paneles oscuros" }).scrollIntoViewIfNeeded();
+    },
+    shoot: "dialog",
+  },
+  {
+    id: "phone-note-info",
+    title: "Phone: a note's info, in Spanish",
+    look: "The panel inside the screen with room on both sides; the formats on two lines rather than past its edge.",
+    language: "es",
+    note: PROSE,
+    width: 390,
+    height: 780,
+    act: (page) => page.getByRole("button", { name: "Información de la nota" }).click(),
+  },
 ];
 
 const scenes = SCENES.filter((scene) => !only.length || only.some((word) => scene.id.includes(word)));
@@ -398,14 +437,15 @@ for (const scene of scenes) {
     const context = await browser.newContext({ viewport: { width: scene.width ?? 1280, height: scene.height ?? 800 }, colorScheme: scheme, deviceScaleFactor: 2, reducedMotion: "reduce" });
     const { plugins: pluginChoices, ...prefs } = scene.prefs ?? {};
     await context.addInitScript(
-      ([prefs, plugins, storage]) => {
+      ([prefs, plugins, storage, language]) => {
         if (location.protocol !== "http:") return;
         localStorage.setItem("lines.seeded", "1");
         localStorage.setItem("lines.prefs", JSON.stringify(prefs));
         if (plugins) localStorage.setItem("lines.plugins", JSON.stringify(plugins));
         for (const [key, value] of Object.entries(storage)) localStorage.setItem(key, JSON.stringify(value));
+        if (language) localStorage.setItem("lines.language", language);
       },
-      [prefs, pluginChoices, scene.storage ?? {}],
+      [prefs, pluginChoices, scene.storage ?? {}, scene.language],
     );
     const page = await context.newPage();
     const errors = [];

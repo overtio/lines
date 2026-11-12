@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends string">
-  // One of a few options side by side, as radio buttons: Tab stops once, the arrow keys choose.
+  // One of a few options side by side (on more lines where they don't fit), as radio buttons: Tab stops once, the arrow keys choose.
   import { RadioGroup } from "bits-ui";
   import type { Snippet } from "svelte";
   import Icon from "../../icons/Icon.svelte";
@@ -43,7 +43,7 @@
   onValueChange={(id) => id && onselect(id as T)}
   orientation="horizontal"
   aria-label={label}
-  class={["ui-segmented gap-0.5 rounded-lg bg-input p-[3px]", columns ? "grid" : "flex", className]}
+  class={["ui-segmented gap-0.5 rounded-lg bg-input p-[3px]", columns ? "grid" : "flex flex-wrap", className]}
   style={columns ? `grid-template-columns: repeat(${columns}, minmax(0, 1fr))` : undefined}
 >
   {#each options as option (option.id)}
