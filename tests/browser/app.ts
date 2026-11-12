@@ -14,6 +14,8 @@ export interface Options {
   scheme?: "light" | "dark";
   width?: number;
   height?: number;
+  /** The page's time zone (`America/New_York`), if not this machine's. */
+  timezone?: string;
 }
 
 export interface App {
@@ -47,8 +49,8 @@ export const clickMod = (page: App["page"]) => page.evaluate(() => (/Mac|iPhone|
 /** What a browser says in the console on its own, not about lines: WebKit on Linux doesn't know a viewport key the page sets. */
 const NOISE = [/^Viewport argument key ".+" not recognized and ignored\.$/];
 
-export async function openApp({ prefs = {}, tour = false, scheme = "light", width = 1280, height = 820 }: Options = {}): Promise<App> {
-  const context = await globalThis.lines.browser.newContext({ viewport: { width, height }, colorScheme: scheme, deviceScaleFactor: 1 });
+export async function openApp({ prefs = {}, tour = false, scheme = "light", width = 1280, height = 820, timezone }: Options = {}): Promise<App> {
+  const context = await globalThis.lines.browser.newContext({ viewport: { width, height }, colorScheme: scheme, deviceScaleFactor: 1, timezoneId: timezone });
   if (engine() === "chromium") await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   // Once, so a reload keeps what the test changed.
   await context.addInitScript(
