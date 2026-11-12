@@ -415,7 +415,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Right-click a type → Rename edits its name in place (Enter keeps it, Esc doesn't): every note of it gets the new `type`, every `@type.…` of it the new name (keeping its columns; not in code), the icon and the list's filter follow, and notes keep their dates; renaming onto another type merges them
 - [ ] Right-click (long-press [Touch]) a type: Icon and Color (Reset in its picker goes back to the usual icon); the icon changes in the sidebar, on the type's notes in the list, and on mentions of them in an open note
 - [ ] Search finds notes by their property values
-- [ ] ⌘⇧F focuses search (leaving focus mode, or going back to the list on a phone); every word must match; Esc clears
+- [ ] ⌘⇧F focuses search (leaving focus mode, or going back to the list on a phone); every word must match; Esc clears it and puts focus on the open note's row (the first, with none open)
 - [ ] Locked notes are found only by their title
 
 ## 12. Menus, pickers and note info
