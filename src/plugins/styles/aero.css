@@ -2,7 +2,7 @@
  * Aero: glossy glass of the 2000s. Gel buttons with a shine across their top half, frosted
  * see-through menus and dialogs, a sheen over the panes, and a sky glow with soft bubbles behind
  * the note. The gloss is white over the theme's colors, so it follows whatever is chosen with it;
- * Increased contrast makes the glass solid.
+ * Increased contrast makes the glass and the buttons solid.
  */
 
 /* Made from the theme's colors, and made again in a part with its own (a pane shown dark). */
@@ -13,7 +13,9 @@
   --sheen: color-mix(in srgb, white 45%, transparent);
   --gel-edge: color-mix(in srgb, var(--ink) 22%, transparent);
   --gel: linear-gradient(to bottom, var(--gloss) 0 48%, transparent 52%), linear-gradient(to bottom, var(--bg-elevated), color-mix(in srgb, var(--bg-elevated), var(--ink) 9%));
-  --gel-accent: linear-gradient(to bottom, color-mix(in srgb, white 38%, transparent) 0 48%, transparent 52%), linear-gradient(to bottom, color-mix(in srgb, var(--accent), white 18%), color-mix(in srgb, var(--accent), black 12%));
+  /* On a button in a color, the shine fades out above the text, which keeps its contrast on the color. */
+  --gel-shine: linear-gradient(to bottom, color-mix(in srgb, white 38%, transparent), transparent 40%);
+  --gel-accent: var(--gel-shine), linear-gradient(to bottom, var(--accent), color-mix(in srgb, var(--accent), black 12%));
   --chosen: linear-gradient(to bottom, color-mix(in srgb, var(--accent) 24%, transparent), color-mix(in srgb, var(--accent) 12%, transparent));
   --glow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
   --orb: radial-gradient(circle at 35% 30%, white, var(--bg-elevated) 55%, color-mix(in srgb, var(--bg-elevated), var(--ink) 12%));
@@ -26,6 +28,14 @@
   --gloss-edge: color-mix(in srgb, white 22%, transparent);
   --sheen: color-mix(in srgb, white 6%, transparent);
   --orb: radial-gradient(circle at 35% 30%, color-mix(in srgb, white 70%, var(--bg-elevated)), var(--bg-elevated) 60%);
+}
+
+/* With Increased contrast, buttons are solid, with no shine under their text. */
+:root[data-style="aero"][data-contrast="more"],
+:root[data-style="aero"][data-contrast="more"] [data-scheme] {
+  --gel: var(--bg-elevated);
+  --gel-shine: none;
+  --gel-accent: var(--accent);
 }
 
 /* A sheen down from the top of the panes. */
@@ -81,7 +91,7 @@
 
 :root[data-style="aero"] .ui-button[data-variant="danger-primary"] {
   border-color: color-mix(in srgb, var(--danger), black 25%);
-  background: linear-gradient(to bottom, color-mix(in srgb, white 38%, transparent) 0 48%, transparent 52%), var(--danger);
+  background: var(--gel-shine), var(--danger);
   color: var(--on-danger);
 }
 

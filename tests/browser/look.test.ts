@@ -209,6 +209,43 @@ describe("styles", () => {
     expect(track!.x + track!.width - (knob!.x + knob!.width)).toBeLessThan(5);
   });
 
+  test("Aero's shine stays above the text on its colored buttons, and goes with Increased contrast", async () => {
+    for (const contrast of ["standard", "more"]) {
+      app = await openApp({ prefs: { style: "aero", theme: "aero", contrast } });
+      await app.page.evaluate(() => (window.testing.themeDrafts.picking = true));
+      const done = app.page.getByRole("button", { name: "Done", exact: true });
+      await done.evaluate((button) => Promise.all(button.closest(".ui-menu")!.getAnimations().map((animation) => animation.finished)));
+      const picture = (await app.page.screenshot({ clip: (await done.boundingBox())! })).toString("base64");
+      // The least contrast between the text and the button just before it, from the top of its capitals down.
+      const least = await done.evaluate(async (button, picture) => {
+        const range = document.createRange();
+        range.selectNodeContents(button);
+        const [own, text] = [button.getBoundingClientRect(), range.getBoundingClientRect()];
+        const image = new Image();
+        image.src = `data:image/png;base64,${picture}`;
+        await image.decode();
+        const canvas = new OffscreenCanvas(image.width, image.height).getContext("2d")!;
+        canvas.drawImage(image, 0, 0);
+        const luminance = ([r, g, b]: Iterable<number>) => {
+          const linear = (value: number) => ((value /= 255) <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+          return 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+        };
+        const style = getComputedStyle(button);
+        const ink = luminance(style.color.match(/[\d.]+/g)!.map(Number));
+        const capitals = (text.top + text.bottom) / 2 - own.top - 0.35 * parseFloat(style.fontSize);
+        let least = Infinity;
+        for (let y = Math.ceil(capitals); y < text.bottom - own.top; y++) {
+          const under = luminance(canvas.getImageData(Math.floor(text.left - own.left) - 2, y, 1, 1).data);
+          least = Math.min(least, (Math.max(under, ink) + 0.05) / (Math.min(under, ink) + 0.05));
+        }
+        return least;
+      }, picture);
+      expect(least).toBeGreaterThanOrEqual(4.5);
+      if (contrast === "more") expect(await done.evaluate((button) => getComputedStyle(button).backgroundImage)).toBe("none");
+      else await app.close();
+    }
+  });
+
   test("a style's look outranks a theme's own, in dark as in light", async () => {
     for (const scheme of ["light", "dark"] as const) {
       app = await openApp({ scheme, prefs: { style: "neon", theme: "high-contrast" } });
