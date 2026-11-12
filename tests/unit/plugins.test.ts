@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { stubApp } from "./stubs";
 import { readFileSync } from "node:fs";
 import { contrast, over, parse, toLch } from "../../src/lib/themes/color";
-import { moreContrast } from "../../src/lib/themes/palette";
+import { MORE_CONTRAST } from "../../src/lib/themes/css";
 import { BASE_COLORS } from "../../src/lib/themes/palette";
 import type { AppStyle, Mascot, MascotPose, Theme, ThemeColors } from "../../src/lib/plugins/types";
 
@@ -13,6 +13,9 @@ const { styles } = await import("../../src/plugins/styles");
 const { mascots } = await import("../../src/plugins/mascots");
 
 const all = themes();
+/** lines' themes and those the styles bring, and the schemes each shows: the one it has, or both. */
+const withStyles = [...all, ...(styles().contributes.themes ?? [])];
+const shownSchemes = (theme: Theme) => (theme.scheme ? [theme.scheme] : (["light", "dark"] as const));
 const ratio = (colors: Partial<ThemeColors>, text: string, surface: string) => {
   const background = parse(colors[surface])!;
   return contrast(over(parse(colors[text])!, background), background);
@@ -46,13 +49,14 @@ describe("built-in themes", () => {
     expect(misses).toEqual(known);
   });
 
-  test("Increased contrast reaches what docs/accessibility.md promises", () => {
+  test("Increased contrast reaches what docs/accessibility.md promises, in the styles' themes too", () => {
     const misses: string[] = [];
-    for (const theme of all) {
-      for (const scheme of ["light", "dark"] as const) {
+    for (const theme of withStyles) {
+      for (const scheme of shownSchemes(theme)) {
         const own = theme[scheme];
         if (!parse(own.bg)) continue;
-        const colors = { ...own, ...moreContrast(own), ...theme.moreContrast?.[scheme] };
+        // As themeCss has it: what Increased contrast changes in every theme, then the theme's own.
+        const colors = { ...own, ...MORE_CONTRAST[scheme], ...theme.moreContrast?.[scheme] };
         for (const surface of ["bg", "bg-list", "bg-sidebar"]) {
           for (const [text, goal] of [["text", 9], ["text-muted", 7], ["text-faint", 4.5], ["accent", 4.5]] as const) {
             const measured = ratio(colors, text, surface);
@@ -66,7 +70,6 @@ describe("built-in themes", () => {
 });
 
 describe("themes' own highlighter, status and callout colors", () => {
-  const withStyles = [...all, ...(styles().contributes.themes ?? [])];
   /** app.css's, for what a theme leaves to it: light's, then dark's. */
   const [lightCss, darkCss] = readFileSync("src/app.css", "utf8").split(':root[data-scheme="dark"],');
   const fromCss = (css: string) => Object.fromEntries([...css.matchAll(/--([a-z-]+):\s*(#[0-9a-f]{6});/g)].map((match) => [match[1], match[2]]));
@@ -75,7 +78,6 @@ describe("themes' own highlighter, status and callout colors", () => {
   /** Themes drawn in lines' own colors, which may keep app.css's for these. */
   const LINES_COLORS = new Set(["lines", "ember", "ink", "indigo", "plum", "moss", "amber", "sepia", "forest", "ocean"]);
 
-  const shownSchemes = (theme: Theme) => (theme.scheme ? [theme.scheme] : (["light", "dark"] as const));
   const effective = (theme: Theme, scheme: "light" | "dark") => {
     const colors: Record<string, string> = { ...shared[scheme], ...theme[scheme] };
     for (const [key, value] of Object.entries(colors)) if (value === "var(--accent)") colors[key] = colors.accent;

@@ -548,8 +548,21 @@ const themes = (): Theme[] => [
     dark: neonColors,
     moreContrast: { dark: { "text-faint": "#697c9e" } },
   },
-  { id: "puddle", name: "Puddle", ...puddleColors },
-  { id: "lightbulb", name: "Lightbulb", ...lightbulbColors },
+  {
+    id: "puddle",
+    name: "Puddle",
+    ...puddleColors,
+    moreContrast: {
+      light: { "text-muted": "#272f30", "text-faint": "#444b4c", accent: "#1d4375", "tag-text": "#6e2e35" },
+      dark: { "text-muted": "#b7cbce", "text-faint": "#8da4a9" },
+    },
+  },
+  {
+    id: "lightbulb",
+    name: "Lightbulb",
+    ...lightbulbColors,
+    moreContrast: { light: { "text-muted": "#50401b", "text-faint": "#6a5c40", accent: "#a51f0d" } },
+  },
 ];
 
 const looks = (): AppStyle[] => [
