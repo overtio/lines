@@ -119,6 +119,13 @@ function alone<T>(work: () => Promise<T>): Promise<T> {
   return "locks" in navigator ? navigator.locks.request("lines.sync", work) : work();
 }
 
+/**
+ * A cloud drive's own copy of a note, which it keeps beside the note when it can't merge two
+ * versions, by its name without the extension: `<id> 2` (iCloud), `<id> (1)` (Google Drive), `<id>
+ * (MacBook's conflicted copy 2026-11-09)` (Dropbox), `<id>-MacBook` (OneDrive). The note's id.
+ */
+const driveCopyOf = (name: string) => /^([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})[ -]./i.exec(name)?.[1];
+
 function conflictCopy(note: Note): Note {
   const copy = { ...note, id: crypto.randomUUID(), createdAt: Date.now(), pinned: false };
   // A locked note that isn't open can't be changed; its title can.
@@ -487,9 +494,15 @@ class SyncEngine {
     await this.#checkEncryption(config, store, root, listed, attachmentDir);
     const ext = config.encryption ? SEALED : ".md";
     const remoteById = new Map<string, RemoteObject>();
+    /** Drives' own copies of notes, by name: the note's id. */
+    const driveCopies = new Map<string, string>();
     for (const object of listed) {
       const name = object.key.slice(dir.length);
-      if (!name.includes("/") && name.endsWith(ext) && name.length > ext.length) remoteById.set(name.slice(0, -ext.length), object);
+      if (name.includes("/") || !name.endsWith(ext) || name.length <= ext.length) continue;
+      const stem = name.slice(0, -ext.length);
+      const original = driveCopyOf(stem);
+      if (original) driveCopies.set(stem, original);
+      else remoteById.set(stem, object);
     }
     const records = new Map((await syncRecords.all()).map((r) => [r.id, r]));
     // Notes were synced, yet the remote has none: as likely a drive that's signed out or a wrong
@@ -605,6 +618,17 @@ class SyncEngine {
         // New on another device, or edited there after we deleted it here.
         if (await notes.applyRemote(fetched.note)) await record(fetched.note, fetched.etag ?? object.etag, fetched.text);
       }
+    });
+
+    // The version a drive kept as its own copy: a conflicted copy here, as for any conflict, unless
+    // it says what the note does. Then it's taken out of the folder, as the copy syncs on its own.
+    await pool([...driveCopies], async ([name, id]) => {
+      const file = await remote.get(keyOf(name), keyOf(id));
+      if (!file) return;
+      const copy = await opened({ ...deserialize(file.text, id), id });
+      const note = notes.get(id)?.note;
+      if (!note || textOf(note) !== textOf(copy)) await notes.insert(conflictCopy(copy));
+      await remote.delete(keyOf(name));
     });
 
     for (const id of records.keys()) {

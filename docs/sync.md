@@ -11,6 +11,7 @@ In the Mac (and Windows/Linux) app, Settings → Sync → Cloud drive lists the 
 - If iCloud hasn't downloaded a note to this Mac yet, lines asks it to and picks the note up on the next pass.
 - A note's file another app saved with a byte order mark or Windows line endings, or as UTF-16, reads as usual. Bytes that aren't UTF-8 (a file saved as Latin-1, say) read as �, as they do from a bucket, rather than stop sync.
 - The drive's app does the uploading, so lines doesn't need to be online, and conflicts are handled just like with a bucket.
+- When the drive itself finds two versions of a note's file it can't merge, it keeps one under the note's name and the other beside it: `<note-id> (MacBook's conflicted copy 2026-11-09).md` (Dropbox), `<note-id> 2.md` (iCloud), `<note-id> (1).md` (Google Drive), `<note-id>-MacBook.md` (OneDrive). lines brings that one in as a “… (conflicted copy)” note, as for a conflict of its own (or nothing, if it says what the note does), and then deletes the drive's file: the copy syncs as a note of its own. Two devices bringing in the same file at once each make a copy.
 
 On the web and on phones, use a bucket for now; signing in to iCloud, Google Drive and Proton Drive there is on the roadmap.
 

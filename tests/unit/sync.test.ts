@@ -248,6 +248,58 @@ describe("sync, of a note's file saved by another app", () => {
   });
 });
 
+describe("sync, when a cloud drive keeps its own copy of a note it couldn't merge", () => {
+  const copyOf = (id: string, suffix: string) => `${FOLDER.path}/notes/${id}${suffix}.md`;
+
+  // Dropbox, iCloud, Google Drive and OneDrive name theirs so.
+  test.each([" (MacBook's conflicted copy 2026-11-09)", " 2", " (1)", "-MacBook"])("<id>%s.md is a conflicted copy, on every device", async (suffix) => {
+    const [here, there] = await devices(2);
+    const id = notes.add("# Trip\n\nRome");
+    await here.sync();
+    await there.sync();
+    await here.open();
+    notes.update(id, "# Trip\n\nRome\nFlorence");
+    await here.sync();
+    // The drive brings in another device's version too: it keeps that as the note, and this one beside it.
+    drive.set(copyOf(id, suffix), drive.get(fileOf(id))!);
+    editElsewhere(id, { body: "# Trip\n\nRome\nVenice" });
+    await here.sync();
+    const both = ["# Trip\n\nRome\nVenice", "# Trip (conflicted copy)\n\nRome\nFlorence"];
+    expect(bodies()).toEqual(both);
+    expect(drive.has(copyOf(id, suffix))).toBe(false);
+    await here.sync();
+    await there.sync();
+    expect(bodies()).toEqual(both);
+  });
+
+  test("one that says what the note does is just taken out of the folder", async () => {
+    const [here] = await devices(1);
+    const id = notes.add("# Trip\n\nRome");
+    await here.sync();
+    drive.set(copyOf(id, " 2"), drive.get(fileOf(id))!);
+    await here.sync();
+    expect(bodies()).toEqual(["# Trip\n\nRome"]);
+    expect(drive.has(copyOf(id, " 2"))).toBe(false);
+  });
+
+  test("with end-to-end encryption too", async () => {
+    const [here] = await devices(1);
+    const id = notes.add("# Trip\n\nRome");
+    await here.sync();
+    await sync.encrypt("correct horse battery");
+    await sync.syncNow();
+    const sealed = (name: string) => `${FOLDER.path}/notes/${name}.enc`;
+    const before = drive.get(sealed(id))!;
+    notes.update(id, "# Trip\n\nRome\nFlorence");
+    await here.sync();
+    drive.set(sealed(`${id} 2`), drive.get(sealed(id))!);
+    drive.set(sealed(id), { ...before, etag: "the drive's" });
+    await here.sync();
+    expect(bodies()).toEqual(["# Trip\n\nRome", "# Trip (conflicted copy)\n\nRome\nFlorence"]);
+    expect(drive.has(sealed(`${id} 2`))).toBe(false);
+  });
+});
+
 describe("sync, of tags' and types' icons and colors", () => {
   test("go to the folder, and come in from other devices choice by choice, the later winning", async () => {
     const [here] = await devices(1);
