@@ -252,7 +252,9 @@ test("a click into a note that isn't focused keeps it where it was, though focus
   expect(result.after).toBe(900);
 });
 
-test("a drag that starts in text already selected selects from where it started to where it ends, smoothly", async () => {
+// Not on Linux, where Chrome takes a press in selected text as the start of dragging that text, as it
+// does in any page; lines leaves that to the browser.
+test.skipIf(process.platform === "linux")("a drag that starts in text already selected selects from where it started to where it ends, smoothly", async () => {
   await app.open("One two three four five six seven eight nine ten eleven twelve");
   const page = app.page;
   const line = (await page.locator(".editor-pane .cm-line").first().boundingBox())!;
