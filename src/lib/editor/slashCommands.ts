@@ -50,17 +50,27 @@ export interface SlashCommand {
 /** Any block marker a line may already start with, so a command replaces it rather than stacking. */
 const BLOCK_PREFIX = /^(\s*)(?:#{1,6}\s+|>\s?|[-*+]\s+\[[ xX]\]\s+|[-*+]\s+|\d+[.)]\s+)*/;
 
-/** Turns the current line into a block (heading, list item, quote…), keeping its text. */
+/** The quote markers a line starts with. */
+const QUOTED = /^(?:\s*>\s?)*/;
+
+/**
+ * Turns the current line into a block (heading, list item, quote…), keeping its text. A line in a
+ * quote stays in it, the block in the quote, and Quote leaves it as it is.
+ */
 function setPrefix(prefix: string) {
   return (view: EditorView, from: number, to: number) => {
     const line = view.state.doc.lineAt(from);
     const text = line.text.slice(0, from - line.from) + line.text.slice(to - line.from);
-    const [marker, indent] = BLOCK_PREFIX.exec(text)!;
-    const content = text.slice(marker.length);
-    const cursor = line.from + indent.length + prefix.length + Math.max(0, from - line.from - marker.length);
+    const [quotes] = QUOTED.exec(text)!;
+    const [marker, indent] = BLOCK_PREFIX.exec(text.slice(quotes.length))!;
+    let content = text.slice(quotes.length + marker.length);
+    // The space typed before a command at the line's end goes with it.
+    if (to === line.to) content = content.trimEnd();
+    const lead = quotes + indent + (quotes && prefix === "> " ? "" : prefix);
+    const at = Math.min(content.length, Math.max(0, from - line.from - quotes.length - marker.length));
     view.dispatch({
-      changes: { from: line.from, to: line.to, insert: indent + prefix + content },
-      selection: { anchor: cursor },
+      changes: { from: line.from, to: line.to, insert: lead + content },
+      selection: { anchor: line.from + lead.length + at },
       userEvent: "input.format",
     });
   };
