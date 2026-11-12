@@ -10,7 +10,17 @@ import type { NoteMeta } from "./types";
 const TAG_RE = new RegExp(`(^|\\s|(?<!\\])\\()(?<!^[ \\t]{0,3}#{1,6}[ \\t]+)#(${TAG_NAME})`, "gmu");
 /** A code block, indented or not. One that's never closed runs to the end, as in Markdown. */
 const FENCE_RE = /^[ \t]*(`{3,}|~{3,})[\s\S]*?(?:^[ \t]*\1|(?![\s\S]))/gm;
-const INLINE_CODE_RE = /`[^`\n]*`/g;
+/** Inline code: from a run of backticks to the next run as long (``a `b` c``), on one line. */
+const INLINE_CODE_RE = /(`+)[^\n]*?(?<!`)\1(?!`)/g;
+/** An HTML comment, which Markdown apps don't show. */
+const COMMENT_RE = /<!--[\s\S]*?-->/g;
+/**
+ * Lines indented as code (four spaces, or a tab) after a blank line or at the start, and the
+ * indented lines after them, blank lines between.
+ */
+const INDENTED_RE = /(?:^|\n[ \t]*\n)((?: {4}|\t)[^\n]*(?:\n(?:[ \t]*\n)*(?: {4}|\t)[^\n]*)*)/g;
+/** A line in a list, or going on with one: indented, or a list item's. */
+const IN_LIST_RE = /^(?:\s|[-*+](?:\s|$)|\d+[.)](?:\s|$))/;
 const OPEN_TODO_RE = /^\s*[-*+] \[ \]/m;
 
 /**
@@ -28,12 +38,12 @@ export function normalizeTag(raw: string): string | null {
 export const cleanTagInput = (text: string) => text.replace(/\s+/g, "-").replace(/[^#]/gu, (char) => (TAG_CHAR.test(char) ? char : ""));
 
 export function extractTags(body: string): string[] {
-  // Tags in code don't count. Most notes have none, and looking for it is most of the work.
-  let text = body;
-  if (text.includes("```") || text.includes("~~~")) text = text.replace(FENCE_RE, "");
-  if (text.includes("`")) text = text.replace(INLINE_CODE_RE, "");
+  // Tags in code or a comment don't count.
+  const code = codeRanges(body);
   const tags = new Set<string>();
-  for (const match of text.matchAll(TAG_RE)) {
+  for (const match of body.matchAll(TAG_RE)) {
+    const start = match.index + match[1].length;
+    if (code.some(([from, to]) => start >= from && start < to)) continue;
     const tag = normalizeTag(match[2]);
     if (tag) tags.add(tag);
   }
@@ -83,11 +93,31 @@ export function renameTagIn(body: string, from: string, to: string): string {
   return last ? out + body.slice(last) : body;
 }
 
-/** Where `body`'s code is, inline and in blocks, where tags and type references aren't read. */
+/**
+ * Where `body`'s code (inline, fenced and indented) and HTML comments are, where tags and type
+ * references aren't read. Most notes have none, and looking for them is most of the work.
+ */
 function codeRanges(body: string): [number, number][] {
   const code: [number, number][] = [];
-  for (const re of [FENCE_RE, INLINE_CODE_RE]) {
+  const add = (re: RegExp) => {
     for (const m of body.matchAll(re)) code.push([m.index, m.index + m[0].length]);
+  };
+  if (body.includes("```") || body.includes("~~~")) add(FENCE_RE);
+  if (body.includes("`")) add(INLINE_CODE_RE);
+  if (body.includes("<!--")) add(COMMENT_RE);
+  if (body.includes("    ") || body.includes("\t")) code.push(...indentedCode(body));
+  return code;
+}
+
+/** Indented code: indented lines after a blank line, but not after a list, where the indent is its items'. */
+function indentedCode(body: string): [number, number][] {
+  const code: [number, number][] = [];
+  for (const m of body.matchAll(INDENTED_RE)) {
+    // The text above it, past the blank lines.
+    let end = m.index;
+    while (end > 0 && /\s/.test(body[end - 1])) end--;
+    const above = body.slice(body.lastIndexOf("\n", end - 1) + 1, end);
+    if (!end || !IN_LIST_RE.test(above)) code.push([m.index + m[0].length - m[1].length, m.index + m[0].length]);
   }
   return code;
 }

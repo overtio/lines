@@ -16,12 +16,18 @@ Edge cases for tags, highlights and underlines. Check each line against what it 
 - #123 is not a tag
 - [a link](#anchor) is not a tag
 - `#qa/in-code` is not a tag
+- ``#qa/in-double-backticks`` is not a tag
+- a tag in a comment, hidden here (<!-- #qa/in-a-comment -->), is not a tag
 
 #### 2. Tags in code blocks
 
 ```
 #qa/not-a-tag in a code block
 ```
+
+An indented code block:
+
+    #qa/not-a-tag in an indented code block
 
 #### 3. Highlights
 
