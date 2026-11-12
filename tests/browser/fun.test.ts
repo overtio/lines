@@ -140,9 +140,9 @@ describe("cursor", () => {
     const settings = await app.settings("Theme");
     await settings.getByRole("button", { name: "New", exact: true }).click();
     await app.page.getByRole("menuitem").first().click();
-    const field = settings.getByRole("textbox", { name: "Accent", exact: true });
-    await field.fill("#c01060");
-    await field.press("Enter");
+    await settings.getByRole("button", { name: "Choose a color for Accent", exact: true }).click();
+    await app.page.getByRole("dialog", { name: "Choose a color for Accent" }).getByRole("textbox", { name: "Accent", exact: true }).fill("#c01060");
+    await app.page.keyboard.press("Escape");
     const [edited, shown] = await colors();
     expect(edited).not.toBe(dot);
     expect(edited).toBe(shown);

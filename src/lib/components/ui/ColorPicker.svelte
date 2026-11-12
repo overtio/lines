@@ -20,10 +20,12 @@
     swatches: SwatchColor[];
     optional?: boolean;
     placeholder?: string;
+    /** Whether a color of your own can be picked, or only one of `swatches`. */
+    custom?: boolean;
     onchange: (value: string | undefined) => void;
     onadd?: (color: string) => void;
   };
-  let { label, value, start, swatches, optional, placeholder, onchange, onadd }: Props = $props();
+  let { label, value, start, swatches, optional, placeholder, custom = true, onchange, onadd }: Props = $props();
 
   /** The colors of the rainbow, in hue's order, for the hue slider's track. */
   const HUES = `linear-gradient(to right, ${[0, 60, 120, 180, 240, 300, 360].map((h) => hex(fromHsv({ h, s: 1, v: 1 }))).join(", ")})`;
@@ -94,68 +96,70 @@
 <div class="flex w-max flex-col gap-3">
   <Swatches colors={swatches} value={chosen} label={t("settings.colorSwatches")} onselect={(id) => choose(swatches.find((swatch) => swatch.id === id)?.color)} />
 
-  <!-- Saturation across, brightness up: the hue's own color at the top right, white at the top left,
-       black along the bottom. Pressed or dragged anywhere, its thumb (the slider) goes there. -->
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div
-    bind:this={area}
-    class="relative h-36 w-full cursor-crosshair touch-none rounded-md inset-ring inset-ring-line forced-color-adjust-none"
-    style:background-color={hue}
-    style:background-image="linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent)"
-    onpointerdown={(event) => {
-      if (event.button !== 0) return;
-      event.preventDefault();
-      area!.setPointerCapture(event.pointerId);
-      thumb!.focus({ preventScroll: true });
-      dragTo(event);
-    }}
-    onpointermove={(event) => area!.hasPointerCapture(event.pointerId) && dragTo(event)}
-  >
+  {#if custom}
+    <!-- Saturation across, brightness up: the hue's own color at the top right, white at the top left,
+         black along the bottom. Pressed or dragged anywhere, its thumb (the slider) goes there. -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
-      bind:this={thumb}
-      role="slider"
-      tabindex="0"
-      aria-label={t("settings.colorArea")}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={percent(hsv.s)}
-      aria-valuetext={t("settings.colorAreaValue", { saturation: percent(hsv.s), brightness: percent(hsv.v), color })}
-      class="absolute -translate-1/2 {THUMB}"
-      style:left="{hsv.s * 100}%"
-      style:top="{(1 - hsv.v) * 100}%"
-      style:background={color}
-      onkeydown={onAreaKeydown}
-    ></div>
-  </div>
+      bind:this={area}
+      class="relative h-36 w-full cursor-crosshair touch-none rounded-md inset-ring inset-ring-line forced-color-adjust-none"
+      style:background-color={hue}
+      style:background-image="linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent)"
+      onpointerdown={(event) => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        area!.setPointerCapture(event.pointerId);
+        thumb!.focus({ preventScroll: true });
+        dragTo(event);
+      }}
+      onpointermove={(event) => area!.hasPointerCapture(event.pointerId) && dragTo(event)}
+    >
+      <div
+        bind:this={thumb}
+        role="slider"
+        tabindex="0"
+        aria-label={t("settings.colorArea")}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percent(hsv.s)}
+        aria-valuetext={t("settings.colorAreaValue", { saturation: percent(hsv.s), brightness: percent(hsv.v), color })}
+        class="absolute -translate-1/2 {THUMB}"
+        style:left="{hsv.s * 100}%"
+        style:top="{(1 - hsv.v) * 100}%"
+        style:background={color}
+        onkeydown={onAreaKeydown}
+      ></div>
+    </div>
 
-  <!-- In whole degrees: the slider moves a value between its steps onto one, which would change the color just by opening. -->
-  <Slider.Root
-    type="single"
-    value={Math.round(hsv.h)}
-    onValueChange={(h) => pick({ ...hsv, h })}
-    min={0}
-    max={360}
-    thumbPositioning="exact"
-    class="relative flex h-4 w-full touch-none items-center select-none coarse:h-6"
-  >
-    <span class="h-3 w-full rounded-sm inset-ring inset-ring-line forced-color-adjust-none" style:background-image={HUES}></span>
-    <Slider.Thumb
-      index={0}
-      aria-label={t("settings.colorHue")}
-      aria-valuetext={t("settings.colorHueValue", { degrees: Math.round(hsv.h), color })}
-      onkeydown={onHueKeydown}
-      class="block cursor-pointer {THUMB}"
-      style="background: {hue}"
-    />
-  </Slider.Root>
+    <!-- In whole degrees: the slider moves a value between its steps onto one, which would change the color just by opening. -->
+    <Slider.Root
+      type="single"
+      value={Math.round(hsv.h)}
+      onValueChange={(h) => pick({ ...hsv, h })}
+      min={0}
+      max={360}
+      thumbPositioning="exact"
+      class="relative flex h-4 w-full touch-none items-center select-none coarse:h-6"
+    >
+      <span class="h-3 w-full rounded-sm inset-ring inset-ring-line forced-color-adjust-none" style:background-image={HUES}></span>
+      <Slider.Thumb
+        index={0}
+        aria-label={t("settings.colorHue")}
+        aria-valuetext={t("settings.colorHueValue", { degrees: Math.round(hsv.h), color })}
+        onkeydown={onHueKeydown}
+        class="block cursor-pointer {THUMB}"
+        style="background: {hue}"
+      />
+    </Slider.Root>
 
-  <div class="flex items-center gap-2">
-    <ColorText aria-label={label} {value} {optional} {placeholder} class="flex-1" onchange={choose} />
-    {#if EyeDropper}
-      <IconButton icon="pipette" label={t("settings.colorFromScreen")} iconSize={16} onclick={pickFromScreen} />
-    {/if}
-    {#if onadd}
-      <IconButton icon="plus" label={t("settings.colorAdd")} onclick={() => onadd(color)} />
-    {/if}
-  </div>
+    <div class="flex items-center gap-2">
+      <ColorText aria-label={label} {value} {optional} {placeholder} class="flex-1" onchange={choose} />
+      {#if EyeDropper}
+        <IconButton icon="pipette" label={t("settings.colorFromScreen")} iconSize={16} onclick={pickFromScreen} />
+      {/if}
+      {#if onadd}
+        <IconButton icon="plus" label={t("settings.colorAdd")} onclick={() => onadd(color)} />
+      {/if}
+    </div>
+  {/if}
 </div>

@@ -164,7 +164,7 @@ describe("themes", () => {
   test("a picture's colors make a theme, chosen at once", async () => {
     app = await openApp();
     const settings = await app.settings("Theme");
-    await settings.getByRole("button", { name: "New" }).click();
+    await settings.getByRole("button", { name: "New", exact: true }).click();
     const chooser = app.page.waitForEvent("filechooser");
     await app.page.getByRole("menuitem", { name: "From a Picture" }).click();
     await (await chooser).setFiles({ name: "Sunset_over-sea.png", mimeType: "image/png", buffer: png(48, 32, (x, y) => (y < 14 ? [240, 140 - x, 60] : [40, 30 + x, 90])) });
@@ -177,7 +177,7 @@ describe("themes", () => {
     const plugins = await app.settings("All Plugins");
     expect(await plugins.getByText("Needs the lines app: Wallhaven's site doesn't answer web pages.").isVisible()).toBe(true);
     const theme = await app.settings("Theme");
-    await theme.getByRole("button", { name: "New" }).click();
+    await theme.getByRole("button", { name: "New", exact: true }).click();
     expect(await app.page.getByRole("menuitem", { name: "From Wallhaven" }).count()).toBe(0);
     await app.page.keyboard.press("Escape");
   });
@@ -187,9 +187,9 @@ describe("themes", () => {
     const settings = await app.settings("Theme");
     await settings.getByRole("button", { name: "New", exact: true }).click();
     await app.page.getByRole("menuitem", { name: /From Nord/ }).click();
-    const field = settings.getByRole("textbox", { name: "Accent", exact: true });
-    await field.fill("#c01060");
-    await field.press("Enter");
+    await settings.getByRole("button", { name: "Choose a color for Accent", exact: true }).click();
+    await app.page.getByRole("dialog", { name: "Choose a color for Accent" }).getByRole("textbox", { name: "Accent", exact: true }).fill("#c01060");
+    await app.page.keyboard.press("Escape");
     expect(await app.page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--accent").trim())).toBe("#c01060");
     const palettes = await app.page.evaluate(() => {
       const { customThemes, plugins, prefs } = window.testing;
@@ -251,7 +251,7 @@ describe("themes", () => {
   test("New → From a theme with colors for one scheme only copies that one", async () => {
     app = await openApp({ prefs: { theme: "neon" } });
     const settings = await app.settings("Theme");
-    await settings.getByRole("button", { name: "New" }).click();
+    await settings.getByRole("button", { name: "New", exact: true }).click();
     await app.page.getByRole("menuitem", { name: /From Neon/ }).click();
     const theme = await app.page.evaluate(() => window.testing.plugins.theme(window.testing.prefs.theme));
     expect(theme.scheme).toBe("dark");
@@ -342,23 +342,24 @@ describe("the color picker", () => {
   /** Waits for focus to be on what has this name, as it moves there a moment after a picker opens or closes. */
   const focusOn = (label: string) => app.page.waitForFunction((label) => document.activeElement?.getAttribute("aria-label") === label, label);
 
-  test("a swatch opens the theme's colors; one chosen by click or arrow key is the color at once, and Esc goes back to the swatch", async () => {
+  test("a swatch opens the colors of the theme's palette; one chosen by click or arrow key is the color at once, and Esc goes back to the swatch", async () => {
     const picker = await openPicker("#3d7dd8");
-    // Opening it changes nothing; the color isn't one of the theme's, so none is chosen.
+    // Opening it changes nothing; the color isn't one of the palette's, so none is chosen.
     expect(await color()).toBe("#3d7dd8");
-    const swatches = picker.getByRole("radiogroup", { name: "Theme colors" });
-    expect((await swatches.getByRole("radio").evaluateAll((radios) => radios.map((radio) => radio.getAttribute("aria-label")))).slice(0, 4)).toEqual(["Accent", "Red", "Orange", "Yellow"]);
+    const swatches = picker.getByRole("radiogroup", { name: "Palette colors" });
+    // Lines' own colors are named from their look.
+    expect((await swatches.getByRole("radio").evaluateAll((radios) => radios.map((radio) => radio.getAttribute("aria-label")))).slice(0, 4)).toEqual(["White", "Dark Gray", "Light Gray", "Teal"]);
     expect(await swatches.getByRole("radio", { checked: true }).count()).toBe(0);
-    await focusOn("Accent");
+    await focusOn("White");
 
-    await swatches.getByRole("radio", { name: "Red", exact: true }).click();
-    expect(await color()).toBe("#d53c40");
+    await swatches.getByRole("radio", { name: "Teal", exact: true }).click();
+    expect(await color()).toBe("#0e7a7e");
     await app.page.keyboard.press("ArrowRight");
-    expect(await color()).toBe("#c46800");
-    expect(await swatches.getByRole("radio", { name: "Orange", exact: true }).getAttribute("aria-checked")).toBe("true");
-    expect(await picker.getByRole("textbox", { name: "Your color" }).inputValue()).toBe("#c46800");
+    expect(await color()).toBe("#33413f");
+    expect(await swatches.getByRole("radio", { name: "Dark Gray 2", exact: true }).getAttribute("aria-checked")).toBe("true");
+    expect(await picker.getByRole("textbox", { name: "Your color" }).inputValue()).toBe("#33413f");
 
-    // An eyedropper only where the browser has one (not WebKit); nothing to add to, as no palette is yours yet.
+    // An eyedropper only where the browser has one (not WebKit); nothing to add to, as the palette is lines'.
     const eyedropper = await app.page.evaluate(() => "EyeDropper" in window);
     expect(await picker.getByRole("button", { name: "Pick a color from the screen" }).count()).toBe(eyedropper ? 1 : 0);
     if (engine() === "webkit") expect(eyedropper).toBe(false);
@@ -371,7 +372,7 @@ describe("the color picker", () => {
     // Enter opens it again, on the color chosen.
     await app.page.keyboard.press("Enter");
     await picker.waitFor();
-    await focusOn("Orange");
+    await focusOn("Dark Gray 2");
   });
 
   test("the saturation and brightness area and the hue, dragged or keyed, change the color as they go; a color typed moves them", async () => {
@@ -412,18 +413,31 @@ describe("the color picker", () => {
     expect(await area.getAttribute("aria-valuetext")).toBe("Saturation 100%, brightness 50%, #008000");
   });
 
-  test("in your theme's editor, it offers the colors of the theme being changed", async () => {
+  test("in your theme's editor, a part's offers the colors of the palette it's drawn in, and one of your own goes into it", async () => {
     app = await openApp();
     const settings = await app.settings("Theme");
-    await settings.getByRole("button", { name: "New" }).click();
+    await settings.getByRole("button", { name: "New", exact: true }).click();
     await app.page.getByRole("menuitem", { name: /From Lines/ }).click();
-    await settings.getByRole("textbox", { name: "Accent", exact: true }).fill("#7c3aed");
     await settings.getByRole("button", { name: "Choose a color for Text", exact: true }).click();
     const picker = app.page.getByRole("dialog", { name: "Choose a color for Text" });
-    await picker.getByRole("radio", { name: "Accent", exact: true }).click();
-    // Drawn in the palette's color the accent is.
+    await picker.getByRole("radio", { name: "Teal", exact: true }).click();
+    // Drawn in the palette's color the accent is, which the row names.
     const theme = await app.page.evaluate(() => window.testing.customThemes.get(window.testing.prefs.theme));
     expect(theme?.light?.text).toBe(theme?.light?.accent);
+    // The palette is the theme's own copy: a color of your own goes into it, chosen, and the row says its name.
+    await picker.getByRole("textbox", { name: "Text", exact: true }).fill("#7c3aed");
+    const chosen = picker.getByRole("radio", { checked: true });
+    expect(await chosen.count()).toBe(1);
+    const name = (await chosen.getAttribute("aria-label"))!;
+    await app.page.keyboard.press("Escape");
+    await picker.waitFor({ state: "detached" });
+    expect(await settings.getByRole("region", { name: "Text", exact: true }).getByText(name, { exact: true }).first().isVisible()).toBe(true);
+    const palette = await app.page.evaluate(() => {
+      const { customThemes, prefs } = window.testing;
+      const theme = customThemes.get(prefs.theme)!;
+      return customThemes.palette(typeof theme.palette === "string" ? theme.palette : theme.palette.light)!.colors.map((entry) => entry.color);
+    });
+    expect(palette).toContain("#7c3aed");
   });
 });
 

@@ -106,6 +106,13 @@ export function toLch(color: Rgb): Lch {
   };
 }
 
+/** How different two colors look: how far apart they are in OKLab, 0 for the same, about 0.02 for a difference just seen. */
+export function difference(a: Rgb, b: Rgb) {
+  const [x, y] = [toLch(a), toLch(b)];
+  const hue = x.c ** 2 + y.c ** 2 - 2 * x.c * y.c * Math.cos(((x.h - y.h) * Math.PI) / 180);
+  return Math.hypot(x.l - y.l, Math.sqrt(Math.max(0, hue)));
+}
+
 function lchToLinear({ l: L, c, h }: Lch) {
   const A = c * Math.cos((h * Math.PI) / 180);
   const B = c * Math.sin((h * Math.PI) / 180);

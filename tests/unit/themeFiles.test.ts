@@ -1,12 +1,27 @@
 import { describe, expect, test } from "bun:test";
-import { parse } from "../../src/lib/themes/color";
-import { filePalette, fromColors, type PaletteFile, readPaletteFile, readThemeFile, resolveFile, sameTheme, type ThemeFile, writePaletteFile, writeThemeFile } from "../../src/lib/themes/file";
+import { difference, parse } from "../../src/lib/themes/color";
+import {
+  colorsIn,
+  filePalette,
+  fromColors,
+  PALETTE_SIZE,
+  type PaletteFile,
+  readPalette,
+  readPaletteFile,
+  readThemeFile,
+  resolveFile,
+  sameTheme,
+  type ThemeFile,
+  writePaletteFile,
+  writeThemeFile,
+} from "../../src/lib/themes/file";
 import { importedColors, paletteOf, workOut } from "../../src/lib/themes/palette";
 import { stubApp } from "./stubs";
 
 /*
  * lines' theme and palette files, from before palettes too; your themes and palettes as they're kept,
- * and what changing one does to its palette; themes from other apps' colors; and colors' names.
+ * and what changing one does to its palette, or to the themes drawn in it; themes from other apps'
+ * colors; and colors' names.
  */
 
 stubApp();
@@ -130,6 +145,22 @@ describe("palette files", () => {
     expect(readPaletteFile({ name: "Empty", colors: [{ id: "x", color: "nope" }] })).toBeUndefined();
     expect(readPaletteFile({ colors: [{ id: "x", color: "#fff" }] })).toBeUndefined();
   });
+
+  test("pasted or in another file, the colors written in it make one: hex and rgb(), each once, as many as a palette has", () => {
+    const sea = { name: "Sea", colors: [{ id: "deep", name: "Deep", color: "#123456" }] };
+    expect(readPalette(writePaletteFile(sea), "Pasted")).toEqual(sea);
+    expect(colorsIn("--bg: #FFF; --text: rgb(14 122 126); accent #0e7a7e, again #0E7A7E and #12345678; not #12345 or #ggg")).toEqual(["#ffffff", "#0e7a7e", "rgb(18 52 86 / 0.471)"]);
+    expect(readPalette("background = #282a36\nforeground = #f8f8f2", "Dracula")).toEqual({
+      name: "Dracula",
+      colors: [
+        { id: "c1", color: "#282a36" },
+        { id: "c2", color: "#f8f8f2" },
+      ],
+    });
+    const many = Array.from({ length: 40 }, (_, i) => `#0000${i.toString(16).padStart(2, "0")}`).join(" ");
+    expect(colorsIn(many)).toHaveLength(PALETTE_SIZE);
+    expect(readPalette("no colors here", "Nothing")).toBeUndefined();
+  });
 });
 
 describe("your themes", () => {
@@ -226,6 +257,111 @@ describe("your themes", () => {
   });
 });
 
+describe("palettes of yours", () => {
+  const hex = (id: string) => customThemes.palette(id)!.colors.map((entry) => entry.color);
+  /** A theme of yours drawn in palette `palette`, its light parts in these of its colors. */
+  const drawnIn = (palette: string, light: Record<string, string>) => customThemes.add({ name: "Drawn", palette, light });
+
+  test("renamed, their colors changed, named, moved and added to, up to as many as a palette has", () => {
+    const id = customThemes.addPalette({ name: "Sea", colors: [{ id: "c1", color: "#123456" }] });
+    customThemes.renamePalette(id, "  Deep sea ");
+    customThemes.renamePalette(id, " ");
+    expect(customThemes.palette(id)!.name).toBe("Deep sea");
+    customThemes.setPaletteColor(id, "c1", "rgb(18 52 86 / 50%)");
+    customThemes.setPaletteColor(id, "c1", "not a color");
+    expect(hex(id)).toEqual(["rgb(18 52 86 / 0.5)"]);
+    customThemes.nameColor(id, "c1", " Deep ");
+    expect(customThemes.palette(id)!.colors[0].name).toBe("Deep");
+    customThemes.nameColor(id, "c1", "");
+    expect(customThemes.palette(id)!.colors[0]).not.toHaveProperty("name");
+    const added = customThemes.addColor(id, "#e0f0f0")!;
+    customThemes.moveColor(id, added, -1);
+    customThemes.moveColor(id, added, -1);
+    expect(hex(id)).toEqual(["#e0f0f0", "rgb(18 52 86 / 0.5)"]);
+    // A color it has already is that one.
+    expect(customThemes.addColor(id, "#E0F0F0")).toBe(added);
+    for (let n = 0; customThemes.palette(id)!.colors.length < PALETTE_SIZE; n++) customThemes.addColor(id, `#8080${n.toString(16).padStart(2, "0")}`);
+    expect(customThemes.addColor(id, "#ff0000")).toBeUndefined();
+    expect(customThemes.palette(id)!.colors).toHaveLength(PALETTE_SIZE);
+    expect(customThemes.removePalette(id)).toBe(true);
+    expect(customThemes.palette(id)).toBeUndefined();
+  });
+
+  test("a color taken out, what was drawn in it is drawn in the nearest left; the last stays", () => {
+    const id = customThemes.addPalette({
+      name: "Three",
+      colors: [
+        { id: "white", color: "#ffffff" },
+        { id: "teal", color: "#0e7a7e" },
+        { id: "green", color: "#2f7d32" },
+      ],
+    });
+    const theme = drawnIn(id, { bg: "white", accent: "teal" });
+    customThemes.removeColor(id, "teal");
+    expect(customThemes.get(theme)!.light!.accent).toBe("green");
+    customThemes.removeColor(id, "green");
+    customThemes.removeColor(id, "white");
+    expect(hex(id)).toEqual(["#ffffff"]);
+    customThemes.remove(theme);
+  });
+
+  test("a theme drawn in another palette has each part in its nearest color, and one palette for both schemes while they're the same", () => {
+    const from = customThemes.addPalette({
+      name: "From",
+      colors: [
+        { id: "a", color: "#fafafa" },
+        { id: "b", color: "#0e7a7e" },
+      ],
+    });
+    const to = customThemes.addPalette({
+      name: "To",
+      colors: [
+        { id: "dark", color: "#202020" },
+        { id: "white", color: "#ffffff" },
+        { id: "teal", color: "#107070" },
+      ],
+    });
+    const theme = customThemes.add({ name: "Both", palette: from, light: { bg: "a", accent: "b" }, dark: { bg: "b" } });
+    const lookUp = (each: string) => customThemes.palette(each);
+    customThemes.setPalette(theme, ["light"], to, lookUp);
+    expect(customThemes.get(theme)!.palette).toEqual({ light: to, dark: from });
+    expect(customThemes.get(theme)!.light).toEqual({ bg: "white", accent: "teal" });
+    customThemes.setPalette(theme, ["dark"], to, lookUp);
+    expect(customThemes.get(theme)!.palette).toBe(to);
+    expect(customThemes.get(theme)!.dark).toEqual({ bg: "teal" });
+    // A part drawn in one of the palette's colors by its id.
+    customThemes.assign(theme, "light", "accent", "dark");
+    expect(customThemes.get(theme)!.light!.accent).toBe("dark");
+    customThemes.remove(theme);
+    expect([lookUp(from), lookUp(to)]).toEqual([lookUp(from), undefined]);
+    customThemes.removePalette(from);
+  });
+
+  test("deleted, the themes drawn in it are drawn in another first; without one, it stays", () => {
+    const id = customThemes.addPalette({ name: "Used", colors: [{ id: "c1", color: "#0e7a7e" }] });
+    const other = customThemes.addPalette({ name: "Other", colors: [{ id: "x", color: "#107070" }] });
+    const theme = drawnIn(id, { accent: "c1" });
+    expect(customThemes.themesIn(id).map((each) => each.id)).toEqual([theme]);
+    expect(customThemes.removePalette(id)).toBe(false);
+    expect(customThemes.removePalette(id, id, (each) => customThemes.palette(each))).toBe(false);
+    expect(customThemes.palette(id)).toBeDefined();
+    expect(customThemes.removePalette(id, other, (each) => customThemes.palette(each))).toBe(true);
+    expect(customThemes.palette(id)).toBeUndefined();
+    expect(customThemes.get(theme)).toMatchObject({ palette: other, light: { accent: "x" } });
+    customThemes.remove(theme);
+  });
+
+  test("a color of your own for a part of a theme whose palette is full is drawn in its nearest", () => {
+    const colors = Array.from({ length: PALETTE_SIZE }, (_, i) => ({ id: `c${i + 1}`, color: `#${(i * 8).toString(16).padStart(2, "0")}0000` }));
+    const id = customThemes.addPalette({ name: "Full", colors });
+    const theme = drawnIn(id, { bg: "c1", text: "c2", accent: "c2" });
+    customThemes.setColor(theme, "light", "accent", "#f90000");
+    expect(customThemes.palette(id)!.colors).toHaveLength(PALETTE_SIZE);
+    expect(customThemes.get(theme)!.light!.accent).toBe("c32");
+    customThemes.remove(theme);
+  });
+});
+
 describe("themes from other apps", () => {
   test("make a palette of the colors they have, each once, and a theme drawn in it", () => {
     const terminal = { background: "#282a36", foreground: "#f8f8f2", accent: "#bd93f9", hues: { red: "#ff5555", green: "#50fa7b", yellow: "#f1fa8c", blue: "#bd93f9" } };
@@ -235,6 +371,16 @@ describe("themes from other apps", () => {
     expect(new Set(palette).size).toBe(palette.length);
     expect(palette).toContain("#bd93f9");
     expect(resolveFile(file).dark).toEqual(workOut(colors));
+  });
+});
+
+describe("colors", () => {
+  test("how different two look: none for the same, little for near ones, most for black and white", () => {
+    const of = (a: string, b: string) => difference(parse(a)!, parse(b)!);
+    expect(of("#0e7a7e", "#0e7a7e")).toBe(0);
+    expect(of("#0e7a7e", "#0f7a7e")).toBeLessThan(0.01);
+    expect(of("#0e7a7e", "#107070")).toBeLessThan(of("#0e7a7e", "#2f7d32"));
+    expect(of("#000000", "#ffffff")).toBeCloseTo(1, 2);
   });
 });
 

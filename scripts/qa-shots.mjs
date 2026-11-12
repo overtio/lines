@@ -509,9 +509,51 @@ const SCENES = [
       await page.getByRole("button", { name: "Settings", exact: true }).click();
       await page.getByRole("dialog").getByRole("navigation").getByText("Typography", { exact: true }).click();
       await page.getByRole("button", { name: "Choose a color for Your color" }).click();
-      await page.getByRole("dialog", { name: "Choose a color for Your color" }).getByRole("radio", { name: "Accent", exact: true }).click();
+      await page.getByRole("dialog", { name: "Choose a color for Your color" }).getByRole("radio").first().click();
     },
   })),
+  ...["lines", "classic", "pixel", "neon"].flatMap((style) => {
+    /** Settings → Theme, with a theme of yours made from Nord (its palette copied as yours), scrolled to `at`. */
+    const yours = async (page, at) => {
+      await page.evaluate(() => {
+        const { customThemes, plugins, prefs } = window.testing;
+        prefs.theme = customThemes.copy(plugins.theme("nord").definition, (id) => plugins.palette(id), "Nord Copy");
+      });
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      await page.getByRole("dialog").getByRole("navigation").getByText("Theme", { exact: true }).click();
+      await at(page.getByRole("dialog")).scrollIntoViewIfNeeded();
+    };
+    const name = `${style[0].toUpperCase()}${style.slice(1)}`;
+    return [
+      {
+        id: `palettes-${style}`,
+        title: `Palettes, in ${name}`,
+        look: "Every palette a strip of its colors with its name under it, in an even grid, the chosen one ringed in the accent; yours under their own heading; below, the chosen one's colors by name.",
+        prefs: { style, theme: style },
+        act: (page) => yours(page, (dialog) => dialog.getByRole("radiogroup", { name: "Palettes" })),
+        shoot: "dialog",
+      },
+      {
+        id: `palette-editor-${style}`,
+        title: `A palette of yours, in ${name}`,
+        look: "Its name, then a row for each color: its swatch and hex, its name (or the one lines gives it, greyed), and arrows and a cross that line up row to row; Add a Color at the end. Nothing cut off or crowded.",
+        prefs: { style, theme: style },
+        act: async (page) => {
+          await yours(page, (dialog) => dialog.getByRole("radiogroup", { name: "Palettes" }));
+          await page.getByRole("dialog").getByRole("textbox", { name: "Name of Polar Night 1" }).scrollIntoViewIfNeeded();
+        },
+        shoot: "dialog",
+      },
+      {
+        id: `theme-parts-${style}`,
+        title: `A theme of yours, its parts, in ${name}`,
+        look: "The palette chosen for light and for dark; each part's swatch as drawn and its palette color's name (or Auto), lined up; a part drawn darker or lighter to read says so in its note.",
+        prefs: { style, theme: style },
+        act: (page) => yours(page, (dialog) => dialog.getByRole("button", { name: "Choose a color for Accent" })),
+        shoot: "dialog",
+      },
+    ];
+  }),
   { id: "phone-dark-list", title: "Phone: a dark note list", look: "The list dark, its rows readable; the top of the screen not a light strip over it (a known gap, docs/limitations.md).", prefs: { darkPanes: "list" }, width: 390, height: 780, schemes: ["light"] },
   {
     id: "phone-typing",

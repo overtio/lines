@@ -1,9 +1,10 @@
+import { fromLch, hex } from "./color";
 import type { SchemeNames } from "./file";
-import { groups, points, themeFromSwatches } from "./swatches";
+import { groups, points, swatches, themeFromSwatches } from "./swatches";
 
 /*
- * A theme from a picture (Settings → Theme → New → From a Picture…): a wallpaper's colors, read on
- * this device and grouped into a few (swatches.ts), which make the theme.
+ * A theme from a picture (Settings → Theme → New → From a Picture…), or a palette: a wallpaper's
+ * colors, read on this device and grouped into a few (swatches.ts), which make the theme.
  */
 
 /** The longest side the picture is read at: enough for its colors, quick to group. */
@@ -33,3 +34,6 @@ export const themeFromPicture = async (picture: Blob, name: string, names?: Sche
 
 /** For a picture called "Lake at dawn.jpg": "Lake at dawn". */
 export const pictureName = (fileName: string) => fileName.replace(/\.[a-z0-9]+$/i, "").replace(/[-_]+/g, " ").trim();
+
+/** A picture's colors for a palette (Settings → Theme → Palettes → New), most plentiful first. */
+export const pictureColors = async (picture: Blob, count = 12) => swatches(points(await pixels(picture)), count).map((swatch) => hex(fromLch(swatch)));
