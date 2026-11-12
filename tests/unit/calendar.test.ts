@@ -93,6 +93,12 @@ test("a time after the date is read as the clock on the wall reads it", () => {
   expect(spansOf(properties("start: 2026-11-30 14:00\nend: 2026-11-30 15:30"))).toEqual([{ key: "start", from: "2026-11-30", to: "2026-11-30", start: 840, end: 930 }]);
   // An end before the start on the same day is the start alone.
   expect(spansOf(properties("start: 2026-11-30 14:00\nend: 2026-11-30 13:00"))).toEqual([{ key: "start", from: "2026-11-30", to: "2026-11-30", start: 840 }]);
+  // An end at 24:00 is the day's end, as an event dragged to midnight writes it; anything else isn't a time then.
+  const late = eventProperties({ day: "2026-11-30", start: 22 * 60, end: 24 * 60 });
+  expect(late.end).toBe("2026-11-30 24:00");
+  expect(spansOf(properties(`start: ${late.start}\nend: ${late.end}`))).toEqual([{ key: "start", from: "2026-11-30", to: "2026-11-30", start: 1320, end: 1440 }]);
+  expect(timeIn("2026-11-30 24:00")).toBeNull();
+  expect(itemsOn([entry("end: 2026-11-30 24:00")], ["2026-11-30"], false).get("2026-11-30")!.timed.map(({ start, end }) => [start, end])).toEqual([[1425, 1440]]);
 });
 
 test("a day's notes with times sit at them, side by side where they overlap; the others are all day", () => {
