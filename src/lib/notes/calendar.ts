@@ -351,7 +351,11 @@ export function notesOnDays<E extends { note: Note; meta: NoteMeta }>(entries: r
     if (edited) {
       for (const day of [dayOf(note.createdAt), dayOf(note.updatedAt)]) if (day >= from && day <= to) days.add(day);
     }
-    for (const day of days) on.set(day, [...(on.get(day) ?? []), entry]);
+    for (const day of days) {
+      const list = on.get(day);
+      if (list) list.push(entry);
+      else on.set(day, [entry]);
+    }
   }
   return on;
 }
