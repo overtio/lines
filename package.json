@@ -1,7 +1,7 @@
 {
   "name": "lines",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Beautiful, simple, local-first notes. Write in Markdown, see formatted text.",
   "license": "AGPL-3.0-only",
   "type": "module",

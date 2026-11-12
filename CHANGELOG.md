@@ -2,6 +2,19 @@
 
 What changed in each release of lines. Written by `bun scripts/release.mjs prepare` from the commits since the release before (docs/releasing.md).
 
+## [0.4.1](https://github.com/overtio/lines/compare/v0.4.0...v0.4.1) (2026-11-12)
+
+### Fixes
+
+- **sync:** an edit synced in while a floating note is typed in is kept as a conflicted copy ([#281](https://github.com/overtio/lines/pull/281))
+- **settings:** Settings and a note's info fit a phone's width, in Spanish and French too ([#280](https://github.com/overtio/lines/pull/280))
+- **editor:** a slash command on a quoted line keeps it in the quote, with no space left at its end ([#276](https://github.com/overtio/lines/pull/276))
+- **list:** Esc in the search field puts focus on the open note's row, not on the page ([#274](https://github.com/overtio/lines/pull/274))
+- **editor:** ⌘↵ leaves code, table rows and headings alone, and ⌘⇧M marks a todo ([#272](https://github.com/overtio/lines/pull/272))
+- **editor:** ⌘D isn't listed as selecting the next match, which notes with one selection can't do ([#270](https://github.com/overtio/lines/pull/270))
+- **notes:** keep what's typed just before closing the tab, reloading or quitting the Mac app ([#273](https://github.com/overtio/lines/pull/273))
+- **sync:** a cloud drive's own conflicted copy of a note comes in as a conflicted copy, not lost ([#271](https://github.com/overtio/lines/pull/271))
+
 ## [0.4.0](https://github.com/overtio/lines/compare/v0.3.3...v0.4.0) (2026-11-12)
 
 ### Features
