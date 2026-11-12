@@ -22,6 +22,14 @@ test("a # at the start of a heading's text, ## being typed there, isn't a tag; o
   expect(renameTagIn("# #work\n#work", "work", "job")).toBe("# #work\n#job");
 });
 
+test("a # in code or an HTML comment isn't a tag: a span of two backticks, indented code; in a list an indent is its item's", () => {
+  expect(extractTags("``a #incode`` and `#one` #real")).toEqual(["real"]);
+  expect(extractTags("    #indented\n\nText\n\n\t#tabbed\n\n#real")).toEqual(["real"]);
+  expect(extractTags("<!-- #commented -->\nText <!-- mark: #also -->\n#real")).toEqual(["real"]);
+  expect(extractTags("Text\n    #continued\n\n- Item\n\n    #initem")).toEqual(["continued", "initem"]);
+  expect(renameTagIn("``#work`` #work\n\n    #work\n\n<!-- #work -->", "work", "job")).toBe("``#work`` #job\n\n    #work\n\n<!-- #work -->");
+});
+
 test("renaming one keeps how the rest of a nested tag was written", () => {
   expect(renameTagIn("#İstanbul/Food and #Work/Meetings", "istanbul", "travel")).toBe("#travel/Food and #Work/Meetings");
   expect(renameTagIn("#हिंदी/नोट्स", "हिंदी", "hindi")).toBe("#hindi/नोट्स");
