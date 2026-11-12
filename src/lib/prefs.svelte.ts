@@ -56,7 +56,7 @@ export const POINTER_TRAILS = ["none", "comet", "sparkles"] as const;
 /** A mascot's size, as how many screen pixels each of its pixels takes. */
 export const MASCOT_SIZES = ["small", "medium", "large"] as const;
 
-/** Headings' color: the text's, the theme's accent, or one of your own. */
+/** Headings' color: the theme's for each level ("text", as it was named when that was the text's), its accent, or one of your own. */
 export const HEADING_COLORS = ["text", "accent", "custom"] as const;
 export type HeadingColor = (typeof HEADING_COLORS)[number];
 

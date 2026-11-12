@@ -12,6 +12,7 @@
   import type { ThemeColors } from "../../plugins/types";
   import { customThemes } from "../../themes/custom.svelte";
   import { SCHEMES, THEME_FILE_EXTENSION, writeThemeFile } from "../../themes/file";
+  import { FORMATTING_COLORS } from "../../themes/formatting";
   import { assigned, otherScheme, paletteOf, resolveTheme, type Scheme } from "../../themes/palette";
   import Button from "../ui/Button.svelte";
   import CardBlock from "./CardBlock.svelte";
@@ -38,7 +39,7 @@
 
   type Color = { key: string; label: string; note?: string };
   const color = (key: string, note?: string): Color => ({ key, label: colorName(key), note });
-  const GROUPS: { title: string; colors: Color[]; more?: boolean }[] = [
+  const GROUPS: { title: string; note?: string; colors: Color[]; more?: boolean }[] = [
     {
       title: t("settings.themeBackgrounds"),
       colors: [
@@ -90,6 +91,12 @@
       title: t("settings.themePalette"),
       more: true,
       colors: PALETTE.filter((each) => each !== "accent").map((each) => color(`palette-${each}`)),
+    },
+    {
+      title: t("settings.themeFormatting"),
+      note: t("settings.themeFormattingNote"),
+      more: true,
+      colors: FORMATTING_COLORS.map((key) => color(key)),
     },
     {
       title: t("settings.themeCode"),
@@ -204,14 +211,15 @@
   </FieldGroup>
 
   {#each GROUPS.filter((group) => more || !group.more) as group (group.title)}
-    <FieldGroup title={group.title}>
+    <FieldGroup title={group.title} note={group.note}>
       {#each group.colors as { key, label, note } (key)}
         <FieldRow {label} {note} for="{uid}-{key}">
+          <!-- Formatting left on Auto with no color of app.css's (bold, a heading) is the text's around it. -->
           <ColorField
             id="{uid}-{key}"
             {label}
             value={colors[key]}
-            swatch="var(--{key})"
+            swatch="var(--{key}, var(--text))"
             {frame}
             optional={!needed.has(key)}
             onchange={(value) => customThemes.setColor(id, editing, key, value, palette)}

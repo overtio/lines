@@ -89,6 +89,100 @@ Error
 Decision
 :::`;
 
+/** Every kind of formatting a theme can color (themes/formatting.ts), in a Markdown note and a LaTeX one. */
+const FORMATTING = `# Heading one
+
+## Heading two
+
+### Heading three
+
+#### Heading four
+
+##### Heading five
+
+###### Heading six
+
+Text with **bold**, *italics*, **bold with *italics* inside**, ~~struck through~~, <u>underlined</u>, ==highlighted==, \`inline code\`, a [link](https://example.com) and a mention of @Ada.
+
+> A quote, with **bold** in it.
+
+- A bullet
+  - A nested bullet
+
+1. A numbered item`;
+
+const FORMATTING_LATEX = String.raw`\section{Section}
+
+\subsection{Subsection}
+
+\subsubsection{Subsubsection}
+
+Text with \textbf{bold}, \emph{italics}, \sout{struck through}, \underline{underlined}, \texttt{code} and a \href{https://example.com}{link}.
+
+\begin{quote}
+A quote, with \textbf{bold} in it.
+\end{quote}
+
+\begin{itemize}
+\item A bullet
+\end{itemize}`;
+
+/** A theme of your own: Lines with a color for each kind of formatting, light and dark. */
+const FORMATTING_COLORS = {
+  light: {
+    "text-h1": "#be123c",
+    "text-h2": "#b45309",
+    "text-h3": "#15803d",
+    "text-h4": "#0e7490",
+    "text-h5": "#6d28d9",
+    "text-h6": "#64748b",
+    "text-bold": "#9a3412",
+    "text-italic": "#7c3aed",
+    "text-strike": "#be185d",
+    "text-underline": "#0369a1",
+    "text-highlight": "#713f12",
+    "text-code": "#c2410c",
+    "text-link": "#2563eb",
+    "text-mention": "#db2777",
+    "text-quote": "#4d7c0f",
+    "text-bullet": "#e11d48",
+    "text-number": "#0f766e",
+  },
+  dark: {
+    "text-h1": "#fb7185",
+    "text-h2": "#fbbf24",
+    "text-h3": "#4ade80",
+    "text-h4": "#22d3ee",
+    "text-h5": "#a78bfa",
+    "text-h6": "#94a3b8",
+    "text-bold": "#fdba74",
+    "text-italic": "#c4b5fd",
+    "text-strike": "#f9a8d4",
+    "text-underline": "#7dd3fc",
+    "text-highlight": "#fde68a",
+    "text-code": "#fb923c",
+    "text-link": "#60a5fa",
+    "text-mention": "#f472b6",
+    "text-quote": "#a3e635",
+    "text-bullet": "#fb7185",
+    "text-number": "#2dd4bf",
+  },
+};
+
+/** Chooses a theme of your own with formatting's colors, then opens `note` (and a note it mentions). */
+const formattingTheme = (note, format) => (page) =>
+  page.evaluate(
+    async ([note, format, colors]) => {
+      const { customThemes, plugins, prefs } = window.testing;
+      const id = customThemes.copy(plugins.theme("lines").definition, (each) => plugins.palette(each), "Formatted");
+      for (const scheme of ["light", "dark"]) for (const [part, color] of Object.entries(colors[scheme])) customThemes.setColor(id, scheme, part, color);
+      prefs.theme = id;
+      await window.testing.open("# Ada");
+      await window.testing.open(note, format);
+    },
+    [note, format, FORMATTING_COLORS],
+  );
+
 /*
  * Each scene: a note (and its format), Settings to start with, what to open, what to photograph,
  * and what a person should see in it. `schemes` defaults to light and dark, `language` to English.
@@ -123,6 +217,41 @@ const SCENES = [
     act: (page) => page.evaluate(() => window.testing.place(4)),
     schemes: ["light"],
   })),
+  {
+    id: "formatting-colors",
+    title: "Formatting's colors, in a theme of your own",
+    look: "Each heading level in its own color, bold, italics, strikethrough, underline, highlighted text, inline code, the link, the mention, the quote and the bullets and number each in theirs; italics inside bold in italics' color; bold in the quote in bold's; the strikethrough's line and the link's underline quiet; everything readable on the note, the highlighted text on the highlighter too.",
+    act: formattingTheme(FORMATTING),
+  },
+  {
+    id: "formatting-colors-source",
+    title: "Formatting's colors, Markdown as written",
+    look: "Headings, bold, italics, strikethrough, the link, the mention and the quote in their colors, the marks (`#`, `**`) faint; the rest as written.",
+    prefs: { markdownMode: "source" },
+    act: formattingTheme(FORMATTING),
+    schemes: ["light"],
+  },
+  {
+    id: "formatting-colors-editor",
+    title: "Formatting's colors, in your theme's editor",
+    look: "More Colors' Formatting group under its heading and note: Heading 1 to 6, Bold, Italic and the rest, each name beside its swatch and value, the swatches the colors set, lined up with the groups above and below.",
+    act: async (page) => {
+      await formattingTheme(FORMATTING)(page);
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      const dialog = page.getByRole("dialog");
+      await dialog.getByRole("navigation").getByText("Theme", { exact: true }).first().click();
+      await dialog.getByRole("button", { name: "More Colors" }).click();
+      await dialog.locator('section[aria-label="Formatting"]').evaluate((group) => group.scrollIntoView({ block: "start" }));
+    },
+    shoot: "dialog",
+  },
+  {
+    id: "formatting-colors-latex",
+    title: "Formatting's colors, in a LaTeX note",
+    look: "\\section, \\subsection and \\subsubsection in the first three headings' colors; bold, italics, strikethrough, underline, code, the link, the quote and the bullet in theirs, as in the Markdown note.",
+    act: formattingTheme(FORMATTING_LATEX, "latex"),
+    schemes: ["light"],
+  },
   ...["ink", "indigo", "plum", "moss", "amber", "mono"].map((theme) => ({ id: `theme-${theme}`, title: `Theme: ${theme[0].toUpperCase()}${theme.slice(1)}`, look: "Text, links, tags and the chosen row read clearly; the accent stands out but isn't loud.", prefs: { theme }, note: PROSE })),
   ...[
     ["green-world", "Green World", "Violet backgrounds, the accent a leaf's green, tags magenta"],

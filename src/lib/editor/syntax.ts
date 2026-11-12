@@ -116,7 +116,8 @@ const WIKI_AT = /\[\[[^[\]\n|#]*[^\s[\]|#][^[\]\n|#]*(?:#[^[\]\n|]*)?(?:\|[^[\]\
  * properties, `@Oleks.fullname`; or of a type, `@type.recipe` (notes/properties.ts).
  */
 export const Mention: MarkdownConfig = {
-  defineNodes: [{ name: "Mention", style: t.link }],
+  // A link of its own kind, so Markdown shown as written colors it as a mention.
+  defineNodes: [{ name: "Mention", style: t.special(t.link) }],
   parseInline: [
     {
       name: "Mention",

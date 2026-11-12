@@ -6,6 +6,8 @@ Everything here is plain text that other Markdown apps open without trouble. An 
 
 How much of it shows as you write is a setting (Settings → Editor → Show Markdown), and the text is the same in each: as written, only colored (Source); drawn, with every mark in sight (Visible); drawn, with the marks hidden but where you're writing (Live, the first choice); or drawn, with marks that only style text (`**`, a heading's `#`, a list's marker) never shown, as in Bear or Notion (Hidden).
 
+Each kind of formatting is in the theme's color for it: headings, bold, italics and the rest in the color of the text they're in, links, mentions and list markers in the accent, quotes and sixth-level headings in grey, unless a theme of your own gives one a color of its own ([themes.md](themes.md#your-own-themes)).
+
 The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underline, cards, math, mentions), on top of `@lezer/markdown` with GFM. What the editor draws for each construct is in `src/lib/editor/`. The QA notes in `qa/notes/` show every construct, alone and combined (see [qa/README.md](../qa/README.md)).
 
 | Construct | Linedown | Standard? |

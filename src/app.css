@@ -191,6 +191,20 @@
   --disabled-opacity: 0.45;
   --highlight-base: #ffd60a;
   --highlight: color-mix(in srgb, var(--highlight-base) 40%, transparent);
+  /*
+   * Formatting in a note, each a color a theme can set (themes/formatting.ts): --text-h1 to
+   * --text-h6, --text-bold, --text-italic, --text-strike, --text-underline, --text-highlight
+   * (highlighted text) and --text-code. Unset, as here, each is in the color of the text it's in
+   * (a paragraph's, a link's, a quote's), so formatting inside formatting takes the innermost's.
+   * These have colors of their own; a link's underline is a little of its color.
+   */
+  --text-h6: var(--text-muted);
+  --text-link: var(--accent);
+  --text-mention: var(--accent);
+  --text-quote: var(--text-muted);
+  --text-bullet: var(--accent);
+  --text-number: var(--accent);
+  --link-soft: color-mix(in srgb, var(--text-link) 35%, transparent);
   /* Code block colors; themes with their own syntax palettes override these. */
   --syn-keyword: #cf222e;
   --syn-string: #0a3069;
@@ -214,6 +228,7 @@
   --input: color-mix(in srgb, var(--ink) 6%, transparent);
   --code-bg: color-mix(in srgb, var(--ink) 6%, transparent);
   --accent-soft: color-mix(in srgb, var(--accent) 40%, transparent);
+  --link-soft: color-mix(in srgb, var(--text-link) 40%, transparent);
   --selection: color-mix(in srgb, var(--accent) 25%, transparent);
   --tag-tint: 14%;
   --tag-bg: color-mix(in srgb, var(--accent) var(--tag-tint), transparent);

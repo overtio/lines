@@ -83,6 +83,38 @@ test("a color's picker opens over the colors here, which stay open while it's us
   await panel.waitFor({ state: "detached" });
 });
 
+test("in a note, a bold word opens Bold, then Text; a heading its level's; a link Links; each changes alone", async () => {
+  app = await openApp();
+  await app.open("# Groceries\n\nMilk and **bread**, from [the shop](https://example.com).\n\nEnd");
+  await startPicking();
+  const panel = app.page.getByRole("dialog", { name: "Colors here, in Lines" });
+  const labels = () => panel.locator("label").allTextContents();
+  const pick = async (selector: string) => {
+    await app.page.locator(`.editor-pane ${selector}`).first().click({ button: "right" });
+    await panel.waitFor();
+  };
+  const close = async () => {
+    await app.page.keyboard.press("Escape");
+    await panel.waitFor({ state: "detached" });
+  };
+
+  await pick(".cm-lp-strong");
+  expect((await labels()).slice(0, 2)).toEqual(["Bold", "Text"]);
+  await panel.getByRole("textbox", { name: "Bold", exact: true }).fill("rgb(200, 0, 0)");
+  expect(await rootColor("text-bold")).toBe("rgb(200, 0, 0)");
+  expect(await app.style(".editor-pane .cm-lp-strong", "color")).toBe("rgb(200, 0, 0)");
+  expect(await app.style(".editor-pane .cm-line:has(.cm-lp-strong)", "color")).not.toBe("rgb(200, 0, 0)");
+  await close();
+
+  await pick(".cm-lp-h1");
+  expect((await labels()).slice(0, 2)).toEqual(["Heading 1", "Text"]);
+  await close();
+
+  await pick(".cm-lp-link");
+  expect((await labels()).slice(0, 2)).toEqual(["Links", "Accent"]);
+  await close();
+});
+
 test("a note's row keeps its menu for after; while picking, its colors open, and discarding puts the theme back", async () => {
   app = await openApp();
   await app.open("# Groceries\n\nMilk");
