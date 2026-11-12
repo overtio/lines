@@ -396,6 +396,8 @@ export interface Placed<E> {
   entry: E;
   /** What put it there. */
   span: Span;
+  /** Which of the note's spans that is, as a note can be at two times on a day (two `date`s). */
+  nth: number;
   /** From and to, in minutes after midnight. */
   start: number;
   end: number;
@@ -421,12 +423,12 @@ export function itemsOn<E extends { note: Note; meta: NoteMeta }>(entries: reado
   for (const entry of entries) {
     if (entry.note.trashed) continue;
     const whole = new Set<Day>();
-    for (const span of spansIn(entry.meta.properties, from, to)) {
+    for (const [nth, span] of spansIn(entry.meta.properties, from, to).entries()) {
       if (span.to < from || span.from > to) continue;
       if (span.from === span.to && span.start !== undefined) {
         const start = span.start;
         const end = Math.min(DAY_MINUTES, Math.max(start + SHORTEST, span.end ?? start + USUAL_LENGTH));
-        items.get(span.from)?.timed.push({ entry, span, start, end, column: 0, columns: 1 });
+        items.get(span.from)?.timed.push({ entry, span, nth, start, end, column: 0, columns: 1 });
       } else {
         for (let day = span.from < from ? from : span.from; day <= span.to && day <= to; day = addDays(day, 1)) whole.add(day);
       }
