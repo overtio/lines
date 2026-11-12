@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { type App, choose, engine, mod, noErrors, openApp, toggle } from "./app";
+import { type App, choose, clickMod, engine, mod, noErrors, openApp, toggle } from "./app";
 
 let app: App;
 beforeEach(async () => {
@@ -225,12 +225,22 @@ test("a click into a note that isn't focused keeps it where it was, though focus
     const view = window.testing.editor()!;
     const scroller = view.scrollDOM;
     view.contentDOM.blur();
-    scroller.scrollTop = 1500;
-    await new Promise(requestAnimationFrame);
+    // Scrolled down the way the editor scrolls itself, to a line, so it draws the lines there (setting
+    // scrollTop, it can take a while to).
+    const { scrollIntoView } = view.constructor as unknown as { scrollIntoView: (pos: number, options: { y: "start" }) => never };
+    view.dispatch({ effects: scrollIntoView(view.state.doc.line(120).from, { y: "start" }) });
+    const below = () => [...view.contentDOM.querySelectorAll<HTMLElement>(".cm-line")].find((each) => each.getBoundingClientRect().top > scroller.getBoundingClientRect().top + 100);
+    for (let frames = 0; (scroller.scrollTop < 1000 || !below()) && frames < 60; frames++) await new Promise(requestAnimationFrame);
+    const scrolled = scroller.scrollTop;
+    const line = below();
+    if (!line) {
+      const tops = [...view.contentDOM.querySelectorAll<HTMLElement>(".cm-line")].map((each) => Math.round(each.getBoundingClientRect().top));
+      const box = scroller.getBoundingClientRect();
+      return { missing: { scrollTop: scroller.scrollTop, scrollHeight: scroller.scrollHeight, box: [box.top, box.height], viewport: view.viewport, lines: tops.length, first: tops[0], last: tops.at(-1) } };
+    }
     // As WebKit does in the Mac app: focusing the editor scrolls it, to where its cursor last was.
     const jump = () => (scroller.scrollTop = 200);
     view.contentDOM.addEventListener("focus", jump, { once: true });
-    const line = [...view.contentDOM.querySelectorAll<HTMLElement>(".cm-line")].find((each) => each.getBoundingClientRect().top > scroller.getBoundingClientRect().top + 100)!;
     const box = line.getBoundingClientRect();
     line.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, button: 0, detail: 1, clientX: box.left + 10, clientY: box.top + 5 }));
     line.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, cancelable: true, button: 0, detail: 1, clientX: box.left + 10, clientY: box.top + 5 }));
@@ -241,14 +251,16 @@ test("a click into a note that isn't focused keeps it where it was, though focus
     scroller.dispatchEvent(new WheelEvent("wheel", { deltaY: 100 }));
     scroller.scrollTop = 900;
     await new Promise((resolve) => setTimeout(resolve, 50));
-    return { kept, focused: view.hasFocus, after: scroller.scrollTop, cursor: view.state.selection.main.empty, line: view.state.doc.lineAt(view.state.selection.main.head).text, clicked: line.textContent };
+    return { kept, scrolled, focused: view.hasFocus, after: scroller.scrollTop, cursor: view.state.selection.main.empty, line: view.state.doc.lineAt(view.state.selection.main.head).text, clicked: line.textContent };
   });
+  if ("missing" in result) throw new Error(`No line drawn below the top after scrolling: ${JSON.stringify(result.missing)}`);
   expect(result.focused).toBe(true);
   // A cursor where it was clicked, not a selection from where the press was before the jump.
   expect(result.cursor).toBe(true);
   expect(result.line).toBe(result.clicked);
   // Where it was, but for the editor measuring its lines again (a few pixels), not where focusing jumped it.
-  expect(Math.abs(result.kept - 1500)).toBeLessThan(40);
+  expect(result.scrolled).toBeGreaterThan(1000);
+  expect(Math.abs(result.kept - result.scrolled)).toBeLessThan(40);
   expect(result.after).toBe(900);
 });
 
@@ -814,7 +826,7 @@ describe("clicking a tag in a note", () => {
     expect(await clickTag(app)).toBe(true);
     await app.close();
     app = await openApp();
-    expect(await clickTag(app, [mod()])).toBe(false);
+    expect(await clickTag(app, [await clickMod(app.page)])).toBe(false);
   });
 
   test("does so too with settings saved before it did, unless they were changed", async () => {

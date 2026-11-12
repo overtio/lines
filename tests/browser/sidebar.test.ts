@@ -10,6 +10,36 @@ afterEach(async () => {
 /** The sidebar's rows, as their text reads, from the top. */
 const rows = (app: App) => app.page.getByRole("navigation", { name: "Library" }).locator(".row").allInnerTexts();
 
+/**
+ * Right-clicks the sidebar's own empty space, below its rows, found where no row or control is: rows
+ * are as tall as the fonts make them, and where they fill the list, its space is at the end, scrolled
+ * to. Tried again for a moment while the sidebar doesn't take the pointer yet (just after opening).
+ */
+async function rightClickEmpty(app: App) {
+  const list = app.page.getByRole("navigation", { name: "Library" }).locator(".overflow-y-auto");
+  const find = () =>
+    list.evaluate(async (element) => {
+      element.scrollTop = element.scrollHeight;
+      await new Promise(requestAnimationFrame);
+      const box = element.getBoundingClientRect();
+      for (let y = box.bottom - 2; y > box.top; y -= 4) {
+        for (const x of [box.left + 12, box.left + box.width / 2]) {
+          // The list, or something in it that isn't a row or a control: the press reaches the list's menu.
+          const hit = document.elementFromPoint(x, y);
+          if (hit && element.contains(hit) && !hit.closest("button, [role='button'], .row, input, a, [contenteditable]")) return { x, y };
+        }
+      }
+      return null;
+    });
+  let point = await find();
+  for (let tries = 0; !point && tries < 40; tries++) {
+    await app.page.waitForTimeout(50);
+    point = await find();
+  }
+  expect(point).not.toBeNull();
+  await app.page.mouse.click(point!.x, point!.y, { button: "right" });
+}
+
 test("sections fold away; rows hide from their menu and come back from Show Hidden; order is kept", async () => {
   app = await openApp();
   await app.open("---\ntype: person\n---\n# Ada\n\n#work #home");
@@ -33,8 +63,7 @@ test("sections fold away; rows hide from their menu and come back from Show Hidd
 
   // Show Hidden, from the empty space: #work comes back alone, then everything.
   await page.getByRole("menu").waitFor({ state: "detached" });
-  const empty = await sidebar.locator(".overflow-y-auto").boundingBox();
-  await page.mouse.click(empty!.x + 40, empty!.y + empty!.height - 20, { button: "right" });
+  await rightClickEmpty(app);
   await page.getByRole("menuitem", { name: "Show Hidden" }).click();
   await page.getByRole("menuitem", { name: "#work" }).click();
   await sidebar.getByRole("button", { name: /^work/ }).waitFor();
@@ -152,8 +181,7 @@ test("a hidden section or place comes back on its own from Show Hidden", async (
     await page.getByRole("menu").waitFor({ state: "detached" });
   };
   const show = async (name: string) => {
-    const empty = await sidebar.locator(".overflow-y-auto").boundingBox();
-    await page.mouse.click(empty!.x + 40, empty!.y + empty!.height - 20, { button: "right" });
+    await rightClickEmpty(app);
     await page.getByRole("menuitem", { name: "Show Hidden" }).click();
     await page.getByRole("menuitem", { name, exact: true }).click();
     await page.getByRole("menu").waitFor({ state: "detached" });
@@ -188,8 +216,7 @@ test("places sit in sections, Inbox apart; rows drag between them; a new section
   expect(await sectionOf("Notes")).toBe("all");
 
   // A new section, named as it's made.
-  const empty = (await sidebar.locator(".overflow-y-auto").boundingBox())!;
-  await page.mouse.click(empty.x + 40, empty.y + empty.height - 20, { button: "right" });
+  await rightClickEmpty(app);
   await page.getByRole("menuitem", { name: "New Section" }).click();
   const name = sidebar.getByRole("textbox", { name: "Section name" });
   await name.waitFor();
@@ -200,7 +227,7 @@ test("places sit in sections, Inbox apart; rows drag between them; a new section
   await sidebar.getByText("Drag rows here").waitFor();
 
   // A second goes after it, above Types, as each new one does.
-  await page.mouse.click(empty.x + 40, empty.y + empty.height - 20, { button: "right" });
+  await rightClickEmpty(app);
   await page.getByRole("menuitem", { name: "New Section" }).click();
   await name.waitFor();
   await page.keyboard.type("Someday");
@@ -266,8 +293,7 @@ test("dragged into an empty section, the line takes the place of its words", asy
   // The line goes straight to its place, rather than gliding, which a sleeping display can stall.
   await page.emulateMedia({ reducedMotion: "reduce" });
   const sidebar = page.getByRole("navigation", { name: "Library" });
-  const empty = (await sidebar.locator(".overflow-y-auto").boundingBox())!;
-  await page.mouse.click(empty.x + 40, empty.y + empty.height - 20, { button: "right" });
+  await rightClickEmpty(app);
   await page.getByRole("menuitem", { name: "New Section" }).click();
   await page.keyboard.press("Enter");
   const words = sidebar.getByText("Drag rows here");
@@ -488,8 +514,7 @@ test("dividers go between places from the menus, move by keyboard, are kept, and
   await divider.waitFor({ state: "detached" });
 
   // From the empty space: at the end of the places.
-  const empty = (await sidebar.locator(".overflow-y-auto").boundingBox())!;
-  await page.mouse.click(empty.x + 40, empty.y + empty.height - 20, { button: "right" });
+  await rightClickEmpty(app);
   await page.getByRole("menuitem", { name: "Add Divider" }).click();
   await divider.waitFor();
   const rows = await order();
@@ -526,8 +551,7 @@ test("a divider between sections sits halfway between them; dividers go among ty
   const sidebar = page.getByRole("navigation", { name: "Library" });
 
   // At the end of the places, from the empty space: halfway between Trash and the Types heading.
-  const empty = (await sidebar.locator(".overflow-y-auto").boundingBox())!;
-  await page.mouse.click(empty.x + 40, empty.y + empty.height - 20, { button: "right" });
+  await rightClickEmpty(app);
   await page.getByRole("menuitem", { name: "Add Divider", exact: true }).click();
   const divider = sidebar.getByRole("button", { name: "Divider" });
   await divider.waitFor();

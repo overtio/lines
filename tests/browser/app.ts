@@ -38,6 +38,12 @@ export const engine = () => globalThis.lines.engine;
 /** ⌘ where the browser runs on a Mac, Ctrl elsewhere (WebKit on Linux too), as the app's shortcuts take them. */
 export const mod = () => (process.platform === "darwin" ? "Meta" : "Control");
 
+/**
+ * ⌘ or Ctrl as a click with it reads in the page (links.ts): by what the browser says it is, so ⌘ in
+ * Playwright's WebKit, which says it's a Mac on Linux too.
+ */
+export const clickMod = (page: App["page"]) => page.evaluate(() => (/Mac|iPhone|iPad|iPod/.test(navigator.userAgent) ? "Meta" : "Control"));
+
 /** What a browser says in the console on its own, not about lines: WebKit on Linux doesn't know a viewport key the page sets. */
 const NOISE = [/^Viewport argument key ".+" not recognized and ignored\.$/];
 
