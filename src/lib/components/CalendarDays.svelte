@@ -514,6 +514,7 @@
                 renaming?.id === entry.note.id && "inset-ring-2 inset-ring-accent-soft",
               ]}
               style:--look={lookOf(entry)}
+              aria-label={repeatOf(entry.meta.properties) ? t("calendar.repeating", { title: titleOf(entry) }) : undefined}
               onclick={() => open(entry, on)}
               oncontextmenu={(event) => oncontextmenu(event, entry, on)}
               {@attach longPress((x, y) => showMenu(entry, on, x, y))}

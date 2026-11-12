@@ -25,6 +25,7 @@ export default {
   "calendar.open": "Abrir",
   "calendar.eventName": "Nombre del evento",
   "calendar.atRepeating": "{title}, {time}, se repite",
+  "calendar.repeating": "{title}, se repite",
   "calendar.repeat": "Repetir",
   "calendar.repeatNever": "No se repite",
   "calendar.repeatDaily": "Cada día",

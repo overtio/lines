@@ -33,6 +33,7 @@ export default {
   // Repeating, from an event's menu: how often, from its first day ({weekday} "Tuesday", {day} 10,
   // {date} "November 10", {nth} one of the ordinals after); and what's said once it's chosen.
   "calendar.atRepeating": "{title}, {time}, repeats",
+  "calendar.repeating": "{title}, repeats",
   "calendar.repeat": "Repeat",
   "calendar.repeatNever": "Doesn’t Repeat",
   "calendar.repeatDaily": "Every Day",
