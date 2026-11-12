@@ -1,4 +1,6 @@
 import { describe, expect, mock, test } from "bun:test";
+import { markdownLanguage } from "@codemirror/lang-markdown";
+import type { MarkdownParser } from "@lezer/markdown";
 import { stubApp } from "./stubs";
 import { readPack } from "../../src/lib/sounds/mechvibes";
 import { parseHurl } from "../../src/plugins/http/hurl/parse";
@@ -14,6 +16,7 @@ const { attachmentFileName, referencedAttachments } = await import("../../src/li
 const { fileName } = await import("../../src/lib/notes/fileName");
 const { latexTags } = await import("../../src/plugins/latex/text");
 const { addTagIn } = await import("../../src/lib/notes/parse");
+const { Highlight } = await import("../../src/lib/editor/syntax");
 
 const languages = code().contributes.languages as NoteLanguage[];
 const language = (name: string) => languages.find((each) => each.name === name)!;
@@ -99,6 +102,17 @@ test("a request's body ends before the comments after it: a Hurl entry's title, 
 test("a line's comments, a line mark among them, aren't part of its text", () => {
   expect(plainLine("# Plan <!-- mark green: due -->")).toBe("Plan");
   expect(plainLine("Before <!-- note --> after")).toBe("Before after");
+});
+
+test("== highlights only as a pair of its own, not as part of a longer run of =", () => {
+  const parser = (markdownLanguage.parser as MarkdownParser).configure([Highlight]);
+  const highlighted = (text: string) => {
+    const found: string[] = [];
+    parser.parse(text).iterate({ enter: (node) => void (node.name === "Highlight" && found.push(text.slice(node.from, node.to))) });
+    return found;
+  };
+  expect(highlighted("===x=== and x===y")).toEqual([]);
+  expect(highlighted("==x== and a ==b==")).toEqual(["==x==", "==b=="]);
 });
 
 test("a pack's empty or backwards sound timings are left out", () => {
