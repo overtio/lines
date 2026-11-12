@@ -118,7 +118,6 @@ export default {
   "shortcuts.searchSettings": "Search settings",
   "shortcuts.inSettings": "In Settings",
   "shortcuts.findNext": "Next or previous match",
-  "shortcuts.selectNext": "Select the next match too",
   "shortcuts.goToLine": "Go to a line",
   "shortcuts.inList": "In the note list",
   "shortcuts.inCalendar": "In the Calendar",

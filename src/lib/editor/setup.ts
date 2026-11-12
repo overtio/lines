@@ -365,7 +365,8 @@ export function createExtensions(onChange: () => void, format?: string): Extensi
     highlightSelectionMatches(),
     placeholder(message("editor.placeholder")),
     phrases,
-    keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, indentWithTab]),
+    // Not ⌘D, which selects the next match as well as this one: a note has one selection.
+    keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap.filter((binding) => binding.key !== "Mod-d"), indentWithTab]),
     readOnlyCompartment.of(readOnly(false)),
     outlineCompartment.of([]),
     theme,

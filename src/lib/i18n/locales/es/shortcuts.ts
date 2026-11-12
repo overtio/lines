@@ -120,7 +120,6 @@ export default {
   "shortcuts.searchSettings": "Buscar en Ajustes",
   "shortcuts.inSettings": "En Ajustes",
   "shortcuts.findNext": "Coincidencia siguiente o anterior",
-  "shortcuts.selectNext": "Seleccionar también la siguiente coincidencia",
   "shortcuts.goToLine": "Ir a una línea",
   "shortcuts.inList": "En la lista de notas",
   "shortcuts.inCalendar": "En el Calendario",
