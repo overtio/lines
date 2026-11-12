@@ -40,7 +40,7 @@ Settings → Theme → Contrast → Increased works with your themes as with lin
 
 ## Presets
 
-A theme is colors. A preset is the whole look in one: the theme, and the style that goes with it (how round the corners are, the type, the lines and shadows, and what makes it itself), with the rest of how lines looks. Choosing one sets every setting it has; **Undo**, just after, puts back the look you had. Settings → Presets has eleven:
+A theme is colors. A preset is the whole look in one: the theme, and the style that goes with it (how round the corners are, the type, the lines and shadows, and what makes it itself), with the rest of how lines looks. Choosing one sets every setting it has; **Undo**, just after (after trying several, too), puts back the look you had before them. Settings → Presets has eleven:
 
 - **Lines**: soft corners, quiet shadows and your system's font, as lines has always looked, and every other look setting as lines first has it.
 - **Classic**: a desktop of the late 90s. Raised and sunken bevels lit from the top left, a title bar with a gradient over the note list, the selection in the accent, square corners, Tahoma, scroll bars with arrow buttons, and the 90s pointer.
