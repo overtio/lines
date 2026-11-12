@@ -4,7 +4,7 @@ import { HighlightStyle, Language, ParseContext, syntaxHighlighting } from "@cod
 import type { Parser } from "@lezer/common";
 import { type MarkdownParser, parseCode } from "@lezer/markdown";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { Compartment, EditorState, Prec, type Extension, type StateCommand } from "@codemirror/state";
+import { Compartment, EditorState, type Line, Prec, type Extension, type StateCommand } from "@codemirror/state";
 import { EditorView, keymap, placeholder } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
 import { cards } from "./cards";
@@ -29,7 +29,7 @@ import { tables } from "./tables";
 import { typeTables } from "./typeTables";
 import { frontMatterField, missingNotes } from "./objects";
 import { markdownOutline, outlineCompartment } from "./outline.svelte";
-import { cheer, selectedBlocks, selectedLines } from "./util";
+import { ancestors, cheer, selectedBlocks, selectedLines } from "./util";
 import { copyOnSelect } from "./copyOnSelect";
 import { Card, headingSyntax, Highlight, Mention, Tag, TexMath, Underline } from "./syntax";
 import { t as message } from "../i18n/index.svelte";
@@ -79,18 +79,29 @@ const linedown = (additions: MarkdownAddition[], underlined: boolean) =>
     "markdown",
   );
 
-/** Turn the selected lines into todos, or tick/untick them if they already are. */
+/**
+ * Whether a line with text on it isn't one for a todo: a heading, or where a line mark couldn't
+ * follow the text either (code, a table's row, the properties).
+ */
+function notTodo(state: EditorState, line: Line) {
+  if (plugins.language(DEFAULT_LANGUAGE).lineMarks?.skip?.(state, line.to)) return true;
+  for (const node of ancestors(state, line.to, -1)) if (node.name.startsWith("ATXHeading")) return true;
+  return false;
+}
+
+/** Turn the selected lines into todos, or tick/untick them if they already are; lines that aren't for one stay as they are. */
 const toggleTodo: StateCommand = ({ state, dispatch }) => {
   if (state.readOnly) return false;
   const changes = [];
   for (const line of selectedLines(state)) {
+    if (line.text.trim() && notTodo(state, line)) continue;
     // Quote markers and indentation stay; a list marker becomes a checkbox.
     const [, lead, marker = "", box] = /^((?:\s*>\s?)*\s*)([-*+] \[([ xX])\] |[-*+] |\d+[.)] )?/.exec(line.text)!;
     const from = line.from + lead.length;
     if (box) changes.push({ from: from + 3, to: from + 4, insert: box === " " ? "x" : " " });
     else changes.push({ from, to: from + marker.length, insert: "- [ ] " });
   }
-  dispatch(state.update({ changes, scrollIntoView: true, userEvent: "input.format" }));
+  if (changes.length) dispatch(state.update({ changes, scrollIntoView: true, userEvent: "input.format" }));
   if (changes.some((change) => change.insert === "x")) cheer();
   return true;
 };
