@@ -90,7 +90,7 @@ const methods = (target: Target) => target as Record<string, unknown>;
 
 /** What the Settings window may ask the main window to do, by object and method. */
 const FORWARDED: Record<string, string[]> = {
-  sync: ["configure", "encrypt", "unlockLibrary", "decrypt", "changePassphrase", "syncNow"],
+  sync: ["configure", "encrypt", "unlockLibrary", "decrypt", "changePassphrase", "syncNow", "deleteMissing", "uploadMissing"],
   lock: ["enable", "disable", "changePassphrase", "setAfter", "setTouchId", "lockNow"],
   lockedNotes: ["unlock", "changePassword", "reset", "setTouchId"],
   notes: ["addSamples", "reset", "setFilter"],
@@ -112,6 +112,7 @@ export interface SyncState {
   error: string | null;
   lastSynced: number | null;
   encryptionIssue: unknown;
+  missing: number;
 }
 
 /**

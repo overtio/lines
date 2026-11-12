@@ -76,6 +76,8 @@ On each sync, lines compares every note with what it last exchanged with the buc
 | Edited on one, pinned, moved to the trash, filed or put in the Inbox, given an icon or locked on the other | Both kept, in one note: pinning and the rest don't count as edits. A note locked on either device stays locked, the edit inside it (or, on a device that doesn't have the password, the edit as a conflicted copy) |
 | Deleted on one device | Deleted on the others, unless another device edited it in the meantime, in which case the edit wins |
 
+If every note that synced is gone from the bucket or folder at once, that's as likely a drive that's signed out or the wrong folder as every note deleted elsewhere, so lines changes nothing and sync stops until you say which, in Settings → Sync: **Delete them here too…** (asks first; notes edited here since they last synced are kept and uploaded), or **Upload them again**.
+
 Images and files in notes sit next to them, named after their content and keeping their extension:
 
 ```

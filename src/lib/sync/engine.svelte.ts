@@ -199,6 +199,11 @@ class SyncEngine {
   error = $state<string | null>(null);
   lastSynced = $state<number | null>(null);
   encryptionIssue = $state<EncryptionIssue | null>(null);
+  /**
+   * How many notes here were synced and are gone from the remote, all of them: deleted on another
+   * device, or a wrong or emptied folder. Sync stops until the person says which (`deleteMissing`, `uploadMissing`).
+   */
+  missing = $state(0);
 
   #running: Promise<void> | null = null;
   /** A follow-up pass requested while one was running; repeated requests share it. */
@@ -272,6 +277,7 @@ class SyncEngine {
     this.config = next;
     this.error = null;
     this.encryptionIssue = null;
+    this.missing = 0;
     this.lastSynced = null;
     this.status = this.config ? "idle" : "off";
     this.#settingUp = !!this.config;
@@ -348,6 +354,16 @@ class SyncEngine {
       if (file?.id !== config.encryption.id) throw new SyncError(t("sync.error.changedElsewhere"));
       await writeKeyFile(store, root, { ...file, ...(await lockKey(fromBase64(config.encryption.key), passphrase)) });
     });
+  }
+
+  /** The synced notes are all gone from the remote (`missing`), deleted elsewhere: deletes them here too, but for any edited here since. */
+  async deleteMissing() {
+    await this.#exclusive((config) => this.#pass(config, true));
+  }
+
+  /** The synced notes are all gone from the remote (`missing`), though they weren't deleted: uploads them again, as when connecting. */
+  async uploadMissing() {
+    await this.#exclusive(() => syncRecords.clear());
   }
 
   /** Runs `work` with no pass running or starting, then syncs. */
@@ -461,7 +477,8 @@ class SyncEngine {
     }
   }
 
-  async #pass(config: SyncConfig) {
+  /** `emptied`: the person said the notes missing from the remote were deleted there (`deleteMissing`). */
+  async #pass(config: SyncConfig, emptied = false) {
     const { store, remote, root, dir, attachmentDir } = await connect(config);
     const keyOf = (id: string) => `${dir}${id}.md`;
 
@@ -475,11 +492,11 @@ class SyncEngine {
       if (!name.includes("/") && name.endsWith(ext) && name.length > ext.length) remoteById.set(name.slice(0, -ext.length), object);
     }
     const records = new Map((await syncRecords.all()).map((r) => [r.id, r]));
-    // Notes were synced, yet the remote has none: far more likely a drive that's signed out or
-    // a wrong folder than every note deleted elsewhere. Deleting them all here would be worse.
-    if (remoteById.size === 0 && records.size > 0) {
-      throw new SyncError(t("sync.error.missing"));
-    }
+    // Notes were synced, yet the remote has none: as likely a drive that's signed out or a wrong
+    // folder as every note deleted elsewhere. Deleting them all here would be worse; the person says.
+    const synced = notes.entries.filter((entry) => records.has(entry.note.id)).length;
+    this.missing = remoteById.size === 0 && !emptied ? synced : 0;
+    if (this.missing) throw new SyncError(t("sync.error.missing"));
     // A locked note edited a moment ago is still being encrypted; it syncs on the next pass.
     const local = notes.entries.map((e) => e.note).filter((note) => (note.locked ? !!note.locked.sealed : !isBlank(note.body)));
     const localIds = new Set(notes.entries.map((e) => e.note.id));

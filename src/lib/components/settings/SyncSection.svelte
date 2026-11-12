@@ -7,6 +7,7 @@
   import { sync } from "../../sync/engine.svelte";
   import { isFolder } from "../../sync/providers";
   import Button from "../ui/Button.svelte";
+  import Callout from "../ui/Callout.svelte";
   import FieldGroup from "../ui/FieldGroup.svelte";
   import Segmented from "../ui/Segmented.svelte";
   import BrowserFolderForm from "./BrowserFolderForm.svelte";
@@ -36,6 +37,25 @@
 
   const where = $derived(sync.config ? (isFolder(sync.config) ? sync.config.name : sync.config.bucket) : null);
   const syncing = $derived(sync.status === "syncing");
+
+  // The synced notes all gone from the remote (`sync.missing`): deleted elsewhere, or not.
+  const id = $props.id();
+  let deleting = $state(false);
+  let busy = $state(false);
+  let failed = $state<string | null>(null);
+
+  async function settle(choice: () => Promise<void>) {
+    busy = true;
+    failed = null;
+    try {
+      await choice();
+      deleting = false;
+    } catch (e) {
+      failed = e instanceof Error ? e.message : String(e);
+    } finally {
+      busy = false;
+    }
+  }
 </script>
 
 {#if sync.config}
@@ -63,6 +83,35 @@
         </Button>
       {/snippet}
     </StatusRow>
+    {#if sync.missing}
+      <CardBlock>
+        {#if deleting}
+          <p class="m-0 text-sm leading-normal text-muted" id="{id}-delete">{t("sync.missing.deleteHint", { count: sync.missing })}</p>
+          <div class="flex flex-wrap items-center justify-end gap-1.5" role="group" aria-labelledby="{id}-delete">
+            <Button variant="quiet" onclick={() => (deleting = false)} disabled={busy}>{t("sync.cancel")}</Button>
+            <Button
+              variant="danger-primary"
+              onclick={() => settle(() => sync.deleteMissing())}
+              disabled={busy}
+              aria-busy={busy}
+              {@attach (node: HTMLButtonElement) => node.focus()}
+            >
+              {busy ? t("sync.missing.deleting") : t("sync.missing.delete", { count: sync.missing })}
+            </Button>
+          </div>
+        {:else}
+          <div class="flex flex-wrap items-center gap-1.5">
+            <Button variant="danger" class="-ml-2.5" onclick={() => (deleting = true)} disabled={busy}>{t("sync.missing.askDelete")}</Button>
+            <Button variant="quiet" class="ml-auto" onclick={() => settle(() => sync.uploadMissing())} disabled={busy} aria-busy={busy}>
+              {t("sync.missing.upload")}
+            </Button>
+          </div>
+        {/if}
+        {#if failed}
+          <Callout tone="danger">{failed}</Callout>
+        {/if}
+      </CardBlock>
+    {/if}
   </FieldGroup>
 {/if}
 

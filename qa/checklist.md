@@ -450,3 +450,244 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Settings → Theme → Change colors by right-clicking: on, a bar at the bottom says "Right-click anything to change its color" (hidden while Settings shows over the notes); right-clicking the sidebar, a note row, a tag, code, a button or a menu opens "Colors here, in <theme>" with the colors it's drawn in (the sidebar's background and text; a chosen row's Pressed over the note list; a tag's Tags and Tag background), not its menu; the part is outlined while it's open; changing one (picker or typed) shows at once everywhere it's used; the arrow puts the theme's own back; the bar says how many are changed, with Save in Settings; in Settings, "N colors changed in <theme>" with Save as New Theme (a theme of yours, shown, name selected), Save to <name> in a theme of yours, and Discard Changes (asks first); changes stay through Done, a restart and another theme chosen and back; a dark pane (Dark panes) changes the dark colors; ⇧F10 or the menu key opens it for what has focus; off, right-click opens menus again; light and dark
 - [ ] Presets of your own: Save as Preset adds "My <name>" under Your presets, chosen, its name selected to type over (a second "My <name> 2"); changing the theme, paper, typography's font or spacing, the cursor, pointer or mascot shows "Changed since you chose …" with Back to it and, for one of yours, Update Preset, which keeps the change (the note goes); text size, Light or dark and Contrast don't count as a change; renaming shows at once in its tile; Delete asks in the page, then the look stays as it was; they show in every window, and after a restart
 - [ ] Sharing a preset: Share (where the system has a share sheet), Copy Preset and Download Preset File (`<name>.lines-preset.json`); on another browser or device Import → Choose a File or Paste a Preset adds it and chooses it, with Undo; its own theme comes with it (added once, the same one used if it's there already); a backdrop picture of your own comes as none; a file that isn't a preset says so, naming it; several files at once add them all
+- [ ] Theme: each of the 23 themes in light and dark; Theme → Light or dark: System follows the OS live
+- [ ] Theme → Dark panes, in light: Sidebar, Note list and Both show those panes in the theme's dark colors (text, hovers, the chosen row, the search field, tags, counts, scroll bars and dividers readable), the note and menus opened from the panes light; None and dark mode show them as before; a few themes, yours, one with light colors only (worked-out dark ones) and one with dark only (nothing changes); Classic, Pixel and Neon draw their bevels, lines and glow in the panes' colors; Increased contrast, Monochrome and Invert (dark mode inverted to light: the panes dark) change them too; the theme picker's swatches show the sidebar dark; on a phone the list and the sidebar drawer; [Mac] with See-through below 100%
+- [ ] Plugins → Paper: each pattern and texture shows behind a Markdown and a LaTeX note in light and dark, in a few themes, and scrolls with the note; Lines sits a rule under every row of text (wrapped lines, headings, list items, callouts), not under code blocks; Color draws the pattern in the theme's ink, its accent, or a color picked or typed under Custom (kept when switching away and back); Opacity makes it fainter or stronger, at once, dots staying stronger than lines; Spacing → Text (to begin with) gives Dots, Squares and Graph a row of cells for each line, every bullet and wrapped line in its own, columns unbroken down the note and through headings, growing with ⌘+; Spacing → Custom and its Size slider (not shown for Lines, which always follows the text) draw them across the page at that size; a spreadsheet note stays plain; Monochrome and Invert change the paper's color too, a custom one included; a floating note shows the same paper [Desktop]; with the Paper plugin off, notes are plain and Settings → Plugins → Paper says so
+- [ ] Plugins → Paper → Backdrop: each gradient, a color and a picture (Image, then Choose Image…) fill the note pane behind a page, in light and dark; the page scrolls over it, cards, callouts and the paper drawn on it, the toolbar frosted; with a picture, it stays after a restart and shows in the Settings window at once [Desktop]; Image then Cancel leaves the backdrop as it was, not Image checked; Remove Image takes the picture away (and the backdrop, if it's shown); a spreadsheet and a LaTeX note are pages too; a code note's page holds its line numbers, each beside its line; full width and a phone's width keep room around the page; Page → Custom colors it, starting from the page's color as it was (with Invert on too), and Opacity below 100% lets the backdrop through, blurred; Monochrome turns the backdrop grey; a floating note has no backdrop; None goes back to plain
+- [ ] Theme: the Accessibility group (High Contrast, Red-Green Friendly, Blue-Yellow Friendly) sits below the other themes with its heading and note; Tab stops once on the theme picker and the arrow keys move through every theme, across both groups
+- [ ] [Desktop] Theme → New → From Wallhaven…: a search picker over Settings, the month's top wallpapers first; typing searches; picking one says it's getting the picture, then makes a theme named after the search and chooses it, with Use the Picture as the Backdrop; with no internet, it says it couldn't; on the web there's no From Wallhaven…, and Settings → Plugins says Wallhaven needs the app
+- [ ] [Desktop] `/wallhaven` in a note: the picker, and the picture picked put in the note as an attachment (at most 2,400 pixels across), described by the search's words; it stays after a restart and without the internet
+- [ ] Theme → New → From a Picture…: a JPEG, PNG or WebP (a wallpaper, a photo) makes a theme named after the file, chosen at once, light and dark following the picture (a sunset's warm tint and pink accent, an ocean's blue), its text and links readable in both; a black-and-white picture makes a grey theme; Use the Picture as the Backdrop puts the picture behind the page; a file that isn't a picture says it couldn't be read; the theme opens in the editor to change like any other
+- [ ] Theme → New → From <theme> makes "<theme> Copy" under Your themes, chosen, and scrolls to its editor with the name selected to type over; renaming changes the swatch's name and the heading as you type, and an emptied name comes back on leaving the field
+- [ ] Your theme's editor: Colors for Light / Dark switches the preview and the colors listed; changing a color (typing a hex, `rgb()` or `oklch()`, or the swatch's system picker) changes the preview and, for the scheme showing, all of lines at once, Settings and the main window and floating notes too [Desktop]; a value that isn't a color is outlined red and changes nothing; More Colors shows Status, Callouts and Code, each Auto (its swatch lines' own color) until set, and the arrow makes it Auto again
+- [ ] Import → Choose a File… with a VS Code theme `.json`, a Zed family, a Base16 `.yaml`, an `.itermcolors`, an Alacritty `.toml`, a Kitty `.conf`, a Ghostty theme (no extension), a KDE `.colors` and a `gtk.css` (samples at iTerm2-Color-Schemes and tinted-theming/schemes): each is added under Your themes and chosen, with "Added …"; several files at once; a file that isn't a theme says which file and the formats lines reads; Zed's One makes one theme with light and dark, Gruvbox three (Gruvbox, Hard, Soft)
+- [ ] A dark-only import (Dracula) is dark with Light or dark on Light, and that row says why; Make Light Colors gives it light colors (readable: text, links, code), shows Colors for, and Light or dark works again
+- [ ] Share Theme → Copy Theme, then Import → Paste a Theme… and ⌘V: the copy is added; Download Theme File saves `<name>.lines-theme.json`, which imports back the same; [Mac, iPhone] Share… opens the share sheet with the file
+- [ ] Delete Theme asks first (Cancel puts focus back on the delete button); deleting shows Lines and puts focus on the Theme heading; a floating note's own theme that was it goes back to Same as main window
+- [ ] Contrast → Increased with your theme (one imported, and one made light from dark): grey text, faint text, links and tags darken (lighten in dark) as in lines' own themes
+- [ ] [Desktop] Import, edit and delete a theme in the Settings window: the main window and floating notes follow, with no flash of Lines when an imported theme is chosen
+- [ ] High Contrast, light and dark: pure white or black, text black or white, borders clearly visible, the chosen segment ringed; a note with a callout of each kind, code, a tag, a mention, a highlight and a done todo reads clearly; the selected row's date stays readable
+- [ ] Red-Green Friendly and Blue-Yellow Friendly, light and dark: the same note; callout kinds, danger (Delete, errors) and success are told apart, and look apart in Chrome DevTools → Rendering → Emulate vision deficiencies (protanopia and deuteranopia for Red-Green, tritanopia for Blue-Yellow)
+- [ ] Theme → Icons: Lucide and SF Symbols [Mac]; on the web SF Symbols is disabled with a note
+- [ ] [Mac] Floating → Main window: opacity and blur
+- [ ] [Mac] Floating → Main window → See-through below 100% opacity: Whole window shows the desktop through every pane; Sidebar and list keeps the note (and a note open beside it) solid; Sidebar keeps the note list solid too, in light and dark, with the sidebar on either side; the row is dimmed at 100%; floating notes stay as their own opacity says
+- [ ] [Desktop] Floating → Floating notes: theme and appearance; [Mac] opacity, blur, border, window buttons and over full-screen apps (not shown on Windows and Linux, where they do nothing)
+- [ ] Typography: the preview follows font, size, spacing presets and every slider; Reset to default
+- [ ] Typography → Heading color: Text (the default), Accent and Custom (with Your color) color every heading at once, in the preview, Markdown and LaTeX notes and every window, in light and dark; h6 is muted only with Text; a heading's `#` stays faint; Source mode colors them too; Monochrome greys a color of your own and Invert turns it; the PDF keeps headings black
+- [ ] Typography → Note width: Narrow, Medium (the default), Wide and Full change how wide notes' text runs, at once and in every window; Full fills the pane beside the sidebar and list, keeping the side margins; the slider sets any width from 480 to 1400 px (no choice then marked) and, dragged while on Full, goes back to a width; spacing presets leave the width alone; a width saved before this section keeps
+- [ ] ⌘+ and ⌘− (Ctrl+ and Ctrl− on Windows and Linux; ⌘= and the keypad's + and − too) make notes' text a pixel bigger or smaller, from 12 to 28 px, in the main window and floating notes alike, and Settings → Typography → Text size follows; ⌘0 goes back to 17 px; the page itself doesn't zoom (web); screen readers hear the new size; in the drawing editor the keys zoom the drawing instead
+- [ ] Editor → Symbols: turning off "in text" or "in code" shows the characters there at once (tables too), in every window, and is remembered; the other keeps its symbols
+- [ ] About: version, Source on GitHub, Report an issue, license, credits, third-party licenses load
+- [ ] [Desktop, installed from a release] About → Updates: Check now says whether lines is up to date (a screen reader hears it); with a newer version out, the row says which and the day it updates on its own, with Install and restart, which downloads it (percent shown) and restarts into it; turning Update automatically off hides Wait before updating, and lines then looks only when asked; not shown on the web, on phones, or in a development build
+- [ ] [Desktop] Once a version that's been out as long as Wait before updating (a week unless changed) is downloaded, About says it's ready with Restart to update, and the sidebar shows a ↻ button beside the version (its tooltip, and what a screen reader says, names the version); either restarts into it, keeping what's typed; quitting instead (⌘Q, or closing the last window) installs it, and lines opens as the new version next time; turning Update automatically off then drops it (the row offers Install and restart), and quitting doesn't install it
+
+## 13a. Plugins
+
+- [ ] Settings → Plugins lists Secrets under More; Formats (Markdown, LaTeX, Spreadsheets, API Requests), Engines (Math, Diagrams (Pele), Diagrams (Mermaid), Timing Diagrams, 3D Models, Formulas, TeX Typesetting), Look (Themes, Lucide, SF Symbols [Apple]) and More (Unsplash, GIPHY, asciinema, GitHub, arXiv), each with its icon and what it does; Markdown, Themes and Lucide say Always on; on the web SF Symbols has no switch, and says it's in the Mac and iPhone apps
+- [ ] Clicking a plugin's name (or its switch) turns it on or off; VoiceOver reads its name, whether it's on, and what it does
+- [ ] LaTeX off: LaTeX notes show as plain text at once (the open one too), their titles in the list become their first line, TeX Typesetting dims and says it needs LaTeX, and a LaTeX note's ⓘ panel says its plugin is off, with Turn On, and its format switch offers only Markdown and Spreadsheet; Turn On draws it as LaTeX again at once
+- [ ] With LaTeX off, Share → Copy LaTeX, Download LaTeX and Settings → Export and Import → Export still write LaTeX notes as LaTeX (a .tex document that compiles)
+- [ ] Turning TeX Typesetting on while LaTeX is off turns LaTeX on too
+- [ ] API Requests off: ```http and ```hurl blocks show as plain code with no Send buttons, `/request` and `/hurl` are gone, and HTTP Requests and Hurl notes show as plain text; on again, all back
+- [ ] 3D Models off: ```openscad and ```stl blocks show as code, `/model` is gone, attached models show as file cards, and the PDF prints the blocks as code; on again, drawn again
+- [ ] Diagrams (Pele) is on and Diagrams (Mermaid) off at first. Turning Mermaid on turns Pele off, and diagrams are drawn again by Mermaid, on screen and in the PDF; turning Pele on turns Mermaid off
+- [ ] Both Diagrams plugins off: ```mermaid blocks show as code, `/diagram` is gone from the "/" menu, and the PDF prints them as code; either on again, they're drawn again, and Diagram is right after Code block in the menu
+- [ ] Timing Diagrams off: ```wavedrom blocks show as code, `/timing` is gone from the "/" menu, and the PDF prints them as code; on again, they're drawn again
+- [ ] Math off: `$…$`, `$$` blocks and LaTeX notes' math show as written, on screen and in the PDF; on again, drawn
+- [ ] TeX Typesetting off: a LaTeX note's PDF preview has no "Typeset with" switch
+- [ ] Formulas off: formulas in tables and spreadsheets show as written, and a spreadsheet's share menu has no Download Values or Excel Workbook; on again, worked out
+- [ ] Unsplash or GIPHY off: `/unsplash` or `/giphy` is gone from the "/" menu, and photos and GIFs already in notes still show. In a build without their keys they have no switch and say they need an API key
+- [ ] asciinema off: a recording's embed code shows asciinema's preview image (inline, as any linked image), an attached `.cast` file is only its card, and pasting a recording's link on an empty line pastes the link; on again, they play
+- [ ] GitHub or arXiv off: its links show as ordinary links at once, in text, tables and LaTeX notes, and short again when it's back on; with arXiv off, `/paper` is gone [Apps]
+- [ ] Choices are remembered after reloading, and turning a plugin on or off in one window changes every window at once (the Settings window, floating notes [Desktop], other browser tabs [Web])
+
+## 13b. Layout and tabs
+
+- [ ] Settings → Layout: Sidebar Left/Right and Note list Left/Right; each of the four arrangements applies at once, in every window, and is remembered after reloading
+- [ ] Settings → Layout → Scroll bars off: no scroll bar anywhere (the sidebar, the note list, notes, Settings, menus, pickers, a drawing, a spreadsheet's grid), in every window at once, with Show scroll bars set to Always in macOS too [Mac], and on Windows and Linux; scrolling still works by trackpad, wheel, touch and keys; on again, they're back
+- [ ] Each arrangement, wide: the sidebar is outermost on its side and the list beside the note; dividers are on each pane's inner edge; hiding the sidebar slides it out to its side; focus mode slides both away and back
+- [ ] The sidebar's hide button is on its inner edge, with the icon of its side; its show button is in the note list's title bar on the sidebar's side when the list is on that side, else at the note toolbar's edge on that side; focus moves between the two as they swap
+- [ ] Dragging a pane's inner edge resizes it the way the pointer goes, on either side; from the keyboard, ← and → move the edge; double-click and Enter put it back
+- [ ] With the sidebar and list dragged wide, making the window smaller narrows the sidebar first, then the list, the note keeping at least 360 px; made bigger again, they go back to their widths
+- [ ] Tablet width: the sidebar drawer slides in from its own side, with the scrim; Esc, or a click on the scrim, closes it and focus goes back to what had it (the button that opened it, or the note after ⌘\\)
+- [ ] Phone width: the drawer comes from the sidebar's side, and its button is in the note list's title bar; the list and note still stack
+- [ ] F6 goes through the panes left to right in every arrangement
+- [ ] [Mac] The window buttons never cover anything: the leftmost pane's title bar leaves room for them in every arrangement, with the sidebar shown or hidden, in focus mode, and at each width
+- [ ] Tabs are off by default; on, the open note shows as a tab in the note's toolbar, with its icon if it has one, and the space around the tabs still moves the window [Desktop]
+- [ ] A note opened from the list (or a mention, or a floating note's Show) opens in the preview tab, in italics, replacing the last preview; editing it, double-clicking its tab, Enter on it, or its menu's Keep Open makes it a normal tab; the next note opens beside the open tab
+- [ ] × (on hover, and on the open tab), middle-click, Delete, or the menu's Close Tab closes a tab, and the tab beside it opens; Close Other Tabs leaves one; closing the last shows "Select a note"
+- [ ] Choosing another list in the sidebar keeps the open note open; trashing or deleting a note closes its tab; a blank new note left behind closes its tab
+- [ ] ← and → (Home, End) go from tab to tab; many tabs shrink, then scroll, keeping the open one in view
+- [ ] Tabs and the open one come back after reloading; turning tabs off removes them; at phone width there are no tabs
+- [ ] Outline is off by default; on, a note with two or more headings has a short line on the right for each, longer for larger headings and darker for the part being read, which follows scrolling (at the very end, the last heading in sight); past 40 headings each line stands for a run of them; a note with fewer, or no room beside the text (phone width), has none, and it comes back with room
+- [ ] Headings in the properties, a code block or HTML don't count; `# Title ##` reads "Title"; Markdown in a heading reads as text; in a LaTeX note \section, \subsection and \subsubsection (starred too) count
+- [ ] Moving the pointer up and down the lines, or over the card's headings, lights the heading pointed at in the card and swells the lines in a little wave around its line, smoothly; leaving settles them back; clicking a line goes to its heading
+- [ ] Pointing at the lines opens the card of headings after a moment, indented by level, the current one in the accent color; it stays while the pointer crosses to it and closes after leaving; a long card scrolls, keeping the current one in sight
+- [ ] Clicking a heading glides there (at once with Reduce motion), the heading ending just below the top with no jump at the end; the cursor and focus stay where they were; scrolling during the glide stops it
+- [ ] Keyboard: Tab reaches "Headings"; Enter, Space or ↓ opens the card on the current heading; ↑ ↓ Home End move; Enter goes there with the cursor on the heading and focus in the note; Esc closes the card and returns to the button; Tab away closes it
+- [ ] Touch: tapping the lines opens and closes the card; tapping a heading goes there and closes it; tapping elsewhere closes it
+- [ ] Turning the outline off and on in Settings applies at once, in floating notes too; it follows edits as headings are added, renamed or removed; switching notes shows the other note's
+- [ ] Outline side (Settings → Layout, shown while the outline is on) is Right by default; Left moves the lines to the note's left edge at once, lined up on their left, with the card opening to their right over the text; on the left it needs room for the line grip too, so it hides sooner as the window narrows; the side is remembered
+
+## 14. Sync
+
+- [ ] [Desktop] Cloud drive: the drives on the machine are listed; Choose another folder…; Connect, Switch, Disconnect, Show in Finder
+- [ ] [Web] [Chromium] Folder: Choose a Folder… saves notes there as Markdown files and keeps them up to date; after a browser restart, Allow access asks once and sync carries on
+- [ ] [Web] Safari and Firefox explain that saving to a folder needs Chrome or Edge
+- [ ] S3 bucket (not on the demo website): every provider's help, Test connection, Connect, Disconnect, the CORS rule [Web]
+- [ ] Sync runs after edits, every minute, on focus and when back online; the sidebar shows its status
+- [ ] An edit on two devices keeps the newer and adds a "(conflicted copy)"; a delete on one side deletes on the other; a conflicted copy of a note with properties keeps its type, and a spreadsheet's is marked on its title, not in a cell
+- [ ] Editing a note on two devices and syncing both at the same moment (Sync Now on each) keeps both edits, one as a "(conflicted copy)", in a bucket and in a cloud drive's folder
+- [ ] Pinning, an icon, moving to the trash or locking a note on one device while it's edited on another keeps both in one note, without a conflicted copy; a note locked on either stays locked, with the edit
+- [ ] Deleting every synced note for good on one device: the other stops syncing and says so, deleting nothing; Settings → Sync offers Delete them here too… (asks in the panel, Cancel backs out, the confirm button has focus; notes written there since are kept and uploaded) and Upload them again; either way sync carries on. [Desktop] the same in the Settings window
+- [ ] [Web] With lines open in two tabs, sync runs in one pass at a time: a conflict makes one conflicted copy, not two; connecting or switching in one tab, the other follows; opening a second tab doesn't delete images the first could still bring back with ⌘Z
+- [ ] Images and files sync both ways, an empty file too [Desktop: through a cloud drive]
+- [ ] Folder sync keeps working offline; a bucket says Offline and catches up
+
+## 15. Encryption
+
+- [ ] Set up encryption: 8 characters minimum, matching passphrases; notes upload again encrypted
+- [ ] Another device asks for the passphrase once, then syncs
+- [ ] Change passphrase; turn off (and "Turn off here too" on the other device)
+
+## 16. App lock
+
+- [ ] Turn on with a passphrase; every window reloads encrypted
+- [ ] Lock after 1, 5, 15 minutes, 1 hour, Never; locks after sleep too
+- [ ] ⌃⌘L [Mac] (Ctrl+Alt+L elsewhere) and the sidebar lock button lock at once
+- [ ] Lock screen: wrong passphrase shakes and clears; right one unlocks
+- [ ] [Mac] Touch ID prompts on its own; cancelling falls back to the passphrase
+- [ ] Forgot your passphrase? → Erase this device asks first, in the lock screen itself, then starts over (synced notes come back); Cancel backs out. [Mac] it works in the app too
+- [ ] Change passphrase; turn off with the current one
+- [ ] [Desktop] Floating notes show "lines is locked" and reopen after unlocking
+
+## 17. Locked notes
+
+- [ ] Lock Note the first time asks for a new password; after that for the password, or Touch ID [Mac]
+- [ ] A locked note shows its title and a password field; a wrong password shakes; the right one opens every note locked with it, in every window
+- [ ] A note locked with an older password says so
+- [ ] Lock Now locks them everywhere; they lock again after 5 minutes idle; typing in an open locked note and choosing Lock Now at once keeps what was typed
+- [ ] Remove Lock; Change password (works on other devices once synced); Forgot password
+- [ ] Locked notes stay out of tags, Todo, search (except titles) and export
+
+## 18. Export and share
+
+- [ ] Export makes a .zip of files named by title in their notes' formats (Markdown, LaTeX, spreadsheets as CSV with formulas), attachments in their folder, Trash in its folder when included
+- [ ] Settings → Export and Import → Import Files… makes notes of Markdown, LaTeX, CSV (comma, semicolon or tab; Excel for Windows' CSV keeps its accents and €), TSV and Excel files: a workbook's each visible sheet a note "Workbook – Sheet" (one sheet: just "Workbook"), formulas kept, formulas into other sheets as values; other files are listed as not imported
+- [ ] Importing a note's file from a sync folder (`lines/notes/<id>.md`) brings the note back as it was: its text without lines' header, pinned or in the trash, its dates, icon and format, locked (opening with its password); importing it again, or with that note still here, adds a second note rather than replace it
+- [ ] A LaTeX note exports as a .tex file wrapped in \documentclass … \end{document}, and compiles with pdflatex; the share menu says Copy LaTeX and Download LaTeX
+- [ ] Closed locked notes are left out, and the panel says how many
+- [ ] [Web] It downloads; [Desktop] it saves to Downloads and Show in Finder works
+
+## 18a. PDF
+
+- [ ] ⌘P (Ctrl+P), or Share → Preview as PDF, opens the PDF preview of the open note; ⌘P with no note open does nothing (the browser doesn't print the window)
+- [ ] The pages are white with black text in every theme, light and dark; Paper switches between A4 and Letter and lays the pages out again, and the choice is remembered (Letter by default in the US and Canada)
+- [ ] Markdown: headings, lists, todos (ticked ones greyed), quotes, tables (with alignment), callouts with their colors and icons, cards, highlighted code, Mermaid diagrams, math, images, files, tags, mentions (as their text), properties at the top, type tables; symbols (→, ≠) as the editor shows them, following Settings → Editor
+- [ ] No page cuts through a line of text, an image, math, a diagram or a table row; a heading isn't left alone at the bottom of a page; page numbers at the bottom
+- [ ] LaTeX (lines): the paper example has its title block, abstract, numbered sections, theorems and equations, "Section 2" and "(1)" where it \ref's them, a numbered table, references and its footnote at the end; lines join into paragraphs
+- [ ] Print… opens the print dialog showing the same pages, one per sheet, with nothing of the app; Save as PDF there names the file after the note
+- [ ] [iOS] There's no Print… button
+- [ ] Share → Print… (the last item) opens the preview on lines' pages (a LaTeX note too, even with TeX chosen) and goes straight on to the print dialog; [iOS] the share menu has no Print…
+- [ ] Share → Export as PDF… opens the preview and goes straight on to print (lines) or save (TeX)
+- [ ] Save PNG (lines' pages) offers One Image (the whole note as one tall picture, no page numbers) and One per Page ("3 images, in a ZIP"; a one-page note saves a single PNG). [Web] It downloads "<title>.png" or "<title>.zip"; [Desktop] it saves to Downloads with Show in Finder. The images are twice the page's size, with bullets, numbers, callout icons, code colors, diagrams, math and images as on the pages
+- [ ] Share → Export as PNG… opens the preview on lines' pages (a LaTeX note too, even with TeX chosen) with the PNG choices showing
+- [ ] LaTeX (TeX): Typeset with → TeX downloads TeX the first time with a progress bar ("Downloading TeX… 40%"), then shows the PDF; the next note typesets in a second or two, offline too
+- [ ] The paper example (booktabs), the lecture notes and the problem set all typeset with TeX
+- [ ] A note with an error (`\undefined`) says "TeX stopped at line N of the note", with the error and TeX's log; Try Again typesets again
+- [ ] Save PDF: [Web] downloads "<title>.pdf"; [Desktop] saves to Downloads, with Show in Finder
+- [ ] A build without `bun run tex-assets` says TeX isn't included in this version
+- [ ] [Mac] The preview's title row leaves room for the window's traffic lights, lined up with them as the app's own title rows are; dragging it moves the window
+- [ ] Esc or × closes the preview and focus goes back where it was; Tab stays inside it; a screen reader hears "2 pages, ready" and each page as "Page 1 of 2"
+
+## 19. Floating notes [Desktop]
+
+- [ ] Open in Floating Window from the toolbar or menu; it stays on top, shows the note's title, and edits appear everywhere at once
+- [ ] Moving and resizing is remembered; open floating notes come back after relaunch
+- [ ] ⌘W closes it; trashing the note closes it
+- [ ] [Mac] Window buttons on hover or always, as set
+
+## 20. Layout
+
+- [ ] Wide (1000 px and up): three columns; ⌘\ hides and shows the sidebar
+- [ ] Dragging the sidebar's right edge, or the note list's, makes it wider or narrower (an accent line shows on the edge); it stops at its narrowest and widest, leaves the note at least 360 px, and double-clicking the edge puts it back. The widths are remembered after a reload. Medium windows have just the list's edge; focus mode and phones have none
+- [ ] Tab reaches each edge (named "Sidebar width" / "Note list width" with its width): ← and → resize by 10 px, ⇧ by 50, Home and End go to the narrowest and widest, Enter back to the usual width
+- [ ] Medium (700–999 px): the sidebar is a drawer over the list
+- [ ] Narrow (under 700 px): one pane at a time; Back returns to the list
+- [ ] Focus mode (⇧⌘\ or the toolbar button) shows just the note; not on phones
+- [ ] Trashed notes show Restore and Delete Forever instead of the toolbar
+- [ ] [Mac] The window drags by its toolbars and starts without a flash
+- [ ] Reduced motion in the OS settings stops the slides
+
+## 21. Website and demo
+
+- [ ] The home page (overtio.github.io/lines/) and its pictures show in light and dark as the system is, with no flash of the other
+- [ ] **Download** offers the visitor's system's app (Mac, Windows or Linux), and the Download section lists the latest release's files with their sizes; each link downloads
+- [ ] **Open in your browser** and **Open lines** open the web app (overtio.github.io/lines/app/)
+- [ ] lines installed from the web app before it moved to app/ opens the app, not the home page
+- [ ] Docs: every page in the README's Documentation tables is listed, the open one marked; links between pages and to their headings land; the outline beside a page jumps to its headings; on a phone, All docs opens the list
+- [ ] At a phone's width no page scrolls sideways; wide tables and code scroll by themselves
+- [ ] Tab first shows Skip to content; every link shows the focus ring
+- [ ] The web app: a first visit opens the feature tour, with the picture and the file working
+- [ ] Save to a folder at the bottom of the sidebar opens Sync with only the folder option
+- [ ] Reloading keeps every change
+- [ ] It works when served from a subfolder (GitHub Pages): icons, the manifest and third-party notices load
+
+## 22. LaTeX notes
+
+- [ ] The ⓘ panel switches a note between Markdown, LaTeX and Spreadsheet; the panel stays open, and the note redraws at once
+- [ ] A new note switched to LaTeX loses its "# "; one made under a tag keeps it as `% #tag`
+- [ ] In **QA · LaTeX note**, each construct draws as its heading says, and its LaTeX shows while the cursor is on it
+- [ ] Clicking drawn math or a table shows its LaTeX; displayed math is redrawn below as you type
+- [ ] Enter after `\item text` adds an `\item`; Enter on an empty item ends the list; Enter after an unclosed `\begin{itemize}` (or `\[`) adds its end
+- [ ] ⌘B, ⌘I and ⌘E wrap the selection in `\textbf{}`, `\emph{}` and `\texttt{}`, and again take it out
+- [ ] In a LaTeX note, pasting rows from a spreadsheet or pgAdmin makes a `tabular` (underscores escaped, numbers right-aligned, header over `\hline`); ⌘Z once gives the rows as copied
+- [ ] In a LaTeX note, pasting or dropping an image adds `\includegraphics{../attachments/…}` and shows it; a PDF adds an `\href` link; `/image` and `/file` do the same; an Unsplash link on an empty line shows the photo; a URL over selected text becomes `\href{url}{text}`; none of these happen in verbatim or math
+- [ ] `/` shows the LaTeX commands (Section, Bullet list, Math, Table…), and each inserts its LaTeX; `/date` writes today in the app's language, as in a Markdown note
+- [ ] `\` opens the command menu in sections (Text, Environments); inside math, or after an unclosed `$`, it shows math commands instead; after `\\` and in verbatim it doesn't open
+- [ ] An environment picked after text starts on a new line; Tab moves through `\begin{tabular}{ll}`'s places
+- [ ] The list shows the title and excerpt without commands; `% #tag` tags the note, a `#include` in a `lstlisting` or `verbatim` doesn't; note info counts the words as they read
+- [ ] A LaTeX note syncs to another device as LaTeX (`format: latex` in its file)
+- [ ] Each of the LaTeX examples (Settings → Export and Import → Add LaTeX Examples) draws with no red math: the paper's preamble folds into its title and authors, clicking it shows the LaTeX; theorems are numbered (Lemma 1, Theorem 2), the proof ends with ∎, citations and references are chips, the bibliography is headed References
+- [ ] [Dev] Settings → Export and Import → Reset Notes to Defaults… asks in the panel (Delete and Reset, or Cancel), then leaves only the welcome note, the tour and the examples; it works in the Mac app; it's disabled while sync is on, and missing from release builds
+- [ ] [Web] On the demo website (`bun run build:site`), Export and Import → Start Again → Reset Notes to Defaults… asks in the panel, then leaves only the tour and the examples (no separate welcome note) and opens the tour's first note; it's disabled while saving to a folder, saying to stop that first
+
+## 23. Properties and mentions
+
+- [ ] In **QA · Ada**, the properties are a column of keys and values with a line under them: the type with its icon, the list items under their key's value, the comment faint, the employer a chip; the `---` lines show only while the cursor is in the properties, and the values don't move when they do
+- [ ] Hovering a value shows its copy button, which copies the value as it reads (a mention as its note's title)
+- [ ] In **QA · Mentions**, each line reads as it says: chips for notes, values for `.key`, grey dashed text for what isn't found (with the reason on hover), and text for emails, `owner/repo@main`, `\@` and code; wiki links (`[[…]]`) as chips too, `[[…|her]]` reading "her", a missing one grey and dashed with Create on hover, and embeds (`![[…]]`) as text
+- [ ] ⌘-click on a chip or a value opens its note (also in a floating note [Desktop], where it opens in the main window); a plain click puts the cursor in and shows the mention as written
+- [ ] `@` and a letter opens a menu of notes, with icons and types; it filters as you type; Enter or Tab writes `@Name`, or `@[Two Words]` for a title with spaces
+- [ ] After a mention, `.` opens a menu of its properties with their values (long ones end in …), and typing filters it; Enter right after the `.` closes it and starts a new line, while Tab, a click, or ↓ then Enter picks one
+- [ ] `[[` opens the same menu at once; Enter or Tab writes `[[Title]]`, taking in a `]]` after the cursor rather than doubling it. `[[` in code, and `![[`, open nothing
+- [ ] A lone `@` after text, and `@` in code, open nothing
+- [ ] Hovering a mention of a note there isn't shows "No note called …" and Create; Create adds that note (with the property mentioned, empty) without leaving this one, the mention becomes a chip with no underline left behind, and the new note is first in the list
+- [ ] Changing a mentioned note's title, icon, type or properties (in another window, or after switching notes) redraws the mention; renaming its title makes the mention grey
+- [ ] A note mentioned by two titles that match: the one with a type wins; a trashed note isn't found
+- [ ] In **QA · Mentions**, `@type.qa-person` on its own line is a table: a row per note of the type (titles as chips that open the note), columns for every property, the most used first; `@type.qa-person(fullname, email)` has just those two
+- [ ] In a type table, hovering a header shows ×, which removes the column and rewrites the line; + at the end lists the type's other properties and adds one; clicking a header sorts by it, again the other way, again back by title
+- [ ] New … under a type table makes a note of the type with the table's columns as empty properties and opens it, with the cursor on its title
+- [ ] Clicking a type table's cells shows its line with the table below; editing the line redraws it; a table for a type with no notes says so
+- [ ] `/type table` writes `@type.` and opens the menu of types (icons, counts); Enter or Tab picks one; within text `@type.qa-person` is a chip that ⌘-click turns into that type's list
+- [ ] Changing a property of a note in a type table (in another window, or after switching notes) updates the table
+
+## 24. Accessibility and languages
+
+- [ ] With Contrast → Increased, Lighthouse's accessibility audit (Chrome DevTools) scores 100 on the main window, with Settings open, and in a note with a table, math and a callout, in a few themes light and dark (Lines, Solarized, Ayu, Everforest); on Standard, only contrast fails
+- [ ] Theme → Monochrome: every color in lines turns grey (accent, tags, links, chips, callouts, code, the chosen switch), in light and dark and a few themes, at once in every window [Desktop]; pictures in notes keep their colors; diagrams, 3D models and recordings redraw in greys; off, the colors come back
+- [ ] Theme → Invert: a light theme shows as a dark one (Lines: black background, light text, teal links) and a dark one as a light one; highlights stay yellow and readable; diagrams, drawings, 3D models, recordings, scrollbars and form controls follow the new light or dark; pictures stay as they are; with Monochrome too, greys turned; with Contrast → Increased, still darker grey text; switching theme or Light or dark while it's on changes what's turned
+- [ ] Contrast: System follows the device's Increase Contrast live; Increased darkens grey text, links, tags and borders in every theme, light and dark, and a selected row's date and count stay readable
+- [ ] Keyboard only, from launch: reach the sidebar, list, note, toolbar, menus, Settings and every control in it with Tab; use each with Enter or Space; arrows move in lists, menus, tabs, segmented controls and the icon picker; Esc closes what's open and focus returns to what opened it; focus is always visible
+- [ ] Focus never drops to the page: after renaming a tag or a type (Enter or Esc) it's on that row; after a menu item that opens a dialog (Share → Preview as PDF), then Esc, on what opened the menu; locking a note keeps it on the lock button; closing the last tab with Delete puts it in the note list; a window resized to or from phone width moves it to a pane that shows
+- [ ] With a dialog open (Settings on the web, the PDF preview, a password), the window's shortcuts wait: ⌥N, ⌘\\, ⇧⌘\\, ⌘P, ⌘F and F6 do nothing behind it; ⌃⌘L and ⌘+ / ⌘− still work
+- [ ] [Mac] VoiceOver (⌘F5): every button says what it does; the note list reads each note's title, pinned or locked, and date, then its excerpt after a pause; a note reads as its text; the rotor's Headings list a note's headings; list items say "bullet"; checkboxes say checked or not; a callout reads "Warning callout" … "End of warning callout" and properties "Properties" … "End of properties" (not colons and dashes); menus and dialogs are announced; "Copied" or a sync problem is spoken
+- [ ] F6 and ⇧F6 move between the sidebar, the note list and the note, passing a hidden sidebar by, and in focus mode staying in the note; Enter on a note in the list opens it with the cursor in its text
+- [ ] System text size or browser zoom at 200%: nothing overlaps or is cut off, and the note list and sidebar still work
+- [ ] Reduced motion on (System Settings → Accessibility → Display): nothing slides or bounces
+- [ ] [Windows] A contrast theme on (Settings → Accessibility → Contrast themes), or Chrome DevTools → Rendering → Emulate CSS media feature forced-colors: focus rings show; the open note's row, the current sidebar item, the chosen segment, theme, Settings section and tab, a focused menu item and a switch that's on are marked in the system's highlight color, with their text readable on it (no box over it); switches that are off and sliders keep an outline; mentions and links are link-colored; tags, mentions and code are outlined; a ticked checkbox is filled; highlights show; a callout's or card's hidden `:::` lines stay hidden; the theme swatches keep their colors
+- [ ] In Spanish and in French: every screen reads in that language, nothing is cut off (the sidebar's sync button, Settings' tabs, menu items), and plurals read right ("1 nota", "0 note")
+- [ ] ⌥↵ with the cursor on a link opens it; on an attached file, opens the file; on a mention, its note (the main window shows it); on `@type.…`, that type's list; on a tag, its notes; on a mention of a note that isn't there, makes the note and says so
+- [ ] Format toolbar: with text selected, Tab reaches the toolbar, ← → move between its buttons, Enter applies one, Esc goes back to the text
+- [ ] A type table's column names sort from the keyboard (Enter), say which way they sort, and a row's title opens its note with Enter
+- [ ] `bun run i18n` reports every message translated in Spanish and French

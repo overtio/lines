@@ -167,6 +167,7 @@ async function start() {
         error: sync.error,
         lastSynced: sync.lastSynced,
         encryptionIssue: sync.encryptionIssue,
+        missing: sync.missing,
       }),
       () => ({ lock: lock.settings, noteKeys: noteKeys.settings }),
     );
