@@ -77,11 +77,13 @@
 
   const longDate = new Intl.DateTimeFormat(locale, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
   const shortDay = new Intl.DateTimeFormat(locale, { weekday: "short" });
-  const hourFormat = new Intl.DateTimeFormat(locale, { hour: "numeric" });
-  const timeFormat = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" });
+  // Times are as the clock reads them, so they're read in UTC, where no day is an hour short or long.
+  const hourFormat = new Intl.DateTimeFormat(locale, { hour: "numeric", timeZone: "UTC" });
+  const timeFormat = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit", timeZone: "UTC" });
 
 
-  const at = (on: Day, minutes: number) => new Date(dateOf(on).getTime() + minutes * 60_000);
+  /** A time of day, to format: as a moment that many minutes into a day in UTC. */
+  const at = (minutes: number) => new Date(minutes * 60_000);
   const titleOf = (entry: Entry) => entry.meta.title || t("list.untitled");
   /** Its color as CSS: its own, its type's or a tag's, or the accent. */
   const lookOf = (entry: Entry) => paletteVar(noteColor(entry) ?? "accent");
@@ -396,7 +398,7 @@
     speak(t("calendar.moved", { title: titleOf(placed.entry), time: timeRange(slot) }));
   }
 
-  const timeRange = ({ day: on, start, end }: Slot) => timeFormat.formatRange(at(on, start), at(on, end));
+  const timeRange = ({ start, end }: Slot) => timeFormat.formatRange(at(start), at(end));
 
   function openPlaced(placed: Placed<Entry>, on: Day) {
     if (dragged) dragged = false;
@@ -541,7 +543,7 @@
     <div class="relative grid" bind:this={grid} style:grid-template-columns={columns} style:height="{24 * HOUR}px" style:--hour="{HOUR}px">
       <div class="relative" aria-hidden="true">
         {#each { length: 23 }, i (i)}
-          <span class="tabular absolute right-2 -translate-y-1/2 text-2xs text-faint" style:top="{(i + 1) * HOUR}px">{hourFormat.format(at(day, (i + 1) * 60))}</span>
+          <span class="tabular absolute right-2 -translate-y-1/2 text-2xs text-faint" style:top="{(i + 1) * HOUR}px">{hourFormat.format(at((i + 1) * 60))}</span>
         {/each}
       </div>
       {#each days as on (on)}

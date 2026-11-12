@@ -124,6 +124,25 @@ test("a note at two times on one day shows at both", async () => {
   await page.getByRole("button", { name: /^Twice, 2:00/ }).waitFor();
 });
 
+test("on the days the clocks change, the hours and times are as the clock reads them", async () => {
+  app = await openApp({ timezone: "America/New_York", prefs: { calendarView: "day" } });
+  await app.open(`---\ndate: 2026-03-08 14:00\n---\n# Spring`);
+  await app.open(`---\ndate: 2026-11-01 14:00\n---\n# Fall`);
+  const page = app.page;
+  for (const [day, title] of [
+    ["2026-03-08", "Spring"],
+    ["2026-11-01", "Fall"],
+  ]) {
+    await page.evaluate((day) => {
+      window.testing.notes.setFilter({ kind: "calendar", day });
+      window.testing.notes.select(null);
+    }, day);
+    await page.getByRole("button", { name: new RegExp(`^${title}, 2:00`) }).waitFor();
+    const hours = await page.locator("div:has(> [data-column]) > div[aria-hidden] > span").allInnerTexts();
+    expect(hours.slice(0, 3).map((hour) => hour.replace(/\s/g, " "))).toEqual(["1 AM", "2 AM", "3 AM"]);
+  }
+});
+
 /** Drags with the mouse in a day's column of the hours, from one time to another (in minutes), and on to `toDay`'s column. */
 async function dragIn(app: App, on: string, from: number, to: number, toDay = on) {
   const page = app.page;
