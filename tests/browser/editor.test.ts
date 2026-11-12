@@ -229,7 +229,12 @@ test("a click into a note that isn't focused keeps it where it was, though focus
     // Once the editor has drawn the lines scrolled to, which takes a frame or more on a slow machine.
     const below = () => [...view.contentDOM.querySelectorAll<HTMLElement>(".cm-line")].find((each) => each.getBoundingClientRect().top > scroller.getBoundingClientRect().top + 100);
     for (let frames = 0; !below() && frames < 60; frames++) await new Promise(requestAnimationFrame);
-    const line = below()!;
+    const line = below();
+    if (!line) {
+      const tops = [...view.contentDOM.querySelectorAll<HTMLElement>(".cm-line")].map((each) => Math.round(each.getBoundingClientRect().top));
+      const box = scroller.getBoundingClientRect();
+      return { missing: { scrollTop: scroller.scrollTop, scrollHeight: scroller.scrollHeight, box: [box.top, box.height], viewport: view.viewport, lines: tops.length, first: tops[0], last: tops.at(-1) } };
+    }
     // As WebKit does in the Mac app: focusing the editor scrolls it, to where its cursor last was.
     const jump = () => (scroller.scrollTop = 200);
     view.contentDOM.addEventListener("focus", jump, { once: true });
@@ -245,6 +250,7 @@ test("a click into a note that isn't focused keeps it where it was, though focus
     await new Promise((resolve) => setTimeout(resolve, 50));
     return { kept, focused: view.hasFocus, after: scroller.scrollTop, cursor: view.state.selection.main.empty, line: view.state.doc.lineAt(view.state.selection.main.head).text, clicked: line.textContent };
   });
+  if ("missing" in result) throw new Error(`No line drawn below the top after scrolling: ${JSON.stringify(result.missing)}`);
   expect(result.focused).toBe(true);
   // A cursor where it was clicked, not a selection from where the press was before the jump.
   expect(result.cursor).toBe(true);
