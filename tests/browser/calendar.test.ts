@@ -208,6 +208,9 @@ test("an event's menu renames it in place, gives it a color, and moves it to the
   await field.fill("Design review");
   await field.press("Enter");
   await page.getByRole("button", { name: /^Design review, 10:00/ }).waitFor();
+  // Focus is back on the event, not lost.
+  const focused = () => page.evaluate(() => document.activeElement?.getAttribute("aria-label"));
+  expect(await focused()).toStartWith("Design review, 10:00");
   expect(await body()).toBe(`---\ntype: event\ndate: ${day} 10:00\n---\n# Design review\n\nNotes`);
 
   // Esc leaves it as it was.
@@ -217,6 +220,7 @@ test("an event's menu renames it in place, gives it a color, and moves it to the
   await field.press("Escape");
   await field.waitFor({ state: "detached" });
   expect(await body()).toContain("# Design review\n");
+  expect(await focused()).toStartWith("Design review, 10:00");
 
   // An untitled whole day's note gets a heading after its properties.
   const untitled = page.getByRole("list", { name: /^All day, / }).getByRole("button", { name: "Untitled" });

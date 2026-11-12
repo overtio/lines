@@ -224,12 +224,14 @@
     else notes.edit(entry.note.id, body);
   }
 
-  function onRenameKeydown(event: KeyboardEvent) {
-    if (event.key === "Enter") finishRename();
-    else if (event.key === "Escape") finishRename(false);
-    else return;
+  function onRenameKeydown(event: KeyboardEvent & { currentTarget: HTMLInputElement }) {
+    if (event.key !== "Enter" && event.key !== "Escape") return;
     event.preventDefault();
     event.stopPropagation();
+    // From the keyboard, focus goes back to the event: the button the field is over.
+    const button = event.currentTarget.parentElement?.querySelector("button");
+    finishRename(event.key === "Enter");
+    button?.focus();
   }
 
   /** Whether the note being renamed has its field on `on`: the first day it shows on, for one shown on several. */
