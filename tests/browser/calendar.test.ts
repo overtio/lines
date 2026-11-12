@@ -114,6 +114,16 @@ test("the week and the day show notes at their times, open them, and make one at
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lines.prefs")!).calendarView)).toBe("day");
 });
 
+test("a note at two times on one day shows at both", async () => {
+  app = await openApp();
+  const day = await dayIn(app);
+  await app.open(`---\ndate: ${day} 10:00\nDate: ${day} 14:00\n---\n# Twice`);
+  const page = app.page;
+  await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: "Calendar" }).click();
+  await page.getByRole("button", { name: /^Twice, 10:00/ }).waitFor();
+  await page.getByRole("button", { name: /^Twice, 2:00/ }).waitFor();
+});
+
 /** Drags with the mouse in a day's column of the hours, from one time to another (in minutes), and on to `toDay`'s column. */
 async function dragIn(app: App, on: string, from: number, to: number, toDay = on) {
   const page = app.page;

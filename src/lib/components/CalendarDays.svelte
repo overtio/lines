@@ -556,9 +556,9 @@
           onpointercancel={() => (drag = null)}
         >
           <ul class="m-0 list-none p-0" aria-label={longDate.format(dateOf(on))}>
-            {#each timed as placed (`${placed.entry.note.id}-${placed.span.key}`)}
+            {#each timed as placed (`${placed.entry.note.id}-${placed.nth}`)}
               {@const time = timeRange({ day: on, start: placed.start, end: placed.end })}
-              {@const held = drag?.moved && drag.placed?.entry.note.id === placed.entry.note.id && drag.placed.span.key === placed.span.key ? drag.kind : null}
+              {@const held = drag?.moved && drag.placed?.entry.note.id === placed.entry.note.id && drag.placed.nth === placed.nth ? drag.kind : null}
               <li
                 class={[
                   "absolute px-px transition-opacity",
