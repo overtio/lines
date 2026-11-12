@@ -18,6 +18,7 @@ When a change adds or changes something users can see, update these in the same 
 ## UI
 
 - Components are styled with Tailwind utilities on the tokens in `src/app.css` (the theme's colors, one scale of radii, type and control heights). No other colors: themes are plugins, and everything follows the one chosen.
+- Highlights, tags, icons, line marks, callouts and status colors take the theme's colors too, never a color fixed for every theme. Tags and most icons are the accent. A theme made from another palette (Nord, Dracula…) sets its highlighter, pin, danger, success and callout colors from that palette's own. lines' own themes may keep app.css's shared ones, or use their accent for the one nearest it in hue. `tests/unit/plugins.test.ts` checks both, and that each color still reads.
 - Interactive parts (menus, dialogs, popovers, selects, switches, sliders, radio groups, tabs) are Bits UI. Use the shared parts in `src/lib/components/ui/` (Button, IconButton, Switch, Select, Slider, Segmented, TextField, FieldGroup, FieldRow, Callout…) rather than styling a new one; add to them when something's missing.
 - Settings: a section per file in `src/lib/components/settings/`, listed in `sections.ts`; each is FieldGroups of FieldRows.
 - What CodeMirror draws in a note is styled by `src/lib/editor/editor.css`, not Tailwind.

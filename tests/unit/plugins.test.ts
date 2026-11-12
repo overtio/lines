@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { stubApp } from "./stubs";
 import { readFileSync } from "node:fs";
-import { contrast, over, parse } from "../../src/lib/themes/color";
+import { contrast, over, parse, toLch } from "../../src/lib/themes/color";
 import { moreContrast } from "../../src/lib/themes/palette";
 import { BASE_COLORS } from "../../src/lib/themes/palette";
-import type { AppStyle, Mascot, MascotPose, ThemeColors } from "../../src/lib/plugins/types";
+import type { AppStyle, Mascot, MascotPose, Theme, ThemeColors } from "../../src/lib/plugins/types";
 
 // Names are looked up in the app's language; here they're their keys.
 stubApp();
@@ -59,6 +59,57 @@ describe("built-in themes", () => {
             if (measured < goal - 0.05) misses.push(`${theme.id} ${scheme}: ${text} on ${surface} ${measured.toFixed(2)} < ${goal}`);
           }
         }
+      }
+    }
+    expect(misses).toEqual([]);
+  });
+});
+
+describe("themes' own highlighter, status and callout colors", () => {
+  const withStyles = [...all, ...(styles().contributes.themes ?? [])];
+  /** app.css's, for what a theme leaves to it: light's, then dark's. */
+  const [lightCss, darkCss] = readFileSync("src/app.css", "utf8").split(':root[data-scheme="dark"],');
+  const fromCss = (css: string) => Object.fromEntries([...css.matchAll(/--([a-z-]+):\s*(#[0-9a-f]{6});/g)].map((match) => [match[1], match[2]]));
+  const shared = { light: fromCss(lightCss), dark: { ...fromCss(lightCss), ...fromCss(darkCss) } };
+  const NAMED = ["highlight-base", "pin", "danger", "success", "callout-info", "callout-question", "callout-warning", "callout-decision"];
+  /** Themes drawn in lines' own colors, which may keep app.css's for these. */
+  const LINES_COLORS = new Set(["lines", "ember", "ink", "indigo", "plum", "moss", "amber", "sepia", "forest", "ocean"]);
+
+  const shownSchemes = (theme: Theme) => (theme.scheme ? [theme.scheme] : (["light", "dark"] as const));
+  const effective = (theme: Theme, scheme: "light" | "dark") => {
+    const colors: Record<string, string> = { ...shared[scheme], ...theme[scheme] };
+    for (const [key, value] of Object.entries(colors)) if (value === "var(--accent)") colors[key] = colors.accent;
+    return colors;
+  };
+
+  test("every theme not in lines' own colors sets its own", () => {
+    for (const theme of withStyles.filter((theme) => !LINES_COLORS.has(theme.id)))
+      for (const scheme of shownSchemes(theme)) for (const key of NAMED) expect(theme[scheme][key], `${theme.id} ${scheme} ${key}`).toBeString();
+  });
+
+  test("they read: danger 4.5:1 on the note and menus, icons 3:1, text on the highlighter and on status buttons", () => {
+    const misses: string[] = [];
+    for (const theme of withStyles) {
+      for (const scheme of shownSchemes(theme)) {
+        const colors = effective(theme, scheme);
+        const check = (key: string, surface: string, goal: number) => {
+          const measured = ratio(colors, key, surface);
+          if (measured < goal - 0.05) misses.push(`${theme.id} ${scheme}: ${key} on ${surface} ${measured.toFixed(2)} < ${goal}`);
+        };
+        for (const surface of ["bg", "bg-elevated"]) {
+          check("danger", surface, 4.5);
+          for (const key of ["success", "callout-info", "callout-question", "callout-warning", "callout-decision"]) check(key, surface, 3);
+        }
+        for (const status of ["danger", "success", "pin"]) check(`on-${status}`, status, 4.5);
+        const bg = parse(colors.bg)!;
+        const text = parse(colors.text)!;
+        const share = Number(/(\d+)%/.exec(colors.highlight ?? "")?.[1] ?? (scheme === "dark" ? 25 : 40)) / 100;
+        const highlighted = over({ ...parse(colors["highlight-base"])!, a: share }, bg);
+        const goal = Math.min(4.5, contrast(text, bg));
+        if (contrast(text, highlighted) < goal - 0.05) misses.push(`${theme.id} ${scheme}: text on the highlighter ${contrast(text, highlighted).toFixed(2)} < ${goal.toFixed(2)}`);
+        // A light theme's highlighter is itself light, as a highlighter pen is, not a dark yellow that muddies the page.
+        const lightness = toLch(parse(colors["highlight-base"])!).l;
+        if (scheme === "light" && lightness < 0.8) misses.push(`${theme.id} light: the highlighter's lightness ${lightness.toFixed(2)} < 0.8`);
       }
     }
     expect(misses).toEqual([]);

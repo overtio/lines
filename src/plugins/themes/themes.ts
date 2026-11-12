@@ -1,11 +1,19 @@
 import { t } from "../../lib/i18n/index.svelte";
 import type { Theme } from "../../lib/plugins/types";
 import { lines } from "./lines";
+import { quiet } from "./quiet";
 
 /*
  * lines' themes. Each sets a handful of base colors for light and dark, and app.css works out the
  * rest (borders, hovers, selection, tags) unless a theme sets them too. `ink` is the color subtle
  * overlays are mixed from.
+ *
+ * Highlights, line marks, callouts, the pin and the danger and success colors are each theme's too
+ * (CLAUDE.md). A theme made from another palette sets them from that palette's own colors: its
+ * yellow for the highlighter, its red, green, orange, blue, purple and cyan for the rest, darkened
+ * (lightened in dark) only as far as reading takes. Danger needs 4.5:1 on the note and menus,
+ * the others 3:1, and a light theme's highlighter is made paler, its hue kept, until it's about
+ * as light as lines' own yellow (0.85 in OKLCH; at least 0.8) and text reads on it. Themes in lines' own colors keep app.css's, with the accent for the one nearest it in hue.
  *
  * `moreContrast` is for Contrast → Increased (Settings → Theme, or the system's Increase Contrast):
  * text at least 9:1 against the backgrounds it's on, muted text 7:1 (WCAG AAA), faint text and the
@@ -31,6 +39,7 @@ export const themes = (): Theme[] => [
       accent: "#e5484d",
       "tag-text": "#c93b40",
       ink: "rgb(40, 30, 20)",
+      danger: "#d34247",
     },
     dark: {
       bg: "#1b1b1d",
@@ -73,6 +82,7 @@ export const themes = (): Theme[] => [
       accent: "#2f54eb",
       "tag-text": "#2945c7",
       ink: "rgb(24, 24, 27)",
+      "callout-info": "var(--accent)",
     },
     dark: {
       bg: "#141416",
@@ -86,6 +96,7 @@ export const themes = (): Theme[] => [
       accent: "#7c9cff",
       "tag-text": "#9fb5ff",
       ink: "#ffffff",
+      "callout-info": "var(--accent)",
     },
     moreContrast: {
       light: {
@@ -113,6 +124,7 @@ export const themes = (): Theme[] => [
       accent: "#5047e5",
       "tag-text": "#4239c9",
       ink: "rgb(25, 25, 50)",
+      "callout-info": "var(--accent)",
     },
     dark: {
       bg: "#131318",
@@ -126,6 +138,7 @@ export const themes = (): Theme[] => [
       accent: "#8f89ff",
       "tag-text": "#aba6ff",
       ink: "#ffffff",
+      "callout-question": "var(--accent)",
     },
     moreContrast: {
       light: {
@@ -234,6 +247,7 @@ export const themes = (): Theme[] => [
       accent: "#a85d0a",
       "tag-text": "#93520a",
       ink: "rgb(45, 35, 15)",
+      "callout-warning": "var(--accent)",
     },
     dark: {
       bg: "#151413",
@@ -247,6 +261,7 @@ export const themes = (): Theme[] => [
       accent: "#f0a54a",
       "tag-text": "#f5bb6f",
       ink: "#ffffff",
+      "callout-warning": "var(--accent)",
     },
     moreContrast: {
       light: {
@@ -275,6 +290,7 @@ export const themes = (): Theme[] => [
       accent: "#171717",
       "tag-text": "#404040",
       ink: "rgb(23, 23, 23)",
+      ...quiet.light,
     },
     dark: {
       bg: "#121212",
@@ -288,6 +304,7 @@ export const themes = (): Theme[] => [
       accent: "#f5f5f5",
       "tag-text": "#d4d4d4",
       ink: "#ffffff",
+      ...quiet.dark,
     },
     moreContrast: {
       light: {
@@ -315,6 +332,7 @@ export const themes = (): Theme[] => [
       accent: "#5b6472",
       "tag-text": "#4b5360",
       ink: "rgb(28, 32, 48)",
+      ...quiet.light,
     },
     dark: {
       bg: "#18191b",
@@ -328,6 +346,7 @@ export const themes = (): Theme[] => [
       accent: "#a3adbd",
       "tag-text": "#b8c1cf",
       ink: "#ffffff",
+      ...quiet.dark,
     },
     moreContrast: {
       light: {
@@ -355,6 +374,8 @@ export const themes = (): Theme[] => [
       accent: "#b4572e",
       "tag-text": "#a14b25",
       ink: "rgb(90, 62, 30)",
+      danger: "#cf3a3e",
+      "callout-warning": "var(--accent)",
     },
     dark: {
       bg: "#221d17",
@@ -396,6 +417,9 @@ export const themes = (): Theme[] => [
       accent: "#2f8a55",
       "tag-text": "#26774a",
       ink: "rgb(27, 48, 32)",
+      danger: "#d33b3f",
+      success: "#2f8a55",
+      "on-success": "#000000",
     },
     dark: {
       bg: "#161a17",
@@ -409,6 +433,7 @@ export const themes = (): Theme[] => [
       accent: "#5cc489",
       "tag-text": "#7dd3a2",
       ink: "#ffffff",
+      success: "#5cc489",
     },
     moreContrast: {
       light: {
@@ -437,6 +462,7 @@ export const themes = (): Theme[] => [
       accent: "#2f6fdb",
       "tag-text": "#2860c0",
       ink: "rgb(18, 35, 58)",
+      danger: "#d33b3f",
     },
     dark: {
       bg: "#141a22",
@@ -553,6 +579,7 @@ export const themes = (): Theme[] => [
       ink: "rgb(20, 45, 48)",
       danger: "#cc2f45",
       success: "#3f8a1c",
+      "on-success": "#000000",
       pin: "#ee8a00",
       "highlight-base": "#9de8e2",
       "callout-info": "#1f77c4",
@@ -705,6 +732,16 @@ export const themes = (): Theme[] => [
       "syn-comment": "#93a1a1",
       "syn-function": "#268bd2",
       "syn-type": "#b58900",
+      "highlight-base": "#ffd881",
+      pin: "#cb4b16",
+      "on-pin": "#ffffff",
+      danger: "#d5312e",
+      success: "#849700",
+      "on-success": "#141414",
+      "callout-info": "#268bd2",
+      "callout-question": "#6c71c4",
+      "callout-warning": "#b38800",
+      "callout-decision": "#299e95",
     },
     dark: {
       bg: "#002b36",
@@ -730,6 +767,16 @@ export const themes = (): Theme[] => [
       "syn-comment": "#657b83",
       "syn-function": "#268bd2",
       "syn-type": "#b58900",
+      "highlight-base": "#b58900",
+      highlight: "color-mix(in srgb, var(--highlight-base) 18%, transparent)",
+      pin: "#cb4b16",
+      "on-pin": "#ffffff",
+      danger: "#ea8482",
+      success: "#859900",
+      "callout-info": "#268bd2",
+      "callout-question": "#757ac8",
+      "callout-warning": "#b58900",
+      "callout-decision": "#2aa198",
     },
     moreContrast: {
       light: {
@@ -774,6 +821,15 @@ export const themes = (): Theme[] => [
       "syn-comment": "#7b88a1",
       "syn-function": "#2e7a8a",
       "syn-type": "#3b7a78",
+      "highlight-base": "#ebcb8b",
+      pin: "#d08770",
+      danger: "#a4535b",
+      success: "#7a8f69",
+      "on-success": "#141414",
+      "callout-info": "#5e81ac",
+      "callout-question": "#a07e9a",
+      "callout-warning": "#bb7a65",
+      "callout-decision": "#6d8f8e",
     },
     dark: {
       bg: "#2e3440",
@@ -799,6 +855,14 @@ export const themes = (): Theme[] => [
       "syn-comment": "#616e88",
       "syn-function": "#88c0d0",
       "syn-type": "#8fbcbb",
+      "highlight-base": "#ebcb8b",
+      pin: "#d08770",
+      danger: "#d89fa4",
+      success: "#a3be8c",
+      "callout-info": "#81a1c1",
+      "callout-question": "#b48ead",
+      "callout-warning": "#ebcb8b",
+      "callout-decision": "#8fbcbb",
     },
     moreContrast: {
       light: {
@@ -843,6 +907,15 @@ export const themes = (): Theme[] => [
       "syn-comment": "#6c664b",
       "syn-function": "#14710a",
       "syn-type": "#036a96",
+      "highlight-base": "#f1fa8c",
+      pin: "#a34d14",
+      "on-pin": "#ffffff",
+      danger: "#cb3a2a",
+      success: "#14710a",
+      "callout-info": "#036a96",
+      "callout-question": "#644ac9",
+      "callout-warning": "#a34d14",
+      "callout-decision": "#036a96",
     },
     dark: {
       bg: "#282a36",
@@ -868,6 +941,14 @@ export const themes = (): Theme[] => [
       "syn-comment": "#6272a4",
       "syn-function": "#50fa7b",
       "syn-type": "#8be9fd",
+      "highlight-base": "#f1fa8c",
+      pin: "#ffb86c",
+      danger: "#ff7575",
+      success: "#50fa7b",
+      "callout-info": "#8be9fd",
+      "callout-question": "#bd93f9",
+      "callout-warning": "#ffb86c",
+      "callout-decision": "#50fa7b",
     },
     moreContrast: {
       light: {
@@ -909,6 +990,15 @@ export const themes = (): Theme[] => [
       "syn-comment": "#7c7f93",
       "syn-function": "#1e66f5",
       "syn-type": "#df8e1d",
+      "highlight-base": "#ffc07c",
+      pin: "#fe640b",
+      danger: "#d20f39",
+      success: "#3f9e2b",
+      "on-success": "#141414",
+      "callout-info": "#1e66f5",
+      "callout-question": "#8839ef",
+      "callout-warning": "#ec5d0a",
+      "callout-decision": "#179299",
     },
     dark: {
       bg: "#1e1e2e",
@@ -934,6 +1024,14 @@ export const themes = (): Theme[] => [
       "syn-comment": "#9399b2",
       "syn-function": "#89b4fa",
       "syn-type": "#f9e2af",
+      "highlight-base": "#f9e2af",
+      pin: "#fab387",
+      danger: "#f38ba8",
+      success: "#a6e3a1",
+      "callout-info": "#89b4fa",
+      "callout-question": "#cba6f7",
+      "callout-warning": "#fab387",
+      "callout-decision": "#94e2d5",
     },
     moreContrast: {
       light: {
@@ -977,6 +1075,15 @@ export const themes = (): Theme[] => [
       "syn-comment": "#9699a3",
       "syn-function": "#34548a",
       "syn-type": "#0f4b6e",
+      "highlight-base": "#fbc582",
+      pin: "#965027",
+      "on-pin": "#ffffff",
+      danger: "#8c4351",
+      success: "#485e30",
+      "callout-info": "#34548a",
+      "callout-question": "#5a4a78",
+      "callout-warning": "#965027",
+      "callout-decision": "#33635c",
     },
     dark: {
       bg: "#1a1b26",
@@ -1002,6 +1109,14 @@ export const themes = (): Theme[] => [
       "syn-comment": "#565f89",
       "syn-function": "#7aa2f7",
       "syn-type": "#2ac3de",
+      "highlight-base": "#e0af68",
+      pin: "#ff9e64",
+      danger: "#f7768e",
+      success: "#9ece6a",
+      "callout-info": "#7aa2f7",
+      "callout-question": "#bb9af7",
+      "callout-warning": "#ff9e64",
+      "callout-decision": "#73daca",
     },
     moreContrast: {
       light: {
@@ -1043,6 +1158,15 @@ export const themes = (): Theme[] => [
       "syn-comment": "#928374",
       "syn-function": "#427b58",
       "syn-type": "#b57614",
+      "highlight-base": "#ffc25e",
+      pin: "#af3a03",
+      "on-pin": "#ffffff",
+      danger: "#9d0006",
+      success: "#79740e",
+      "callout-info": "#076678",
+      "callout-question": "#8f3f71",
+      "callout-warning": "#b57614",
+      "callout-decision": "#427b58",
     },
     dark: {
       bg: "#282828",
@@ -1068,6 +1192,14 @@ export const themes = (): Theme[] => [
       "syn-comment": "#928374",
       "syn-function": "#8ec07c",
       "syn-type": "#fabd2f",
+      "highlight-base": "#fabd2f",
+      pin: "#fe8019",
+      danger: "#fc7c6d",
+      success: "#b8bb26",
+      "callout-info": "#83a598",
+      "callout-question": "#d3869b",
+      "callout-warning": "#fabd2f",
+      "callout-decision": "#8ec07c",
     },
     moreContrast: {
       light: {
@@ -1110,6 +1242,15 @@ export const themes = (): Theme[] => [
       "syn-comment": "#939f91",
       "syn-function": "#35a77c",
       "syn-type": "#dfa000",
+      "highlight-base": "#ffca6c",
+      pin: "#f57d26",
+      danger: "#c54441",
+      success: "#859701",
+      "on-success": "#141414",
+      "callout-info": "#3a94c5",
+      "callout-question": "#d866b4",
+      "callout-warning": "#dd7122",
+      "callout-decision": "#33a077",
     },
     dark: {
       bg: "#2d353b",
@@ -1135,6 +1276,15 @@ export const themes = (): Theme[] => [
       "syn-comment": "#859289",
       "syn-function": "#83c092",
       "syn-type": "#dbbc7f",
+      "highlight-base": "#dbbc7f",
+      highlight: "color-mix(in srgb, var(--highlight-base) 23%, transparent)",
+      pin: "#e69875",
+      danger: "#e98f91",
+      success: "#a7c080",
+      "callout-info": "#7fbbb3",
+      "callout-question": "#d699b6",
+      "callout-warning": "#e69875",
+      "callout-decision": "#83c092",
     },
     moreContrast: {
       light: {
@@ -1182,6 +1332,15 @@ export const themes = (): Theme[] => [
       "syn-comment": "#a0a6ac",
       "syn-function": "#f2ae49",
       "syn-type": "#399ee6",
+      "highlight-base": "#ffc076",
+      pin: "#fa8d3e",
+      danger: "#ca4646",
+      success: "#5ca239",
+      "on-success": "#141414",
+      "callout-info": "#3799df",
+      "callout-question": "#a37acc",
+      "callout-warning": "#bd8839",
+      "callout-decision": "#41a282",
     },
     dark: {
       bg: "#0d1017",
@@ -1207,6 +1366,14 @@ export const themes = (): Theme[] => [
       "syn-comment": "#5c6773",
       "syn-function": "#ffb454",
       "syn-type": "#59c2ff",
+      "highlight-base": "#e6b450",
+      pin: "#ff8f40",
+      danger: "#d95757",
+      success: "#7fd962",
+      "callout-info": "#59c2ff",
+      "callout-question": "#d2a6ff",
+      "callout-warning": "#ffb454",
+      "callout-decision": "#95e6cb",
     },
     moreContrast: {
       light: {

@@ -58,6 +58,37 @@ function dayFromToday(days) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
+/** What takes each theme's own colors besides its accent: a highlight, callouts and line marks. */
+const THEME_COLORS = `# Colors
+
+A ==highlighted phrase== beside a #tag and a [link](https://example.com).
+
+Ready <!-- mark green: ready -->
+Check <!-- mark yellow: check -->
+Fix <!-- mark red: fix -->
+Note <!-- mark blue: note -->
+Idea <!-- mark purple: idea -->
+
+:::info
+Info
+:::
+
+:::question
+Question
+:::
+
+:::warning
+Warning
+:::
+
+:::error
+Error
+:::
+
+:::decision
+Decision
+:::`;
+
 /*
  * Each scene: a note (and its format), Settings to start with, what to open, what to photograph,
  * and what a person should see in it. `schemes` defaults to light and dark.
@@ -103,6 +134,13 @@ const SCENES = [
     look: `${colors}; callouts and code in its own colors, each readable.`,
     prefs: { theme },
     note: `${PROSE}\n\n#garden\n\n:::info\nA callout, in the theme's blue.\n:::\n\n\`\`\`js\n// Code in its colors\nconst leaves = grow(3, "green");\n\`\`\``,
+  })),
+  ...["lines", "ember", "ink", "indigo", "plum", "moss", "amber", "mono", "graphite", "sepia", "forest", "ocean", "green-world", "miku", "teto", "solarized", "nord", "dracula", "catppuccin", "tokyo-night", "gruvbox", "everforest", "ayu", "void", "puddle", "lightbulb"].map((theme) => ({
+    id: `theme-colors-${theme}`,
+    title: `Theme colors: ${theme}`,
+    look: "The highlight, callouts and marks in the theme's own colors, sitting with its accent rather than lines' own; the highlighted text readable; each callout's icon clear on its tint.",
+    prefs: { theme },
+    note: THEME_COLORS,
   })),
   ...["classic", "pixel", "neon", "adventure", "aero", "brutalist", "constructivist", "void"].map((style) => ({
     id: `style-${style}`,
