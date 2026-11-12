@@ -119,14 +119,17 @@
   $effect(() => {
     view = new EditorView({ parent: host });
     const unregister = notes.registerFlusher(sync);
-    const save = () => notes.saveNow();
-    const onVisibility = () => document.visibilityState === "hidden" && save();
+    const leave = () => notes.leave();
+    const onVisibility = () => document.visibilityState === "hidden" && leave();
     document.addEventListener("visibilitychange", onVisibility);
-    window.addEventListener("pagehide", save);
+    window.addEventListener("pagehide", leave);
+    // WebKit closes a tab without telling it (no pagehide) unless it listens for beforeunload.
+    window.addEventListener("beforeunload", leave);
     return () => {
       unregister();
       document.removeEventListener("visibilitychange", onVisibility);
-      window.removeEventListener("pagehide", save);
+      window.removeEventListener("pagehide", leave);
+      window.removeEventListener("beforeunload", leave);
       sync();
       view?.destroy();
       view = undefined;

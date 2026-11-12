@@ -20,7 +20,7 @@ import { arrived, removeUnusedAttachments } from "./lib/notes/attachments";
 import { lockedNotes } from "./lib/notes/locked.svelte";
 import { noteKeys } from "./lib/notes/noteKeys.svelte";
 import { notes } from "./lib/notes/store.svelte";
-import { isMacApp, isTauri } from "./lib/platform";
+import { isDesktopApp, isMacApp, isTauri } from "./lib/platform";
 import { plugins } from "./lib/plugins/registry.svelte";
 import { sync } from "./lib/sync/engine.svelte";
 import { announce, onAnnounce, windowLabel } from "./lib/windows/channel";
@@ -61,6 +61,15 @@ if (isTauri) {
     event.preventDefault();
     void import("@tauri-apps/api/core").then(({ invoke }) => invoke("toggle_devtools"));
   });
+  // Quitting the Mac app waits for every window to store what's typed in it (src-tauri/src/quit.rs).
+  if (isMacApp) {
+    void import("@tauri-apps/api/event").then(({ listen }) =>
+      listen("quit", async () => {
+        await notes.leave();
+        await (await import("@tauri-apps/api/core")).invoke("quit_ready");
+      }),
+    );
+  }
 }
 
 if (import.meta.env.DEV) Object.assign(window, { lines: { notes, sync, lock, lockedNotes, noteKeys, plugins, updates } });
@@ -72,6 +81,11 @@ if (import.meta.env.MODE === "test") await import("./test/harness");
 const label = windowLabel();
 const floatingId = label.startsWith("note-") ? label.slice("note-".length) : null;
 const isMain = !floatingId && !isSettingsWindow;
+
+// Closing the main window (and so quitting, on Windows and Linux) waits for what's typed in it to be stored.
+if (isDesktopApp && isMain) {
+  void import("@tauri-apps/api/window").then(({ getCurrentWindow }) => getCurrentWindow().onCloseRequested(() => notes.leave()));
+}
 
 // Every window shares one database; this keeps them in step.
 void onAnnounce(async (message) => {

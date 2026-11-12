@@ -7,6 +7,8 @@ mod export;
 mod folder_sync;
 mod local_links;
 mod lock;
+#[cfg(target_os = "macos")]
+mod quit;
 mod sf_symbols;
 #[cfg(desktop)]
 mod updates;
@@ -24,6 +26,8 @@ pub fn run() {
     .manage(updates::Updates::default());
   #[cfg(any(windows, target_os = "linux"))]
   let builder = builder.plugin(tauri_plugin_dialog::init());
+  #[cfg(target_os = "macos")]
+  let builder = builder.manage(quit::Quitting::default());
   builder
     .invoke_handler(tauri::generate_handler![
       attachments::open_attachment,
@@ -57,6 +61,8 @@ pub fn run() {
       updates::updates_forget,
       #[cfg(desktop)]
       updates::updates_restart,
+      #[cfg(target_os = "macos")]
+      quit::quit_ready,
       window_style::set_window_buttons,
       window_style::set_window_effects,
       window_style::set_follows_desktops,
@@ -72,6 +78,10 @@ pub fn run() {
       if event.id() == devtools::MENU_ID {
         devtools::toggle_focused(app);
       }
+      #[cfg(target_os = "macos")]
+      if event.id() == quit::MENU_ID {
+        quit::quit(app);
+      }
     })
     .register_uri_scheme_protocol(sf_symbols::SCHEME, |_ctx, request| sf_symbols::handle(request))
     .setup(|app| {
@@ -83,8 +93,11 @@ pub fn run() {
           let _ = window.show();
         });
       }
-      #[cfg(all(debug_assertions, target_os = "macos"))]
-      add_devtools_menu_item(app.handle())?;
+      // Should it fail, Tauri's menu stays, and lines still opens.
+      #[cfg(target_os = "macos")]
+      if let Err(error) = set_menu(app.handle()) {
+        log::error!("couldn't set the menu: {error}");
+      }
       #[cfg(desktop)]
       updates::clean_up(app.handle());
       if cfg!(debug_assertions) {
@@ -108,16 +121,25 @@ pub fn run() {
     });
 }
 
-/// View → Developer Tools (F12) in debug builds of the Mac app.
-#[cfg(all(debug_assertions, target_os = "macos"))]
-fn add_devtools_menu_item(app: &tauri::AppHandle) -> tauri::Result<()> {
-  use tauri::menu::{Menu, MenuItem, MenuItemKind, PredefinedMenuItem};
+/// The Mac app's menu: Tauri's, with a Quit of lines' own that waits for notes to be stored
+/// (quit.rs), and in debug builds View → Developer Tools (F12).
+#[cfg(target_os = "macos")]
+fn set_menu(app: &tauri::AppHandle) -> tauri::Result<()> {
+  use tauri::menu::{Menu, MenuItem, MenuItemKind};
   let menu = Menu::default(app)?;
   for item in menu.items()? {
-    if let MenuItemKind::Submenu(submenu) = item
-      && submenu.text()? == "View"
-    {
-      submenu.append(&PredefinedMenuItem::separator(app)?)?;
+    let MenuItemKind::Submenu(submenu) = item else { continue };
+    for (position, item) in submenu.items()?.into_iter().enumerate() {
+      let MenuItemKind::Predefined(predefined) = item else { continue };
+      let text = predefined.text()?;
+      if text.starts_with("Quit") {
+        submenu.remove_at(position)?;
+        submenu.insert(&MenuItem::with_id(app, quit::MENU_ID, text, true, Some("CmdOrCtrl+Q"))?, position)?;
+      }
+    }
+    #[cfg(debug_assertions)]
+    if submenu.text()? == "View" {
+      submenu.append(&tauri::menu::PredefinedMenuItem::separator(app)?)?;
       submenu.append(&MenuItem::with_id(app, devtools::MENU_ID, "Developer Tools", true, Some("F12"))?)?;
     }
   }

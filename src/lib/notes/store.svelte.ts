@@ -1,5 +1,6 @@
 import type { IconName } from "../icons/icons";
 import type { PaletteColor } from "../palette";
+import { vault } from "../lock/vault";
 import { isSite } from "../platform";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
 import type { Made, NoteLanguage } from "../plugins/types";
@@ -32,6 +33,8 @@ const SAVE_DELAY = 400;
 const RETRY_DELAY = 1000;
 const RETRY_MAX = 60_000;
 const SEEDED_KEY = "lines.seeded";
+/** Before each note's id: a note `leave` kept in localStorage, not stored yet. */
+const KEPT_KEY = "lines.unsaved.";
 
 export function isBlank(body: string) {
   return /^\s*#?\s*$/.test(body);
@@ -140,6 +143,8 @@ class NotesStore {
   #retryAt = 0;
   /** Each note's write under way, so its writes land in order and `flush` can wait for them. */
   #saving = new Map<string, Promise<void>>();
+  /** The notes `leave` kept in localStorage, until they're stored. */
+  #kept = new Set<string>();
   #changeListeners = new Set<() => void>();
   #flushers = new Set<() => void>();
   /**
@@ -326,7 +331,7 @@ class NotesStore {
 
   async load() {
     try {
-      let all = await this.#storage.all();
+      let all = await this.#storeKept(await this.#storage.all());
       if (!all.length && !seeded()) {
         all = await firstNotes();
         for (const note of all) await this.#storage.put(note);
@@ -340,6 +345,38 @@ class NotesStore {
       console.error("lines: couldn't load notes", error);
       this.loadError = error instanceof Error ? error.message : String(error);
     }
+  }
+
+  /**
+   * Stores the notes `leave` kept that the page went before storing, and returns `all` with them.
+   * Not over a note stored since with a later edit, nor over one locked since.
+   */
+  async #storeKept(all: Note[]): Promise<Note[]> {
+    const keys = Object.keys(localStorage).filter((key) => key.startsWith(KEPT_KEY));
+    if (!keys.length) return all;
+    const byId = new Map(all.map((note) => [note.id, note]));
+    const newer: Note[] = [];
+    for (const key of keys) {
+      try {
+        const note: Note = JSON.parse(localStorage.getItem(key)!);
+        const was = byId.get(note.id);
+        if (note.id === key.slice(KEPT_KEY.length) && (!was || (!was.locked && was.updatedAt < note.updatedAt))) newer.push(note);
+      } catch {
+        // Not a note: nothing to store.
+      }
+    }
+    try {
+      if (newer.length) await this.#storage.put(...newer);
+    } catch (error) {
+      console.error("lines: couldn't store what was typed as lines closed", error);
+      return all;
+    }
+    for (const key of keys) localStorage.removeItem(key);
+    for (const note of newer) {
+      byId.set(note.id, note);
+      void announce({ type: "note", id: note.id, local: true });
+    }
+    return [...byId.values()];
   }
 
   get(id: string) {
@@ -666,6 +703,7 @@ class NotesStore {
     for (const id of ids) {
       this.#pending.delete(id);
       this.#templates.delete(id);
+      if (this.#kept.delete(id)) localStorage.removeItem(KEPT_KEY + id);
     }
     this.entries = this.entries.filter((e) => !gone.has(e.note.id));
     if (this.selectedId && gone.has(this.selectedId)) this.selectedId = null;
@@ -888,6 +926,42 @@ class NotesStore {
     this.flush().catch(() => {});
   }
 
+  /**
+   * As the page may be going (closed, reloaded, hidden, or lines quitting): writes what isn't stored
+   * yet, which may not finish in time, so keeps it in localStorage too, written at once, for the next
+   * `load`. Not locked notes, nor anything while the app lock is on: their text is only ever stored
+   * encrypted. Resolves once written, or once the write failed, which `saveError` shows.
+   */
+  leave(): Promise<void> {
+    this.#handOver();
+    if (!vault.sealing) {
+      for (const id of new Set([...this.#pending.keys(), ...this.#saving.keys()])) {
+        const note = this.get(id)?.note;
+        if (!note || note.locked) continue;
+        try {
+          localStorage.setItem(KEPT_KEY + id, JSON.stringify(note));
+          this.#kept.add(id);
+        } catch {
+          // Too big for localStorage: it has the write alone.
+        }
+      }
+    }
+    return this.flush().catch(() => {});
+  }
+
+  /** Takes what `leave` kept of a note out of localStorage, once the note is stored as it was then, or later. */
+  #forgetKept({ id, updatedAt }: Note) {
+    if (!this.#kept.has(id)) return;
+    try {
+      const kept: Note | null = JSON.parse(localStorage.getItem(KEPT_KEY + id) ?? "null");
+      if (kept && kept.updatedAt > updatedAt) return;
+      localStorage.removeItem(KEPT_KEY + id);
+    } catch {
+      // Unreadable: the next load drops it, as it's no newer than what's stored.
+    }
+    this.#kept.delete(id);
+  }
+
   /** Changes a note, or several the same way, and saves them after a pause. */
   #patch(which: string | string[], changes: Partial<Note>) {
     const ids = new Set((typeof which === "string" ? [which] : which).filter((id) => this.get(id)));
@@ -950,7 +1024,10 @@ class NotesStore {
       const sealed = await Promise.all(notes.map((note) => (note.locked && !note.locked.sealed ? this.#seal(note) : note)));
       if (!sealed.length) return;
       await this.#storage.put(...sealed.map(stored));
-      for (const { id } of sealed) void announce({ type: "note", id, local: true });
+      for (const note of sealed) {
+        this.#forgetKept(note);
+        void announce({ type: "note", id: note.id, local: true });
+      }
     })()
       .then(() => this.#saved(), (error) => this.#failed(ids, error))
       .finally(() => {
