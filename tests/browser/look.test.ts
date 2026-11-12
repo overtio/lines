@@ -216,6 +216,26 @@ describe("styles", () => {
       if (scheme === "light") await app.close();
     }
   });
+
+  test("Void's hairlines under fields and around switches reach 3:1 with Increased contrast", async () => {
+    app = await openApp({ prefs: { style: "void", theme: "void", contrast: "more" } });
+    const settings = await app.settings("Editor");
+    const ratio = await settings.locator('.ui-switch[data-state="unchecked"]').first().evaluate((element) => {
+      const canvas = new OffscreenCanvas(1, 1).getContext("2d")!;
+      /** How light a color is (WCAG's relative luminance), drawn over the dialog. */
+      const luminance = (color: string) => {
+        canvas.fillStyle = getComputedStyle(element.closest(".ui-dialog")!).backgroundColor;
+        canvas.fillRect(0, 0, 1, 1);
+        canvas.fillStyle = color;
+        canvas.fillRect(0, 0, 1, 1);
+        const [r, g, b] = [...canvas.getImageData(0, 0, 1, 1).data].map((value) => ((value /= 255) <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4));
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const [line, background] = [luminance(getComputedStyle(element).borderTopColor), luminance("transparent")];
+      return (Math.max(line, background) + 0.05) / (Math.min(line, background) + 0.05);
+    });
+    expect(ratio).toBeGreaterThanOrEqual(3);
+  });
 });
 
 describe("dark panes", () => {
