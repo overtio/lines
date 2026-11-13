@@ -21,6 +21,8 @@
   import { menuSections, ui } from "../ui.svelte";
   import type { Direction } from "../panes";
   import { panes } from "../panes.svelte";
+  import { noteEpisode } from "../player/episodes";
+  import { player } from "../player/player.svelte";
   import { canFloat, floatingOpen, toggleFloating } from "../windows/floating";
   import { followPointer } from "./followPointer";
   import LibraryCover from "./LibraryCover.svelte";
@@ -524,6 +526,7 @@
     // A note that isn't picked has its own menu, and the others are let go.
     notes.clearPicks();
     menuOpen = true;
+    const episode = noteEpisode(entry);
     ui.openMenu({
       x,
       y,
@@ -537,6 +540,14 @@
             ? [{ label: floatingOpen.has(id) ? t("list.unfloat") : t("list.float"), icon: "picture-in-picture-2" as const, run: () => toggleFloating(id) }]
             : []),
         ],
+        // An episode's sound, played or paused.
+        episode && !entry.note.trashed
+          ? [
+              player.isPlaying(episode.key)
+                ? { label: t("player.pauseEpisode"), icon: "pause" as const, run: () => player.pause() }
+                : { label: t("player.playEpisode"), icon: "play" as const, run: () => player.play(episode) },
+            ]
+          : [],
         // On its shelf, where it's got to.
         shelf && !entry.note.trashed && !isClosed(entry.note)
           ? (shelf.kind.statuses ?? []).map((status) => ({ label: status.label, checked: status.value === shelf.status?.value, run: () => setStatus(status) }))

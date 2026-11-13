@@ -50,6 +50,26 @@
   color: var(--text-muted);
 }
 
+/* An episode note's Play button, before its `audio` link (player/notePlay.ts): a small round button in the accent. */
+.cm-episode-play {
+  display: inline-grid;
+  place-items: center;
+  width: 1.35em;
+  height: 1.35em;
+  margin-right: 0.4em;
+  vertical-align: -0.22em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+  cursor: pointer;
+  transition: background-color 120ms;
+}
+
+.cm-episode-play:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
 /* An empty line between paragraphs; its height sets the paragraph spacing. */
 .cm-lp-blank {
   line-height: calc(var(--editor-line-height) * var(--paragraph-gap));

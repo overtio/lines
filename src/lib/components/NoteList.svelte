@@ -15,6 +15,7 @@
   import { ui } from "../ui.svelte";
   import CalendarMonth from "./CalendarMonth.svelte";
   import { ListWindow } from "./listWindow.svelte";
+  import MiniPlayer from "./MiniPlayer.svelte";
   import NoteRow from "./NoteRow.svelte";
   import PostRow from "./PostRow.svelte";
   import SidebarToggle from "./SidebarToggle.svelte";
@@ -392,6 +393,9 @@
     {/each}
     {/if}
   </ul>
+  {#if !ui.playerInSidebar}
+    <MiniPlayer class="pb-[calc(8px_+_env(safe-area-inset-bottom))]" />
+  {/if}
 </section>
 
 <style>

@@ -2,6 +2,7 @@ import { FEED_SOURCE, feedItem, feeds } from "../../lib/feeds/feeds.svelte";
 import { fetchFeed } from "../../lib/feeds/fetch";
 import { isFeed, readFeed } from "../../lib/feeds/parse";
 import { t } from "../../lib/i18n/index.svelte";
+import { episodePlay } from "../../lib/player/notePlay";
 import type { LibraryKind, LibrarySource, Plugin } from "../../lib/plugins/types";
 
 /*
@@ -51,5 +52,5 @@ export const feedsPlugin = (): Plugin => ({
   icon: "rss",
   enabledByDefault: true,
   requires: ["library"],
-  contributes: { libraryKinds: [FEED], librarySources: [source] },
+  contributes: { libraryKinds: [FEED], librarySources: [source], markdown: [{ editor: episodePlay }] },
 });

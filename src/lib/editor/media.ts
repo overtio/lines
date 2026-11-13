@@ -1,6 +1,7 @@
 import { type EditorView, ViewPlugin, type ViewUpdate } from "@codemirror/view";
 import { mount, unmount } from "svelte";
 import { attachmentURL, type MediaKind, whenArrived } from "../notes/attachments";
+import { oneAtATime } from "../playing";
 import type { Shown } from "../plugins/types";
 import { setWidth } from "./actions";
 import AudioPlayer from "./AudioPlayer.svelte";
@@ -18,14 +19,6 @@ import AudioPlayer from "./AudioPlayer.svelte";
 export interface Drawn {
   dom: HTMLElement;
   destroy: () => void;
-}
-
-let playing: HTMLMediaElement | null = null;
-
-function pauseOthers(event: Event) {
-  const media = event.currentTarget as HTMLMediaElement;
-  if (playing !== media) playing?.pause();
-  playing = media;
 }
 
 interface Player {
@@ -58,7 +51,7 @@ class Players {
       media.preload = "metadata";
     }
     media.src = url;
-    media.addEventListener("play", pauseOthers);
+    oneAtATime(media);
     const made = { media, shown: 0 };
     if (!player) this.players.set(name, made);
     return made;

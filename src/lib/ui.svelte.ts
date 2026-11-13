@@ -109,6 +109,11 @@ class UIState {
     return this.layout === "narrow" || prefs.listSide === prefs.sidebarSide ? "list" : "editor";
   }
 
+  /** The podcast player docks at the bottom of the sidebar where that's a column; else of the note list (MiniPlayer.svelte). */
+  get playerInSidebar() {
+    return this.layout === "wide" && this.sidebarOpen;
+  }
+
   toggleSidebar() {
     // Leaving focus mode is the quickest way to show the sidebar again.
     if (this.focus) {

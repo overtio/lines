@@ -32,6 +32,9 @@ export type CalendarView = (typeof CALENDAR_VIEWS)[number];
 /** How often feeds are fetched again while lines is open, in minutes; 0 for only when asked (Settings → Library). */
 export const FEED_REFRESH = [15, 30, 60, 240, 0] as const;
 export type FeedRefresh = (typeof FEED_REFRESH)[number];
+/** How fast podcast episodes play (the player's speed), remembered. */
+export const PLAYBACK_RATES = [0.75, 1, 1.25, 1.5, 1.75, 2] as const;
+export type PlaybackRate = (typeof PLAYBACK_RATES)[number];
 /** The paper a note's PDF is laid out on. */
 export type Paper = "a4" | "letter";
 /** Which side of the window a pane goes on. */
@@ -195,6 +198,7 @@ export interface Stored {
   /** The Calendar also shows notes on the day they were made or last edited, not only by their dates. */
   calendarEdited: boolean;
   feedRefresh: FeedRefresh;
+  playbackRate: PlaybackRate;
   spacing: Spacing;
   /** How wide a note's text runs before wrapping, in px; or all the room there is, with the side margins kept. */
   noteWidth: number;
@@ -381,6 +385,7 @@ const DEFAULTS: Stored = {
   newNotes: "inbox",
   calendarEdited: false,
   feedRefresh: 30,
+  playbackRate: 1,
   spacing: DEFAULT_SPACING,
   noteWidth: 720,
   fullWidth: false,
@@ -540,6 +545,7 @@ function read(json?: string): Stored {
     newNotes: oneOf(raw.newNotes, NEW_NOTES, DEFAULTS.newNotes),
     calendarEdited: flag(raw.calendarEdited, DEFAULTS.calendarEdited),
     feedRefresh: oneOf(raw.feedRefresh, FEED_REFRESH, DEFAULTS.feedRefresh),
+    playbackRate: oneOf(raw.playbackRate, PLAYBACK_RATES, DEFAULTS.playbackRate),
     spacing: Object.fromEntries(
       SPACING_FIELDS.map(({ key, min, max }) => [key, clamp(spacing[key], min, max, DEFAULT_SPACING[key])]),
     ) as unknown as Spacing,
@@ -651,6 +657,7 @@ class Prefs {
   newNotes = $state<NewNotes>(this.#initial.newNotes);
   calendarEdited = $state(this.#initial.calendarEdited);
   feedRefresh = $state<FeedRefresh>(this.#initial.feedRefresh);
+  playbackRate = $state<PlaybackRate>(this.#initial.playbackRate);
   windowOpacity = $state(this.#initial.windowOpacity);
   windowBlur = $state(this.#initial.windowBlur);
   windowSeeThrough = $state(this.#initial.windowSeeThrough);
@@ -855,6 +862,7 @@ class Prefs {
       newNotes: this.newNotes,
       calendarEdited: this.calendarEdited,
       feedRefresh: this.feedRefresh,
+      playbackRate: this.playbackRate,
       spacing: $state.snapshot(this.spacing),
       noteWidth: this.noteWidth,
       fullWidth: this.fullWidth,
@@ -968,6 +976,7 @@ class Prefs {
     this.newNotes = next.newNotes;
     this.calendarEdited = next.calendarEdited;
     this.feedRefresh = next.feedRefresh;
+    this.playbackRate = next.playbackRate;
     if (!sameSpacing(this.spacing, next.spacing)) this.spacing = next.spacing;
     this.noteWidth = next.noteWidth;
     this.fullWidth = next.fullWidth;

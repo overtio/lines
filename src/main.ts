@@ -16,6 +16,7 @@ import Settings from "./lib/components/settings/Settings.svelte";
 import LockedNote from "./lib/components/LockedNote.svelte";
 import LockScreen from "./lib/components/LockScreen.svelte";
 import { feeds } from "./lib/feeds/feeds.svelte";
+import { player } from "./lib/player/player.svelte";
 import { lock } from "./lib/lock/lock.svelte";
 import { arrived, removeUnusedAttachments } from "./lib/notes/attachments";
 import { lockedNotes } from "./lib/notes/locked.svelte";
@@ -62,11 +63,11 @@ if (isTauri) {
     event.preventDefault();
     void import("@tauri-apps/api/core").then(({ invoke }) => invoke("toggle_devtools"));
   });
-  // Quitting the Mac app waits for every window to store what's typed in it (src-tauri/src/quit.rs).
+  // Quitting the Mac app waits for every window to store what's typed in it, and where the episode playing is (src-tauri/src/quit.rs).
   if (isMacApp) {
     void import("@tauri-apps/api/event").then(({ listen }) =>
       listen("quit", async () => {
-        await notes.leave();
+        await Promise.all([notes.leave(), player.keep()]);
         await (await import("@tauri-apps/api/core")).invoke("quit_ready");
       }),
     );
@@ -83,16 +84,20 @@ const label = windowLabel();
 const floatingId = label.startsWith("note-") ? label.slice("note-".length) : null;
 const isMain = !floatingId && !isSettingsWindow;
 
-// Closing the main window (and so quitting, on Windows and Linux) waits for what's typed in it to be stored.
+// Closing the main window (and so quitting, on Windows and Linux) waits for what's typed in it to be stored, and where the episode playing is.
 if (isDesktopApp && isMain) {
-  void import("@tauri-apps/api/window").then(({ getCurrentWindow }) => getCurrentWindow().onCloseRequested(() => notes.leave()));
+  void import("@tauri-apps/api/window").then(({ getCurrentWindow }) =>
+    getCurrentWindow().onCloseRequested(async () => {
+      await Promise.all([notes.leave(), player.keep()]);
+    }),
+  );
 }
 
 // Every window shares one database; this keeps them in step.
 void onAnnounce(async (message) => {
   if (message.type === "lock") {
     // Locked, or the lock was turned on or off: whatever this window had in memory goes.
-    await notes.flush();
+    await Promise.all([notes.flush(), player.keep()]);
     location.reload();
   } else if (message.type === "unlocked") {
     if (lock.locked && !isMain) location.reload();
@@ -113,6 +118,8 @@ void onAnnounce(async (message) => {
   } else if (message.type === "floating") {
     if (message.open) floatingOpen.add(message.id);
     else floatingOpen.delete(message.id);
+  } else if (message.type === "play" && isMain) {
+    player.play(message.episode);
   } else if (message.type === "show" && isMain) {
     notes.show(message.id);
     if (isTauri) {
@@ -172,8 +179,9 @@ async function start() {
   );
   await sync.load();
   sync.start();
-  // Only the main window fetches feeds, as it syncs.
+  // Only the main window fetches feeds, as it syncs, and plays episodes.
   void feeds.start().catch((error) => console.error("lines: couldn't read the feeds kept", error));
+  void player.load();
   // Settings, in its own window, asks this one to sync, lock and add notes.
   if (isTauri) {
     serveSettings(

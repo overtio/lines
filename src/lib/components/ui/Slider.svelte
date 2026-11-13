@@ -12,10 +12,12 @@
     format?: (value: number) => string;
     spoken?: (value: number) => string;
     oninput?: (value: number) => void;
+    /** Once it's let go of (or a key moved it): where it ended up. */
+    oncommit?: (value: number) => void;
     disabled?: boolean;
     class?: string;
   };
-  let { value = $bindable(), min, max, step = 1, label, format, spoken, oninput, disabled = false, class: className }: Props = $props();
+  let { value = $bindable(), min, max, step = 1, label, format, spoken, oninput, oncommit, disabled = false, class: className }: Props = $props();
 </script>
 
 <div class={["flex min-w-0 items-center gap-3", className]}>
@@ -23,6 +25,7 @@
     type="single"
     bind:value
     onValueChange={(changed) => oninput?.(changed)}
+    onValueCommit={(committed) => oncommit?.(committed)}
     {min}
     {max}
     {step}
