@@ -108,8 +108,15 @@
       {/snippet}
     </Segmented>
   </FieldRow>
-  <FieldRow label={t("settings.fontInstalled")} note={missing ? t("settings.fontMissing", { name: prefs.installedFont }) : t("settings.fontInstalledNote")}>
-    <FontPicker class="w-60" label={t("settings.fontInstalled")} value={prefs.installedFont} onchange={(family) => (prefs.installedFont = family)} />
+  <FieldRow label={t("settings.fontInstalled")} for="installed-font" note={missing ? t("settings.fontMissing", { name: prefs.installedFont }) : t("settings.fontInstalledNote")}>
+    <FontPicker
+      class="w-60"
+      id="installed-font"
+      describedby="installed-font-note"
+      label={t("settings.fontInstalled")}
+      value={prefs.installedFont}
+      onchange={(family) => (prefs.installedFont = family)}
+    />
   </FieldRow>
 </FieldGroup>
 
@@ -119,8 +126,8 @@
   </FieldRow>
 </FieldGroup>
 
-<FieldGroup>
-  <FieldRow label={t("settings.headingColor")}>
+<FieldGroup title={t("settings.headingColor")}>
+  <FieldRow label={t("settings.paperColor")}>
     <Segmented label={t("settings.headingColor")} options={headingColors} value={prefs.headingColor} onselect={(id) => (prefs.headingColor = id)}>
       {#snippet content(option)}
         <span class="size-2.5 shrink-0 rounded-full inset-ring inset-ring-line" style:background={headingSwatches[option.id]} aria-hidden="true"></span>

@@ -139,7 +139,7 @@ describe("fonts installed on this device", () => {
 
   const stored = (page: App["page"]) => page.evaluate(() => JSON.parse(localStorage.getItem("lines.prefs")!).installedFont as string);
 
-  test("Typography has Font family, its recommended fonts and an installed one, then Font size with the text's size, then heading color", async () => {
+  test("Typography has Font family, its recommended fonts and an installed one, then Font size with the text's size, then Heading color, then Font ligatures", async () => {
     app = await openApp();
     const settings = await app.settings("Typography");
     const family = settings.getByRole("region", { name: "Font family" });
@@ -147,8 +147,10 @@ describe("fonts installed on this device", () => {
     expect(await family.getByRole("combobox", { name: "Installed font" }).isVisible()).toBe(true);
     expect(await settings.getByRole("region", { name: "Font size" }).getByRole("slider", { name: "Text size" }).isVisible()).toBe(true);
     expect(await family.getByRole("slider").count()).toBe(0);
-    const order = await settings.locator("[data-setting]").evaluateAll((rows) => rows.slice(0, 4).map((row) => row.querySelector(".min-w-0")!.firstElementChild!.textContent));
-    expect(order).toEqual(["Recommended", "Installed font", "Text size", "Heading color"]);
+    const groups = await settings.locator("section[aria-label]").evaluateAll((groups) => groups.map((group) => group.getAttribute("aria-label")));
+    expect(groups.slice(0, 4)).toEqual(["Font family", "Font size", "Heading color", "Font ligatures"]);
+    const rows = await settings.locator("[data-setting]").evaluateAll((rows) => rows.slice(0, 4).map((row) => row.querySelector(".min-w-0")!.firstElementChild!.textContent));
+    expect(rows).toEqual(["Recommended", "Installed font", "Text size", "Color"]);
   });
 
   test("the picker lists the device's fonts, asked for as it opens, each in its own face, a few at a time; one chosen writes notes in it and unmarks the recommended fonts, and one of those goes back", async () => {
@@ -195,9 +197,9 @@ describe("fonts installed on this device", () => {
     const picker = settings.getByRole("combobox", { name: "Installed font" });
     await picker.click();
     const list = app.page.getByRole("listbox");
-    await list.getByText("Type the name of a font on this device.").waitFor();
+    await app.page.getByText("Type the name of a font on this device.").waitFor();
     await picker.fill("Zz Not A Font");
-    await list.getByText("No font called “Zz Not A Font” is installed here.").waitFor();
+    await app.page.getByText("No font called “Zz Not A Font” is installed here.").waitFor();
     expect(await list.getByRole("option").count()).toBe(0);
     await picker.fill(installed.toLowerCase());
     await list.getByRole("option", { name: installed.toLowerCase(), exact: true }).waitFor();
@@ -207,6 +209,41 @@ describe("fonts installed on this device", () => {
     expect(await app.root("font")).toBe("installed");
   });
 
+  test("a list the browser couldn't give is asked for again as the picker opens again; there, with a font chosen, typing searches afresh rather than adding to its name", async () => {
+    app = await openApp();
+    const installed = await someInstalledFont(app.page);
+    await listFonts(app.page, "refused");
+    const settings = await app.settings("Typography");
+    const picker = settings.getByRole("combobox", { name: "Installed font" });
+    await picker.click();
+    await app.page.getByText("Type the name of a font on this device.").waitFor();
+    // What it says is beside the list of options, which holds options only.
+    expect(await app.page.getByRole("listbox").locator("p").count()).toBe(0);
+    await app.page.keyboard.press("Escape");
+
+    await listFonts(app.page, [installed, "Zz Other"]);
+    await picker.click();
+    const list = app.page.getByRole("listbox");
+    await list.getByRole("option", { name: installed, exact: true }).click();
+    await list.waitFor({ state: "detached" });
+    await picker.focus();
+    await app.page.keyboard.press("End");
+    await app.page.keyboard.type(installed.slice(0, 3));
+    expect(await picker.inputValue()).toBe(installed.slice(0, 3));
+    await list.getByRole("option", { name: installed, exact: true }).waitFor();
+    expect(await list.getByRole("option", { name: "Zz Other" }).count()).toBe(0);
+  });
+
+  test("another window follows the font chosen", async () => {
+    app = await openApp();
+    const other = await app.page.context().newPage();
+    await other.goto(globalThis.lines.url);
+    await other.waitForFunction(() => window.testing?.notes.ready);
+    await app.page.evaluate(() => (window.testing.prefs.installedFont = "Zz Some Font"));
+    await other.waitForFunction(() => document.documentElement.style.getPropertyValue("--font-text").includes("Zz Some Font"));
+    expect(await other.evaluate(() => document.documentElement.dataset.font)).toBe("installed");
+  });
+
   test("one chosen on another computer that isn't here: notes are in the system's font, and Settings says so, keeping it; a name that can't be one is none", async () => {
     app = await openApp({ prefs: { font: "serif", installedFont: "Zz Not A Font" } });
     await app.open("Text");
@@ -214,7 +251,12 @@ describe("fonts installed on this device", () => {
     expect((await app.style(".editor-pane .cm-content", "font-family")).replaceAll('"', "")).toStartWith("Zz Not A Font, -apple-system");
     const settings = await app.settings("Typography");
     await settings.getByText("Zz Not A Font isn’t installed on this device, so notes are in the system font.").waitFor();
-    expect(await settings.getByRole("combobox", { name: "Installed font" }).inputValue()).toBe("Zz Not A Font");
+    const picker = settings.getByRole("combobox", { name: "Installed font" });
+    expect(await picker.inputValue()).toBe("Zz Not A Font");
+    // The note is the field's description, which a screen reader reads with it.
+    expect(await picker.evaluate((field) => document.getElementById(field.getAttribute("aria-describedby")!)?.textContent)).toBe(
+      "Zz Not A Font isn’t installed on this device, so notes are in the system font.",
+    );
     expect(await settings.getByRole("radiogroup", { name: "Recommended" }).getByRole("radio", { checked: true }).count()).toBe(0);
     await app.close();
 

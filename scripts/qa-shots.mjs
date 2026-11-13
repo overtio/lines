@@ -530,6 +530,18 @@ const SCENES = [
     },
   })),
   {
+    id: "settings-typography-groups",
+    title: "Settings → Typography, under the fonts",
+    look: "Font size's Text size, then Heading color's Color (Theme, Accent, Custom) as a titled group like it, then Font ligatures; headings, cards and rows lined up and evenly spaced.",
+    act: async (page) => {
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      const dialog = page.getByRole("dialog");
+      await dialog.getByRole("navigation").getByText("Typography", { exact: true }).click();
+      await dialog.locator('section[aria-label="Heading color"]').evaluate((group) => group.scrollIntoView({ block: "center" }));
+    },
+    shoot: "dialog",
+  },
+  {
     id: "installed-font-missing",
     title: "Typography, with an installed font this computer hasn't",
     look: "Installed font says “Zz Not A Font isn’t installed on this device, so notes are in the system font.” under its label, the field keeping the name; no recommended font marked; the preview in the system's font.",

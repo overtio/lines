@@ -1,8 +1,8 @@
 <script lang="ts">
   // A choice from a long list, found by typing: a field drawn as a Select is, one height
-  // (h-control), whose options its owner finds by what's typed (`query`). Closed, or open before
-  // anything's typed, it shows the choice. Only the first options are drawn, more as the list is
-  // scrolled or arrowed through, so hundreds open at once.
+  // (h-control), whose options its owner finds by what's typed (`query`). Closed it shows the
+  // choice, selected as the list opens so typing starts a search. Only the first options are
+  // drawn, more as the list is scrolled or arrowed through, so hundreds open at once.
   import { Combobox } from "bits-ui";
   import type { Snippet } from "svelte";
   import { speak } from "../../a11y";
@@ -15,6 +15,9 @@
     options: readonly Option[];
     onchange: (value: string) => void;
     label: string;
+    /** The field's id, and what else describes it (a note under its row, FieldRow's `<id>-note`). */
+    id?: string;
+    describedby?: string;
     placeholder?: string;
     /** What's typed since it opened. */
     query?: string;
@@ -27,11 +30,12 @@
     item?: Snippet<[Option]>;
     class?: string;
   };
-  let { value, options, onchange, label, placeholder, query = $bindable(""), message = null, counted, onopen, item, class: className }: Props = $props();
+  let { value, options, onchange, label, id, describedby, placeholder, query = $bindable(""), message = null, counted, onopen, item, class: className }: Props = $props();
 
   /** How many options are drawn at first, and added each time the end of the list comes near. */
   const PAGE = 60;
 
+  let field = $state<HTMLInputElement | null>(null);
   let open = $state(false);
   let typing = $state(false);
   let limit = $state(PAGE);
@@ -45,6 +49,8 @@
   function openChange(opened: boolean) {
     limit = PAGE;
     if (opened) {
+      // What's typed next replaces the choice shown rather than adding to it.
+      field?.select();
       onopen?.();
     } else {
       typing = false;
@@ -77,7 +83,7 @@
 
 <Combobox.Root type="single" {value} onValueChange={(next) => next && next !== value && onchange(next)} bind:open onOpenChange={openChange} allowDeselect={false}>
   <div class={["relative min-w-32", className]}>
-    <Combobox.Input aria-label={label} {placeholder} oninput={type} onclick={show} onfocus={(event) => event.currentTarget.select()}>
+    <Combobox.Input bind:ref={field} {id} aria-label={label} aria-describedby={describedby} {placeholder} oninput={type} onclick={show}>
       {#snippet child({ props })}
         <input
           {...props}
@@ -94,18 +100,28 @@
     </Combobox.Trigger>
   </div>
   <Combobox.Portal>
-    <Combobox.Content sideOffset={4} collisionPadding={8} class="{floating} max-h-72 w-(--bits-combobox-anchor-width) p-1">
-      <Combobox.Viewport onscroll={({ currentTarget: list }) => list.scrollTop + list.clientHeight * 2 >= list.scrollHeight && more()}>
-        {#each shown as option, index (option.value)}
-          <Combobox.Item value={option.value} label={option.label} class="{optionClass} justify-between gap-4" onHighlight={() => index >= shown.length - 8 && more()}>
-            {#snippet children({ selected })}
-              {#if item}{@render item(option)}{:else}<span class="truncate">{option.label}</span>{/if}
-              {#if selected}<Icon name="check" size={14} class="shrink-0 text-accent!" />{/if}
-            {/snippet}
-          </Combobox.Item>
-        {/each}
-        {#if message}<p class="m-0 px-2.5 py-1.5 text-sm text-muted">{message}</p>{/if}
-      </Combobox.Viewport>
+    <Combobox.Content sideOffset={4} collisionPadding={8}>
+      <!-- The message beside the list of options rather than in it, which holds options only. -->
+      {#snippet child({ wrapperProps, props })}
+        <div {...wrapperProps}>
+          <div class="{floating} flex max-h-72 w-(--bits-floating-anchor-width) flex-col p-1">
+            <!-- The list's layer is the wrapper's, taken from here. -->
+            <div {...props} class="z-50 min-h-0">
+              <Combobox.Viewport onscroll={({ currentTarget: list }) => list.scrollTop + list.clientHeight * 2 >= list.scrollHeight && more()}>
+                {#each shown as option, index (option.value)}
+                  <Combobox.Item value={option.value} label={option.label} class="{optionClass} justify-between gap-4" onHighlight={() => index >= shown.length - 8 && more()}>
+                    {#snippet children({ selected })}
+                      {#if item}{@render item(option)}{:else}<span class="truncate">{option.label}</span>{/if}
+                      {#if selected}<Icon name="check" size={14} class="shrink-0 text-accent!" />{/if}
+                    {/snippet}
+                  </Combobox.Item>
+                {/each}
+              </Combobox.Viewport>
+            </div>
+            {#if message}<p class="m-0 px-2.5 py-1.5 text-sm text-muted">{message}</p>{/if}
+          </div>
+        </div>
+      {/snippet}
     </Combobox.Content>
   </Combobox.Portal>
 </Combobox.Root>

@@ -356,7 +356,7 @@ export default {
   "settings.previewNote":
     "# Fin de semana en la montaña\n\nUna mañana tranquila y luego el mercado. Comprar pan, queso y algo verde para la cena.\n\nSalir a mediodía para evitar el tráfico.\n\n## Equipaje\n- [x] Reservar la cabaña\n- [ ] Chubasqueros\n- [ ] Mapa de senderos",
   "settings.fontFamily": "Familia tipográfica",
-  "settings.fontRecommended": "Recomendadas",
+  "settings.fontRecommended": "Recomendados",
   "settings.fontInstalled": "Tipo de letra instalado",
   "settings.fontInstalledNote": "Cualquier tipo de letra de este dispositivo.",
   "settings.fontMissing": "{name} no está instalado en este dispositivo, así que las notas usan el tipo de letra del sistema.",

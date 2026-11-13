@@ -355,7 +355,7 @@ export default {
   "settings.preview": "Aperçu",
   "settings.previewNote":
     "# Week-end à la montagne\n\nUne matinée tranquille, puis le marché. Prendre du pain, du fromage et quelque chose de vert pour le dîner.\n\nPartir à midi pour éviter les bouchons.\n\n## Bagages\n- [x] Réserver le chalet\n- [ ] Vestes de pluie\n- [ ] Carte des sentiers",
-  "settings.fontFamily": "Famille de police",
+  "settings.fontFamily": "Famille de polices",
   "settings.fontRecommended": "Recommandées",
   "settings.fontInstalled": "Police installée",
   "settings.fontInstalledNote": "N’importe quelle police de cet appareil.",

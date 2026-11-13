@@ -1,32 +1,22 @@
-//! The font families installed on this device, to write notes in (Settings → Typography, src/lib/themes/installedFonts.ts):
-//! AppKit's on the Mac, UIKit's on iPhone and iPad, DirectWrite's on Windows and fontconfig's on
-//! Linux. Each is the name the system's web view knows the family by. Android lists none, and
-//! there a font is chosen by typing its name.
+//! The font families installed on this device, to write notes in (Settings → Typography), as the
+//! system lists them: src/lib/themes/installedFonts.ts puts them in order, once each, without its
+//! hidden ones. AppKit's on the Mac, UIKit's on iPhone and iPad (iOS's own fonts: those other apps
+//! install need the Fonts entitlement, which lines doesn't have), DirectWrite's on Windows and
+//! fontconfig's on Linux, each the name the system's web view knows the family by. Android lists
+//! none, and there a font is chosen by typing its name.
 
 use tauri::AppHandle;
 
-/// Every font family installed, in alphabetical order, once each, without the system's hidden ones (".SF NS").
+/// Every font family installed.
 #[tauri::command]
 pub async fn installed_fonts(app: AppHandle) -> Vec<String> {
   #[cfg(target_os = "macos")]
-  let families = crate::local_links::on_main(&app, macos::families).await.unwrap_or_default();
+  return crate::local_links::on_main(&app, macos::families).await.unwrap_or_default();
   #[cfg(not(target_os = "macos"))]
-  let families = {
+  {
     let _ = app;
     tauri::async_runtime::spawn_blocking(families).await.unwrap_or_default()
-  };
-  tidy(families)
-}
-
-fn tidy(families: Vec<String>) -> Vec<String> {
-  let mut families: Vec<String> = families
-    .into_iter()
-    .map(|family| family.trim().to_owned())
-    .filter(|family| !family.is_empty() && !family.starts_with('.'))
-    .collect();
-  families.sort_by_cached_key(|family| family.to_lowercase());
-  families.dedup_by(|a, b| a.to_lowercase() == b.to_lowercase());
-  families
+  }
 }
 
 #[cfg(target_os = "macos")]
@@ -47,37 +37,40 @@ fn families() -> Vec<String> {
 }
 
 /// The system's font collection, each family by its English name, which the web view knows it by
-/// whatever Windows' language (and by its first, for one without).
+/// whatever Windows' language (and by its first, for one without); one whose name can't be read
+/// is left out.
 #[cfg(windows)]
 fn families() -> Vec<String> {
-  use windows::core::{w, BOOL};
+  use windows::core::{w, Result, BOOL};
   use windows::Win32::Graphics::DirectWrite::{DWriteCreateFactory, IDWriteFactory, IDWriteFontCollection, DWRITE_FACTORY_TYPE_SHARED};
 
-  let list = || -> windows::core::Result<Vec<String>> {
+  let collection = || -> Result<Option<IDWriteFontCollection>> {
+    let factory: IDWriteFactory = unsafe { DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED)? };
+    let mut collection = None;
+    unsafe { factory.GetSystemFontCollection(&mut collection, false)? };
+    Ok(collection)
+  };
+  let name = |collection: &IDWriteFontCollection, index: u32| -> Result<String> {
     unsafe {
-      let factory: IDWriteFactory = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED)?;
-      let mut collection: Option<IDWriteFontCollection> = None;
-      factory.GetSystemFontCollection(&mut collection, false)?;
-      let Some(collection) = collection else { return Ok(Vec::new()) };
-      let mut families = Vec::new();
-      for index in 0..collection.GetFontFamilyCount() {
-        let names = collection.GetFontFamily(index)?.GetFamilyNames()?;
-        let (mut name, mut english) = (0, BOOL(0));
-        names.FindLocaleName(w!("en-us"), &mut name, &mut english)?;
-        if !english.as_bool() {
-          name = 0;
-        }
-        let mut text = vec![0u16; names.GetStringLength(name)? as usize + 1];
-        names.GetString(name, &mut text)?;
-        families.push(String::from_utf16_lossy(&text[..text.len() - 1]));
+      let names = collection.GetFontFamily(index)?.GetFamilyNames()?;
+      let (mut name, mut english) = (0, BOOL(0));
+      names.FindLocaleName(w!("en-us"), &mut name, &mut english)?;
+      if !english.as_bool() {
+        name = 0;
       }
-      Ok(families)
+      let mut text = vec![0u16; names.GetStringLength(name)? as usize + 1];
+      names.GetString(name, &mut text)?;
+      Ok(String::from_utf16_lossy(&text[..text.len() - 1]))
     }
   };
-  list().unwrap_or_else(|error| {
-    log::error!("couldn't list the installed fonts: {error}");
-    Vec::new()
-  })
+  match collection() {
+    Ok(Some(collection)) => (0..unsafe { collection.GetFontFamilyCount() }).filter_map(|index| name(&collection, index).ok()).collect(),
+    Ok(None) => Vec::new(),
+    Err(error) => {
+      log::error!("couldn't list the installed fonts: {error}");
+      Vec::new()
+    }
+  }
 }
 
 /// fontconfig's list, which WebKitGTK finds fonts by: each font's first family name. Where its
@@ -94,15 +87,4 @@ fn families() -> Vec<String> {
 #[cfg(target_os = "android")]
 fn families() -> Vec<String> {
   Vec::new()
-}
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[test]
-  fn sorted_once_each_without_hidden_ones() {
-    let listed = ["Zapfino", ".SF NS", "avenir", "Avenir", " Menlo ", "", "Arial", "Menlo"].map(String::from).to_vec();
-    assert_eq!(tidy(listed), ["Arial", "avenir", "Menlo", "Zapfino"]);
-  }
 }

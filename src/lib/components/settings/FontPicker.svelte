@@ -1,23 +1,19 @@
 <script lang="ts">
   // A font installed on this device (themes/installedFonts.ts), each drawn in its own face: from
-  // the system's list, asked for as the picker first opens, or by its name typed where there's none.
+  // the system's list, asked for as the picker opens, or by its name typed where there's none.
   import { t } from "../../i18n/index.svelte";
   import { canDraw, installedFamily, listInstalledFonts, matchingFamilies } from "../../themes/installedFonts";
   import Combobox from "../ui/Combobox.svelte";
 
-  type Props = { value: string; onchange: (family: string) => void; label: string; class?: string };
-  let { value, onchange, label, class: className }: Props = $props();
+  type Props = { value: string; onchange: (family: string) => void; label: string; id?: string; describedby?: string; class?: string };
+  let { value, onchange, label, id, describedby, class: className }: Props = $props();
 
   let query = $state("");
-  /** The families installed, once listed; null where they can't be. */
+  /** The families installed, once listed; null where they can't be (asked again as it opens again). */
   let families = $state<string[] | null>();
-  let loading = $state(false);
 
   async function load() {
-    if (families !== undefined) return;
-    loading = true;
-    families = await listInstalledFonts();
-    loading = false;
+    if (!families) families = await listInstalledFonts();
   }
 
   const typed = $derived(query.trim());
@@ -30,7 +26,7 @@
   });
 
   const message = $derived(
-    loading ? t("settings.fontsFinding") : options.length ? null : typed ? t("settings.fontNotHere", { name: typed }) : t("settings.fontTypeName"),
+    families === undefined ? t("settings.fontsFinding") : options.length ? null : typed ? t("settings.fontNotHere", { name: typed }) : t("settings.fontTypeName"),
   );
 </script>
 
@@ -40,6 +36,8 @@
   {options}
   {onchange}
   {label}
+  {id}
+  {describedby}
   bind:query
   {message}
   placeholder={t("settings.fontSearch")}

@@ -49,10 +49,11 @@ type LocalFonts = { queryLocalFonts?: () => Promise<{ family: string }[]> };
 let listing: Promise<string[] | null> | undefined;
 
 /**
- * The families installed here, or null where they can't be listed: a browser without Local Font
- * Access (Safari, Firefox), or whose person said no, and Android. Asked for once a window. In a
- * browser it asks the person, so it's called as they open the picker: the browser wants a click or
- * key press behind it.
+ * The families installed here, in alphabetical order, or null where they can't be listed: a
+ * browser without Local Font Access (Safari, Firefox), or whose person said no, and Android. Kept
+ * for the window once listed; asked again otherwise, as the person may say yes the next time. In
+ * a browser it asks the person, so it's called as they open the picker: the browser wants a click
+ * or key press behind it.
  */
 export function listInstalledFonts() {
   return (listing ??= list());
@@ -64,7 +65,9 @@ async function list() {
     ? import("@tauri-apps/api/core").then(({ invoke }) => invoke<string[]>("installed_fonts"))
     : local?.call(window).then((fonts) => fonts.map((font) => font.family));
   const families = tidyFamilies((await listed?.catch(() => null)) ?? []);
-  return families.length ? families : null;
+  if (families.length) return families;
+  listing = undefined;
+  return null;
 }
 
 let probe: CanvasRenderingContext2D | null | undefined;
