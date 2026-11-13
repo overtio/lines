@@ -157,7 +157,7 @@
   const post = $derived.by(() => {
     const f = notes.filter;
     const row = feeds.openRow;
-    return !selected && f.kind === "feeds" && row && (!f.feed || f.feed === row.feed) ? row : null;
+    return !selected && f.kind === "feeds" && row && (f.feed ? f.feed === row.feed : !f.group || feeds.groupOf.get(row.feed) === f.group) ? row : null;
   });
 
   /** On a phone, the note list and the note side by side, slid along to the one showing. */

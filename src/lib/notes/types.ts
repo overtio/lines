@@ -1,4 +1,5 @@
 import type { LockedKey } from "../crypto";
+import type { FeedGroup } from "../feeds/groups";
 import type { IconName } from "../icons/icons";
 import type { PaletteColor } from "../palette";
 import type { Property } from "./properties";
@@ -75,5 +76,5 @@ export type Filter =
   | { kind: "library"; shelf: string }
   /** The Calendar, on one day (`YYYY-MM-DD`, see calendar.ts): the notes on it. */
   | { kind: "calendar"; day: string }
-  /** The posts of every feed subscribed to, or of the one at `feed` (feeds/feeds.svelte.ts): no notes. */
-  | { kind: "feeds"; feed?: string };
+  /** The posts of every feed subscribed to, of a group's (feeds/groups.ts), or of the one at `feed` (feeds/feeds.svelte.ts): no notes. */
+  | { kind: "feeds"; feed?: string; group?: FeedGroup };

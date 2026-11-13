@@ -93,8 +93,13 @@ class Plugins {
   readonly mascots = $derived(this.#from("mascots"));
   readonly pictureLibraries = $derived(this.#from("pictureLibraries"));
   readonly libraryKinds = $derived(this.#from("libraryKinds"));
-  /** Where links are looked up, in the order they're asked: each site's, then those that read any page. */
-  readonly librarySources = $derived(this.#from("librarySources").sort((a, b) => Number(!!a.general) - Number(!!b.general)));
+  /** Where links are looked up, in the order they're asked: each site's, then those that read any page; each with the plugins it needs running. */
+  readonly librarySources = $derived.by(() => {
+    const running = new Set(this.active.map((plugin) => plugin.id));
+    return this.#from("librarySources")
+      .filter((source) => (source.requires ?? []).every((id) => running.has(id)))
+      .sort((a, b) => Number(!!a.general) - Number(!!b.general));
+  });
   readonly linkActions = $derived(this.#from("linkActions"));
 
   constructor() {

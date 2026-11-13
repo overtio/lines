@@ -9,9 +9,16 @@
   import Callout from "../ui/Callout.svelte";
   import FieldGroup from "../ui/FieldGroup.svelte";
   import FieldRow from "../ui/FieldRow.svelte";
+  import Segmented from "../ui/Segmented.svelte";
   import Select from "../ui/Select.svelte";
 
-  // The feeds' part of Settings → Library: how often they're fetched, and OPML in and out.
+  // The feeds' part of Settings → Library: how they're listed in the sidebar, how often they're
+  // fetched, and OPML in and out.
+
+  const inSidebar = [
+    { id: "kind", label: t("feeds.byKind") },
+    { id: "together", label: t("feeds.together") },
+  ] as const;
 
   const intervals = FEED_REFRESH.map((minutes) => ({
     value: String(minutes),
@@ -47,6 +54,9 @@
 </script>
 
 <FieldGroup title={t("feeds.title")} note={isTauri ? undefined : t("feeds.webHint")}>
+  <FieldRow label={t("feeds.inSidebar")} note={t("feeds.inSidebarNote")}>
+    <Segmented label={t("feeds.inSidebar")} options={inSidebar} value={prefs.feedsInSidebar} onselect={(id) => (prefs.feedsInSidebar = id)} />
+  </FieldRow>
   <FieldRow label={t("feeds.refreshEvery")} note={t("feeds.refreshEveryNote")}>
     <Select
       label={t("feeds.refreshEvery")}

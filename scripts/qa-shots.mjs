@@ -638,12 +638,22 @@ const SCENES = [
   })),
   {
     id: "feeds",
-    title: "The Feeds, a post open",
-    look: "Every feed's posts in the list, newest first: an unread dot in the row's margin, the titles lined up whether read or not, the excerpt two lines at most, where it's from and when under it (an episode with its headphones and length, and its play button clear of the text). The open post in the note's place, drawn as a note: its title, a smaller, quieter line of where it's from, by whom and when, then its text with its links, list and quote; the toolbar's Mark as Unread and Open in Browser lined up with the other buttons.",
+    title: "The Feeds by kind, an Atom feed's post open",
+    look: "In the Library, before its shelves: RSS Feeds (the Svelte blog), Atom Feeds (Daring Fireball) and Podcast Feeds (Syntax), each with its unread count and its feeds under it, lined up as the tag tree nests tags; the Podcasts shelf after them, apart. Atom Feeds chosen: its posts in the list, newest first, an unread dot in the row's margin, the excerpt two lines at most, where it's from and when under it. The open post in the note's place, drawn as a note: its title, a smaller, quieter line of where it's from, by whom and when, then its text with its links, list and quote; the toolbar's Mark as Unread and Open in Browser lined up with the other buttons.",
+    act: async (page) => {
+      await subscribe(page, FEEDS);
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Atom Feeds/ }).click();
+      await page.locator(".note-list").getByRole("button", { name: /^Jensen Huang/ }).click();
+    },
+  },
+  {
+    id: "feeds-together",
+    title: "The Feeds together (Settings → Library → Feeds in the sidebar)",
+    look: "One Feeds row in the Library with every feed under it and every feed's posts in the list, newest first (an episode with its headphones and length, and its play button clear of the text).",
+    prefs: { feedsInSidebar: "together" },
     act: async (page) => {
       await subscribe(page, FEEDS);
       await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Feeds/ }).click();
-      await page.locator(".note-list").getByRole("button", { name: /^Jensen Huang/ }).click();
     },
   },
   ...["neon", "classic", "pixel"].map((style) => ({
@@ -653,7 +663,7 @@ const SCENES = [
     prefs: { style, theme: style },
     act: async (page) => {
       await subscribe(page, FEEDS);
-      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Feeds/ }).click();
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^RSS Feeds/ }).click();
       await page.locator(".note-list").getByRole("button", { name: /^SvelteKit 3 is here/ }).click();
     },
   })),
@@ -662,7 +672,7 @@ const SCENES = [
     title: "Subscribing to a feed",
     look: "The box under the + over the list: its heading, the field with the feed icon and its placeholder, the Subscribe button in the accent; on the web, the quiet line under it about which feeds the web can read.",
     act: async (page) => {
-      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Feeds/ }).click();
+      await page.evaluate(() => window.testing.notes.setFilter({ kind: "feeds" }));
       await page.locator(".note-list").getByRole("button", { name: "Subscribe to a Feed" }).first().click();
     },
   },

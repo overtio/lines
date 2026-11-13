@@ -1,11 +1,15 @@
 <script lang="ts" module>
-  /** Whether the subscriptions are shown, as the sidebar was left. */
-  const shown = $state({ open: true });
+  import { SvelteSet } from "svelte/reactivity";
+
+  /** Which rows of feeds have their subscriptions folded away, as the sidebar was left. */
+  const folded = new SvelteSet<string>();
 </script>
 
 <script lang="ts">
+  import type { Attachment } from "svelte/attachments";
   import { speak } from "../a11y";
-  import { feedError, feeds, type Subscription } from "../feeds/feeds.svelte";
+  import { feedError, feedRowLabel, feeds, type Subscription } from "../feeds/feeds.svelte";
+  import type { FeedGroup } from "../feeds/groups";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { longPress } from "../longPress";
@@ -16,102 +20,135 @@
   import type { Filter } from "../notes/types";
   import { copyText } from "../platform";
   import { menuPoint } from "../popover";
+  import type { RowSize } from "../sidebarLayout.svelte";
   import { type MenuItem, menuSections, ui } from "../ui.svelte";
   import SidebarRow from "./SidebarRow.svelte";
 
-  // The Library's Feeds: every feed's posts, and under it, each feed subscribed to with its unread
-  // posts counted, as the tag tree nests tags. A feed that couldn't be fetched says why when pointed at.
+  // A row of the Library's feeds: a kind of feed's posts (RSS, Atom, podcasts'), or every feed's,
+  // and under it each feed subscribed to with its unread posts counted, as the tag tree nests tags.
+  // A feed that couldn't be fetched says why when pointed at. The row's own menu is the sidebar's
+  // (`onmenu`), which adds sizing and hiding it.
 
-  let { onchoose }: { onchoose: (filter: Filter) => void } = $props();
+  let {
+    group,
+    subscriptions,
+    unread,
+    size = "standard",
+    marked = false,
+    onchoose,
+    onmenu,
+    reorder,
+  }: {
+    /** Its kind of feed, or null for every feed. */
+    group: FeedGroup | null;
+    subscriptions: Subscription[];
+    unread: number;
+    size?: RowSize;
+    marked?: boolean;
+    onchoose: (filter: Filter) => void;
+    onmenu: (label: string, items: MenuItem[], x: number, y: number) => void;
+    reorder: Attachment<HTMLElement>;
+  } = $props();
 
-  /** The row whose menu is open, outlined like a right-clicked note. */
+  /** The subscription whose menu is open, outlined like a right-clicked note. */
   let menuFor = $state<string | null>(null);
 
+  const key = $derived(group ?? "all");
+  const label = $derived(feedRowLabel(group));
   const filter = $derived(notes.filter.kind === "feeds" ? notes.filter : null);
+  const shown = $derived(!folded.has(key) && subscriptions.length > 0);
+  /** What the row lists. */
+  const own = $derived<Filter>(group ? { kind: "feeds", group } : { kind: "feeds" });
+  const urls = () => subscriptions.map(({ url }) => url);
 
-  function readAll(feed?: string) {
-    feeds.readAll(feed);
+  function readAll(urls: string[]) {
+    feeds.readAll(urls);
     speak(t("feeds.didReadAll"));
   }
 
-  function showMenu(key: string, label: string, items: MenuItem[], x: number, y: number) {
-    menuFor = key;
-    ui.openMenu({ x, y, label, items, onclose: () => (menuFor = null) });
-  }
-
-  function feedsMenu(x: number, y: number) {
-    showMenu("feeds", t("feeds.title"), [
-      { label: t("feeds.refresh"), icon: "refresh", run: () => feeds.refresh() },
-      { label: t("feeds.readAll"), icon: "check-check", run: () => readAll() },
+  function rowMenu(x: number, y: number) {
+    onmenu(label, [
+      { label: t("feeds.refresh"), icon: "refresh", run: () => feeds.refresh(urls()) },
+      { label: t("feeds.readAll"), icon: "check-check", run: () => readAll(urls()) },
       "separator",
       { label: t("feeds.subscribe"), icon: "plus", run: () => (ui.subscribePrompt = { x, y }) },
     ], x, y);
   }
 
   function subscriptionMenu({ url, note, title }: Subscription, x: number, y: number) {
-    showMenu(url, title, menuSections(
-      [
-        { label: t("feeds.refreshOne"), icon: "refresh", run: () => feeds.refresh([url]) },
-        { label: t("feeds.readAll"), icon: "check-check", run: () => readAll(url) },
-      ],
-      [
-        { label: t("feeds.openNote"), icon: "file-text", run: () => notes.show(note) },
-        { label: t("feeds.copyFeedLink"), icon: "link", run: () => void copyText(url).then(() => speak(t("list.copied"))) },
-      ],
-      // Its notes are the subscription: to the Trash with every one, which ⌘Z (or Restore) undoes.
-      [{ label: t("feeds.unsubscribe"), icon: "trash", danger: true, run: () => {
-        notes.trashMany(feeds.notesOf(url));
-        if (filter?.feed === url) onchoose({ kind: "feeds" });
-        speak(t("feeds.unsubscribed", { title }));
-      } }],
-    ), x, y);
+    menuFor = url;
+    ui.openMenu({
+      x,
+      y,
+      label: title,
+      items: menuSections(
+        [
+          { label: t("feeds.refreshOne"), icon: "refresh", run: () => feeds.refresh([url]) },
+          { label: t("feeds.readAll"), icon: "check-check", run: () => readAll([url]) },
+        ],
+        [
+          { label: t("feeds.openNote"), icon: "file-text", run: () => notes.show(note) },
+          { label: t("feeds.copyFeedLink"), icon: "link", run: () => void copyText(url).then(() => speak(t("list.copied"))) },
+        ],
+        // Its notes are the subscription: to the Trash with every one, which ⌘Z (or Restore) undoes.
+        [{ label: t("feeds.unsubscribe"), icon: "trash", danger: true, run: () => {
+          notes.trashMany(feeds.notesOf(url));
+          if (filter?.feed === url) onchoose(own);
+          speak(t("feeds.unsubscribed", { title }));
+        } }],
+      ),
+      onclose: () => (menuFor = null),
+    });
   }
 
-  function oncontextmenu(event: MouseEvent, key: string, open: (x: number, y: number) => void) {
+  function oncontextmenu(event: MouseEvent, open: (x: number, y: number) => void, opened: boolean) {
     event.preventDefault();
     // Android also fires this after a long press, when the menu is already up.
-    if (menuFor === key) return;
+    if (opened) return;
     const { x, y } = menuPoint(event);
     open(x, y);
   }
 </script>
 
-<li>
+<!-- Dragged, the row goes with its subscriptions (reorder.ts). -->
+<li data-reorder-area>
   <div class="relative">
     <SidebarRow
-      class={feeds.subscriptions.length ? "pr-[30px] coarse:pr-12" : undefined}
+      {size}
+      class={subscriptions.length ? "pr-[30px] coarse:pr-12" : undefined}
       icon="rss"
-      label={t("feeds.title")}
-      count={feeds.totalUnread}
-      active={!!filter && !filter.feed}
-      marked={menuFor === "feeds"}
-      aria-label={feeds.totalUnread ? t("feeds.titleWithUnread", { count: feeds.totalUnread }) : undefined}
-      onclick={() => onchoose({ kind: "feeds" })}
-      oncontextmenu={(event) => oncontextmenu(event, "feeds", feedsMenu)}
-      {@attach longPress(feedsMenu)}
+      {label}
+      count={unread}
+      active={!!filter && !filter.feed && filter.group === (group ?? undefined)}
+      {marked}
+      aria-label={unread ? `${label}, ${t("feeds.unreadCount", { count: unread })}` : undefined}
+      onclick={() => onchoose(own)}
+      oncontextmenu={(event) => oncontextmenu(event, rowMenu, marked)}
+      {@attach longPress(rowMenu)}
+      {@attach reorder}
     />
-    {#if feeds.subscriptions.length}
+    {#if subscriptions.length}
       <button
         class={[
           "absolute top-1/2 right-1 -mt-3 grid size-6 place-items-center rounded-sm text-faint transition-[rotate,background-color] hover:bg-hover hover:text-muted coarse:right-0 coarse:-mt-[22px] coarse:size-11",
-          shown.open && "rotate-90",
+          shown && "rotate-90",
         ]}
-        onclick={() => (shown.open = !shown.open)}
-        aria-label={t("feeds.showSubscriptions")}
-        title={t("feeds.showSubscriptions")}
-        aria-expanded={shown.open}
-        aria-controls="feeds-subscriptions"
+        onclick={() => (folded.has(key) ? folded.delete(key) : folded.add(key))}
+        aria-label={group ? t("feeds.showGroup", { group: label }) : t("feeds.showSubscriptions")}
+        title={group ? t("feeds.showGroup", { group: label }) : t("feeds.showSubscriptions")}
+        aria-expanded={shown}
+        aria-controls="feeds-in-{key}"
       >
         <Icon name="chevron-right" size={14} />
       </button>
     {/if}
   </div>
-  {#if shown.open && feeds.subscriptions.length}
-    <ul id="feeds-subscriptions" class="mt-0.5 grid grid-cols-1 gap-y-0.5" aria-label={t("feeds.subscriptions")}>
-      {#each feeds.subscriptions as subscription (subscription.url)}
+  {#if shown}
+    <ul id="feeds-in-{key}" class="mt-0.5 grid grid-cols-1 gap-y-0.5" aria-label={label}>
+      {#each subscriptions as subscription (subscription.url)}
         {@const { url, title, note } = subscription}
         {@const error = feeds.records.get(url)?.error}
-        {@const unread = feeds.unread.get(url) ?? 0}
+        {@const count = feeds.unread.get(url) ?? 0}
         {@const entry = notes.get(note)}
         {@const cover = entry && coverOf(entry.note.body)}
         <li class="pl-3.5">
@@ -124,17 +161,18 @@
             {/await}
           {/snippet}
           <SidebarRow
+            size={size === "small" ? "small" : "standard"}
             icon={error ? "circle-alert" : (entry && plugins.libraryKind(entry.meta.type)?.icon) || "rss"}
             iconClass={error ? "shrink-0 text-faint" : undefined}
             picture={cover && !error ? artwork : undefined}
             label={title || url}
-            count={unread}
+            {count}
             active={filter?.feed === url}
             marked={menuFor === url}
             title={error ? feedError(error) : undefined}
-            aria-label={[title || url, unread ? t("feeds.unreadCount", { count: unread }) : "", error ? feedError(error) : ""].filter(Boolean).join(", ")}
+            aria-label={[title || url, count ? t("feeds.unreadCount", { count }) : "", error ? feedError(error) : ""].filter(Boolean).join(", ")}
             onclick={() => onchoose({ kind: "feeds", feed: url })}
-            oncontextmenu={(event) => oncontextmenu(event, url, (x, y) => subscriptionMenu(subscription, x, y))}
+            oncontextmenu={(event) => oncontextmenu(event, (x, y) => subscriptionMenu(subscription, x, y), menuFor === url)}
             {@attach longPress((x, y) => subscriptionMenu(subscription, x, y))}
           />
         </li>

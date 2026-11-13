@@ -4,7 +4,6 @@ import { findFeed, looksLikeFeed, NoFeed } from "../../lib/feeds/find";
 import { isFeed, readFeed } from "../../lib/feeds/parse";
 import { t } from "../../lib/i18n/index.svelte";
 import { episodePlay } from "../../lib/player/notePlay";
-import { readsPages } from "../../lib/library/web";
 import type { LibraryKind, LibrarySource, Plugin } from "../../lib/plugins/types";
 
 /*
@@ -41,13 +40,14 @@ const source: LibrarySource = {
 
 /**
  * A page no other source took for something (a blog's, a podcast's, a site's front page): its
- * site's feed, or its podcast's (findFeed). Asked last, and only while pages are read (Web Pages).
+ * site's feed, or its podcast's (findFeed). Asked last, and only while Web Pages reads pages.
  */
 const site: LibrarySource = {
   id: "feeds-site",
   name: t("feeds.title"),
   general: true,
-  recognizes: (url) => (url.protocol === "https:" || url.protocol === "http:") && readsPages(),
+  requires: ["web-pages"],
+  recognizes: (url) => url.protocol === "https:" || url.protocol === "http:",
   async lookup(url, signal) {
     try {
       const found = await findFeed(url.href, signal, namedFeed);
