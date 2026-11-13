@@ -297,6 +297,8 @@ note(
     `${label(25, "asciinema's preview alone plays too")}\n\n![asciicast](https://asciinema.org/a/1271559.png)`,
     `${label(26, "Starting at 0:10, twice as fast")}\n\n[![asciicast](https://asciinema.org/a/1271559.svg)](https://asciinema.org/a/1271559?t=0:10&speed=2)`,
     `${label(27, "Recordings that stay links")}\n\n[A recording's page](https://asciinema.org/a/1271559) and [terminal.cast](attachment:terminal.cast) within a line of text are links.`,
+    `${label(28, "Spotify and SoundCloud, as players once played")}\n\n[Never Gonna Give You Up](https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC)\n\n[SoundCloud](https://soundcloud.com/forss/flickermood)`,
+    `${label(29, "Spotify links that stay links")}\n\nhttps://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC on its own line bare, and [a song](https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC) within a line of text, are links.`,
   ],
   "edge-cases",
 );

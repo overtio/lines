@@ -130,6 +130,10 @@ export default {
   "plugins.musicbrainz.description":
     "Busca canciones y álbumes por un enlace a MusicBrainz, o a Spotify, Apple Music, Bandcamp, Deezer o Tidal que conozca: artista, álbum, año y portada. El enlace se envía a MusicBrainz.",
   "plugins.applePodcasts.description": "Busca pódcasts y sus episodios por un enlace a Apple Podcasts, con el feed del pódcast. Los identificadores del enlace se envían a Apple.",
+  "plugins.spotify.description":
+    "Reproduce los enlaces de Spotify en las notas con el propio reproductor de Spotify, cuando los reproduces (sin cuenta, 30 segundos de cada canción), y busca canciones, álbumes y episodios de Spotify para la Biblioteca. El enlace se envía a Spotify.",
+  "plugins.soundcloud.description":
+    "Reproduce los enlaces de SoundCloud en las notas con el propio reproductor de SoundCloud, cuando los reproduces, y busca sus pistas para la Biblioteca; en las apps, un enlace a alguien que publica allí un pódcast te suscribe a él. El enlace se envía a SoundCloud.",
   "plugins.feeds.description":
     "Suscríbete a los feeds de sitios y pódcasts, y lee sus publicaciones en los Feeds de la Biblioteca. Una nota nueva que es solo el enlace de un feed te suscribe a él. Las notas de episodios tienen un botón para reproducirlos. Los feeds se descargan de sus sitios, en las apps cada 30 minutos.",
   "plugins.hackerNews.description": "Muestra los comentarios de una historia de Hacker News bajo su publicación en los Feeds de la Biblioteca, en hilos, para leerlos. El id de la historia va a la API de Hacker News y a la copia de Algolia.",

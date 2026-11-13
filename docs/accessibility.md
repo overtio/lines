@@ -127,6 +127,11 @@ A spreadsheet's grid (`src/plugins/spreadsheet/Grid.svelte`, [spreadsheets.md](s
 - With reduced motion, GIFs show still: in the picker, and GIPHY's GIFs in notes (their first frame, which GIPHY serves).
 - `/paper` opens a dialog named "Search arXiv", the same way: the papers are a listbox, one Tab stop, ↓ from the field into them, ↑ and ↓ between them, ↵ to link to one. Each is named by its title, authors, year and subject ("Attention Is All You Need, Ashish Vaswani et al., 2017, cs.CL"). Before anything's typed, the status says what can be searched for.
 
+## Spotify and SoundCloud
+
+- A link to either on a line of its own is a group named by the link's text (or "Track on Spotify"), with a button, "Play with Spotify". ↑ and ↓ stop on it; with it selected, Enter loads the site's player and puts focus in it, where Tab reaches its buttons.
+- The player is the site's own, in a frame titled "Spotify player: …": its buttons are named by the site, in the site's language. Esc can't leave it, as keys pressed in another site's frame don't reach lines; Tab and ⇧Tab do.
+
 ## Terminal recordings
 
 - A recording (asciinema) is a group named "Terminal recording". ↑ and ↓ stop on it, as on an image; with it selected, Enter plays it and puts focus in the player. There Space pauses and plays, ← and → skip 5 seconds, a number from 0 to 9 jumps to that tenth of it, F is full screen, and Tab reaches its play and full-screen buttons. Esc puts focus back in the note with the recording selected. These are in Settings → Shortcuts.

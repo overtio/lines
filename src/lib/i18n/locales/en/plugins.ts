@@ -138,6 +138,11 @@ export default {
   "plugins.musicbrainz.description":
     "Looks up songs and albums by a link to MusicBrainz, or one to Spotify, Apple Music, Bandcamp, Deezer or Tidal it knows: artist, album, year and cover. The link goes to MusicBrainz.",
   "plugins.applePodcasts.description": "Looks up podcasts and their episodes by a link to Apple Podcasts, with the podcast’s feed. The ids in the link go to Apple.",
+  // Spotify and SoundCloud are names, not translated.
+  "plugins.spotify.description":
+    "Plays Spotify links in notes with Spotify’s own player, once you play them (without an account, 30 seconds of each song), and looks up Spotify’s songs, albums and episodes for the Library. The link goes to Spotify.",
+  "plugins.soundcloud.description":
+    "Plays SoundCloud links in notes with SoundCloud’s own player, once you play them, and looks up its tracks for the Library; in the apps, a link to someone who publishes a podcast there subscribes to it. The link goes to SoundCloud.",
   "plugins.feeds.description":
     "Subscribe to sites’ and podcasts’ feeds, and read their posts in the Library’s Feeds. A new note that’s just a feed’s link subscribes to it. Episode notes get a Play button. Feeds are fetched from their sites, in the apps every 30 minutes.",
   "plugins.hackerNews.description": "Shows a Hacker News story’s comments under its post in the Library’s Feeds, threaded, to read. The story’s id goes to Hacker News’ API and to Algolia’s copy of it.",

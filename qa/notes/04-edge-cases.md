@@ -163,3 +163,13 @@ The # and the - above are text, not an empty heading and list item: a tag and a 
 #### 27. Recordings that stay links
 
 [A recording's page](https://asciinema.org/a/1271559) and [terminal.cast](attachment:terminal.cast) within a line of text are links.
+
+#### 28. Spotify and SoundCloud, as players once played
+
+[Never Gonna Give You Up](https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC)
+
+[SoundCloud](https://soundcloud.com/forss/flickermood)
+
+#### 29. Spotify links that stay links
+
+https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC on its own line bare, and [a song](https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC) within a line of text, are links.

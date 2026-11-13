@@ -99,6 +99,14 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - A GIF is kept as its address on GIPHY, like an Unsplash photo: it needs the internet to show, and isn't in exports or sync as a picture. With reduced motion, GIFs from GIPHY show still, but other animated images in notes still play.
 - They're in Markdown notes only. A LaTeX note can't compile a picture from the web anyway.
 
+## Spotify and SoundCloud
+
+- The players are the sites' own, in a frame: Spotify plays only 30 seconds of a song in Safari and the apps (their web views can't play the audio Spotify protects), and to anyone not logged in to Spotify in that browser. Nothing of Spotify's plays through lines' own player.
+- Scrolled far from it in a long note, a player playing stops, as the note draws only what's near the view, and it's loaded again (paused) when scrolled back to. Keys in it don't reach lines, so Esc doesn't leave it.
+- In Safari (and so, it's likely, the Mac app), playing a card loads the player without starting it: the site's play button starts it.
+- Only a Markdown link on a line of its own is a player; a bare address is a link. Spotify's short links (`spotify.link/…`) and SoundCloud's (`on.soundcloud.com/…`) aren't known.
+- Nothing of either needs an account, and nothing from one is read: your saved songs, playlists or what's playing aren't in lines.
+
 ## Terminal recordings (asciinema)
 
 - A recording on asciinema.org is kept as its embed code, not as a file: it needs the internet to play, and isn't in exports or sync as a recording. A `.cast` file dropped into a note is an attachment like any other, and plays offline.

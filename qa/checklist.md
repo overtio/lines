@@ -310,6 +310,15 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Scrolling to the end of the pictures loads more. A search that finds nothing says so; with no connection (or a bad key) it says it couldn't reach Unsplash or GIPHY, with Try Again. The credit under the pictures ("Photos from Unsplash", "Powered by GIPHY") opens their site
 - [ ] With reduced motion on in the system, GIFs in the picker and GIPHY GIFs in notes are still
 
+### Spotify and SoundCloud
+
+- [ ] A Spotify link on a line of its own (`[Never Gonna Give You Up](https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC)`) is a card like an audio file's: a round play button in the accent, the link's text, and "Loads Spotify's player when you play it" under it, faint. `[Spotify](…)` is named "Track on Spotify" (Album, Playlist, Artist, Podcast, Episode for the others). A SoundCloud track, set or person's link is the same. Nothing is fetched from either site until it's played (the browser's network panel shows nothing)
+- [ ] Its play button (or Enter with the card selected, ↑ and ↓ stopping on it) puts the site's player in its place, as wide as the note up to a column; in Chrome it starts playing, in Safari and the Mac app it waits for the player's own play button. Spotify says Preview and stops after 30 seconds; SoundCloud plays the whole track, its buttons in the theme's accent
+- [ ] Playing one pauses the podcast player, a sound in a note and the other site's player; playing any of those pauses it
+- [ ] Pasting a Spotify or SoundCloud link on an empty line writes `[Spotify](…)` and shows the card; ⌘Z turns it back into the address. A bare address on its own line, or a link within text, stays a link
+- [ ] In the Mac app: the player loads (no frame refused in the console), plays, and its links (the Spotify logo, Share) open in the browser rather than in lines' window
+- [ ] Spotify or SoundCloud off: its links are links, at once; on again, cards
+
 ### Terminal recordings (asciinema)
 
 - [ ] asciinema's embed code on a line of its own (`[![asciicast](https://asciinema.org/a/1271559.svg)](https://asciinema.org/a/1271559)`) shows the recording's player, with the frame from its middle and a round play button; while it loads, an empty box about its size. The terminal is the theme's code-block background, text and colors (try light and dark, and a few themes), in the code font, no bigger than code: a narrow `.cast` is narrower than the note
@@ -583,6 +592,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] TeX Typesetting off: a LaTeX note's PDF preview has no "Typeset with" switch
 - [ ] Formulas off: formulas in tables and spreadsheets show as written, and a spreadsheet's share menu has no Download Values or Excel Workbook; on again, worked out
 - [ ] Unsplash or GIPHY off: `/unsplash` or `/giphy` is gone from the "/" menu, and photos and GIFs already in notes still show. In a build without their keys they have no switch and say they need an API key
+- [ ] Settings → Plugins lists Spotify and SoundCloud under More, after MusicBrainz, each with its icon and what it does
 - [ ] asciinema off: a recording's embed code shows asciinema's preview image (inline, as any linked image), an attached `.cast` file is only its card, and pasting a recording's link on an empty line pastes the link; on again, they play
 - [ ] GitHub or arXiv off: its links show as ordinary links at once, in text, tables and LaTeX notes, and short again when it's back on; with arXiv off, `/paper` is gone [Apps]
 - [ ] Choices are remembered after reloading, and turning a plugin on or off in one window changes every window at once (the Settings window, floating notes [Desktop], other browser tabs [Web])

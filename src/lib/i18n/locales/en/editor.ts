@@ -179,6 +179,18 @@ export default {
   // A terminal recording (asciinema) played in a note, named for screen readers, and what shows when it can't load.
   "editor.recording": "Terminal recording",
   "editor.recording.failed": "This recording couldn’t be loaded",
+  // A player from another site (Spotify, SoundCloud) in a note: a card until it's played, as nothing is
+  // asked of the site before. {site} is its name; {kind} one of the kinds below; {title} what it plays.
+  "editor.sitePlayer.play": "Play with {site}",
+  "editor.sitePlayer.name": "{kind} on {site}",
+  "editor.sitePlayer.loads": "Loads {site}’s player when you play it",
+  "editor.sitePlayer.frame": "{site} player: {title}",
+  "editor.sitePlayer.track": "Track",
+  "editor.sitePlayer.album": "Album",
+  "editor.sitePlayer.playlist": "Playlist",
+  "editor.sitePlayer.artist": "Artist",
+  "editor.sitePlayer.podcast": "Podcast",
+  "editor.sitePlayer.episode": "Episode",
   "editor.size.bytes": "{count, plural, one {# byte} other {# bytes}}",
   "editor.size.kb": "{size} KB",
   "editor.size.mb": "{size} MB",

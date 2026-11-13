@@ -39,6 +39,8 @@ const { openLibrary, bookIn, isIsbn } = await import("../../src/plugins/open-lib
 const { wikidata, itemIn } = await import("../../src/plugins/wikidata");
 const { musicbrainz, musicIn } = await import("../../src/plugins/musicbrainz");
 const { applePodcasts, podcastIn } = await import("../../src/plugins/apple-podcasts");
+const { spotify, spotifyIn, spotifyItem } = await import("../../src/plugins/spotify");
+const { soundcloud, soundcloudIn } = await import("../../src/plugins/soundcloud");
 const { paperItem } = await import("../../src/plugins/arxiv");
 const bookmarks = await import("../../src/lib/library/bookmarks");
 const { dayOf } = await import("../../src/lib/notes/calendar");
@@ -461,6 +463,83 @@ describe("MusicBrainz", () => {
       ["tracks", "10"],
     ]);
     expect(new URL(asked[0]).searchParams.get("resource")).toBe("https://open.spotify.com/album/6N9PS4QXF1D0OWPk0Sxtb4");
+  });
+});
+
+describe("Spotify", () => {
+  test("knows its songs', albums', playlists', artists', podcasts' and episodes' links, and looks up what the library keeps", () => {
+    expect(spotifyIn(new URL("https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC?si=0123456789abcdef"))).toEqual({ kind: "track", id: "4uLU6hMCjMI75M1A2tKUQC" });
+    expect(spotifyIn(new URL("https://open.spotify.com/intl-de/album/6N9PS4QXF1D0OWPk0Sxtb4"))).toEqual({ kind: "album", id: "6N9PS4QXF1D0OWPk0Sxtb4" });
+    expect(spotifyIn(new URL("https://open.spotify.com/embed/show/4rOoJ6Egrf8K2IrywzwOMk"))).toEqual({ kind: "show", id: "4rOoJ6Egrf8K2IrywzwOMk" });
+    for (const not of ["https://open.spotify.com/user/someone", "https://open.spotify.com/track/short", "https://spotify.com/track/4uLU6hMCjMI75M1A2tKUQC", "https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC/more"]) {
+      expect(spotifyIn(new URL(not)), not).toBeNull();
+    }
+    const source = sourceOf(spotify);
+    expect(source.recognizes(new URL("https://open.spotify.com/episode/0R6JJpgimzFfiGkdeFgimD"))).toBe(true);
+    expect(source.recognizes(new URL("https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M"))).toBe(false);
+  });
+
+  test("on the web, a song's title and cover from oEmbed, sent its link without who shared it; a podcast isn't asked, its oEmbed naming its latest episode", async () => {
+    // As Spotify's oEmbed answered (November 2026).
+    answers.set("https://open.spotify.com/oembed", { type: "rich", title: "Never Gonna Give You Up", thumbnail_url: "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02255e131abc1410833be95673" });
+    expect(await look(spotify, "https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC?si=0123456789abcdef")).toEqual({
+      type: "song",
+      title: "Never Gonna Give You Up",
+      link: "https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC",
+      properties: [],
+      cover: "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02255e131abc1410833be95673",
+    });
+    expect(asked).toEqual(["https://open.spotify.com/oembed?url=https%3A%2F%2Fopen.spotify.com%2Ftrack%2F4uLU6hMCjMI75M1A2tKUQC"]);
+    expect(await look(spotify, "https://open.spotify.com/show/4rOoJ6Egrf8K2IrywzwOMk")).toBeNull();
+    expect(asked).toHaveLength(1);
+  });
+
+  test("in the apps, an episode from its page: its podcast and length, and what it's about without Spotify's words", () => {
+    const item = spotifyItem(page("spotify-episode.html", "https://open.spotify.com/episode/0R6JJpgimzFfiGkdeFgimD"), "episode")!;
+    expect(item.title).toBe("JRE MMA Show #188 with Paddy Pimblett");
+    expect(item.properties).toEqual([
+      ["podcast", "The Joe Rogan Experience"],
+      ["published", "2026-11-11"],
+      ["duration", "2:55:43"],
+    ]);
+    expect(item.description).toStartWith("Joe sits down with Paddy Pimblett");
+    // A song's description is only Spotify's own.
+    expect(spotifyItem(page("spotify.html", "https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC"), "song")?.description).toBeUndefined();
+    expect(spotifyItem(page("spotify.html", "https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC"), "album")).toBeNull();
+  });
+});
+
+describe("SoundCloud", () => {
+  test("knows tracks, sets and people's links, a private track's with its secret, and not SoundCloud's own pages or people's tabs", () => {
+    expect(soundcloudIn(new URL("https://soundcloud.com/forss/flickermood?si=abc&utm_source=clipboard"))).toEqual({ kind: "track", page: "https://soundcloud.com/forss/flickermood" });
+    expect(soundcloudIn(new URL("https://m.soundcloud.com/forss/sets/soulhack"))).toEqual({ kind: "set", page: "https://soundcloud.com/forss/sets/soulhack" });
+    expect(soundcloudIn(new URL("https://soundcloud.com/forss"))).toEqual({ kind: "user", page: "https://soundcloud.com/forss" });
+    expect(soundcloudIn(new URL("https://soundcloud.com/forss/demo/s-AbC123"))).toEqual({ kind: "track", page: "https://soundcloud.com/forss/demo/s-AbC123" });
+    for (const not of ["https://soundcloud.com/discover", "https://soundcloud.com/forss/likes", "https://soundcloud.com/forss/sets", "https://soundcloud.com/forss/flickermood/comments", "https://soundcloudx.com/forss"]) {
+      expect(soundcloudIn(new URL(not)), not).toBeNull();
+    }
+  });
+
+  test("a track from its oEmbed: its title without who it's by, its artist, its cover and what it's about as text, sent only its link", async () => {
+    // Trimmed from SoundCloud's oEmbed's answer (November 2026).
+    answers.set("https://soundcloud.com/oembed", {
+      title: "Flickermood by Forss",
+      author_name: "Forss",
+      description: 'From the Soulhack album,&nbsp;recently featured in this ad <a href="https://www.dswshoes.com/tv_commercial.jsp?m=october2007">https://www.dswshoes.com/tv_commercial.jsp?m=october2007</a> ',
+      thumbnail_url: "https://i1.sndcdn.com/artworks-000067273316-smsiqx-t500x500.jpg",
+      html: '<iframe width="100%" height="400" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F293&show_artwork=true"></iframe>',
+    });
+    const item = await look(soundcloud, "https://soundcloud.com/forss/flickermood?si=abc");
+    expect(item).toMatchObject({ type: "song", title: "Flickermood", link: "https://soundcloud.com/forss/flickermood", properties: [["artist", "Forss"]], cover: "https://i1.sndcdn.com/artworks-000067273316-smsiqx-t500x500.jpg" });
+    expect(item?.description).toStartWith("From the Soulhack album,");
+    expect(item?.description).not.toContain("&nbsp;");
+    expect(asked).toEqual(["https://soundcloud.com/oembed?format=json&url=https%3A%2F%2Fsoundcloud.com%2Fforss%2Fflickermood"]);
+  });
+
+  test("a set, an album or a playlist, isn't asked; nor on the web is someone, whose podcast only the apps can read", async () => {
+    expect(await look(soundcloud, "https://soundcloud.com/forss/sets/soulhack")).toBeNull();
+    expect(await look(soundcloud, "https://soundcloud.com/bader_b")).toBeNull();
+    expect(asked).toEqual([]);
   });
 });
 

@@ -932,6 +932,27 @@ const SCENES = [
     },
     shoot: ".editor-pane",
   },
+  ...["lines", "classic", "pixel", "neon"].map((style) => ({
+    id: `site-players-${style}`,
+    title: `Spotify and SoundCloud links before they're played, in ${style[0].toUpperCase()}${style.slice(1)}`,
+    look: "Three cards like an audio file's, the same width: a round play button in the accent's soft box, then Never Gonna Give You Up, Flickermood and Album on Spotify, each with “Loads … player when you play it” faint under it; lined up with the text above, with room between them.",
+    prefs: style === "lines" ? {} : { style, theme: style },
+    note: "# Listening\n\nA few things to listen to this week.\n\n[Never Gonna Give You Up](https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC)\n\n[Flickermood](https://soundcloud.com/forss/flickermood)\n\n[Spotify](https://open.spotify.com/album/6N9PS4QXF1D0OWPk0Sxtb4)\n",
+    shoot: ".editor-pane",
+    schemes: style === "lines" ? ["light", "dark"] : ["light"],
+  })),
+  {
+    id: "site-players-playing",
+    title: "Spotify's and SoundCloud's players, played (needs a connection)",
+    look: "Spotify's player (Preview, the song's art and its own colors) and SoundCloud's below it with its buttons in the accent, each as wide as the note up to a column, the corners round; the album still a card. Nothing cut off, no frame refused.",
+    note: "# Listening\n\n[Never Gonna Give You Up](https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC)\n\n[Flickermood](https://soundcloud.com/forss/flickermood)\n\n[Spotify](https://open.spotify.com/album/6N9PS4QXF1D0OWPk0Sxtb4)\n",
+    act: async (page) => {
+      await page.getByRole("button", { name: "Play with Spotify" }).first().click();
+      await page.getByRole("button", { name: "Play with SoundCloud" }).click();
+    },
+    wait: 5000,
+    shoot: ".editor-pane",
+  },
   ...["block", "underline", "thick"].map((shape) => ({
     id: `cursor-${shape}`,
     title: `Text cursor: ${shape}`,

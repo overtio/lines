@@ -26,6 +26,8 @@ import { paper } from "./paper";
 import { pele } from "./pele";
 import { secrets } from "./secrets";
 import { sfSymbols } from "./sf-symbols";
+import { soundcloud } from "./soundcloud";
+import { spotify } from "./spotify";
 import { spreadsheet, spreadsheetNotes } from "./spreadsheet";
 import { tex } from "./tex";
 import { keyboardSounds } from "./keyboards";
@@ -73,6 +75,9 @@ export const builtIn = (): Plugin[] => [
   openLibrary(),
   wikidata(),
   musicbrainz(),
+  // After MusicBrainz, which knows more of a song or album where it knows its link.
+  spotify(),
+  soundcloud(),
   applePodcasts(),
   webPages(),
   feedsPlugin(),
