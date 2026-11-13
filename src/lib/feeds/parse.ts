@@ -1,5 +1,5 @@
 import { readDate, readDuration } from "./dates";
-import { plainText } from "./markdown";
+import { plainText, saysMore } from "./markdown";
 import { fingerprint } from "./posts";
 
 /*
@@ -237,8 +237,12 @@ function asHtml(value: string): string {
     .join("");
 }
 
-/** A few sentences of a post, as plain text, cut at a word. */
-function excerptOf(html: string): string {
+/**
+ * A few sentences of a post, as plain text, cut at a word; none for one that says nothing but links
+ * to its `own` addresses (itself, its comments), as Hacker News' say only "Comments".
+ */
+function excerptOf(html: string, base?: string, own: (string | undefined)[] = []): string {
+  if (base && !saysMore(html, base, own)) return "";
   const text = plainText(html);
   if (text.length <= EXCERPT) return text;
   const cut = text.slice(0, EXCERPT);
@@ -313,17 +317,18 @@ function readItem(item: Element, base: string, ns: string | null): Post {
   const description = text(item, "description", ns);
   const html = asHtml(text(item, "encoded", NS.content) ?? description ?? tags.summary ?? "");
   const enclosures = children(item, "enclosure", ns).map((enclosure) => ({ url: enclosure.getAttribute("url"), type: enclosure.getAttribute("type") }));
+  const comments = web(text(item, "comments", ns), base);
   return {
     id: guidText || link || `${title}\n${date ?? ""}\n${fingerprint(html)}`,
     title: title || excerptOf(html).slice(0, 80),
     link,
-    comments: web(text(item, "comments", ns), base),
+    comments,
     author: authorName(text(item, "author", ns) ?? tags.author),
     date,
     html,
     // A post's relative links are from its own page, if it has one.
     base: link ?? base,
-    excerpt: excerptOf(description ? asHtml(description) : html),
+    excerpt: excerptOf(description ? asHtml(description) : html, link ?? base, [link, comments]),
     image: tags.image ?? web(enclosures.find(({ type }) => type?.startsWith("image/"))?.url, base),
     audio: audioOf(tags.playable ? [...enclosures, tags.playable] : enclosures, base),
     duration: tags.duration,
@@ -385,6 +390,7 @@ function readAtom(root: Element, url: string): Feed {
     const entryBase = baseOf(entry, base);
     const entryTags = podcastTags(entry, entryBase);
     const link = atomLink(entry, ns, "alternate", entryBase);
+    const comments = atomLink(entry, ns, "replies", entryBase);
     const title = plainText(atomHtml(child(entry, "title", ns)));
     const date = readDate(text(entry, "published", ns) ?? text(entry, "issued", ns) ?? text(entry, "updated", ns) ?? text(entry, "modified", ns));
     const summary = atomHtml(child(entry, "summary", ns));
@@ -397,12 +403,12 @@ function readAtom(root: Element, url: string): Feed {
       id: text(entry, "id", ns) || link || `${title}\n${date ?? ""}\n${fingerprint(html)}`,
       title: title || excerptOf(html).slice(0, 80),
       link,
-      comments: atomLink(entry, ns, "replies", entryBase),
+      comments,
       author: name(entry) ?? entryTags.author ?? feedAuthor,
       date,
       html,
       base: content ? baseOf(content, entryBase) : entryBase,
-      excerpt: excerptOf(summary || html),
+      excerpt: excerptOf(summary || html, entryBase, [link, comments]),
       image: entryTags.image,
       audio: audioOf(entryTags.playable ? [...enclosures, entryTags.playable] : enclosures, entryBase),
       duration: entryTags.duration,

@@ -153,6 +153,12 @@ describe("reading feeds", () => {
       "https://news.example/rss",
     );
     expect(rss.posts.map((post) => post.comments)).toEqual(["https://news.example/item?id=1", undefined]);
+    // One that says only "Comments", a link to them, has no excerpt to show in the list.
+    const news = await read(
+      `<rss version="2.0"><channel><title>News</title><item><title>A</title><link>https://a.example/post</link><comments>https://news.example/item?id=1</comments><description><![CDATA[<a href="https://news.example/item?id=1">Comments</a>]]></description></item><item><title>B</title><link>https://b.example/</link><description>What B is about.</description></item></channel></rss>`,
+      "https://news.example/rss",
+    );
+    expect(news.posts.map((post) => post.excerpt)).toEqual(["", "What B is about."]);
     const atom = await read(
       `<feed xmlns="http://www.w3.org/2005/Atom"><title>Blog</title><entry><title>A</title><id>a</id><link href="/a"/><link rel="replies" type="application/atom+xml" href="/a/comments.xml"/><link rel="replies" type="text/html" href="/a#comments"/></entry><entry><title>B</title><id>b</id><link rel="replies" type="application/atom+xml" href="/b/comments.xml"/></entry></feed>`,
       "https://blog.example/feed",
