@@ -89,15 +89,22 @@ export function fenceAt(state: EditorState, pos: number): SyntaxNode | null {
   return null;
 }
 
-/** What drawings' colors depend on: one made in one look is drawn again in another. */
+/** What drawings' colors and fonts depend on: one made in one look is drawn again in another. */
 export const lookKey = () => {
-  const { theme, scheme, font, contrast, filters } = document.documentElement.dataset;
-  return `${theme} ${scheme} ${font} ${contrast ?? ""} ${filters ?? ""}`;
+  const root = document.documentElement;
+  const { theme, scheme, font, contrast, filters } = root.dataset;
+  // A font installed on this device is named in the page's own style (prefs.svelte.ts).
+  return `${theme} ${scheme} ${font} ${contrast ?? ""} ${filters ?? ""} ${root.style.getPropertyValue("--font-text")}`;
 };
 
 /** Calls `callback` whenever the look changes, for what draws in the theme's colors without CSS. */
 export function onLookChange(callback: () => void) {
-  new MutationObserver(callback).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-scheme", "data-font", "data-contrast", "data-filters"] });
+  let look = lookKey();
+  new MutationObserver(() => {
+    if (lookKey() === look) return;
+    look = lookKey();
+    callback();
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-scheme", "data-font", "data-contrast", "data-filters", "style"] });
 }
 
 /* Drawing. */

@@ -95,7 +95,7 @@ test("Fonts: IBM Plex Sans, Fira Sans and Agave come with lines, write notes in 
   app = await openApp();
   await app.open("# Title\n\nText");
   const settings = await app.settings("Typography");
-  const fonts = settings.getByRole("radiogroup", { name: "Font" });
+  const fonts = settings.getByRole("radiogroup", { name: "Recommended" });
   for (const [name, id] of [["IBM Plex Sans", "ibm-plex-sans"], ["Fira Sans", "fira-sans"], ["Agave", "agave"]]) {
     await fonts.getByRole("radio", { name }).click();
     expect(await app.root("font")).toBe(id);
@@ -111,6 +111,117 @@ test("Fonts: IBM Plex Sans, Fira Sans and Agave come with lines, write notes in 
   await app.settings("Typography");
   expect(await fonts.getByRole("radio").count()).toBe(4);
   expect(await app.style(".editor-pane .cm-content", "font-family")).toStartWith("-apple-system");
+});
+
+describe("fonts installed on this device", () => {
+  /** A family this computer has (the Mac's and Linux's differ), by how it measures against the generic fonts. */
+  const someInstalledFont = (page: App["page"]) =>
+    page.evaluate(() => {
+      const context = document.createElement("canvas").getContext("2d")!;
+      const width = (font: string) => {
+        context.font = `40px ${font}`;
+        return context.measureText("mmmmmmmmmmlli1WQ@#Aa").width;
+      };
+      return ["Helvetica", "Arial", "DejaVu Sans", "Liberation Sans", "Verdana", "Georgia"].find((name) => ["monospace", "serif"].some((generic) => width(`"${name}", ${generic}`) !== width(generic)))!;
+    });
+
+  /** The system's fonts as the browser lists them (Local Font Access): many, and `families` among them; or the person saying no. */
+  const listFonts = (page: App["page"], families: string[] | "refused") =>
+    page.evaluate((families) => {
+      const many = Array.from({ length: 300 }, (_, i) => ({ family: `Zz Sample ${i + 1}` }));
+      Object.assign(window, {
+        queryLocalFonts: async () => {
+          if (families === "refused") throw new DOMException("Permission denied", "NotAllowedError");
+          return [...families.map((family) => ({ family })), ...families.map((family) => ({ family })), { family: ".Hidden" }, ...many];
+        },
+      });
+    }, families);
+
+  const stored = (page: App["page"]) => page.evaluate(() => JSON.parse(localStorage.getItem("lines.prefs")!).installedFont as string);
+
+  test("Typography has Font family, its recommended fonts and an installed one, then Font size with the text's size, then heading color", async () => {
+    app = await openApp();
+    const settings = await app.settings("Typography");
+    const family = settings.getByRole("region", { name: "Font family" });
+    expect(await family.getByRole("radiogroup", { name: "Recommended" }).getByRole("radio").count()).toBe(7);
+    expect(await family.getByRole("combobox", { name: "Installed font" }).isVisible()).toBe(true);
+    expect(await settings.getByRole("region", { name: "Font size" }).getByRole("slider", { name: "Text size" }).isVisible()).toBe(true);
+    expect(await family.getByRole("slider").count()).toBe(0);
+    const order = await settings.locator("[data-setting]").evaluateAll((rows) => rows.slice(0, 4).map((row) => row.querySelector(".min-w-0")!.firstElementChild!.textContent));
+    expect(order).toEqual(["Recommended", "Installed font", "Text size", "Heading color"]);
+  });
+
+  test("the picker lists the device's fonts, asked for as it opens, each in its own face, a few at a time; one chosen writes notes in it and unmarks the recommended fonts, and one of those goes back", async () => {
+    app = await openApp();
+    await app.open("# Title\n\nText");
+    const installed = await someInstalledFont(app.page);
+    await listFonts(app.page, [installed, "Zz Other"]);
+    const settings = await app.settings("Typography");
+    const recommended = settings.getByRole("radiogroup", { name: "Recommended" });
+    const picker = settings.getByRole("combobox", { name: "Installed font" });
+    await picker.click();
+    const list = app.page.getByRole("listbox");
+    await list.getByRole("option", { name: installed, exact: true }).waitFor();
+    // Once each, without hidden ones, and not all 300 at once.
+    expect(await list.getByRole("option", { name: installed, exact: true }).count()).toBe(1);
+    expect(await list.getByRole("option", { name: ".Hidden" }).count()).toBe(0);
+    expect(await list.getByRole("option").count()).toBeLessThan(100);
+    // Each in its own face.
+    expect(await list.getByRole("option", { name: installed, exact: true }).locator("span").first().evaluate((name) => getComputedStyle(name).fontFamily.replaceAll('"', ""))).toStartWith(`${installed},`);
+
+    await picker.fill(installed.slice(0, 4));
+    await list.getByRole("option", { name: "Zz Other" }).waitFor({ state: "detached" });
+    await list.getByRole("option", { name: installed, exact: true }).click();
+    await list.waitFor({ state: "detached" });
+    expect(await picker.inputValue()).toBe(installed);
+    expect(await recommended.getByRole("radio", { checked: true }).count()).toBe(0);
+    expect(await app.root("font")).toBe("installed");
+    expect((await app.style(".editor-pane .cm-content", "font-family")).replaceAll('"', "")).toStartWith(`${installed},`);
+    expect(await stored(app.page)).toBe(installed);
+    expect(await settings.getByText("Any font on this device.").isVisible()).toBe(true);
+
+    await recommended.getByRole("radio", { name: "Serif" }).click();
+    expect(await app.root("font")).toBe("serif");
+    expect(await picker.inputValue()).toBe("");
+    expect(await stored(app.page)).toBe("");
+    expect(await app.style(".editor-pane .cm-content", "font-family")).toStartWith("ui-serif");
+  });
+
+  test("where the browser can't list them, or is told not to, a font is chosen by typing its name, and one that isn't installed says so", async () => {
+    app = await openApp();
+    const installed = await someInstalledFont(app.page);
+    await listFonts(app.page, "refused");
+    const settings = await app.settings("Typography");
+    const picker = settings.getByRole("combobox", { name: "Installed font" });
+    await picker.click();
+    const list = app.page.getByRole("listbox");
+    await list.getByText("Type the name of a font on this device.").waitFor();
+    await picker.fill("Zz Not A Font");
+    await list.getByText("No font called “Zz Not A Font” is installed here.").waitFor();
+    expect(await list.getByRole("option").count()).toBe(0);
+    await picker.fill(installed.toLowerCase());
+    await list.getByRole("option", { name: installed.toLowerCase(), exact: true }).waitFor();
+    await app.page.keyboard.press("Enter");
+    await list.waitFor({ state: "detached" });
+    expect(await stored(app.page)).toBe(installed.toLowerCase());
+    expect(await app.root("font")).toBe("installed");
+  });
+
+  test("one chosen on another computer that isn't here: notes are in the system's font, and Settings says so, keeping it; a name that can't be one is none", async () => {
+    app = await openApp({ prefs: { font: "serif", installedFont: "Zz Not A Font" } });
+    await app.open("Text");
+    expect(await app.root("font")).toBe("installed");
+    expect((await app.style(".editor-pane .cm-content", "font-family")).replaceAll('"', "")).toStartWith("Zz Not A Font, -apple-system");
+    const settings = await app.settings("Typography");
+    await settings.getByText("Zz Not A Font isn’t installed on this device, so notes are in the system font.").waitFor();
+    expect(await settings.getByRole("combobox", { name: "Installed font" }).inputValue()).toBe("Zz Not A Font");
+    expect(await settings.getByRole("radiogroup", { name: "Recommended" }).getByRole("radio", { checked: true }).count()).toBe(0);
+    await app.close();
+
+    app = await openApp({ prefs: { font: "serif", installedFont: 'Zz"; color: red' } });
+    expect(await app.root("font")).toBe("serif");
+    expect(await app.page.evaluate(() => window.testing.prefs.installedFont)).toBe("");
+  });
 });
 
 describe("on a phone, in French", () => {

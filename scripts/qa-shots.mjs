@@ -512,6 +512,31 @@ const SCENES = [
       await page.getByRole("dialog", { name: "Choose a color for Your color" }).getByRole("radio").first().click();
     },
   })),
+  ...["lines", "classic", "pixel", "neon"].map((style) => ({
+    id: `installed-fonts-${style}`,
+    title: `Typography's installed fonts, in ${style[0].toUpperCase()}${style.slice(1)}`,
+    look: "Under Font family's recommended fonts (none marked), Installed font's field shows Georgia, like a select in the style's look; its list under it as wide, each name in its own face, Georgia checked, rows evenly spaced and nothing cut off. The preview above is in Georgia.",
+    prefs: { style, theme: style, installedFont: "Georgia" },
+    act: async (page) => {
+      // The fonts as Chrome lists them, the same on every computer.
+      await page.evaluate(() => {
+        const families = ["American Typewriter", "Avenir Next", "Baskerville", "Courier New", "Didot", "Futura", "Georgia", "Gill Sans", "Helvetica Neue", "Menlo", "Optima", "Palatino", "Times New Roman", "Verdana"];
+        Object.assign(window, { queryLocalFonts: async () => families.map((family) => ({ family })) });
+      });
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      await page.getByRole("dialog").getByRole("navigation").getByText("Typography", { exact: true }).click();
+      await page.getByRole("combobox", { name: "Installed font" }).click();
+      await page.getByRole("option", { name: "Georgia" }).waitFor();
+    },
+  })),
+  {
+    id: "installed-font-missing",
+    title: "Typography, with an installed font this computer hasn't",
+    look: "Installed font says “Zz Not A Font isn’t installed on this device, so notes are in the system font.” under its label, the field keeping the name; no recommended font marked; the preview in the system's font.",
+    prefs: { installedFont: "Zz Not A Font" },
+    settings: "Typography",
+    shoot: "dialog",
+  },
   ...["lines", "classic", "pixel", "neon"].flatMap((style) => {
     /** Settings → Theme, with a theme of yours made from Nord (its palette copied as yours), scrolled to `at`. */
     const yours = async (page, at) => {

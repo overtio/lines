@@ -28,6 +28,7 @@ export const PRESET_KEYS = [
   "headingColor",
   "headingCustomColor",
   "font",
+  "installedFont",
   "spacing",
   "noteWidth",
   "fullWidth",

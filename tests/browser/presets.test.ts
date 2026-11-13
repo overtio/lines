@@ -72,6 +72,19 @@ test("the look saved as a preset of yours shows as changed once it is, updates, 
   await presetsGroup(theirs).getByRole("radio", { name: /^Mossy/, checked: true }).waitFor();
 });
 
+test("a font installed on this device is part of the look: a preset of yours keeps it, and lines' own goes back to lines' font", async () => {
+  app = await openApp({ prefs: { installedFont: "Zz Some Font" } });
+  const settings = await app.settings("Presets");
+  await settings.getByRole("button", { name: "Save as Preset" }).click();
+  const mine = presetsGroup(settings).getByRole("radio", { name: /^My Lines/ });
+  await presetsGroup(settings).getByRole("radio", { name: /^My Lines/, checked: true }).waitFor();
+  const font = () => app.page.evaluate(() => [window.testing.prefs.font, window.testing.prefs.installedFont]);
+  await presetsGroup(settings).getByRole("radio", { name: /^Lines/ }).click();
+  expect(await font()).toEqual(["system", ""]);
+  await mine.click();
+  expect(await font()).toEqual(["system", "Zz Some Font"]);
+});
+
 test("Puddle brings its colors, ink lines around cards and what's chosen, and no shadows, light and dark", async () => {
   for (const scheme of ["light", "dark"] as const) {
     app = await openApp({ scheme });

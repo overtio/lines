@@ -20,6 +20,7 @@
     type Spacing,
   } from "../../prefs.svelte";
   import { noteFonts } from "../../themes/fonts.svelte";
+  import { canDraw } from "../../themes/installedFonts";
   import Button from "../ui/Button.svelte";
   import ColorField from "../ui/ColorField.svelte";
   import FieldGroup from "../ui/FieldGroup.svelte";
@@ -27,9 +28,17 @@
   import Segmented from "../ui/Segmented.svelte";
   import Slider from "../ui/Slider.svelte";
   import Switch from "../ui/Switch.svelte";
+  import FontPicker from "./FontPicker.svelte";
 
   const SAMPLE = t("settings.previewNote");
   const fonts = $derived(noteFonts());
+  /** The installed font chosen isn't on this device (a preset's, or settings from another computer). */
+  const missing = $derived(!!prefs.installedFont && !canDraw(prefs.installedFont));
+
+  function chooseFont(id: string) {
+    prefs.font = id;
+    prefs.installedFont = "";
+  }
 
   // "text" is the theme's colors for each level, by its first name (prefs.svelte.ts).
   const HEADING_COLOR_NAMES = { text: "settings.headingColorTheme", accent: "settings.color.accent", custom: "settings.paperColorCustom" } as const;
@@ -82,14 +91,14 @@
   ></div>
 </div>
 
-<FieldGroup>
-  <FieldRow label={t("settings.font")} stacked>
+<FieldGroup title={t("settings.fontFamily")}>
+  <FieldRow label={t("settings.fontRecommended")} stacked>
     <Segmented
       class="w-full"
-      label={t("settings.font")}
+      label={t("settings.fontRecommended")}
       options={fonts.map((font) => ({ id: font.id, label: font.id === "system" ? (plugins.style(prefs.style)?.font?.name ?? font.name) : font.name }))}
-      value={prefs.font}
-      onselect={(id) => (prefs.font = id)}
+      value={prefs.installedFont ? null : prefs.font}
+      onselect={chooseFont}
       stacked
       columns={4}
     >
@@ -99,9 +108,18 @@
       {/snippet}
     </Segmented>
   </FieldRow>
+  <FieldRow label={t("settings.fontInstalled")} note={missing ? t("settings.fontMissing", { name: prefs.installedFont }) : t("settings.fontInstalledNote")}>
+    <FontPicker class="w-60" label={t("settings.fontInstalled")} value={prefs.installedFont} onchange={(family) => (prefs.installedFont = family)} />
+  </FieldRow>
+</FieldGroup>
+
+<FieldGroup title={t("settings.fontSize")}>
   <FieldRow label={t("settings.textSize")}>
     <Slider class="w-60" bind:value={prefs.textSize} {...TEXT_SIZE} label={t("settings.textSize")} format={formatPixels} spoken={spokenPixels} />
   </FieldRow>
+</FieldGroup>
+
+<FieldGroup>
   <FieldRow label={t("settings.headingColor")}>
     <Segmented label={t("settings.headingColor")} options={headingColors} value={prefs.headingColor} onselect={(id) => (prefs.headingColor = id)}>
       {#snippet content(option)}

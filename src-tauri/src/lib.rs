@@ -5,6 +5,7 @@ mod devtools;
 mod drag_out;
 mod export;
 mod folder_sync;
+mod fonts;
 mod local_links;
 mod lock;
 #[cfg(target_os = "macos")]
@@ -42,6 +43,7 @@ pub fn run() {
       folder_sync::sync_folder_write_file,
       folder_sync::sync_folder_delete,
       folder_sync::sync_folder_pick,
+      fonts::installed_fonts,
       local_links::dropped_paths,
       local_links::pick_link_folder,
       local_links::open_local,
