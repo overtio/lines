@@ -1,4 +1,6 @@
 import { ATTACHMENT_PATH } from "../notes/attachments";
+import { escapeMarkdown, propertyValue } from "../notes/escape";
+import { mentionOf } from "../notes/properties";
 import type { LibraryItem } from "../plugins/types";
 
 /*
@@ -14,7 +16,7 @@ import type { LibraryItem } from "../plugins/types";
  *   ---
  *   # Dune: Part Two
  *
- *   ![Dune: Part Two](../attachments/3f9c….jpg)
+ *   ![Dune: Part Two|240](../attachments/3f9c….jpg)
  *
  *   Paul Atreides unites with Chani and the Fremen…
  *
@@ -24,22 +26,8 @@ import type { LibraryItem } from "../plugins/types";
 /** About as long as what it's about runs, give or take a sentence. */
 const SUMMARY = 600;
 
-/** One line of plain text: tags and HTML out, spaces collapsed. */
+/** One line of plain text: HTML's tags out, spaces collapsed. */
 const oneLine = (text: string) => text.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
-
-/**
- * Text as a paragraph of a note says it and nothing more: no `#tag` that would tag the note, no
- * `@name` that would mention another, and no line read as a heading, list or quote.
- */
-function plainParagraph(text: string) {
-  return oneLine(text)
-    .replace(/(^|\s)#[\p{L}\p{N}_/-]*\p{L}[\p{L}\p{N}_/-]*/gu, "$1")
-    .replace(/(^|[^\p{L}\p{N}_./\\@`])@(?=[\p{L}\p{N}_[])/gu, "$1\\@")
-    .replace(/^([#>*+-])(\s)/, "\\$1$2")
-    .replace(/^(\d+)([.)])(\s)/, "$1\\$2$3")
-    .replace(/\s+/g, " ")
-    .trim();
-}
 
 /** Where a sentence ends in `text`, before `max`: after its stop and the space that follows. */
 function sentenceEnd(text: string, max: number) {
@@ -49,14 +37,15 @@ function sentenceEnd(text: string, max: number) {
 }
 
 /**
- * What something's about, short: its first paragraphs, as many as fit in about SUMMARY characters,
- * a long one cut at a sentence, and one the source cut off (ending "…") back to its last sentence.
+ * What something's about, short, as plain text: its first paragraphs, as many as fit in about
+ * SUMMARY characters, a long one cut at a sentence, and one the source cut off (ending "…") back to
+ * its last sentence.
  */
 export function summary(text: string): string[] {
   const paragraphs = text
     .replace(/<\/p>|<br\s*\/?>/gi, "\n\n")
     .split(/\n\s*\n/)
-    .map(plainParagraph)
+    .map(oneLine)
     // Not one that's only dots, as a page with nothing to say may say.
     .filter((paragraph) => /[\p{L}\p{N}]/u.test(paragraph));
   const kept: string[] = [];
@@ -76,19 +65,33 @@ export function summary(text: string): string[] {
   return kept;
 }
 
+/** How a library note is written, besides what's found: where it starts, its cover, and which properties name another note. */
+export interface NoteOptions {
+  /** Its `status`, where its kind starts. */
+  status?: string;
+  /** Its cover, an attachment's name, and how wide the note shows it. */
+  cover?: { name: string; width: number };
+  /** The keys whose values are another note's title (an episode's podcast), written as a mention of it. */
+  mentions?: string[];
+}
+
 /**
  * The note's text for `item`: its properties (type first, then its own, the link and where it's
- * got to, `status`), its title as its heading, its cover (an attachment's name) and its summary.
+ * got to, `status`), its title as its heading, its cover and its summary. What came from elsewhere
+ * reads as just that text (escape.ts): no tag, mention, link or picture is made of it.
  */
-export function libraryNoteText(item: LibraryItem, { status, cover }: { status?: string; cover?: string } = {}): string {
+export function libraryNoteText(item: LibraryItem, { status, cover, mentions = [] }: NoteOptions = {}): string {
   const properties: [string, string][] = [["type", item.type], ...item.properties];
   if (item.link) properties.push(["link", item.link]);
   if (status) properties.push(["status", status]);
-  const front = properties.map(([key, value]) => [key, oneLine(value)]).filter(([, value]) => value);
+  const front = properties.flatMap(([key, value]) => {
+    const text = oneLine(value);
+    return text ? [`${key}: ${mentions.includes(key) ? mentionOf(text) : propertyValue(text)}`] : [];
+  });
   const title = oneLine(item.title);
-  const parts = [`---\n${front.map(([key, value]) => `${key}: ${value}`).join("\n")}\n---\n# ${title}`];
-  if (cover) parts.push(`![${title.replace(/[[\]]/g, "")}](${ATTACHMENT_PATH}${cover})`);
-  if (item.description) parts.push(...summary(item.description));
+  const parts = [`---\n${front.join("\n")}\n---\n# ${escapeMarkdown(title)}`];
+  if (cover) parts.push(`![${escapeMarkdown(title.replace(/[[\]|]/g, ""))}|${cover.width}](${ATTACHMENT_PATH}${cover.name})`);
+  if (item.description) parts.push(...summary(item.description).map(escapeMarkdown));
   return parts.join("\n\n") + "\n";
 }
 
@@ -112,6 +115,23 @@ export function linkOnly(text: string): string | null {
   } catch {
     return null;
   }
+}
+
+/** A link written in a note: `<…>`, `[text](…)` or bare. */
+const LINK = /<https?:\/\/[^\s<>]+>|\[[^\]\n]*\]\(https?:\/\/[^\s()]+(?:\([^\s()]*\)[^\s()]*)*\)|https?:\/\/[^\s<>]+/gi;
+
+/**
+ * The link a note is, if that's all it is (`linkOnly`); or, for a note made just now, its start left
+ * as it was made (`template`: `# `, or its properties too, made on a shelf) with only a link put in it.
+ */
+export function linkNoteLink(text: string, template?: string): string | null {
+  const whole = linkOnly(text);
+  if (whole || !template) return whole;
+  const found = [...text.matchAll(LINK)];
+  if (found.length !== 1) return null;
+  const [{ 0: link, index }] = found;
+  const rest = text.slice(0, index) + text.slice(index + link.length);
+  return rest.trimEnd() === template.trimEnd() ? linkOnly(link) : null;
 }
 
 /* How sources write what they find. */

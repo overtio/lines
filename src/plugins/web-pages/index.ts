@@ -1,7 +1,7 @@
 import { t } from "../../lib/i18n/index.svelte";
 import type { Page } from "../../lib/library/page";
 import { known } from "../../lib/library/text";
-import { getJson, getPage } from "../../lib/library/web";
+import { getJson, getPage, isPublic } from "../../lib/library/web";
 import { isTauri } from "../../lib/platform";
 import type { LibraryItem, LibrarySource, Plugin } from "../../lib/plugins/types";
 import { itemOfPage } from "./read";
@@ -22,7 +22,7 @@ interface OEmbed {
 }
 
 async function fromOEmbed(page: Page, signal: AbortSignal): Promise<LibraryItem | null> {
-  const href = page.links.find((link) => link.type === "application/json+oembed")?.href;
+  const href = page.links.find((link) => link.type === "application/json+oembed" && isPublic(link.href))?.href;
   const embed = href ? await getJson<OEmbed>(href, signal) : null;
   if (embed?.type !== "video" || !embed.title) return null;
   return { type: "video", title: embed.title, link: page.url, properties: known([["channel", embed.author_name]]), cover: embed.thumbnail_url };

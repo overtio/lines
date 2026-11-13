@@ -1,5 +1,6 @@
 import type { IconName } from "../icons/icons";
 import type { PaletteColor } from "../palette";
+import { plugins } from "../plugins/registry.svelte";
 import type { Note, NoteMeta } from "./types";
 import { type Chosen, type Look, type LookKind, type Looks, mergeLooks, noLooks, readLooks, writeLooks } from "./looks";
 
@@ -142,7 +143,7 @@ class KindLooks {
 /** Tags without an icon of their own show a #. */
 export const tagLooks = new KindLooks("tags", () => "hash");
 
-/** Icons that suit types people often use, until another is chosen; the library's kinds as its rows show them (plugins/library). */
+/** Icons that suit types people often use, until another is chosen. */
 const TYPE_ICONS: Record<string, IconName> = {
   person: "user",
   people: "users",
@@ -155,13 +156,9 @@ const TYPE_ICONS: Record<string, IconName> = {
   project: "briefcase",
   meeting: "calendar",
   event: "calendar",
-  book: "book-open",
+  book: "book",
   article: "newspaper",
-  paper: "graduation-cap",
-  show: "tv",
-  video: "square-play",
-  podcast: "podcast",
-  episode: "headphones",
+  paper: "file-text",
   place: "map-pin",
   location: "map-pin",
   city: "map-pin",
@@ -178,8 +175,8 @@ const TYPE_ICONS: Record<string, IconName> = {
   idea: "lightbulb",
 };
 
-/** The look of each type (`type: person`, see properties.ts). */
-export const typeLooks = new KindLooks("types", (type) => TYPE_ICONS[type] ?? "shapes");
+/** The look of each type (`type: person`, see properties.ts): a library kind's icon (books', movies'…), or else one that suits it. */
+export const typeLooks = new KindLooks("types", (type) => plugins.libraryKind(type)?.icon ?? TYPE_ICONS[type] ?? "shapes");
 
 /**
  * The color a note shows in on the Calendar: its own (chosen with its icon), or else its type's, or

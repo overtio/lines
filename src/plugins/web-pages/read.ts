@@ -1,6 +1,5 @@
 import { absolute, imageOf, namesOf, type Page, textOf, typesOf } from "../../lib/library/page";
 import { clock, dayOf, isoSeconds, known, names, runtime, yearOf } from "../../lib/library/text";
-import { mentionOf } from "../../lib/notes/properties";
 import type { LibraryItem } from "../../lib/plugins/types";
 
 /*
@@ -121,15 +120,13 @@ function propertiesOf(type: string, o: Record<string, unknown>, page: Page): [st
         ["author", names(namesOf(o.author))],
         ["feed", textOf(o.webFeed) ?? page.links.find((link) => link.rel.includes("alternate") && /(?:rss|atom)\+xml/.test(link.type))?.href],
       ];
-    case "episode": {
-      const series = textOf(o.partOfSeries);
+    case "episode":
       return [
-        ["podcast", series && mentionOf(series)],
+        ["podcast", textOf(o.partOfSeries)],
         ["published", dayOf(o.datePublished)],
         ["duration", clock(isoSeconds(o.duration ?? o.timeRequired))],
         ["audio", imageOf(o.associatedMedia ?? o.audio)],
       ];
-    }
     case "paper":
       return [
         ["authors", names(namesOf(o.author))],

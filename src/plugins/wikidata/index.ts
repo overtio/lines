@@ -32,8 +32,16 @@ export function itemIn(url: URL): Found | null {
   }
   const wiki = /^([a-z-]{2,12})(?:\.m)?\.wikipedia\.org$/.exec(host)?.[1];
   if (wiki) {
-    const title = /^\/wiki\/([^/]+)$/.exec(path)?.[1];
-    return title && !/^[^:]+:[^_]/.test(decodeURIComponent(title)) ? { wiki, title: decodeURIComponent(title) } : null;
+    const written = /^\/wiki\/([^/]+)$/.exec(path)?.[1];
+    let title: string | undefined;
+    try {
+      title = written && decodeURIComponent(written);
+    } catch {
+      // A `%` that isn't one of an address's: not a page's link.
+      return null;
+    }
+    // A page's title, not one of Wikipedia's own pages (`Special:Random`, `File:…`).
+    return title && !/^[^:]+:[^_]/.test(title) ? { wiki, title } : null;
   }
   const imdb = /(?:^|\.)imdb\.com$/.test(host) && /^\/title\/(tt\d+)/.exec(path)?.[1];
   if (imdb) return { property: "P345", id: imdb };

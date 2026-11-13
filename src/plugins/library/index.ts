@@ -100,6 +100,7 @@ const KINDS: LibraryKind[] = [
     icon: "headphones",
     properties: ["podcast", "published", "duration", "audio"],
     subtitle: ["podcast", "duration"],
+    mentions: ["podcast"],
     statuses: LISTENED,
   },
   {

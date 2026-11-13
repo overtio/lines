@@ -1,8 +1,6 @@
 import { t } from "../../lib/i18n/index.svelte";
 import { clock, dayOf, known } from "../../lib/library/text";
-import { getJson } from "../../lib/library/web";
-import { mentionOf } from "../../lib/notes/properties";
-import { webFetch } from "../../lib/platform";
+import { getJson, request } from "../../lib/library/web";
 import type { LibraryItem, LibrarySource, Plugin } from "../../lib/plugins/types";
 
 /*
@@ -52,8 +50,7 @@ function clean(link: string | undefined) {
 /** What a podcast is about, as its feed says; nothing where the feed can't be read (on the web, most). */
 async function aboutOf(feed: string, signal: AbortSignal): Promise<string | undefined> {
   try {
-    const fetch = await webFetch();
-    const response = await fetch(feed, { signal });
+    const response = await request(feed, signal);
     if (!response.ok) return undefined;
     const channel = new DOMParser().parseFromString(await response.text(), "application/xml").querySelector("channel");
     const own = [...(channel?.children ?? [])].find((child) => child.localName === "description" || child.localName === "summary");
@@ -79,7 +76,7 @@ async function lookup(url: URL, signal: AbortSignal): Promise<LibraryItem | null
       title: episode.trackName,
       link: clean(episode.trackViewUrl) ?? url.href,
       properties: known([
-        ["podcast", episode.collectionName && mentionOf(episode.collectionName)],
+        ["podcast", episode.collectionName],
         ["published", dayOf(episode.releaseDate)],
         ["duration", clock(episode.trackTimeMillis && episode.trackTimeMillis / 1000)],
         ["audio", episode.episodeUrl],

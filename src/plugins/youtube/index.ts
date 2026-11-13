@@ -1,7 +1,7 @@
 import { t } from "../../lib/i18n/index.svelte";
 import { clock, dayOf, isoSeconds, known } from "../../lib/library/text";
-import { getJson, getPage } from "../../lib/library/web";
-import { isTauri, webFetch } from "../../lib/platform";
+import { getJson, getPage, request } from "../../lib/library/web";
+import { isTauri } from "../../lib/platform";
 import type { LibrarySource, Plugin } from "../../lib/plugins/types";
 
 /*
@@ -29,8 +29,7 @@ interface OEmbed {
 /** The video's largest picture without black bars: its full-size one, which older videos lack, or else a small one. */
 async function thumbnail(id: string, signal: AbortSignal) {
   const large = `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
-  const fetch = await webFetch();
-  const response = await fetch(large, { method: "HEAD", signal }).catch(() => null);
+  const response = await request(large, signal, { method: "HEAD" }).catch(() => null);
   return response?.ok ? large : `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
 }
 

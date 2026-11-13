@@ -99,6 +99,8 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - MusicBrainz knows Spotify, Apple Music, Bandcamp, Deezer and Tidal links only where someone has added them: most albums, few songs. In the apps, Web Pages reads the rest.
 - A YouTube video looked up on the web has its title, channel and picture, but not when it came out, how long it is or what it's about: those are on its page, which only the apps can read.
 - The keys and `status` values are English in every language, so a note reads the same everywhere; lines shows the status in its own language.
+- A note filled in after you've moved to another note can't be put back with <kbd>⌘Z</kbd>: that's the note you're in's. Delete what was written, or paste the link again.
+- If its cover can't be stored once the note's written (the device out of space), the note keeps the picture's link without the picture.
 - The Library has no grid of covers yet, and no way to search the catalogs to add something without a link; subscribing to podcasts and feeds isn't there yet either.
 - Looking links up hasn't been tried in the Mac, Windows, Linux, iOS or Android apps yet: the apps read pages through Rust (`webFetch`), which the browser tests don't reach.
 

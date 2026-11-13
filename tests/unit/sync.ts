@@ -80,6 +80,7 @@ mock.module("../../src/lib/plugins/registry.svelte", () => ({
     },
     language,
     meta: (id: string | undefined, body: string) => language(id).meta!(body),
+    libraryKind: () => undefined,
   },
 }));
 

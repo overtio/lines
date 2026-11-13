@@ -78,6 +78,9 @@ const ask = <T>(path: string, signal: AbortSignal) => paced(() => getJson<T>(`${
 /** Who's credited, as MusicBrainz writes it: `Simon & Garfunkel`. */
 const artistOf = (credits: Credit[] | undefined) => credits?.map((credit) => credit.name + (credit.joinphrase ?? "")).join("").trim() || undefined;
 
+/** The album a recording's on: the first of its releases that's an album, else the first of any. */
+const albumOf = (recording: Recording) => recording.releases?.find((each) => each["release-group"]?.["primary-type"] === "Album") ?? recording.releases?.[0];
+
 const cover = (kind: "release" | "release-group", id: string) => `https://coverartarchive.org/${kind}/${id}/front-500`;
 
 /** The recording, release or release group MusicBrainz keeps a link to elsewhere under (as the site writes it, without what's shared with it), if it does. */
@@ -98,8 +101,7 @@ async function lookup(url: URL, signal: AbortSignal): Promise<LibraryItem | null
   if (entity.kind === "recording") {
     const recording = await ask<Recording>(`recording/${entity.id}?inc=artist-credits+releases+release-groups`, signal);
     if (!recording) return null;
-    // The album it's on: the first release that's an album, else the first of any.
-    const release = recording.releases?.find((each) => each["release-group"]?.["primary-type"] === "Album") ?? recording.releases?.[0];
+    const release = albumOf(recording);
     const group = release?.["release-group"];
     return {
       type: "song",

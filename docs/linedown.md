@@ -19,6 +19,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Page break | `<!-- pagebreak -->` on a line of its own | Yes: an HTML comment, which other apps don't show |
 | Underline | `<u>text</u>` | Yes (inline HTML, as GitHub, Obsidian and Typora show it) |
 | Tag | `#tag`, `#nested/tag` | No (as in Bear) |
+| Escape | `\#not-a-tag`, `\*not italic\*`, `\@[Not a mention]` | Yes (CommonMark's backslash escapes) |
 | Card | `::: card` … `:::` | Pandoc fenced div |
 | Callout | `:::!` … `:::`, `:::info icon=flag` … `:::` | Pandoc fenced div |
 | Diagram | ` ```mermaid ` code block | GitHub, GitLab, Obsidian |
@@ -106,6 +107,10 @@ It's drawn as a dashed line across the note, named; over a backdrop (Settings �
 - Tags inside code (inline, or a code block, fenced or indented) or an HTML comment (`<!-- #draft -->`) don't count.
 - As a tag's typed, a menu offers the tags you have: those starting with what's typed first (`#ide` → `ideas`), then those with a part that does (`#meet` → `work/meetings`), then any with it in them, each with its icon and how many notes have it. ↑ ↓ choose, Enter or Tab writes the whole tag, Esc closes it; typing on, or a space, carries on without it. A lone `#` doesn't open it, nor does code, a link or a heading's `# `.
 - `# Heading` (with a space) is a heading, not a tag. `## ` typed at the start of a heading's text changes its level, an H1 to an H2, rather than putting `##` in its text; ⌘Z just after leaves them as typed. So a `#` at the start of a heading's text isn't a tag (`# #Boo` is a heading reading `#Boo`), though one later in it is (`## Plan #work`). A `#` at a heading's end shows as typed, as the note list shows it (`# Plan #` reads "Plan #"), so typing a tag there shows it as it's typed, though other Markdown apps leave those `#`s out. A line of only `#` (up to six, with nothing after) is text, where a tag is being typed, rather than CommonMark's empty heading: `# ` with its space is the heading. A line of only a list's marker (`-`, `*`, `+`, `1.`) is text the same way, rather than an empty item: `- ` with its space is the item, so typing `-h` never shows a bullet on the way.
+
+## Escapes
+
+A backslash before a punctuation mark keeps it from being Markdown, as CommonMark has it: `\#idea` is text, not a tag, and so are `\*not italic\*`, `\@[Not a mention]` and `\# Not a heading`. The editor shows the backslash only with the cursor on it, as other Markdown apps show the text; the note list, a note's title and its properties read the text without it (`author: \@nytimes` is `@nytimes`). The Library writes what a source found this way, so a title or description makes no tag, mention or heading ([library.md](library.md#a-note-thats-just-a-link)).
 
 ## Cards
 

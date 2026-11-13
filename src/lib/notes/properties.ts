@@ -1,3 +1,5 @@
+import { escapeTags, unescapeMarkdown } from "./escape";
+
 /*
  * Properties and objects. A Markdown note can start with `key: value` lines between `---` lines
  * (front matter, as in Obsidian, Jekyll and Pandoc):
@@ -69,8 +71,14 @@ export function frontMatter(text: string): FrontMatter | null {
   return null;
 }
 
+/**
+ * A value as it reads: its quotes taken off (a single-quoted one's doubled `''` a quote again, as
+ * YAML has it), and a `#` or `@` kept from being a tag or mention (`\#`, escape.ts) just that.
+ */
 function unquote(value: string) {
-  return /^(["']).*\1$/.test(value) && value.length > 1 ? value.slice(1, -1) : value;
+  const quoted = /^(["']).*\1$/.test(value) && value.length > 1;
+  const inner = quoted ? value.slice(1, -1) : value;
+  return (quoted && value[0] === "'" ? inner.replace(/''/g, "'") : inner).replace(/\\([#@])/g, "$1");
 }
 
 /** A key as it's looked up: `Full name`, `full_name` and `fullName` are all `fullname`. */
@@ -117,7 +125,7 @@ export function readMention(text: string): Mention | null {
   const match = MENTION.exec(text);
   if (!match || match.index !== 0) return null;
   if (match[4] !== undefined) return { name: match[4].trim(), ...(match[5]?.trim() ? { shown: match[5].trim() } : {}) };
-  return { name: match[1] ?? match[2], ...(match[3] ? { key: match[3] } : {}) };
+  return { name: unescapeMarkdown(match[1] ?? match[2]), ...(match[3] ? { key: match[3] } : {}) };
 }
 
 /** A wiki link to the note titled `title`, without the characters one can't hold. */
@@ -125,7 +133,8 @@ export const wikiLinkOf = (title: string) => `[[${title.replace(/[[\]|#\n]/g, ""
 
 /** How to write a mention of the note titled `title`: bare if it's one word, in brackets otherwise. */
 export function mentionOf(title: string) {
-  return /^[\p{L}\p{N}_][\p{L}\p{M}\p{N}_-]*$/u.test(title) ? `@${title}` : `@[${title.replace(/[\]\n]/g, "")}]`;
+  // A `#` in the title stays a `#` in it, not a tag of the note it's in.
+  return /^[\p{L}\p{N}_][\p{L}\p{M}\p{N}_-]*$/u.test(title) ? `@${title}` : `@[${escapeTags(title.replace(/[\]\n]/g, ""))}]`;
 }
 
 /** A property's key as a mention writes it: `Full name` → `full_name`. */

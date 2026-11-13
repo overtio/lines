@@ -35,19 +35,19 @@ export default {
   "library.didUndoStatus": "Status put back",
   // The Library's heading in the sidebar: its button, and the menu it opens of kinds of things to start a note of.
   "library.new": "New in Library",
-  // In the Library, while nothing is in it.
-  "library.empty": "Paste a link into a new note to add it here",
+  // In the Library, while nothing is in it: the + is its heading's button.
+  "library.empty": "Press + to add something, or paste a link into a new note",
   // In a note that's just a link, while what it is is looked up, and when it couldn't be.
   "library.lookingUp": "Looking up…",
   "library.failed": "Couldn’t look this link up",
-  // Said to screen readers once a note that was a link is filled in, and when ⌘Z puts the link back.
+  // Said to screen readers once a note that was a link is filled in.
   "library.filled": "Added {title} to the Library",
-  "library.didUndo": "Link put back",
   "library.settings.links": "Links",
   "library.settings.lookUp": "Look up links",
   "library.settings.lookUpNote":
     "A new note that’s just a link is filled in with what it is: a book, a movie, a song, an article… with its cover and details, from the site and open catalogs. Only the link is sent, and undoing puts it back.",
+  // {names}: the sources a web page can ask, listed ("Open Library, Wikidata and YouTube").
   "library.settings.web":
-    "In the browser, only Open Library, Wikidata, MusicBrainz, Apple Podcasts and YouTube can be asked: other sites don’t let web pages read them. The lines app reads any page.",
+    "In the browser, only {names} can be asked: other sites don’t let web pages read them. The lines app reads any page.",
   "library.settings.sources": "Each place links are looked up can be turned off in Settings → Plugins.",
 };

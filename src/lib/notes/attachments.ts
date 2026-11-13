@@ -124,11 +124,16 @@ function extension(file: Blob) {
 
 /** Saves an image or file and returns its name; the same one saved twice is stored once. */
 export async function saveAttachment(file: Blob): Promise<string> {
-  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", await file.arrayBuffer()));
-  const hex = Array.from(digest.slice(0, 16), (byte) => byte.toString(16).padStart(2, "0")).join("");
-  const name = `${hex}.${extension(file)}`;
+  const name = await attachmentNameOf(file);
   await putAttachment(name, file);
   return name;
+}
+
+/** The name a file is saved as (saveAttachment), from its content: to write a note's link to it before it's saved. */
+export async function attachmentNameOf(file: Blob): Promise<string> {
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", await file.arrayBuffer()));
+  const hex = Array.from(digest.slice(0, 16), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  return `${hex}.${extension(file)}`;
 }
 
 /** An attachment's extension: `csv` for `3b8a….csv`. */

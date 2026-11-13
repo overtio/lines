@@ -254,7 +254,7 @@ const formatWidget = new FormatWidget();
 const hidden = Decoration.replace({});
 
 /** What's drawn in a note's properties (its front matter): only what's within a line. */
-const IN_PROPERTIES = new Set(["Emphasis", "StrongEmphasis", "Strikethrough", "Highlight", "Underline", "InlineCode", "Link", "Autolink", "URL", "Tag", "Mention", "InlineMath"]);
+const IN_PROPERTIES = new Set(["Emphasis", "StrongEmphasis", "Strikethrough", "Highlight", "Underline", "InlineCode", "Link", "Autolink", "URL", "Tag", "Mention", "InlineMath", "Escape"]);
 
 /** Text styled by marks around it: its class, and its marks' name. */
 export const INLINE_STYLES: Record<string, [cls: string, mark: string]> = {
@@ -469,6 +469,12 @@ function build(view: EditorView): DecorationSet {
             doc.sliceString(marks[0].to, marks[1].from),
           );
           decos.push(Decoration.replace({ widget }).range(node.from, node.to));
+          return false;
+        }
+
+        case "Escape": {
+          // `\#` reads as `#`, as other Markdown apps show it: its backslash shows only under the cursor.
+          if (!styleShows(node.from, node.to)) hide(node.from, node.from + 1);
           return false;
         }
 

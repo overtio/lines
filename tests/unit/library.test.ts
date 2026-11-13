@@ -21,12 +21,19 @@ const answer = (url: string, init?: RequestInit) => {
   return Response.json(found);
 };
 stubApp({ isTauri: false, webFetch: async () => async (url: string, init?: RequestInit) => answer(url, init) });
-// The version the app is built with, which requests from the apps say.
-(globalThis as { __APP_VERSION__?: string }).__APP_VERSION__ = "0.0.0";
 
 const text = await import("../../src/lib/library/text");
+const { escapeMarkdown, propertyValue } = await import("../../src/lib/notes/escape");
+const { frontMatter, mentionOf, nameOf, readMention } = await import("../../src/lib/notes/properties");
+const { computeMeta, extractTags } = await import("../../src/lib/notes/parse");
+const { plainLine } = await import("../../src/lib/notes/stats");
+const { pacing, withTimeout } = await import("../../src/lib/pacing");
+const { isPublic } = await import("../../src/lib/library/web");
+const { libraryNote } = await import("../../src/lib/library/note");
+const { subtitleOf } = await import("../../src/lib/library/rows");
 const { readPage, decodeEntities } = await import("../../src/lib/library/page");
 const { itemOfPage } = await import("../../src/plugins/web-pages/read");
+const { webPages } = await import("../../src/plugins/web-pages");
 const { youtube, youtubeId } = await import("../../src/plugins/youtube");
 const { openLibrary, bookIn, isIsbn } = await import("../../src/plugins/open-library");
 const { wikidata, itemIn } = await import("../../src/plugins/wikidata");
@@ -53,6 +60,20 @@ describe("a note that's a link", () => {
       expect(text.linkOnly(not), not).toBeNull();
     }
   });
+  test("or a new note's start, as it was made, with only a link put in it", () => {
+    const link = "https://www.imdb.com/title/tt15239678/";
+    expect(text.linkNoteLink(`# ${link}`, "# ")).toBe(link);
+    expect(text.linkNoteLink(`# ${link}\n`, "# ")).toBe(link);
+    const shelf = "---\ntype: movie\nstatus: to watch\n---\n# ";
+    expect(text.linkNoteLink(`${shelf}<${link}>`, shelf)).toBe(link);
+    expect(text.linkNoteLink(`${shelf}\n${link}`, shelf)).toBe(link);
+    // Anything else written in it, or a start that isn't the one it was made with, and it's a note.
+    for (const not of [`# Dune ${link}`, `# ${link} ${link}`, `## ${link}`, `${shelf}${link}\nMore.`]) {
+      expect(text.linkNoteLink(not, "# "), not).toBeNull();
+    }
+    expect(text.linkNoteLink(`# ${link}`)).toBeNull();
+    expect(text.linkNoteLink(link, "# ")).toBe(link);
+  });
 });
 
 describe("a library note's text", () => {
@@ -69,7 +90,7 @@ describe("a library note's text", () => {
   };
 
   test("is its properties, link and status, its title as a heading, its cover and what it's about", () => {
-    expect(text.libraryNoteText(item, { status: "to watch", cover: "0123456789abcdef0123456789abcdef.jpg" })).toBe(
+    expect(text.libraryNoteText(item, { status: "to watch", cover: { name: "0123456789abcdef0123456789abcdef.jpg", width: 240 } })).toBe(
       [
         "---",
         "type: movie",
@@ -80,7 +101,7 @@ describe("a library note's text", () => {
         "---",
         "# Dune: Part Two",
         "",
-        "![Dune: Part Two](../attachments/0123456789abcdef0123456789abcdef.jpg)",
+        "![Dune: Part Two|240](../attachments/0123456789abcdef0123456789abcdef.jpg)",
         "",
         "Paul Atreides unites with Chani and the Fremen.",
         "",
@@ -96,9 +117,56 @@ describe("a library note's text", () => {
   });
 
   test("reads as a note's cover: its first picture that's an attachment", () => {
-    const written = text.libraryNoteText(item, { cover: "0123456789abcdef0123456789abcdef.jpg" });
+    const written = text.libraryNoteText(item, { cover: { name: "0123456789abcdef0123456789abcdef.jpg", width: 400 } });
     expect(text.coverOf(written)).toBe("0123456789abcdef0123456789abcdef.jpg");
     expect(text.coverOf("![](https://example.com/a.png)")).toBeNull();
+  });
+
+  test("reads as what was found: a title, a value or what it's about makes no tag, mention, heading, list, fence or picture", () => {
+    const written = text.libraryNoteText({
+      type: "video",
+      title: "Insane card trick #shorts #magic @someone",
+      properties: [["channel", "#Kids Band @home"]],
+      description: "```js\n\n# Not a heading\n\n- not a list\n\n:::warning hello\n\nWatch #magic with @rick ![x](https://tracker.example/p.gif) <img src=https://tracker.example/q.gif> now.",
+    });
+    expect(extractTags(written)).toEqual([]);
+    expect(written).not.toMatch(/(?<!\\)!\[|<img|(?<!\\)@(?:rick|home|someone)/);
+    const meta = computeMeta(written);
+    expect(meta.title).toBe("Insane card trick #shorts #magic @someone");
+    expect(meta.properties.find((property) => property.key === "channel")?.value).toBe("#Kids Band @home");
+    // What it's about, after its heading: none of it Markdown's, and read as written, escaped rather than taken out.
+    const lines = written.split("\n");
+    const about = lines.slice(lines.findIndex((line) => line.startsWith("# ")) + 1).filter(Boolean);
+    expect(about.filter((line) => /^(?:`|#|-|:)/.test(line))).toEqual([]);
+    expect(about.map(plainLine)).toEqual(["```js", "# Not a heading", "- not a list", ":::warning hello", "Watch #magic with @rick ![x](https://tracker.example/p.gif) now."]);
+  });
+
+  test("a title reads back as it was, as the note's title and as a mention of it", () => {
+    for (const title of ["**BEST** moments of 2024", "Lab_Rats_ the movie", "Blade Runner (Final Cut)", "`git` explained", "Foo <3 Bar", "C++ in 100 Seconds", "Me & You", "1. Intro", "#1 Hits", "A == B", "$5 Shake"]) {
+      const note = text.libraryNoteText({ type: "video", title, properties: [] });
+      expect(computeMeta(note).title, title).toBe(title);
+      expect(nameOf(readMention(mentionOf(title))!.name), title).toBe(nameOf(title));
+    }
+    expect(escapeMarkdown("  two\n lines ")).toBe("two lines");
+  });
+
+  test("a value YAML would read as something else is quoted, and lines reads each back as it was", () => {
+    const values = ['"Weird Al" Yankovic', '"Heroes"', "Star Wars: Episode IV", "*NSYNC", "!!!", "@nytimes", "#Kids Band", "& Juliet", "[Remastered]", "Foo # bar", "yes", "It's", "%", "Ends:"];
+    for (const value of values) {
+      const body = text.libraryNoteText({ type: "song", title: "X", properties: [["artist", value]] });
+      expect(frontMatter(body)?.properties.find((property) => property.key === "artist")?.value, value).toBe(value);
+      expect(extractTags(body), value).toEqual([]);
+    }
+    expect([propertyValue("Star Wars: Episode IV"), propertyValue("It's"), propertyValue("Plain Words")]).toEqual(["'Star Wars: Episode IV'", "It's", "Plain Words"]);
+  });
+
+  test("an episode's podcast, a mention of it, where its kind says so; its row shows the podcast", () => {
+    const written = text.libraryNoteText({ type: "episode", title: "An Episode", properties: [["podcast", "The Daily"], ["author", "@nytimes"]] }, { mentions: ["podcast"] });
+    expect(written).toContain("podcast: @[The Daily]\nauthor: \\@nytimes\n");
+    const kind = { type: "episode", subtitle: ["podcast", "author"], mentions: ["podcast"] } as unknown as Parameters<typeof subtitleOf>[0];
+    const meta = computeMeta(written);
+    const value = (key: string) => meta.properties.find((property) => property.key === key)?.value;
+    expect(subtitleOf(kind, value)).toBe("The Daily · @nytimes");
   });
 });
 
@@ -112,10 +180,9 @@ describe("what something's about", () => {
     expect(text.summary("<p>One.</p><p>Two.</p>")).toEqual(["One.", "Two."]);
   });
 
-  test("adds no tags, mentions or headings to the note, and nothing for a page that says only dots", () => {
-    expect(text.summary("Watch #rickroll with @rick now")).toEqual(["Watch with \\@rick now"]);
-    expect(text.summary("# Not a heading\n\n- not a list")).toEqual(["\\# Not a heading", "\\- not a list"]);
-    expect(text.summary("C# for #1 fans, mail a@b.com")).toEqual(["C# for #1 fans, mail a@b.com"]);
+  test("is the text as it was, without HTML, and nothing for a page that says only dots", () => {
+    expect(text.summary("Watch #rickroll with @rick now")).toEqual(["Watch #rickroll with @rick now"]);
+    expect(text.summary("<b>Bold</b> and <img src=x.gif> plain")).toEqual(["Bold and plain"]);
     expect(text.summary("...")).toEqual([]);
   });
 
@@ -280,6 +347,9 @@ describe("Wikidata", () => {
     expect(itemIn(new URL("https://fr.m.wikipedia.org/wiki/Dune,_deuxi%C3%A8me_partie"))).toEqual({ wiki: "fr", title: "Dune,_deuxième_partie" });
     expect(itemIn(new URL("https://en.wikipedia.org/wiki/Special:Random"))).toBeNull();
     expect(itemIn(new URL("https://www.imdb.com/name/nm0898288/"))).toBeNull();
+    // A `%` that isn't one of an address's escapes is no page's title, and nothing to fail on.
+    expect(itemIn(new URL("https://en.wikipedia.org/wiki/100%"))).toBeNull();
+    expect(itemIn(new URL("https://en.wikipedia.org/wiki/Caf%E9"))).toBeNull();
   });
 
   test("a film by its IMDb id: its director, first year, runtime, genres, and Wikipedia's summary and poster", async () => {
@@ -409,7 +479,7 @@ describe("Apple Podcasts", () => {
     expect(podcastIn(new URL("https://podcasts.apple.com/us/artist/the-new-york-times/121664449"))).toBeNull();
   });
 
-  test("a podcast, with its feed; an episode, a mention of its podcast", async () => {
+  test("a podcast, with its feed; an episode, and its podcast", async () => {
     answers.set("https://itunes.apple.com/lookup?id=1200361736&country=us&entity", {
       results: [
         podcast,
@@ -440,7 +510,7 @@ describe("Apple Podcasts", () => {
     });
     const episode = await look(applePodcasts, "https://podcasts.apple.com/us/podcast/the-daily/id1200361736?i=1000801496509");
     expect(episode?.properties).toEqual([
-      ["podcast", "@[The Daily]"],
+      ["podcast", "The Daily"],
       ["published", "2026-11-12"],
       ["duration", "24:40"],
       ["audio", "https://example.com/episode.mp3"],
@@ -458,5 +528,62 @@ describe("arXiv", () => {
       ["arxiv", "1706.03762"],
     ]);
     expect(item.description).toBe("The dominant sequence transduction models…");
+  });
+});
+
+describe("asking the web", () => {
+  test("only asks a page's addresses on the web at large, over https", () => {
+    for (const address of ["https://i.ytimg.com/vi/x/hq.jpg", "https://upload.wikimedia.org/a.jpg", "https://8.8.8.8/a.png", "https://172.32.0.1/a.png"]) {
+      expect(isPublic(address), address).toBe(true);
+    }
+    for (const address of [
+      "http://example.com/a.png",
+      "file:///etc/passwd",
+      "https://localhost/a.png",
+      "https://printer/a.png",
+      "https://nas.local/a.png",
+      "https://127.0.0.1/a.png",
+      "https://10.0.0.2/a.png",
+      "https://172.16.0.1/a.png",
+      "https://192.168.1.1/a.png",
+      "https://169.254.169.254/latest/meta-data",
+      "https://100.64.0.1/a.png",
+      "https://[::1]/a.png",
+      "not an address",
+    ]) {
+      expect(isPublic(address), address).toBe(false);
+    }
+  });
+
+  test("a cover that isn't on the web at large isn't asked for, and nothing's kept", async () => {
+    const note = await libraryNote({ type: "movie", title: "Dune", properties: [], cover: "https://192.168.1.1/poster.jpg" });
+    expect(asked).toEqual([]);
+    expect(text.coverOf(note.text)).toBeNull();
+    await note.keep();
+  });
+
+  test("a page's oEmbed on this computer's network isn't asked", async () => {
+    answers.set("https://example.com/video", '<html><head><link rel="alternate" type="application/json+oembed" href="http://127.0.0.1:8080/oembed"></head></html>');
+    expect(await look(webPages, "https://example.com/video")).toBeNull();
+    expect(asked).toEqual(["https://example.com/video"]);
+  });
+
+  test("a request waiting behind one that never answers gives up as soon as it's stopped", async () => {
+    const paced = pacing(10);
+    void paced(() => new Promise(() => {}), new AbortController().signal).catch(() => {});
+    const later = new AbortController();
+    const second = paced(async () => "second", later.signal);
+    later.abort();
+    expect(await second.then(() => "answered", () => "stopped")).toBe("stopped");
+  });
+
+  test("a request gives up after a while by itself, or when it's stopped", async () => {
+    const timed = withTimeout(new AbortController().signal, 10);
+    await new Promise((resolve) => timed.addEventListener("abort", resolve));
+    expect((timed.reason as DOMException).name).toBe("TimeoutError");
+    const stop = new AbortController();
+    const stopped = withTimeout(stop.signal, 60_000);
+    stop.abort();
+    expect(stopped.aborted).toBe(true);
   });
 });

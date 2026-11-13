@@ -33,16 +33,15 @@ export default {
   "library.status": "État : {status}",
   "library.didUndoStatus": "État rétabli",
   "library.new": "Nouveau dans la bibliothèque",
-  "library.empty": "Collez un lien dans une nouvelle note pour l’ajouter ici",
+  "library.empty": "Appuyez sur + pour ajouter quelque chose, ou collez un lien dans une nouvelle note",
   "library.lookingUp": "Recherche…",
   "library.failed": "Impossible de rechercher ce lien",
   "library.filled": "{title} a été ajouté à la bibliothèque",
-  "library.didUndo": "Lien rétabli",
   "library.settings.links": "Liens",
   "library.settings.lookUp": "Rechercher les liens",
   "library.settings.lookUpNote":
     "Une nouvelle note qui n’est qu’un lien est complétée avec ce qu’il désigne : un livre, un film, un morceau, un article… avec sa couverture et ses détails, tirés du site et de catalogues ouverts. Seul le lien est envoyé, et annuler rétablit le lien.",
   "library.settings.web":
-    "Dans le navigateur, seuls Open Library, Wikidata, MusicBrainz, Apple Podcasts et YouTube peuvent être consultés : les autres sites ne se laissent pas lire par les pages web. L’app lines lit n’importe quelle page.",
+    "Dans le navigateur, seuls {names} peuvent être consultés : les autres sites ne se laissent pas lire par les pages web. L’app lines lit n’importe quelle page.",
   "library.settings.sources": "Chaque source de recherche peut être désactivée dans Réglages → Extensions.",
 } satisfies Translation<typeof en>;

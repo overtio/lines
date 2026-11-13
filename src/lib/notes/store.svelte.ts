@@ -444,7 +444,8 @@ class NotesStore {
       updatedAt: now,
       pinned: false,
       trashed: false,
-      ...(prefs.newNotes === "inbox" && { inbox: true }),
+      // Made on a shelf of the Library, it's filed there.
+      ...(prefs.newNotes === "inbox" && f.kind !== "library" && { inbox: true }),
     };
     this.#templates.set(note.id, { body: note.body, made });
     if (this.filter.kind === "trash") this.filter = { kind: "all" };
@@ -490,6 +491,21 @@ class NotesStore {
     this.#patch(edited.id, { body: edited.before, ...(!edited.keepDate && { updatedAt: Date.now() }) });
     this.#changedOutside([edited.id]);
     return edited.undone;
+  }
+
+  /**
+   * Changes a note's text from outside its editor as something done for it in the background (a
+   * note that was a link filled in while another is open): ⌘Z stays with what was last done by hand.
+   */
+  setText(id: string, body: string) {
+    if (!this.get(id) || this.get(id)!.note.body === body) return;
+    this.#patch(id, { body, updatedAt: Date.now() });
+    this.#changedOutside([id]);
+  }
+
+  /** What a note made just now started as (`# `, or its type's properties too), while it's still kept: to see what's been put in it. */
+  templateOf(id: string): string | undefined {
+    return this.#templates.get(id)?.body;
   }
 
   /** The picked notes still in the list, in its order. */

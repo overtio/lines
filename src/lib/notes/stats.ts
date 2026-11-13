@@ -20,10 +20,20 @@ const CARD_FENCE_RE = /^\s*:{3,}/;
 const TABLE_DELIM_RE = /^(?=.*\|)\s*\|?(\s*:?-+:?\s*\|)*\s*:?-+:?\s*\|?\s*$/;
 const sentenceSegmenter = "Segmenter" in Intl ? new Intl.Segmenter(undefined, { granularity: "sentence" }) : null;
 
+/**
+ * A character Markdown escapes (`\#`, `\*`), set aside as one of Unicode's private characters while
+ * the syntax around it is taken out, so it stays as written, and then put back.
+ */
+const ESCAPED = /\\([!-/:-@[-`{-~])/g;
+const SET_ASIDE = /[-]/g;
+const setAside = (_: string, char: string) => String.fromCharCode(0xe000 + char.charCodeAt(0));
+const putBack = (char: string) => String.fromCharCode(char.charCodeAt(0) - 0xe000);
+
 /** One line with its Markdown syntax removed, so it reads (and counts) as written. */
 export function plainLine(line: string): string {
   if (isPageBreak(line)) return "";
   return line
+    .replace(ESCAPED, setAside)
     // Comments show nowhere: a line's mark (`<!-- mark green: check -->`) isn't part of its text, nor of a title.
     .replace(/\s*<!--.*?-->/g, "")
     .replace(/^\s*\|(.*?)\|?\s*$/, (_, row: string) =>
@@ -45,6 +55,7 @@ export function plainLine(line: string): string {
     .replace(/(?<![\p{L}\p{N}_./\\@])@\[([^\]\n]+)\]/gu, "@$1")
     // _emphasis_, but not the underscores inside snake_case words.
     .replace(/(?<![\p{L}\p{N}])_([^_\n]+)_(?![\p{L}\p{N}])/gu, "$1")
+    .replace(SET_ASIDE, putBack)
     .trimEnd();
 }
 

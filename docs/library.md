@@ -4,7 +4,7 @@ Books, movies, shows, videos, music, podcasts, articles and papers, kept in line
 
 ## A note that's just a link
 
-Paste a link into a new note, and lines fills the note in with what the link is: its title, cover, details and a few sentences of what it's about.
+Paste a link into a new note (after the `# ` it starts with, or on its own), and lines fills the note in with what the link is: its title, cover, details and a few sentences of what it's about.
 
 ```markdown
 ---
@@ -18,18 +18,19 @@ status: to watch
 ---
 # Dune: Part Two
 
-![Dune: Part Two](../attachments/3f9c….jpg)
+![Dune: Part Two|240](../attachments/3f9c….jpg)
 
 Dune: Part Two is a 2024 American epic space opera film directed by Denis Villeneuve…
 ```
 
-- It's looked up when the note **becomes** just a link: at once when it's pasted or dropped in, or once it's stayed that link for a second while you type it, so a link half typed isn't. The link can be bare, in `<…>`, or a Markdown link (`[text](…)`), with nothing else in the note.
-- Notes that are already just a link are never looked up as they open or sync. Only Markdown notes are looked up, and never a locked note.
+- It's looked up when the note **becomes** just a link, or its link changes: at once when it's pasted or dropped in, or once it's stayed that link for a second while you type it, so a link half typed isn't. The link can be bare, in `<…>`, or a Markdown link (`[text](…)`), with nothing else in the note; or, in a note made just now, in what it was made with and nothing else: after its `# `, or under the properties a note started on a shelf has.
+- Notes that are already just a link are never looked up as they open or sync, nor as you write on around the same link (a line under it, say). Only Markdown notes are looked up, and never a locked note, nor one locked while it's looked up.
 - Meanwhile the note says "Looking up…" after the link, quietly, and screen readers hear it. Offline, or when the site couldn't be reached, it says so for a moment and stays a link.
-- Filled in, it's one change: undo (<kbd>⌘Z</kbd>) puts the link back. If you change the note while it's looked up, what was found is dropped; nothing you write is ever written over. If you've moved to another note by then, the note is filled in all the same, and <kbd>⌘Z</kbd> puts it back until you type.
+- Filled in, it's one change: undo (<kbd>⌘Z</kbd>) puts the link back. If you change the note while it's looked up, what was found is dropped; nothing you write is ever written over. If you've moved to another note by then, the note is filled in all the same; <kbd>⌘Z</kbd> stays the note's you're in, and the link isn't put back.
 - The note leaves the Inbox: it's filed, on its shelf in the Library.
 - A link lines can't say what it is (a page that doesn't say it's a book, a movie, an article…) stays as it is. Nothing is guessed.
-- The cover is downloaded and kept with the note as an attachment, at most 1,200 pixels across, so it shows offline and syncs. Where it can't be downloaded (on the web, from a site that doesn't let pages download its pictures), the note has none rather than one shown from the site.
+- The cover is downloaded and kept with the note as an attachment, at most 1,200 pixels across, so it shows offline and syncs; the note shows it at a width that leaves room for the rest (240 pixels, a video's 400), which you can change as any picture's. It's kept only once the note is written, so a lookup dropped leaves nothing behind. Where it can't be downloaded (on the web, from a site that doesn't let pages download its pictures), the note has none rather than one shown from the site, and a picture a page gives that isn't on the web at large (an address on your own network, or not over https) isn't asked for.
+- What a source says is written as just that text: a `#` or `@` in a title, a value or a description is escaped (`\#`), so it makes no tag or mention, nor a heading, list, code block or picture; a value YAML would read as something else (`Star Wars: Episode IV`, `"Heroes"`, `*NSYNC`) is quoted. Each request gives up after 15 seconds (arXiv's 20).
 - Settings → Library → Look up links turns it off; then nothing is contacted.
 
 ## Kinds of things

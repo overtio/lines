@@ -133,6 +133,8 @@ export interface LibraryKind {
   subtitle: string[];
   /** The shape its covers come in, which its rows show them in: a book's tall, an album's square (the first), a video's wide. */
   cover?: "square" | "tall" | "wide";
+  /** Its properties whose value is another note's title (an episode's `podcast`), which its notes write as a mention of it. */
+  mentions?: string[];
   /** Where it's got to, in order (the first is where it starts): what's written, and what's shown. None for kinds without (a podcast). */
   statuses?: { value: string; label: string }[];
 }

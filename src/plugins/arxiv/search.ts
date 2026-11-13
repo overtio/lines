@@ -1,4 +1,4 @@
-import { pacing } from "../../lib/pacing";
+import { pacing, withTimeout } from "../../lib/pacing";
 import { webFetch } from "../../lib/platform";
 import type { Paper, SearchPage } from "../../lib/plugins/types";
 import { arxivIdIn } from "./links";
@@ -12,6 +12,8 @@ import { arxivIdIn } from "./links";
 const API = "https://export.arxiv.org/api/query";
 const PER_PAGE = 20;
 const SPACING = 3000;
+/** How long a request waits for arXiv to answer, so one that never does holds up none after it. */
+const TIMEOUT = 20_000;
 /** As many answers as are kept. */
 const KEPT = 50;
 const ATOM = "http://www.w3.org/2005/Atom";
@@ -54,7 +56,7 @@ const paced = pacing(SPACING);
 const inTurn = (url: string, signal: AbortSignal) =>
   paced(async () => {
     const fetch = await webFetch();
-    const response = await fetch(url, { signal });
+    const response = await fetch(url, { signal: withTimeout(signal, TIMEOUT) });
     if (!response.ok) throw new Error(`arXiv answered ${response.status}`);
     return response.text();
   }, signal);

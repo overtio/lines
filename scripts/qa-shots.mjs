@@ -95,7 +95,9 @@ const seedLibrary = (page) =>
     for (const [i, [type, title, properties, status, picture, about]] of items.entries()) {
       const name = picture && (await cover(picture, title));
       const front = Object.entries({ type, ...properties, link: `https://example.com/${i}`, status }).map(([key, value]) => `${key}: ${value}`);
-      const body = [`---\n${front.join("\n")}\n---\n# ${title}`, ...(name ? [`![${title}](../attachments/${name})`] : []), ...(about ? [about] : [])].join("\n\n");
+      // As wide as the library shows a cover: a video's wider than a poster or an album.
+      const shown = picture && (picture[0] > picture[1] ? 400 : 240);
+      const body = [`---\n${front.join("\n")}\n---\n# ${title}`, ...(name ? [`![${title}|${shown}](../attachments/${name})`] : []), ...(about ? [about] : [])].join("\n\n");
       await notes.insert({ id: crypto.randomUUID(), body, createdAt: now - i * 60_000, updatedAt: now - i * 60_000, pinned: false, trashed: false });
     }
     await notes.insert({ id: crypto.randomUUID(), body: "---\ntype: person\n---\n# Ada Lovelace", createdAt: now, updatedAt: now - 3_600_000, pinned: false, trashed: false });
@@ -584,7 +586,7 @@ const SCENES = [
   ...["lines", "classic", "pixel", "neon"].map((style) => ({
     id: `library-shelf-${style}`,
     title: `The Library and a shelf of it, in ${style[0].toUpperCase()}${style.slice(1)}`,
-    look: "In the sidebar, Library after the places and before Types with its + at the heading's end, quiet like the heading: Books, Movies, Music and Videos with their icons and counts, lined up with the rows above; Types with Person only. Movies listed: each row's poster beside its title, the director and year under it, and its status in a quiet outline before the date; Paris, Texas without a poster shows the film icon in a box of the same size; titles lined up with each other. Dune: Part Two open: its properties, its title, its poster and what it's about.",
+    look: "In the sidebar, Library after the places and before Types with its + at the heading's end, quiet like the heading: Books, Movies, Music and Videos with their icons and counts, lined up with the rows above; Types with Person only. Movies listed: each row's poster beside its title, the director and year under it, and its status in a quiet outline before the date; Paris, Texas without a poster shows the film icon in a box of the same size; titles lined up with each other. Dune: Part Two open: its properties, its title, its poster 240 pixels wide (not the note's width) and what it's about.",
     prefs: style === "lines" ? {} : { style, theme: style },
     act: async (page) => {
       await seedLibrary(page);

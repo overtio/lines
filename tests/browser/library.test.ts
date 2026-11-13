@@ -39,24 +39,26 @@ const paste = (page: App["page"], text: string) =>
     document.querySelector(".editor-pane [data-pane-content='main'] .cm-content")!.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
   }, text);
 
-const filled = (page: App["page"]) => page.waitForFunction(() => window.testing.text()?.startsWith("---\ntype: video\n"));
+const TITLE = "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)";
+const filled = (page: App["page"]) => page.waitForFunction(() => window.testing.text()?.includes("\nchannel: Rick Astley\n"));
 
-test("a link pasted as a new note is filled in at once, filed, and one ⌘Z puts the link back", async () => {
+test("a link pasted into a new note is filled in at once, filed, and one ⌘Z puts it back", async () => {
   app = await openApp();
   const { page } = app;
   const asked = await youtube(page);
+  // Pasted after the `# ` it starts with, as it's made.
   await page.getByRole("button", { name: "New note", exact: true }).click();
   await page.waitForFunction(() => window.testing.text() === "# ");
-  await page.keyboard.press(`${mod()}+a`);
-  await page.keyboard.press("Backspace");
   await paste(page, LINK);
   await filled(page);
   const text = (await app.text())!;
-  const title = "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)";
-  expect(text).toStartWith(`---\ntype: video\nchannel: Rick Astley\nlink: https://www.youtube.com/watch?v=dQw4w9WgXcQ\nstatus: to watch\n---\n# ${title}\n`);
-  // Its picture kept with it. (WebKit here can't store pictures, and so has none, rather than one shown from the site.)
-  if (engine() === "chromium") expect(text.slice(text.indexOf(`# ${title}\n`))).toMatch(/^# .*\n\n!\[.*\]\(\.\.\/attachments\/[0-9a-f]{32}\.jpg\)\n$/);
-  else expect(text).not.toContain("](");
+  expect(text).toStartWith(`---\ntype: video\nchannel: Rick Astley\nlink: https://www.youtube.com/watch?v=dQw4w9WgXcQ\nstatus: to watch\n---\n# ${TITLE}\n`);
+  // Its picture, as wide as a video's shows, kept with it once it's written. (WebKit here can't store pictures.)
+  expect(text.slice(text.indexOf(`# ${TITLE}\n`))).toMatch(/^# .*\n\n!\[.*\|400\]\(\.\.\/attachments\/([0-9a-f]{32}\.jpg)\)\n$/);
+  if (engine() === "chromium") {
+    const name = /attachments\/([0-9a-f]{32}\.jpg)/.exec(text)![1];
+    await page.waitForFunction(async (name) => (await window.testing.attachmentNames()).includes(name), name);
+  }
   // Only the link was sent.
   expect(asked).toEqual([`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent("https://www.youtube.com/watch?v=dQw4w9WgXcQ")}`]);
   // Out of the Inbox, on its shelf in the Library.
@@ -66,11 +68,26 @@ test("a link pasted as a new note is filled in at once, filed, and one ⌘Z puts
   expect(await sidebar.getByRole("button", { name: /^Videos/ }).innerText()).toMatch(/Videos\s+1/);
 
   await page.keyboard.press(`${mod()}+z`);
-  await page.waitForFunction((link) => window.testing.text() === link, LINK);
-  // Put back, it isn't looked up again.
+  await page.waitForFunction((link) => window.testing.text() === `# ${link}`, LINK);
+  // Put back, it isn't looked up again, nor as it's written on: its link is the same.
+  await page.evaluate(() => window.testing.place());
+  await page.keyboard.press("Enter");
   await page.waitForTimeout(1500);
-  expect(await app.text()).toBe(LINK);
+  expect(await app.text()).toStartWith(`# ${LINK}\n`);
   expect(asked.length).toBe(1);
+});
+
+test("a link pasted into a note started on a shelf, its type and status, is filled in too", async () => {
+  app = await openApp();
+  const { page } = app;
+  await youtube(page);
+  await page.getByRole("button", { name: "New in Library" }).click();
+  await page.getByRole("menuitem", { name: "Video", exact: true }).click();
+  await page.waitForFunction(() => window.testing.text() === "---\ntype: video\nstatus: to watch\n---\n# ");
+  await page.evaluate(() => window.testing.place());
+  await paste(page, LINK);
+  await filled(page);
+  expect(await app.text()).toContain(`\n---\n# ${TITLE}\n`);
 });
 
 test("a link typed is looked up once it's stayed a moment, and not filled in if it changes meanwhile", async () => {
@@ -98,7 +115,7 @@ test("a link typed is looked up once it's stayed a moment, and not filled in if 
   await filled(page);
 });
 
-test("a note left while it's looked up is filled in as it's stored, and ⌘Z puts it back", async () => {
+test("a note left while it's looked up is filled in as it's stored, and ⌘Z in the note open is that note's", async () => {
   app = await openApp();
   const { page } = app;
   let answer!: () => void;
@@ -107,20 +124,53 @@ test("a note left while it's looked up is filled in as it's stored, and ⌘Z put
   await page.evaluate(() => window.testing.place());
   await paste(page, LINK);
   await page.locator(".cm-library-lookup").waitFor();
-  await app.open("# Elsewhere");
+  await app.open("# Elsewhere\n\n");
+  await page.evaluate(() => window.testing.place());
+  await page.keyboard.type("Some words");
   answer();
   await page.waitForFunction((id) => window.testing.notes.get(id)?.note.body.startsWith("---\ntype: video\n"), id);
-  // Still the other note open, and nothing typed: ⌘Z puts the link back.
+  // ⌘Z takes back what was typed here, not the other note's filling in.
   await page.keyboard.press(`${mod()}+z`);
-  await page.waitForFunction(([id, link]) => window.testing.notes.get(id)?.note.body === link, [id, LINK] as const);
-  expect(await app.text()).toBe("# Elsewhere");
+  await page.waitForFunction(() => window.testing.text() === "# Elsewhere\n\n");
+  await page.waitForTimeout(300);
+  expect(await page.evaluate((id) => window.testing.notes.get(id)?.note.body, id)).toStartWith("---\ntype: video\n");
 });
 
-test("notes that are just a link aren't looked up as they open, nor with lookups off", async () => {
-  app = await openApp({ prefs: { lookUpLinks: false } });
+test("a note locked while it's looked up isn't filled in", async () => {
+  app = await openApp();
+  const { page } = app;
+  let answer!: () => void;
+  await youtube(page, new Promise<void>((resolve) => (answer = resolve)));
+  const id = await app.open("");
+  await page.evaluate(() => window.testing.place());
+  await paste(page, LINK);
+  const looking = page.locator(".cm-library-lookup");
+  await looking.waitFor();
+  await page.evaluate(async (id) => {
+    const { noteKeys, notes } = window.testing;
+    noteKeys.save({ key: (await noteKeys.create("a password")).key, touchId: false });
+    notes.lock(id);
+  }, id);
+  await page.waitForFunction((id) => window.testing.notes.get(id)?.note.locked, id);
+  answer();
+  await looking.waitFor({ state: "detached" });
+  await page.waitForTimeout(300);
+  expect(await page.evaluate((id) => window.testing.notes.get(id)?.note.body, id)).toBe(LINK);
+});
+
+test("notes that are just a link aren't looked up as they open or as they're written on, nor with lookups off", async () => {
+  app = await openApp();
   const { page } = app;
   const asked = await youtube(page);
+  // Its link the same as it was, a line written under it.
   await app.open(LINK);
+  await page.evaluate(() => window.testing.place());
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(1500);
+  expect(asked).toEqual([]);
+
+  await toggle(await app.settings("Library"), "Look up links", false);
+  await app.closeSettings();
   await app.open("");
   await page.evaluate(() => window.testing.place());
   await paste(page, LINK);

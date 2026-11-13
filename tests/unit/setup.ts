@@ -31,3 +31,6 @@ class MemoryStorage {
   clear = () => this.#items.clear();
 }
 globalThis.localStorage ??= new MemoryStorage() as unknown as Storage;
+
+/** The version Vite builds in (vite.config.ts), which the apps' requests say. */
+(globalThis as { __APP_VERSION__?: string }).__APP_VERSION__ = "0.0.0";

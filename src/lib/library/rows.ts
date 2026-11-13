@@ -17,20 +17,31 @@ export interface ShelfRow {
 
 const rows = new WeakMap<Note, ShelfRow | null>();
 
+/**
+ * What something of a kind is by and from, as its row says it: its kind's `subtitle` properties,
+ * joined (`Frank Herbert · 1965`); one its kind writes as a mention (an episode's podcast,
+ * `@[The Daily]`) as the note's title.
+ */
+export function subtitleOf(kind: LibraryKind, value: (key: string) => string | undefined): string {
+  const shown = (key: string, text: string) => (kind.mentions?.includes(key) && readMention(text)?.name) || text;
+  return kind.subtitle.flatMap((key) => {
+    const text = value(key);
+    return text ? [shown(key, text)] : [];
+  }).join(" · ");
+}
+
 /** A library note's row, if its type is a library kind's; worked out once for each version of the note. */
 export function shelfRow({ note, meta }: { note: Note; meta: NoteMeta }): ShelfRow | null {
   let row = rows.get(note);
   if (row === undefined) {
     const kind = plugins.libraryKind(meta.type);
     const value = (key: string) => propertyOf(meta.properties, key)?.value.trim() || undefined;
-    // A mention (an episode's podcast, `@[The Daily]`) reads as the note's title.
-    const shown = (text: string) => readMention(text)?.name ?? text;
     const written = value("status");
     row = kind
       ? {
           kind,
           cover: coverOf(note.body),
-          subtitle: kind.subtitle.flatMap((key) => value(key) ?? []).map(shown).join(" · "),
+          subtitle: subtitleOf(kind, value),
           status: written ? (kind.statuses?.find((status) => status.value === written.toLowerCase()) ?? { value: written, label: written }) : undefined,
         }
       : null;

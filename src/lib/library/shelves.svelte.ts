@@ -42,11 +42,13 @@ class Shelves {
 
   /** What a new note of a kind is, by its type (on a shelf, its first kind's: the shelf's key): of that type, where it starts (`status: to read`). */
   made(type: string): Made {
-    const kind = plugins.libraryKind(type);
-    if (!kind) return {};
-    const status = kind.statuses?.[0]?.value;
-    return { type: kind.type, ...(status && { properties: { status } }) };
+    if (!plugins.libraryKind(type)) return {};
+    const status = firstStatus(type);
+    return { type, ...(status && { properties: { status } }) };
   }
 }
 
 export const shelves = new Shelves();
+
+/** Where something of a kind starts, by its type: `to read`; nothing for a kind without statuses. */
+export const firstStatus = (type: string) => plugins.libraryKind(type)?.statuses?.[0]?.value;
