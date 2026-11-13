@@ -56,6 +56,29 @@ export function encodingOf(bytes: Uint8Array, contentType: string): string {
   }
 }
 
+/** A body read as it comes, given up on (and stopped) once it's more than `limit` bytes, whatever its length said. */
+export async function readAtMost(body: ReadableStream<Uint8Array> | null, limit: number): Promise<Uint8Array> {
+  if (!body) return new Uint8Array();
+  const reader = body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (let read = await reader.read(); !read.done; read = await reader.read()) {
+    size += read.value.length;
+    if (size > limit) {
+      void reader.cancel();
+      throw new FetchError("too big");
+    }
+    chunks.push(read.value);
+  }
+  const bytes = new Uint8Array(size);
+  let at = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, at);
+    at += chunk.length;
+  }
+  return bytes;
+}
+
 /**
  * Fetches `url`, unless it hasn't changed since `validators` (in the apps, which ask; browsers ask
  * by themselves, from what they've kept). Throws FetchError if it can't be, or answers with an error.
@@ -93,8 +116,7 @@ export async function fetchFeed(url: string, validators: Validators = {}, signal
       throw new FetchError(`HTTP ${response.status}`, response.status, retryAt);
     }
     if (Number(response.headers.get("content-length")) > MAX_BYTES) throw new FetchError("too big");
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    if (bytes.length > MAX_BYTES) throw new FetchError("too big");
+    const bytes = await readAtMost(response.body, MAX_BYTES);
     const type = response.headers.get("content-type") ?? "";
     return {
       changed: true,

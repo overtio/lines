@@ -30,7 +30,8 @@ const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "
  * in another language, a two-digit year, a single-digit hour.
  */
 export function readDate(text: string | null | undefined): number | undefined {
-  const trimmed = text?.trim();
+  // A date is short: what's past that isn't one, and isn't read through.
+  const trimmed = text?.slice(0, 80).trim();
   if (!trimmed) return undefined;
   // ISO 8601 (Atom), which every browser reads alike.
   if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) return valid(Date.parse(trimmed));

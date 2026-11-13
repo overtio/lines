@@ -44,9 +44,10 @@ const paste = (page: App["page"], text: string) =>
     document.querySelector(".editor-pane [data-pane-content='main'] .cm-content")!.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
   }, text);
 
-/** Opens Add to Library, under the Library's +. */
+/** Opens Add to Library from the Library's + (a menu of it and Subscribe to a Feed, with the Feeds plugin on). */
 const addToLibrary = async (page: App["page"]) => {
   await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: "Add to Library" }).click();
+  await page.getByRole("menuitem", { name: "Add to Library" }).click();
   return page.getByRole("dialog", { name: "Add to Library" });
 };
 

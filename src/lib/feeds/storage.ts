@@ -1,4 +1,4 @@
-import { fromUtf8, toHex, utf8 } from "../crypto";
+import { fromUtf8, utf8 } from "../crypto";
 import { isSealed, openRecord, sealRecord, vault, type Sealed } from "../lock/vault";
 import { database, ObjectStore } from "../notes/storage";
 import type { FeedRecord } from "./posts";
@@ -6,7 +6,7 @@ import type { FeedRecord } from "./posts";
 /*
  * Feeds' posts on this device, in a database of their own (`lines-feeds`): a record for each feed
  * (what it said of itself, its posts but their content, which were read), and each post's content
- * apart, read when it's opened. Each is stored under a hash of what it is, and with the app lock on,
+ * apart, read when it's opened. Each is stored under a random id, and with the app lock on,
  * encrypted like notes (lock/vault.ts), so nothing kept says what's subscribed to or read.
  */
 
@@ -20,13 +20,8 @@ interface Content {
 }
 
 const open = database(FEEDS_DB, 1, [FEEDS, POSTS]);
-const feedStore = new ObjectStore<(FeedRecord & { id: string }) | Sealed>(FEEDS, open);
+const feedStore = new ObjectStore<FeedRecord | Sealed>(FEEDS, open);
 const postStore = new ObjectStore<Content | Sealed>(POSTS, open);
-
-/** What something is stored under: a hash of it, which says nothing of it. */
-export async function storageKey(text: string): Promise<string> {
-  return toHex(new Uint8Array(await crypto.subtle.digest("SHA-256", utf8(text)))).slice(0, 32);
-}
 
 async function seal<T extends { id: string }>(store: string, value: T): Promise<T | Sealed> {
   return vault.sealing ? sealRecord(store, value.id, utf8(JSON.stringify(value))) : value;
@@ -43,7 +38,7 @@ export const feedStorage = {
   },
 
   async put(record: FeedRecord) {
-    await feedStore.put(await seal(FEEDS, { ...record, id: await storageKey(record.url) }));
+    await feedStore.put(await seal(FEEDS, record));
   },
 
   /** A post's content, by its key. */
@@ -63,7 +58,7 @@ export const feedStorage = {
   /** A feed and its posts, gone. */
   async delete(record: FeedRecord) {
     await this.deleteContents(record.posts.map((post) => post.key));
-    await feedStore.delete(await storageKey(record.url));
+    await feedStore.delete(record.id);
   },
 
   /** Writes everything again, encrypted or not as the app lock now says. */

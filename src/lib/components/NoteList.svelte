@@ -59,10 +59,10 @@
   /** The feed listed, if it's one, as it was last fetched. */
   const record = $derived(feedView?.feed ? feeds.records.get(feedView.feed) : undefined);
 
-  /** The box to subscribe in, under the button pressed. */
-  function openSubscribe(event: MouseEvent & { currentTarget: HTMLElement }) {
+  /** The box to subscribe in, under the button pressed: lined up with the header's at its right, centered under the empty list's. */
+  function openSubscribe(event: MouseEvent & { currentTarget: HTMLElement }, align: "center" | "end" = "end") {
     const box = event.currentTarget.getBoundingClientRect();
-    ui.subscribePrompt = { x: box.right, y: box.bottom + 4, align: "end" };
+    ui.subscribePrompt = { x: align === "end" ? box.right : box.left + box.width / 2, y: box.bottom + 4, align };
   }
 
   // Screen readers hear how many notes (or posts) a search finds, once typing pauses.
@@ -328,7 +328,7 @@
           <p class="m-0">{t("feeds.noMatches", { query: notes.query })}</p>
         {:else if !feeds.subscriptions.length}
           <p class="m-0">{t("feeds.none")}</p>
-          <Button variant="quiet" icon="plus" onclick={openSubscribe}>{t("feeds.subscribeButton")}</Button>
+          <Button variant="quiet" icon="plus" onclick={(event) => openSubscribe(event, "center")}>{t("feeds.subscribe")}</Button>
         {:else}
           <p class="m-0">{feeds.fetching.size ? t("feeds.fetching") : t("feeds.noPosts")}</p>
         {/if}

@@ -52,7 +52,8 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 
 ## Feeds
 
-- **On the web, most feeds can't be read.** A web page may only read a feed whose site allows it (CORS), and most don't; the Feeds view and the box to subscribe say so. Apple Podcasts' lookup, and feeds that allow it (some blogs, many podcast hosts), work. The desktop apps read every feed.
+- **On the web, most feeds can't be read.** A web page may only read a feed whose site allows it (CORS), and most don't; the Feeds view and the box to subscribe say so. Feeds that allow it (some blogs, many podcast hosts) work, and Apple Podcasts' lookup finds a podcast's feed, which can be subscribed to if it allows it. The desktop apps read every feed.
+- On the web, a site's answer can't be read either unless it allows it: a feed that says to wait (with Retry-After) or that it's gone looks like one that couldn't be reached, so it's asked again as one that failed, later each time, a day at most.
 - **Read and unread are per device.** Subscriptions are notes and sync, but which posts were read, and the posts themselves, are kept on each device, which fetches them itself (a new device starts with every post unread).
 - Only the newest 200 posts of each feed are kept. Older ones go, and so does their content, unless saved to the Library.
 - A post is shown as Markdown made from its HTML: what Markdown can't say (layouts, embedded players, forms, styling) is left out, and embedded videos are links. Its pictures load from the web each time it's opened.

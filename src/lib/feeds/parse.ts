@@ -1,5 +1,6 @@
 import { readDate, readDuration } from "./dates";
 import { plainText } from "./markdown";
+import { fingerprint } from "./posts";
 
 /*
  * Reading a feed: RSS 2.0, Atom 1.0 and RSS 1.0 (RDF), with the podcast tags that matter (iTunes',
@@ -63,9 +64,35 @@ const EXCERPT = 240;
 const PLAYABLE = /^(?:audio|video)\//i;
 const PLAYABLE_FILE = /\.(?:mp3|m4a|m4b|aac|ogg|oga|opus|wav|flac|mp4|m4v|mov)(?:$|[?#])/i;
 
-/** Whether some text is a feed rather than a page: its first element is RSS's, Atom's or RDF's. */
+const FEED_ROOT = /<(?:[\w-]+:)?(?:rss|feed|RDF)[\s>]/iy;
+
+/**
+ * Whether some text is a feed rather than a page: its first element, past the XML declaration,
+ * comments and a doctype, is RSS's, Atom's or RDF's. Read through once, whatever comes before it.
+ */
 export function isFeed(text: string): boolean {
-  return /^(?:\s|<\?[\s\S]*?\?>|<!--[\s\S]*?-->|<!DOCTYPE[^>]*>)*<(?:[\w-]+:)?(?:rss|feed|RDF)[\s>]/i.test(text.replace(/^\uFEFF/, ""));
+  let at = text.startsWith("\uFEFF") ? 1 : 0;
+  for (;;) {
+    while (at < text.length && /\s/.test(text[at])) at++;
+    const end = text.startsWith("<?", at) ? text.indexOf("?>", at) + 2 : text.startsWith("<!--", at) ? text.indexOf("-->", at) + 3 : /^<!doctype/i.test(text.slice(at, at + 9)) ? doctypeEnd(text, at) : -1;
+    if (end === -1) break;
+    // Never closed: no element follows.
+    if (end < at + 2) return false;
+    at = end;
+  }
+  FEED_ROOT.lastIndex = at;
+  return FEED_ROOT.test(text);
+}
+
+/** Where a doctype starting at `at` ends, past its internal subset (`[…]`) if it has one; -1 if it doesn't. */
+function doctypeEnd(text: string, at: number) {
+  const close = text.indexOf(">", at);
+  const subset = text.indexOf("[", at);
+  if (subset !== -1 && (close === -1 || subset < close)) {
+    const end = text.indexOf("]", subset);
+    return end === -1 ? -1 : text.indexOf(">", end) + 1;
+  }
+  return close === -1 ? -1 : close + 1;
 }
 
 /** Reads a feed fetched from `url`; throws NotAFeed if it isn't one. */
@@ -109,21 +136,48 @@ function entity(name: string): string {
 }
 
 /**
+ * The text in parts, each whether it's a CDATA section or a comment (which are kept as written); one
+ * never closed runs to the end. Read through once, each start and end found from where the last was.
+ */
+function untouched(text: string): [part: string, kept: boolean][] {
+  const parts: [string, boolean][] = [];
+  // Where each next opens; Infinity once there are no more, so it isn't looked for again.
+  const marks = [
+    { open: "<![CDATA[", close: "]]>", next: -1 },
+    { open: "<!--", close: "-->", next: -1 },
+  ];
+  let at = 0;
+  for (;;) {
+    for (const mark of marks) {
+      if (mark.next >= at) continue;
+      const next = text.indexOf(mark.open, at);
+      mark.next = next === -1 ? Infinity : next;
+    }
+    const found = marks[0].next <= marks[1].next ? marks[0] : marks[1];
+    if (found.next === Infinity) break;
+    if (found.next > at) parts.push([text.slice(at, found.next), false]);
+    const close = text.indexOf(found.close, found.next + found.open.length);
+    const end = close === -1 ? text.length : close + found.close.length;
+    parts.push([text.slice(found.next, end), true]);
+    at = end;
+  }
+  if (at < text.length) parts.push([text.slice(at), false]);
+  return parts;
+}
+
+/**
  * The usual mistakes made right, outside CDATA sections and comments: characters XML doesn't
  * allow, a bare `&`, HTML's named entities, and namespace prefixes used but never declared.
  */
-function mend(text: string): string {
-  const mended = text
-    .split(/(<!\[CDATA\[[\s\S]*?\]\]>|<!--[\s\S]*?-->)/)
-    .map((part, i) =>
-      i % 2
-        ? part
-        : part
-            // oxlint-disable-next-line no-control-regex -- control characters are what it takes out
-            .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, "")
-            .replace(/&(?!#\d+;|#x[\da-f]+;|[a-z][\w.-]*;)/gi, "&amp;")
-            .replace(/&([a-z][\w.-]*);/gi, (whole, name: string) => (XML_ENTITIES.has(name) ? whole : entity(name))),
-    )
+export function mend(text: string): string {
+  const mendPart = (part: string) =>
+    part
+      // oxlint-disable-next-line no-control-regex -- control characters are what it takes out
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, "")
+      .replace(/&(?!#\d+;|#x[\da-f]+;|[a-z][\w.-]*;)/gi, "&amp;")
+      .replace(/&([a-z][\w.-]*);/gi, (whole, name: string) => (XML_ENTITIES.has(name) ? whole : entity(name)));
+  const mended = untouched(text)
+    .map(([part, kept]) => (kept ? part : mendPart(part)))
     .join("");
   const declared = new Set([...mended.matchAll(/xmlns:([\w.-]+)\s*=/g)].map((match) => match[1]));
   const used = new Set([...mended.matchAll(/<\/?([\w.-]+):[\w.-]+/g)].map((match) => match[1]));
@@ -163,7 +217,8 @@ const titleText = (value: string | undefined) => (!value ? "" : /&[#\w]+;|<\/[a-
 
 /** HTML for content that may be plain text: plain text's paragraphs and lines kept as such. */
 function asHtml(value: string): string {
-  if (/<[a-z][\s\S]*>/i.test(value)) return value;
+  // A tag: its name, then a space or its end (read without looking further, however long the text).
+  if (/<\/?[a-z][\w:-]*(?:\s|\/?>)/i.test(value)) return value;
   const escape = (line: string) => line.replace(/&(?![#\w]+;)/g, "&amp;").replace(/</g, "&lt;");
   return value
     .trim()
@@ -249,7 +304,7 @@ function readItem(item: Element, base: string, ns: string | null): Post {
   const html = asHtml(text(item, "encoded", NS.content) ?? description ?? tags.summary ?? "");
   const enclosures = children(item, "enclosure", ns).map((enclosure) => ({ url: enclosure.getAttribute("url"), type: enclosure.getAttribute("type") }));
   return {
-    id: guidText || link || `${title}\n${date ?? ""}`,
+    id: guidText || link || `${title}\n${date ?? ""}\n${fingerprint(html)}`,
     title: title || excerptOf(html).slice(0, 80),
     link,
     author: authorName(text(item, "author", ns) ?? tags.author),
@@ -326,7 +381,7 @@ function readAtom(root: Element, url: string): Feed {
       .filter((each) => each.getAttribute("rel") === "enclosure")
       .map((each) => ({ url: each.getAttribute("href"), type: each.getAttribute("type") }));
     return {
-      id: text(entry, "id", ns) || link || `${title}\n${date ?? ""}`,
+      id: text(entry, "id", ns) || link || `${title}\n${date ?? ""}\n${fingerprint(html)}`,
       title: title || excerptOf(html).slice(0, 80),
       link,
       author: name(entry) ?? entryTags.author ?? feedAuthor,

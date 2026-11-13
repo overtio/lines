@@ -1,3 +1,8 @@
+<script lang="ts" module>
+  /** Whether the subscriptions are shown, as the sidebar was left. */
+  const shown = $state({ open: true });
+</script>
+
 <script lang="ts">
   import { speak } from "../a11y";
   import { feedError, feeds, type Subscription } from "../feeds/feeds.svelte";
@@ -19,7 +24,6 @@
 
   let { onchoose }: { onchoose: (filter: Filter) => void } = $props();
 
-  let open = $state(true);
   /** The row whose menu is open, outlined like a right-clicked note. */
   let menuFor = $state<string | null>(null);
 
@@ -54,9 +58,9 @@
         { label: t("feeds.openNote"), icon: "file-text", run: () => notes.show(note) },
         { label: t("feeds.copyFeedLink"), icon: "link", run: () => void copyText(url).then(() => speak(t("list.copied"))) },
       ],
-      // Its note is the subscription: to the Trash with it, which ⌘Z (or Restore) undoes.
+      // Its notes are the subscription: to the Trash with every one, which ⌘Z (or Restore) undoes.
       [{ label: t("feeds.unsubscribe"), icon: "trash", danger: true, run: () => {
-        notes.trashMany([note]);
+        notes.trashMany(feeds.notesOf(url));
         if (filter?.feed === url) onchoose({ kind: "feeds" });
         speak(t("feeds.unsubscribed", { title }));
       } }],
@@ -90,19 +94,19 @@
       <button
         class={[
           "absolute top-1/2 right-1 -mt-3 grid size-6 place-items-center rounded-sm text-faint transition-[rotate,background-color] hover:bg-hover hover:text-muted coarse:right-0 coarse:-mt-[22px] coarse:size-11",
-          open && "rotate-90",
+          shown.open && "rotate-90",
         ]}
-        onclick={() => (open = !open)}
+        onclick={() => (shown.open = !shown.open)}
         aria-label={t("feeds.showSubscriptions")}
         title={t("feeds.showSubscriptions")}
-        aria-expanded={open}
+        aria-expanded={shown.open}
         aria-controls="feeds-subscriptions"
       >
         <Icon name="chevron-right" size={14} />
       </button>
     {/if}
   </div>
-  {#if open && feeds.subscriptions.length}
+  {#if shown.open && feeds.subscriptions.length}
     <ul id="feeds-subscriptions" class="mt-0.5 grid grid-cols-1 gap-y-0.5" aria-label={t("feeds.subscriptions")}>
       {#each feeds.subscriptions as subscription (subscription.url)}
         {@const { url, title, note } = subscription}
@@ -113,8 +117,10 @@
         <li class="pl-3.5">
           <!-- Its artwork, or its kind's icon; a feed that failed, a quiet mark there instead, and why, said and shown on pointing at it. -->
           {#snippet artwork()}
-            {#await attachmentURL(cover!) then src}
-              {#if src}<img class="size-4 shrink-0 rounded-[3px] object-cover" {src} alt="" draggable="false" />{:else}<Icon name="rss" size={16} strokeWidth={1.75} class="shrink-0 text-muted" />{/if}
+            {#await attachmentURL(cover!)}
+              <span class="size-4 shrink-0 rounded-[calc(3px*var(--radius-scale))] bg-hover"></span>
+            {:then src}
+              {#if src}<img class="size-4 shrink-0 rounded-[calc(3px*var(--radius-scale))] object-cover" {src} alt="" draggable="false" />{:else}<Icon name="rss" size={16} strokeWidth={1.75} class="shrink-0 text-muted" />{/if}
             {/await}
           {/snippet}
           <SidebarRow

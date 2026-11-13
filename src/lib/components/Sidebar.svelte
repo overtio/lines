@@ -13,6 +13,7 @@
   import { menuPoint } from "../popover";
   import { longPress } from "../longPress";
   import { isSite, openExternal } from "../platform";
+  import { plugins } from "../plugins/registry.svelte";
   import { prefs } from "../prefs.svelte";
   import { sync } from "../sync/engine.svelte";
   import { today } from "../today.svelte";
@@ -560,7 +561,9 @@
                 />
               </li>
             {:else}
-              <li class="px-2.5 py-1 text-xs text-faint">{t("library.empty")}</li>
+              {#if !(feeds.on && feeds.subscriptions.length)}
+                <li class="px-2.5 py-1 text-xs text-faint">{t("library.empty")}</li>
+              {/if}
             {/each}
           </ul>
         {:else if open && section.kind === "types"}

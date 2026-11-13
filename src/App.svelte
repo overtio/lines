@@ -666,6 +666,8 @@
             iconSize={17}
             on={!!saved}
             label={saved ? t("feeds.openSaved") : t("feeds.save")}
+            busy={feeds.saving.has(shown.key)}
+            disabled={feeds.saving.has(shown.key)}
             onclick={() => (saved ? notes.show(saved.note.id) : void savePost(post))}
           />
           <IconButton

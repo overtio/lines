@@ -41,6 +41,7 @@ export default {
   "feeds.errorTimeout": "The feed took too long to answer.",
   "feeds.errorTooBig": "The feed is too big to read.",
   "feeds.errorNotFeed": "There’s no feed at this address any more.",
+  "feeds.errorGone": "The feed is gone for good, its site says. It’s fetched again only when you refresh it.",
   "feeds.errorStatus": "The feed’s site answered with an error ({status}).",
   "feeds.errorOther": "The feed couldn’t be fetched: {error}",
   // A post in the list, as screen readers hear it.
@@ -62,6 +63,7 @@ export default {
   "feeds.choosePost": "Choose a post to read it.",
   // The open post, as screen readers name it.
   "feeds.postLabel": "Post: {title}",
+  "feeds.unreadable": "This post couldn’t be read from this device.",
   // On a phone, the button back from an open post to the list.
   "feeds.back": "Back to posts",
   // The title of the OPML file the feeds are exported in.

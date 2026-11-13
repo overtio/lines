@@ -143,6 +143,7 @@ async function searchLibrary(page) {
     return route.fulfill({ headers: { ...cors, "content-type": "image/jpeg" }, body: Buffer.from(covers[i], "base64") });
   });
   await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: "Add to Library" }).click();
+  await page.getByRole("menuitem", { name: "Add to Library" }).click();
   await page.keyboard.type("dune");
   await page.getByRole("dialog", { name: "Add to Library" }).getByRole("option").nth(3).waitFor();
 }

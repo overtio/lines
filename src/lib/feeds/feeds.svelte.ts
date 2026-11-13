@@ -1,10 +1,11 @@
 import { untrack } from "svelte";
+import { SvelteMap } from "svelte/reactivity";
 import { speak } from "../a11y";
 import { t } from "../i18n/index.svelte";
 import { libraryNote } from "../library/note";
 import { clock, known } from "../library/text";
 import { dayOf } from "../notes/calendar";
-import { mentionOf, propertyOf } from "../notes/properties";
+import { propertyOf } from "../notes/properties";
 import { isClosed, notes } from "../notes/store.svelte";
 import { plugins } from "../plugins/registry.svelte";
 import type { LibraryItem } from "../plugins/types";
@@ -14,8 +15,8 @@ import { findFeed, linkOf, NoFeed } from "./find";
 import { readOpml, writeOpml } from "./opml";
 import { plainText } from "./markdown";
 import { isFeed, NotAFeed, readFeed, type Feed } from "./parse";
-import { merge, newestFirst, type FeedRecord, type KeptPost } from "./posts";
-import { feedStorage, storageKey } from "./storage";
+import { backoff, DAY, merge, newestFirst, type FeedRecord, type KeptPost } from "./posts";
+import { feedStorage } from "./storage";
 
 /*
  * Feeds subscribed to, and their posts. A subscription is a note with a `feed:` property, so it
@@ -82,6 +83,8 @@ class Feeds {
   fetching = $state.raw(new Set<string>());
   /** The post open in the note's place. */
   open = $state<{ feed: string; id: string } | null>(null);
+  /** The posts being saved to the Library, by key: each saved once, however often it's asked meanwhile. */
+  saving = new SvelteMap<string, Promise<string>>();
 
   #signature = $derived(signature());
 
@@ -119,10 +122,14 @@ class Feeds {
     return post ? { feed: open.feed, post } : null;
   });
 
-  /** Fetches waiting their turn. */
-  #queue: string[] = [];
+  /** Fetches waiting their turn, in order: by feed, whether it was asked for (⟳), which goes even when it was to wait. */
+  #queue = new Map<string, boolean>();
+  /** What's waiting for each feed queued or being fetched: what it read of it, or null. */
+  #waiting = new Map<string, ((feed: Feed | null) => void)[]>();
   /** Each feed's write under way, so they land in order. */
   #writes = new Map<string, Promise<void>>();
+  /** Each feed being kept now, by its address: writing everything again (the app lock) waits for them. */
+  #taking = new Map<string, Promise<void>>();
 
   /** The posts of one feed, or of all, newest first. */
   posts(feed?: string): Row[] {
@@ -132,6 +139,11 @@ class Feeds {
 
   subscription(url: string) {
     return this.subscriptions.find((subscription) => subscription.url === url);
+  }
+
+  /** Every note subscribing to a feed, but those in the Trash. */
+  notesOf(url: string): string[] {
+    return notes.entries.filter(({ note, meta }) => !note.trashed && feedOf(meta.properties) === url).map(({ note }) => note.id);
   }
 
   /**
@@ -159,82 +171,130 @@ class Feeds {
       $effect(() => {
         const minutes = prefs.feedRefresh;
         if (!minutes || !this.on) return;
-        untrack(() => this.refresh(this.#due(minutes)));
-        const timer = setInterval(() => this.refresh(this.#due(minutes)), minutes * 60_000);
+        untrack(() => this.refreshDue(minutes));
+        const timer = setInterval(() => this.refreshDue(minutes), minutes * 60_000);
         return () => clearInterval(timer);
       });
       $effect(() => {
         const fresh = [...this.#subscribed].filter((url) => !untrack(() => this.records.has(url) || this.fetching.has(url)));
         if (!fresh.length || !prefs.feedRefresh || !this.on) return;
         // Still subscribed to (a link typed in has settled), and not fetched since.
-        const timer = setTimeout(() => this.refresh(fresh.filter((url) => this.#subscribed.has(url) && !this.records.has(url))), SETTLE);
+        const timer = setTimeout(() => {
+          for (const url of fresh) if (this.#subscribed.has(url) && !this.records.has(url)) void this.#request(url);
+        }, SETTLE);
         return () => clearTimeout(timer);
       });
     });
   }
 
-  /** The feeds not fetched within the last `minutes`, nor asked to wait. */
-  #due(minutes: number) {
+  /**
+   * Fetches the feeds subscribed to that are due: not fetched within the last `minutes`, and not
+   * waiting, as one said to (429, 503), after failing, or gone (410).
+   */
+  refreshDue(minutes: number = prefs.feedRefresh || 30) {
     const now = Date.now();
-    return this.subscriptions
-      .map(({ url }) => url)
-      .filter((url) => {
-        const record = this.records.get(url);
-        return !record?.checked || (now - record.checked >= minutes * 60_000 - 30_000 && !(record.retryAt && record.retryAt > now));
-      });
+    for (const { url } of this.subscriptions) {
+      const record = this.records.get(url);
+      if (!record?.checked || (!record.gone && !(record.retryAt && record.retryAt > now) && now - record.checked >= minutes * 60_000 - 30_000)) void this.#request(url);
+    }
   }
 
-  /** Fetches these feeds (every one subscribed to, if none are named), a few at a time. */
+  /** Fetches these feeds (every one subscribed to, if none are named) as they're asked for: even those waiting, or gone. */
   refresh(urls: string[] = this.subscriptions.map(({ url }) => url)) {
-    for (const url of urls) if (!this.#queue.includes(url) && !this.fetching.has(url)) this.#queue.push(url);
+    for (const url of urls) void this.#request(url, true);
+  }
+
+  /** A feed fetched in its turn, a few at a time and one per site: what it read, or null if nothing changed or it couldn't be. */
+  #request(url: string, asked = false): Promise<Feed | null> {
+    const read = new Promise<Feed | null>((resolve) => this.#waiting.set(url, [...(this.#waiting.get(url) ?? []), resolve]));
+    if (!this.fetching.has(url)) this.#queue.set(url, asked || !!this.#queue.get(url));
     this.#next();
+    return read;
   }
 
   #next() {
     while (this.fetching.size < AT_ONCE) {
       const busy = new Set([...this.fetching].map(hostOf));
-      const index = this.#queue.findIndex((url) => !busy.has(hostOf(url)));
-      if (index < 0) return;
-      const [url] = this.#queue.splice(index, 1);
+      const url = [...this.#queue.keys()].find((each) => !busy.has(hostOf(each)));
+      if (url === undefined) return;
+      const asked = this.#queue.get(url)!;
+      this.#queue.delete(url);
       this.fetching = new Set([...this.fetching, url]);
-      void this.#fetch(url).finally(() => {
+      void this.#fetch(url, asked).then((feed) => {
         const fetching = new Set(this.fetching);
         fetching.delete(url);
         this.fetching = fetching;
+        for (const resolve of this.#waiting.get(url) ?? []) resolve(feed);
+        this.#waiting.delete(url);
         this.#next();
       });
     }
   }
 
-  async #fetch(url: string) {
+  async #fetch(url: string, asked: boolean): Promise<Feed | null> {
     const record = this.records.get(url);
-    if (record?.retryAt && record.retryAt > Date.now()) return;
+    if (!asked && (record?.gone || (record?.retryAt && record.retryAt > Date.now()))) return null;
     try {
       const response = await fetchFeed(url, record ?? {});
-      if (!response.changed) return this.#update(url, { checked: Date.now(), error: undefined, retryAt: undefined });
+      if (!response.changed) {
+        this.#update(url, { checked: Date.now(), error: undefined, failures: 0, retryAt: undefined, gone: false });
+        return null;
+      }
       if (!isFeed(response.text)) throw new NotAFeed(url);
-      await this.take(url, readFeed(response.text, response.url), response.validators);
+      const feed = readFeed(response.text, response.url);
+      await this.take(url, feed, response.validators);
+      return feed;
     } catch (error) {
       console.warn(`lines: couldn't fetch the feed ${url}`, error);
+      const now = Date.now();
       const reason = error instanceof NotAFeed ? "not a feed" : error instanceof Error ? error.message : String(error);
-      this.#update(url, { checked: Date.now(), error: reason, retryAt: error instanceof FetchError ? error.retryAt : undefined });
+      const failures = (record?.failures ?? 0) + 1;
+      // Longer after each failure in a row, or as long as it said if that's longer; a day at most.
+      const said = error instanceof FetchError ? (error.retryAt ?? 0) : 0;
+      const retryAt = Math.min(now + DAY, Math.max(said, now + backoff(failures, (prefs.feedRefresh || 30) * 60_000)));
+      this.#update(url, { checked: now, error: reason, failures, retryAt, gone: error instanceof FetchError && error.status === 410 });
+      return null;
     }
   }
 
   /** Keeps a feed as it was just fetched: its posts merged with those kept, which were read staying read. */
-  async take(url: string, feed: Feed, validators: Validators) {
-    const fetched = await Promise.all(feed.posts.map(async (post) => ({ ...post, key: await storageKey(`${url}\n${post.id}`) })));
-    const { posts: _, ...rest } = feed;
-    // With the posts as they're kept now: any read since the fetch began stay read.
-    const { posts, changed, dropped } = merge(this.records.get(url)?.posts ?? [], fetched, Date.now());
+  take(url: string, feed: Feed, validators: Validators): Promise<void> {
+    // After the feed's last, so each merges with what the one before kept.
+    const taking = (this.#taking.get(url) ?? Promise.resolve()).catch(() => {}).then(() => this.#take(url, feed, validators));
+    this.#taking.set(url, taking);
+    void taking
+      .catch(() => {})
+      .finally(() => {
+        if (this.#taking.get(url) === taking) this.#taking.delete(url);
+      });
+    return taking;
+  }
+
+  async #take(url: string, feed: Feed, validators: Validators) {
+    const { posts, changed, dropped } = merge(this.records.get(url)?.posts ?? [], feed.posts, Date.now());
     await feedStorage.putContents(changed.map(({ key, html }) => ({ id: key, html })));
-    this.#set(url, { ...rest, url, posts, ...validators, checked: Date.now(), error: undefined, retryAt: undefined });
+    // As the posts are now: one opened (or marked) while their content was written stays as it was left.
+    const now = this.records.get(url);
+    const read = new Map(now?.posts.map((post) => [post.id, post.read]));
+    const { posts: _, ...rest } = feed;
+    this.#set(url, {
+      ...rest,
+      id: now?.id ?? crypto.randomUUID(),
+      url,
+      posts: posts.map((post) => (read.has(post.id) ? { ...post, read: read.get(post.id)! } : post)),
+      ...validators,
+      checked: Date.now(),
+      error: undefined,
+      failures: 0,
+      retryAt: undefined,
+      gone: false,
+    });
     await feedStorage.deleteContents(dropped);
   }
 
   /** Changes what's kept of a feed (one not kept yet only once it's been fetched). */
   #update(url: string, change: Partial<FeedRecord>) {
-    const record = this.records.get(url) ?? { url, title: this.subscription(url)?.title ?? url, posts: [] };
+    const record = this.records.get(url) ?? { id: crypto.randomUUID(), url, title: this.subscription(url)?.title ?? url, posts: [] };
     this.#set(url, { ...record, ...change });
   }
 
@@ -282,9 +342,20 @@ class Feeds {
 
   /**
    * Keeps a post in the Library, as a note made as any library note is: an `article`, or an
-   * `episode` whose `podcast` mentions its subscription's note. Returns the note's id.
+   * `episode` whose `podcast` mentions its subscription's note; asked again while it's being saved,
+   * the same save. Returns the note's id.
    */
-  async save(row: Row, signal?: AbortSignal): Promise<string> {
+  save(row: Row, signal?: AbortSignal): Promise<string> {
+    const { key } = row.post;
+    let saving = this.saving.get(key);
+    if (!saving) {
+      saving = this.#save(row, signal).finally(() => this.saving.delete(key));
+      this.saving.set(key, saving);
+    }
+    return saving;
+  }
+
+  async #save(row: Row, signal?: AbortSignal): Promise<string> {
     const saved = this.savedNote(row);
     if (saved) return saved.note.id;
     const { feed, post } = row;
@@ -298,7 +369,7 @@ class Feeds {
           title: post.title,
           link: post.link,
           properties: known([
-            ["podcast", show && mentionOf(show)],
+            ["podcast", show],
             ["published", published],
             ["duration", clock(post.duration)],
             ["audio", post.audio.url],
@@ -318,10 +389,16 @@ class Feeds {
           cover: post.image,
           description: html ? plainText(html) : post.excerpt,
         };
-    const body = await libraryNote(item, signal);
+    return this.#write(item, signal);
+  }
+
+  /** A note for `item`, made as any library note is: its text written, then its cover kept with it. Its id. */
+  async #write(item: LibraryItem, signal?: AbortSignal): Promise<string> {
+    const note = await libraryNote(item, signal);
     const id = crypto.randomUUID();
     const now = Date.now();
-    await notes.insert({ id, body, createdAt: now, updatedAt: now, pinned: false, trashed: false });
+    await notes.insert({ id, body: note.text, createdAt: now, updatedAt: now, pinned: false, trashed: false });
+    await note.keep().catch((error) => console.warn("lines: couldn't keep a cover", error));
     return id;
   }
 
@@ -335,41 +412,26 @@ class Feeds {
     const link = linkOf(input);
     if (!link) throw new NoFeed(input);
     const found = await findFeed((await namedFeed(link, signal)) ?? link, signal);
-    if (!this.#subscribed.has(found.url)) await this.#add(found.url, found.feed, signal, found.validators);
+    if (this.#subscribed.has(found.url)) return found.url;
+    await this.take(found.url, found.feed, found.validators);
+    await this.#write(feedItem(found.url, found.feed), signal);
     return found.url;
   }
 
-  /** A subscription's note, for a feed fetched (with its posts kept from that) or only known of. */
-  async #add(url: string, feed: Feed, signal?: AbortSignal, validators?: Validators) {
-    if (validators) await this.take(url, feed, validators);
-    const body = await libraryNote(feedItem(url, feed), signal);
-    const now = Date.now();
-    await notes.insert({ id: crypto.randomUUID(), body, createdAt: now, updatedAt: now, pinned: false, trashed: false });
-  }
-
   /**
-   * Subscribes to the feeds an OPML file lists that aren't already, a few at a time: each fetched
-   * for what it says of itself, or, where it can't be, a note of what the file says of it. How many
-   * were added.
+   * Subscribes to the feeds an OPML file lists that aren't already, each fetched in its turn as
+   * feeds are refreshed, for what it says of itself; one that can't be, a note of what the file
+   * says of it, and why kept as any feed's that failed. How many were added.
    */
   async importOpml(text: string): Promise<number> {
     const outlines = readOpml(text).filter(({ url }) => !this.#subscribed.has(url));
-    let done = 0;
-    const next = async (): Promise<void> => {
-      const outline = outlines.shift();
-      if (!outline) return;
-      try {
-        const response = await fetchFeed(outline.url);
-        if (!response.changed || !isFeed(response.text)) throw new NotAFeed(outline.url);
-        await this.#add(outline.url, readFeed(response.text, response.url), undefined, response.validators);
-      } catch {
-        await this.#add(outline.url, { title: outline.title || outline.url, link: outline.site, posts: [] });
-      }
-      done++;
-      return next();
-    };
-    await Promise.all(Array.from({ length: AT_ONCE }, next));
-    return done;
+    await Promise.all(
+      outlines.map(async ({ url, title, site }) => {
+        const feed = await this.#request(url);
+        await this.#write(feedItem(url, feed ?? { title: title || url, link: site, posts: [] }));
+      }),
+    );
+    return outlines.length;
   }
 
   /** Every feed subscribed to, as an OPML file other readers take. */
@@ -381,8 +443,9 @@ class Feeds {
     return writeOpml(t("feeds.opmlTitle"), outlines);
   }
 
-  /** Writes what's kept again, encrypted or not as the app lock now says. */
+  /** Writes what's kept again, encrypted or not as the app lock now says, once the feeds being kept are. */
   async rewrite() {
+    while (this.#taking.size) await Promise.allSettled(this.#taking.values());
     await Promise.all(this.#writes.values());
     await feedStorage.rewrite();
   }
@@ -390,6 +453,7 @@ class Feeds {
 
 /** Why a feed couldn't be fetched (a FetchError's message), as people read it. */
 export function feedError(reason: string): string {
+  if (reason === "HTTP 410") return t("feeds.errorGone");
   const status = /^HTTP (\d+)$/.exec(reason)?.[1];
   if (status) return t("feeds.errorStatus", { status });
   switch (reason) {
@@ -406,8 +470,9 @@ export function feedError(reason: string): string {
   }
 }
 
-/** Saves a post to the Library, and says so, or that it couldn't be. */
+/** Saves a post to the Library, and says so, or that it couldn't be; once, if it's being saved already. */
 export async function savePost(row: Row) {
+  if (feeds.saving.has(row.post.key)) return;
   try {
     await feeds.save(row);
     speak(t("feeds.saved", { title: row.post.title }));

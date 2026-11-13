@@ -4,7 +4,8 @@ import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type Vi
 import { tags } from "@lezer/highlight";
 import { mount, unmount } from "svelte";
 import { speak } from "../../lib/a11y";
-import { fenceAt, fenceFor, fenceLanguage } from "../../lib/editor/rendered";
+import { fenceFor } from "../../lib/editor/codeFence";
+import { fenceAt, fenceLanguage } from "../../lib/editor/rendered";
 import { copyButton, destroyCopyButton } from "../../lib/editor/keyValue";
 import { outlineHeadings } from "../../lib/editor/outline.svelte";
 import Icon from "../../lib/icons/Icon.svelte";

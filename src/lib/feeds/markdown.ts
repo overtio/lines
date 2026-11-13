@@ -1,11 +1,16 @@
+import { fenceFor } from "../editor/codeFence";
+import { escapeMarkdown } from "../notes/escape";
+
 /*
  * A feed's HTML as Markdown, for reading a post as a note is drawn: the page is read into a document
  * of its own (DOMParser's, where nothing runs or loads) and walked, keeping paragraphs, headings,
  * links, emphasis, lists, quotes, code, pictures and simple tables, and dropping everything else.
- * No HTML is ever put into the page as it came.
+ * No HTML is ever put into the page as it came, and nothing in a post is ever more than text there:
+ * its words are escaped (notes/escape.ts), its code has no language (so nothing draws or runs it),
+ * and its links go only to the web or to mail.
  */
 
-/** Links and pictures only to the web (and mail, for links): no `javascript:`, no `data:`. */
+/** Links and pictures only to the web (and mail, for links): no `file:`, `javascript:` or `data:`. */
 const SAFE_LINK = /^(?:https?:|mailto:)/i;
 const SAFE_IMAGE = /^https?:/i;
 
@@ -13,6 +18,8 @@ const SAFE_IMAGE = /^https?:/i;
 const SKIPPED = new Set(["script", "style", "noscript", "template", "head", "title", "meta", "link", "svg", "math", "form", "button", "input", "select", "textarea", "object", "embed", "canvas", "map"]);
 /** Blocks whose inline content is a paragraph of its own. */
 const BLOCKS = new Set(["p", "div", "section", "article", "header", "footer", "main", "aside", "nav", "figure", "address", "details", "summary", "center", "hgroup", "body"]);
+/** Every element that makes a block, those above and those with Markdown of their own. */
+const BLOCK_ELEMENTS = new Set([...BLOCKS, "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li", "blockquote", "pre", "hr", "table", "figcaption", "dl", "iframe", "video", "audio"]);
 
 const parse = (html: string) => new DOMParser().parseFromString(html, "text/html").body;
 
@@ -31,26 +38,15 @@ export function htmlToMarkdown(html: string, base?: string): string {
   return new Writer(base).blocks(parse(html)).join("\n\n").trim();
 }
 
-/** Text that would read as Markdown, or as lines' own syntax (tags, mentions, math, highlights), escaped to stay text. */
-export function escapeText(text: string): string {
-  return (
-    text
-      .replace(/[\\`*[\]<]/g, "\\$&")
-      // `_` only where it could start or end emphasis, not within a word (snake_case).
-      .replace(/(?<![\p{L}\p{N}])_|_(?![\p{L}\p{N}])/gu, "\\_")
-      .replace(/~~/g, "\\~\\~")
-      .replace(/==/g, "=\\=")
-      // A tag has more than digits (#2 isn't one).
-      .replace(/(^|[\s(])#(?=[\p{L}\p{M}\p{N}_/-]*[\p{L}\p{M}_/-])/gu, "$1\\#")
-      .replace(/(^|[^\p{L}\p{M}\p{N}_./\\@`])@(?=[[\p{L}\p{N}_])/gu, "$1\\@")
-      // Not a price: lines doesn't read "$5" as math anyway.
-      .replace(/\$(?![\d\s])/g, "\\$")
-  );
+/** A text node's words, escaped as a line of text is (notes/escape.ts), with a space kept at either end that had one: it parts them from what's beside them. */
+function escapeText(text: string): string {
+  const words = escapeMarkdown(text);
+  if (!words) return /\s/.test(text) ? " " : "";
+  return `${/^\s/.test(text) ? " " : ""}${words}${/\s$/.test(text) ? " " : ""}`;
 }
 
-/** A line's first characters that would make it a heading, list item, quote or rule, escaped. */
-const escapeLineStart = (line: string) =>
-  line.replace(/^(\s*)(#{1,6}(?=\s|$)|[-+>](?=\s|$)|=+\s*$|-+\s*$)/, "$1\\$2").replace(/^(\s*\d+)([.)])(?=\s|$)/, "$1\\$2");
+/** What a line under another can make of both, which a line alone can't: a table's row, a heading's underline. */
+const escapeUnder = (line: string) => line.replace(/^(\||[=-]+\s*$)/, "\\$1");
 
 /** HTML's whitespace as the page shows it: one space. */
 const collapse = (text: string) => text.replace(/\s+/g, " ");
@@ -69,10 +65,19 @@ class Writer {
     }
   }
 
-  /** The Markdown of a node within a line: its text escaped, or an element's inline Markdown (a block's, on the line). */
+  /**
+   * The Markdown of a node within a line: its text escaped, or an element's inline Markdown. A block
+   * found within a line (a page's `<i><pre>…</pre></i>`) is only its words there: block Markdown in
+   * the middle of a paragraph would break out of it.
+   */
   #within(node: Node): string {
-    if (node instanceof Element) return this.block(node)?.join(" ") ?? this.inline(node);
-    return node.nodeType === Node.TEXT_NODE ? escapeText(collapse(node.textContent ?? "")) : "";
+    if (!(node instanceof Element)) return node.nodeType === Node.TEXT_NODE ? escapeText(node.textContent ?? "") : "";
+    const name = node.localName;
+    if (SKIPPED.has(name)) return "";
+    if (name === "pre") return ` ${inlineCode(collapse(node.textContent ?? "").trim())} `;
+    // An embedded player is a link, which a line can hold.
+    if (name === "iframe" || name === "video" || name === "audio") return this.block(node)!.join(" ");
+    return BLOCK_ELEMENTS.has(name) ? ` ${this.line(node)} ` : this.inline(node);
   }
 
   /** The Markdown blocks of an element's children, in order, its loose text and inline elements making paragraphs. */
@@ -81,16 +86,14 @@ class Writer {
     let inline = "";
     const flush = () => {
       const text = inline.replace(/ *\n */g, "\n").replace(/ +/g, " ").trim();
-      if (text) out.push(text.split("\n").map(escapeLineStart).join("\n"));
+      if (text) out.push(text.split("\n").map(escapeUnder).join("\n"));
       inline = "";
     };
     for (const node of parent.childNodes) {
-      const block = node instanceof Element ? this.block(node) : null;
-      if (block === null) inline += this.#within(node);
-      else {
+      if (node instanceof Element && BLOCK_ELEMENTS.has(node.localName)) {
         flush();
-        out.push(...block);
-      }
+        out.push(...this.block(node)!);
+      } else inline += this.#within(node);
     }
     flush();
     return out;
@@ -100,7 +103,7 @@ class Writer {
   block(element: Element): string[] | null {
     const name = element.localName;
     if (SKIPPED.has(name)) return [];
-    if (BLOCKS.has(name)) return this.blocks(element);
+    if (BLOCKS.has(name) || name === "li") return this.blocks(element);
     const heading = /^h([1-6])$/.exec(name);
     if (heading) {
       // The post's title is the note's heading: its own go under it.
@@ -117,8 +120,12 @@ class Writer {
         const inner = this.blocks(element).join("\n\n");
         return inner ? [inner.split("\n").map((line) => (line ? `> ${line}` : ">")).join("\n")] : [];
       }
-      case "pre":
-        return [this.code(element)];
+      case "pre": {
+        // Without its language: a post's code is shown, never drawn or run (a diagram, a request).
+        const code = (element.textContent ?? "").replace(/\n$/, "");
+        const fence = fenceFor(code);
+        return code.trim() ? [`${fence}\n${code}\n${fence}`] : [];
+      }
       case "hr":
         return ["---"];
       case "table":
@@ -223,18 +230,12 @@ class Writer {
     return out.join("\n");
   }
 
-  /** A block of code, fenced, in its language where the page says. */
-  code(element: Element): string {
-    const text = (element.textContent ?? "").replace(/\n$/, "");
-    const classes = `${element.className} ${element.querySelector("code")?.className ?? ""}`;
-    const language = /(?:^|\s)(?:language|lang)-([\w+#-]+)/.exec(classes)?.[1] ?? "";
-    return `${fenceFor(text, 3)}${language}\n${text}\n${fenceFor(text, 3)}`;
-  }
-
   /** A table of plain cells, as a Markdown table; one with cells across others, as its rows' text. */
   table(element: Element): string[] {
     const rows = [...element.querySelectorAll("tr")].filter((row) => row.closest("table") === element);
-    const cells = rows.map((row) => [...row.children].filter((cell) => cell.localName === "td" || cell.localName === "th").map((cell) => this.line(cell).replace(/\|/g, "\\|")));
+    // A cell's `|` would end it, and a leading `=` make it a formula.
+    const text = (cell: Element) => this.line(cell).replace(/\|/g, "\\|").replace(/^=/, "\\=");
+    const cells = rows.map((row) => [...row.children].filter((cell) => cell.localName === "td" || cell.localName === "th").map(text));
     const width = Math.max(0, ...cells.map((row) => row.length));
     if (!width) return [];
     if (width === 1 || element.querySelector("[colspan], [rowspan]")) return cells.map((row) => row.filter(Boolean).join(" · ")).filter(Boolean);
@@ -245,17 +246,19 @@ class Writer {
 
 /** Text in a mark on each side, its spaces left outside, as Markdown needs. */
 function wrap(text: string, mark: string) {
-  const [, before, inner, after] = /^(\s*)([\s\S]*?)(\s*)$/.exec(text)!;
-  return inner ? `${before}${mark}${inner}${mark}${after}` : text;
+  const inner = text.trim();
+  if (!inner) return text;
+  const before = text.slice(0, text.length - text.trimStart().length);
+  const after = text.slice(text.trimEnd().length);
+  return `${before}${mark}${inner}${mark}${after}`;
 }
 
-/** Backticks enough to fence `text`: more than the longest run in it, and at least `least`. */
-const fenceFor = (text: string, least: number) => "`".repeat(Math.max(least, ...[...text.matchAll(/`+/g)].map((run) => run[0].length + 1)));
-
+/** Code within a line, between backticks enough that none in it ends it. */
 function inlineCode(code: string) {
   if (!code.trim()) return code;
+  const fence = "`".repeat(Math.max(1, ...[...code.matchAll(/`+/g)].map((run) => run[0].length + 1)));
   const pad = code.startsWith("`") || code.endsWith("`") ? " " : "";
-  return `${fenceFor(code, 1)}${pad}${code}${pad}${fenceFor(code, 1)}`;
+  return `${fence}${pad}${code}${pad}${fence}`;
 }
 
 /** A link's destination, in angle brackets where it has spaces or brackets in it. */

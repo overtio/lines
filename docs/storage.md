@@ -19,7 +19,7 @@ Browser storage belongs to one site (origin) in one browser profile. Another bro
 | `lines-feeds` | `feeds` | Each feed subscribed to: what it said of itself, its newest 200 posts (all but their content), which were read, and its ETag and Last-Modified for asking whether it changed |
 | `lines-feeds` | `posts` | Each post's content, as the feed gave it (HTML), read when the post is opened |
 
-With the app lock on, the notes and attachments in `lines` and everything in `lines-feeds` are encrypted (see [sync.md](sync.md) and `src/lib/lock/vault.ts`). `lines-feeds` keeps each record under a hash of what it is (a feed's address, a post's), so nothing there says what's subscribed to. It isn't synced: subscriptions are notes and sync as notes do, and each device fetches the posts itself.
+With the app lock on, the notes and attachments in `lines` and everything in `lines-feeds` are encrypted (see [sync.md](sync.md) and `src/lib/lock/vault.ts`). `lines-feeds` keeps each record under a random id (a feed's, and each post's), so nothing there says what's subscribed to. It isn't synced: subscriptions are notes and sync as notes do, and each device fetches the posts itself.
 
 ### localStorage
 
