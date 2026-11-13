@@ -252,7 +252,39 @@ describe("subscribing", () => {
     if (engine() === "chromium") expect(bodies.filter((body) => /!\[[^\]]*\]\(\.\.\/attachments\/[0-9a-f]{32}\.\w+\)/.test(body))).toHaveLength(2);
   });
 
+  test("a site's page that names no feed: where sites usually keep theirs, beside the page first, one request at a time, giving up on a site that asks to be left alone", async () => {
+    const asked: string[] = [];
+    /** Every request to `host` noted, and answered 404 unless answered otherwise below (routes added later are asked first). */
+    const site = (host: string) =>
+      app.page.route(
+        (url) => url.hostname === host,
+        (route) => {
+          asked.push(route.request().url());
+          return route.fulfill({ status: 404, body: "", headers: { "access-control-allow-origin": "*" } });
+        },
+      );
+    await site("quiet.example");
+    await site("busy.example");
+    await answer("https://quiet.example/blog", "<!doctype html><title>Blog</title>", "text/html");
+    await answer("https://quiet.example/blog/rss.xml", fixture("blog.atom"), "application/atom+xml");
+    await answer("https://busy.example/news", "<!doctype html><title>News</title>", "text/html");
+    await app.page.route("https://busy.example/news/rss", (route) => {
+      asked.push(route.request().url());
+      return route.fulfill({ status: 429, body: "", headers: { "access-control-allow-origin": "*", "retry-after": "60" } });
+    });
+
+    const blog = await subscribe("quiet.example/blog");
+    expect(blog.url).toBe("https://quiet.example/blog/rss.xml");
+    expect(asked).toEqual(["https://quiet.example/blog/feed", "https://quiet.example/blog/rss"]);
+    asked.length = 0;
+    expect(await subscribe("https://busy.example/news")).toEqual({ error: "no feed" });
+    expect(asked).toEqual(["https://busy.example/news/feed", "https://busy.example/news/rss"]);
+    app.errors.length = 0;
+  });
+
   test("says when there's none, and when the site doesn't let web pages read it", async () => {
+    // Where sites usually keep a feed isn't there either.
+    await app.page.route((url) => url.hostname === "nofeed.example", (route) => route.fulfill({ status: 404, body: "", headers: { "access-control-allow-origin": "*" } }));
     await answer("https://nofeed.example/", "<!doctype html><title>Nothing</title>", "text/html");
     // A page sees a site that doesn't let it read it as one it couldn't reach (Playwright lets every answer of its own through).
     await app.page.route("https://closed.example/feed", (route) => route.abort("failed"));

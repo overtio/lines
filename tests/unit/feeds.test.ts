@@ -8,7 +8,7 @@ import { stubApp } from "./stubs";
 stubApp();
 mock.module("../../src/lib/release", () => ({ VERSION: "0.0.0", REPO: "https://github.com/overtio/lines" }));
 const { encodingOf, readAtMost } = await import("../../src/lib/feeds/fetch");
-const { linkOf } = await import("../../src/lib/feeds/find");
+const { linkOf, usualFeeds } = await import("../../src/lib/feeds/find");
 
 /*
  * Feeds' logic that needs no page: dates and durations as feeds write them, keeping posts across
@@ -177,6 +177,22 @@ describe("links", () => {
     expect(linkOf("feed:https://example.com/rss")).toBe("https://example.com/rss");
     expect(linkOf("example.com/blog")).toBe("https://example.com/blog");
     expect([linkOf("not a link"), linkOf("javascript:alert(1)"), linkOf("")]).toEqual([null, null, null]);
+  });
+
+  test("where a site usually keeps its feed: beside the page first, then at the root, on that site only", () => {
+    const blog = usualFeeds("https://vercel.com/blog?ref=x#top");
+    expect(blog.slice(0, 2)).toEqual(["https://vercel.com/blog/feed", "https://vercel.com/blog/rss"]);
+    expect(blog).toContain("https://vercel.com/atom");
+    expect(blog.indexOf("https://vercel.com/blog/index.xml")).toBeLessThan(blog.indexOf("https://vercel.com/feed"));
+    expect(blog.every((url) => url.startsWith("https://vercel.com/"))).toBe(true);
+    // A folder with or without its slash, and a page in one, are the same folder.
+    expect(usualFeeds("https://example.com/news/")[0]).toBe("https://example.com/news/feed");
+    expect(usualFeeds("https://example.com/news/index.html")[0]).toBe("https://example.com/news/feed");
+    // A site's front page has only the root's, once each.
+    const root = usualFeeds("https://example.com/");
+    expect(root[0]).toBe("https://example.com/feed");
+    expect(new Set(root).size).toBe(root.length);
+    expect(root.length).toBe(blog.length / 2);
   });
 
   test("decodes a feed as it says it's encoded", () => {
