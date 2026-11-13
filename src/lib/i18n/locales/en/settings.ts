@@ -518,7 +518,7 @@ export default {
   "settings.soundPackError": "That isn't a sound pack lines can read: it needs a Mechvibes config.json and the sounds it names.",
   // Who recorded a sound pack.
   "settings.soundPackBy": "By {author}",
-  "settings.symbols": "Symbols",
+  "settings.ligatures": "Font ligatures",
   "settings.symbolsInText": "Show -> as → in text",
   "settings.symbolsInCode": "Show -> as → in code",
   // The arrows and signs are shown as they appear in notes; keep them as they are.

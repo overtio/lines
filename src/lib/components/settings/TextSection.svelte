@@ -26,6 +26,7 @@
   import FieldRow from "../ui/FieldRow.svelte";
   import Segmented from "../ui/Segmented.svelte";
   import Slider from "../ui/Slider.svelte";
+  import Switch from "../ui/Switch.svelte";
 
   const SAMPLE = t("settings.previewNote");
   const fonts = $derived(noteFonts());
@@ -114,6 +115,15 @@
       <ColorField id="heading-custom-color" label={t("settings.paperCustomColor")} value={prefs.headingCustomColor} onchange={(color) => color && (prefs.headingCustomColor = color)} />
     </FieldRow>
   {/if}
+</FieldGroup>
+
+<FieldGroup title={t("settings.ligatures")} note={t("settings.symbolsNote")}>
+  <FieldRow label={t("settings.symbolsInText")}>
+    <Switch label={t("settings.symbolsInText")} checked={prefs.symbolsInText} onchange={(on) => (prefs.symbolsInText = on)} />
+  </FieldRow>
+  <FieldRow label={t("settings.symbolsInCode")}>
+    <Switch label={t("settings.symbolsInCode")} checked={prefs.symbolsInCode} onchange={(on) => (prefs.symbolsInCode = on)} />
+  </FieldRow>
 </FieldGroup>
 
 <FieldGroup>

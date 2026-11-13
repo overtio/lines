@@ -58,15 +58,6 @@
   </FieldRow>
 </FieldGroup>
 
-<FieldGroup title={t("settings.symbols")} note={t("settings.symbolsNote")}>
-  <FieldRow label={t("settings.symbolsInText")}>
-    <Switch label={t("settings.symbolsInText")} checked={prefs.symbolsInText} onchange={(on) => (prefs.symbolsInText = on)} />
-  </FieldRow>
-  <FieldRow label={t("settings.symbolsInCode")}>
-    <Switch label={t("settings.symbolsInCode")} checked={prefs.symbolsInCode} onchange={(on) => (prefs.symbolsInCode = on)} />
-  </FieldRow>
-</FieldGroup>
-
 <FieldGroup title={t("settings.links")} note={t("settings.linksNote", { openKey: formatKeys("Alt-Enter", system) })}>
   <!-- A table rather than rows: each kind of link has a choice for each way of clicking it. -->
   <div class="overflow-x-auto px-2.5 py-1.5">

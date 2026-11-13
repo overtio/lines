@@ -471,7 +471,7 @@ export default {
   "settings.soundPackAdded": "{name} a été ajouté.",
   "settings.soundPackError": "Ce n’est pas un pack de sons que lines peut lire : il lui faut un config.json de Mechvibes et les sons qu’il nomme.",
   "settings.soundPackBy": "Par {author}",
-  "settings.symbols": "Symboles",
+  "settings.ligatures": "Ligatures",
   "settings.symbolsInText": "Afficher -> comme → dans le texte",
   "settings.symbolsInCode": "Afficher -> comme → dans le code",
   "settings.symbolsNote":
