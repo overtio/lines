@@ -1,6 +1,6 @@
-import { FEED_SOURCE, feedItem, feeds } from "../../lib/feeds/feeds.svelte";
+import { FEED_SOURCE, feedItem, feeds, namedFeed } from "../../lib/feeds/feeds.svelte";
 import { fetchFeed } from "../../lib/feeds/fetch";
-import { findFeed, NoFeed } from "../../lib/feeds/find";
+import { findFeed, looksLikeFeed, NoFeed } from "../../lib/feeds/find";
 import { isFeed, readFeed } from "../../lib/feeds/parse";
 import { t } from "../../lib/i18n/index.svelte";
 import { episodePlay } from "../../lib/player/notePlay";
@@ -25,15 +25,6 @@ const FEED: LibraryKind = {
   shelf: false,
 };
 
-/** Links that look like a feed's, which are fetched to see: `….xml`, `/feed`, `/rss`, `feeds.…`, `?format=rss`. */
-function looksLikeFeed(url: URL) {
-  return (
-    /(?:\.(?:rss|atom|rdf|xml)|\/(?:feeds?|rss2?|atom)(?:\.\w+)?)\/?$/i.test(url.pathname) ||
-    /^(?:feeds?|rss)\./i.test(url.hostname) ||
-    /(?:^|&)(?:feed|format)=(?:rss|atom|feed)\b/i.test(url.search.slice(1))
-  );
-}
-
 const source: LibrarySource = {
   id: FEED_SOURCE,
   name: t("feeds.title"),
@@ -49,8 +40,8 @@ const source: LibrarySource = {
 };
 
 /**
- * A page no other source took for something (a blog's, a site's front page): the feed it names, or
- * one where sites usually keep theirs. Asked last, and only while pages are read (Web Pages).
+ * A page no other source took for something (a blog's, a podcast's, a site's front page): its
+ * site's feed, or its podcast's (findFeed). Asked last, and only while pages are read (Web Pages).
  */
 const site: LibrarySource = {
   id: "feeds-site",
@@ -59,7 +50,7 @@ const site: LibrarySource = {
   recognizes: (url) => (url.protocol === "https:" || url.protocol === "http:") && plugins.librarySources.some((each) => each.id === "web-pages"),
   async lookup(url, signal) {
     try {
-      const found = await findFeed(url.href, signal);
+      const found = await findFeed(url.href, signal, namedFeed);
       await feeds.take(found.url, found.feed, found.validators);
       return feedItem(found.url, found.feed);
     } catch (error) {

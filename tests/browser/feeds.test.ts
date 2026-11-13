@@ -282,6 +282,30 @@ describe("subscribing", () => {
     app.errors.length = 0;
   });
 
+  test("a podcast's site, whose own feed is for its posts: the podcast it links to, by its feed or its page on Apple Podcasts, but not one it only mentions", async () => {
+    for (const host of ["www.syntax.fm", "syntax.fm", "mentions.example", "feeds.host.example"])
+      await app.page.route((url) => url.hostname === host, (route) => route.fulfill({ status: 404, body: "", headers: { "access-control-allow-origin": "*" } }));
+    await app.page.route(
+      (url) => url.href.startsWith("https://itunes.apple.com/lookup?id=1253186678"),
+      (route) => route.fulfill({ json: { resultCount: 1, results: [{ kind: "podcast", collectionName: "Syntax", feedUrl: "https://feeds.megaphone.fm/FSI1483080183" }] }, headers: { "access-control-allow-origin": "*" } }),
+    );
+    await answer("https://feeds.megaphone.fm/FSI1483080183", fixture("podcast.rss"), "application/xml");
+    // The podcast's feed says its site is https://syntax.fm.
+    await answer("https://feeds.host.example/syntax.rss", fixture("podcast.rss"), "application/xml");
+    const page = (feed: string, link: string) => `<!doctype html><head><link rel="alternate" type="application/atom+xml" href="${feed}"></head><body><a href="${link}">Listen</a></body>`;
+    await answer("https://www.syntax.fm/", page("/posts.atom", "https://feeds.host.example/syntax.rss"), "text/html");
+    await answer("https://www.syntax.fm/posts.atom", fixture("blog.atom"), "application/atom+xml");
+    await answer("https://syntax.fm/listen", `<!doctype html><a href="https://example.com/">Elsewhere</a> <a href="https://podcasts.apple.com/us/podcast/syntax/id1253186678">Apple Podcasts</a>`, "text/html");
+    await answer("https://mentions.example/", page("/feed.xml", "https://feeds.host.example/syntax.rss"), "text/html");
+    await answer("https://mentions.example/feed.xml", fixture("blog.rss"), "application/rss+xml");
+
+    expect((await subscribe("https://www.syntax.fm/")).url).toBe("https://feeds.host.example/syntax.rss");
+    expect((await subscribe("https://syntax.fm/listen")).url).toBe("https://feeds.megaphone.fm/FSI1483080183");
+    // A blog that links to someone else's podcast is subscribed to for its own posts.
+    expect((await subscribe("https://mentions.example/")).url).toBe("https://mentions.example/feed.xml");
+    app.errors.length = 0;
+  });
+
   test("says when there's none, and when the site doesn't let web pages read it", async () => {
     // Where sites usually keep a feed isn't there either.
     await app.page.route((url) => url.hostname === "nofeed.example", (route) => route.fulfill({ status: 404, body: "", headers: { "access-control-allow-origin": "*" } }));
