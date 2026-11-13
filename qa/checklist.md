@@ -439,6 +439,26 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Add to Library (the Library's +): opens under it, the field focused, the kinds to search for above it (Books, Movies, Shows, Music, Podcasts, and [Desktop] Papers), Books first; with nothing typed, which catalogs it searches. Type "dune": books from Open Library, each its cover, title, author · year; Movies: films from Wikidata with Wikipedia's posters and their descriptions; Music: songs and albums from MusicBrainz; Podcasts: from Apple. Choosing another kind searches it again for what's typed. ↓ into the results, ↑ back to the field, ↵ or a click: a new note on its shelf at once, opened with the cursor on its title, then "Looking up…" and its cover and description filled in a moment later (⌘Z takes that back); not in the Inbox. Esc closes it with focus back on the +. Paste a link instead: one result, what it is, added the same way. Chosen again, the note there is already opens, no second one. Blank: a new note of the kind chosen, to fill in, not in the Inbox. As tall as what it shows: with nothing typed, the field, the hint and Blank, no gap. Offline: it says it couldn't search, with Try Again
 - [ ] A link's menu in a note (right-click it, or the cursor on it and ⇧F10 or the menu key): Open Link, Copy Link, Add to Library. Add to Library: "Looking up…" after the link, then the link is a mention of its new library note (`@[…]`), the note in the Library; ⌘Z puts the link back, the library note staying; done again, the same note is mentioned, not another made; a link to something nothing can say shows "Nothing found for this link" a moment; changed while looked up (a letter typed into it), nothing happens, while typing after it doesn't stop it; go to another note while it's looked up and come back: "Looking up…" still there, gone once it's done; left until it's found, the note has the mention where the link was (another link starting the same way left alone), and ⌘Z in the note you're in is that note's; with the Library plugin off, the menu has Open Link and Copy Link only. Not on images, attachments or mentions; a selection reaching past the link keeps the system's menu; [Mac] right-clicking a link that selects its word still shows this menu
 
+## 11b. Feeds
+
+- [ ] Library → Feeds → + (or the Library heading's +, Subscribe to a Feed): pasting a feed's link and Enter subscribes: a note for it (its title, artwork, author, `feed:` and `link:`), filed, not in the Inbox; the list shows its posts, newest first, each unread with a dot, its title, excerpt, where it's from and when
+- [ ] Subscribing with a site's link finds its feed (a blog's home page); with an Apple Podcasts link, the podcast's; with a link to nothing that has one, "There's no feed there that lines can read"; subscribing again to one already there opens it rather than adding another
+- [ ] [Web] The box to subscribe, and Feeds when a feed couldn't be read, say once, quietly, that on the web only feeds whose sites allow it can be read; in the apps they don't
+- [ ] Under Feeds in the sidebar, each feed is a row with its unread count; the chevron folds them away; Feeds counts every feed's unread
+- [ ] Choosing a post opens it in the note's place, read-only: its title, a quiet line of where it's from, by whom and when, then its text as a note draws it (headings, links, lists, quotes, code, pictures); nothing in it can be typed into; it's marked read
+- [ ] ↑ and ↓ in the list open the post above or below; Home and End the first and last; Tab reaches the list once
+- [ ] Over an open post: Mark as Unread puts its dot back; Open in Browser opens its page; a post's menu (right-click, long press) has those and Copy Link
+- [ ] Save to Library over an open post (or in its menu) makes a note of it, made as a link's is: an `article` (author, site, published, link, `status: to read`, its picture, a few sentences) or, for an episode, an `episode` whose `podcast` is a mention of the subscription; then the button opens that note
+- [ ] A new note that's just a feed's link (pasted) becomes the subscription's note, and the feed is under Feeds with its posts, without being fetched again
+- [ ] Settings → Plugins → Feeds off: Feeds leaves the Library and nothing is fetched; a site's subscription is under Types; on again, it's all back
+- [ ] Refresh (⟳ over the list) fetches the feed (or every feed) again: only new posts are added, unread, and those read stay read; with nothing new, nothing changes
+- [ ] [Apps] Feeds are fetched when lines starts and every 30 minutes; Settings → Library → Refresh feeds changes how often, or to only when asked
+- [ ] A feed that can't be fetched shows a quiet mark in place of its icon, and why on pointing at it, and above its posts when chosen
+- [ ] Searching in Feeds finds posts by words in their titles and excerpts
+- [ ] A feed's menu: Mark All as Read clears its count; Open Its Note opens the subscription; Unsubscribe moves the note to the Trash and the feed goes from the sidebar (Restore brings it back, with its posts read as they were); Feeds' own menu marks every feed read
+- [ ] Settings → Library → Export OPML downloads `feeds.opml`, which another feed reader imports; Import OPML… subscribes to each feed in a file that isn't already, saying how many
+- [ ] With the app lock on, quit and reopen: before unlocking nothing's fetched; after, the posts and which were read are as they were
+
 ## 12. Menus, pickers and note info
 
 - [ ] Menus open at the pointer, stay inside the window, move with ↑ ↓, and close on Esc, a click outside, scroll or resize
@@ -710,23 +730,6 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Clicking a type table's cells shows its line with the table below; editing the line redraws it; a table for a type with no notes says so
 - [ ] `/type table` writes `@type.` and opens the menu of types (icons, counts); Enter or Tab picks one; within text `@type.qa-person` is a chip that ⌘-click turns into that type's list
 - [ ] Changing a property of a note in a type table (in another window, or after switching notes) updates the table
-
-## 23b. Feeds
-
-- [ ] Library → Feeds → + (or the Library heading's +, Subscribe to a Feed): pasting a feed's link and Enter subscribes: a note for it (its title, artwork, author, `feed:` and `link:`), filed, not in the Inbox; the list shows its posts, newest first, each unread with a dot, its title, excerpt, where it's from and when
-- [ ] Subscribing with a site's link finds its feed (a blog's home page); with an Apple Podcasts link, the podcast's; with a link to nothing that has one, "There's no feed there that lines can read"; subscribing again to one already there opens it rather than adding another
-- [ ] [Web] The box to subscribe, and Feeds when a feed couldn't be read, say once, quietly, that on the web only feeds whose sites allow it can be read; in the apps they don't
-- [ ] Under Feeds in the sidebar, each feed is a row with its unread count; the chevron folds them away; Feeds counts every feed's unread
-- [ ] Choosing a post opens it in the note's place, read-only: its title, a quiet line of where it's from, by whom and when, then its text as a note draws it (headings, links, lists, quotes, code, pictures); nothing in it can be typed into; it's marked read
-- [ ] ↑ and ↓ in the list open the post above or below; Home and End the first and last; Tab reaches the list once
-- [ ] Over an open post: Mark as Unread puts its dot back; Open in Browser opens its page; a post's menu (right-click, long press) has those and Copy Link
-- [ ] Refresh (⟳ over the list) fetches the feed (or every feed) again: only new posts are added, unread, and those read stay read; with nothing new, nothing changes
-- [ ] [Apps] Feeds are fetched when lines starts and every 30 minutes; Settings → Library → Refresh feeds changes how often, or to only when asked
-- [ ] A feed that can't be fetched shows a quiet mark in place of its icon, and why on pointing at it, and above its posts when chosen
-- [ ] Searching in Feeds finds posts by words in their titles and excerpts
-- [ ] A feed's menu: Mark All as Read clears its count; Open Its Note opens the subscription; Unsubscribe moves the note to the Trash and the feed goes from the sidebar (Restore brings it back, with its posts read as they were); Feeds' own menu marks every feed read
-- [ ] Settings → Library → Export OPML downloads `feeds.opml`, which another feed reader imports; Import OPML… subscribes to each feed in a file that isn't already, saying how many
-- [ ] With the app lock on, quit and reopen: before unlocking nothing's fetched; after, the posts and which were read are as they were
 
 ## 24. Accessibility and languages
 

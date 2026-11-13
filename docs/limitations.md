@@ -58,7 +58,8 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - A post is shown as Markdown made from its HTML: what Markdown can't say (layouts, embedded players, forms, styling) is left out, and embedded videos are links. Its pictures load from the web each time it's opened.
 - A feed is fetched in the main window only, at start and then as often as Settings → Library says, a few at a time and never two from one site at once; while lines is closed nothing's fetched.
 - A feed that moved for good (a permanent redirect) is followed each time; its note keeps the address it was subscribed with.
-- JSON Feed isn't read yet, only RSS 2.0, Atom and RSS 1.0.
+- JSON Feed isn't read yet, only RSS 2.0, Atom and RSS 1.0, nor feeds that need signing in.
+- Fetching feeds hasn't been tried in the Mac, Windows, Linux, iOS or Android apps yet: the apps fetch through Rust (`webFetch`, with conditional requests of their own), which the browser tests don't reach.
 
 ## Wallhaven
 
@@ -111,7 +112,7 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - The keys and `status` values are English in every language, so a note reads the same everywhere; lines shows the status in its own language.
 - A note filled in after you've moved to another note can't be put back with <kbd>⌘Z</kbd>: that's the note you're in's. Delete what was written, or paste the link again.
 - If its cover can't be stored once the note's written (the device out of space), the note keeps the picture's link without the picture.
-- The Library has no grid of covers yet, and subscribing to podcasts and feeds isn't there yet either.
+- The Library has no grid of covers yet. Feeds have limits of their own ([Feeds](#feeds)).
 - Add to Library searches each catalog as it ranks things: Wikidata's search puts what's titled as typed and has the most Wikipedias first, but can miss what's new; MusicBrainz is asked once a second, so Music, which searches songs and albums, takes a moment more; only the first page of what each finds is shown.
 - A link added to the library from its menu becomes a mention as one change, which ⌘Z takes back; the library note made stays (it isn't taken back with it), in the Library. Done while the note's closed, the mention can't be taken back with ⌘Z.
 - A link being added shows how it's getting on in one pane: the same note open in two shows it in the first.
