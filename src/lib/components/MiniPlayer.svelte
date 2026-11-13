@@ -3,6 +3,7 @@
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { clock } from "../library/text";
+  import { attachmentURL } from "../notes/attachments";
   import { notes } from "../notes/store.svelte";
   import { BACK, FORWARD, player } from "../player/player.svelte";
   import { ui } from "../ui.svelte";
@@ -40,10 +41,17 @@
   <section class={["flex flex-col gap-1.5 border-t border-line px-3 pt-2.5 pb-2", className]} aria-label={t("player.label")}>
     <div class="flex min-w-0 items-center gap-2.5">
       <button class="flex min-w-0 flex-1 items-center gap-2.5 rounded-md text-left" onclick={show} title={t("player.show")}>
-        {#if episode.artwork}
-          <img src={episode.artwork} alt="" class="size-9 shrink-0 rounded-md bg-input object-cover" />
+        {#snippet artwork(src: string | null | undefined)}
+          {#if src}
+            <img {src} alt="" class="size-9 shrink-0 rounded-md bg-input object-cover" />
+          {:else}
+            <span class="grid size-9 shrink-0 place-items-center rounded-md bg-input text-muted"><Icon name="headphones" size={16} /></span>
+          {/if}
+        {/snippet}
+        {#if episode.cover && !episode.artwork}
+          {#await attachmentURL(episode.cover) then src}{@render artwork(src)}{/await}
         {:else}
-          <span class="grid size-9 shrink-0 place-items-center rounded-md bg-input text-muted"><Icon name="headphones" size={16} /></span>
+          {@render artwork(episode.artwork)}
         {/if}
         <span class="flex min-w-0 flex-col">
           <span class="truncate text-sm font-semibold">{episode.title}</span>

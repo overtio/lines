@@ -698,6 +698,20 @@ const SCENES = [
     height: 780,
     act: (page) => playEpisode(page),
   },
+  ...["", "pixel"].map((style) => ({
+    id: `player-note${style && `-${style}`}`,
+    title: `An episode note, playing${style && ` in ${style[0].toUpperCase()}${style.slice(1)}`}`,
+    look: "Before the audio link, a round Play (here Pause) button in the accent, the size of the text, lined up with the value and clear of the key's column; the mini player below the sidebar with the note's title and show.",
+    prefs: style ? { style, theme: style } : {},
+    note: "---\ntype: episode\npodcast: @[Syntax]\npublished: 2026-11-11\nduration: 1:00\naudio: https://traffic.megaphone.fm/FSI3647670844.mp3\nstatus: to listen\n---\n# 1055: What the hell is going on with GitHub?\n\nScott and Wes sit down with GitHub's Kyle Daigle to ask what the hell is going on with GitHub.",
+    act: async (page) => {
+      const audio = wav(60_000);
+      await page.route((url) => url.hostname === "traffic.megaphone.fm", (route) => answerFile(route, audio, "audio/wav"));
+      await page.locator(".cm-content").getByRole("button", { name: "Play Episode" }).click();
+      await page.waitForFunction(() => window.testing.player.playing);
+      await page.evaluate(() => window.testing.player.seek(20));
+    },
+  })),
   {
     id: "calendar-repeat",
     title: "A repeating event and its Repeat menu",

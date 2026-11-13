@@ -48,6 +48,8 @@
   const episode = $derived(postEpisode(row));
   const playing = $derived(!!episode && player.playing && player.episode?.key === episode.key);
   const position = $derived(episode && player.positionOf(episode.key));
+  /** What's left of one begun, as a player shows it. */
+  const left = $derived(position?.at ? clock((position.duration ?? post.duration ?? 0) - position.at) : undefined);
 
   function play() {
     if (!episode) return;
@@ -134,8 +136,8 @@
       <!-- How much of an episode is left to hear: all of it, some, or none. -->
       {#if position?.played}
         <span aria-hidden="true">·</span><span class="flex shrink-0 items-center gap-0.5"><Icon name="check" size={12} />{t("player.played")}</span>
-      {:else if position?.at && (position.duration ?? post.duration)}
-        <span aria-hidden="true">·</span><span class="tabular shrink-0">{t("player.left", { time: clock((position.duration ?? post.duration ?? 0) - position.at) })}</span>
+      {:else if left}
+        <span aria-hidden="true">·</span><span class="tabular shrink-0">{t("player.left", { time: left })}</span>
       {:else if post.duration}
         <span aria-hidden="true">·</span><span class="tabular shrink-0">{clock(post.duration)}</span>
       {/if}

@@ -1,5 +1,6 @@
 import { feedStorage, type Position } from "../feeds/storage";
 import { t } from "../i18n/index.svelte";
+import { attachmentURL } from "../notes/attachments";
 import { PLAYBACK_RATES, type PlaybackRate, prefs } from "../prefs.svelte";
 
 /*
@@ -18,7 +19,9 @@ export interface Episode {
   title: string;
   /** The podcast it's an episode of. */
   show?: string;
+  /** Its picture: a feed's, on the web; or a note's cover, an attachment's name. */
   artwork?: string;
+  cover?: string;
   /** Its length in seconds, as its feed or note says, until the audio says itself. */
   duration?: number;
   /** Where it opens from the player: its post in the Feeds, or its note. */
@@ -123,7 +126,7 @@ class Player {
       // The place it was stopped at, once the audio knows how long it is.
       const start = this.time;
       if (start) audio.addEventListener("loadedmetadata", () => (audio.currentTime = start), { once: true });
-      this.#metadata();
+      void this.#metadata();
     }
     audio.playbackRate = audio.defaultPlaybackRate = this.rate;
     this.loading = true;
@@ -244,14 +247,16 @@ class Player {
     }
   }
 
-  #metadata() {
+  async #metadata() {
     const episode = this.episode;
     if (!("mediaSession" in navigator) || !episode) return;
+    const artwork = episode.artwork ?? (episode.cover && (await attachmentURL(episode.cover)));
+    if (this.episode !== episode) return;
     navigator.mediaSession.metadata = new MediaMetadata({
       title: episode.title,
       artist: episode.show ?? "",
       album: episode.show ?? "",
-      artwork: episode.artwork ? [{ src: episode.artwork }] : [],
+      artwork: artwork ? [{ src: artwork }] : [],
     });
   }
 

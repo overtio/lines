@@ -111,6 +111,14 @@ Subscribe to blogs, sites and podcasts, and read their posts in lines.
 - **What's kept**: the newest 200 posts of each feed and which were read, in this device's `lines-feeds` database ([storage.md](storage.md)), each under a random id, and encrypted while the app lock is on. None of it syncs: each device fetches the posts itself, and has its own read and unread.
 - **On the web** only feeds whose sites let web pages read them can be (CORS): most blogs' don't, and many podcast hosts' do. The Feeds and the box to subscribe say so. Apple Podcasts' lookup finds a podcast's feed on the web too, but subscribing still needs the feed itself to be readable. Nor can a site's answer be read when it doesn't allow it: a feed that says to wait, or that it's gone, looks like one that couldn't be reached, and is asked again as one that failed.
 
+## The podcast player
+
+- An episode plays in lines: the play button on an episode's row in the Feeds, or over an open one; on an `episode` note, the button before its `audio` link, or Play Episode in its row's menu. The mini player sits at the bottom of the sidebar (or of the note list, where the sidebar's a drawer or hidden): the episode's artwork, title and show, which open it; where it's got to, with the time played and left; back 15 seconds, play or pause, forward 30, and the speed (0.75× to 2×, kept for the next).
+- It plays on across notes, tabs and views: there's one player for all of lines.
+- Where each episode was stopped is kept on this device, a feed's episode by its post, a note's by its `audio` link, and it starts there next time; an episode's row says how much is left. Played to the end it's Played (its row's menu marks it played or not), and an `episode` note's `status` becomes `listened` (⌘Z puts it back).
+- The system's media controls (media keys, the Mac's Now Playing) show what's playing and play, pause and skip it.
+- Episodes play from their feeds' addresses, over https (an `http:` one is asked for over https), as the apps' web views allow; nothing is downloaded to listen to offline yet.
+
 ## Not yet
 
 See [limitations.md](limitations.md#library) for what's missing, and the README's roadmap for what's planned: a grid of covers, and read and played synced between devices.

@@ -139,7 +139,7 @@ export default {
     "Looks up songs and albums by a link to MusicBrainz, or one to Spotify, Apple Music, Bandcamp, Deezer or Tidal it knows: artist, album, year and cover. The link goes to MusicBrainz.",
   "plugins.applePodcasts.description": "Looks up podcasts and their episodes by a link to Apple Podcasts, with the podcast’s feed. The ids in the link go to Apple.",
   "plugins.feeds.description":
-    "Subscribe to sites’ and podcasts’ feeds, and read their posts in the Library’s Feeds. A new note that’s just a feed’s link subscribes to it. Feeds are fetched from their sites, in the apps every 30 minutes.",
+    "Subscribe to sites’ and podcasts’ feeds, and read their posts in the Library’s Feeds. A new note that’s just a feed’s link subscribes to it. Episode notes get a Play button. Feeds are fetched from their sites, in the apps every 30 minutes.",
   "plugins.code": "Code",
   "plugins.code.description": "Notes that are files of code, in any of about 120 programming languages: line numbers, a fixed-width font, and highlighting in the theme's colors, with indenting and brackets as in a code editor. They download and export as their language's files (.py, .ts, .rs…).",
   "plugins.typing": "Typing Practice",

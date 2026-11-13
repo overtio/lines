@@ -463,6 +463,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 ## 11c. The podcast player
 
 - [ ] A podcast's episode in the Feeds has a play button at its row's end, its row's menu Play Episode, and an open episode a Play button over it; each starts it in the mini player, at the bottom of the sidebar (where the sidebar's a drawer or hidden, at the bottom of the note list)
+- [ ] An `episode` note (Save to Library on an episode, or an Apple Podcasts episode's link) has a round Play button before its `audio` link, and Play Episode in its row's menu; played to the end, its `status` becomes `listened` (⌘Z puts it back)
 - [ ] The mini player shows the episode's artwork, title and show (clicking them opens the episode), a slider of where it's got to with the time played and left, back 15 s, play or pause, forward 30 s and the speed; × stops it and puts it away
 - [ ] It plays on while moving between notes, the Feeds, the Calendar and Settings, and in tabs
 - [ ] The speed goes round 0.75×, 1×, 1.25×, 1.5×, 1.75×, 2× and is kept for the next episode and after lines restarts

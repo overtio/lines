@@ -62,6 +62,15 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - JSON Feed isn't read yet, only RSS 2.0, Atom and RSS 1.0, nor feeds that need signing in.
 - Fetching feeds hasn't been tried in the Mac, Windows, Linux, iOS or Android apps yet: the apps fetch through Rust (`webFetch`, with conditional requests of their own), which the browser tests don't reach.
 
+## The podcast player
+
+- Episodes play from the web, as they're listened to: nothing is downloaded for offline listening yet.
+- Where each episode was stopped, and which were played, are kept on each device, not synced.
+- A feed's episode and the `episode` note saved from it are kept apart: one by its post, the other by its audio's link, so each starts from where it was itself stopped.
+- An episode linked over `http:` is asked for over https, as the apps' web views play only that; one whose site has no https doesn't play.
+- On a phone, the mini player is at the bottom of the note list, so not over an open note; the system's media controls work from anywhere.
+- Not tried in the Mac app (WKWebView), nor Windows, Linux, iOS or Android: only in Chromium and WebKit with sound served by the tests. The Mac's Now Playing and media keys need trying there.
+
 ## Wallhaven
 
 - In the apps only: Wallhaven's site doesn't answer web pages (it sends no CORS headers), so the web app can't search it.

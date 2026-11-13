@@ -85,3 +85,20 @@ test("an episode played to its end is played, and starts again from the start", 
   }, undefined, { timeout: 10_000 });
   await expect(row.innerText()).resolves.toContain("Played");
 });
+
+test("an episode note plays from the button after its audio, and is listened to once played to its end", async () => {
+  app = await openApp({ prefs: { playbackRate: 2 } });
+  const page = app.page;
+  const audio = wav(2000);
+  await page.route((url) => url.hostname === "audio.example", (route) => answerFile(route, audio, "audio/wav"));
+  const id = await app.open("---\ntype: episode\npodcast: @[Syntax]\nduration: 0:02\naudio: https://audio.example/1055.wav\nstatus: to listen\n---\n# What the hell is going on with GitHub?");
+  await page.locator(".cm-content").getByRole("button", { name: "Play Episode" }).click();
+  const mini = page.getByRole("region", { name: "Podcast player" });
+  await mini.waitFor();
+  expect(await mini.innerText()).toContain("Syntax");
+  await page.waitForFunction((id) => window.testing.notes.get(id)?.note.body.includes("status: listened"), id, { timeout: 10_000 });
+  // From its row's menu too.
+  await page.locator(`.note-list [data-id="${id}"]`).click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Play Episode" }).waitFor();
+  await page.keyboard.press("Escape");
+});
