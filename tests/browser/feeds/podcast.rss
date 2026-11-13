@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:googleplay="http://www.google.com/schemas/play-podcasts/1.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:podcast="https://podcastindex.org/namespace/1.0">
+  <channel>
+    <atom:link href="https://feeds.megaphone.fm/FSI1483080183" rel="self" type="application/rss+xml"/>
+    <title>Syntax - Tasty Web Development Treats</title>
+    <link>https://syntax.fm</link>
+    <language>en</language>
+    <description>Full Stack Developers Wes Bos and Scott Tolinski dive deep into web development topics.</description>
+    <image>
+      <url>https://megaphone.imgix.net/podcasts/5197fe5a/image/channel.png</url>
+      <title>Syntax - Tasty Web Development Treats</title>
+      <link>https://syntax.fm</link>
+    </image>
+    <itunes:explicit>no</itunes:explicit>
+    <itunes:type>episodic</itunes:type>
+    <itunes:author>Wes Bos &amp; Scott Tolinski - Full Stack JavaScript Web Developers</itunes:author>
+    <itunes:image href="https://megaphone.imgix.net/podcasts/5197fe5a/image/artwork.png?ixlib=rails-4.3.1&amp;max-w=3000"/>
+    <itunes:category text="Technology"/>
+    <item>
+      <title>1055: What the hell is going on with GitHub?</title>
+      <link>https://syntax.fm/1055</link>
+      <description>Scott and Wes sit down with GitHub’s Kyle Daigle to ask what the hell is going on with GitHub.
+
+Show Notes
+
+00:00 Welcome to Syntax!</description>
+      <pubDate>Wed, 11 Nov 2026 12:00:00 -0000</pubDate>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:author>Wes Bos &amp; Scott Tolinski</itunes:author>
+      <itunes:image href="https://megaphone.imgix.net/podcasts/14678690/image/episode.png"/>
+      <itunes:season>9</itunes:season>
+      <itunes:episode>1055</itunes:episode>
+      <content:encoded>
+        <![CDATA[<p class="has-line-data">Scott and Wes sit down with GitHub’s Kyle Daigle to ask what the hell is going on with GitHub.</p>
+<h3 class="code-line"><a></a>Show Notes</h3>
+<ul>
+<li class="has-line-data"><strong><a href="#t=00:00">00:00</a></strong> Welcome to Syntax!</li>
+<li class="has-line-data"><strong><a href="#t=03:36">03:36</a></strong> <a href="https://sentry.io/syntax/">Brought to you by Sentry!</a></li>
+</ul>]]>
+      </content:encoded>
+      <itunes:duration>1882</itunes:duration>
+      <guid isPermaLink="false"><![CDATA[14678690-dd33-11f1-b943-2b9148b63cb2]]></guid>
+      <enclosure url="https://traffic.megaphone.fm/FSI3647670844.mp3" length="0" type="audio/mpeg"/>
+    </item>
+    <item>
+      <title>1054: Is CSS a Programming Language?</title>
+      <description>&lt;p&gt;Wes and Scott argue it out.&lt;/p&gt;</description>
+      <pubDate>Mon, 09 Nov 2026 12:00:00 -0000</pubDate>
+      <podcast:season>9</podcast:season>
+      <podcast:episode>1054</podcast:episode>
+      <itunes:duration>45:10</itunes:duration>
+      <guid isPermaLink="false">a2b9c0f2-dd33-11f1</guid>
+      <enclosure url="https://traffic.megaphone.fm/FSI3647670843.mp3" length="21600000" type="audio/mpeg"/>
+    </item>
+  </channel>
+</rss>

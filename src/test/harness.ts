@@ -1,4 +1,9 @@
 import { EditorView } from "@codemirror/view";
+import { feeds } from "../lib/feeds/feeds.svelte";
+import { findFeed, NoFeed } from "../lib/feeds/find";
+import { htmlToMarkdown } from "../lib/feeds/markdown";
+import { readOpml } from "../lib/feeds/opml";
+import { NotAFeed, readFeed } from "../lib/feeds/parse";
 import { attachmentNames, saveAttachment } from "../lib/notes/attachments";
 import { noteKeys } from "../lib/notes/noteKeys.svelte";
 import { notes } from "../lib/notes/store.svelte";
@@ -33,6 +38,9 @@ async function until(ready: () => unknown, timeout = 10_000) {
 const testing = {
   notes,
   noteKeys,
+  feeds,
+  /** Reading feeds, the pages that name them, their HTML and OPML, as lines does (lib/feeds/). */
+  reading: { readFeed, NotAFeed, findFeed, NoFeed, htmlToMarkdown, readOpml },
   panes,
   plugins,
   prefs,

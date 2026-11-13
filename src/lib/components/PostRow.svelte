@@ -1,0 +1,110 @@
+<script lang="ts">
+  import type { Attachment } from "svelte/attachments";
+  import { speak } from "../a11y";
+  import { clock } from "../feeds/dates";
+  import { feeds, type Row } from "../feeds/feeds.svelte";
+  import { formatDate } from "../format";
+  import { t } from "../i18n/index.svelte";
+  import Icon from "../icons/Icon.svelte";
+  import { longPress } from "../longPress";
+  import { copyText, openExternal } from "../platform";
+  import { menuPoint } from "../popover";
+  import { menuSections, ui } from "../ui.svelte";
+
+  let {
+    row,
+    index,
+    count,
+    top,
+    measure,
+    selected,
+    tabbable,
+    now,
+    onkeydown,
+  }: {
+    row: Row;
+    /** Its place in the list, from 0, of `count`; the list draws only some of its rows. */
+    index: number;
+    count: number;
+    /** Where it's placed when it's drawn apart from the rows around it (the list's ListWindow). */
+    top?: number;
+    measure: Attachment<HTMLElement>;
+    /** It's the post open. */
+    selected: boolean;
+    tabbable: boolean;
+    now: Date;
+    onkeydown: (event: KeyboardEvent) => void;
+  } = $props();
+
+  const post = $derived(row.post);
+  const source = $derived(feeds.subscription(row.feed)?.title ?? feeds.records.get(row.feed)?.title ?? "");
+  let menuOpen = $state(false);
+
+  function setRead(read: boolean) {
+    feeds.setRead(row.feed, [post.id], read);
+    speak(t(read ? "feeds.didRead" : "feeds.didUnread"));
+  }
+
+  function showMenu(x: number, y: number) {
+    menuOpen = true;
+    const link = post.link;
+    ui.openMenu({
+      x,
+      y,
+      label: post.title,
+      items: menuSections(
+        [post.read ? { label: t("feeds.markUnread"), icon: "circle-dot", run: () => setRead(false) } : { label: t("feeds.markRead"), icon: "check", run: () => setRead(true) }],
+        link
+          ? [
+              { label: t("feeds.openInBrowser"), icon: "external-link", run: () => void openExternal(link) },
+              { label: t("feeds.copyLink"), icon: "link", run: () => void copyText(link).then(() => speak(t("list.copied"))) },
+            ]
+          : [],
+      ),
+      onclose: () => (menuOpen = false),
+    });
+  }
+
+  function oncontextmenu(event: MouseEvent) {
+    event.preventDefault();
+    if (menuOpen) return;
+    const { x, y } = menuPoint(event);
+    showMenu(x, y);
+  }
+</script>
+
+<!-- As a note's row (NoteRow.svelte), and in the list's dividers the same way. Screen readers hear its
+     title, whether it's unread, where it's from and when; its excerpt after a pause. -->
+<li class={[top === undefined ? "relative" : "absolute inset-x-3", menuOpen && "menu-target"]} style:top={top === undefined ? undefined : `${top}px`} aria-posinset={index + 1} aria-setsize={count}>
+  <button
+    class={[
+      "item ui-note-row relative flex w-full flex-col gap-[3px] rounded-lg bg-[image:linear-gradient(var(--layer),var(--layer))] pt-3 pr-3 pb-[11px] pl-[22px] text-left text-fg select-none [-webkit-touch-callout:none]",
+      selected ? "selected [--layer:var(--active)]" : "[--layer:transparent] hover:[--layer:var(--hover)]",
+      menuOpen && "inset-ring-2 inset-ring-accent",
+    ]}
+    data-post={post.key}
+    tabindex={tabbable ? 0 : -1}
+    aria-current={selected}
+    aria-describedby={post.excerpt ? `excerpt-${post.key}` : undefined}
+    onclick={() => feeds.show(row.feed, post.id)}
+    {onkeydown}
+    {oncontextmenu}
+    {@attach measure}
+    {@attach longPress(showMenu)}
+  >
+    <!-- Unread: a dot in a margin of its own, so titles line up either way. -->
+    <span class="relative min-w-0 text-md leading-[1.35] font-semibold">
+      {#if !post.read}<span class="absolute top-1/2 -left-[14px] size-[7px] -translate-y-1/2 rounded-full bg-accent" aria-hidden="true"></span>{/if}
+      <span class="block truncate">{post.title}</span>{#if !post.read}<span class="sr-only">, {t("feeds.unread")}</span>{/if}
+    </span>
+    {#if post.excerpt}
+      <span class="line-clamp-2 text-sm leading-[1.45] text-muted" id="excerpt-{post.key}" aria-hidden="true">{post.excerpt}</span>
+    {/if}
+    <span class={["mt-0.5 flex min-w-0 items-center gap-[5px] text-[11.5px] text-faint", selected && "in-data-[contrast=more]:text-muted"]}>
+      {#if post.audio}<Icon name="headphones" size={12} class="shrink-0" /><span class="sr-only">{t("feeds.episode")}</span>{/if}
+      <span class="min-w-0 truncate">{source}</span>
+      {#if post.date}<span aria-hidden="true">·</span><time class="shrink-0" datetime={new Date(post.date).toISOString()}>{formatDate(post.date, now)}</time>{/if}
+      {#if post.duration}<span aria-hidden="true">·</span><span class="tabular shrink-0">{clock(post.duration)}</span>{/if}
+    </span>
+  </button>
+</li>

@@ -2,8 +2,8 @@ import { fromBase64, fromUtf8, open, seal, toBase64, utf8, type Bytes } from "..
 import { t } from "../i18n/index.svelte";
 
 /*
- * What the app lock encrypts on this device: notes, attachments, and the sync settings (with
- * their keys). While the lock is on, everything is written encrypted with the device key, which
+ * What the app lock encrypts on this device: notes, attachments, feeds' posts, and the sync settings
+ * (with their keys). While the lock is on, everything is written encrypted with the device key, which
  * only exists in memory once lines is unlocked. Reading takes either form, so turning the lock on
  * or off can rewrite things one at a time, and pick up where it left off.
  */

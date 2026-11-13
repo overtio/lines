@@ -1,0 +1,27 @@
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+<channel>
+<title>Tom & Jerry&rsquo;s Blog</title>
+<link>https://tomandjerry.example/?a=1&b=2</link>
+<description>Cartoons&nbsp;and chases</description>
+<itunes:image href="https://tomandjerry.example/art.png"/>
+<item>
+<title>Cheese &mdash; a history</title>
+<link>https://tomandjerry.example/cheese?ref=feed&utm=1</link>
+<guid>https://tomandjerry.example/cheese</guid>
+<pubDate>Tue, 10 Nov 2026 08:00:00 EST</pubDate>
+<description><![CDATA[<p>Holes & all. <b>Swiss</b> first.</p>]]></description>
+<itunes:duration>12:30</itunes:duration>
+</item>
+<item>
+<title>Mousetraps &copy; 2026</title>
+<link>https://tomandjerry.example/traps</link>
+<description>Plain text,
+two lines.
+
+And a second paragraph &unknownentity; here.</description>
+</item>
+</channel>
+</rss>

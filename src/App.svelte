@@ -8,6 +8,8 @@
   import Settings from "./lib/components/settings/Settings.svelte";
   import IconPicker from "./lib/components/IconPicker.svelte";
   import TagPrompt from "./lib/components/TagPrompt.svelte";
+  import SubscribePrompt from "./lib/components/SubscribePrompt.svelte";
+  import PostView from "./lib/components/PostView.svelte";
   import LockedNoteView from "./lib/components/LockedNoteView.svelte";
   import NotesPasswordDialog from "./lib/components/NotesPasswordDialog.svelte";
   import PdfPreview from "./lib/components/PdfPreview.svelte";
@@ -33,7 +35,8 @@
   import { lockedNotes } from "./lib/notes/locked.svelte";
   import { isClosed, notes } from "./lib/notes/store.svelte";
   import { plugins } from "./lib/plugins/registry.svelte";
-  import { canPrint, copyText, isApple, isNewNoteShortcut, newNoteKey } from "./lib/platform";
+  import { feeds } from "./lib/feeds/feeds.svelte";
+  import { canPrint, copyText, isApple, isNewNoteShortcut, newNoteKey, openExternal } from "./lib/platform";
   import { saveAndShow } from "./lib/save";
   import { NOTE_MIN, ui, type MenuItem } from "./lib/ui.svelte";
   import { MAIN } from "./lib/panes";
@@ -76,7 +79,7 @@
 
   /** The pane at the window's left edge, which leaves room for the Mac app's window buttons (app.css). */
   const first = $derived.by((): Pane => {
-    if (ui.layout === "narrow") return selected ? "editor" : "list";
+    if (ui.layout === "narrow") return selected || post ? "editor" : "list";
     if (ui.layout === "wide" && prefs.sidebarSide === "left" && ui.sidebarOpen && !ui.focus) return "sidebar";
     return prefs.listSide === "left" && !ui.focus ? "list" : "editor";
   });
@@ -143,8 +146,20 @@
               ],
         ],
   ]);
+  const selected = $derived(notes.selected);
+  /** The day whose week or day is in the note's place: on the Calendar, with no note open, beside the list. */
+  const calendarDay = $derived(!selected && !notes.loadError && notes.ready && notes.filter.kind === "calendar" && !narrow ? notes.filter.day : null);
+  /** A locked note that isn't open shows the password prompt instead of its text. */
+  const closed = $derived(!!selected && isClosed(selected.note));
+  /** The feed's post open in the note's place, in the Feeds, with no note open. */
+  const post = $derived.by(() => {
+    const f = notes.filter;
+    const row = feeds.openRow;
+    return !selected && f.kind === "feeds" && row && (!f.feed || f.feed === row.feed) ? row : null;
+  });
+
   /** On a phone, the note list and the note side by side, slid along to the one showing. */
-  const stacked = $derived(["row-start-1 transition-[translate] duration-320 ease-sheet", notes.selected && "-translate-x-full"]);
+  const stacked = $derived(["row-start-1 transition-[translate] duration-320 ease-sheet", (selected || post) && "-translate-x-full"]);
   const listPaneClass = $derived([
     "min-h-0 min-w-0 bg-surface-list",
     narrow
@@ -156,11 +171,11 @@
         ],
   ]);
 
-  const selected = $derived(notes.selected);
-  /** The day whose week or day is in the note's place: on the Calendar, with no note open, beside the list. */
-  const calendarDay = $derived(!selected && !notes.loadError && notes.ready && notes.filter.kind === "calendar" && !narrow ? notes.filter.day : null);
-  /** A locked note that isn't open shows the password prompt instead of its text. */
-  const closed = $derived(!!selected && isClosed(selected.note));
+  /** Back to the list on a phone: no note open, nor post. */
+  function back() {
+    notes.select(null);
+    feeds.open = null;
+  }
 
   const focusKey = isApple ? "⇧⌘\\" : "Ctrl+Shift+\\";
 
@@ -522,7 +537,7 @@
   {/if}
 
   <!-- On a phone one pane shows at a time; the other is off-screen and out of reach. -->
-  <div class={listPaneClass} data-pane="list" data-scheme={isDarkPane("list") ? "dark" : undefined} inert={narrow && !!selected} bind:this={listPane}>
+  <div class={listPaneClass} data-pane="list" data-scheme={isDarkPane("list") ? "dark" : undefined} inert={narrow && !!(selected || post)} bind:this={listPane}>
     <NoteList bind:searchInput />
   </div>
 
@@ -555,7 +570,7 @@
 
   <main
     class={["editor-pane relative flex min-h-0 min-w-0 bg-surface", narrow ? ["col-start-2", stacked] : "[grid-area:editor]"]}
-    inert={narrow && !selected}
+    inert={narrow && !selected && !post}
     bind:this={editorPane}
     bind:clientWidth={ui.editorWidth}
     bind:clientHeight={ui.editorHeight}
@@ -572,7 +587,7 @@
           <SidebarToggle />
         {/if}
         {#if narrow}
-          <IconButton icon="chevron-left" iconSize={22} label={t("app.backToNotes")} onclick={() => notes.select(null)} />
+          <IconButton icon="chevron-left" iconSize={22} label={post ? t("feeds.back") : t("app.backToNotes")} onclick={back} />
         {:else if selected || ui.focus}
           {#if selected && notes.filter.kind === "calendar"}
             <IconButton icon="calendar" iconSize={17} label={t("calendar.back")} onclick={() => notes.select(null)} />
@@ -643,6 +658,21 @@
             />
             <IconButton icon="trash" iconSize={17} label={t("app.trash")} onclick={() => trash(selected.note.id)} />
           {/if}
+        {:else if post}
+          {@const { feed, post: shown } = post}
+          <IconButton
+            icon="circle-dot"
+            iconSize={17}
+            label={t("feeds.markUnread")}
+            onclick={() => {
+              feeds.setRead(feed, [shown.id], false);
+              speak(t("feeds.didUnread"));
+            }}
+          />
+          {#if shown.link}
+            {@const link = shown.link}
+            <IconButton icon="external-link" iconSize={17} label={t("feeds.openInBrowser")} onclick={() => void openExternal(link)} />
+          {/if}
         {/if}
         {#if ui.sidebarToggle === "editor" && prefs.sidebarSide === "right"}
           <SidebarToggle />
@@ -667,6 +697,15 @@
         </div>
       {:else if calendarDay}
         <CalendarDays day={calendarDay} header={tabs.shown} />
+      {:else if post}
+        {#key post.post.key}
+          <PostView row={post} />
+        {/key}
+      {:else if notes.filter.kind === "feeds"}
+        <div class={placeholder}>
+          <Icon name="rss" size={36} strokeWidth={1.25} />
+          <p class="m-0 text-md">{t("feeds.choosePost")}</p>
+        </div>
       {:else if notes.ready}
         <div class={placeholder}>
           <Icon name="feather" size={36} strokeWidth={1.25} />
@@ -703,3 +742,4 @@
 <ColorPicking />
 <IconPicker />
 <TagPrompt />
+<SubscribePrompt />

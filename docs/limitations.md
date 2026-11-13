@@ -50,6 +50,16 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - lines loads the photo through Unsplash's download link, which counts as a download each time it's shown.
 - Unsplash+ photos don't show: Unsplash only hands them to subscribers. They say the image couldn't be shown. `/unsplash` leaves them out.
 
+## Feeds
+
+- **On the web, most feeds can't be read.** A web page may only read a feed whose site allows it (CORS), and most don't; the Feeds view and the box to subscribe say so. Apple Podcasts' lookup, and feeds that allow it (some blogs, many podcast hosts), work. The desktop apps read every feed.
+- **Read and unread are per device.** Subscriptions are notes and sync, but which posts were read, and the posts themselves, are kept on each device, which fetches them itself (a new device starts with every post unread).
+- Only the newest 200 posts of each feed are kept. Older ones go, and so does their content, unless saved to the Library.
+- A post is shown as Markdown made from its HTML: what Markdown can't say (layouts, embedded players, forms, styling) is left out, and embedded videos are links. Its pictures load from the web each time it's opened.
+- A feed is fetched in the main window only, at start and then as often as Settings → Library says, a few at a time and never two from one site at once; while lines is closed nothing's fetched.
+- A feed that moved for good (a permanent redirect) is followed each time; its note keeps the address it was subscribed with.
+- JSON Feed isn't read yet, only RSS 2.0, Atom and RSS 1.0.
+
 ## Wallhaven
 
 - In the apps only: Wallhaven's site doesn't answer web pages (it sends no CORS headers), so the web app can't search it.

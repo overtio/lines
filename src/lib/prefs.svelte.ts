@@ -29,6 +29,9 @@ export type WeekStart = (typeof WEEK_STARTS)[number];
 /** What the Calendar shows beside its month, while no note is open: a week or a day, by the hour. */
 export const CALENDAR_VIEWS = ["week", "day"] as const;
 export type CalendarView = (typeof CALENDAR_VIEWS)[number];
+/** How often feeds are fetched again while lines is open, in minutes; 0 for only when asked (Settings → Library). */
+export const FEED_REFRESH = [15, 30, 60, 240, 0] as const;
+export type FeedRefresh = (typeof FEED_REFRESH)[number];
 /** The paper a note's PDF is laid out on. */
 export type Paper = "a4" | "letter";
 /** Which side of the window a pane goes on. */
@@ -191,6 +194,7 @@ export interface Stored {
   newNotes: NewNotes;
   /** The Calendar also shows notes on the day they were made or last edited, not only by their dates. */
   calendarEdited: boolean;
+  feedRefresh: FeedRefresh;
   spacing: Spacing;
   /** How wide a note's text runs before wrapping, in px; or all the room there is, with the side margins kept. */
   noteWidth: number;
@@ -376,6 +380,7 @@ const DEFAULTS: Stored = {
   calendarView: "week",
   newNotes: "inbox",
   calendarEdited: false,
+  feedRefresh: 30,
   spacing: DEFAULT_SPACING,
   noteWidth: 720,
   fullWidth: false,
@@ -534,6 +539,7 @@ function read(json?: string): Stored {
     calendarView: oneOf(raw.calendarView, CALENDAR_VIEWS, DEFAULTS.calendarView),
     newNotes: oneOf(raw.newNotes, NEW_NOTES, DEFAULTS.newNotes),
     calendarEdited: flag(raw.calendarEdited, DEFAULTS.calendarEdited),
+    feedRefresh: oneOf(raw.feedRefresh, FEED_REFRESH, DEFAULTS.feedRefresh),
     spacing: Object.fromEntries(
       SPACING_FIELDS.map(({ key, min, max }) => [key, clamp(spacing[key], min, max, DEFAULT_SPACING[key])]),
     ) as unknown as Spacing,
@@ -644,6 +650,7 @@ class Prefs {
   calendarView = $state<CalendarView>(this.#initial.calendarView);
   newNotes = $state<NewNotes>(this.#initial.newNotes);
   calendarEdited = $state(this.#initial.calendarEdited);
+  feedRefresh = $state<FeedRefresh>(this.#initial.feedRefresh);
   windowOpacity = $state(this.#initial.windowOpacity);
   windowBlur = $state(this.#initial.windowBlur);
   windowSeeThrough = $state(this.#initial.windowSeeThrough);
@@ -847,6 +854,7 @@ class Prefs {
       calendarView: this.calendarView,
       newNotes: this.newNotes,
       calendarEdited: this.calendarEdited,
+      feedRefresh: this.feedRefresh,
       spacing: $state.snapshot(this.spacing),
       noteWidth: this.noteWidth,
       fullWidth: this.fullWidth,
@@ -959,6 +967,7 @@ class Prefs {
     this.calendarView = next.calendarView;
     this.newNotes = next.newNotes;
     this.calendarEdited = next.calendarEdited;
+    this.feedRefresh = next.feedRefresh;
     if (!sameSpacing(this.spacing, next.spacing)) this.spacing = next.spacing;
     this.noteWidth = next.noteWidth;
     this.fullWidth = next.fullWidth;

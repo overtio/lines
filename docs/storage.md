@@ -16,14 +16,16 @@ Browser storage belongs to one site (origin) in one browser profile. Another bro
 | `lines` | `attachments` | Images and files added to notes, named by their content hash |
 | `lines` | `sync` | What was last exchanged with the sync folder or bucket, per note, to tell which side changed |
 | `lines-folders` | `folders` | The browser's handle to the folder chosen with **Save to a folder**, so lines can use it again after a reload |
+| `lines-feeds` | `feeds` | Each feed subscribed to: what it said of itself, its newest 200 posts (all but their content), which were read, and its ETag and Last-Modified for asking whether it changed |
+| `lines-feeds` | `posts` | Each post's content, as the feed gave it (HTML), read when the post is opened |
 
-With the app lock on, the notes and attachments in `lines` are encrypted (see [sync.md](sync.md) and `src/lib/lock/vault.ts`).
+With the app lock on, the notes and attachments in `lines` and everything in `lines-feeds` are encrypted (see [sync.md](sync.md) and `src/lib/lock/vault.ts`). `lines-feeds` keeps each record under a hash of what it is (a feed's address, a post's), so nothing there says what's subscribed to. It isn't synced: subscriptions are notes and sync as notes do, and each device fetches the posts itself.
 
 ### localStorage
 
 | Key | What's in it |
 |---|---|
-| `lines.prefs` | Theme, appearance, font (one of lines' or one installed on the device, by its name) and formatting's fonts, text size, note width, spacing, icon set, layout, symbols, spreadsheets, links, whether links are looked up (the Library) |
+| `lines.prefs` | Theme, appearance, font (one of lines' or one installed on the device, by its name) and formatting's fonts, text size, note width, spacing, icon set, layout, symbols, spreadsheets, links, whether links are looked up (the Library), how often feeds refresh |
 | `lines.language` | The language chosen in Settings, unless it's System |
 | `lines.plugins` | Plugins turned off or on in Settings |
 | `lines.tabs` | The open tabs, when tabs are on |

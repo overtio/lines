@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>Daring Fireball</title>
+<subtitle>By John Gruber</subtitle>
+<link rel="alternate" type="text/html" href="https://daringfireball.net/" />
+<link rel="self" type="application/atom+xml" href="https://daringfireball.net/feeds/main" />
+<id>https://daringfireball.net/feeds/main</id>
+<updated>2026-11-13T01:05:53Z</updated><rights>Copyright © 2026, John Gruber</rights><entry>
+	<title>Jensen Huang Agrees to Testify Before Congress, But Not Publicly (Yet)</title>
+	<link rel="alternate" type="text/html" href="https://techcrunch.com/2026/11/12/jensen-huang-agrees-to-testify-before-congress/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xqk" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/11/12/huang-testimony" />
+	<id>tag:daringfireball.net,2026:/linked//6.43724</id>
+	<published>2026-11-12T21:32:07Z</published>
+	<updated>2026-11-13T01:05:53Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Aisha Malik, TechCrunch:</p>
+
+<blockquote>
+  <p>Ex-Nvidia CEO Jensen Huang has agreed to testify before Congress,
+House Foreign Affairs Committee Chairman Brian Mast said on
+Thursday, according to reports from <a href="https://www.bloomberg.com/news/">Bloomberg</a>.</p>
+</blockquote>
+
+<p>Closed-door is pantomime. <a href="2026/11/11/huang">Public reckonings will come next year</a>.</p>
+]]></content>
+	</entry><entry>
+	<title type="html">Apple&#8217;s &lt;em&gt;Year&lt;/em&gt; in Review</title>
+	<link rel="alternate" type="text/html" href="https://daringfireball.net/2026/11/year_in_review" />
+	<id>tag:daringfireball.net,2026://1.43700</id>
+	<updated>2026-11-10T18:00:00Z</updated>
+	<author>
+		<name>John Gruber</name>
+	</author>
+	<summary type="text">A look back at the year, in brief &amp; with feeling.</summary>
+	<content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>It was a <strong>good</strong> year.</p></div></content>
+	</entry>
+</feed>

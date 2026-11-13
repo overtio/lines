@@ -5,6 +5,7 @@
 import app from "./app";
 import calendar from "./calendar";
 import editor from "./editor";
+import feeds from "./feeds";
 import http from "./http";
 import hurl from "./hurl";
 import latex from "./latex";
@@ -26,6 +27,7 @@ export default {
   ...app,
   ...calendar,
   ...editor,
+  ...feeds,
   ...http,
   ...hurl,
   ...latex,
