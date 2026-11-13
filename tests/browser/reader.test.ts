@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import type { Request } from "playwright";
-import { type App, mod, noErrors, openApp } from "./app";
+import { type App, choose, mod, noErrors, openApp } from "./app";
 import { answerPictures } from "./files";
 
 /*
@@ -178,8 +178,8 @@ test("Feeds in the Library: its row and each feed's, counting what's unread; a f
   await subscribe(app, BLOG);
   const page = app.page;
   const sidebar = page.getByRole("navigation", { name: "Library" });
-  await sidebar.getByRole("button", { name: "Feeds, 2 unread" }).click();
-  await expect(page.locator("#note-list-title").innerText()).resolves.toBe("Feeds");
+  await sidebar.getByRole("button", { name: "RSS Feeds, 2 unread" }).click();
+  await expect(page.locator("#note-list-title").innerText()).resolves.toBe("RSS Feeds");
   const blog = sidebar.getByRole("button", { name: "Svelte blog, 2 unread" });
   await blog.click();
   await expect(page.locator("#note-list-title").innerText()).resolves.toBe("Svelte blog");
@@ -189,7 +189,7 @@ test("Feeds in the Library: its row and each feed's, counting what's unread; a f
   await blog.click({ button: "right" });
   await page.getByRole("menuitem", { name: "Mark All as Read" }).click();
   await sidebar.getByRole("button", { name: "Svelte blog", exact: true }).waitFor();
-  await sidebar.getByRole("button", { name: "Feeds", exact: true }).waitFor();
+  await sidebar.getByRole("button", { name: "RSS Feeds", exact: true }).waitFor();
 
   // Every note subscribing to it goes to the Trash: a copy of its note too.
   await page.evaluate((feed) => window.testing.notes.insert({ id: "copy", body: `---\ntype: feed\nfeed: ${feed}\n---\n# Svelte blog`, createdAt: 0, updatedAt: 0, pinned: false, trashed: false }), BLOG);
@@ -197,6 +197,103 @@ test("Feeds in the Library: its row and each feed's, counting what's unread; a f
   await page.getByRole("menuitem", { name: "Unsubscribe" }).click();
   await sidebar.getByRole("button", { name: "Svelte blog", exact: true }).waitFor({ state: "detached" });
   expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.title === "Svelte blog").map((entry) => entry.note.trashed))).toEqual([true, true]);
+});
+
+/** Subscribes to each of these feeds (by address, its fixture in feeds/), answered by the test. */
+async function subscribeAll(app: App, feeds: Record<string, string>) {
+  await answerPictures(app.page);
+  for (const [url, name] of Object.entries(feeds)) {
+    const body = fixture(name);
+    await app.page.route((asked) => asked.href === url, (route) => route.fulfill({ body, contentType: "application/rss+xml", headers: { "access-control-allow-origin": "*" } }));
+    await app.page.evaluate((url) => window.testing.feeds.subscribe(url), url);
+  }
+}
+
+const KINDS = {
+  [BLOG]: "blog.rss",
+  "https://daringfireball.net/feeds/main": "blog.atom",
+  "https://feeds.megaphone.fm/FSI1483080183": "podcast.rss",
+  "https://rss.slashdot.org/Slashdot/slashdot": "slashdot.rdf",
+};
+
+test("feeds by kind: RSS (and RSS 1.0), Atom and podcasts' each a row, its feeds under it, its posts listed, read, folded, hidden and moved", async () => {
+  // Nonsense where the setting is saved reads as By Kind.
+  app = await openApp({ prefs: { feedsInSidebar: "sideways" } });
+  await subscribeAll(app, KINDS);
+  const page = app.page;
+  const sidebar = page.getByRole("navigation", { name: "Library" });
+  const rows = () => sidebar.locator("[data-reorder-key^='feeds:']").evaluateAll((all) => all.map((row) => row.getAttribute("aria-label") ?? row.textContent?.trim()));
+  await sidebar.getByRole("button", { name: "Podcast Feeds, 2 unread" }).waitFor();
+  expect(await rows()).toEqual(["RSS Feeds, 4 unread", "Atom Feeds, 2 unread", "Podcast Feeds, 2 unread"]);
+  expect(await sidebar.getByRole("button", { name: /^Feeds\b/ }).count()).toBe(0);
+  expect(await sidebar.getByRole("list", { name: "RSS Feeds" }).getByRole("button").evaluateAll((all) => all.map((row) => row.getAttribute("aria-label")))).toEqual(["Slashdot, 2 unread", "Svelte blog, 2 unread"]);
+
+  // A kind's posts, and its menu marks only them read.
+  await sidebar.getByRole("button", { name: "Atom Feeds, 2 unread" }).click();
+  await expect(page.locator("#note-list-title").innerText()).resolves.toBe("Atom Feeds");
+  expect(await page.locator(".note-list [data-post]").count()).toBe(2);
+  await sidebar.getByRole("button", { name: "Atom Feeds, 2 unread" }).click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Mark All as Read" }).click();
+  await sidebar.getByRole("button", { name: "Atom Feeds", exact: true }).waitFor();
+  expect(await rows()).toEqual(["RSS Feeds, 4 unread", "Atom Feeds", "Podcast Feeds, 2 unread"]);
+
+  // Its feeds fold away, and stay folded.
+  await sidebar.getByRole("button", { name: "Show the feeds in RSS Feeds" }).click();
+  await sidebar.getByRole("button", { name: "Svelte blog, 2 unread" }).waitFor({ state: "detached" });
+  await expect(sidebar.getByRole("button", { name: "Show the feeds in RSS Feeds" }).getAttribute("aria-expanded")).resolves.toBe("false");
+
+  // Moved with ⌥↑, it goes with its feeds; hidden, it's back from Show Hidden.
+  await sidebar.getByRole("button", { name: "Podcast Feeds, 2 unread" }).focus();
+  await page.keyboard.press("Alt+ArrowUp");
+  await page.waitForFunction(() => document.querySelector("[data-reorder-key^='feeds:']")?.closest("li")?.nextElementSibling?.querySelector("[data-reorder-key]")?.getAttribute("data-reorder-key") === "feeds:podcast");
+  expect(await rows()).toEqual(["RSS Feeds, 4 unread", "Podcast Feeds, 2 unread", "Atom Feeds"]);
+  await sidebar.getByRole("button", { name: "Atom Feeds", exact: true }).click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Hide" }).click();
+  await sidebar.getByRole("button", { name: "Atom Feeds", exact: true }).waitFor({ state: "detached" });
+  await sidebar.getByRole("button", { name: "RSS Feeds, 4 unread" }).click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Show Hidden" }).click();
+  await page.getByRole("menuitem", { name: "Atom Feeds" }).click();
+  await sidebar.getByRole("button", { name: "Atom Feeds", exact: true }).waitFor();
+});
+
+test("a feed kept from before its format was is with RSS (a podcast's with podcasts') until it's fetched", async () => {
+  app = await openApp();
+  const page = app.page;
+  const atom = "https://daringfireball.net/feeds/main";
+  const body = fixture("blog.atom");
+  await page.route((url) => url.href === atom, (route) => route.fulfill({ body, contentType: "application/atom+xml", headers: { "access-control-allow-origin": "*" } }));
+  await page.evaluate(
+    async ({ atom, body }) => {
+      const { feeds, notes, reading } = window.testing;
+      const { format: _, ...unknown } = reading.readFeed(body, atom);
+      await feeds.take(atom, unknown, {});
+      await notes.insert({ id: "fireball", body: `---\ntype: feed\nfeed: ${atom}\n---\n# Daring Fireball`, createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+      await notes.insert({ id: "show", body: "---\ntype: podcast\nfeed: https://podcast.example/feed\n---\n# A Show", createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+    },
+    { atom, body },
+  );
+  const sidebar = page.getByRole("navigation", { name: "Library" });
+  await sidebar.getByRole("list", { name: "RSS Feeds" }).getByRole("button", { name: /^Daring Fireball/ }).waitFor();
+  await sidebar.getByRole("list", { name: "Podcast Feeds" }).getByRole("button", { name: /^A Show/ }).waitFor();
+  await page.evaluate((atom) => window.testing.feeds.refresh([atom]), atom);
+  await sidebar.getByRole("list", { name: "Atom Feeds" }).getByRole("button", { name: /^Daring Fireball/ }).waitFor();
+  app.errors.length = 0;
+});
+
+test("Settings → Library → Feeds in the sidebar: Together is one Feeds row of every feed, By Kind a row each", async () => {
+  app = await openApp();
+  await subscribeAll(app, { [BLOG]: "blog.rss", "https://daringfireball.net/feeds/main": "blog.atom" });
+  const page = app.page;
+  const sidebar = page.getByRole("navigation", { name: "Library" });
+  await sidebar.getByRole("button", { name: "Atom Feeds, 2 unread" }).waitFor();
+  const dialog = await app.settings("Library");
+  await choose(dialog, "Feeds in the sidebar", "Together");
+  await sidebar.getByRole("button", { name: "Feeds, 4 unread" }).waitFor();
+  expect(await sidebar.getByRole("button", { name: /^(RSS|Atom) Feeds/ }).count()).toBe(0);
+  expect(await page.evaluate(() => window.testing.prefs.feedsInSidebar)).toBe("together");
+  await choose(dialog, "Feeds in the sidebar", "By Kind");
+  await sidebar.getByRole("button", { name: "RSS Feeds, 2 unread" }).waitFor();
+  await app.closeSettings();
 });
 
 test("Save to Library keeps a post as an article, made as the Library makes notes, and then opens it", async () => {

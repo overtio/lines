@@ -12,6 +12,7 @@ import type { LibraryItem } from "../plugins/types";
 import { prefs } from "../prefs.svelte";
 import { fetchFeed, FetchError, type Validators } from "./fetch";
 import { findFeed, linkOf, NoFeed } from "./find";
+import { FEED_GROUPS, type FeedGroup, groupOf } from "./groups";
 import { readOpml, writeOpml } from "./opml";
 import { plainText } from "./markdown";
 import { isFeed, isPodcast, NotAFeed, readFeed, type Feed } from "./parse";
@@ -115,6 +116,17 @@ class Feeds {
 
   totalUnread = $derived([...this.unread.values()].reduce((sum, count) => sum + count, 0));
 
+  /** Which group each feed subscribed to is in (groups.ts), by its address. */
+  groupOf = $derived(new Map(this.subscriptions.map(({ url, note }) => [url, groupOf(this.records.get(url), notes.get(note)?.meta.type)])));
+
+  /** The groups with feeds in them, in order, each with its subscriptions and how many of their posts are unread. */
+  groups = $derived(
+    FEED_GROUPS.map((group) => {
+      const subscriptions = this.subscriptions.filter(({ url }) => this.groupOf.get(url) === group);
+      return { group, subscriptions, unread: subscriptions.reduce((sum, { url }) => sum + (this.unread.get(url) ?? 0), 0) };
+    }).filter(({ subscriptions }) => subscriptions.length),
+  );
+
   /** The open post, with its feed. */
   openRow = $derived.by((): Row | null => {
     const open = this.open;
@@ -131,10 +143,15 @@ class Feeds {
   /** Each feed being kept now, by its address: writing everything again (the app lock) waits for them. */
   #taking = new Map<string, Promise<void>>();
 
-  /** The posts of one feed, or of all, newest first. */
-  posts(feed?: string): Row[] {
-    if (!feed) return this.#all;
-    return (this.records.get(feed)?.posts ?? []).map((post) => ({ feed, post }));
+  /** The posts of one feed, of one group's, or of all, newest first. */
+  posts(feed?: string, group?: FeedGroup): Row[] {
+    if (feed) return (this.records.get(feed)?.posts ?? []).map((post) => ({ feed, post }));
+    return group ? this.#all.filter((row) => this.groupOf.get(row.feed) === group) : this.#all;
+  }
+
+  /** The feeds subscribed to in a group, or all of them. */
+  feedsIn(group?: FeedGroup): string[] {
+    return this.subscriptions.filter(({ url }) => !group || this.groupOf.get(url) === group).map(({ url }) => url);
   }
 
   subscription(url: string) {
@@ -313,9 +330,9 @@ class Feeds {
     this.#set(feed, { ...record, posts: record.posts.map((post) => (marking.has(post.id) ? { ...post, read } : post)) });
   }
 
-  /** Marks every post of a feed (or of all of them) read. */
-  readAll(feed?: string) {
-    for (const url of feed ? [feed] : this.#subscribed) {
+  /** Marks every post of these feeds (or of all of them) read. */
+  readAll(urls: Iterable<string> = this.#subscribed) {
+    for (const url of urls) {
       const posts = this.records.get(url)?.posts ?? [];
       this.setRead(url, posts.filter((post) => !post.read).map((post) => post.id));
     }
@@ -450,6 +467,9 @@ class Feeds {
     await feedStorage.rewrite();
   }
 }
+
+/** A row of feeds' name in the sidebar: its kind's ("RSS Feeds"), or for every feed, "Feeds". */
+export const feedRowLabel = (group?: FeedGroup | null) => (group ? t(`feeds.group.${group}` as const) : t("feeds.title"));
 
 /** Why a feed couldn't be fetched (a FetchError's message), as people read it. */
 export function feedError(reason: string): string {

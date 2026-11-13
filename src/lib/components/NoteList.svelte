@@ -3,7 +3,7 @@
   import { speak } from "../a11y";
   import { locale, t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
-  import { feedError, feeds } from "../feeds/feeds.svelte";
+  import { feedError, feedRowLabel, feeds } from "../feeds/feeds.svelte";
   import { shelves } from "../library/shelves.svelte";
   import { dateOf } from "../notes/calendar";
   import { typeLabel } from "../notes/properties";
@@ -30,7 +30,7 @@
     if (f.kind === "type") return typeLabel(f.type);
     if (f.kind === "library") return shelves.get(f.shelf)?.label ?? typeLabel(f.shelf);
     if (f.kind === "calendar") return t("sidebar.calendar");
-    if (f.kind === "feeds") return (f.feed && feeds.subscription(f.feed)?.title) || t("feeds.title");
+    if (f.kind === "feeds") return (f.feed && feeds.subscription(f.feed)?.title) || feedRowLabel(f.group);
     return { inbox: t("sidebar.inbox"), all: t("sidebar.notes"), todo: t("sidebar.todo"), untagged: t("sidebar.untagged"), trash: t("sidebar.trash") }[f.kind];
   });
 
@@ -40,12 +40,14 @@
    */
   const tabStop = $derived(Math.max(0, notes.visible.findIndex((e) => e.note.id === notes.selectedId)));
 
-  /** The Feeds (Library), where the list is of posts: every feed's, or one's. */
+  /** The Feeds (Library), where the list is of posts: every feed's, a kind's, or one's. */
   const feedView = $derived(notes.filter.kind === "feeds" ? notes.filter : null);
+  /** The feeds whose posts are listed. */
+  const listedFeeds = $derived(feedView ? (feedView.feed ? [feedView.feed] : feeds.feedsIn(feedView.group)) : []);
   const posts = $derived.by(() => {
     if (!feedView) return [];
     const terms = notes.query.toLowerCase().split(/\s+/).filter(Boolean);
-    const all = feeds.posts(feedView.feed);
+    const all = feeds.posts(feedView.feed, feedView.group);
     if (!terms.length) return all;
     return all.filter(({ feed, post }) => {
       const text = `${post.title} ${post.excerpt} ${feeds.subscription(feed)?.title ?? ""}`.toLowerCase();
@@ -223,9 +225,9 @@
       <IconButton
         icon="refresh"
         iconSize={16}
-        busy={feedView.feed ? feeds.fetching.has(feedView.feed) : feeds.fetching.size > 0}
+        busy={listedFeeds.some((url) => feeds.fetching.has(url))}
         label={feedView.feed ? t("feeds.refreshOne") : t("feeds.refresh")}
-        onclick={() => feeds.refresh(feedView.feed ? [feedView.feed] : undefined)}
+        onclick={() => feeds.refresh(listedFeeds)}
       />
       <IconButton icon="plus" label={t("feeds.subscribe")} open={!!ui.subscribePrompt} onclick={openSubscribe} />
     {:else if notes.filter.kind !== "trash"}
@@ -320,7 +322,7 @@
     <!-- Why a feed couldn't be fetched; on the web, that most can't be. -->
     {#if record?.error}
       <p class="mx-3 mb-2 rounded-lg bg-input px-2.5 py-2 text-xs leading-normal text-muted" role="status">{feedError(record.error)}</p>
-    {:else if !isTauri && !feedView.feed && feeds.subscriptions.some(({ url }) => feeds.records.get(url)?.error === "blocked")}
+    {:else if !isTauri && !feedView.feed && listedFeeds.some((url) => feeds.records.get(url)?.error === "blocked")}
       <p class="mx-3 mb-2 rounded-lg bg-input px-2.5 py-2 text-xs leading-normal text-muted">{t("feeds.webHint")}</p>
     {/if}
     {#if !posts.length}
@@ -331,7 +333,7 @@
           <p class="m-0">{t("feeds.none")}</p>
           <Button variant="quiet" icon="plus" onclick={(event) => openSubscribe(event, "center")}>{t("feeds.subscribe")}</Button>
         {:else}
-          <p class="m-0">{feeds.fetching.size ? t("feeds.fetching") : t("feeds.noPosts")}</p>
+          <p class="m-0">{listedFeeds.some((url) => feeds.fetching.has(url)) ? t("feeds.fetching") : t("feeds.noPosts")}</p>
         {/if}
       </div>
     {/if}

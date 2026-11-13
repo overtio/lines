@@ -60,6 +60,7 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - A feed is fetched in the main window only, at start and then as often as Settings → Library says, a few at a time and never two from one site at once; while lines is closed nothing's fetched.
 - A feed that moved for good (a permanent redirect) is followed each time; its note keeps the address it was subscribed with.
 - JSON Feed isn't read yet, only RSS 2.0, Atom and RSS 1.0, nor feeds that need signing in.
+- A feed subscribed to before lines kept what it's written in is listed with RSS Feeds (or Podcast Feeds, if its note is a podcast's) until it's next fetched, which it is at start; one that can't be fetched stays there.
 - Fetching feeds hasn't been tried in the Mac, Windows, Linux, iOS or Android apps yet: the apps fetch through Rust (`webFetch`, with conditional requests of their own), which the browser tests don't reach.
 
 ## The podcast player

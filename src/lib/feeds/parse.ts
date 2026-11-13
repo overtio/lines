@@ -9,9 +9,14 @@ import { fingerprint } from "./posts";
  * mended and read again, and one still broken is read as far as it goes.
  */
 
+/** What a feed is written in: RSS 2.0, Atom, or RSS 1.0 (RDF). */
+export type FeedFormat = "rss" | "atom" | "rdf";
+
 /** A feed as it was read. */
 export interface Feed {
   title: string;
+  /** What it's written in; not known of one only listed somewhere (an OPML file). */
+  format?: FeedFormat;
   /** The site it's from. */
   link?: string;
   description?: string;
@@ -104,9 +109,9 @@ function doctypeEnd(text: string, at: number) {
 export function readFeed(text: string, url: string): Feed {
   const root = parseXml(text).documentElement;
   const kind = root?.localName;
-  if (kind === "rss") return readRss(child(root, "channel", null) ?? root, url, null);
-  if (kind === "RDF") return readRdf(root, url);
-  if (kind === "feed") return readAtom(root, url);
+  if (kind === "rss") return { ...readRss(child(root, "channel", null) ?? root, url, null), format: "rss" };
+  if (kind === "RDF") return { ...readRdf(root, url), format: "rdf" };
+  if (kind === "feed") return { ...readAtom(root, url), format: "atom" };
   throw new NotAFeed(`Not a feed: ${url}`);
 }
 

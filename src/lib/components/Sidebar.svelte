@@ -3,7 +3,8 @@
   import type { IconName } from "../icons/icons";
   import { formatDate } from "../format";
   import { t } from "../i18n/index.svelte";
-  import { feeds } from "../feeds/feeds.svelte";
+  import { feedRowLabel, feeds, type Subscription } from "../feeds/feeds.svelte";
+  import { FEED_GROUPS, type FeedGroup } from "../feeds/groups";
   import { type Shelf, shelves } from "../library/shelves.svelte";
   import { lock } from "../lock/lock.svelte";
   import { notesOnDays } from "../notes/calendar";
@@ -55,14 +56,33 @@
   /** The types listed under Types: all but the Library's, which lists its own. */
   const ownTypes = $derived(notes.types.filter(({ type }) => !plugins.libraryKind(type)));
 
-  /** The Library's shelves with something on them, how much, in the order chosen; and those not hidden. */
-  const shelfRows = $derived.by(() => {
+  /**
+   * The Library's rows: its feeds (a row for each kind with subscriptions, or one for them all, as
+   * Settings → Library says), then its shelves with something on them, in the order chosen; and
+   * those not hidden. A feeds' row is ordered, sized and hidden as `feeds:rss`, a shelf as its kind.
+   */
+  type LibraryRow =
+    | { kind: "feeds"; key: string; group: FeedGroup | null; subscriptions: Subscription[]; unread: number }
+    | { kind: "shelf"; key: string; shelf: Shelf; count: number };
+  const libraryRows = $derived.by(() => {
+    const feedRows: LibraryRow[] = !feeds.on
+      ? []
+      : prefs.feedsInSidebar === "together"
+        ? [{ kind: "feeds", key: "feeds:all", group: null, subscriptions: feeds.subscriptions, unread: feeds.totalUnread }]
+        : feeds.groups.map(({ group, subscriptions, unread }) => ({ kind: "feeds", key: `feeds:${group}`, group, subscriptions, unread }));
     const counts = new Map(notes.types.map(({ type, count }) => [type, count]));
-    const stocked = shelves.all.map((shelf) => ({ shelf, count: shelf.kinds.reduce((sum, kind) => sum + (counts.get(kind.type) ?? 0), 0) }));
-    return sidebarLayout.sorted("library", stocked.filter(({ count }) => count > 0), ({ shelf }) => shelf.key);
+    const stocked = shelves.all
+      .map((shelf) => ({ kind: "shelf" as const, key: shelf.key, shelf, count: shelf.kinds.reduce((sum, kind) => sum + (counts.get(kind.type) ?? 0), 0) }))
+      .filter(({ count }) => count > 0);
+    // A row new since the rows were put in order (a kind of feed's first subscription) goes where it comes.
+    return sidebarLayout.sorted("library", [...feedRows, ...stocked], (row) => row.key, true);
   });
-  const shelfKeys = $derived(shelfRows.map(({ shelf }) => shelf.key));
-  const shownShelves = $derived(shelfRows.filter(({ shelf }) => !sidebarLayout.isHidden(`shelf:${shelf.key}`)));
+  const libraryKeys = $derived(libraryRows.map((row) => row.key));
+  /** What a Library row is hidden and sized as. */
+  const rowKey = (row: LibraryRow) => (row.kind === "feeds" ? row.key : `shelf:${row.key}`);
+  const shownLibrary = $derived(libraryRows.filter((row) => !sidebarLayout.isHidden(rowKey(row))));
+  /** Every row of feeds there can be, to size along with the Library's other rows. */
+  const FEED_ROWS = ["feeds:all", ...FEED_GROUPS.map((group) => `feeds:${group}`)];
 
   const placeKeys = PLACES.map((place) => place.key);
   const placeOf = new Map(PLACES.map((place) => [place.key, place]));
@@ -138,7 +158,7 @@
     shownSections.map((section) => {
       const open = !hasHeading(section) || !sidebarLayout.isCollapsed(section.key);
       // Which of its rows shown are dividers, in order.
-      const shown = section.kind === "places" ? section.places.filter(isShown) : section.kind === "types" ? shownTypes : section.kind === "library" ? shownShelves : [];
+      const shown = section.kind === "places" ? section.places.filter(isShown) : section.kind === "types" ? shownTypes : section.kind === "library" ? shownLibrary : [];
       const rows: boolean[] = !open ? [] : shown.map((row) => "divider" in row);
       const count = (from: boolean[]) => (from.indexOf(false) === -1 ? from.length : from.indexOf(false));
       const trail = count([...rows].reverse());
@@ -197,6 +217,7 @@
     }
     if (kind === "type") return notes.types.some(({ type }) => type === name) ? { label: typeLabel(name), icon: typeLooks.icon(name) } : null;
     if (kind === "shelf") return shelves.get(name) ?? null;
+    if (kind === "feeds") return feeds.on ? { label: feedRowLabel(name === "all" ? null : (name as FeedGroup)), icon: "rss" } : null;
     if (kind === "tag") return tagPaths.has(name) ? { label: `#${name}`, icon: tagLooks.icon(name) } : null;
     return null;
   };
@@ -238,7 +259,7 @@
   function sectionMenu(section: Section, x: number, y: number) {
     const label = nameOf(section);
     if (section.kind === "library") {
-      const own = sizeItems("library", "", shelves.all.map((shelf) => `shelf:${shelf.key}`));
+      const own = sizeItems("library", "", [...FEED_ROWS, ...shelves.all.map((shelf) => `shelf:${shelf.key}`)]);
       return openRowMenu(`section:${section.key}`, label, own, hideItems("section", section.key), x, y);
     }
     if (section.kind !== "places") {
@@ -258,6 +279,11 @@
 
   function shelfMenu(shelf: Shelf, x: number, y: number) {
     openRowMenu(`shelf:${shelf.key}`, shelf.label, sizeItems("library", `shelf:${shelf.key}`), hideItems("shelf", shelf.key), x, y);
+  }
+
+  /** A row of feeds' menu: its own items (FeedRows.svelte), then its size (never a tile: its feeds are under it), and hiding it. */
+  function feedsMenu(key: string, label: string, own: MenuItem[], x: number, y: number) {
+    openRowMenu(key, label, [...own, "separator", ...sizeItems("library", key, undefined, false)], hideItems("feeds", key.slice("feeds:".length)), x, y);
   }
 
   /** Add to Library, open under the Library heading's button. */
@@ -542,10 +568,21 @@
           </ul>
         {:else if open && section.kind === "library"}
           <ul id="sidebar-library-list" class={ROWS} aria-labelledby="sidebar-library">
-            {#if feeds.on}
-              <FeedRows onchoose={choose} />
-            {/if}
-            {#each shownShelves as { shelf, count } (shelf.key)}
+            {#each shownLibrary as row (row.key)}
+              {#if row.kind === "feeds"}
+                {@const size = sidebarLayout.sizeOf(row.key, "library")}
+                <FeedRows
+                  group={row.group}
+                  subscriptions={row.subscriptions}
+                  unread={row.unread}
+                  size={size === "large" ? "standard" : size}
+                  marked={menuFor === row.key}
+                  onchoose={choose}
+                  onmenu={(label, own, x, y) => feedsMenu(row.key, label, own, x, y)}
+                  reorder={reorderable("library", row.key, (before) => sidebarLayout.move("library", libraryKeys, row.key, before), true)}
+                />
+              {:else}
+              {@const { shelf, count } = row}
               {@const size = sidebarLayout.sizeOf(`shelf:${shelf.key}`, "library")}
               <li data-tile={size === "large" || undefined}>
                 <SidebarRow
@@ -558,13 +595,12 @@
                   onclick={() => choose({ kind: "library", shelf: shelf.key })}
                   oncontextmenu={(event) => onRowContextMenu(event, `shelf:${shelf.key}`, (x, y) => shelfMenu(shelf, x, y))}
                   {@attach longPress((x, y) => shelfMenu(shelf, x, y))}
-                  {@attach reorderable("library", shelf.key, (before) => sidebarLayout.move("library", shelfKeys, shelf.key, before))}
+                  {@attach reorderable("library", shelf.key, (before) => sidebarLayout.move("library", libraryKeys, shelf.key, before))}
                 />
               </li>
-            {:else}
-              {#if !(feeds.on && feeds.subscriptions.length)}
-                <li class="px-2.5 py-1 text-xs text-faint">{t("library.empty")}</li>
               {/if}
+            {:else}
+              <li class="px-2.5 py-1 text-xs text-faint">{t("library.empty")}</li>
             {/each}
           </ul>
         {:else if open && section.kind === "types"}

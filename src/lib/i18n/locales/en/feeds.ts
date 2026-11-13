@@ -4,11 +4,8 @@ export default {
   "feeds.title": "Feeds",
   // One subscription, as a kind of note in the Library (a site's, not a podcast's).
   "feeds.feed": "Feed",
-  // The Feeds row, as screen readers hear it.
-  "feeds.titleWithUnread": "Feeds, {count, plural, one {# unread} other {# unread}}",
-  // The feeds subscribed to, nested under Feeds: the button that shows them, and their list.
+  // The button that shows the feeds subscribed to, nested under Feeds.
   "feeds.showSubscriptions": "Show feeds",
-  "feeds.subscriptions": "Feeds subscribed to",
   "feeds.unreadCount": "{count, plural, one {# unread} other {# unread}}",
   // A feed's menu (and Feeds' own).
   "feeds.readAll": "Mark All as Read",
@@ -71,6 +68,15 @@ export default {
   // The title of the OPML file the feeds are exported in.
   "feeds.opmlTitle": "Feeds from lines",
   // Settings → Library: how often feeds are fetched, and OPML.
+  // The Library's rows of feeds, a kind each (Settings → Library → Feeds in the sidebar).
+  "feeds.group.rss": "RSS Feeds",
+  "feeds.group.atom": "Atom Feeds",
+  "feeds.group.podcast": "Podcast Feeds",
+  "feeds.showGroup": "Show the feeds in {group}",
+  "feeds.inSidebar": "Feeds in the sidebar",
+  "feeds.inSidebarNote": "By Kind: a row each in the Library for RSS, Atom and podcasts’ feeds (a podcast’s whatever it’s written in). Together: one Feeds row for them all.",
+  "feeds.byKind": "By Kind",
+  "feeds.together": "Together",
   "feeds.refreshEvery": "Refresh feeds",
   "feeds.refreshEveryNote": "When lines starts, and then this often while it’s open.",
   "feeds.every": "{minutes, plural, =60 {Every hour} =240 {Every 4 hours} other {Every # minutes}}",
