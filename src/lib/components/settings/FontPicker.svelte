@@ -8,6 +8,7 @@
   import type { FontChoice } from "../../themes/formattingFonts";
   import { canDraw, installedFamily, listInstalledFonts, matching } from "../../themes/installedFonts";
   import Combobox from "../ui/Combobox.svelte";
+  import { ownFace } from "./ownFace";
 
   type Props = {
     value: FontChoice | null;
@@ -85,6 +86,6 @@
   onopen={load}
 >
   {#snippet item(option)}
-    <span class="truncate" style:font-family={option.family}>{option.label}</span>
+    <span class="truncate" {@attach ownFace(option.family)}>{option.label}</span>
   {/snippet}
 </Combobox>
