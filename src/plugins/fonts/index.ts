@@ -15,7 +15,7 @@ import { t } from "../../lib/i18n/index.svelte";
 import type { Plugin } from "../../lib/plugins/types";
 
 /*
- * Fonts to write notes in (Settings → Typography → Font), beside the system's: IBM Plex Sans, Fira
+ * Fonts to write notes in (Settings → Typography → Font family), beside the system's: IBM Plex Sans, Fira
  * Sans and Agave, a monospaced one. They come with lines (SIL Open Font License), so they look the
  * same on every computer and offline, and each file loads only once text is shown in it.
  */

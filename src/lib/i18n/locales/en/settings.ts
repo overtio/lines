@@ -394,7 +394,19 @@ export default {
   // A note shown in the preview, in Markdown. Keep its # headings and - [x] checkboxes.
   "settings.previewNote":
     "# Weekend in the mountains\n\nA slow morning, then the farmers market. Pick up bread, cheese and something green for dinner.\n\nLeave by noon to beat the traffic.\n\n## Packing\n- [x] Book the cabin\n- [ ] Rain jackets\n- [ ] Trail map",
-  "settings.font": "Font",
+  // Settings → Typography: the font notes are in. Recommended are those lines suggests; any other installed on this device can be chosen too.
+  "settings.fontFamily": "Font family",
+  "settings.fontRecommended": "Recommended",
+  "settings.fontInstalled": "Installed font",
+  "settings.fontInstalledNote": "Any font on this device.",
+  "settings.fontMissing": "{name} isn’t installed on this device, so notes are in the system font.",
+  // In the field to find an installed font by its name.
+  "settings.fontSearch": "Search fonts",
+  "settings.fontsFinding": "Finding fonts…",
+  "settings.fontTypeName": "Type the name of a font on this device.",
+  "settings.fontNotHere": "No font called “{name}” is installed here.",
+  "settings.fontsFound": "{count, plural, one {# font} other {# fonts}}",
+  "settings.fontSize": "Font size",
   "settings.fontSystem": "System",
   "settings.fontSerif": "Serif",
   "settings.fontRounded": "Rounded",

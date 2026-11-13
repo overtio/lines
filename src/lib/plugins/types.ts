@@ -54,7 +54,7 @@ export interface Contributions {
   themes?: ThemeDefinition[];
   /** Whole looks for the app, beyond its colors: shapes, type, borders, shadows; each a preset (Settings → Presets). */
   styles?: AppStyle[];
-  /** Fonts to write notes in (Settings → Typography → Font), beside your system's. */
+  /** Fonts to write notes in (Settings → Typography → Font family), beside your system's. */
   fonts?: NoteFont[];
   /** Kinds of theme files made for other apps (VS Code, Base16, a terminal's) that lines can read themes from. */
   themeFormats?: ThemeFormat[];

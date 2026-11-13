@@ -83,7 +83,7 @@ Each but Lines comes with a color theme made for it (Classic, Pixel, Neon, Puddl
 
 - **Theme:** the theme (a theme of your own goes along in a preset's file), the style, Dark panes, Monochrome, Invert, the icons and headings' color.
 - **Layout:** Hide toolbars, and whether icons show.
-- **Typography:** the font, the spacing and the note's width.
+- **Typography:** the font (a font installed on the device too, by its name), the spacing and the note's width.
 - **Paper:** the pattern, texture and their color, size and strength; the backdrop and the page over it.
 - **Cursor:** the text cursor's shape, width, color, blink, moving and effect; the pointer and what follows it.
 - **Mascot:** which, and how big.

@@ -12,6 +12,7 @@
   import { plugins } from "../../plugins/registry.svelte";
   import { prefs } from "../../prefs.svelte";
   import { fontFamily } from "../../themes/fonts.svelte";
+  import { installedFamily } from "../../themes/installedFonts";
   import { currentSettings, PRESET_FILE_EXTENSION, presets, readPresetFile, writePresetFile, type Preset } from "../../themes/presets.svelte";
   import { schemeShown } from "../../themes/show.svelte";
   import Button from "../ui/Button.svelte";
@@ -31,7 +32,8 @@
     const theme = plugins.theme(settings.theme);
     const { bg, text, accent } = theme[schemeShown(theme, prefs.dark)];
     const style = plugins.style(settings.style);
-    const font = settings.font === "system" ? (style?.font?.family ?? "system-ui, sans-serif") : fontFamily(settings.font);
+    const system = style?.font?.family ?? "system-ui, sans-serif";
+    const font = settings.installedFont ? installedFamily(settings.installedFont, system) : settings.font === "system" ? system : fontFamily(settings.font);
     return { bg, text, accent, font, round: style?.properties?.["radius-scale"] ?? "1" };
   }
 

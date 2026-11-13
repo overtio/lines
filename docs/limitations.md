@@ -240,6 +240,10 @@ How they work is in [spreadsheets.md](spreadsheets.md).
 - IBM Plex Sans, Fira Sans and Agave cover Latin, Greek, Cyrillic and Vietnamese; other writing shows in the fallback font. They come in regular and bold (Plex and Fira with their italics); weights between are the nearest of those, and Agave's italic is its regular slanted.
 - Code is in the code font whichever is chosen; Agave isn't one to choose for code yet.
 - Not tried in the Mac app yet.
+- A font installed on your device (Settings → Typography → Installed font): the apps list the fonts the system has, but on Android none, so there it's typed by name, and on iPhone and iPad only those iOS comes with: fonts installed from the App Store's font apps need the Fonts entitlement (`com.apple.developer.user-fonts`), which lines' app doesn't have yet. In a browser, Chrome and Edge list them once you allow it; Safari and Firefox can't, and you type a font's name instead, which says when it isn't one there. Safari only uses the fonts macOS comes with, not ones you installed, and Firefox can limit fonts the same way with its stricter privacy settings: such a font says it isn't installed.
+- It's kept by its name, so settings or a preset from another computer can name one this device hasn't: notes are then in the system's font (a style's own, where it has one), Settings → Typography says the font isn't installed here, and it's used again where it is. A font's bold and italic are its own where it has them; where it hasn't, the browser thickens or slants its regular.
+- lines' printed pages, PDF and PNG images are in it; TeX's PDF of a LaTeX note never is (it's in TeX's fonts).
+- Listing them hasn't been tried in the apps yet: the Mac's (AppKit), Windows' (DirectWrite), Linux's (fontconfig's `fc-list`, which a desktop without it lacks; then the name is typed), the iPhone's and iPad's (UIKit).
 
 ## Symbols
 

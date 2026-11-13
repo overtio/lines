@@ -6,9 +6,9 @@ use std::path::{Component, Path, PathBuf};
 
 use tauri::AppHandle;
 
-/// Runs `job` on the main thread, as AppKit's panels and the drag pasteboard want, and waits for it.
+/// Runs `job` on the main thread, as AppKit's panels, the drag pasteboard and the font manager want, and waits for it.
 #[cfg(target_os = "macos")]
-async fn on_main<T: Send + 'static>(app: &AppHandle, job: impl FnOnce() -> T + Send + 'static) -> Option<T> {
+pub(crate) async fn on_main<T: Send + 'static>(app: &AppHandle, job: impl FnOnce() -> T + Send + 'static) -> Option<T> {
   let (send, receive) = std::sync::mpsc::channel();
   app
     .run_on_main_thread(move || {

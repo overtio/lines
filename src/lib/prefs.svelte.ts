@@ -1,6 +1,7 @@
 import { locale, t } from "./i18n/index.svelte";
 import { isMacApp } from "./platform";
 import { CURRENCIES, DATE_STYLES, type DateStyle, localCurrency, MONEY_STYLES, type MoneyStyle, NEGATIVE_STYLES, type NegativeStyle } from "./sheets/display";
+import { familyName, installedFamily } from "./themes/installedFonts";
 import { announce, onAnnounce, windowLabel } from "./windows/channel";
 
 export type Appearance = "system" | "light" | "dark";
@@ -177,6 +178,8 @@ export interface Stored {
   invert: boolean;
   darkPanes: DarkPanes;
   font: FontId;
+  /** A font installed on this device notes are in, by its family name, in place of `font` (which older versions of lines show); "" for none. */
+  installedFont: string;
   textSize: number;
   icons: string;
   swipe: SwipeDirection;
@@ -359,6 +362,7 @@ const DEFAULTS: Stored = {
   invert: false,
   darkPanes: "none",
   font: "system",
+  installedFont: "",
   textSize: 17,
   icons: "lucide",
   swipe: "fingers",
@@ -514,6 +518,7 @@ function read(json?: string): Stored {
     invert: flag(raw.invert, DEFAULTS.invert),
     darkPanes: oneOf(raw.darkPanes, DARK_PANES, DEFAULTS.darkPanes),
     font: id(raw.font, DEFAULTS.font),
+    installedFont: familyName(raw.installedFont),
     textSize: clamp(raw.textSize, TEXT_SIZE.min, TEXT_SIZE.max, DEFAULTS.textSize),
     icons: id(raw.icons, DEFAULTS.icons),
     swipe: oneOf(raw.swipe, ["fingers", "reversed"] as const, DEFAULTS.swipe),
@@ -621,6 +626,7 @@ class Prefs {
   invert = $state(this.#initial.invert);
   darkPanes = $state<DarkPanes>(this.#initial.darkPanes);
   font = $state<FontId>(this.#initial.font);
+  installedFont = $state(this.#initial.installedFont);
   textSize = $state(this.#initial.textSize);
   icons = $state(this.#initial.icons);
   swipe = $state<SwipeDirection>(this.#initial.swipe);
@@ -776,16 +782,18 @@ class Prefs {
    * re-runs when they change and can tell CodeMirror to measure again.
    */
   watchLayout() {
-    return [this.font, this.textSize, $state.snapshot(this.spacing)];
+    return [this.font, this.installedFont, this.textSize, $state.snapshot(this.spacing)];
   }
 
   #apply() {
     const root = document.documentElement;
-    root.dataset.font = this.font;
+    root.dataset.font = this.installedFont ? "installed" : this.font;
     root.toggleAttribute("data-no-scrollbars", !this.scrollbars);
     root.toggleAttribute("data-hide-bars", this.hideBars);
     root.toggleAttribute("data-no-icons", !this.showIcons);
     const { style } = root;
+    if (this.installedFont) style.setProperty("--font-text", installedFamily(this.installedFont));
+    else style.removeProperty("--font-text");
     style.setProperty("--editor-size", `${this.textSize}px`);
     const s = this.spacing;
     style.setProperty("--editor-line-height", String(s.lineHeight));
@@ -819,6 +827,7 @@ class Prefs {
       invert: this.invert,
       darkPanes: this.darkPanes,
       font: this.font,
+      installedFont: this.installedFont,
       textSize: this.textSize,
       icons: this.icons,
       swipe: this.swipe,
@@ -928,6 +937,7 @@ class Prefs {
     this.invert = next.invert;
     this.darkPanes = next.darkPanes;
     this.font = next.font;
+    this.installedFont = next.installedFont;
     this.textSize = next.textSize;
     this.icons = next.icons;
     this.swipe = next.swipe;
