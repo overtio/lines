@@ -142,7 +142,7 @@ async function search(type: string, text: string, signal: AbortSignal): Promise<
   if (type === "song") {
     const found = await ask<{ recordings?: Recording[] }>(`recording?query=${encodeURIComponent(words(text))}&limit=15`, signal);
     return (found?.recordings ?? []).map((recording) => {
-      const release = recording.releases?.find((each) => each["release-group"]?.["primary-type"] === "Album") ?? recording.releases?.[0];
+      const release = albumOf(recording);
       const group = release?.["release-group"];
       return {
         type: "song",

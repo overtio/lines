@@ -103,7 +103,8 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - If its cover can't be stored once the note's written (the device out of space), the note keeps the picture's link without the picture.
 - The Library has no grid of covers yet, and subscribing to podcasts and feeds isn't there yet either.
 - Add to Library searches each catalog as it ranks things: Wikidata's search puts what's titled as typed and has the most Wikipedias first, but can miss what's new; MusicBrainz is asked once a second, so Music, which searches songs and albums, takes a moment more; only the first page of what each finds is shown.
-- A link added to the library from its menu becomes a mention as one change, which ⌘Z takes back; the library note made stays (it isn't taken back with it), in the Library.
+- A link added to the library from its menu becomes a mention as one change, which ⌘Z takes back; the library note made stays (it isn't taken back with it), in the Library. Done while the note's closed, the mention can't be taken back with ⌘Z.
+- A link being added shows how it's getting on in one pane: the same note open in two shows it in the first.
 - Looking links up hasn't been tried in the Mac, Windows, Linux, iOS or Android apps yet: the apps read pages through Rust (`webFetch`), which the browser tests don't reach.
 
 ## Math

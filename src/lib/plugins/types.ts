@@ -92,6 +92,26 @@ export interface Contributions {
   libraryKinds?: LibraryKind[];
   /** Where lines finds out what a link is, to fill a library note with it: a site's catalog, or any page's own description of itself. */
   librarySources?: LibrarySource[];
+  /** What a web link in a note can be used for, in its menu (right-click it) after Open and Copy: added to the Library, say. */
+  linkActions?: LinkAction[];
+}
+
+/** A web link in a Markdown note: its whole Markdown (`[text](…)`, `<…>` or a bare address), where it is, its address and its text. */
+export interface WebLink {
+  from: number;
+  to: number;
+  markdown: string;
+  href: string;
+  text: string;
+}
+
+/** Something to do with a web link in a note, from its menu (editor/linkMenu.ts). */
+export interface LinkAction {
+  label: string;
+  icon: IconName;
+  /** Whether it changes the note: if so, a note that can't be changed doesn't offer it. */
+  edits?: boolean;
+  run(view: EditorView, link: WebLink): void;
 }
 
 /**

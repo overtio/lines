@@ -95,6 +95,7 @@ class Plugins {
   readonly libraryKinds = $derived(this.#from("libraryKinds"));
   /** Where links are looked up, in the order they're asked: each site's, then those that read any page. */
   readonly librarySources = $derived(this.#from("librarySources").sort((a, b) => Number(!!a.general) - Number(!!b.general)));
+  readonly linkActions = $derived(this.#from("linkActions"));
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).

@@ -328,7 +328,7 @@ src/
       lookup.ts              Asking the sources in turn what a link is
       linkNotes.ts           A note that's just a link, looked up as it becomes one and filled in as one change
       adding.ts              Add to Library (components/AddToLibrary.svelte): what a search found, as a note filled in from its page
-      linkMenu.ts            A link's menu in a note: Add to Library makes its note and mentions it in its place
+      addLink.ts             Add to Library from a link's menu: makes its note and mentions it in its place
       page.ts  web.ts        What a page says about itself, read as text; asking the web as lines
       shelves.svelte.ts      The Library's rows in the sidebar; rows.ts, what a note's row on its shelf shows
     themes/                  Themes worked out from their palettes (palette.ts) as CSS (css.ts, which the website uses too), and this window's theme (show.svelte.ts) and style (styles.svelte.ts); presets (presets.svelte.ts); your own themes and palettes, their files, importing them, and colors' names
@@ -342,6 +342,7 @@ src/
       formatCode.ts          Tidies code blocks (JSON, SQL, Prettier languages)
       formatting.ts          Bold, italic, underline, code… toggles and the toolbar over selected text
       links.ts               Following links, tags and mentions as Settings → Editor → Links says for each click
+      linkMenu.ts            A web link's menu (Open, Copy, and what plugins add: Add to Library)
       outline.svelte.ts      The outline beside a note: its languages' headings, the part being read, gliding to one
       OutlineRail.svelte     The outline's lines and its card of headings
       dragBlocks.ts          Grips for dragging lines and blocks to move them

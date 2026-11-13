@@ -190,6 +190,9 @@ export default {
   "editor.copyCode": "Copy code",
   "editor.copyCell": "Copy cell",
   "editor.copied": "Copied",
+  // A web link's menu, in a note (right-click it); plugins add to it.
+  "editor.link.open": "Open Link",
+  "editor.link.copy": "Copy Link",
   // The button on a code block that tidies its code.
   "editor.formatCode": "Format code",
   "editor.codeFormatted": "Code formatted",

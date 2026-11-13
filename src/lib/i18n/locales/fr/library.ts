@@ -37,8 +37,6 @@ export default {
   "library.add.hint": "Tapez un titre pour chercher dans {names}, ou collez un lien.",
   "library.add.hintLink": "Collez un lien pour le rechercher.",
   "library.add.blank": "Vierge",
-  "library.link.open": "Ouvrir le lien",
-  "library.link.copy": "Copier le lien",
   "library.nothing": "Rien n’a été trouvé pour ce lien",
   "library.empty": "Appuyez sur + pour ajouter quelque chose, ou collez un lien dans une nouvelle note",
   "library.lookingUp": "Recherche…",

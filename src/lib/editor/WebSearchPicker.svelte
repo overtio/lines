@@ -43,12 +43,14 @@
     itemClass: string;
     /** The popover's width, as a Tailwind class. */
     widthClass: string;
+    /** As tall as what it shows (rows of results, which grow as they're found), rather than always as tall as a grid of pictures fills. */
+    fit?: boolean;
     x: number;
     y: number;
     onchoose: (item: T) => void;
     onclose: () => void;
   };
-  let { name, title, credit, header, footer, search, hint, columns, label, item, listClass, itemClass, widthClass, x, y, onchoose, onclose }: Props = $props();
+  let { name, title, credit, header, footer, search, hint, columns, label, item, listClass, itemClass, widthClass, fit = false, x, y, onchoose, onclose }: Props = $props();
   const named = $derived(title ?? t("editor.web.search", { name }));
 
   /** How long typing pauses before it searches. */
@@ -225,8 +227,11 @@
         onkeydown={onFieldKeydown}
         class="mb-2 [&_input::-webkit-search-cancel-button]:hidden"
       />
-      <!-- A fixed height, so the picker doesn't jump around while searching. -->
-      <div bind:this={scroller} class="-mx-1 h-[min(360px,calc(100dvh-150px))] overflow-x-hidden overflow-y-auto overscroll-contain p-1">
+      <!-- A fixed height, so a grid of pictures doesn't jump around while searching; or as tall as what's shown, up to that. -->
+      <div
+        bind:this={scroller}
+        class={["-mx-1 overflow-x-hidden overflow-y-auto overscroll-contain p-1", fit ? "max-h-[min(360px,calc(100dvh-150px))] min-h-0" : "h-[min(360px,calc(100dvh-150px))]"]}
+      >
         <div bind:this={list} role="listbox" tabindex="-1" aria-label={name} onkeydown={onListKeydown} class={[listClass, "transition-opacity", status === "searching" && "opacity-50"]}>
           {#each items as each, i (each.id)}
             <button
@@ -247,7 +252,7 @@
           <div {@attach loadsMore} class="h-px"></div>
         {/if}
         <!-- Said as it changes; shown while there are no results, or when more couldn't load. -->
-        <p role="status" class={items.length && status !== "failed" ? "sr-only" : "m-0 mt-10 mb-3 px-4 text-center text-sm text-faint"}>{message}</p>
+        <p role="status" class={items.length && status !== "failed" ? "sr-only" : ["m-0 px-4 text-center text-sm text-faint", fit ? "my-3" : "mt-10 mb-3"]}>{message}</p>
         {#if status === "failed"}
           <div class="flex justify-center"><Button variant="secondary" onclick={() => load(loadingMore)}>{t("editor.web.retry")}</Button></div>
         {/if}

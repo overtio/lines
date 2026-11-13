@@ -3,6 +3,7 @@
   import WebSearchPicker from "../editor/WebSearchPicker.svelte";
   import { addBlank, addToLibrary } from "../library/adding";
   import { lookUp } from "../library/lookup";
+  import { subtitleOf } from "../library/rows";
   import { shelves } from "../library/shelves.svelte";
   import { linkOnly } from "../library/text";
   import { plugins } from "../plugins/registry.svelte";
@@ -55,10 +56,10 @@
     return { items: items.map((item, i) => ({ id: `${i}:${item.link ?? item.title}`, item, whole: false })), more: false };
   }
 
-  /** Who made it and when, as its kind's rows say (`Frank Herbert · 1965`), or what the catalog says it is. */
+  /** Who made it and when, as its row on its shelf will say (`Frank Herbert · 1965`), or what the catalog says it is. */
   function about(item: LibraryItem) {
-    const subtitle = plugins.libraryKind(item.type)?.subtitle ?? [];
-    const said = subtitle.flatMap((key) => item.properties.find(([each]) => each === key)?.[1] ?? []).join(" · ");
+    const kind = plugins.libraryKind(item.type);
+    const said = kind ? subtitleOf(kind, (key) => item.properties.find(([each]) => each === key)?.[1]) : "";
     return said || item.description || "";
   }
 
@@ -79,6 +80,7 @@
   listClass="flex flex-col gap-0.5"
   itemClass="flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-left hover:bg-hover focus-visible:bg-hover"
   widthClass="w-[min(520px,calc(100vw-16px))]"
+  fit
   {x}
   {y}
   onchoose={({ item, whole }) => addToLibrary(item, whole)}

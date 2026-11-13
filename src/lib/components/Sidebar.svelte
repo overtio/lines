@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { mount, unmount } from "svelte";
   import Icon from "../icons/Icon.svelte";
   import type { IconName } from "../icons/icons";
   import { formatDate } from "../format";
@@ -257,21 +256,18 @@
     openRowMenu(`shelf:${shelf.key}`, shelf.label, sizeItems("library", `shelf:${shelf.key}`), hideItems("shelf", shelf.key), x, y);
   }
 
-  /** The Library heading's button: Add to Library, under it. Closed with nothing chosen, focus is back on the button. */
+  /** Add to Library, open under the Library heading's button. */
+  let adding = $state<{ x: number; y: number; button: HTMLElement } | null>(null);
+
   function openAddToLibrary(button: HTMLElement) {
     const { left, bottom } = button.getBoundingClientRect();
-    const picker = mount(AddToLibrary, {
-      target: document.body,
-      props: {
-        x: left,
-        y: bottom + 4,
-        onclose() {
-          if (!document.activeElement || document.activeElement === document.body) button.focus();
-          // Once it has finished closing.
-          setTimeout(() => void unmount(picker));
-        },
-      },
-    });
+    adding = { x: left, y: bottom + 4, button };
+  }
+
+  /** Closed with nothing chosen, focus is back on the button. */
+  function closeAddToLibrary() {
+    if (!document.activeElement || document.activeElement === document.body) adding?.button.focus();
+    adding = null;
   }
 
   /** The section of places being named in its heading, and the name typed so far. */
@@ -643,6 +639,10 @@
     <IconButton icon="settings" iconSize={17} label={t("sidebar.settings")} onclick={() => void openSettings()} />
   </footer>
 </nav>
+
+{#if adding}
+  <AddToLibrary x={adding.x} y={adding.y} onclose={closeAddToLibrary} />
+{/if}
 
 <style>
   /* While a row is dragged to another place (reorder.ts), as a block in a note is (editor.css): it fades, and a line glides to where it'll go. */

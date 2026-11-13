@@ -42,9 +42,6 @@ export default {
   "library.add.hintLink": "Paste a link to look it up.",
   // A new one, of the kind chosen, to fill in by hand.
   "library.add.blank": "Blank",
-  // A web link's menu, in a note.
-  "library.link.open": "Open Link",
-  "library.link.copy": "Copy Link",
   // In the Library, while nothing is in it: the + is its heading's button.
   "library.empty": "Press + to add something, or paste a link into a new note",
   // In a note, after a link, while what it is is looked up, when it couldn't be, and when nothing was found (asked from its menu).

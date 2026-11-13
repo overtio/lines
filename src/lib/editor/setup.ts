@@ -40,6 +40,7 @@ import { hiddenMarkdown } from "./hiddenMarkdown";
 import { dropTagSlash } from "./tagSlash";
 import { markdownPageBreaks } from "./pageBreaks";
 import { markupMode } from "./markupMode";
+import { linkMenu } from "./linkMenu";
 import { type MarkdownMode, prefs } from "../prefs.svelte";
 
 /**
@@ -291,6 +292,7 @@ const linedownEditing = (additions: MarkdownAddition[], papers: PaperSource[], m
   quoteInput,
   formattingKeymap,
   markdownOutline,
+  linkMenu,
   additions.flatMap((addition) => addition.editor ?? []),
 ];
 
