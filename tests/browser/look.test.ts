@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
+import type { Locator } from "playwright";
 import { type App, choose, engine, mod, noErrors, openApp, toggle } from "./app";
 import { png } from "./files";
 
@@ -136,6 +137,16 @@ const listFonts = (page: App["page"], families: string[] | "refused") =>
     });
   }, families);
 
+/** The font an option's name in a font picker is drawn in, once it has it: each takes its own as it comes into sight (ownFace.ts). */
+const nameFace = (option: Locator) =>
+  option.locator("span").first().evaluate(
+    (name) =>
+      new Promise<string>((done) => {
+        const check = () => (name.style.fontFamily ? done(getComputedStyle(name).fontFamily.replaceAll('"', "")) : requestAnimationFrame(check));
+        check();
+      }),
+  );
+
 describe("fonts installed on this device", () => {
   const stored = (page: App["page"]) => page.evaluate(() => JSON.parse(localStorage.getItem("lines.prefs")!).installedFont as string);
 
@@ -168,8 +179,9 @@ describe("fonts installed on this device", () => {
     expect(await list.getByRole("option", { name: installed, exact: true }).count()).toBe(1);
     expect(await list.getByRole("option", { name: ".Hidden" }).count()).toBe(0);
     expect(await list.getByRole("option").count()).toBeLessThan(100);
-    // Each in its own face.
-    expect(await list.getByRole("option", { name: installed, exact: true }).locator("span").first().evaluate((name) => getComputedStyle(name).fontFamily.replaceAll('"', ""))).toStartWith(`${installed},`);
+    // Each in its own face, once it's in sight: those out of sight aren't yet, as sixty fonts at once held WebKit still.
+    expect(await nameFace(list.getByRole("option", { name: installed, exact: true }))).toStartWith(`${installed},`);
+    expect(await list.getByRole("option").last().locator("span").first().evaluate((name) => name.style.fontFamily)).toBe("");
 
     await picker.fill(installed.slice(0, 4));
     await list.getByRole("option", { name: "Zz Other" }).waitFor({ state: "detached" });
@@ -401,7 +413,7 @@ describe("formatting's fonts", () => {
       await headings.click();
       const first = app.page.getByRole("listbox").getByRole("option").first();
       expect(await first.innerText()).toBe(face);
-      expect((await first.locator("span").first().evaluate((name) => getComputedStyle(name).fontFamily)).replaceAll('"', "")).toStartWith(`${face},`);
+      expect(await nameFace(first)).toStartWith(`${face},`);
       await app.page.getByRole("listbox").getByRole("option", { name: "Serif", exact: true }).click();
       expect(await family(".cm-lp-h1")).toStartWith("ui-serif");
       expect(await family(".cm-lp-quote.cm-lp-h")).toStartWith("ui-serif");
