@@ -11,7 +11,8 @@
 
   /*
    * Something on the web to search and pick from, at the cursor: pictures (WebImagePicker.svelte),
-   * papers (PaperPicker.svelte). It opens on what `search` finds for nothing typed (what a library
+   * papers (PaperPicker.svelte), things for the library (AddToLibrary.svelte, under its button). It
+   * opens on what `search` finds for nothing typed (what a library
    * features, or `hint`), and searches as you type. ↵ in the field takes the first result; ↓ goes
    * into them, the arrow keys move between them (`columns` to a row) and ↵ takes one. More load on
    * scrolling to the end.
@@ -20,8 +21,14 @@
   type Props = {
     /** What's searched, as it's known: "Unsplash", "arXiv". */
     name: string;
+    /** What the picker and its field are called, if not "Search <name>". */
+    title?: string;
     /** Said under the results, linking to what's searched. */
-    credit: { text: string; href: string; title?: string };
+    credit?: { text: string; href: string; title?: string };
+    /** Above the field: what to search in, say. */
+    header?: Snippet;
+    /** Under the results, beside the credit: another way to go on. */
+    footer?: Snippet;
     search: (query: string, page: number, signal: AbortSignal) => Promise<SearchPage<T>>;
     /** Shown while nothing's typed and nothing's found for it. */
     hint?: string;
@@ -41,7 +48,8 @@
     onchoose: (item: T) => void;
     onclose: () => void;
   };
-  let { name, credit, search, hint, columns, label, item, listClass, itemClass, widthClass, x, y, onchoose, onclose }: Props = $props();
+  let { name, title, credit, header, footer, search, hint, columns, label, item, listClass, itemClass, widthClass, x, y, onchoose, onclose }: Props = $props();
+  const named = $derived(title ?? t("editor.web.search", { name }));
 
   /** How long typing pauses before it searches. */
   const PAUSE = 300;
@@ -99,6 +107,17 @@
   }
 
   void load();
+
+  /** Searches again for what's typed, now: what's searched has changed (another kind of thing to find). */
+  export function searchAgain() {
+    void load();
+  }
+
+  /** Closes it, something other than a result chosen (a footer's button). */
+  export function close() {
+    open = false;
+  }
+
   // Nothing more to wait for once it's closed.
   $effect(() => () => {
     clearTimeout(timer);
@@ -184,21 +203,22 @@
       sideOffset={6}
       collisionPadding={8}
       role="dialog"
-      aria-label={t("editor.web.search", { name })}
+      aria-label={named}
       onOpenAutoFocus={(event) => {
         event.preventDefault();
         field?.focus();
       }}
       onCloseAutoFocus={(event) => event.preventDefault()}
-      class="{floating} flex {widthClass} flex-col p-2.5"
+      class="{floating} flex {widthClass} max-h-(--bits-floating-available-height) flex-col p-2.5"
     >
+      {@render header?.()}
       <TextField
         bind:input={field}
         bind:value={query}
         type="search"
         icon="search"
-        placeholder={t("editor.web.search", { name })}
-        aria-label={t("editor.web.search", { name })}
+        placeholder={named}
+        aria-label={named}
         autocomplete="off"
         spellcheck="false"
         {oninput}
@@ -232,11 +252,18 @@
           <div class="flex justify-center"><Button variant="secondary" onclick={() => load(loadingMore)}>{t("editor.web.retry")}</Button></div>
         {/if}
       </div>
-      <button
-        class="mt-2 ml-1 cursor-pointer self-start text-left text-2xs text-faint underline-offset-2 hover:text-muted hover:underline"
-        title={credit.title}
-        onclick={() => openExternal(credit.href)}>{credit.text}</button
-      >
+      {#if credit || footer}
+        <div class="mt-2 flex items-center gap-3">
+          {#if credit}
+            <button
+              class="ml-1 min-w-0 cursor-pointer text-left text-2xs text-faint underline-offset-2 hover:text-muted hover:underline"
+              title={credit.title}
+              onclick={() => openExternal(credit.href)}>{credit.text}</button
+            >
+          {/if}
+          {@render footer?.()}
+        </div>
+      {/if}
     </Popover.Content>
   </Popover.Portal>
 </Popover.Root>

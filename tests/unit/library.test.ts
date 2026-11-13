@@ -519,6 +519,94 @@ describe("Apple Podcasts", () => {
   });
 });
 
+describe("searching the catalogs (Add to Library)", () => {
+  const find = (plugin: () => Plugin, type: string, text: string) => sourceOf(plugin).search!(type, text, new AbortController().signal);
+
+  test("Open Library: books by title or author, each its work, with a small cover", async () => {
+    // Trimmed from openlibrary.org's answer (November 2026).
+    answers.set("https://openlibrary.org/search.json", { docs: [{ key: "/works/OL893414W", title: "Dune", author_name: ["Frank Herbert"], first_publish_year: 1965, cover_i: 11481354 }, { key: "/works/OL1W", title: "No Cover" }] });
+    expect(await find(openLibrary, "book", "dune")).toEqual([
+      { type: "book", title: "Dune", link: "https://openlibrary.org/works/OL893414W", properties: [["author", "Frank Herbert"], ["year", "1965"]], cover: "https://covers.openlibrary.org/b/id/11481354-M.jpg" },
+      { type: "book", title: "No Cover", link: "https://openlibrary.org/works/OL1W", properties: [], cover: undefined },
+    ]);
+    expect(new URL(asked[0]).searchParams.get("q")).toBe("dune");
+  });
+
+  test("Wikidata: films of that title, the one titled as typed and the best known first, with Wikipedia's posters", async () => {
+    // Trimmed from wikidata.org's and Wikipedia's answers (November 2026).
+    answers.set("https://www.wikidata.org/w/api.php?action=query", { query: { search: [{ title: "Q20972530" }, { title: "Q60834962" }] } });
+    answers.set("https://www.wikidata.org/w/api.php?action=wbgetentities", {
+      entities: {
+        Q20972530: { labels: { en: { value: "The Dune" } }, descriptions: { en: { value: "2013 French-Israeli drama film by Yossi Aviram" } }, sitelinks: { enwiki: { title: "The Dune (film)" } } },
+        Q60834962: { labels: { en: { value: "Dune" } }, descriptions: { en: { value: "2021 film directed by Denis Villeneuve" } }, sitelinks: { enwiki: { title: "Dune (2021 film)" }, frwiki: { title: "Dune (film, 2021)" } } },
+      },
+    });
+    answers.set("https://en.wikipedia.org/w/api.php", { query: { pages: { 1: { title: "Dune (2021 film)", thumbnail: { source: "https://upload.wikimedia.org/dune.jpg" } } } } });
+    const found = await find(wikidata, "movie", "dune");
+    expect(found.map((item) => [item.title, item.link, item.cover, item.description])).toEqual([
+      ["Dune", "https://en.wikipedia.org/wiki/Dune_(2021_film)", "https://upload.wikimedia.org/dune.jpg", "2021 film directed by Denis Villeneuve"],
+      ["The Dune", "https://en.wikipedia.org/wiki/The_Dune_(film)", undefined, "2013 French-Israeli drama film by Yossi Aviram"],
+    ]);
+    expect(new URL(asked[0]).searchParams.get("srsearch")).toStartWith("dune haswbstatement:P31=Q11424|");
+    // Chosen, its Wikipedia link is what's looked up for the rest.
+    expect(itemIn(new URL(found[0].link!))).toEqual({ wiki: "en", title: "Dune_(2021_film)" });
+  });
+
+  test("MusicBrainz: songs with the album they're on, and albums, the words searched for taken as words", async () => {
+    // Trimmed from musicbrainz.org's answers (November 2026).
+    answers.set("https://musicbrainz.org/ws/2/recording?", {
+      recordings: [
+        {
+          id: "8f3471b5-7e6a-48da-86a9-c1c07a0f47ae",
+          title: "Never Gonna Give You Up",
+          "artist-credit": [{ name: "Rick Astley", joinphrase: "" }],
+          releases: [{ id: "a1", title: "Whenever You Need Somebody", "release-group": { id: "082c6aff-a7cc-36e0-a960-35a578ecd937", title: "Whenever You Need Somebody", "primary-type": "Album" } }],
+        },
+      ],
+    });
+    answers.set("https://musicbrainz.org/ws/2/release-group?", { "release-groups": [{ id: "082c6aff-a7cc-36e0-a960-35a578ecd937", title: "Whenever You Need Somebody", "first-release-date": "1987-11-16", "artist-credit": [{ name: "Rick Astley", joinphrase: "" }] }] });
+    const [song] = await find(musicbrainz, "song", "never gonna (give)");
+    expect([song.title, song.properties, song.cover]).toEqual([
+      "Never Gonna Give You Up",
+      [
+        ["artist", "Rick Astley"],
+        ["album", "Whenever You Need Somebody"],
+      ],
+      "https://coverartarchive.org/release-group/082c6aff-a7cc-36e0-a960-35a578ecd937/front-250",
+    ]);
+    expect(new URL(asked[0]).searchParams.get("query")).toBe("never gonna \\(give\\)");
+    const [album] = await find(musicbrainz, "album", "whenever");
+    expect([album.type, album.link, album.properties]).toEqual([
+      "album",
+      "https://musicbrainz.org/release-group/082c6aff-a7cc-36e0-a960-35a578ecd937",
+      [
+        ["artist", "Rick Astley"],
+        ["year", "1987"],
+      ],
+    ]);
+  });
+
+  test("Apple Podcasts: podcasts with their feeds", async () => {
+    // Trimmed from the iTunes Search API's answer (November 2026).
+    answers.set("https://itunes.apple.com/search", {
+      results: [{ collectionName: "The Daily", artistName: "The New York Times", feedUrl: "https://feeds.simplecast.com/Sl5CSM3S", collectionViewUrl: "https://podcasts.apple.com/us/podcast/the-daily/id1200361736?uo=4", artworkUrl100: "https://is1-ssl.mzstatic.com/a/100x100bb.jpg" }],
+    });
+    expect(await find(applePodcasts, "podcast", "the daily")).toEqual([
+      {
+        type: "podcast",
+        title: "The Daily",
+        link: "https://podcasts.apple.com/us/podcast/the-daily/id1200361736",
+        properties: [
+          ["author", "The New York Times"],
+          ["feed", "https://feeds.simplecast.com/Sl5CSM3S"],
+        ],
+        cover: "https://is1-ssl.mzstatic.com/a/100x100bb.jpg",
+      },
+    ]);
+    expect(new URL(asked[0]).searchParams.get("term")).toBe("the daily");
+  });
+});
+
 describe("arXiv", () => {
   test("a paper, as the library keeps it", () => {
     const item = paperItem({ id: "1706.03762", title: "Attention Is All You Need", authors: ["Ashish Vaswani", "Noam Shazeer"], year: 2017, url: "https://arxiv.org/abs/1706.03762", abstract: "The dominant sequence transduction models…" });

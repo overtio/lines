@@ -99,11 +99,35 @@ async function lookup(url: URL, signal: AbortSignal): Promise<LibraryItem | null
   };
 }
 
+/** Podcasts `text` names, as Apple's directory finds them, each with its feed. */
+async function search(_type: string, text: string, signal: AbortSignal): Promise<LibraryItem[]> {
+  const params = new URLSearchParams({ term: text, media: "podcast", entity: "podcast", limit: "20" });
+  const answer = await getJson<{ results?: (Result & { artworkUrl100?: string })[] }>(`https://itunes.apple.com/search?${params}`, signal);
+  return (answer?.results ?? []).flatMap((podcast) =>
+    podcast.collectionName
+      ? [
+          {
+            type: "podcast",
+            title: podcast.collectionName,
+            link: clean(podcast.collectionViewUrl),
+            properties: known([
+              ["author", podcast.artistName],
+              ["feed", podcast.feedUrl],
+            ]),
+            cover: podcast.artworkUrl100,
+          },
+        ]
+      : [],
+  );
+}
+
 const source: LibrarySource = {
   id: "apple-podcasts",
   name: "Apple Podcasts",
   recognizes: (url) => podcastIn(url) !== null,
   lookup,
+  searches: ["podcast"],
+  search,
 };
 
 export const applePodcasts = (): Plugin => ({

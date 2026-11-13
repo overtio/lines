@@ -85,9 +85,11 @@ function openNoteAs(id: string, action: LinkAction) {
  * Copies a link's address, which glows a moment to say so: an animation rather than a class, as
  * CodeMirror draws again anything in the note whose attributes change.
  */
-function copyAddress(href: string, element: HTMLElement) {
+/** Copies a link's address, its text glowing a moment where it's drawn (`element`). */
+export function copyAddress(href: string, element?: HTMLElement | null) {
   void copyText(href);
   speak(t("editor.copied"));
+  if (!element) return;
   const glow = getComputedStyle(element).getPropertyValue("--selection");
   element.animate([{ backgroundColor: glow, borderRadius: "3px" }, { backgroundColor: "transparent", borderRadius: "3px" }], { duration: 800, easing: "ease-out" });
 }

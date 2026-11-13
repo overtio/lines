@@ -103,6 +103,49 @@ const seedLibrary = (page) =>
     await notes.insert({ id: crypto.randomUUID(), body: "---\ntype: person\n---\n# Ada Lovelace", createdAt: now, updatedAt: now - 3_600_000, pinned: false, trashed: false });
   });
 
+/**
+ * Add to Library, searching Books for "dune": Open Library's answer (trimmed) and its covers, drawn
+ * here as the library's are, answered in place of the network.
+ */
+async function searchLibrary(page) {
+  const books = [
+    ["OL893414W", "Dune", "Frank Herbert", 1965, "#c86c2b", "#391507"],
+    ["OL893461W", "Dune Messiah", "Frank Herbert", 1969, "#4f7fa8", "#16263a"],
+    ["OL893516W", "Children of Dune", "Frank Herbert", 1976, "#9a5aa0", "#2a1330"],
+    ["OL15331214W", "The Dune Encyclopedia", "Willis E. McNelly", 1984, "#7a9a5a", "#1f2a14"],
+  ];
+  const covers = await page.evaluate(async (books) => {
+    const drawn = [];
+    for (const [, title, , , top, bottom] of books) {
+      const canvas = new OffscreenCanvas(200, 300);
+      const draw = canvas.getContext("2d");
+      const gradient = draw.createLinearGradient(0, 0, 0, 300);
+      gradient.addColorStop(0, top);
+      gradient.addColorStop(1, bottom);
+      draw.fillStyle = gradient;
+      draw.fillRect(0, 0, 200, 300);
+      draw.fillStyle = "rgba(255, 255, 255, 0.92)";
+      draw.font = "600 22px sans-serif";
+      draw.textAlign = "center";
+      draw.fillText(title.toUpperCase(), 100, 252, 180);
+      const bytes = new Uint8Array(await (await canvas.convertToBlob({ type: "image/jpeg", quality: 0.9 })).arrayBuffer());
+      drawn.push(btoa(String.fromCharCode(...bytes)));
+    }
+    return drawn;
+  }, books);
+  const cors = { "access-control-allow-origin": "*" };
+  await page.route("https://openlibrary.org/search.json**", (route) =>
+    route.fulfill({ headers: cors, json: { docs: books.map(([key, title, author, year], i) => ({ key: `/works/${key}`, title, author_name: [author], first_publish_year: year, cover_i: i + 1 })) } }),
+  );
+  await page.route("https://covers.openlibrary.org/b/id/*", (route) => {
+    const i = Number(/\/id\/(\d+)-/.exec(route.request().url())[1]) - 1;
+    return route.fulfill({ headers: { ...cors, "content-type": "image/jpeg" }, body: Buffer.from(covers[i], "base64") });
+  });
+  await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: "Add to Library" }).click();
+  await page.keyboard.type("dune");
+  await page.getByRole("dialog", { name: "Add to Library" }).getByRole("option").nth(3).waitFor();
+}
+
 /** What takes each theme's own colors besides its accent: a highlight, callouts and line marks. */
 const THEME_COLORS = `# Colors
 
@@ -595,6 +638,21 @@ const SCENES = [
     },
     schemes: style === "lines" ? ["light", "dark"] : ["light"],
   })),
+  ...["lines", "classic", "pixel", "neon"].map((style) => ({
+    id: `library-add-${style}`,
+    title: `Add to Library, searching Books, in ${style[0].toUpperCase()}${style.slice(1)}`,
+    look: "Under the Library's +, the kinds to search for in a row (Books chosen, then Movies, Shows, Music, Podcasts; no Papers on the web), the field with “dune”, and four books, each its cover small and tall at its left, its title and its author · year under it, lined up; Blank at the bottom right, quiet. Nothing cut off or crowded.",
+    prefs: style === "lines" ? {} : { style, theme: style },
+    act: searchLibrary,
+    schemes: style === "lines" ? ["light", "dark"] : ["light"],
+  })),
+  {
+    id: "library-link-menu",
+    title: "A link's menu in a note",
+    look: "Right-clicked, the link outlined by nothing new; its menu: Open Link, Copy Link, then Add to Library with the library's icon, after a line.",
+    note: "# Plans\n\nWatch https://youtu.be/dQw4w9WgXcQ tonight, and read more.",
+    act: (page) => page.locator(".cm-content .cm-lp-link").click({ button: "right" }),
+  },
   {
     id: "library-music",
     title: "A shelf of square covers: Music",

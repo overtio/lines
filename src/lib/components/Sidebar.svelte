@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { mount, unmount } from "svelte";
   import Icon from "../icons/Icon.svelte";
   import type { IconName } from "../icons/icons";
   import { formatDate } from "../format";
@@ -18,10 +19,10 @@
   import type { Filter } from "../notes/types";
   import { isDivider, type PlaceGroup, sidebarLayout } from "../sidebarLayout.svelte";
   import { panes } from "../panes.svelte";
-  import { plugins } from "../plugins/registry.svelte";
   import { type MenuItem, ui } from "../ui.svelte";
   import { updates } from "../updates.svelte";
   import { openSettings } from "../windows/settings.svelte";
+  import AddToLibrary from "./AddToLibrary.svelte";
   import IconButton from "./ui/IconButton.svelte";
   import SidebarDivider from "./SidebarDivider.svelte";
   import SidebarRow from "./SidebarRow.svelte";
@@ -256,24 +257,20 @@
     openRowMenu(`shelf:${shelf.key}`, shelf.label, sizeItems("library", `shelf:${shelf.key}`), hideItems("shelf", shelf.key), x, y);
   }
 
-  /** The Library heading's button: a menu of the kinds of things to start a note of, on its shelf. */
-  function newInLibrary(button: HTMLElement) {
-    const { right, bottom } = button.getBoundingClientRect();
-    ui.openMenu({
-      x: right,
-      y: bottom + 4,
-      align: "end",
-      anchor: button,
-      label: t("library.new"),
-      items: plugins.libraryKinds.map((kind) => ({
-        label: kind.name,
-        icon: kind.icon,
-        run: () => {
-          const shelf = shelves.of(kind.type);
-          if (shelf) choose({ kind: "library", shelf: shelf.key });
-          notes.create(undefined, shelves.made(kind.type));
+  /** The Library heading's button: Add to Library, under it. Closed with nothing chosen, focus is back on the button. */
+  function openAddToLibrary(button: HTMLElement) {
+    const { left, bottom } = button.getBoundingClientRect();
+    const picker = mount(AddToLibrary, {
+      target: document.body,
+      props: {
+        x: left,
+        y: bottom + 4,
+        onclose() {
+          if (!document.activeElement || document.activeElement === document.body) button.focus();
+          // Once it has finished closing.
+          setTimeout(() => void unmount(picker));
         },
-      })),
+      },
     });
   }
 
@@ -482,7 +479,7 @@
               </button>
               {#if section.kind === "library"}
                 <!-- As tall as the heading: the button's room for a pointer reaches past it, not the heading. -->
-                <IconButton class="-my-1 text-faint" icon="plus" iconSize={15} label={t("library.new")} onclick={(event) => newInLibrary(event.currentTarget)} />
+                <IconButton class="-my-1 text-faint" icon="plus" iconSize={15} label={t("library.add.title")} onclick={(event) => openAddToLibrary(event.currentTarget)} />
               {/if}
             {/if}
           </h2>

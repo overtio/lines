@@ -81,7 +81,7 @@ const artistOf = (credits: Credit[] | undefined) => credits?.map((credit) => cre
 /** The album a recording's on: the first of its releases that's an album, else the first of any. */
 const albumOf = (recording: Recording) => recording.releases?.find((each) => each["release-group"]?.["primary-type"] === "Album") ?? recording.releases?.[0];
 
-const cover = (kind: "release" | "release-group", id: string) => `https://coverartarchive.org/${kind}/${id}/front-500`;
+const cover = (kind: "release" | "release-group", id: string, size = 500) => `https://coverartarchive.org/${kind}/${id}/front-${size}`;
 
 /** The recording, release or release group MusicBrainz keeps a link to elsewhere under (as the site writes it, without what's shared with it), if it does. */
 async function entityOf(url: URL, signal: AbortSignal): Promise<Entity | null> {
@@ -134,11 +134,48 @@ async function lookup(url: URL, signal: AbortSignal): Promise<LibraryItem | null
   };
 }
 
+/** Words as MusicBrainz's search reads them, its syntax's characters taken as they are. */
+const words = (text: string) => text.replace(/[+\-&|!(){}[\]^"~*?:\\/]/g, "\\$&");
+
+/** Songs or albums `text` names (a title, perhaps with who it's by), the album's cover small. */
+async function search(type: string, text: string, signal: AbortSignal): Promise<LibraryItem[]> {
+  if (type === "song") {
+    const found = await ask<{ recordings?: Recording[] }>(`recording?query=${encodeURIComponent(words(text))}&limit=15`, signal);
+    return (found?.recordings ?? []).map((recording) => {
+      const release = recording.releases?.find((each) => each["release-group"]?.["primary-type"] === "Album") ?? recording.releases?.[0];
+      const group = release?.["release-group"];
+      return {
+        type: "song",
+        title: recording.title,
+        link: `https://musicbrainz.org/recording/${recording.id}`,
+        properties: known([
+          ["artist", artistOf(recording["artist-credit"])],
+          ["album", release?.title],
+        ]),
+        cover: group && cover("release-group", group.id, 250),
+      };
+    });
+  }
+  const found = await ask<{ "release-groups"?: ReleaseGroup[] }>(`release-group?query=${encodeURIComponent(`${words(text)} AND primarytype:album`)}&limit=15`, signal);
+  return (found?.["release-groups"] ?? []).map((group) => ({
+    type: "album",
+    title: group.title,
+    link: `https://musicbrainz.org/release-group/${group.id}`,
+    properties: known([
+      ["artist", artistOf(group["artist-credit"])],
+      ["year", yearOf(group["first-release-date"])],
+    ]),
+    cover: cover("release-group", group.id, 250),
+  }));
+}
+
 const source: LibrarySource = {
   id: "musicbrainz",
   name: "MusicBrainz",
   recognizes: (url) => musicIn(url) !== null,
   lookup,
+  searches: ["album", "song"],
+  search,
 };
 
 export const musicbrainz = (): Plugin => ({

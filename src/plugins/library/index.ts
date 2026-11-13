@@ -1,4 +1,5 @@
 import { t } from "../../lib/i18n/index.svelte";
+import { linkMenu } from "../../lib/library/linkMenu";
 import { linkLookups } from "../../lib/library/linkNotes";
 import type { LibraryKind, Plugin } from "../../lib/plugins/types";
 
@@ -133,6 +134,6 @@ export const library = (): Plugin => ({
   enabledByDefault: true,
   contributes: {
     libraryKinds: KINDS,
-    markdown: [{ editor: linkLookups }],
+    markdown: [{ editor: [linkLookups, linkMenu] }],
   },
 });

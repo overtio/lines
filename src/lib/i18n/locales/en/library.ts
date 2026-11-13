@@ -33,13 +33,24 @@ export default {
   // Said to screen readers as one is chosen from an item's menu, and when ⌘Z puts back the one before.
   "library.status": "Status: {status}",
   "library.didUndoStatus": "Status put back",
-  // The Library's heading in the sidebar: its button, and the menu it opens of kinds of things to start a note of.
-  "library.new": "New in Library",
+  // Add to Library: the Library's + in the sidebar, and a link's menu in a note.
+  "library.add.title": "Add to Library",
+  // What to search for (Books, Movies…), for screen readers.
+  "library.add.kind": "What to search for",
+  // Shown while nothing's typed. {names} is the catalogs searched: "Open Library", "MusicBrainz".
+  "library.add.hint": "Type a title to search {names}, or paste a link.",
+  "library.add.hintLink": "Paste a link to look it up.",
+  // A new one, of the kind chosen, to fill in by hand.
+  "library.add.blank": "Blank",
+  // A web link's menu, in a note.
+  "library.link.open": "Open Link",
+  "library.link.copy": "Copy Link",
   // In the Library, while nothing is in it: the + is its heading's button.
   "library.empty": "Press + to add something, or paste a link into a new note",
-  // In a note that's just a link, while what it is is looked up, and when it couldn't be.
+  // In a note, after a link, while what it is is looked up, when it couldn't be, and when nothing was found (asked from its menu).
   "library.lookingUp": "Looking up…",
   "library.failed": "Couldn’t look this link up",
+  "library.nothing": "Nothing found for this link",
   // Said to screen readers once a note that was a link is filled in.
   "library.filled": "Added {title} to the Library",
   "library.settings.links": "Links",

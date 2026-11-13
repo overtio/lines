@@ -154,6 +154,13 @@ export interface LibrarySource {
   recognizes(url: URL): boolean;
   /** What the link is, or null if it isn't something the library keeps. Rejects when it can't be asked (offline). */
   lookup(url: URL, signal: AbortSignal): Promise<LibraryItem | null>;
+  /** The kinds it can search for, by type, in Add to Library. */
+  searches?: string[];
+  /**
+   * What `text` (a title, a name) finds of things of `type`, the best first: as much as a search
+   * says of each (a small `cover`, its `link`), the rest looked up by its link once one is chosen.
+   */
+  search?(type: string, text: string, signal: AbortSignal): Promise<LibraryItem[]>;
 }
 
 /** A font to write notes in, which the plugin brings with it (`@font-face`) so it's there on every computer. */

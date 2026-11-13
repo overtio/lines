@@ -77,7 +77,7 @@ Put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block), or, with Sp
 ### Organizing
 
 - **Tags, not folders.** Write `#tag` or `#nested/tag` anywhere in a note, or drag a note onto a tag (or a type, the Inbox, the Trash) in the sidebar. Give tags and types icons and colors, synced to your other devices, and rename them everywhere at once.
-- **Library.** Paste a link to a book, a movie, a show, a video, a song, a podcast, an article or a paper into a new note, and it fills itself in: its title, cover, who made it, when and what it's about, from the site and open catalogs (Open Library, Wikidata, MusicBrainz, Apple Podcasts, YouTube, arXiv), with only the link sent. One undo puts the link back. The sidebar's Library lists them by kind, each with its cover and where you've got to (to read, reading, read), set from its menu. See [docs/library.md](docs/library.md).
+- **Library.** Paste a link to a book, a movie, a show, a video, a song, a podcast, an article or a paper into a new note, and it fills itself in: its title, cover, who made it, when and what it's about, from the site and open catalogs (Open Library, Wikidata, MusicBrainz, Apple Podcasts, YouTube, arXiv), with only the link sent. One undo puts the link back. Or search the catalogs from the Library's +, or turn a link in any note into a mention of its own library note from the link's menu. The sidebar's Library lists them by kind, each with its cover and where you've got to (to read, reading, read), set from its menu. See [docs/library.md](docs/library.md).
 - **Objects and mentions.** Give a note properties and a type (`type: person`) and it's listed under Types. Type `@` or `[[` to mention another note, `@Ada.email` to show one of its properties, and `@type.recipe` for a table of every recipe.
 - **Inbox.** New notes and imports land in the Inbox, first in the sidebar, until you file them (or send new notes straight to Notes, in Settings).
 - **Calendar.** Notes on their days: a `date` or `due` in a note's properties, or every day from its `start` to its `end`. Its row counts what's on today. Events repeat (`repeat: every weekday`, `monthly on the last friday until 2027-06-01`, or from an event's menu). Events in their colors: a note's own, or its type's or tag's. A month above the list, and beside it the week or the day by the hour, with notes at their times (`date: 2026-11-30 14:00`). Drag down the hours to make an event, or across All day for one of whole days, drag one to another time or day, or its edge to change how long it is (<kbd>⌘Z</kbd> moves it back). Choose a day for its notes, or press <kbd>↵</kbd> on a day for a note dated that day.
@@ -327,6 +327,8 @@ src/
       note.ts                That text with its cover downloaded and kept as an attachment
       lookup.ts              Asking the sources in turn what a link is
       linkNotes.ts           A note that's just a link, looked up as it becomes one and filled in as one change
+      adding.ts              Add to Library (components/AddToLibrary.svelte): what a search found, as a note filled in from its page
+      linkMenu.ts            A link's menu in a note: Add to Library makes its note and mentions it in its place
       page.ts  web.ts        What a page says about itself, read as text; asking the web as lines
       shelves.svelte.ts      The Library's rows in the sidebar; rows.ts, what a note's row on its shelf shows
     themes/                  Themes worked out from their palettes (palette.ts) as CSS (css.ts, which the website uses too), and this window's theme (show.svelte.ts) and style (styles.svelte.ts); presets (presets.svelte.ts); your own themes and palettes, their files, importing them, and colors' names
@@ -480,7 +482,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] Moving cells and resizing blocks with a finger
 
 **Library**
-- [ ] Add to the Library by searching the catalogs (Open Library, Wikidata, MusicBrainz, Apple Podcasts, arXiv), without a link
+- [x] Add to the Library by searching the catalogs (Open Library, Wikidata, MusicBrainz, Apple Podcasts, arXiv), without a link; and a link in a note, as a mention of its own note
 - [ ] Subscribe to podcasts and RSS and Atom feeds, read their posts and play episodes in lines
 - [ ] Sync what's been read and played between devices
 - [ ] Shelves as a grid of covers
