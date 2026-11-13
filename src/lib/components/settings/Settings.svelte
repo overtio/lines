@@ -16,6 +16,7 @@
   import FloatingSection from "./FloatingSection.svelte";
   import GeneralSection from "./GeneralSection.svelte";
   import LayoutSection from "./LayoutSection.svelte";
+  import LibrarySection from "./LibrarySection.svelte";
   import PresetsSection from "./PresetsSection.svelte";
   import PluginPage from "./PluginPage.svelte";
   import PluginsSection from "./PluginsSection.svelte";
@@ -52,6 +53,7 @@
     text: TextSection,
     cursor: CursorSection,
     touches: TouchesSection,
+    library: LibrarySection,
     editor: EditorSection,
     floating: FloatingSection,
     plugins: PluginsSection,

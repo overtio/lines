@@ -10,6 +10,8 @@
   import { isClosed, notes, type Entry } from "../notes/store.svelte";
   import { longPress } from "../longPress";
   import { coarsePointer, copyText, isApple, isMacApp, reducedMotion } from "../platform";
+  import { shelfRow } from "../library/rows";
+  import { setProperties } from "../notes/properties";
   import { dragNoteOut, handNoteOut } from "../notes/dragOut";
   import { deletePicked, inboxPicked, pinPicked, restorePicked, tagPicked, trashPicked } from "../notes/picked";
   import { menuPoint } from "../popover";
@@ -21,6 +23,7 @@
   import { panes } from "../panes.svelte";
   import { canFloat, floatingOpen, toggleFloating } from "../windows/floating";
   import { followPointer } from "./followPointer";
+  import LibraryCover from "./LibraryCover.svelte";
 
   let {
     entry,
@@ -85,6 +88,8 @@
   /** The icon of its type (`type: person`), which a note of that type has unless it has its own. */
   const typeIcon = $derived(entry.meta.type ? typeLooks.icon(entry.meta.type) : undefined);
   const icon = $derived(iconOf(entry));
+  /** On a shelf of the Library, the row shows the item: its cover, what it's by, and where it's got to. */
+  const shelf = $derived(notes.filter.kind === "library" ? shelfRow(entry) : null);
 
   // Swipe right for the leading action and left for the trailing one, like Mail.
   const leading = $derived<Action>(
@@ -486,6 +491,14 @@
     });
   }
 
+  /** Where a library item has got to (`status: reading`): kept as its kind writes it, and taken back with ⌘Z. */
+  function setStatus(status: { value: string; label: string }) {
+    const body = notes.get(id)?.note.body;
+    if (body === undefined) return;
+    notes.edit(id, setProperties(body, { status: status.value }), t("library.didUndoStatus"), { keepDate: true });
+    speak(t("library.status", { status: status.label }));
+  }
+
   /** Puts it in the Inbox, or takes it out (filed). */
   function fileOne(inbox: boolean) {
     notes.setInbox([id], inbox);
@@ -524,6 +537,10 @@
             ? [{ label: floatingOpen.has(id) ? t("list.unfloat") : t("list.float"), icon: "picture-in-picture-2" as const, run: () => toggleFloating(id) }]
             : []),
         ],
+        // On its shelf, where it's got to.
+        shelf && !entry.note.trashed && !isClosed(entry.note)
+          ? (shelf.kind.statuses ?? []).map((status) => ({ label: status.label, checked: status.value === shelf.status?.value, run: () => setStatus(status) }))
+          : [],
         [
           { label: leading.menuLabel, icon: leading.icon, run: () => perform(leading) },
           {
@@ -561,6 +578,35 @@
     });
   }
 </script>
+
+{#snippet title(withIcon: boolean)}
+  <span
+    class={["flex min-w-0 items-center gap-1.5 text-md leading-[1.35] font-semibold whitespace-nowrap", !entry.meta.title && "text-faint"]}
+    style:--look={withIcon && icon ? paletteVar(iconColor(entry) ?? "accent") : undefined}
+  >
+    {#if withIcon && icon}<Icon name={icon} size={15} strokeWidth={2} class="flex-none text-(--look)" />{/if}
+    <span class="truncate">{entry.meta.title || t("list.untitled")}</span>
+    {#if picked && notes.picked.size}<span class="sr-only">, {t("list.picked")}</span>{/if}
+  </span>
+{/snippet}
+
+<!-- Said after the title, by name: the icons alone would say nothing. With increased contrast,
+     the date on the open note's row keeps 4.5:1 over its darker background. -->
+{#snippet details()}
+  <span class={["mt-0.5 flex items-center gap-[5px] text-[11.5px] text-faint", lit && "in-data-[contrast=more]:text-muted"]}>
+    {#if entry.note.pinned}<Icon name="pin" size={12} class="text-accent" /><span class="sr-only">{t("list.pinned")}</span>{/if}
+    {#if entry.note.locked}
+      {@const lockLabel = entry.note.locked.open ? t("list.lockedNoteOpen") : t("list.lockedNote")}
+      <span class="flex" title={lockLabel}>
+        <Icon name={entry.note.locked.open ? "lock-open" : "lock"} size={12} /><span class="sr-only">{lockLabel}</span>
+      </span>
+    {/if}
+    {#if shelf?.status}
+      <span class="rounded-[calc(9px*var(--radius-scale))] px-1.5 leading-[17px] inset-ring-1 inset-ring-line">{shelf.status.label}</span>
+    {/if}
+    <time datetime={new Date(entry.note.updatedAt).toISOString()}>{formatDate(entry.note.updatedAt, now)}</time>
+  </span>
+{/snippet}
 
 <!-- `menu-target`, `selected` and `swiped` hide the dividers beside it (NoteList.svelte). Screen
      readers hear where it is in the whole list, not only among the rows drawn. -->
@@ -606,7 +652,7 @@
       data-id={id}
       tabindex={tabbable ? 0 : -1}
       aria-current={selected}
-      aria-describedby={entry.meta.excerpt ? `excerpt-${id}` : undefined}
+      aria-describedby={entry.meta.excerpt && !shelf ? `excerpt-${id}` : undefined}
       style:transform={offset ? `translateX(${offset}px)` : undefined}
       {onclick}
       {onkeydown}
@@ -623,29 +669,23 @@
       }}
       {@attach longPress(onlongpress)}
     >
-      <span
-        class={["flex min-w-0 items-center gap-1.5 text-md leading-[1.35] font-semibold whitespace-nowrap", !entry.meta.title && "text-faint"]}
-        style:--look={icon && paletteVar(iconColor(entry) ?? "accent")}
-      >
-        {#if icon}<Icon name={icon} size={15} strokeWidth={2} class="flex-none text-(--look)" />{/if}
-        <span class="truncate">{entry.meta.title || t("list.untitled")}</span>
-        {#if picked && notes.picked.size}<span class="sr-only">, {t("list.picked")}</span>{/if}
-      </span>
-      {#if entry.meta.excerpt}
-        <span class="line-clamp-2 text-sm leading-[1.45] text-muted" id="excerpt-{id}" aria-hidden="true">{entry.meta.excerpt}</span>
-      {/if}
-      <!-- Said after the title, by name: the icons alone would say nothing. With increased contrast,
-           the date on the open note's row keeps 4.5:1 over its darker background. -->
-      <span class={["mt-0.5 flex items-center gap-[5px] text-[11.5px] text-faint", lit && "in-data-[contrast=more]:text-muted"]}>
-        {#if entry.note.pinned}<Icon name="pin" size={12} class="text-accent" /><span class="sr-only">{t("list.pinned")}</span>{/if}
-        {#if entry.note.locked}
-          {@const lockLabel = entry.note.locked.open ? t("list.lockedNoteOpen") : t("list.lockedNote")}
-          <span class="flex" title={lockLabel}>
-            <Icon name={entry.note.locked.open ? "lock-open" : "lock"} size={12} /><span class="sr-only">{lockLabel}</span>
+      {#if shelf}
+        <!-- An item on its shelf: its cover beside what it is, who it's by and where it's got to. -->
+        <span class="flex min-w-0 items-center gap-3">
+          <LibraryCover name={shelf.cover} kind={shelf.kind} />
+          <span class="flex min-w-0 flex-1 flex-col gap-[3px]">
+            {@render title(false)}
+            {#if shelf.subtitle}<span class="truncate text-sm leading-[1.45] text-muted">{shelf.subtitle}</span>{/if}
+            {@render details()}
           </span>
+        </span>
+      {:else}
+        {@render title(true)}
+        {#if entry.meta.excerpt}
+          <span class="line-clamp-2 text-sm leading-[1.45] text-muted" id="excerpt-{id}" aria-hidden="true">{entry.meta.excerpt}</span>
         {/if}
-        <time datetime={new Date(entry.note.updatedAt).toISOString()}>{formatDate(entry.note.updatedAt, now)}</time>
-      </span>
+        {@render details()}
+      {/if}
     </button>
   </div>
 </li>

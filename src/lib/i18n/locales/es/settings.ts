@@ -619,6 +619,7 @@ export default {
   "settings.resetNotes": "Restablecer las notas predeterminadas…",
   "settings.resetDone": "Se ha empezado de nuevo con {count, plural, one {# nota} other {# notas}}.",
   "settings.section.touches": "Pequeños detalles",
+  "settings.section.library": "Biblioteca",
   "settings.touchesValues": "Valores",
   "settings.copyValues": "Botones para copiar valores",
   "settings.copyValuesNote": "Al pasar sobre el valor de una línea como «Matrícula: 3WBZ56», o de una propiedad, aparece un botón que lo copia.",

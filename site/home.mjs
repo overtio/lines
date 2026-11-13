@@ -45,6 +45,7 @@ const KINDS = [
 ];
 
 const MORE = [
+  ["library", "Books, movies and music"],
   ["sigma", "Math"],
   ["pen-tool", "Drawings"],
   ["send", "API requests"],

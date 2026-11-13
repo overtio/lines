@@ -1,9 +1,12 @@
 import { syntaxTree } from "@codemirror/language";
 import { searchPanelOpen } from "@codemirror/search";
-import { type EditorSelection, type EditorState, type Line, type SelectionRange, Prec, type Range, StateEffect, type StateEffectType, StateField, type Text, type Transaction } from "@codemirror/state";
+import { type EditorSelection, type EditorState, Facet, type Line, type SelectionRange, Prec, type Range, StateEffect, type StateEffectType, StateField, type Text, type Transaction } from "@codemirror/state";
 import { type Command, Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, type WidgetType } from "@codemirror/view";
 import type { SyntaxNode, SyntaxNodeRef, Tree } from "@lezer/common";
 import { markupMode } from "./markupMode";
+
+/** The note an editor has open, by its id (Editor.svelte), for what acts on the note as well as its text; null in a preview. */
+export const editedNote = Facet.define<string, string | null>({ combine: (ids) => ids[0] ?? null });
 
 /** The syntax node at `pos` and each node it's inside, innermost first. */
 export function* ancestors(state: EditorState, pos: number, side: -1 | 0 | 1 = 0): Generator<SyntaxNode> {

@@ -114,7 +114,22 @@ export default {
   "plugins.asciinema.description": "Lit les enregistrements de terminal dans les notes : le code d’intégration d’asciinema.org et les fichiers .cast que vous ajoutez. Ceux d’asciinema.org se chargent depuis le site.",
   "plugins.noKey": "Nécessite une clé d’API {name}, avec laquelle cette copie de lines n’a pas été compilée.",
   "plugins.github.description": "Affiche les liens vers GitHub en abrégé, comme GitHub les écrit, avec son logo : overtio/lines#12.",
-  "plugins.arxiv.description": "Affiche les liens vers les articles d’arXiv comme arXiv les cite : arXiv:1706.03762. Dans les apps, ajoute /article, pour chercher sur arXiv et mettre un lien vers un article. Ce que vous cherchez est envoyé à arXiv.",
+  "plugins.arxiv.description":
+    "Affiche les liens vers les articles d’arXiv comme arXiv les cite : arXiv:1706.03762. Dans les apps, ajoute /article, pour chercher sur arXiv et mettre un lien vers un article, et complète une note qui n’est qu’un lien vers l’un d’eux comme article scientifique de la bibliothèque. Ce que vous cherchez est envoyé à arXiv.",
+  "plugins.library.name": "Bibliothèque",
+  "plugins.library.description":
+    "Livres, films, séries, vidéos, musique, podcasts, articles et articles scientifiques, chacun une note, dans la Bibliothèque de la barre latérale avec sa couverture et où vous en êtes. Une nouvelle note qui n’est qu’un lien est complétée avec ce qu’il désigne.",
+  "plugins.webPages.name": "Pages web",
+  "plugins.webPages.description":
+    "Recherche un lien vers n’importe quelle page d’après ce qu’elle dit être (un livre, un film, un article…), comme la plupart des sites le disent aux moteurs de recherche : IMDb, Letterboxd, Goodreads, Spotify, Bandcamp, Substack, blogs et actualités. Le lien est envoyé à son site.",
+  "plugins.webPages.apps": "Nécessite l’app lines : les sites ne se laissent pas lire par les pages web.",
+  "plugins.youtube.description": "Recherche les liens vers les vidéos YouTube : leur titre, leur chaîne et leur image, et dans les apps leur date de publication et leur durée. Le lien est envoyé à YouTube.",
+  "plugins.openLibrary.description": "Recherche les livres par un lien vers Open Library ou un ISBN dans un lien (celui d’une librairie, ou d’Amazon) : auteur, année, pages et couverture. L’ISBN ou l’identifiant du livre est envoyé à Open Library.",
+  "plugins.wikidata.description":
+    "Recherche les films, séries et livres par un lien vers IMDb, The Movie Database, Letterboxd, Wikipédia ou Wikidata : réalisation, année, durée, genre et sujet, d’après Wikipédia. L’identifiant du lien est envoyé à Wikidata et Wikipédia.",
+  "plugins.musicbrainz.description":
+    "Recherche les morceaux et albums par un lien vers MusicBrainz, ou vers Spotify, Apple Music, Bandcamp, Deezer ou Tidal qu’il connaît : artiste, album, année et pochette. Le lien est envoyé à MusicBrainz.",
+  "plugins.applePodcasts.description": "Recherche les podcasts et leurs épisodes par un lien vers Apple Podcasts, avec le flux du podcast. Les identifiants du lien sont envoyés à Apple.",
   "plugins.code": "Code",
   "plugins.code.description": "Des notes qui sont des fichiers de code, dans l’un des quelque 120 langages de programmation : numéros de ligne, police à chasse fixe et coloration aux couleurs du thème, avec indentation et crochets comme dans un éditeur de code. Elles se téléchargent et s’exportent comme des fichiers de leur langage (.py, .ts, .rs…).",
   "plugins.typing": "Dactylographie",

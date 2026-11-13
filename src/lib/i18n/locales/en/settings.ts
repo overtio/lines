@@ -687,6 +687,7 @@ export default {
   "settings.resetDone": "Started again with {count, plural, one {# note} other {# notes}}.",
   // Little Touches (Settings): small things, each easy to turn off.
   "settings.section.touches": "Little Touches",
+  "settings.section.library": "Library",
   "settings.touchesValues": "Values",
   "settings.copyValues": "Copy buttons on values",
   "settings.copyValuesNote": "Hovering the value of a line like “Plate: 3WBZ56”, or of a property, shows a button that copies it.",

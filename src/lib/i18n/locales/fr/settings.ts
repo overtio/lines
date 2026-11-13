@@ -619,6 +619,7 @@ export default {
   "settings.resetNotes": "Réinitialiser les notes par défaut…",
   "settings.resetDone": "Réinitialisation terminée : {count, plural, one {# note} other {# notes}}.",
   "settings.section.touches": "Petites touches",
+  "settings.section.library": "Bibliothèque",
   "settings.touchesValues": "Valeurs",
   "settings.copyValues": "Boutons pour copier les valeurs",
   "settings.copyValuesNote": "Survoler la valeur d’une ligne comme « Plaque : 3WBZ56 », ou d’une propriété, montre un bouton qui la copie.",

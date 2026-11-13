@@ -71,5 +71,7 @@ export type Filter =
   | { kind: "trash" }
   | { kind: "tag"; tag: string }
   | { kind: "type"; type: string }
+  /** A shelf of the Library (library/shelves.svelte.ts), by its key: the notes of its kinds. */
+  | { kind: "library"; shelf: string }
   /** The Calendar, on one day (`YYYY-MM-DD`, see calendar.ts): the notes on it. */
   | { kind: "calendar"; day: string };

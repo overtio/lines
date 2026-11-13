@@ -98,6 +98,11 @@ A spreadsheet's grid (`src/plugins/spreadsheet/Grid.svelte`, [spreadsheets.md](s
 
 - The Inbox is a row in the sidebar like the others, read with its count. Mark as Filed and Move to Inbox are in a note's menu (⇧F10 or the menu key in the list) and the menu and toolbar for picked notes, and what they did is said ("Filed", "Moved 3 notes to Inbox"). An empty Inbox says "Nothing to sort."
 
+## The Library
+
+- A note that's just a link says "Looking up…" through the live region as it's looked up, "Added Dune: Part Two to the Library" once it's filled in, and "Couldn't look this link up" when it can't be; the words shown after the link in the note are the same, and hidden from screen readers so they're heard once. Nothing moves focus: the cursor stays in the note, at the end of its new title. ⌘Z puts the link back as any edit, and "Link put back" is said when it's put back from outside the note.
+- The Library's shelves are sidebar rows like the others, read with their counts, reordered with ⌥↑ and ⌥↓; the + on its heading is a button named "New in Library", whose menu lists the kinds by name. On a shelf, a row reads its title, what it's by and its status before its date; its cover is decoration, hidden from screen readers. Its menu (⇧F10 or the menu key) has the statuses as checked choices, and choosing one says it ("Status: Reading").
+
 ## Pane edges
 
 - Several notes are picked from the keyboard too: ⇧↑ and ⇧↓ pick the way, ⌘A (Ctrl+A) picks every note, Esc lets them go, ⌫ moves them to the Trash. A picked row says "Selected" after its title, the count is announced as it changes ("3 notes selected"), and so is what's done to them ("Added #work to 3 notes"). The bar above the list is a toolbar of named icon buttons; the Add Tag box is a dialog whose field is a combobox, with its suggestions as a listbox (↑ ↓ to choose, Enter to add).

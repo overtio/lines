@@ -1,4 +1,5 @@
 import { EditorView } from "@codemirror/view";
+import { saveAttachment } from "../lib/notes/attachments";
 import { notes } from "../lib/notes/store.svelte";
 import { panes } from "../lib/panes.svelte";
 import { plugins } from "../lib/plugins/registry.svelte";
@@ -37,6 +38,7 @@ const testing = {
   themeDrafts,
   presets,
   writePresetFile,
+  saveAttachment,
   editor,
   until,
   /** The open note's text. */

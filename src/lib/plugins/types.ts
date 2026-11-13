@@ -88,6 +88,70 @@ export interface Contributions {
   mascots?: Mascot[];
   /** Pictures on the web to make a theme from, and the backdrop (Settings → Theme → New → From …). */
   pictureLibraries?: PictureLibrary[];
+  /** Kinds of things kept in the library (books, movies, songs…), each a note's `type`, and its row in the sidebar's Library. */
+  libraryKinds?: LibraryKind[];
+  /** Where lines finds out what a link is, to fill a library note with it: a site's catalog, or any page's own description of itself. */
+  librarySources?: LibrarySource[];
+}
+
+/**
+ * What a source found out about something, before it's a note: lib/library/note.ts writes the note,
+ * the same way for every way of adding one.
+ */
+export interface LibraryItem {
+  /** Its kind's `type`: "book", "movie"… */
+  type: string;
+  title: string;
+  /** The page it's from, as the page names itself where it says. */
+  link?: string;
+  /** Its properties, in the order they're written, before `link` and `status`: `["author", "Frank Herbert"]`. */
+  properties: [key: string, value: string][];
+  /** A picture of it (a poster, a cover, artwork), downloaded and kept with the note. */
+  cover?: string;
+  /** What it's about, in a few plain sentences. */
+  description?: string;
+}
+
+/**
+ * A kind of thing in the library: a note's `type`, and the row its notes are listed under in the
+ * sidebar's Library. `type`, the property keys and `status` values are stable English words, the
+ * same on every device; the names are in the app's language.
+ */
+export interface LibraryKind {
+  /** The note's `type`: "book". */
+  type: string;
+  /** One of them: "Book". */
+  name: string;
+  /** Its row in the Library, in the sidebar: "Books". */
+  label: string;
+  icon: IconName;
+  /** Another kind's type, whose row it's listed in: an album's is "song", so both are Music. */
+  shelf?: string;
+  /** Its properties' keys, in the order its notes have them, before `link` and `status`. */
+  properties: string[];
+  /** What its rows show under their titles, by key, those it has joined with " · ": author and year. */
+  subtitle: string[];
+  /** The shape its covers come in, which its rows show them in: a book's tall, an album's square (the first), a video's wide. */
+  cover?: "square" | "tall" | "wide";
+  /** Where it's got to, in order (the first is where it starts): what's written, and what's shown. None for kinds without (a podcast). */
+  statuses?: { value: string; label: string }[];
+}
+
+/**
+ * Where lines finds out what a link is. Sources are asked in turn, those for a site first and then
+ * the `general` ones, and the first to recognize the link and find what it is fills the note.
+ * Only what's needed is sent: the link, or an id read from it.
+ */
+export interface LibrarySource {
+  id: string;
+  /** As people know it: "Open Library". */
+  name: string;
+  /** Reads any page rather than a site's, so it's asked after the rest. */
+  general?: boolean;
+  /** Whether it's a link it knows; quick, and without asking anyone. */
+  recognizes(url: URL): boolean;
+  /** What the link is, or null if it isn't something the library keeps. Rejects when it can't be asked (offline). */
+  lookup(url: URL, signal: AbortSignal): Promise<LibraryItem | null>;
 }
 
 /** A font to write notes in, which the plugin brings with it (`@font-face`) so it's there on every computer. */
@@ -286,6 +350,8 @@ export interface Paper {
   venue?: string;
   /** Where the note links to: its page, with its abstract. */
   url: string;
+  /** What it's about, if the source says. */
+  abstract?: string;
 }
 
 /**

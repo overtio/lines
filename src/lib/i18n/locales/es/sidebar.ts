@@ -10,6 +10,7 @@ export default {
   "sidebar.todo": "Pendientes",
   "sidebar.untagged": "Sin etiquetas",
   "sidebar.trash": "Papelera",
+  "sidebar.library": "Biblioteca",
   "sidebar.types": "Tipos",
   "sidebar.tags": "Etiquetas",
   "sidebar.typeName": "Nombre del tipo",

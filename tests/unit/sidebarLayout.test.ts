@@ -15,6 +15,14 @@ test("rows keep the order they're dragged into; new ones come after", () => {
   expect(names("places", ["inbox", "all", "calendar", "todo"])).toEqual(["todo", "all", "calendar", "inbox"]);
 });
 
+test("a section new since sections were put in order goes where it comes, before the next one placed", () => {
+  sidebarLayout.move("sections", ["g-places", "types", "tags"], "tags", "g-places");
+  const sections = (inPlace: boolean) => sidebarLayout.sorted("sections", ["g-places", "library", "types", "tags"], (key) => key, inPlace);
+  expect(sections(true)).toEqual(["tags", "g-places", "library", "types"]);
+  expect(sections(false)).toEqual(["tags", "g-places", "types", "library"]);
+  expect(sidebarLayout.sorted("sections", ["g-places", "types", "tags", "feeds", "later"], (key) => key, true)).toEqual(["tags", "g-places", "types", "feeds", "later"]);
+});
+
 test("a renamed tag keeps its place, its nested tags theirs, and stays hidden", () => {
   sidebarLayout.move("tags:", ["home", "work"], "work", "home");
   sidebarLayout.move("tags:work", ["work/a", "work/b"], "work/b", "work/a");

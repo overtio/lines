@@ -419,6 +419,21 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] ⌘⇧F focuses search (leaving focus mode, or going back to the list on a phone); every word must match; Esc clears it and puts focus on the open note's row (the first, with none open)
 - [ ] Locked notes are found only by their title
 
+## 11a. Library
+
+- [ ] New note, then paste a YouTube link (`https://youtu.be/dQw4w9WgXcQ`) as its only text: at once "Looking up…" after the link, small and faint, a screen reader hearing it; then the note is a video: `type`, `channel`, `link`, `status: to watch`, its title as a heading, its picture (an attachment) and, [Desktop] when it came out, how long it is and what it's about; the note leaves the Inbox and is under Library → Videos; the cursor at the end of its title, the list not jumping; a screen reader hears "Added … to the Library"
+- [ ] ⌘Z right after puts the link back, as one step; it isn't looked up again (another ⌘Z goes on to what the note was before)
+- [ ] Type a link by hand: nothing happens while typing; a second after the last key it's looked up. Type more while "Looking up…" shows: the note stays as typed, nothing written over it
+- [ ] Paste the link and switch to another note at once: the first is filled in all the same (as stored), and ⌘Z before typing puts it back, a screen reader hearing "Link put back"
+- [ ] Links of each kind, in a new note each: Open Library (`https://openlibrary.org/works/OL450063W`, an Amazon book `…/dp/0441172717`), IMDb (`https://www.imdb.com/title/tt15239678/`), Wikipedia (`https://en.wikipedia.org/wiki/Arrival_(film)`), MusicBrainz (a recording), an Apple Podcasts podcast and episode, [Desktop] arXiv (`https://arxiv.org/abs/1706.03762`), Letterboxd, Goodreads, Spotify, Bandcamp and a Substack post: each the right kind, its properties in its kind's order, a cover where the source has one (none rather than a broken picture where it can't be downloaded), a short description cut at a sentence, no `#tags` or `@mentions` from it
+- [ ] A page that doesn't say what it is (a plain homepage) stays a link, with nothing said; offline, "Couldn't look this link up" for a moment, then nothing
+- [ ] Not looked up: a note that's a link as it opens, syncs or is imported; a note with anything besides the link; a LaTeX or code note that's a link; a locked note; with Settings → Library → Look up links off (nothing is contacted: the network tab stays empty); a source turned off in Settings → Plugins (the next that knows the link is asked)
+- [ ] [Web] Settings → Library says which sources the browser can ask; YouTube, Open Library, Wikidata, MusicBrainz and Apple Podcasts links work, others stay links
+- [ ] Sidebar: Library after the places, before Types, even empty (then "Paste a link into a new note to add it here"); its rows Books, Movies, Shows, Videos, Music (songs and albums), Podcasts, Episodes, Articles, Papers, each only while it has notes, with its icon and count; those types aren't under Types. Its heading folds it, its + opens a menu of kinds (choosing one makes a new note of it, `status` at its first, on its shelf); its menu sizes its rows; a row's menu sizes or hides it; rows drag and ⌥↑ ⌥↓ into an order of your own, kept after a restart
+- [ ] A shelf's list: each row's cover small beside it (tall for books, movies, shows and papers, square for music and podcasts, wide for videos and articles), or its kind's icon in a box of the same size; title, what it's by (author · year, director · year, artist · album, channel · length, an episode's podcast without its `@[…]`), its status in a quiet outline before the date; right-click → To Read / Reading / Read (the one it has checked) changes `status`, keeps the note's place in the list, a screen reader hearing "Status: Reading", and ⌘Z puts it back; a status of your own shows as written
+- [ ] The Library and a shelf in Classic, Pixel and Neon, light and dark: covers in the style's corners, the status outline readable on the chosen row
+- [ ] A new note made while a shelf is shown (New Note) is of its kind with its first status
+
 ## 12. Menus, pickers and note info
 
 - [ ] Menus open at the pointer, stay inside the window, move with ↑ ↓, and close on Esc, a click outside, scroll or resize

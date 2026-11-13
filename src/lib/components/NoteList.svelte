@@ -3,6 +3,7 @@
   import { speak } from "../a11y";
   import { locale, t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
+  import { shelves } from "../library/shelves.svelte";
   import { dateOf } from "../notes/calendar";
   import { typeLabel } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
@@ -23,6 +24,7 @@
     const f = notes.filter;
     if (f.kind === "tag") return `#${f.tag}`;
     if (f.kind === "type") return typeLabel(f.type);
+    if (f.kind === "library") return shelves.get(f.shelf)?.label ?? typeLabel(f.shelf);
     if (f.kind === "calendar") return t("sidebar.calendar");
     return { inbox: t("sidebar.inbox"), all: t("sidebar.notes"), todo: t("sidebar.todo"), untagged: t("sidebar.untagged"), trash: t("sidebar.trash") }[f.kind];
   });

@@ -142,7 +142,7 @@ class KindLooks {
 /** Tags without an icon of their own show a #. */
 export const tagLooks = new KindLooks("tags", () => "hash");
 
-/** Icons that suit types people often use, until another is chosen. */
+/** Icons that suit types people often use, until another is chosen; the library's kinds as its rows show them (plugins/library). */
 const TYPE_ICONS: Record<string, IconName> = {
   person: "user",
   people: "users",
@@ -155,9 +155,13 @@ const TYPE_ICONS: Record<string, IconName> = {
   project: "briefcase",
   meeting: "calendar",
   event: "calendar",
-  book: "book",
+  book: "book-open",
   article: "newspaper",
-  paper: "file-text",
+  paper: "graduation-cap",
+  show: "tv",
+  video: "square-play",
+  podcast: "podcast",
+  episode: "headphones",
   place: "map-pin",
   location: "map-pin",
   city: "map-pin",

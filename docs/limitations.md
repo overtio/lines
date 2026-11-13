@@ -89,6 +89,19 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - A paper goes in as a link named by its title, as arXiv writes it: a title with math (`$k$-means`) shows it drawn in Markdown, and TeX accents (`Schr\"odinger`) aren't turned into the letters they make. Its authors, year and abstract aren't added.
 - Searching from the Windows, Linux, iOS and Android apps hasn't been tried yet.
 
+## Library
+
+- Only Markdown notes are looked up: a LaTeX, code or spreadsheet note that's just a link stays one, and so does a locked note, whose link isn't sent anywhere.
+- On the web, only YouTube, Open Library, Wikidata, MusicBrainz and Apple Podcasts can be asked; other sites don't let web pages read them (CORS), so links to them stay links there. The apps read any page ([library.md](library.md#where-lines-looks)).
+- A page that only says what it is once its scripts have run (YouTube Music, some shops) isn't read for it: lines reads the page as it arrives, and never runs it. IMDb doesn't answer apps at all; its links are looked up through Wikidata, which has most films and series but not every one, nor the newest the day they're announced.
+- What Wikidata finds is what it's about from Wikipedia, in lines' language where Wikipedia has the page, else in English, and the poster at the top of that page.
+- Episodes from Apple Podcasts are found among a podcast's latest 200; a link to an older one stays a link.
+- MusicBrainz knows Spotify, Apple Music, Bandcamp, Deezer and Tidal links only where someone has added them: most albums, few songs. In the apps, Web Pages reads the rest.
+- A YouTube video looked up on the web has its title, channel and picture, but not when it came out, how long it is or what it's about: those are on its page, which only the apps can read.
+- The keys and `status` values are English in every language, so a note reads the same everywhere; lines shows the status in its own language.
+- The Library has no grid of covers yet, and no way to search the catalogs to add something without a link; subscribing to podcasts and feeds isn't there yet either.
+- Looking links up hasn't been tried in the Mac, Windows, Linux, iOS or Android apps yet: the apps read pages through Rust (`webFetch`), which the browser tests don't reach.
+
 ## Math
 
 - Math is drawn by KaTeX, which covers most of LaTeX's math mode but not all of it (no `\newcommand` shared between blocks, no TikZ or other packages), and not whole LaTeX documents.

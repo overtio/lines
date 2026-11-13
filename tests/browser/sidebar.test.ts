@@ -233,7 +233,7 @@ test("places sit in sections, Inbox apart; rows drag between them; a new section
   await page.keyboard.type("Someday");
   await page.keyboard.press("Enter");
   const headings = await sidebar.locator("h2").allInnerTexts();
-  expect(headings.map((text) => text.trim().toLowerCase())).toEqual(["planning", "someday", "types", "tags"]);
+  expect(headings.map((text) => text.trim().toLowerCase())).toEqual(["planning", "someday", "library", "types", "tags"]);
 
   // Calendar into it, onto its heading; Todo into the Inbox's, under Inbox.
   const box = (await heading.boundingBox())!;
@@ -282,7 +282,7 @@ test("Move to New Section, from a place's menu, makes a section with that place 
   // Its own section, right after Notes' (and before Types), with nothing else in it.
   const section = sidebar.getByRole("button", { name: "Planning" }).locator("xpath=ancestor::*[@data-reorder-area][1]");
   expect((await section.locator(".row").allInnerTexts()).map((row) => row.split("\n")[0])).toEqual(["Calendar"]);
-  expect((await sidebar.locator("h2").allInnerTexts()).map((text) => text.trim().toLowerCase())).toEqual(["planning", "types"]);
+  expect((await sidebar.locator("h2").allInnerTexts()).map((text) => text.trim().toLowerCase())).toEqual(["planning", "library", "types"]);
   const tops = await Promise.all(["Trash", "Calendar"].map(async (name) => (await sidebar.getByRole("button", { name: new RegExp(`^${name}`) }).boundingBox())!.y));
   expect(tops[1]).toBeGreaterThan(tops[0]);
 });
@@ -550,17 +550,17 @@ test("a divider between sections sits halfway between them; dividers go among ty
   const page = app.page;
   const sidebar = page.getByRole("navigation", { name: "Library" });
 
-  // At the end of the places, from the empty space: halfway between Trash and the Types heading.
+  // At the end of the places, from the empty space: halfway between Trash and the next heading, the Library's.
   await rightClickEmpty(app);
   await page.getByRole("menuitem", { name: "Add Divider", exact: true }).click();
   const divider = sidebar.getByRole("button", { name: "Divider" });
   await divider.waitFor();
-  const [trash, line, types] = await Promise.all([
+  const [trash, line, library] = await Promise.all([
     sidebar.getByRole("button", { name: /^Trash/ }).boundingBox(),
     divider.locator("span").boundingBox(),
-    sidebar.getByRole("button", { name: "Types", exact: true }).boundingBox(),
+    sidebar.getByRole("button", { name: "Library", exact: true }).boundingBox(),
   ]);
-  const [above, below] = [line!.y - (trash!.y + trash!.height), types!.y - (line!.y + line!.height)];
+  const [above, below] = [line!.y - (trash!.y + trash!.height), library!.y - (line!.y + line!.height)];
   expect(Math.abs(above - below)).toBeLessThan(3);
 
   // Below a type, and below a tag, from their menus.

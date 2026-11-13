@@ -92,6 +92,9 @@ class Plugins {
   readonly keyboardSounds = $derived([...this.#from("keyboardSounds"), ...soundPacks.keyboards]);
   readonly mascots = $derived(this.#from("mascots"));
   readonly pictureLibraries = $derived(this.#from("pictureLibraries"));
+  readonly libraryKinds = $derived(this.#from("libraryKinds"));
+  /** Where links are looked up, in the order they're asked: each site's, then those that read any page. */
+  readonly librarySources = $derived(this.#from("librarySources").sort((a, b) => Number(!!a.general) - Number(!!b.general)));
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).
@@ -246,6 +249,11 @@ class Plugins {
   /** What draws a link on a line of its own (an asciinema recording as its player), if anything does. */
   embed(link: EmbedLink) {
     return this.embeds.find((embed) => embed.draws(link));
+  }
+
+  /** The library's kind of things whose notes have this `type`, if it's one. */
+  libraryKind(type: string) {
+    return this.libraryKinds.find((kind) => kind.type === type);
   }
 
   /** What draws math, if anything does. */

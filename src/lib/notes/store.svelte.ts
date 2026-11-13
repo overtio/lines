@@ -1,6 +1,7 @@
 import type { IconName } from "../icons/icons";
 import type { PaletteColor } from "../palette";
 import { vault } from "../lock/vault";
+import { shelves } from "../library/shelves.svelte";
 import { isSite } from "../platform";
 import { DEFAULT_LANGUAGE, plugins } from "../plugins/registry.svelte";
 import type { Made, NoteLanguage } from "../plugins/types";
@@ -156,8 +157,8 @@ class NotesStore {
   #templates = new Map<string, { body: string; made: Made }>();
   /** Notes moved to the trash since the last edit, most recent last, for undo; those trashed together share a batch. */
   #trashed: { id: string; pinned: boolean; selected: boolean; batch: number }[] = [];
-  /** A note's text before and after it was last changed from outside its editor (moved on the Calendar), for undo. */
-  #edited: { id: string; before: string; after: string } | null = null;
+  /** A note's text before and after it was last changed from outside its editor (moved on the Calendar), for undo, what undoing it is called, and its date then. */
+  #edited: { id: string; before: string; after: string; undone: string; keepDate: boolean } | null = null;
   #batch = 0;
   /** Where a ⇧-click range starts from: the note last ⌘-clicked, or the open one. */
   #anchor: string | null = null;
@@ -224,6 +225,7 @@ class NotesStore {
         if (f.kind === "untagged" && meta.tags.length) return false;
         if (f.kind === "tag" && !matchesTag(meta.tags, f.tag)) return false;
         if (f.kind === "type" && meta.type !== f.type) return false;
+        if (f.kind === "library" && shelves.of(meta.type)?.key !== f.shelf) return false;
         if (f.kind === "calendar" && !isOn(note, meta, f.day, prefs.calendarEdited)) return false;
       }
       return terms.every((t) => meta.searchText.includes(t));
@@ -424,8 +426,17 @@ class NotesStore {
   create(body?: string, made?: Made, { open = true } = {}): string {
     const now = Date.now();
     const f = this.filter;
-    // Made under a tag it has the tag; made under a type, it's one of that type; made on a day, it's dated that day.
-    made ??= f.kind === "tag" ? { tag: f.tag } : f.kind === "type" ? { type: f.type } : f.kind === "calendar" ? { properties: { date: f.day } } : {};
+    // Made under a tag it has the tag; made under a type, or on a shelf of the Library, it's one of that type; made on a day, it's dated that day.
+    made ??=
+      f.kind === "tag"
+        ? { tag: f.tag }
+        : f.kind === "type"
+          ? { type: f.type }
+          : f.kind === "library"
+            ? shelves.made(f.shelf)
+            : f.kind === "calendar"
+              ? { properties: { date: f.day } }
+              : {};
     const note: Note = {
       id: crypto.randomUUID(),
       body: body ?? plugins.language().newNote(made),
@@ -454,24 +465,31 @@ class NotesStore {
     this.#patch(id, { body, updatedAt: Date.now() });
   }
 
-  /** Changes a note's text from outside its editor, as moving it on the Calendar does; ⌘Z puts it back. */
-  edit(id: string, body: string) {
+  /**
+   * Changes a note's text from outside its editor, as moving it on the Calendar does; ⌘Z puts it
+   * back, and screen readers then hear `undone` ("Moved back"). With `keepDate`, the note keeps its
+   * date, so the list doesn't reorder for it (its status set from its row).
+   */
+  edit(id: string, body: string, undone: string, { keepDate = false } = {}) {
     const entry = this.get(id);
     if (!entry || entry.note.body === body) return;
     this.#trashed = [];
-    this.#edited = { id, before: entry.note.body, after: body };
-    this.#patch(id, { body, updatedAt: Date.now() });
+    this.#edited = { id, before: entry.note.body, after: body, undone, keepDate };
+    this.#patch(id, { body, ...(!keepDate && { updatedAt: Date.now() }) });
     this.#changedOutside([id]);
   }
 
-  /** Puts back the note `edit` last changed, if it hasn't changed since (a tag added, a sync), which putting it back would lose. */
-  undoEdit() {
+  /**
+   * Puts back the note `edit` last changed, if it hasn't changed since (a tag added, a sync), which
+   * putting it back would lose; what that's called, or null if nothing was put back.
+   */
+  undoEdit(): string | null {
     const edited = this.#edited;
     this.#edited = null;
-    if (!edited || this.get(edited.id)?.note.body !== edited.after) return false;
-    this.#patch(edited.id, { body: edited.before, updatedAt: Date.now() });
+    if (!edited || this.get(edited.id)?.note.body !== edited.after) return null;
+    this.#patch(edited.id, { body: edited.before, ...(!edited.keepDate && { updatedAt: Date.now() }) });
     this.#changedOutside([edited.id]);
-    return true;
+    return edited.undone;
   }
 
   /** The picked notes still in the list, in its order. */

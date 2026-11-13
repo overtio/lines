@@ -2794,3 +2794,37 @@
   margin: -2px 0 0 -2px;
   border-radius: 50%;
 }
+
+/* A note that's just a link while it's looked up, or when it couldn't be (library/linkNotes.ts): quiet words after it, a ring turning before them. */
+.cm-library-lookup {
+  margin-left: 0.6em;
+  color: var(--text-faint);
+  font-family: var(--font-ui);
+  font-size: 0.82em;
+  white-space: nowrap;
+}
+
+.cm-library-lookup.is-looking::before {
+  content: "";
+  display: inline-block;
+  width: 0.75em;
+  height: 0.75em;
+  margin-right: 0.45em;
+  vertical-align: -0.06em;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: cm-library-turn 0.9s linear infinite;
+}
+
+@keyframes cm-library-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cm-library-lookup.is-looking::before {
+    animation: none;
+  }
+}

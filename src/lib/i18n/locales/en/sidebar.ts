@@ -8,6 +8,8 @@ export default {
   "sidebar.todo": "Todo",
   "sidebar.untagged": "Untagged",
   "sidebar.trash": "Trash",
+  // The section of books, movies, music and the rest (library.ts has their names).
+  "sidebar.library": "Library",
   "sidebar.types": "Types",
   "sidebar.tags": "Tags",
   "sidebar.typeName": "Type name",
