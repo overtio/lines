@@ -14,6 +14,7 @@ Edge cases for tags, highlights and underlines. Check each line against what it 
 - #qa/café, #qa/日本 and #qa/हिंदी are tags
 - C# is not a tag
 - #123 is not a tag
+- \#qa/escaped is not a tag: its backslash shows only with the cursor on it
 - [a link](#anchor) is not a tag
 - `#qa/in-code` is not a tag
 - ``#qa/in-double-backticks`` is not a tag

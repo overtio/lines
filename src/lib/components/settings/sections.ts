@@ -6,7 +6,7 @@ import { windowLookAvailable } from "../../prefs.svelte";
 import { canFloat } from "../../windows/floating";
 
 /** lines' own sections, in the order they're listed; each plugin with settings has one too, after the list of plugins. */
-export const SECTIONS = ["general", "presets", "theme", "layout", "text", "cursor", "editor", "floating", "touches", "plugins", "sync", "privacy", "export", "shortcuts", "about"] as const;
+export const SECTIONS = ["general", "presets", "theme", "layout", "text", "cursor", "editor", "floating", "touches", "library", "plugins", "sync", "privacy", "export", "shortcuts", "about"] as const;
 type OwnSection = (typeof SECTIONS)[number];
 /** A plugin's page of settings, by its id. */
 export type PluginSection = `plugin:${string}`;
@@ -33,6 +33,7 @@ const ICONS: Record<OwnSection, IconName> = {
   editor: "square-pen",
   floating: "picture-in-picture-2",
   touches: "sparkles",
+  library: "library",
   plugins: "puzzle",
   sync: "refresh",
   privacy: "shield",

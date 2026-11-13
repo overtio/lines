@@ -23,7 +23,7 @@ With the app lock on, the notes and attachments in `lines` are encrypted (see [s
 
 | Key | What's in it |
 |---|---|
-| `lines.prefs` | Theme, appearance, font (one of lines' or one installed on the device, by its name) and formatting's fonts, text size, note width, spacing, icon set, layout, symbols, spreadsheets, links |
+| `lines.prefs` | Theme, appearance, font (one of lines' or one installed on the device, by its name) and formatting's fonts, text size, note width, spacing, icon set, layout, symbols, spreadsheets, links, whether links are looked up (the Library) |
 | `lines.language` | The language chosen in Settings, unless it's System |
 | `lines.plugins` | Plugins turned off or on in Settings |
 | `lines.tabs` | The open tabs, when tabs are on |

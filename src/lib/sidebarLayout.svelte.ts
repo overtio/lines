@@ -283,14 +283,20 @@ class SidebarLayout {
 
   /**
    * `items` in the order chosen for `list`: those it was given a place among first, as placed, then
-   * any it hasn't seen (new ones) in the order they came in.
+   * any it hasn't seen (new ones) in the order they came in. With `inPlace`, a new one goes just
+   * before the next of `items` that has a place, as one of lines' own sections new since the list was
+   * ordered (the Library, before Types).
    */
-  sorted<T>(list: string, items: readonly T[], keyOf: (item: T) => string): T[] {
+  sorted<T>(list: string, items: readonly T[], keyOf: (item: T) => string, inPlace = false): T[] {
     const order = this.#order[list];
     if (!order?.length) return [...items];
     const rank = new Map(order.map((key, i) => [key, i]));
+    const ranks = items.map((item) => rank.get(keyOf(item)));
+    /** Where a new one goes: just before the next with a place, or after them all; new ones in the order they came. */
+    const fresh = (i: number) => (inPlace ? (ranks.slice(i + 1).find((each) => each !== undefined) ?? order.length) : order.length) - 0.5 + i / (2 * items.length);
+    const placed = (i: number) => ranks[i] ?? fresh(i);
     return items
-      .map((item, i) => ({ item, rank: rank.get(keyOf(item)) ?? order.length + i }))
+      .map((item, i) => ({ item, rank: placed(i) }))
       .sort((a, b) => a.rank - b.rank)
       .map(({ item }) => item);
   }

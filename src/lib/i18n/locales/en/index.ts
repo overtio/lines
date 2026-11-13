@@ -8,6 +8,7 @@ import editor from "./editor";
 import http from "./http";
 import hurl from "./hurl";
 import latex from "./latex";
+import library from "./library";
 import list from "./list";
 import lock from "./lock";
 import models from "./models";
@@ -28,6 +29,7 @@ export default {
   ...http,
   ...hurl,
   ...latex,
+  ...library,
   ...list,
   ...lock,
   ...models,

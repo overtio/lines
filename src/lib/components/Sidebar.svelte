@@ -3,6 +3,7 @@
   import type { IconName } from "../icons/icons";
   import { formatDate } from "../format";
   import { t } from "../i18n/index.svelte";
+  import { type Shelf, shelves } from "../library/shelves.svelte";
   import { lock } from "../lock/lock.svelte";
   import { notesOnDays } from "../notes/calendar";
   import { typeLabel } from "../notes/properties";
@@ -17,6 +18,7 @@
   import type { Filter } from "../notes/types";
   import { isDivider, type PlaceGroup, sidebarLayout } from "../sidebarLayout.svelte";
   import { panes } from "../panes.svelte";
+  import { plugins } from "../plugins/registry.svelte";
   import { type MenuItem, ui } from "../ui.svelte";
   import { updates } from "../updates.svelte";
   import { openSettings } from "../windows/settings.svelte";
@@ -46,17 +48,30 @@
   /** Notes, the way back to every note, can't be hidden. */
   const ALWAYS: Place = "all";
 
+  /** The types listed under Types: all but the Library's, which lists its own. */
+  const ownTypes = $derived(notes.types.filter(({ type }) => !shelves.of(type)));
+
+  /** The Library's shelves with something on them, how much, in the order chosen; and those not hidden. */
+  const shelfRows = $derived.by(() => {
+    const counts = new Map(notes.types.map(({ type, count }) => [type, count]));
+    const stocked = shelves.all.map((shelf) => ({ shelf, count: shelf.kinds.reduce((sum, kind) => sum + (counts.get(kind.type) ?? 0), 0) }));
+    return sidebarLayout.sorted("library", stocked.filter(({ count }) => count > 0), ({ shelf }) => shelf.key);
+  });
+  const shelfKeys = $derived(shelfRows.map(({ shelf }) => shelf.key));
+  const shownShelves = $derived(shelfRows.filter(({ shelf }) => !sidebarLayout.isHidden(`shelf:${shelf.key}`)));
+
   const placeKeys = PLACES.map((place) => place.key);
   const placeOf = new Map(PLACES.map((place) => [place.key, place]));
   const isShown = (place: (typeof PLACES)[number] | Divider) => "divider" in place || ((place.shown?.() ?? true) && !sidebarLayout.isHidden(`place:${place.key}`));
 
-  /** The sections of the sidebar, in order: those of places (named or a gap), Types and Tags. */
+  /** The sections of the sidebar, in order: those of places (named or a gap), the Library, Types and Tags. */
   /** A line between places (sidebarLayout.ts). */
   type Divider = { key: string; divider: true };
   type Section =
     | { key: string; kind: "places"; group: PlaceGroup; places: ((typeof PLACES)[number] | Divider)[] }
-    | { key: "types" | "tags"; kind: "types" | "tags"; label: string; icon: IconName };
+    | { key: "library" | "types" | "tags"; kind: "library" | "types" | "tags"; label: string; icon: IconName };
   const BUILT_IN: Section[] = [
+    { key: "library", kind: "library", label: t("sidebar.library"), icon: "library" },
     { key: "types", kind: "types", label: t("sidebar.types"), icon: "shapes" },
     { key: "tags", kind: "tags", label: t("sidebar.tags"), icon: "hash" },
   ];
@@ -80,6 +95,8 @@
         ...BUILT_IN,
       ],
       (section) => section.key,
+      // The Library came after some had put sections in an order of their own: it goes before Types there too.
+      true,
     ),
   );
   const sectionKeys = $derived(sections.map((section) => section.key));
@@ -89,12 +106,16 @@
   /** Whether it has a heading: a name, or a name being given it. */
   const hasHeading = (section: Section) => !!nameOf(section) || renamingGroup === section.key;
 
-  /** The sections drawn: not hidden, and with something in them (a named one, even empty, to drag places into). */
+  /**
+   * The sections drawn: not hidden, and with something in them (a named one, even empty, to drag
+   * places into); the Library always, while its plugin's on, to be found.
+   */
   const shownSections = $derived(
     sections.filter((section) => {
       if (sidebarLayout.isHidden(`section:${section.key}`)) return false;
       if (section.kind === "places") return hasHeading(section) || section.places.some(isShown);
-      return section.kind === "types" ? notes.types.length > 0 : notes.tagTree.length > 0;
+      if (section.kind === "library") return shelves.all.length > 0;
+      return section.kind === "types" ? ownTypes.length > 0 : notes.tagTree.length > 0;
     }),
   );
 
@@ -113,7 +134,8 @@
     shownSections.map((section) => {
       const open = !hasHeading(section) || !sidebarLayout.isCollapsed(section.key);
       // Which of its rows shown are dividers, in order.
-      const rows: boolean[] = !open ? [] : (section.kind === "places" ? section.places.filter(isShown) : section.kind === "types" ? shownTypes : []).map((row) => "divider" in row);
+      const shown = section.kind === "places" ? section.places.filter(isShown) : section.kind === "types" ? shownTypes : section.kind === "library" ? shownShelves : [];
+      const rows: boolean[] = !open ? [] : shown.map((row) => "divider" in row);
       const count = (from: boolean[]) => (from.indexOf(false) === -1 ? from.length : from.indexOf(false));
       const trail = count([...rows].reverse());
       return { rows: rows.length, trail, lead: hasHeading(section) ? 0 : Math.min(count(rows), rows.length - trail) };
@@ -140,7 +162,7 @@
     return pad.join("; ") || undefined;
   }
 
-  const types = $derived(sidebarLayout.arrange("types", "types", notes.types, (each) => each.type, (each) => each.type, (each) => each.count));
+  const types = $derived(sidebarLayout.arrange("types", "types", ownTypes, (each) => each.type, (each) => each.type, (each) => each.count));
   type TypeRow = (typeof types)[number] | Divider;
   const typeKey = (row: TypeRow) => ("divider" in row ? row.key : row.type);
   /** The types, and the dividers put among them while they're in an order of your own. */
@@ -170,6 +192,7 @@
       return section.kind === "places" ? (section.group.name ? { label: section.group.name, icon: "folder" } : null) : section;
     }
     if (kind === "type") return notes.types.some(({ type }) => type === name) ? { label: typeLabel(name), icon: typeLooks.icon(name) } : null;
+    if (kind === "shelf") return shelves.get(name) ?? null;
     if (kind === "tag") return tagPaths.has(name) ? { label: `#${name}`, icon: tagLooks.icon(name) } : null;
     return null;
   };
@@ -210,9 +233,13 @@
 
   function sectionMenu(section: Section, x: number, y: number) {
     const label = nameOf(section);
+    if (section.kind === "library") {
+      const own = sizeItems("library", "", shelves.all.map((shelf) => `shelf:${shelf.key}`));
+      return openRowMenu(`section:${section.key}`, label, own, hideItems("section", section.key), x, y);
+    }
     if (section.kind !== "places") {
       // Its rows, which follow its size again once it's chosen.
-      const rows = section.kind === "types" ? notes.types.map(({ type }) => `type:${type}`) : [...tagPaths].map((path) => `tag:${path}`);
+      const rows = section.kind === "types" ? ownTypes.map(({ type }) => `type:${type}`) : [...tagPaths].map((path) => `tag:${path}`);
       const own: MenuItem[] = [...sortItems(section.kind), "separator", ...sizeItems(section.kind, "", rows)];
       return openRowMenu(`section:${section.key}`, label, own, hideItems("section", section.key), x, y);
     }
@@ -223,6 +250,31 @@
       ...sizeItems(section.key, "", section.group.places.filter((key) => !isDivider(key)).map((key) => `place:${key}`)),
     ];
     openRowMenu(`section:${section.key}`, label, own, hideItems("section", section.key), x, y);
+  }
+
+  function shelfMenu(shelf: Shelf, x: number, y: number) {
+    openRowMenu(`shelf:${shelf.key}`, shelf.label, sizeItems("library", `shelf:${shelf.key}`), hideItems("shelf", shelf.key), x, y);
+  }
+
+  /** The Library heading's button: a menu of the kinds of things to start a note of, on its shelf. */
+  function newInLibrary(button: HTMLElement) {
+    const { right, bottom } = button.getBoundingClientRect();
+    ui.openMenu({
+      x: right,
+      y: bottom + 4,
+      align: "end",
+      anchor: button,
+      label: t("library.new"),
+      items: plugins.libraryKinds.map((kind) => ({
+        label: kind.name,
+        icon: kind.icon,
+        run: () => {
+          const shelf = shelves.of(kind.type);
+          if (shelf) choose({ kind: "library", shelf: shelf.key });
+          notes.create(undefined, shelves.made(kind.type));
+        },
+      })),
+    });
   }
 
   /** The section of places being named in its heading, and the name typed so far. */
@@ -391,10 +443,10 @@
       <!-- The room after each, whatever comes next. Dragged by its heading, a section goes whole (reorder.ts). -->
       <div style:margin-bottom="{marginAfter(i)}px" data-reorder-area>
         {#if heading}
-          <h2 class="mx-0 mt-0 mb-1" id="sidebar-{section.key}">
+          <h2 class="mx-0 mt-0 mb-1 flex items-center" id="sidebar-{section.key}">
             {#if renamingGroup === section.key}
               <!-- As tags and types are renamed in place (SidebarRow.svelte): a field in the heading's place, with one ring. -->
-              <div class="flex h-6 items-center rounded-sm bg-bg px-2.5 inset-ring-2 inset-ring-accent-soft">
+              <div class="flex h-6 flex-1 items-center rounded-sm bg-bg px-2.5 inset-ring-2 inset-ring-accent-soft">
                 <input
                   class="h-full min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 text-2xs font-semibold tracking-[0.04em] text-fg uppercase outline-none placeholder:font-normal placeholder:tracking-normal placeholder:text-faint placeholder:normal-case"
                   aria-label={t("sidebar.sectionName")}
@@ -415,7 +467,7 @@
             {:else}
               <button
                 class={[
-                  "group flex h-6 w-full items-center gap-1 rounded-sm px-2.5 text-left text-2xs font-semibold tracking-[0.04em] text-faint uppercase transition-colors hover:text-muted",
+                  "group flex h-6 min-w-0 flex-1 items-center gap-1 rounded-sm px-2.5 text-left text-2xs font-semibold tracking-[0.04em] text-faint uppercase transition-colors hover:text-muted",
                   menuFor === `section:${section.key}` && "inset-ring-2 inset-ring-accent",
                 ]}
                 aria-expanded={open}
@@ -428,6 +480,10 @@
                 <span class="truncate">{nameOf(section)}</span>
                 <Icon name="chevron-right" size={12} strokeWidth={2.25} class="shrink-0 transition-transform duration-200 {open ? 'rotate-90' : ''}" />
               </button>
+              {#if section.kind === "library"}
+                <!-- As tall as the heading: the button's room for a pointer reaches past it, not the heading. -->
+                <IconButton class="-my-1 text-faint" icon="plus" iconSize={15} label={t("library.new")} onclick={(event) => newInLibrary(event.currentTarget)} />
+              {/if}
             {/if}
           </h2>
         {/if}
@@ -468,6 +524,28 @@
             {/each}
             <!-- Where a place dragged to the end of this section goes. -->
             <li class="h-0" data-reorder="places" data-reorder-key="end:{section.key}" data-reorder-end aria-hidden="true"></li>
+          </ul>
+        {:else if open && section.kind === "library"}
+          <ul id="sidebar-library-list" class={ROWS} aria-labelledby="sidebar-library">
+            {#each shownShelves as { shelf, count } (shelf.key)}
+              {@const size = sidebarLayout.sizeOf(`shelf:${shelf.key}`, "library")}
+              <li data-tile={size === "large" || undefined}>
+                <SidebarRow
+                  {size}
+                  icon={shelf.icon}
+                  label={shelf.label}
+                  {count}
+                  active={notes.filter.kind === "library" && notes.filter.shelf === shelf.key}
+                  marked={menuFor === `shelf:${shelf.key}`}
+                  onclick={() => choose({ kind: "library", shelf: shelf.key })}
+                  oncontextmenu={(event) => onRowContextMenu(event, `shelf:${shelf.key}`, (x, y) => shelfMenu(shelf, x, y))}
+                  {@attach longPress((x, y) => shelfMenu(shelf, x, y))}
+                  {@attach reorderable("library", shelf.key, (before) => sidebarLayout.move("library", shelfKeys, shelf.key, before))}
+                />
+              </li>
+            {:else}
+              <li class="px-2.5 py-1 text-xs text-faint">{t("library.empty")}</li>
+            {/each}
           </ul>
         {:else if open && section.kind === "types"}
           <ul id="sidebar-types-list" class={ROWS} aria-labelledby="sidebar-types">

@@ -1,0 +1,21 @@
+# Books, movies and music
+
+Paste a link to a book, a movie, a video, a song, a podcast or an article into a new note, and it fills itself in: its title, its cover, who made it, when, and a few sentences of what it's about. Try it with a YouTube video, or a book on Open Library:
+
+```
+https://openlibrary.org/works/OL450063W
+```
+
+The next note, @[Frankenstein], is one, as a link to it becomes. It's in the sidebar's **Library**, under Books, with its cover beside it. Movies, shows, videos, music, podcasts, articles and papers each have a shelf there too.
+
+- **Where you've got to.** Every book starts *to read*. Right-click it on its shelf to mark it Reading or Read; movies are to watch, music to listen to.
+- **One undo puts the link back**, if it isn't what you wanted. Changed while it's looked up, the note is left as you wrote it.
+- **Mention it** anywhere: @[Frankenstein] was written by @[Frankenstein].author in @[Frankenstein].year. And `@type.book` on a line of its own is your reading list:
+
+@type.book
+
+Links are sent to the site they're to, and to open catalogs (Open Library, Wikidata, MusicBrainz), never anything from your notes. Settings → Library turns it off. In the browser, only some sites can be asked; the lines app reads any page.
+
+- [ ] Paste a link to something you'd like to read into a new note
+
+#tour

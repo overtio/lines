@@ -30,7 +30,7 @@ export function dropNote(target: string, id: string) {
   if (target.startsWith("tag:")) {
     speak(t("list.tagged", { count: notes.addTag([id], name), tag: name }));
   } else if (target.startsWith("type:")) {
-    notes.edit(id, setProperties(entry.note.body, { type: name }));
+    notes.edit(id, setProperties(entry.note.body, { type: name }), t("calendar.didUndo"));
     speak(t("list.didType", { type: typeLabel(name) }));
   } else if (name === "inbox") {
     notes.setInbox([id], true);

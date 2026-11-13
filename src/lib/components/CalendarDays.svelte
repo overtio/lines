@@ -187,7 +187,7 @@
       const body = notes.get(id)?.note.body;
       if (body === undefined) return;
       const ending = current && { until: current.until, times: current.times };
-      notes.edit(id, setProperties(body, { repeat: repeat && repeatText({ ...repeat, ...ending }) }));
+      notes.edit(id, setProperties(body, { repeat: repeat && repeatText({ ...repeat, ...ending }) }), t("calendar.didUndo"));
       speak(repeat ? t("calendar.didRepeat", { schedule: label }) : t("calendar.didStopRepeating"));
     };
     menuFor = id;
@@ -223,7 +223,7 @@
     if (!body) return;
     // Naming a new event isn't an edit to take back with ⌘Z.
     if (done.fresh) notes.update(entry.note.id, body);
-    else notes.edit(entry.note.id, body);
+    else notes.edit(entry.note.id, body, t("calendar.didUndo"));
   }
 
   function onRenameKeydown(event: KeyboardEvent & { currentTarget: HTMLInputElement }) {
@@ -393,7 +393,7 @@
     if (unchanged) return;
     // One time of a repeating note: its own dates, the first time, move the same.
     const own = placed.span.shift ? { ...slot, day: addDays(slot.day, -placed.span.shift) } : slot;
-    notes.edit(placed.entry.note.id, retimed(placed.entry.note.body, placed.span, own));
+    notes.edit(placed.entry.note.id, retimed(placed.entry.note.body, placed.span, own), t("calendar.didUndo"));
     choose(slot.day);
     speak(t("calendar.moved", { title: titleOf(placed.entry), time: timeRange(slot) }));
   }

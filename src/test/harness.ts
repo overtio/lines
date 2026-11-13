@@ -1,4 +1,6 @@
 import { EditorView } from "@codemirror/view";
+import { attachmentNames, saveAttachment } from "../lib/notes/attachments";
+import { noteKeys } from "../lib/notes/noteKeys.svelte";
 import { notes } from "../lib/notes/store.svelte";
 import { panes } from "../lib/panes.svelte";
 import { plugins } from "../lib/plugins/registry.svelte";
@@ -30,6 +32,7 @@ async function until(ready: () => unknown, timeout = 10_000) {
 
 const testing = {
   notes,
+  noteKeys,
   panes,
   plugins,
   prefs,
@@ -37,6 +40,8 @@ const testing = {
   themeDrafts,
   presets,
   writePresetFile,
+  saveAttachment,
+  attachmentNames,
   editor,
   until,
   /** The open note's text. */

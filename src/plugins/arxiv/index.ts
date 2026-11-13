@@ -1,12 +1,14 @@
 import { t } from "../../lib/i18n/index.svelte";
+import { known, names } from "../../lib/library/text";
 import { isTauri } from "../../lib/platform";
-import type { PaperSource, Plugin } from "../../lib/plugins/types";
-import { arxivText } from "./links";
+import type { LibraryItem, LibrarySource, Paper, PaperSource, Plugin } from "../../lib/plugins/types";
+import { arxivLinkId, arxivText } from "./links";
 import { search } from "./search";
 
 /*
  * arXiv (arxiv.org), the open archive of papers in physics, math, computer science and more. Links
- * to its papers read the way arXiv cites them, arXiv:1706.03762, and "/paper" searches it.
+ * to its papers read the way arXiv cites them, arXiv:1706.03762, "/paper" searches it, and a note
+ * that's a link to a paper becomes the paper, in the library.
  */
 
 /** A paper (Lucide's graduation cap, ISC): arXiv's own logo is only for crediting its API. */
@@ -26,6 +28,29 @@ const source: PaperSource = {
   search,
 };
 
+/** A paper as the library keeps it. */
+export const paperItem = (paper: Paper): LibraryItem => ({
+  type: "paper",
+  title: paper.title,
+  link: paper.url,
+  properties: known([
+    ["authors", names(paper.authors)],
+    ["year", paper.year],
+    ["arxiv", paper.id],
+  ]),
+  description: paper.abstract,
+});
+
+const library: LibrarySource = {
+  id: "arxiv",
+  name: "arXiv",
+  recognizes: (url) => arxivLinkId(url) !== null,
+  async lookup(url, signal) {
+    const [paper] = (await search(arxivLinkId(url)!, 1, signal)).items;
+    return paper ? paperItem(paper) : null;
+  },
+};
+
 export const arxiv = (): Plugin => ({
   id: "arxiv",
   name: "arXiv",
@@ -36,5 +61,6 @@ export const arxiv = (): Plugin => ({
     links: [{ id: "arxiv", mark: PAPER_MARK, text: arxivText }],
     // arXiv's API doesn't take requests from web pages (CORS), only from the apps.
     papers: isTauri ? [source] : [],
+    librarySources: isTauri ? [library] : [],
   },
 });

@@ -1,3 +1,4 @@
+import { pacing, withTimeout } from "../../lib/pacing";
 import { webFetch } from "../../lib/platform";
 import type { Paper, SearchPage } from "../../lib/plugins/types";
 import { arxivIdIn } from "./links";
@@ -11,6 +12,8 @@ import { arxivIdIn } from "./links";
 const API = "https://export.arxiv.org/api/query";
 const PER_PAGE = 20;
 const SPACING = 3000;
+/** How long a request waits for arXiv to answer, so one that never does holds up none after it. */
+const TIMEOUT = 20_000;
 /** As many answers as are kept. */
 const KEPT = 50;
 const ATOM = "http://www.w3.org/2005/Atom";
@@ -47,31 +50,16 @@ export function searchQuery(typed: string, broad = false): string {
   return terms.join(" AND ");
 }
 
-let last = 0;
-let queue: Promise<unknown> = Promise.resolve();
-
-/** Resolves after `ms`, or rejects once `signal` aborts. */
-const pause = (ms: number, signal: AbortSignal) =>
-  new Promise<void>((resolve, reject) => {
-    if (ms <= 0) return resolve();
-    const timer = setTimeout(resolve, ms);
-    signal.addEventListener("abort", () => (clearTimeout(timer), reject(signal.reason)), { once: true });
-  });
+const paced = pacing(SPACING);
 
 /** Sends `url` once the request before it is done and three seconds have passed since it went. */
-function inTurn(url: string, signal: AbortSignal): Promise<string> {
-  const turn = queue.then(async () => {
-    signal.throwIfAborted();
-    await pause(last + SPACING - Date.now(), signal);
-    last = Date.now();
+const inTurn = (url: string, signal: AbortSignal) =>
+  paced(async () => {
     const fetch = await webFetch();
-    const response = await fetch(url, { signal });
+    const response = await fetch(url, { signal: withTimeout(signal, TIMEOUT) });
     if (!response.ok) throw new Error(`arXiv answered ${response.status}`);
     return response.text();
-  });
-  queue = turn.catch(() => {});
-  return turn;
-}
+  }, signal);
 
 const answers = new Map<string, SearchPage<Paper>>();
 
@@ -94,6 +82,7 @@ function read(xml: string, start: number, versioned: boolean): SearchPage<Paper>
       year: year || undefined,
       venue: entry.getElementsByTagNameNS(ARXIV, "primary_category")[0]?.getAttribute("term") ?? undefined,
       url: `https://arxiv.org/abs/${id}`,
+      abstract: text(entry, "summary") || undefined,
     });
   }
   const total = Number(text(feed.documentElement, "totalResults", OPENSEARCH)) || 0;

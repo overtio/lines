@@ -10,6 +10,7 @@ export default {
   "sidebar.todo": "À faire",
   "sidebar.untagged": "Sans étiquette",
   "sidebar.trash": "Corbeille",
+  "sidebar.library": "Bibliothèque",
   "sidebar.types": "Types",
   "sidebar.tags": "Étiquettes",
   "sidebar.typeName": "Nom du type",

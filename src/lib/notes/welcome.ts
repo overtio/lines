@@ -32,6 +32,10 @@ Add a tag anywhere in a note, like #getting-started. Nested tags work too: #line
 
 Start a note with \`/properties\` to give it a type, like \`type: person\`, and other properties. It shows under Types in the sidebar. Mention any note with \`@\` and its title (or \`[[\` for a wiki link), and show its properties with \`@Name.key\`. \`@type.person\` on a line of its own is a table of every person. A \`date\` or \`due\` property, like \`date: 2026-11-30\`, puts the note on that day in the Calendar.
 
+## Books, movies and music
+
+Paste a link to a book, a movie, a video, a song or an article into a new note, and it fills itself in with its title, cover and details. It's kept in the sidebar's **Library**, on its shelf; right-click it there to mark where you've got to: to read, reading, read.
+
 ## Callouts and cards
 
 :::?

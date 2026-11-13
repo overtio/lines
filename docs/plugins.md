@@ -27,7 +27,14 @@ Settings → Plugins lists them (All Plugins). A plugin that isn't needed can be
 | GIPHY | `/giphy`: search GIPHY's GIFs and put one in a note. Needs an API key when lines is built | Yes | `src/plugins/giphy/` |
 | asciinema | Plays terminal recordings in Markdown notes: asciinema.org's embed code, and attached `.cast` files ([linedown.md](linedown.md#terminal-recordings)) | Yes | `src/plugins/asciinema/` |
 | GitHub | Draws links to GitHub short, with GitHub's mark: `overtio/lines#12` ([linedown.md](linedown.md#github)) | Yes | `src/plugins/github/` |
-| arXiv | Draws links to arXiv's papers as arXiv cites them, `arXiv:1706.03762`, and in the apps is a source of papers for `/paper` ([linedown.md](linedown.md#arxiv)) | Yes | `src/plugins/arxiv/` |
+| arXiv | Draws links to arXiv's papers as arXiv cites them, `arXiv:1706.03762`, and in the apps is a source of papers for `/paper` ([linedown.md](linedown.md#arxiv)) and of the library's papers | Yes | `src/plugins/arxiv/` |
+| Library | Books, movies, shows, videos, music, podcasts, articles and papers as notes with a `type`, listed in the sidebar's Library with their covers and status; and a note that's just a link filled in with what it is, by the sources below ([library.md](library.md)) | Yes | `src/plugins/library/`, with the rest in `src/lib/library/` |
+| YouTube | Looks up links to YouTube's videos for the library: oEmbed, and in the apps the video's page | Yes | `src/plugins/youtube/` |
+| Open Library | Looks up books by their links there or an ISBN in a link | Yes | `src/plugins/open-library/` |
+| Wikidata | Looks up films, series and books by IMDb, The Movie Database, Letterboxd, Wikipedia and Wikidata links, with Wikipedia's summary and poster | Yes | `src/plugins/wikidata/` |
+| MusicBrainz | Looks up songs and albums by their links there, or streaming services' links it knows; covers from the Cover Art Archive | Yes | `src/plugins/musicbrainz/` |
+| Apple Podcasts | Looks up podcasts and episodes by their Apple Podcasts links, with the podcast's feed | Yes | `src/plugins/apple-podcasts/` |
+| Web Pages | Looks up a link to any page by what it says it is (JSON-LD, Open Graph, oEmbed). In the apps: sites don't let web pages read them | Yes | `src/plugins/web-pages/` |
 | Themes | The twenty-six themes, each with its palette, and reading themes made for other apps: VS Code, Zed, TextMate, Base16, terminals, KDE and GTK ([themes.md](themes.md)). Always on. | Yes | `src/plugins/themes/`, with your own themes and palettes in `src/lib/themes/` |
 | Code | Code notes: a note that's a file of code, in any of the 122 languages `@codemirror/language-data` has file extensions for (but Markdown and LaTeX, which are formats of their own), with line numbers, a fixed-width font and highlighting; it downloads and exports as its language's file | Yes | `src/plugins/code/` |
 | Changes | Marks the lines changed in a note since it was opened, in its margin: added, changed, and where lines were taken out. | No | `src/plugins/changes/` |
@@ -47,6 +54,7 @@ Nothing is lost. A plugin turned off stops adding what it adds, at once, in ever
 - **Links drawn short, or a source of papers.** With GitHub or arXiv off, its links are ordinary links. With arXiv off, `/paper` is gone (until another source of papers is on).
 - **An engine.** With Math off, math shows as it's written. With both Diagrams plugins off, a ` ```mermaid ` block is a code block and `/diagram` is gone from the "/" menu. With Typing Practice off, a ` ```typing ` block is a code block and `/typing` is gone. With Timing Diagrams off, a ` ```wavedrom ` block is a code block and `/timing` is gone. With 3D Models off, ` ```openscad ` and ` ```stl ` blocks are code blocks, `/model` is gone, and an attached model is a card naming its file. With asciinema off, a recording's embed code is the picture it's written as (asciinema's preview), and an attached `.cast` file is a card naming it. With Formulas off, formulas show as written, and spreadsheets don't download as values or Excel workbooks. Without TeX, a LaTeX note's PDF is laid out by lines.
 - **Pictures from the web.** With Unsplash, GIPHY or Wallhaven off, its `/` command is gone; with Wallhaven off, so is New → From Wallhaven. Pictures already in notes stay: Wallhaven's are kept in the note.
+- **The library.** With Library off, its section leaves the sidebar, its notes are listed under Types as any typed note is, and links aren't looked up. With a source off, links it knows aren't sent to it: the next source that knows them is asked, or none. Notes already filled in stay as they are.
 - **A theme or an icon set.** What was chosen is kept, and lines shows its own (Lines, Lucide) until the plugin is on again.
 - **Paper.** What was chosen is kept, and notes are plain until the plugin is on again.
 - **A plugin others need** (TeX needs LaTeX): those wait, and say what they need. Turning one on turns on what it needs too.
@@ -181,6 +189,58 @@ export const openalex = (): Plugin => ({
           const response = await (await webFetch())(`https://api.openalex.org/works?search=${encodeURIComponent(query)}&page=${page}`, { signal });
           const { results, meta } = await response.json();
           return { items: results.map(paper), more: page * meta.per_page < meta.count };
+        },
+      },
+    ],
+  },
+});
+```
+
+**`libraryKinds`**: kinds of things kept in the library ([library.md](library.md)), each a note's `type`. A kind has its `type` (a stable English word, like its property keys and `statuses`' values), its `name` ("Book") and the `label` of its row in the sidebar's Library ("Books"), an `icon`, the `properties` its notes have in order, the keys its rows show under their titles (`subtitle`), the shape of its `cover`s (`square`, `tall` or `wide`), and its `statuses`, each a `value` written in the note and a `label` shown, the first where a new one starts. A kind with a `shelf` is listed in another's row, by its type: an album in Music, with songs. Its `mentions` are the keys whose values are another note's title, written as a mention of it: an episode's `podcast`. The Library plugin's own are in `src/plugins/library/`; a plugin can add others (board games, recipes…).
+
+**`librarySources`**: where lines finds out what a link is, to fill in a note that's just one (`LibrarySource`). `recognizes(url)` says, quickly and without asking anyone, whether it knows the link; `lookup(url, signal)` finds what it is, as a `LibraryItem`: its kind's `type`, `title`, `link`, `properties` in order, a `cover`'s address and a `description`; null when it isn't anything the library keeps, and it rejects when it couldn't ask (offline). Sources are asked in turn, the plugins' order, but those marked `general` (Web Pages, which reads any page) after the rest; the first to find something fills the note in, through `libraryNote()` (`src/lib/library/note.ts`), which writes the note the same way for every way of adding one and downloads its cover, to `keep()` once the note's written. What a source found is written as just that text, escaped with `escapeMarkdown()` and `propertyValue()` (`src/lib/notes/escape.ts`): a source gives plain text, not Markdown. `src/lib/library/web.ts` asks as lines in the apps (`getJson`, `getPage`, which reads what a page says about itself, `src/lib/library/page.ts`; `request` for anything else), each request giving up after 15 seconds, and only `isPublic` addresses a page gives; `src/lib/library/text.ts` writes values alike (dates, years, lengths). Send only what's needed: the link, or an id in it. A source for Discogs' records, say:
+
+```ts
+import { t } from "../../lib/i18n/index.svelte";
+import { known, yearOf } from "../../lib/library/text";
+import { getJson } from "../../lib/library/web";
+import type { Plugin } from "../../lib/plugins/types";
+
+interface Release {
+  title: string;
+  year?: number;
+  artists?: { name: string }[];
+  images?: { uri: string }[];
+}
+
+const release = (url: URL) => /^\/release\/(\d+)/.exec(url.pathname)?.[1];
+
+export const discogs = (): Plugin => ({
+  id: "discogs",
+  name: "Discogs",
+  description: t("plugins.discogs.description"),
+  icon: "music",
+  enabledByDefault: true,
+  requires: ["library"],
+  contributes: {
+    librarySources: [
+      {
+        id: "discogs",
+        name: "Discogs",
+        recognizes: (url) => url.hostname.endsWith("discogs.com") && !!release(url),
+        async lookup(url, signal) {
+          const found = await getJson<Release>(`https://api.discogs.com/releases/${release(url)}`, signal);
+          if (!found) return null;
+          return {
+            type: "album",
+            title: found.title,
+            link: url.href,
+            properties: known([
+              ["artist", found.artists?.map((artist) => artist.name).join(", ")],
+              ["year", yearOf(found.year)],
+            ]),
+            cover: found.images?.[0]?.uri,
+          };
         },
       },
     ],

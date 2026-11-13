@@ -15,7 +15,7 @@
   import { copyOnSelectCompartment, createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment, spelling, spellingCompartment } from "./setup";
   import { copyOnSelect } from "./copyOnSelect";
   import { symbolsChanged } from "./symbols";
-  import { changesBetween } from "./util";
+  import { changesBetween, editedNote } from "./util";
 
   let { noteId, trashed }: { noteId: string; trashed: boolean } = $props();
   // Read through these, the effects below run again only when the note or whether it's read-only
@@ -42,7 +42,8 @@
   }
 
   /** A note's editor state, in its language from the start rather than read as Markdown first. */
-  const stateOf = (note: Note | undefined) => EditorState.create({ doc: note?.body ?? "", extensions: createExtensions(changed, note?.format) });
+  const stateOf = (note: Note | undefined) =>
+    EditorState.create({ doc: note?.body ?? "", extensions: [createExtensions(changed, note?.format), note ? editedNote.of(note.id) : []] });
 
   /**
    * The editor owns the text while you type; the store gets a copy shortly

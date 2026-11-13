@@ -121,7 +121,23 @@ export default {
   "plugins.noKey": "Needs an API key from {name}, which this copy of lines wasn’t built with.",
   // GitHub and arXiv are names, not translated.
   "plugins.github.description": "Shows links to GitHub short, the way GitHub writes them, with its mark: overtio/lines#12.",
-  "plugins.arxiv.description": "Shows links to arXiv’s papers the way arXiv cites them: arXiv:1706.03762. In the apps, adds /paper, to search arXiv and link to a paper. What you search for goes to arXiv.",
+  "plugins.arxiv.description":
+    "Shows links to arXiv’s papers the way arXiv cites them: arXiv:1706.03762. In the apps, adds /paper, to search arXiv and link to a paper, and fills in a note that’s a link to one as a paper in the Library. What you search for goes to arXiv.",
+  "plugins.library.name": "Library",
+  "plugins.library.description":
+    "Books, movies, shows, videos, music, podcasts, articles and papers, each a note, listed in the sidebar’s Library with its cover and where you’ve got to. A new note that’s just a link is filled in with what it is.",
+  // YouTube, Open Library, Wikidata, MusicBrainz, Apple Podcasts, IMDb, Spotify… are names, not translated.
+  "plugins.webPages.name": "Web Pages",
+  "plugins.webPages.description":
+    "Looks up a link to any page for what it says it is (a book, a movie, an article…), as most sites say for search engines: IMDb, Letterboxd, Goodreads, Spotify, Bandcamp, Substack, blogs and news. The link goes to its site.",
+  "plugins.webPages.apps": "Needs the lines app: sites don’t let web pages read them.",
+  "plugins.youtube.description": "Looks up links to YouTube’s videos: their title, channel and picture, and in the apps when they came out and how long they are. The link goes to YouTube.",
+  "plugins.openLibrary.description": "Looks up books by a link to Open Library, or an ISBN in a link (a bookshop’s, or Amazon’s): author, year, pages and cover. The book’s ISBN or id goes to Open Library.",
+  "plugins.wikidata.description":
+    "Looks up movies, shows and books by a link to IMDb, The Movie Database, Letterboxd, Wikipedia or Wikidata: director, year, runtime, genre, and what they’re about from Wikipedia. The id in the link goes to Wikidata and Wikipedia.",
+  "plugins.musicbrainz.description":
+    "Looks up songs and albums by a link to MusicBrainz, or one to Spotify, Apple Music, Bandcamp, Deezer or Tidal it knows: artist, album, year and cover. The link goes to MusicBrainz.",
+  "plugins.applePodcasts.description": "Looks up podcasts and their episodes by a link to Apple Podcasts, with the podcast’s feed. The ids in the link go to Apple.",
   "plugins.code": "Code",
   "plugins.code.description": "Notes that are files of code, in any of about 120 programming languages: line numbers, a fixed-width font, and highlighting in the theme's colors, with indenting and brackets as in a code editor. They download and export as their language's files (.py, .ts, .rs…).",
   "plugins.typing": "Typing Practice",

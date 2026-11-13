@@ -375,7 +375,7 @@
     const target = event.target as HTMLElement;
     if (!(event.metaKey || event.ctrlKey) || event.shiftKey || event.altKey || event.key.toLowerCase() !== "z") return;
     if (target.matches("input, textarea")) return;
-    const undone = notes.undoTrash() ? t("list.didRestore") : notes.undoEdit() ? t("calendar.didUndo") : null;
+    const undone = notes.undoTrash() ? t("list.didRestore") : notes.undoEdit();
     if (!undone) return;
     speak(undone);
     event.preventDefault();

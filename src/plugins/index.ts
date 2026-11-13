@@ -1,5 +1,6 @@
 import { isApple } from "../lib/platform";
 import type { Plugin } from "../lib/plugins/types";
+import { applePodcasts } from "./apple-podcasts";
 import { arxiv } from "./arxiv";
 import { asciinema } from "./asciinema";
 import { changesPlugin } from "./changes";
@@ -12,10 +13,13 @@ import { requests } from "./http";
 import { ironcalc } from "./ironcalc";
 import { katex } from "./katex";
 import { latex } from "./latex";
+import { library } from "./library";
 import { lucide } from "./lucide";
 import { markdown } from "./markdown";
 import { mermaid } from "./mermaid";
 import { models } from "./models";
+import { musicbrainz } from "./musicbrainz";
+import { openLibrary } from "./open-library";
 import { paper } from "./paper";
 import { pele } from "./pele";
 import { secrets } from "./secrets";
@@ -29,6 +33,9 @@ import { themes } from "./themes";
 import { typing } from "./typing";
 import { unsplash } from "./unsplash";
 import { wavedrom } from "./wavedrom";
+import { webPages } from "./web-pages";
+import { wikidata } from "./wikidata";
+import { youtube } from "./youtube";
 
 /*
  * The plugins lines comes with, in the order Settings → Plugins lists them. The core finds them
@@ -58,6 +65,14 @@ export const builtIn = (): Plugin[] => [
   asciinema(),
   github(),
   arxiv(),
+  // The library, and where it looks links up: each site, then any page (which it asks last).
+  library(),
+  youtube(),
+  openLibrary(),
+  wikidata(),
+  musicbrainz(),
+  applePodcasts(),
+  webPages(),
   changesPlugin(),
   themes(),
   styles(),

@@ -58,6 +58,51 @@ function dayFromToday(days) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
+/**
+ * Things in the library, as a link looked up makes them: movies with posters (one without), a book,
+ * songs and an album with square covers, and a video; and a person, under Types. The covers are drawn
+ * here, a gradient and a title, and kept as attachments.
+ */
+const seedLibrary = (page) =>
+  page.evaluate(async () => {
+    const { notes, saveAttachment } = window.testing;
+    const cover = async ([width, height, top, bottom], title) => {
+      const canvas = new OffscreenCanvas(width, height);
+      const draw = canvas.getContext("2d");
+      const gradient = draw.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, top);
+      gradient.addColorStop(1, bottom);
+      draw.fillStyle = gradient;
+      draw.fillRect(0, 0, width, height);
+      draw.fillStyle = "rgba(255, 255, 255, 0.92)";
+      draw.font = `600 ${Math.round(Math.min(width, height) / 9)}px sans-serif`;
+      draw.textAlign = "center";
+      draw.fillText(title.toUpperCase(), width / 2, height * 0.84, width * 0.9);
+      return saveAttachment(await canvas.convertToBlob({ type: "image/jpeg", quality: 0.9 }));
+    };
+    const tall = (top, bottom) => [400, 600, top, bottom];
+    const square = (top, bottom) => [500, 500, top, bottom];
+    const items = [
+      ["movie", "Dune: Part Two", { director: "Denis Villeneuve", year: "2024", runtime: "166 min", genre: "Science fiction, Adventure" }, "to watch", tall("#e0a94a", "#4a210a"), "Paul Atreides unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the known universe, he endeavors to prevent a terrible future only he can foresee."],
+      ["movie", "Arrival", { director: "Denis Villeneuve", year: "2016", runtime: "116 min" }, "watched", tall("#9fb3c4", "#1b2733"), "A linguist works with the military to talk with the visitors after twelve spacecraft appear around the world."],
+      ["movie", "Paris, Texas", { director: "Wim Wenders", year: "1984", runtime: "147 min" }, "watching", null, "A man wanders out of the desert, and sets out to put his family back together."],
+      ["book", "Dune", { author: "Frank Herbert", year: "1965", pages: "896" }, "reading", tall("#c86c2b", "#391507"), "Set on the desert planet Arrakis, Dune is the story of the boy Paul Atreides."],
+      ["album", "Kid A", { artist: "Radiohead", year: "2000", tracks: "10" }, "listened", square("#d2dde4", "#56677a"), ""],
+      ["song", "Never Gonna Give You Up", { artist: "Rick Astley", album: "Whenever You Need Somebody", year: "1987", duration: "3:33" }, "to listen", square("#7aa7d8", "#1f3554"), ""],
+      ["video", "How Dune Was Made", { channel: "Behind the Scenes", duration: "14:02" }, "to watch", [640, 360, "#b98a50", "#2f1a0b"], ""],
+    ];
+    const now = Date.now();
+    for (const [i, [type, title, properties, status, picture, about]] of items.entries()) {
+      const name = picture && (await cover(picture, title));
+      const front = Object.entries({ type, ...properties, link: `https://example.com/${i}`, status }).map(([key, value]) => `${key}: ${value}`);
+      // As wide as the library shows a cover: a video's wider than a poster or an album.
+      const shown = picture && (picture[0] > picture[1] ? 400 : 240);
+      const body = [`---\n${front.join("\n")}\n---\n# ${title}`, ...(name ? [`![${title}|${shown}](../attachments/${name})`] : []), ...(about ? [about] : [])].join("\n\n");
+      await notes.insert({ id: crypto.randomUUID(), body, createdAt: now - i * 60_000, updatedAt: now - i * 60_000, pinned: false, trashed: false });
+    }
+    await notes.insert({ id: crypto.randomUUID(), body: "---\ntype: person\n---\n# Ada Lovelace", createdAt: now, updatedAt: now - 3_600_000, pinned: false, trashed: false });
+  });
+
 /** What takes each theme's own colors besides its accent: a highlight, callouts and line marks. */
 const THEME_COLORS = `# Colors
 
@@ -538,6 +583,45 @@ const SCENES = [
     },
   },
   { id: "heading-accent", title: "Headings in the accent", look: "Every heading in the accent; h6 not muted.", prefs: { headingColor: "accent" }, note: "# Heading one\n\n## Heading two\n\n### Heading three\n\nText under them." },
+  ...["lines", "classic", "pixel", "neon"].map((style) => ({
+    id: `library-shelf-${style}`,
+    title: `The Library and a shelf of it, in ${style[0].toUpperCase()}${style.slice(1)}`,
+    look: "In the sidebar, Library after the places and before Types with its + at the heading's end, quiet like the heading: Books, Movies, Music and Videos with their icons and counts, lined up with the rows above; Types with Person only. Movies listed: each row's poster beside its title, the director and year under it, and its status in a quiet outline before the date; Paris, Texas without a poster shows the film icon in a box of the same size; titles lined up with each other. Dune: Part Two open: its properties, its title, its poster 240 pixels wide (not the note's width) and what it's about.",
+    prefs: style === "lines" ? {} : { style, theme: style },
+    act: async (page) => {
+      await seedLibrary(page);
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Movies/ }).click();
+      await page.locator(".note-list [data-id]").first().click();
+    },
+    schemes: style === "lines" ? ["light", "dark"] : ["light"],
+  })),
+  {
+    id: "library-music",
+    title: "A shelf of square covers: Music",
+    look: "Songs and albums together, each cover square and the same size, its artist and album or year under its title.",
+    act: async (page) => {
+      await seedLibrary(page);
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Music/ }).click();
+    },
+    shoot: ".note-list",
+  },
+  {
+    id: "library-looking-up",
+    title: "A link being looked up",
+    look: "After the link, “Looking up…” small and faint with a ring before it, on the link's line; the link as any link.",
+    act: async (page) => {
+      // Never answered, so it stays looking.
+      await page.route("https://www.youtube.com/oembed**", () => {});
+      await page.evaluate(() => window.testing.open(""));
+      await page.evaluate(() => window.testing.place());
+      await page.evaluate(() => {
+        const data = new DataTransfer();
+        data.setData("text/plain", "https://youtu.be/dQw4w9WgXcQ");
+        document.querySelector(".editor-pane [data-pane-content='main'] .cm-content").dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
+      });
+    },
+    shoot: ".editor-pane",
+  },
   ...["block", "underline", "thick"].map((shape) => ({
     id: `cursor-${shape}`,
     title: `Text cursor: ${shape}`,
@@ -580,7 +664,7 @@ const SCENES = [
     },
     shoot: ".cm-lp-editable",
   },
-  ...["Theme", "Paper", "Typography", "Cursor", "Mascots", "Editor", "All Plugins"].map((section) => ({
+  ...["Theme", "Paper", "Typography", "Cursor", "Mascots", "Editor", "Library", "All Plugins"].map((section) => ({
     id: `settings-${section.toLowerCase().replaceAll(" ", "-")}`,
     title: `Settings → ${section}`,
     look: "Rows lined up, notes under their labels, nothing cut off or crowded; the new rows (Dark panes, Heading color, Writing, Typing sounds…) like their neighbors.",

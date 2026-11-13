@@ -294,6 +294,8 @@ export interface Stored {
   copyValues: boolean;
   /** Little Touches: a value like `5/7` drawn as marks, five of seven filled; or as written. */
   scores: ScoreStyle;
+  /** A note that's just a link is looked up and filled in, a library item (library/linkNotes.ts). */
+  lookUpLinks: boolean;
   links: LinkClicks;
   /** What selecting several cells of a spreadsheet shows of them (none: nothing). */
   sheetStats: SheetStat[];
@@ -438,6 +440,7 @@ const DEFAULTS: Stored = {
   symbolsInCode: true,
   copyValues: true,
   scores: "stars",
+  lookUpLinks: true,
   sheetStats: ["sum", "average", "count"],
   sheetDates: "medium",
   sheetMoney: "symbol",
@@ -598,6 +601,7 @@ function read(json?: string): Stored {
     symbolsInCode: flag(raw.symbolsInCode, DEFAULTS.symbolsInCode),
     copyValues: flag(raw.copyValues, DEFAULTS.copyValues),
     scores: oneOf(raw.scores, SCORE_STYLES, DEFAULTS.scores),
+    lookUpLinks: flag(raw.lookUpLinks, DEFAULTS.lookUpLinks),
     links: readLinks(raw.links, typeof raw.version === "number" ? raw.version : 1),
     sheetStats: Array.isArray(raw.sheetStats) ? SHEET_STATS.filter((stat) => (raw.sheetStats as unknown[]).includes(stat)) : DEFAULTS.sheetStats,
     sheetDates: oneOf(raw.sheetDates, DATE_STYLES, DEFAULTS.sheetDates),
@@ -701,6 +705,7 @@ class Prefs {
   symbolsInCode = $state(this.#initial.symbolsInCode);
   copyValues = $state(this.#initial.copyValues);
   scores = $state(this.#initial.scores);
+  lookUpLinks = $state(this.#initial.lookUpLinks);
   sheetStats = $state(this.#initial.sheetStats);
   sheetDates = $state(this.#initial.sheetDates);
   sheetMoney = $state(this.#initial.sheetMoney);
@@ -906,6 +911,7 @@ class Prefs {
       symbolsInCode: this.symbolsInCode,
       copyValues: this.copyValues,
       scores: this.scores,
+      lookUpLinks: this.lookUpLinks,
       links: $state.snapshot(this.links),
       sheetStats: $state.snapshot(this.sheetStats),
       sheetDates: this.sheetDates,
@@ -1016,6 +1022,7 @@ class Prefs {
     this.symbolsInCode = next.symbolsInCode;
     this.copyValues = next.copyValues;
     this.scores = next.scores;
+    this.lookUpLinks = next.lookUpLinks;
     if (next.sheetStats.join() !== this.sheetStats.join()) this.sheetStats = next.sheetStats;
     this.sheetDates = next.sheetDates;
     this.sheetMoney = next.sheetMoney;

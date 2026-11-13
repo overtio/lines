@@ -77,6 +77,7 @@ Put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block), or, with Sp
 ### Organizing
 
 - **Tags, not folders.** Write `#tag` or `#nested/tag` anywhere in a note, or drag a note onto a tag (or a type, the Inbox, the Trash) in the sidebar. Give tags and types icons and colors, synced to your other devices, and rename them everywhere at once.
+- **Library.** Paste a link to a book, a movie, a show, a video, a song, a podcast, an article or a paper into a new note, and it fills itself in: its title, cover, who made it, when and what it's about, from the site and open catalogs (Open Library, Wikidata, MusicBrainz, Apple Podcasts, YouTube, arXiv), with only the link sent. One undo puts the link back. The sidebar's Library lists them by kind, each with its cover and where you've got to (to read, reading, read), set from its menu. See [docs/library.md](docs/library.md).
 - **Objects and mentions.** Give a note properties and a type (`type: person`) and it's listed under Types. Type `@` or `[[` to mention another note, `@Ada.email` to show one of its properties, and `@type.recipe` for a table of every recipe.
 - **Inbox.** New notes and imports land in the Inbox, first in the sidebar, until you file them (or send new notes straight to Notes, in Settings).
 - **Calendar.** Notes on their days: a `date` or `due` in a note's properties, or every day from its `start` to its `end`. Its row counts what's on today. Events repeat (`repeat: every weekday`, `monthly on the last friday until 2027-06-01`, or from an event's menu). Events in their colors: a note's own, or its type's or tag's. A month above the list, and beside it the week or the day by the hour, with notes at their times (`date: 2026-11-30 14:00`). Drag down the hours to make an event, or across All day for one of whole days, drag one to another time or day, or its edge to change how long it is (<kbd>⌘Z</kbd> moves it back). Choose a day for its notes, or press <kbd>↵</kbd> on a day for a note dated that day.
@@ -166,6 +167,7 @@ Also on the website: [overtio.github.io/lines/docs](https://overtio.github.io/li
 | [Themes](docs/themes.md) | Making, sharing and importing themes, and lines' theme files |
 | [API requests](docs/requests.md) | Sending requests from notes, in the `.http` and Hurl formats |
 | [Secrets](docs/secrets.md) | API keys and passwords kept in a locked note, and used by name |
+| [Library](docs/library.md) | Books, movies, music and the rest as notes, filled in from a link, and where lines looks them up |
 | [Plugins](docs/plugins.md) | How lines is made of plugins, turning them off, and writing one |
 | [Sync](docs/sync.md) | How sync and encryption work |
 | [Storage](docs/storage.md) | Where the web app keeps your notes, and for how long |
@@ -300,7 +302,11 @@ src/
     unsplash/  giphy/        /unsplash and /giphy: searching their pictures for the picker
     wallhaven/               Wallhaven's wallpapers: /wallhaven, kept in the note, and themes from them (a picture library)
     github/                  Links to GitHub drawn short
-    arxiv/                   Links to arXiv's papers drawn short, and searching arXiv for /paper (pacing requests as arXiv asks)
+    arxiv/                   Links to arXiv's papers drawn short, searching arXiv for /paper (pacing requests as arXiv asks), and its papers for the library
+    library/                 The library's kinds of things (books, movies, music…), and looking up a note that's just a link
+    web-pages/               What any page says it is (JSON-LD, Open Graph, oEmbed; read.ts), as a library item, in the apps
+    youtube/  open-library/  wikidata/  musicbrainz/  apple-podcasts/
+                             Where the library looks links up, site by site
     code/                    Code notes, a format for each language CodeMirror knows, shown as one (Code) with a choice of language
     changes/                 Marks the lines changed since a note was opened (a line diff, diff.ts)
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
@@ -316,6 +322,13 @@ src/
       registry.svelte.ts     The plugins, which are on (kept and shared between windows), and what they add
       plainText.ts           How a note shows while its format's plugin is off
     paper.svelte.ts          The paper chosen in Settings → Plugins → Paper, as custom properties editor.css draws
+    library/
+      text.ts                A library note's text from what a source found (the same for every way of adding one), and values written alike
+      note.ts                That text with its cover downloaded and kept as an attachment
+      lookup.ts              Asking the sources in turn what a link is
+      linkNotes.ts           A note that's just a link, looked up as it becomes one and filled in as one change
+      page.ts  web.ts        What a page says about itself, read as text; asking the web as lines
+      shelves.svelte.ts      The Library's rows in the sidebar; rows.ts, what a note's row on its shelf shows
     themes/                  Themes worked out from their palettes (palette.ts) as CSS (css.ts, which the website uses too), and this window's theme (show.svelte.ts) and style (styles.svelte.ts); presets (presets.svelte.ts); your own themes and palettes, their files, importing them, and colors' names
     editor/
       Editor.svelte          CodeMirror host; per-note undo history
@@ -456,7 +469,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 
 **Research papers**
 - [ ] More sources for `/paper`: Semantic Scholar, OpenAlex (which, unlike arXiv, takes requests from web pages, so the website could search too), PubMed, bioRxiv
-- [ ] A paper as a note of its own, `type: paper`, with its authors, year, link and abstract as properties, so `@type.paper` is a reading list
+- [x] A paper as a note of its own, `type: paper`, with its authors, year and link, and its abstract, so `@type.paper` is a reading list (a link to it, in the Library)
 - [ ] Citations in LaTeX notes: `\cite` a paper found with `/paper`, its BibTeX entry kept in the note
 - [ ] Open a paper elsewhere from its link: its PDF, alphaXiv, Semantic Scholar, Connected Papers
 
@@ -465,6 +478,13 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] Column widths, number formats and bold kept in the note
 - [ ] Filter, and sort by more than one column
 - [ ] Moving cells and resizing blocks with a finger
+
+**Library**
+- [ ] Add to the Library by searching the catalogs (Open Library, Wikidata, MusicBrainz, Apple Podcasts, arXiv), without a link
+- [ ] Subscribe to podcasts and RSS and Atom feeds, read their posts and play episodes in lines
+- [ ] Sync what's been read and played between devices
+- [ ] Shelves as a grid of covers
+- [ ] Episodes downloaded to listen to offline
 
 **Notes**
 - [ ] Notebooks to file Inbox notes into, nested, beside tags ([#75](https://github.com/overtio/lines/issues/75))
