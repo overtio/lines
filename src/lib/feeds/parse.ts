@@ -22,6 +22,9 @@ export interface Feed {
   posts: Post[];
 }
 
+/** Whether it's a podcast's: its posts have sound. */
+export const isPodcast = (feed: Feed) => feed.posts.some((post) => post.audio);
+
 export interface Post {
   /** What tells it from the feed's other posts: its guid or id, else its link, else its title and date. */
   id: string;

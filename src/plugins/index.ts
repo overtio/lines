@@ -66,15 +66,15 @@ export const builtIn = (): Plugin[] => [
   asciinema(),
   github(),
   arxiv(),
-  // The library, and where it looks links up: each site, then any page (which it asks last).
+  // The library, and where it looks links up: each site, then any page, then a page's site's feed (asked last).
   library(),
   youtube(),
   openLibrary(),
   wikidata(),
   musicbrainz(),
   applePodcasts(),
-  feedsPlugin(),
   webPages(),
+  feedsPlugin(),
   changesPlugin(),
   themes(),
   styles(),

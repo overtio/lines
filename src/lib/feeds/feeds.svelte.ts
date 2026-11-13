@@ -14,7 +14,7 @@ import { fetchFeed, FetchError, type Validators } from "./fetch";
 import { findFeed, linkOf, NoFeed } from "./find";
 import { readOpml, writeOpml } from "./opml";
 import { plainText } from "./markdown";
-import { isFeed, NotAFeed, readFeed, type Feed } from "./parse";
+import { isFeed, isPodcast, NotAFeed, readFeed, type Feed } from "./parse";
 import { backoff, DAY, merge, newestFirst, type FeedRecord, type KeptPost } from "./posts";
 import { feedStorage } from "./storage";
 
@@ -411,7 +411,7 @@ class Feeds {
   async subscribe(input: string, signal = new AbortController().signal): Promise<string> {
     const link = linkOf(input);
     if (!link) throw new NoFeed(input);
-    const found = await findFeed((await namedFeed(link, signal)) ?? link, signal);
+    const found = await findFeed((await namedFeed(link, signal)) ?? link, signal, namedFeed);
     if (this.#subscribed.has(found.url)) return found.url;
     await this.take(found.url, found.feed, found.validators);
     await this.#write(feedItem(found.url, found.feed), signal);
@@ -485,7 +485,7 @@ export async function savePost(row: Row) {
 /** A feed at `url` as the library keeps it: a podcast's (its posts have sound) or a site's, its artwork its cover. */
 export function feedItem(url: string, feed: Feed): LibraryItem {
   return {
-    type: feed.posts.some((post) => post.audio) ? "podcast" : "feed",
+    type: isPodcast(feed) ? "podcast" : "feed",
     title: feed.title,
     link: feed.link,
     properties: known([
@@ -498,13 +498,14 @@ export function feedItem(url: string, feed: Feed): LibraryItem {
 }
 
 /**
- * The feed a site's own library source says a link has, if one does: a podcast's page on Apple
- * Podcasts names its podcast's. (Not the feeds' own source, which reads the link itself.)
+ * The feed a podcasts' library source says a link has, if one does: a podcast's page on Apple
+ * Podcasts names its podcast's. (Not the feeds' own sources, which read the link itself.) Only
+ * podcasts' sources are asked, as a page's every link may be.
  */
-async function namedFeed(link: string, signal: AbortSignal): Promise<string | null> {
+export async function namedFeed(link: string, signal = new AbortController().signal): Promise<string | null> {
   const url = new URL(link);
   for (const source of plugins.librarySources) {
-    if (source.general || source.id === FEED_SOURCE || !source.recognizes(url)) continue;
+    if (source.general || !source.searches?.includes("podcast") || !source.recognizes(url)) continue;
     const item = await source.lookup(url, signal).catch(() => null);
     signal.throwIfAborted();
     const feed = item?.properties.find(([key]) => key === "feed")?.[1];
