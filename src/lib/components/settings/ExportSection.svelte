@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tick } from "svelte";
+  import { type Component, tick } from "svelte";
   import { speak } from "../../a11y";
   import { t } from "../../i18n/index.svelte";
   import Icon from "../../icons/Icon.svelte";
@@ -8,6 +8,7 @@
   import type { SampleSet } from "../../notes/samples";
   import { isClosed, notes } from "../../notes/store.svelte";
   import { isApple, isDesktopApp, isSite, revealFile, saveFile } from "../../platform";
+  import { plugins } from "../../plugins/registry.svelte";
   import { sync } from "../../sync/engine.svelte";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
@@ -31,6 +32,28 @@
   let imported = $state<{ count: number; skipped: string[] } | null>(null);
   let importError = $state<string | null>(null);
   let picker = $state<HTMLInputElement>();
+  let importButton = $state<HTMLElement>();
+
+  type Step = Component<{ files: { name: string; text: string }[]; onclose: () => void }>;
+  /** Files a plugin imports its own way (a browser's bookmarks), each kind asking what to do with them below. */
+  let steps = $state.raw<{ files: { name: string; text: string }[]; step: Step }[]>([]);
+
+  /** The extension a file's name ends in, in lowercase. */
+  const extensionOf = (name: string) => name.slice(name.lastIndexOf(".") + 1).toLowerCase();
+
+  /** The chosen files a plugin imports its own way, by the plugin's import (read to tell), and the rest. */
+  async function sortChosen(files: File[]) {
+    const theirs = new Map<string, { name: string; text: string }[]>();
+    const rest: File[] = [];
+    for (const file of files) {
+      const own = plugins.fileImports.filter((each) => each.extensions.includes(extensionOf(file.name)));
+      const text = own.length ? await file.text() : "";
+      const by = own.find((each) => each.recognizes(text));
+      if (by) theirs.set(by.id, [...(theirs.get(by.id) ?? []), { name: file.name, text }]);
+      else rest.push(file);
+    }
+    return { theirs, rest };
+  }
 
   async function importChosen() {
     const files = [...(picker?.files ?? [])];
@@ -38,9 +61,16 @@
     importing = true;
     imported = null;
     importError = null;
+    steps = [];
     try {
-      imported = await notes.importFiles(files);
-      speak(t("settings.imported", { count: imported.count }));
+      const { theirs, rest } = await sortChosen(files);
+      steps = await Promise.all(
+        [...theirs].map(async ([id, files]) => ({ files, step: (await plugins.fileImports.find((each) => each.id === id)!.step()).default })),
+      );
+      if (rest.length || !theirs.size) {
+        imported = await notes.importFiles(rest);
+        speak(t("settings.imported", { count: imported.count }));
+      }
     } catch (e) {
       importError = e instanceof Error ? e.message : String(e);
     } finally {
@@ -186,16 +216,14 @@
 
 <FieldGroup title={t("settings.import")} note={t("settings.importText")}>
   <CardBlock class="items-start">
-    <Button variant="primary" icon="import" onclick={() => picker?.click()} disabled={importing}>
+    <Button variant="primary" icon="import" onclick={() => picker?.click()} disabled={importing} {@attach (button: HTMLElement) => void (importButton = button)}>
       {importing ? t("settings.importing") : t("settings.importFiles")}
     </Button>
     <input
       bind:this={picker}
       type="file"
       multiple
-      accept={importable()
-        .map((extension) => `.${extension}`)
-        .join(",")}
+      accept={[...importable(), ...plugins.fileImports.flatMap((each) => each.extensions)].map((extension) => `.${extension}`).join(",")}
       class="hidden"
       onchange={importChosen}
     />
@@ -209,6 +237,15 @@
       <Callout tone="danger" class="w-full">{importError}</Callout>
     {/if}
   </CardBlock>
+  {#each steps as chosen (chosen)}
+    <chosen.step
+      files={chosen.files}
+      onclose={() => {
+        steps = steps.filter((each) => each !== chosen);
+        importButton?.focus();
+      }}
+    />
+  {/each}
 </FieldGroup>
 
 <FieldGroup title={t("settings.samples")} note={t("settings.samplesText")}>

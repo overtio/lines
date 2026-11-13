@@ -40,6 +40,8 @@ const { wikidata, itemIn } = await import("../../src/plugins/wikidata");
 const { musicbrainz, musicIn } = await import("../../src/plugins/musicbrainz");
 const { applePodcasts, podcastIn } = await import("../../src/plugins/apple-podcasts");
 const { paperItem } = await import("../../src/plugins/arxiv");
+const bookmarks = await import("../../src/lib/library/bookmarks");
+const { dayOf } = await import("../../src/lib/notes/calendar");
 
 const fixture = (name: string) => readFileSync(new URL(`fixtures/library/${name}`, import.meta.url), "utf8");
 const page = (name: string, url: string) => readPage(fixture(name), url);
@@ -684,5 +686,86 @@ describe("asking the web", () => {
     const stopped = withTimeout(stop.signal, 60_000);
     stop.abort();
     expect(stopped.aborted).toBe(true);
+  });
+});
+
+describe("bookmarks", () => {
+  const backup = readFileSync(new URL("fixtures/bookmarks/firefox.json", import.meta.url), "utf8");
+
+  test("Firefox's backup: its bookmarks in their folders, its own folders named as its bookmark file names them", () => {
+    const read = bookmarks.readBookmarks(backup)!;
+    expect(read.map(({ title, url, folders }) => [title, url, folders.join(" / ")])).toEqual([
+      ["Firefox", "https://www.mozilla.org/en-US/firefox/", ""],
+      ["The Food Lab | Serious Eats", "https://www.seriouseats.com/the-food-lab", "Recipes"],
+      ["Recently Bookmarked", "place:parent=menu________&sort=12&maxResults=10", ""],
+      ["GitHub", "https://github.com/", "Bookmarks Toolbar"],
+      ["HTML 5.2", "https://www.w3.org/TR/html52/", "Other Bookmarks"],
+    ]);
+    // Its microseconds, as milliseconds; its tags and description.
+    expect(read[0]).toEqual({
+      title: "Firefox",
+      url: "https://www.mozilla.org/en-US/firefox/",
+      folders: [],
+      added: 1650000100000,
+      tags: ["mozilla", "Web Browsers"],
+      description: "The browser that puts you first",
+    });
+  });
+
+  test("are told from other files by their start", () => {
+    expect(bookmarks.isBookmarks(backup)).toBe(true);
+    expect(bookmarks.isBookmarks("\uFEFF<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<TITLE>Bookmarks</TITLE>")).toBe(true);
+    expect(bookmarks.isBookmarks('<ul><li><a href="https://example.com" time_added="1600000000">x</a></li></ul>')).toBe(true);
+    for (const other of ['{"notes": []}', "<!doctype html><title>A page</title><a href='https://example.com'>x</a>", "# A note", "not json {"]) {
+      expect(bookmarks.isBookmarks(other), other).toBe(false);
+      expect(bookmarks.readBookmarks(other), other).toBeNull();
+    }
+  });
+
+  test("dates in seconds, milliseconds or microseconds; none that can't be one", () => {
+    expect([bookmarks.bookmarkTime("1700000000"), bookmarks.bookmarkTime(1700000000000), bookmarks.bookmarkTime(1700000000000000)]).toEqual([1700000000000, 1700000000000, 1700000000000]);
+    for (const none of ["", "0", "-5", "soon", 123, Date.now() + 7 * 86_400_000, undefined]) expect(bookmarks.bookmarkTime(none), String(none)).toBeUndefined();
+  });
+
+  test("once each: not those in the library already by their link, nor repeats, nor what isn't a web page", () => {
+    const at = (url: string, title = url) => ({ title, url, folders: [], tags: [] });
+    const plan = bookmarks.planImport(
+      [at("https://example.com/a", "first"), at("HTTPS://EXAMPLE.com/a", "again"), at("https://example.com"), at("https://kept.org/x"), at("javascript:void(0)"), at("place:sort=8"), at("chrome://settings/")],
+      ["https://kept.org/x"],
+    );
+    expect(plan.add.map((each) => each.title)).toEqual(["first", "https://example.com"]);
+    expect([plan.there, plan.repeated, plan.other]).toEqual([1, 1, 3]);
+  });
+
+  test("a resource's note: its folder, the day it was bookmarked, what it says of itself as text, and its tags as lines' own", () => {
+    const bookmark = {
+      title: "HTML 5.2",
+      url: "https://www.w3.org/TR/html52/",
+      folders: ["Other Bookmarks", "Specs & #Drafts"],
+      added: 1650000400000,
+      tags: ["reference", "#spec", "2024", "Web Browsers", "C++"],
+      description: "#not-a-tag, and **not bold**",
+    };
+    expect(text.libraryNoteText(bookmarks.bookmarkItem(bookmark))).toBe(
+      [
+        "---",
+        "type: resource",
+        "folder: Other Bookmarks / Specs & \\#Drafts",
+        `added: ${dayOf(1650000400000)}`,
+        "link: https://www.w3.org/TR/html52/",
+        "---",
+        "# HTML 5.2",
+        "",
+        "\\#not-a-tag, and \\*\\*not bold\\*\\*",
+        "",
+        "#reference #spec #web-browsers #c",
+        "",
+      ].join("\n"),
+    );
+    // Tagged with its folders, asked: nested, as they are.
+    expect(bookmarks.bookmarkItem(bookmark, { folderTags: true }).tags).toContain("other-bookmarks/specs-drafts");
+    // Untitled, named by its link; undated, no day.
+    const untitled = bookmarks.bookmarkItem({ title: "", url: "https://www.example.com/page/", folders: [], tags: [] });
+    expect([untitled.title, untitled.properties]).toEqual(["example.com/page", []]);
   });
 });

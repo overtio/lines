@@ -23,15 +23,16 @@ import { linkNoteLink } from "./text";
 
 /** How long a link typed waits, unchanged, before it's looked up. */
 const TYPED_DELAY = 1000;
-/** How long the note says a lookup couldn't be done. */
-const FAILED_FOR = 4000;
+/** How long the note says a lookup couldn't be done, or found nothing. */
+const SAID_FOR = 4000;
 /** Longer than any link and a new note's start: a note this long isn't one, and isn't read through for one. */
 const MAX_TEXT = 4096;
 
-/** A note's lookup: the text it's for, where it's got to, and what stops it. */
+/** A note's lookup: the text it's for, where it's got to, whether it was asked for (and says when nothing's found), and what stops it. */
 interface Lookup {
   text: string;
-  state: "waiting" | "looking" | "failed";
+  state: "waiting" | LookupState;
+  asked: boolean;
   timer?: ReturnType<typeof setTimeout>;
   abort?: AbortController;
 }
@@ -61,18 +62,19 @@ function stop(id: string) {
 type Find = (signal: AbortSignal) => Promise<LibraryItem | null>;
 
 /** Finds what the note is with `find` once `delay` has passed with its text still `text`, and fills it in. */
-function lookUpNote(id: string, text: string, find: Find, delay: number) {
+function lookUpNote(id: string, text: string, find: Find, delay: number, asked = false) {
   stop(id);
-  const lookup: Lookup = { text, state: "waiting" };
+  const lookup: Lookup = { text, state: "waiting", asked };
   lookups.set(id, lookup);
   lookup.timer = setTimeout(() => void run(id, lookup, find), delay);
 }
 
 /**
- * Fills in a library note just made from what a search said of it (Add to Library), as a note that
- * was a link is filled in: with what `find` finds, its cover kept, while its text is still `text`.
+ * Fills in a library note from what `find` finds, as a note that was a link is filled in, its cover
+ * kept, while its text is still `text`: one just made from what a search said of it (Add to
+ * Library), or a resource asked to be looked up. Asked for, it says when nothing's found.
  */
-export const completeNote = (id: string, text: string, find: Find) => lookUpNote(id, text, find, 0);
+export const completeNote = (id: string, text: string, find: Find) => lookUpNote(id, text, find, 0, true);
 
 async function run(id: string, lookup: Lookup, find: Find) {
   const current = () => lookups.get(id) === lookup;
@@ -86,21 +88,27 @@ async function run(id: string, lookup: Lookup, find: Find) {
     const item = await find(abort.signal);
     const note = item && (await libraryNote(item, abort.signal));
     if (!current()) return;
+    if (!item && lookup.asked) return say(id, lookup, "nothing");
     lookups.delete(id);
     redraw(id);
     if (item && note && fill(id, lookup.text, note)) speak(t("library.filled", { title: item.title }));
   } catch (error) {
     if (abort.signal.aborted || !current()) return;
     console.warn("lines: couldn't look up a link", error);
-    lookup.state = "failed";
-    redraw(id);
-    speak(t("library.failed"));
-    lookup.timer = setTimeout(() => {
-      if (!current()) return;
-      stop(id);
-      redraw(id);
-    }, FAILED_FOR);
+    say(id, lookup, "failed");
   }
+}
+
+/** The note says how its lookup ended, for a moment, and screen readers hear it. */
+function say(id: string, lookup: Lookup, state: "failed" | "nothing") {
+  lookup.state = state;
+  redraw(id);
+  speak(t(SAID[state]));
+  lookup.timer = setTimeout(() => {
+    if (lookups.get(id) !== lookup) return;
+    stop(id);
+    redraw(id);
+  }, SAID_FOR);
 }
 
 /** Where a filled note's title line ends, for the cursor. */

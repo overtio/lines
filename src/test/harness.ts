@@ -4,6 +4,7 @@ import { NoFeed } from "../lib/feeds/find";
 import { htmlToMarkdown, saysMore } from "../lib/feeds/markdown";
 import { readOpml } from "../lib/feeds/opml";
 import { isFeed, NotAFeed, readFeed } from "../lib/feeds/parse";
+import { readBookmarks } from "../lib/library/bookmarks";
 import { lock } from "../lib/lock/lock.svelte";
 import { attachmentNames, saveAttachment } from "../lib/notes/attachments";
 import { noteKeys } from "../lib/notes/noteKeys.svelte";
@@ -42,8 +43,8 @@ const testing = {
   noteKeys,
   feeds,
   player,
-  /** Reading feeds, their HTML and OPML, as lines does (lib/feeds/). */
-  reading: { readFeed, isFeed, NotAFeed, NoFeed, htmlToMarkdown, saysMore, readOpml },
+  /** Reading feeds, their HTML and OPML (lib/feeds/), and bookmarks files (lib/library/bookmarks.ts), as lines does. */
+  reading: { readFeed, isFeed, NotAFeed, NoFeed, htmlToMarkdown, saysMore, readOpml, readBookmarks },
   /** The app lock, to turn on as Settings does. */
   lock,
   panes,

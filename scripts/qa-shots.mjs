@@ -181,6 +181,34 @@ async function playEpisode(page) {
   });
 }
 
+/** A browser's exported bookmarks, as Chrome writes them, for the import's pictures. */
+const BOOKMARKS = `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL><p>
+<DT><H3 PERSONAL_TOOLBAR_FOLDER="true">Bookmarks bar</H3>
+<DL><p>
+<DT><A HREF="https://developer.mozilla.org/en-US/" ADD_DATE="1700000100">MDN Web Docs</A>
+<DT><H3>Dev</H3>
+<DL><p>
+<DT><H3>Rust</H3>
+<DL><p>
+<DT><A HREF="https://doc.rust-lang.org/book/" ADD_DATE="1710000400">The Rust Programming Language</A>
+<DT><A HREF="https://doc.rust-lang.org/book/" ADD_DATE="1710000450">The Rust Book</A>
+</DL><p>
+<DT><A HREF="https://svelte.dev/docs" ADD_DATE="1720000700">Svelte Docs</A>
+<DT><A HREF="javascript:void(0)" ADD_DATE="1700000600">A bookmarklet</A>
+</DL><p>
+</DL><p>
+<DT><H3>Other bookmarks</H3>
+<DL><p>
+<DT><A HREF="https://en.wikipedia.org/wiki/Bookmark_(digital)" ADD_DATE="1730000800">Bookmark (digital) - Wikipedia</A>
+<DT><A HREF="https://www.refactoringui.com/" ADD_DATE="1725000800">Refactoring UI</A>
+<DT><A HREF="https://jvns.ca/" ADD_DATE="1715000800">Julia Evans</A>
+</DL><p>
+</DL><p>
+`;
+
 /** What takes each theme's own colors besides its accent: a highlight, callouts and line marks. */
 const THEME_COLORS = `# Colors
 
@@ -783,6 +811,36 @@ const SCENES = [
       await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Music/ }).click();
     },
     shoot: ".note-list",
+  },
+  {
+    id: "library-bookmarks-import",
+    title: "Importing bookmarks: what it will do",
+    look: "Settings → Library → Bookmarks: Import Bookmarks… then, in the same card, \u201c8 bookmarks in bookmarks.html\u201d with what's left out under it, quieter, a line each; Tag with their folders with its note and switch, lined up like the rows above; Import 6 Resources and Cancel at the start of their row. Nothing cut off.",
+    act: async (page) => {
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      const dialog = page.getByRole("dialog");
+      await dialog.getByRole("navigation").getByText("Library", { exact: true }).click();
+      await dialog.locator("input[type=file][accept*='.json']").setInputFiles({ name: "bookmarks.html", mimeType: "text/html", buffer: Buffer.from(BOOKMARKS) });
+      await dialog.getByText("8 bookmarks in bookmarks.html").evaluate((line) => line.scrollIntoView({ block: "center" }));
+    },
+    shoot: "dialog",
+  },
+  {
+    id: "library-resources",
+    title: "Resources: imported bookmarks on their shelf",
+    look: "Library → Resources: each bookmark its title and folder under it (Bookmarks bar / Dev / Rust), the bookmark icon in its box where a cover would be, the date it was bookmarked on the right, the latest first; the Rust book open: its folder, added and link, its title, and its tag.",
+    act: async (page) => {
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      const dialog = page.getByRole("dialog");
+      await dialog.getByRole("navigation").getByText("Library", { exact: true }).click();
+      await dialog.locator("input[type=file][accept*='.json']").setInputFiles({ name: "bookmarks.html", mimeType: "text/html", buffer: Buffer.from(BOOKMARKS) });
+      await dialog.getByRole("switch", { name: "Tag with their folders" }).click();
+      await dialog.getByRole("button", { name: "Import 6 Resources" }).click();
+      await dialog.getByText("Imported 6 resources").waitFor();
+      await page.keyboard.press("Escape");
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Resources/ }).click();
+      await page.locator(".note-list [data-id]").filter({ hasText: "The Rust Programming Language" }).click();
+    },
   },
   {
     id: "library-looking-up",
