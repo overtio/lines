@@ -21,6 +21,7 @@ class Shelves {
     const types = new Set(kinds.map((kind) => kind.type));
     const shelves = new Map<string, Shelf>();
     for (const kind of kinds) {
+      if (kind.shelf === false) continue;
       const key = kind.shelf && types.has(kind.shelf) ? kind.shelf : kind.type;
       const shelf = shelves.get(key);
       if (shelf) shelf.kinds.push(kind);

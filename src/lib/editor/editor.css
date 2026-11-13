@@ -44,6 +44,12 @@
   padding-bottom: var(--title-gap) !important;
 }
 
+/* A feed's post, read in the note's place (PostView.svelte): where it's from, by whom and when, under its title. */
+.cm-line.cm-post-byline {
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
 /* An empty line between paragraphs; its height sets the paragraph spacing. */
 .cm-lp-blank {
   line-height: calc(var(--editor-line-height) * var(--paragraph-gap));

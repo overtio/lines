@@ -37,28 +37,30 @@ export function committed(tx: IDBTransaction): Promise<void> {
   });
 }
 
-let db: Promise<IDBDatabase> | undefined;
-
-function openDB() {
-  db ??= new Promise((resolve, reject) => {
-    const open = indexedDB.open(DB_NAME, 3);
-    open.onupgradeneeded = () => {
-      const names = open.result.objectStoreNames;
-      if (!names.contains(NOTES)) open.result.createObjectStore(NOTES, { keyPath: "id" });
-      if (!names.contains(SYNC)) open.result.createObjectStore(SYNC, { keyPath: "id" });
-      if (!names.contains(ATTACHMENTS)) open.result.createObjectStore(ATTACHMENTS, { keyPath: "id" });
-    };
-    open.onsuccess = () => resolve(open.result);
-    open.onerror = () => reject(open.error);
-  });
-  return db;
+/** A database of these stores (of records with an `id`), opened when it's first asked for. */
+export function database(name: string, version: number, stores: string[]): () => Promise<IDBDatabase> {
+  let db: Promise<IDBDatabase> | undefined;
+  return () =>
+    (db ??= new Promise((resolve, reject) => {
+      const open = indexedDB.open(name, version);
+      open.onupgradeneeded = () => {
+        for (const store of stores) if (!open.result.objectStoreNames.contains(store)) open.result.createObjectStore(store, { keyPath: "id" });
+      };
+      open.onsuccess = () => resolve(open.result);
+      open.onerror = () => reject(open.error);
+    }));
 }
 
-class ObjectStore<T extends { id: string }> {
-  constructor(private name: string) {}
+const openDB = database(DB_NAME, 3, [NOTES, SYNC, ATTACHMENTS]);
+
+export class ObjectStore<T extends { id: string }> {
+  constructor(
+    private name: string,
+    private db = openDB,
+  ) {}
 
   async #store(mode: IDBTransactionMode) {
-    return (await openDB()).transaction(this.name, mode).objectStore(this.name);
+    return (await this.db()).transaction(this.name, mode).objectStore(this.name);
   }
 
   async all() {
@@ -74,7 +76,7 @@ class ObjectStore<T extends { id: string }> {
   }
 
   async #write(change: (store: IDBObjectStore) => void) {
-    const tx = (await openDB()).transaction(this.name, "readwrite");
+    const tx = (await this.db()).transaction(this.name, "readwrite");
     change(tx.objectStore(this.name));
     await committed(tx);
   }

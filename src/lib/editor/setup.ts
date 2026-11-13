@@ -386,6 +386,34 @@ export const copyOnSelectCompartment = new Compartment();
 export const spelling = (on: boolean): Extension =>
   EditorView.contentAttributes.of(on ? { spellcheck: "true", autocorrect: "on" } : { spellcheck: "false", autocorrect: "off" });
 
+/**
+ * A feed's post, read in the note's place (PostView.svelte): Markdown drawn as a note's is, but
+ * read-only and with nothing that acts. Not plugins' additions (diagrams, requests, secrets, 3D
+ * models), nor blocks that reach other notes (mentions' notes, type tables, math), nor a note's keys,
+ * menus or history: what someone else wrote is only ever read.
+ */
+export function readingExtensions(label: string): Extension[] {
+  return [
+    EditorView.lineWrapping,
+    EditorView.contentAttributes.of({ "aria-label": label, lang: "" }),
+    EditorView.editorAttributes.of({ class: "cm-page" }),
+    readOnly(true),
+    linedown([], prefs.underlinedHeadings),
+    frontMatterField,
+    tables,
+    attachmentBlocks,
+    cards,
+    symbols,
+    livePreview,
+    cursor,
+    syntaxHighlighting(highlightStyle),
+    find,
+    phrases,
+    keymap.of(searchKeymap),
+    theme,
+  ];
+}
+
 /** A note's editor, set up for its language (`format`) from the start. */
 export function createExtensions(onChange: () => void, format?: string): Extension[] {
   return [

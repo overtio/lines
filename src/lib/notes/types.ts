@@ -74,4 +74,6 @@ export type Filter =
   /** A shelf of the Library (library/shelves.svelte.ts), by its key: the notes of its kinds. */
   | { kind: "library"; shelf: string }
   /** The Calendar, on one day (`YYYY-MM-DD`, see calendar.ts): the notes on it. */
-  | { kind: "calendar"; day: string };
+  | { kind: "calendar"; day: string }
+  /** The posts of every feed subscribed to, or of the one at `feed` (feeds/feeds.svelte.ts): no notes. */
+  | { kind: "feeds"; feed?: string };

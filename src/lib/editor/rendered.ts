@@ -9,6 +9,7 @@ import { plugins } from "../plugins/registry.svelte";
 import type { BlockAction, BlockEditor, EditableBlock, Renderer } from "../plugins/types";
 import { actionBar, dropBar, keepBeside, resizeHandle } from "./actions";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
+import { fenceFor } from "./codeFence";
 import { ancestors, arrowsInto, blockPos, changeBetween, clickToShowCode, drawnBlock, drawnBlocks, focused, isEditing, showCode } from "./util";
 
 /*
@@ -48,12 +49,6 @@ export function blockName(info: string): string | null {
 /** An info string with a name and width. */
 const infoText = (language: string, name: string | null, width: number | null) =>
   language + (name ? ` name=${/[\s"]/.test(name) ? `"${name.replaceAll('"', "")}"` : name}` : "") + (width ? ` |${width}` : "");
-
-/** A fence like `fence` for a block of `code`, longer than any run of its character in the code, so no line of the code ends the block. */
-export function fenceFor(code: string, fence = "```") {
-  const runs = code.match(fence[0] === "~" ? /~{3,}/g : /`{3,}/g) ?? [];
-  return fence[0].repeat(Math.max(fence.length, ...runs.map((run) => run.length + 1)));
-}
 
 /** A code block of `language`, with a name if it has one: a ```csv block from its CSV, say. */
 export function fencedBlock(language: string, code: string, name: string | null = null) {

@@ -10,10 +10,11 @@
  *   bun run qa-shots --only paper,typing the scenes whose names have these words
  *   bun run qa-shots --no-build          the last build again
  */
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { chromium, webkit } from "playwright";
 import { build, preview } from "vite";
+import { png } from "../tests/browser/files.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const args = process.argv.slice(2);
@@ -142,9 +143,29 @@ async function searchLibrary(page) {
     return route.fulfill({ headers: { ...cors, "content-type": "image/jpeg" }, body: Buffer.from(covers[i], "base64") });
   });
   await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: "Add to Library" }).click();
+  await page.getByRole("menuitem", { name: "Add to Library" }).click();
   await page.keyboard.type("dune");
   await page.getByRole("dialog", { name: "Add to Library" }).getByRole("option").nth(3).waitFor();
 }
+
+/**
+ * Feeds subscribed to, answered from the tests' copies of real ones (tests/browser/feeds/), their
+ * pictures a plain square: nothing's fetched from the web.
+ */
+async function subscribe(page, feeds) {
+  const cors = { "access-control-allow-origin": "*" };
+  await page.route(
+    (url) => /\.(png|jpe?g|gif)(\?|$)/.test(url.pathname) && url.hostname !== "127.0.0.1",
+    (route) => route.fulfill({ body: png(8, 8, () => [96, 132, 168]), contentType: "image/png", headers: cors }),
+  );
+  for (const [url, fixture] of Object.entries(feeds)) {
+    const body = readFileSync(`${root}tests/browser/feeds/${fixture}`, "utf8");
+    await page.route((asked) => asked.href === url, (route) => route.fulfill({ body, contentType: "application/rss+xml", headers: cors }));
+    await page.evaluate((url) => window.testing.feeds.subscribe(url), url);
+  }
+}
+
+const FEEDS = { "https://svelte.dev/blog/rss.xml": "blog.rss", "https://daringfireball.net/feeds/main": "blog.atom", "https://feeds.megaphone.fm/FSI1483080183": "podcast.rss" };
 
 /** What takes each theme's own colors besides its accent: a highlight, callouts and line marks. */
 const THEME_COLORS = `# Colors
@@ -601,6 +622,48 @@ const SCENES = [
     act: (page) => page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: "Calendar" }).click(),
     schemes: ["light", "dark"],
   })),
+  {
+    id: "feeds",
+    title: "The Feeds, a post open",
+    look: "Every feed's posts in the list, newest first: an unread dot in the row's margin, the titles lined up whether read or not, the excerpt two lines at most, where it's from and when under it (an episode with its headphones and length, and its play button clear of the text). The open post in the note's place, drawn as a note: its title, a smaller, quieter line of where it's from, by whom and when, then its text with its links, list and quote; the toolbar's Mark as Unread and Open in Browser lined up with the other buttons.",
+    act: async (page) => {
+      await subscribe(page, FEEDS);
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Feeds/ }).click();
+      await page.locator(".note-list").getByRole("button", { name: /^Jensen Huang/ }).click();
+    },
+  },
+  ...["neon", "classic", "pixel"].map((style) => ({
+    id: `feeds-${style}`,
+    title: `The Feeds in ${style[0].toUpperCase()}${style.slice(1)}`,
+    look: "The posts' rows as the style draws the note list's, the unread dots in its accent; the open post as it draws a note, its byline quieter than its text.",
+    prefs: { style, theme: style },
+    act: async (page) => {
+      await subscribe(page, FEEDS);
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Feeds/ }).click();
+      await page.locator(".note-list").getByRole("button", { name: /^SvelteKit 3 is here/ }).click();
+    },
+  })),
+  {
+    id: "feeds-subscribe",
+    title: "Subscribing to a feed",
+    look: "The box under the + over the list: its heading, the field with the feed icon and its placeholder, the Subscribe button in the accent; on the web, the quiet line under it about which feeds the web can read.",
+    act: async (page) => {
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Feeds/ }).click();
+      await page.locator(".note-list").getByRole("button", { name: "Subscribe to a Feed" }).first().click();
+    },
+  },
+  {
+    id: "feeds-phone",
+    title: "Phone: a post open",
+    look: "The post filling the screen with the back button at the top left, its title wrapping, its byline and text inside the margins.",
+    width: 390,
+    height: 780,
+    act: async (page) => {
+      await subscribe(page, FEEDS);
+      await page.evaluate(() => window.testing.notes.setFilter({ kind: "feeds" }));
+      await page.locator(".note-list").getByRole("button", { name: /^What’s new in Svelte/ }).click();
+    },
+  },
   {
     id: "calendar-repeat",
     title: "A repeating event and its Repeat menu",

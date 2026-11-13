@@ -3,11 +3,12 @@
   import { speak } from "../a11y";
   import { locale, t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
+  import { feedError, feeds } from "../feeds/feeds.svelte";
   import { shelves } from "../library/shelves.svelte";
   import { dateOf } from "../notes/calendar";
   import { typeLabel } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
-  import { isApple, newNoteKey } from "../platform";
+  import { isApple, isTauri, newNoteKey } from "../platform";
   import { deletePicked, inboxPicked, pinPicked, restorePicked, tagPicked, trashPicked } from "../notes/picked";
   import { prefs } from "../prefs.svelte";
   import { today } from "../today.svelte";
@@ -15,7 +16,9 @@
   import CalendarMonth from "./CalendarMonth.svelte";
   import { ListWindow } from "./listWindow.svelte";
   import NoteRow from "./NoteRow.svelte";
+  import PostRow from "./PostRow.svelte";
   import SidebarToggle from "./SidebarToggle.svelte";
+  import Button from "./ui/Button.svelte";
   import IconButton from "./ui/IconButton.svelte";
 
   let { searchInput = $bindable() }: { searchInput?: HTMLInputElement } = $props();
@@ -26,6 +29,7 @@
     if (f.kind === "type") return typeLabel(f.type);
     if (f.kind === "library") return shelves.get(f.shelf)?.label ?? typeLabel(f.shelf);
     if (f.kind === "calendar") return t("sidebar.calendar");
+    if (f.kind === "feeds") return (f.feed && feeds.subscription(f.feed)?.title) || t("feeds.title");
     return { inbox: t("sidebar.inbox"), all: t("sidebar.notes"), todo: t("sidebar.todo"), untagged: t("sidebar.untagged"), trash: t("sidebar.trash") }[f.kind];
   });
 
@@ -35,10 +39,36 @@
    */
   const tabStop = $derived(Math.max(0, notes.visible.findIndex((e) => e.note.id === notes.selectedId)));
 
-  // Screen readers hear how many notes a search finds, once typing pauses.
+  /** The Feeds (Library), where the list is of posts: every feed's, or one's. */
+  const feedView = $derived(notes.filter.kind === "feeds" ? notes.filter : null);
+  const posts = $derived.by(() => {
+    if (!feedView) return [];
+    const terms = notes.query.toLowerCase().split(/\s+/).filter(Boolean);
+    const all = feeds.posts(feedView.feed);
+    if (!terms.length) return all;
+    return all.filter(({ feed, post }) => {
+      const text = `${post.title} ${post.excerpt} ${feeds.subscription(feed)?.title ?? ""}`.toLowerCase();
+      return terms.every((term) => text.includes(term));
+    });
+  });
+  /** Where the open post is in the list, if it is. */
+  const openPost = $derived.by(() => {
+    const open = feeds.open;
+    return open ? posts.findIndex(({ feed, post }) => feed === open.feed && post.id === open.id) : -1;
+  });
+  /** The feed listed, if it's one, as it was last fetched. */
+  const record = $derived(feedView?.feed ? feeds.records.get(feedView.feed) : undefined);
+
+  /** The box to subscribe in, under the button pressed: lined up with the header's at its right, centered under the empty list's. */
+  function openSubscribe(event: MouseEvent & { currentTarget: HTMLElement }, align: "center" | "end" = "end") {
+    const box = event.currentTarget.getBoundingClientRect();
+    ui.subscribePrompt = { x: align === "end" ? box.right : box.left + box.width / 2, y: box.bottom + 4, align };
+  }
+
+  // Screen readers hear how many notes (or posts) a search finds, once typing pauses.
   $effect(() => {
     if (!notes.query.trim()) return;
-    const count = notes.visible.length;
+    const count = feedView ? posts.length : notes.visible.length;
     const timer = setTimeout(() => speak(t("list.results", { count })), 700);
     return () => clearTimeout(timer);
   });
@@ -77,6 +107,22 @@
   $effect(() => {
     const id = notes.selectedId;
     untrack(() => rows.show(notes.visible.findIndex((e) => e.note.id === id)));
+  });
+
+  const postStop = $derived(Math.max(0, openPost));
+  const postRows = new ListWindow({
+    element: () => list,
+    items: () => posts,
+    key: (row) => row.post.key,
+    keep: () => postStop,
+    gap: ROW_GAP,
+    overscan: 1500,
+  });
+  const drawnRows = $derived(feedView ? postRows : rows);
+
+  $effect(() => {
+    const index = openPost;
+    untrack(() => postRows.show(index));
   });
 
   const picked = $derived(notes.pickedEntries);
@@ -132,15 +178,10 @@
       return;
     }
     const entries = notes.visible;
-    const index = entries.findIndex((e) => e.note.id === notes.selectedId);
-    let to: number;
-    if (event.key === "ArrowDown") to = index + 1;
-    else if (event.key === "ArrowUp") to = index - 1;
-    else if (event.key === "Home") to = 0;
-    else if (event.key === "End") to = entries.length - 1;
-    else return;
+    const to = step(event.key, entries.findIndex((e) => e.note.id === notes.selectedId), entries.length);
+    if (to === null) return;
     event.preventDefault();
-    const next = entries[Math.max(0, Math.min(entries.length - 1, to))]?.note.id;
+    const next = entries[to]?.note.id;
     if (!next) return;
     if (event.shiftKey) notes.pickRange(next);
     else {
@@ -151,6 +192,23 @@
     flushSync();
     list.querySelector<HTMLElement>(`[data-id="${next}"]`)?.focus();
   }
+
+  /** ↑ and ↓ open the post above or below, Home and End the first and last. */
+  function onPostKeydown(event: KeyboardEvent) {
+    const to = step(event.key, openPost, posts.length);
+    const next = to === null ? undefined : posts[to];
+    if (!next) return;
+    event.preventDefault();
+    feeds.show(next.feed, next.post.id);
+    flushSync();
+    list.querySelector<HTMLElement>(`[data-post="${next.post.key}"]`)?.focus();
+  }
+
+  /** The row ↑, ↓, Home or End go to from row `index` (-1 for none) of `count`; null for another key. */
+  function step(key: string, index: number, count: number): number | null {
+    const to = key === "ArrowDown" ? index + 1 : key === "ArrowUp" ? index - 1 : key === "Home" ? 0 : key === "End" ? count - 1 : null;
+    return to === null ? null : Math.max(0, Math.min(count - 1, to));
+  }
 </script>
 
 <section class="note-list flex h-full flex-col" aria-labelledby="note-list-title">
@@ -160,7 +218,16 @@
       <SidebarToggle />
     {/if}
     <h1 id="note-list-title" class="m-0 min-w-0 flex-1 truncate text-md font-semibold" data-tauri-drag-region>{title}</h1>
-    {#if notes.filter.kind !== "trash"}
+    {#if feedView}
+      <IconButton
+        icon="refresh"
+        iconSize={16}
+        busy={feedView.feed ? feeds.fetching.has(feedView.feed) : feeds.fetching.size > 0}
+        label={feedView.feed ? t("feeds.refreshOne") : t("feeds.refresh")}
+        onclick={() => feeds.refresh(feedView.feed ? [feedView.feed] : undefined)}
+      />
+      <IconButton icon="plus" label={t("feeds.subscribe")} open={!!ui.subscribePrompt} onclick={openSubscribe} />
+    {:else if notes.filter.kind !== "trash"}
       <IconButton
         icon="square-pen"
         label={t("list.newNote")}
@@ -248,7 +315,26 @@
     <CalendarMonth day={notes.filter.day} today={today.day} />
   {/if}
 
-  {#if notes.ready && !notes.visible.length}
+  {#if feedView}
+    <!-- Why a feed couldn't be fetched; on the web, that most can't be. -->
+    {#if record?.error}
+      <p class="mx-3 mb-2 rounded-lg bg-input px-2.5 py-2 text-xs leading-normal text-muted" role="status">{feedError(record.error)}</p>
+    {:else if !isTauri && !feedView.feed && feeds.subscriptions.some(({ url }) => feeds.records.get(url)?.error === "blocked")}
+      <p class="mx-3 mb-2 rounded-lg bg-input px-2.5 py-2 text-xs leading-normal text-muted">{t("feeds.webHint")}</p>
+    {/if}
+    {#if !posts.length}
+      <div class="mx-6 my-8 flex flex-col items-center gap-3 text-center text-base text-faint">
+        {#if notes.query}
+          <p class="m-0">{t("feeds.noMatches", { query: notes.query })}</p>
+        {:else if !feeds.subscriptions.length}
+          <p class="m-0">{t("feeds.none")}</p>
+          <Button variant="quiet" icon="plus" onclick={(event) => openSubscribe(event, "center")}>{t("feeds.subscribe")}</Button>
+        {:else}
+          <p class="m-0">{feeds.fetching.size ? t("feeds.fetching") : t("feeds.noPosts")}</p>
+        {/if}
+      </div>
+    {/if}
+  {:else if notes.ready && !notes.visible.length}
     <p class="mx-6 my-8 text-center text-base text-faint">
       {#if notes.query}{t("list.noMatches", { query: notes.query })}{:else if notes.filter.kind === "trash"}{t(
           "list.trashIsEmpty",
@@ -262,16 +348,31 @@
        space above and below the drawn ones (the styles below), so it scrolls as far as all of them. -->
   <ul
     class="items relative flex-1 overflow-y-auto overscroll-contain px-3 pb-6 outline-none"
-    style:--before="{rows.before}px"
-    style:--after="{rows.after}px"
+    style:--before="{drawnRows.before}px"
+    style:--after="{drawnRows.after}px"
     bind:this={list}
-    bind:clientHeight={rows.viewHeight}
+    bind:clientHeight={() => drawnRows.viewHeight, (height) => (rows.viewHeight = postRows.viewHeight = height)}
     aria-labelledby="note-list-title"
     onscroll={() => {
       swipedId = null;
-      rows.scrolled();
+      drawnRows.scrolled();
     }}
   >
+    {#if feedView}
+      {#each postRows.drawn as { item: row, index, top } (row.post.key)}
+        <PostRow
+          {row}
+          {now}
+          {index}
+          count={posts.length}
+          {top}
+          measure={postRows.measure(row.post.key)}
+          selected={index === openPost}
+          tabbable={index === postStop}
+          onkeydown={onPostKeydown}
+        />
+      {/each}
+    {:else}
     {#each rows.drawn as { item: entry, index, top } (entry.note.id)}
       {@const id = entry.note.id}
       <NoteRow
@@ -289,6 +390,7 @@
         onkeydown={onListKeydown}
       />
     {/each}
+    {/if}
   </ul>
 </section>
 

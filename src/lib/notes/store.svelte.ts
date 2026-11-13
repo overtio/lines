@@ -215,6 +215,8 @@ class NotesStore {
   visible = $derived.by(() => {
     const f = this.filter;
     const terms = this.query.toLowerCase().split(/\s+/).filter(Boolean);
+    // The Feeds list posts, not notes.
+    if (f.kind === "feeds") return [];
     return this.#ordered.filter(({ note, meta }) => {
       if (f.kind === "trash") {
         if (!note.trashed) return false;
@@ -448,7 +450,8 @@ class NotesStore {
       ...(prefs.newNotes === "inbox" && !(made.type && plugins.libraryKind(made.type)) && { inbox: true }),
     };
     this.#templates.set(note.id, { body: note.body, made });
-    if (this.filter.kind === "trash") this.filter = { kind: "all" };
+    // Not in a list that won't show it.
+    if (this.filter.kind === "trash" || this.filter.kind === "feeds") this.filter = { kind: "all" };
     this.query = "";
     this.entries = [entryOf(note), ...this.entries];
     if (open) {

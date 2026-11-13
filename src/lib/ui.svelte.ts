@@ -58,8 +58,8 @@ export interface TagPrompt {
   ids: string[];
   x: number;
   y: number;
-  /** Opened from a button: its right edge lines up with `x`. */
-  align?: "start" | "end";
+  /** Opened from a button: its right edge ("end"), or its middle, lines up with `x`. */
+  align?: "start" | "center" | "end";
 }
 
 function layoutFor(width: number): Layout {
@@ -82,6 +82,8 @@ class UIState {
   iconPicker = $state.raw<IconTarget | null>(null);
   /** Notes a tag is being added to, and where its box opens. */
   tagPrompt = $state.raw<TagPrompt | null>(null);
+  /** Where the box to subscribe to a feed opens, while it's open. */
+  subscribePrompt = $state.raw<Omit<TagPrompt, "ids"> | null>(null);
   /**
    * The note whose PDF is being previewed, and what it goes straight on to once it's ready:
    * printing, exporting the PDF (printed, or saved from a typesetter), or offering PNG images.

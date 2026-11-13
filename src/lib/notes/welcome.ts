@@ -34,7 +34,7 @@ Start a note with \`/properties\` to give it a type, like \`type: person\`, and 
 
 ## Books, movies and music
 
-Paste a link to a book, a movie, a video, a song or an article into a new note, and it fills itself in with its title, cover and details. It's kept in the sidebar's **Library**, on its shelf; right-click it there to mark where you've got to: to read, reading, read.
+Paste a link to a book, a movie, a video, a song or an article into a new note, and it fills itself in with its title, cover and details. It's kept in the sidebar's **Library**, on its shelf; right-click it there to mark where you've got to: to read, reading, read. The Library's + also subscribes to blogs and podcasts, whose posts you read under Feeds.
 
 ## Callouts and cards
 

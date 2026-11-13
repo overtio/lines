@@ -35,7 +35,7 @@ Dune: Part Two is a 2024 American epic space opera film directed by Denis Villen
 
 ## Add to Library
 
-The + on the Library's heading in the sidebar opens Add to Library: choose what to search for (Books, Movies, Shows, Music, Podcasts, Papers, as the sources on can search), and type a title, or a name with it. The catalogs answer as you type, each result with its cover, who made it and when; ↓ moves into them, and ↵ or a click adds the one chosen. Paste a link there instead to look it up as a note that's just a link is. Something the Library has a note of already, by its link, opens that note rather than making another. **Blank** starts one of the kind chosen to fill in by hand. What's added is filed on its shelf, not in the Inbox.
+The + on the Library's heading in the sidebar opens Add to Library (with feeds on, it's in the +'s menu, beside Subscribe to a Feed): choose what to search for (Books, Movies, Shows, Music, Podcasts, Papers, as the sources on can search), and type a title, or a name with it. The catalogs answer as you type, each result with its cover, who made it and when; ↓ moves into them, and ↵ or a click adds the one chosen. Paste a link there instead to look it up as a note that's just a link is. Something the Library has a note of already, by its link, opens that note rather than making another. **Blank** starts one of the kind chosen to fill in by hand. What's added is filed on its shelf, not in the Inbox.
 
 What's chosen is a new note on its shelf, opened at once with what the search said of it, then filled in from its page (its cover, and what it's about) as one change, which ⌘Z takes back.
 
@@ -67,6 +67,7 @@ Right-click a link to a web page in any Markdown note (or put the cursor on it a
 | `episode` | Episodes | podcast (a mention of the podcast's note), published, duration, audio | to listen, listening, listened |
 | `article` | Articles | author, site, published | to read, reading, read |
 | `paper` | Papers | authors, year, arxiv | to read, reading, read |
+| `feed` | Feeds (by its posts) | author, feed | |
 
 Each has `link` (where it's from) and `status` after its own properties, and only the properties a source found. The keys and the `status` values are written in English, like `type`, so tables (`@type.book`), mentions (`@[Dune].author`) and the Library read them alike on every device; lines shows the status in its own language. A note's status is set from its row's menu on its shelf (or by writing it), and it keeps its date, so the list stays as it is. A status of your own (`status: abandoned`) is shown as written.
 
@@ -74,7 +75,7 @@ A new note made while a shelf is shown starts as its kind, at its first status, 
 
 ## In the sidebar
 
-The Library comes after the places and before Types, which no longer lists its kinds. It's there even while it's empty, to be found, and like any section it can be folded, hidden, its rows made small or tiles, hidden one by one (Show Hidden brings them back) and dragged into the order you like. Songs and albums share Music.
+The Library comes after the places and before Types, which no longer lists its kinds. It's there even while it's empty, to be found, and like any section it can be folded, hidden, its rows made small or tiles, hidden one by one (Show Hidden brings them back) and dragged into the order you like. Songs and albums share Music. [Feeds](#feeds) is at its top.
 
 On a shelf, each row shows the cover small at its side (in the shape the kind's covers come in: a book's or poster's tall, an album's square, a video's wide), the title, what it's by (author and year, director and year, artist and album, channel and length…) and its status. A row without a cover shows its kind's icon.
 
@@ -89,6 +90,7 @@ Each source is a plugin, which can be turned off in Settings → Plugins, and ot
 | Wikidata | IMDb, The Movie Database, Letterboxd, Wikipedia and Wikidata links to films, series and books | the id in the link (or the page's title) to Wikidata, and the item's page title to Wikipedia, for its summary and poster | Yes |
 | MusicBrainz | musicbrainz.org songs and albums, and Spotify, Apple Music, Bandcamp, Deezer and Tidal links it knows (most albums, fewer songs); covers from the Cover Art Archive | the id in the link, or the link | Yes |
 | Apple Podcasts | podcasts.apple.com podcasts, and their latest 200 episodes | the podcast's and episode's ids, to Apple's iTunes Search API; the podcast's feed, for what it's about | Yes; what a podcast is about only where its feed lets web pages read it (few do) |
+| Feeds | links that look like a feed's (`….xml`, `….rss`, `/feed`, `/rss`, `feeds.…`), made [subscriptions](#feeds) | the link, to its site | Only feeds whose sites let web pages read them |
 | arXiv | arxiv.org papers | the paper's id | No: arXiv's API doesn't answer web pages |
 | Web Pages | any page | the link, to its own site | No: sites don't let web pages read them |
 
@@ -96,6 +98,19 @@ Web Pages reads what a page says about itself for search engines and for links s
 
 Only what's needed is sent: the link, or an id read from it. Nothing from your notes. In the apps, lines says it's `lines/<version> (https://github.com/overtio/lines)` to the services it asks, as MusicBrainz and Wikimedia ask apps to; nothing about you. MusicBrainz is asked once a second at most, and arXiv every three seconds, as they ask.
 
+## Feeds
+
+Subscribe to blogs, sites and podcasts, and read their posts in lines.
+
+- **A subscription is a note** with a `feed:` property: a podcast's (`type: podcast`, on the Podcasts shelf too) or a site's (`type: feed`), with its title, artwork, author, `feed` and `link`, made as any library note is. It syncs as notes do. Trashing or deleting the note, or taking out its `feed:`, unsubscribes; restoring it subscribes again, with its posts as they were. Unsubscribe, in a feed's menu, puts every note subscribing to it in the Trash.
+- **Subscribe** from the Library heading's + (Subscribe to a Feed), or the + over the Feeds: paste a feed's link, a site's (lines finds the feed its page names, `<link rel="alternate">`), or a podcast's page on Apple Podcasts (Apple's lookup, the Apple Podcasts plugin's, gives its feed). A new note that's just a feed's link becomes a subscription too, as any link becomes what it is. Settings → Library imports and exports OPML, the file other feed readers and podcast apps use.
+- **Feeds**, at the top of the Library, lists every feed's posts, newest first, unread ones marked; under it each feed, with its artwork and how many posts are unread, and a quiet mark, saying why when pointed at, if it couldn't be fetched. A post opens in the note's place, read-only, drawn as a note: its HTML made into Markdown (paragraphs, headings, links, emphasis, lists, quotes, code, pictures, simple tables), never shown as it came. Nothing in a post is more than text there: its code has no language, so nothing draws or runs it (a diagram, a request), its links go only to the web or to mail, and what would read as a tag, a mention, math or a link to a note stays words. Opening it marks it read; over it, Mark as Unread and Open in Browser. A feed's menu, and Feeds', marks all its posts read.
+- **Save to Library** (over an open post, or in its menu) keeps a post as a note of its own: an `article`, or an `episode` whose `podcast` mentions its subscription's note.
+- Feeds are read as RSS 2.0, Atom and RSS 1.0, with iTunes' podcast tags (artwork, author, duration, season and episode) and Podcasting 2.0's season and episode. A feed that isn't quite XML (a bare `&`, an HTML entity, a stray character, a namespace never declared) is mended, and one cut short is read as far as it goes.
+- **Refreshing**, in the main window: when lines starts and then every 30 minutes while it's open (Settings → Library → Refresh feeds: 15 minutes, 30, an hour, 4 hours, or only when asked), and with ⟳ over the list. Each feed is asked whether it changed since last time (its ETag and Last-Modified), a few at a time and never two from one site at once, feeds imported from OPML too. One that fails is asked again later each time it fails in a row (after the refresh interval, then twice that, and so on), and one that says to wait (429, 503) no sooner than it said; either way, a day at most. One that says it's gone for good (410) isn't asked again. ⟳ asks any of them anyway. The apps call themselves `lines/<version> (+https://github.com/overtio/lines)`, and say nothing of who's using them.
+- **What's kept**: the newest 200 posts of each feed and which were read, in this device's `lines-feeds` database ([storage.md](storage.md)), each under a random id, and encrypted while the app lock is on. None of it syncs: each device fetches the posts itself, and has its own read and unread.
+- **On the web** only feeds whose sites let web pages read them can be (CORS): most blogs' don't, and many podcast hosts' do. The Feeds and the box to subscribe say so. Apple Podcasts' lookup finds a podcast's feed on the web too, but subscribing still needs the feed itself to be readable. Nor can a site's answer be read when it doesn't allow it: a feed that says to wait, or that it's gone, looks like one that couldn't be reached, and is asked again as one that failed.
+
 ## Not yet
 
-See [limitations.md](limitations.md#library) for what's missing, and the README's roadmap for what's planned: feeds and podcasts, a grid of covers.
+See [limitations.md](limitations.md#library) for what's missing, and the README's roadmap for what's planned: a grid of covers, and read and played synced between devices.

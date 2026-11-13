@@ -46,6 +46,7 @@ const KINDS = [
 
 const MORE = [
   ["library", "Books, movies and music"],
+  ["rss", "Feeds and podcasts"],
   ["sigma", "Math"],
   ["pen-tool", "Drawings"],
   ["send", "API requests"],

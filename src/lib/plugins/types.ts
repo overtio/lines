@@ -145,8 +145,11 @@ export interface LibraryKind {
   /** Its row in the Library, in the sidebar: "Books". */
   label: string;
   icon: IconName;
-  /** Another kind's type, whose row it's listed in: an album's is "song", so both are Music. */
-  shelf?: string;
+  /**
+   * Another kind's type, whose row it's listed in: an album's is "song", so both are Music. False
+   * for no row: a feed's notes are subscriptions, and the Library's Feeds lists them by their posts.
+   */
+  shelf?: string | false;
   /** Its properties' keys, in the order its notes have them, before `link` and `status`. */
   properties: string[];
   /** What its rows show under their titles, by key, those it has joined with " · ": author and year. */

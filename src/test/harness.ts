@@ -1,4 +1,10 @@
 import { EditorView } from "@codemirror/view";
+import { feeds } from "../lib/feeds/feeds.svelte";
+import { NoFeed } from "../lib/feeds/find";
+import { htmlToMarkdown } from "../lib/feeds/markdown";
+import { readOpml } from "../lib/feeds/opml";
+import { isFeed, NotAFeed, readFeed } from "../lib/feeds/parse";
+import { lock } from "../lib/lock/lock.svelte";
 import { attachmentNames, saveAttachment } from "../lib/notes/attachments";
 import { noteKeys } from "../lib/notes/noteKeys.svelte";
 import { notes } from "../lib/notes/store.svelte";
@@ -33,6 +39,11 @@ async function until(ready: () => unknown, timeout = 10_000) {
 const testing = {
   notes,
   noteKeys,
+  feeds,
+  /** Reading feeds, their HTML and OPML, as lines does (lib/feeds/). */
+  reading: { readFeed, isFeed, NotAFeed, NoFeed, htmlToMarkdown, readOpml },
+  /** The app lock, to turn on as Settings does. */
+  lock,
   panes,
   plugins,
   prefs,

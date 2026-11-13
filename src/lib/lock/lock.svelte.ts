@@ -1,4 +1,5 @@
 import { aesKey, isLockedKey, lockKey, randomBytes, unlockKey, type Bytes, type LockedKey } from "../crypto";
+import { feeds } from "../feeds/feeds.svelte";
 import { rewriteAttachments } from "../notes/attachments";
 import { notes, noteStorage } from "../notes/store.svelte";
 import { isDesktopApp, isMacApp } from "../platform";
@@ -171,6 +172,7 @@ class AppLock {
     await notes.flush();
     await noteStorage.rewrite();
     await rewriteAttachments();
+    await feeds.rewrite();
     await sync.rewrite();
   }
 

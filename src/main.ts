@@ -15,6 +15,7 @@ import FloatingNote from "./lib/components/FloatingNote.svelte";
 import Settings from "./lib/components/settings/Settings.svelte";
 import LockedNote from "./lib/components/LockedNote.svelte";
 import LockScreen from "./lib/components/LockScreen.svelte";
+import { feeds } from "./lib/feeds/feeds.svelte";
 import { lock } from "./lib/lock/lock.svelte";
 import { arrived, removeUnusedAttachments } from "./lib/notes/attachments";
 import { lockedNotes } from "./lib/notes/locked.svelte";
@@ -144,7 +145,7 @@ async function start() {
     if (lock.enabled) watchActivity();
   } else if (isSettingsWindow) {
     ui.settings = initialSection();
-    const synced = forwardToMain({ sync, lock, lockedNotes, notes }, sync, (state) => {
+    const synced = forwardToMain({ sync, lock, lockedNotes, notes, feeds }, sync, (state) => {
       lock.settings = state.lock;
       noteKeys.settings = state.noteKeys;
     });
@@ -171,10 +172,12 @@ async function start() {
   );
   await sync.load();
   sync.start();
+  // Only the main window fetches feeds, as it syncs.
+  void feeds.start().catch((error) => console.error("lines: couldn't read the feeds kept", error));
   // Settings, in its own window, asks this one to sync, lock and add notes.
   if (isTauri) {
     serveSettings(
-      { sync, lock, lockedNotes, notes },
+      { sync, lock, lockedNotes, notes, feeds },
       () => ({
         config: sync.config,
         status: sync.status,

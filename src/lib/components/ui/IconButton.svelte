@@ -17,8 +17,10 @@
     danger?: boolean;
     /** Something else to show in its tooltip, such as its shortcut. */
     tooltip?: string;
+    /** Spins a loader in its icon's place while something is under way. */
+    busy?: boolean;
   };
-  let { icon, label, iconSize = 18, open = false, on = false, danger = false, tooltip, class: className, ...rest }: Props = $props();
+  let { icon, label, iconSize = 18, open = false, on = false, danger = false, tooltip, busy = false, class: className, ...rest }: Props = $props();
 </script>
 
 <button
@@ -30,7 +32,8 @@
     danger ? "text-danger" : ["enabled:hover:text-fg", open ? "bg-active text-fg" : on ? "text-accent" : "text-muted"],
     className,
   ]}
+  aria-busy={busy || undefined}
   {...rest}
 >
-  <Icon name={icon} size={iconSize} />
+  <Icon name={busy ? "loader" : icon} size={iconSize} class={busy ? "animate-spin" : undefined} />
 </button>

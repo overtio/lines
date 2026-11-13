@@ -1,6 +1,7 @@
 <script lang="ts">
   // Library: whether a note that's just a link is looked up and filled in, and on the web, which
-  // sources a web page can ask at all (docs/library.md).
+  // sources a web page can ask at all (docs/library.md); and feeds: how often they're fetched, and OPML.
+  import { feeds } from "../../feeds/feeds.svelte";
   import { locale, t } from "../../i18n/index.svelte";
   import { isTauri } from "../../platform";
   import { plugins } from "../../plugins/registry.svelte";
@@ -9,6 +10,7 @@
   import FieldGroup from "../ui/FieldGroup.svelte";
   import FieldRow from "../ui/FieldRow.svelte";
   import Switch from "../ui/Switch.svelte";
+  import FeedSettings from "./FeedSettings.svelte";
 
   /** The sources a web page can ask: those on that let it (the rest are the apps' alone). */
   const names = $derived(new Intl.ListFormat(locale, { type: "conjunction" }).format(plugins.librarySources.map((source) => source.name)));
@@ -22,3 +24,7 @@
     {/snippet}
   </FieldRow>
 </FieldGroup>
+
+{#if feeds.on}
+  <FeedSettings />
+{/if}

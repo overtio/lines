@@ -94,6 +94,7 @@ const FORWARDED: Record<string, string[]> = {
   lock: ["enable", "disable", "changePassphrase", "setAfter", "setTouchId", "lockNow"],
   lockedNotes: ["unlock", "changePassword", "reset", "setTouchId"],
   notes: ["addSamples", "reset", "setFilter"],
+  feeds: ["importOpml"],
 };
 
 /**
