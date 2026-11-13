@@ -113,30 +113,30 @@ test("Fonts: IBM Plex Sans, Fira Sans and Agave come with lines, write notes in 
   expect(await app.style(".editor-pane .cm-content", "font-family")).toStartWith("-apple-system");
 });
 
-describe("fonts installed on this device", () => {
-  /** A family this computer has (the Mac's and Linux's differ), by how it measures against the generic fonts. */
-  const someInstalledFont = (page: App["page"]) =>
-    page.evaluate(() => {
-      const context = document.createElement("canvas").getContext("2d")!;
-      const width = (font: string) => {
-        context.font = `40px ${font}`;
-        return context.measureText("mmmmmmmmmmlli1WQ@#Aa").width;
-      };
-      return ["Helvetica", "Arial", "DejaVu Sans", "Liberation Sans", "Verdana", "Georgia"].find((name) => ["monospace", "serif"].some((generic) => width(`"${name}", ${generic}`) !== width(generic)))!;
+/** A family this computer has (the Mac's and Linux's differ), by how it measures against the generic fonts. */
+const someInstalledFont = (page: App["page"]) =>
+  page.evaluate(() => {
+    const context = document.createElement("canvas").getContext("2d")!;
+    const width = (font: string) => {
+      context.font = `40px ${font}`;
+      return context.measureText("mmmmmmmmmmlli1WQ@#Aa").width;
+    };
+    return ["Helvetica", "Arial", "DejaVu Sans", "Liberation Sans", "Verdana", "Georgia"].find((name) => ["monospace", "serif"].some((generic) => width(`"${name}", ${generic}`) !== width(generic)))!;
+  });
+
+/** The system's fonts as the browser lists them (Local Font Access): many, and `families` among them; or the person saying no. */
+const listFonts = (page: App["page"], families: string[] | "refused") =>
+  page.evaluate((families) => {
+    const many = Array.from({ length: 300 }, (_, i) => ({ family: `Zz Sample ${i + 1}` }));
+    Object.assign(window, {
+      queryLocalFonts: async () => {
+        if (families === "refused") throw new DOMException("Permission denied", "NotAllowedError");
+        return [...families.map((family) => ({ family })), ...families.map((family) => ({ family })), { family: ".Hidden" }, ...many];
+      },
     });
+  }, families);
 
-  /** The system's fonts as the browser lists them (Local Font Access): many, and `families` among them; or the person saying no. */
-  const listFonts = (page: App["page"], families: string[] | "refused") =>
-    page.evaluate((families) => {
-      const many = Array.from({ length: 300 }, (_, i) => ({ family: `Zz Sample ${i + 1}` }));
-      Object.assign(window, {
-        queryLocalFonts: async () => {
-          if (families === "refused") throw new DOMException("Permission denied", "NotAllowedError");
-          return [...families.map((family) => ({ family })), ...families.map((family) => ({ family })), { family: ".Hidden" }, ...many];
-        },
-      });
-    }, families);
-
+describe("fonts installed on this device", () => {
   const stored = (page: App["page"]) => page.evaluate(() => JSON.parse(localStorage.getItem("lines.prefs")!).installedFont as string);
 
   test("Typography has Font family, its recommended fonts and an installed one, then Font size with the text's size, then Heading color, then Fonts for formatting, then Font ligatures", async () => {
@@ -340,7 +340,8 @@ describe("formatting's fonts", () => {
     const text = await family(".cm-content");
     expect(await family(".cm-lp-quote")).toBe(text);
     expect(await family(".cm-lp-code .cm-lp-monospace")).toStartWith("ui-monospace");
-    await app.page.evaluate(() => Object.assign(window, { queryLocalFonts: async () => [{ family: "Zz Listed Font" }] }));
+    const installed = await someInstalledFont(app.page);
+    await listFonts(app.page, [installed]);
     await toggle(await app.settings("All Plugins"), "Fonts", false);
     expect(await family(".cm-lp-link")).toBe(text);
 
@@ -358,8 +359,8 @@ describe("formatting's fonts", () => {
     await settings.getByRole("combobox", { name: "Code blocks" }).click();
     const list = app.page.getByRole("listbox");
     expect(await list.getByRole("group", { name: "Recommended" }).getByRole("option").allInnerTexts()).toEqual(["System", "Serif", "Rounded"]);
-    await list.getByRole("group", { name: "Installed" }).getByRole("option", { name: "Zz Listed Font" }).click();
-    expect(await family(".cm-lp-codeblock .cm-lp-monospace")).toStartWith("Zz Listed Font, ui-monospace");
+    await list.getByRole("group", { name: "Installed" }).getByRole("option", { name: installed, exact: true }).click();
+    expect(await family(".cm-lp-codeblock .cm-lp-monospace")).toStartWith(`${installed}, ui-monospace`);
   });
 
   test("a heading in a quote is in headings' font (quotes' without one), on screen and on paper; bold in a heading in bold's font, or the heading's without one", async () => {
@@ -371,7 +372,7 @@ describe("formatting's fonts", () => {
     await app.page.evaluate(() => window.testing.place(0));
     await app.page.keyboard.press(`${mod()}+P`);
     const doc = app.page.getByRole("dialog").locator(".doc-markdown");
-    await doc.locator("blockquote h1").waitFor();
+    await doc.locator("blockquote h1").first().waitFor({ state: "attached" });
     const printed = (selector: string) => doc.locator(selector).first().evaluate((element) => getComputedStyle(element).fontFamily.replaceAll('"', ""));
     expect(await printed("blockquote h1")).toStartWith("ui-serif");
     expect(await printed("blockquote p")).toStartWith("ui-monospace");
