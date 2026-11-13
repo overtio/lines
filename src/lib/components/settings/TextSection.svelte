@@ -19,7 +19,8 @@
     TEXT_SIZE,
     type Spacing,
   } from "../../prefs.svelte";
-  import { noteFonts } from "../../themes/fonts.svelte";
+  import { fontName, fontOff, noteFonts } from "../../themes/fonts.svelte";
+  import { type FontChoice, FORMATTING_FONTS, type FormattingFont, isCode } from "../../themes/formattingFonts";
   import { canDraw } from "../../themes/installedFonts";
   import Button from "../ui/Button.svelte";
   import ColorField from "../ui/ColorField.svelte";
@@ -28,6 +29,7 @@
   import Segmented from "../ui/Segmented.svelte";
   import Slider from "../ui/Slider.svelte";
   import Switch from "../ui/Switch.svelte";
+  import { colorName } from "./colorNames";
   import FontPicker from "./FontPicker.svelte";
 
   const SAMPLE = t("settings.previewNote");
@@ -38,6 +40,32 @@
   function chooseFont(id: string) {
     prefs.font = id;
     prefs.installedFont = "";
+  }
+
+  /** Each formatting by the name its color has in Settings → Theme, but headings, all levels at once, and code blocks. */
+  const formattingName = (part: FormattingFont) =>
+    part === "headings" ? t("settings.fontHeadings") : part === "code-block" ? t("settings.fontCodeBlocks") : colorName(`text-${part}`);
+
+  /** What a formatting is in without a font of its own: the text's, code's for code, and a style's own for headings where it has one. */
+  function notChosen(part: FormattingFont) {
+    if (isCode(part)) return { label: t("settings.fontCodeFont"), family: "var(--font-mono)" };
+    const own = part === "headings" ? plugins.style(prefs.style)?.headingFont : undefined;
+    return own ? { label: own.name, family: own.family } : { label: t("settings.fontSameAsText"), family: "var(--font-text)" };
+  }
+
+  /** Why a font chosen for formatting isn't what it's in: not installed on this device, or its plugin off. */
+  function unused(choice: FontChoice | null) {
+    if (!choice) return null;
+    if ("installed" in choice) return canDraw(choice.installed) ? null : t("settings.fontNotUsedHere", { name: choice.installed });
+    const off = fonts.some((font) => font.id === choice.font) ? undefined : fontOff(choice.font);
+    return off ? t("settings.fontPluginOff", { name: off.name, plugin: off.plugin }) : null;
+  }
+
+  function chooseFormattingFont(part: FormattingFont, choice: FontChoice | null) {
+    const fonts = { ...prefs.formattingFonts };
+    if (choice) fonts[part] = choice;
+    else delete fonts[part];
+    prefs.formattingFonts = fonts;
   }
 
   // "text" is the theme's colors for each level, by its first name (prefs.svelte.ts).
@@ -96,7 +124,7 @@
     <Segmented
       class="w-full"
       label={t("settings.fontRecommended")}
-      options={fonts.map((font) => ({ id: font.id, label: font.id === "system" ? (plugins.style(prefs.style)?.font?.name ?? font.name) : font.name }))}
+      options={fonts.map((font) => ({ id: font.id, label: fontName(font) }))}
       value={prefs.installedFont ? null : prefs.font}
       onselect={chooseFont}
       stacked
@@ -114,8 +142,8 @@
       id="installed-font"
       describedby="installed-font-note"
       label={t("settings.fontInstalled")}
-      value={prefs.installedFont}
-      onchange={(family) => (prefs.installedFont = family)}
+      value={prefs.installedFont ? { installed: prefs.installedFont } : null}
+      onchange={(choice) => choice && "installed" in choice && (prefs.installedFont = choice.installed)}
     />
   </FieldRow>
 </FieldGroup>
@@ -140,6 +168,26 @@
       <ColorField id="heading-custom-color" label={t("settings.paperCustomColor")} value={prefs.headingCustomColor} onchange={(color) => color && (prefs.headingCustomColor = color)} />
     </FieldRow>
   {/if}
+</FieldGroup>
+
+<FieldGroup title={t("settings.formattingFonts")}>
+  {#each FORMATTING_FONTS as part (part)}
+    {@const choice = prefs.formattingFonts[part] ?? null}
+    {@const name = formattingName(part)}
+    {@const note = unused(choice)}
+    <FieldRow label={name} for="font-{part}" {note}>
+      <FontPicker
+        class="w-60"
+        id="font-{part}"
+        describedby={note ? `font-${part}-note` : undefined}
+        label={name}
+        value={choice}
+        none={notChosen(part)}
+        without={isCode(part) ? "mono" : undefined}
+        onchange={(next) => chooseFormattingFont(part, next)}
+      />
+    </FieldRow>
+  {/each}
 </FieldGroup>
 
 <FieldGroup title={t("settings.ligatures")} note={t("settings.symbolsNote")}>

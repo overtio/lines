@@ -507,6 +507,8 @@ export interface AppStyle {
   settings?: Record<string, unknown>;
   /** Its own font, for the app and as notes' first font in Settings → Typography: what it's called, and its CSS font-family. */
   font?: { name: string; family: string };
+  /** Its own font for notes' headings, where it isn't the text's: what Settings → Typography → Fonts for formatting's first choice for them is. */
+  headingFont?: { name: string; family: string };
   /**
    * Custom properties it sets, by name: the radii (`radius-sm` … `radius-xl`), shadows (`card-shadow`,
    * `shadow-menu`, `shadow-dialog`, `shadow-segment`), fonts (`font-system`, `font-mono`), heights

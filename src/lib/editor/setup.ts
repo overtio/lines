@@ -132,7 +132,8 @@ export const highlightStyle = HighlightStyle.define([
   { tag: t.processingInstruction, color: "var(--text-faint)" },
   { tag: t.url, color: "var(--text-faint)" },
   { tag: t.contentSeparator, color: "var(--text-faint)" },
-  { tag: t.monospace, fontFamily: "var(--font-mono)" },
+  // In the code font, but inside inline code and code blocks, which may have fonts of their own (editor.css).
+  { tag: t.monospace, class: "cm-lp-monospace" },
   // Code blocks; each theme has its own colors for these (app.css, and theme plugins).
   { tag: [t.keyword, t.modifier, t.self, t.operatorKeyword, t.tagName], color: "var(--syn-keyword)" },
   { tag: [t.string, t.special(t.string), t.regexp, t.character], color: "var(--syn-string)" },

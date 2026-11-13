@@ -139,7 +139,7 @@ describe("fonts installed on this device", () => {
 
   const stored = (page: App["page"]) => page.evaluate(() => JSON.parse(localStorage.getItem("lines.prefs")!).installedFont as string);
 
-  test("Typography has Font family, its recommended fonts and an installed one, then Font size with the text's size, then Heading color, then Font ligatures", async () => {
+  test("Typography has Font family, its recommended fonts and an installed one, then Font size with the text's size, then Heading color, then Fonts for formatting, then Font ligatures", async () => {
     app = await openApp();
     const settings = await app.settings("Typography");
     const family = settings.getByRole("region", { name: "Font family" });
@@ -148,7 +148,7 @@ describe("fonts installed on this device", () => {
     expect(await settings.getByRole("region", { name: "Font size" }).getByRole("slider", { name: "Text size" }).isVisible()).toBe(true);
     expect(await family.getByRole("slider").count()).toBe(0);
     const groups = await settings.locator("section[aria-label]").evaluateAll((groups) => groups.map((group) => group.getAttribute("aria-label")));
-    expect(groups.slice(0, 4)).toEqual(["Font family", "Font size", "Heading color", "Font ligatures"]);
+    expect(groups.slice(0, 5)).toEqual(["Font family", "Font size", "Heading color", "Fonts for formatting", "Font ligatures"]);
     const rows = await settings.locator("[data-setting]").evaluateAll((rows) => rows.slice(0, 4).map((row) => row.querySelector(".min-w-0")!.firstElementChild!.textContent));
     expect(rows).toEqual(["Recommended", "Installed font", "Text size", "Color"]);
   });
@@ -263,6 +263,158 @@ describe("fonts installed on this device", () => {
     app = await openApp({ prefs: { font: "serif", installedFont: 'Zz"; color: red' } });
     expect(await app.root("font")).toBe("serif");
     expect(await app.page.evaluate(() => window.testing.prefs.installedFont)).toBe("");
+  });
+});
+
+describe("formatting's fonts", () => {
+  /** The font family `selector`'s first element is in, quotes left out (Chrome keeps them, WebKit doesn't). */
+  const family = async (selector: string) => (await app.style(`.editor-pane ${selector}`, "font-family")).replaceAll('"', "");
+
+  /** Chooses `option` in the font picker labelled `label`. */
+  async function pick(settings: Awaited<ReturnType<App["settings"]>>, label: string, option: string) {
+    await settings.getByRole("combobox", { name: label, exact: true }).click();
+    await app.page.getByRole("listbox").getByRole("option", { name: option, exact: true }).click();
+    await app.page.getByRole("listbox").waitFor({ state: "detached" });
+  }
+
+  test("Typography has a row for each after Font family, the text's or code's font to begin with; one chosen draws that formatting in it, in Markdown and LaTeX notes alike, and Same as text puts it back", async () => {
+    app = await openApp();
+    await app.open("# Title\n\nSome **bold**, *italics* and `code`.\n\n```\nblock\n```");
+    const text = await family(".cm-content");
+    const settings = await app.settings("Typography");
+    const group = settings.getByRole("region", { name: "Fonts for formatting" });
+    const rows = ["Headings", "Bold", "Italic", "Underline", "Strikethrough", "Highlighted text", "Links", "Mentions", "Quotes", "List numbers", "Inline code", "Code blocks"];
+    for (const [i, row] of rows.entries()) {
+      expect(await group.getByRole("combobox").nth(i).getAttribute("aria-label")).toBe(row);
+      expect(await group.getByRole("combobox").nth(i).inputValue()).toBe(row.endsWith("code") || row === "Code blocks" ? "Code font" : "Same as text");
+    }
+    expect(await family(".cm-lp-strong")).toBe(text);
+    expect(await family(".cm-lp-code .cm-lp-monospace")).toStartWith("ui-monospace");
+
+    await pick(settings, "Bold", "Serif");
+    await pick(settings, "Headings", "IBM Plex Sans");
+    await pick(settings, "Inline code", "Agave");
+    expect(await family(".cm-lp-strong")).toStartWith("ui-serif");
+    expect(await family(".cm-lp-h1")).toStartWith("IBM Plex Sans,");
+    expect(await family(".cm-lp-code .cm-lp-monospace")).toStartWith("Agave,");
+    expect(await family(".cm-lp-em")).toBe(text);
+    expect(await family(".cm-lp-codeblock .cm-lp-monospace")).toStartWith("ui-monospace");
+    // Its own bold, which IBM Plex Sans brings.
+    expect(await app.page.evaluate(() => document.fonts.check('bold 16px "IBM Plex Sans"'))).toBe(true);
+    expect(await app.page.evaluate(() => window.testing.prefs.formattingFonts)).toEqual({ bold: { font: "serif" }, headings: { font: "ibm-plex-sans" }, code: { font: "agave" } });
+
+    // On paper too.
+    await app.closeSettings();
+    await app.page.evaluate(() => window.testing.place(0));
+    await app.page.keyboard.press(`${mod()}+P`);
+    const doc = app.page.getByRole("dialog").locator(".doc-markdown");
+    await doc.locator("pre.doc-code").first().waitFor();
+    const printed = (selector: string) => doc.locator(selector).first().evaluate((element) => getComputedStyle(element).fontFamily.replaceAll('"', ""));
+    expect(await printed("strong")).toStartWith("ui-serif");
+    expect(await printed("h1")).toStartWith("IBM Plex Sans,");
+    expect(await printed(".doc-inline-code")).toStartWith("Agave,");
+    expect(await printed("pre.doc-code code")).toStartWith("ui-monospace");
+    await app.page.keyboard.press("Escape");
+    await app.page.getByRole("dialog").waitFor({ state: "hidden" });
+
+    await app.open("\\section{Section}\n\nSome \\textbf{bold} and \\texttt{code}.", "latex");
+    expect(await family(".cm-lp-strong")).toStartWith("ui-serif");
+    expect(await family(".cm-lp-h")).toStartWith("IBM Plex Sans,");
+    expect(await family(".cm-lp-code")).toStartWith("Agave,");
+
+    await pick(await app.settings("Typography"), "Bold", "Same as text");
+    expect(await family(".cm-lp-strong")).toBe(await family(".cm-content"));
+    expect(Object.keys(await app.page.evaluate(() => window.testing.prefs.formattingFonts))).toEqual(["headings", "code"]);
+  });
+
+  test("an installed font for code blocks, from the device's list; one this computer hasn't, or of a plugin that's off, is as none chosen, and Settings says so under its field; what can't be a font is none", async () => {
+    app = await openApp({
+      prefs: { formattingFonts: { quote: { installed: "Zz Not A Font" }, code: { installed: "Zz Not A Font" }, link: { font: "fira-sans" }, bullet: { font: "serif" }, bold: "serif" } },
+    });
+    await app.open("> A quote with `code` and a [link](https://example.com).\n\n```\nblock\n```");
+    expect(await app.page.evaluate(() => window.testing.prefs.formattingFonts)).toEqual({
+      quote: { installed: "Zz Not A Font" },
+      code: { installed: "Zz Not A Font" },
+      link: { font: "fira-sans" },
+    });
+    const text = await family(".cm-content");
+    expect(await family(".cm-lp-quote")).toBe(text);
+    expect(await family(".cm-lp-code .cm-lp-monospace")).toStartWith("ui-monospace");
+    await app.page.evaluate(() => Object.assign(window, { queryLocalFonts: async () => [{ family: "Zz Listed Font" }] }));
+    await toggle(await app.settings("All Plugins"), "Fonts", false);
+    expect(await family(".cm-lp-link")).toBe(text);
+
+    const settings = await app.settings("Typography");
+    const described = (label: string) =>
+      settings.getByRole("combobox", { name: label }).evaluate((field) => document.getElementById(field.getAttribute("aria-describedby") ?? "")?.textContent ?? null);
+    expect(await described("Quotes")).toBe("Zz Not A Font isn’t installed on this device, so it isn’t used here.");
+    expect(await described("Inline code")).toBe("Zz Not A Font isn’t installed on this device, so it isn’t used here.");
+    expect(await described("Links")).toBe("Fira Sans comes from the Fonts plugin, which is off, so it isn’t used.");
+    expect(await described("Bold")).toBeNull();
+    expect(await settings.getByRole("combobox", { name: "Quotes" }).inputValue()).toBe("Zz Not A Font");
+    expect(await settings.getByRole("combobox", { name: "Links" }).inputValue()).toBe("Fira Sans");
+
+    // Code font is the first choice for code, so Mono isn't among the recommended ones too.
+    await settings.getByRole("combobox", { name: "Code blocks" }).click();
+    const list = app.page.getByRole("listbox");
+    expect(await list.getByRole("group", { name: "Recommended" }).getByRole("option").allInnerTexts()).toEqual(["System", "Serif", "Rounded"]);
+    await list.getByRole("group", { name: "Installed" }).getByRole("option", { name: "Zz Listed Font" }).click();
+    expect(await family(".cm-lp-codeblock .cm-lp-monospace")).toStartWith("Zz Listed Font, ui-monospace");
+  });
+
+  test("a heading in a quote is in headings' font (quotes' without one), on screen and on paper; bold in a heading in bold's font, or the heading's without one", async () => {
+    app = await openApp({ prefs: { formattingFonts: { headings: { font: "serif" }, quote: { font: "mono" } } } });
+    await app.open("# A heading with **bold**\n\n> # A heading in a quote\n\n> A quote");
+    expect(await family(".cm-lp-quote:not(.cm-lp-h)")).toStartWith("ui-monospace");
+    expect(await family(".cm-lp-quote.cm-lp-h")).toStartWith("ui-serif");
+    expect(await family(".cm-lp-h1:not(.cm-lp-quote) .cm-lp-strong")).toStartWith("ui-serif");
+    await app.page.evaluate(() => window.testing.place(0));
+    await app.page.keyboard.press(`${mod()}+P`);
+    const doc = app.page.getByRole("dialog").locator(".doc-markdown");
+    await doc.locator("blockquote h1").waitFor();
+    const printed = (selector: string) => doc.locator(selector).first().evaluate((element) => getComputedStyle(element).fontFamily.replaceAll('"', ""));
+    expect(await printed("blockquote h1")).toStartWith("ui-serif");
+    expect(await printed("blockquote p")).toStartWith("ui-monospace");
+    await app.page.keyboard.press("Escape");
+    await app.page.getByRole("dialog").waitFor({ state: "hidden" });
+
+    await app.page.evaluate(() => (window.testing.prefs.formattingFonts = { bold: { font: "mono" }, quote: { font: "serif" } }));
+    expect(await family(".cm-lp-h1:not(.cm-lp-quote) .cm-lp-strong")).toStartWith("ui-monospace");
+    expect(await family(".cm-lp-quote.cm-lp-h")).toStartWith("ui-serif");
+    await app.page.evaluate(() => (window.testing.prefs.formattingFonts = { headings: { font: "mono" } }));
+    expect(await family(".cm-lp-h1:not(.cm-lp-quote) .cm-lp-strong")).toStartWith("ui-monospace");
+  });
+
+  for (const [style, face] of [
+    ["neon", "Orbitron"],
+    ["constructivist", "Oswald"],
+  ]) {
+    test(`${style}: headings are in its display face, which Headings' first choice is named and drawn in, until another is chosen`, async () => {
+      app = await openApp({ prefs: { style, theme: style } });
+      await app.open("# Title\n\n> # In a quote\n\nText");
+      expect(await family(".cm-lp-h1")).toStartWith(`${face},`);
+      expect(await family(".cm-lp-quote.cm-lp-h")).toStartWith(`${face},`);
+      const settings = await app.settings("Typography");
+      const headings = settings.getByRole("combobox", { name: "Headings" });
+      expect(await headings.inputValue()).toBe(face);
+      await headings.click();
+      const first = app.page.getByRole("listbox").getByRole("option").first();
+      expect(await first.innerText()).toBe(face);
+      expect((await first.locator("span").first().evaluate((name) => getComputedStyle(name).fontFamily)).replaceAll('"', "")).toStartWith(`${face},`);
+      await app.page.getByRole("listbox").getByRole("option", { name: "Serif", exact: true }).click();
+      expect(await family(".cm-lp-h1")).toStartWith("ui-serif");
+      expect(await family(".cm-lp-quote.cm-lp-h")).toStartWith("ui-serif");
+    });
+  }
+
+  test("another window follows formatting's fonts", async () => {
+    app = await openApp();
+    const other = await app.page.context().newPage();
+    await other.goto(globalThis.lines.url);
+    await other.waitForFunction(() => window.testing?.notes.ready);
+    await other.evaluate(() => window.testing.open("Some **bold**"));
+    await app.page.evaluate(() => (window.testing.prefs.formattingFonts = { bold: { font: "serif" } }));
+    await other.waitForFunction(() => getComputedStyle(document.querySelector(".editor-pane .cm-lp-strong")!).fontFamily.includes("ui-serif"));
   });
 });
 

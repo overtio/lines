@@ -72,17 +72,18 @@ test("the look saved as a preset of yours shows as changed once it is, updates, 
   await presetsGroup(theirs).getByRole("radio", { name: /^Mossy/, checked: true }).waitFor();
 });
 
-test("a font installed on this device is part of the look: a preset of yours keeps it, and lines' own goes back to lines' font", async () => {
-  app = await openApp({ prefs: { installedFont: "Zz Some Font" } });
+test("fonts are part of the look, one installed on this device and formatting's too: a preset of yours keeps them, and lines' own goes back to lines' fonts", async () => {
+  app = await openApp({ prefs: { installedFont: "Zz Some Font", formattingFonts: { headings: { font: "serif" }, code: { installed: "Zz Code Font" } } } });
   const settings = await app.settings("Presets");
   await settings.getByRole("button", { name: "Save as Preset" }).click();
   const mine = presetsGroup(settings).getByRole("radio", { name: /^My Lines/ });
   await presetsGroup(settings).getByRole("radio", { name: /^My Lines/, checked: true }).waitFor();
-  const font = () => app.page.evaluate(() => [window.testing.prefs.font, window.testing.prefs.installedFont]);
+  const font = () => app.page.evaluate(() => [window.testing.prefs.font, window.testing.prefs.installedFont, window.testing.prefs.formattingFonts]);
   await presetsGroup(settings).getByRole("radio", { name: /^Lines/ }).click();
-  expect(await font()).toEqual(["system", ""]);
+  expect(await font()).toEqual(["system", "", {}]);
   await mine.click();
-  expect(await font()).toEqual(["system", "Zz Some Font"]);
+  expect(await font()).toEqual(["system", "Zz Some Font", { headings: { font: "serif" }, code: { installed: "Zz Code Font" } }]);
+  await settings.getByText(/^Changed since/).waitFor({ state: "detached" });
 });
 
 test("Puddle brings its colors, ink lines around cards and what's chosen, and no shadows, light and dark", async () => {

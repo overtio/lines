@@ -169,6 +169,43 @@ const FORMATTING_COLORS = {
   },
 };
 
+/** A font for most kinds of formatting (Settings → Typography → Fonts for formatting), each from those lines brings. */
+const FORMATTING_FONTS = {
+  headings: { font: "serif" },
+  bold: { font: "ibm-plex-sans" },
+  italic: { font: "fira-sans" },
+  link: { font: "serif" },
+  mention: { font: "fira-sans" },
+  quote: { font: "serif" },
+  number: { font: "mono" },
+  code: { font: "agave" },
+  "code-block": { font: "agave" },
+};
+
+/** Opens `note`, and the note it mentions, once the fonts it's drawn in have loaded. */
+const openFormatting = (note, format) => (page) =>
+  page.evaluate(
+    async ([note, format]) => {
+      await window.testing.open("# Ada");
+      await window.testing.open(note, format);
+      await new Promise(requestAnimationFrame);
+      await document.fonts.ready;
+    },
+    [note, format],
+  );
+
+/** Settings → Typography, at Fonts for formatting. */
+const formattingFontsSettings = async (page) => {
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("navigation").getByText("Typography", { exact: true }).click();
+  // Its heading just under the preview, which stays in sight above.
+  await dialog.locator('section[aria-label="Fonts for formatting"]').evaluate((group) => {
+    group.style.scrollMarginTop = "230px";
+    group.scrollIntoView({ block: "start" });
+  });
+};
+
 /** Chooses a theme of your own with formatting's colors, then opens `note` (and a note it mentions). */
 const formattingTheme = (note, format) => (page) =>
   page.evaluate(
@@ -251,6 +288,45 @@ const SCENES = [
     look: "\\section, \\subsection and \\subsubsection in the first three headings' colors; bold, italics, strikethrough, underline, code, the link, the quote and the bullet in theirs, as in the Markdown note.",
     act: formattingTheme(FORMATTING_LATEX, "latex"),
     schemes: ["light"],
+  },
+  {
+    id: "formatting-fonts",
+    title: "Formatting's fonts",
+    look: "Every heading in the serif font; bold in IBM Plex Sans's bold (the quote's bold too), italics in Fira Sans's italic, the link in the serif font, the mention in Fira Sans, the quote in the serif font, the number in Mono, inline code and the code block in Agave; struck through, underlined and highlighted text, the bullets and the rest in the system's font. Lines evenly spaced, nothing clipped.",
+    prefs: { formattingFonts: FORMATTING_FONTS },
+    act: openFormatting(`${FORMATTING}\n\n\`\`\`js\nconst greeting = "Hello";\n\`\`\``),
+    height: 1000,
+  },
+  {
+    id: "formatting-fonts-latex",
+    title: "Formatting's fonts, in a LaTeX note",
+    look: "\\section and the rest in the serif font, \\textbf in IBM Plex Sans's bold, \\emph in Fira Sans's italic, \\texttt and the verbatim block in Agave, the quote in the serif font, as in the Markdown note.",
+    prefs: { formattingFonts: FORMATTING_FONTS },
+    act: openFormatting(`${FORMATTING_LATEX}\n\n\\begin{verbatim}\nconst greeting = "Hello";\n\\end{verbatim}`, "latex"),
+    schemes: ["light"],
+  },
+  {
+    id: "formatting-fonts-settings",
+    title: "Settings → Typography → Fonts for formatting",
+    look: "A row for each, Headings to Code blocks, its name beside its field, the fields lined up with Installed font's and the sliders; those chosen show their font's name (Serif, Rounded…), the rest Same as text, or Code font for code.",
+    prefs: { formattingFonts: FORMATTING_FONTS },
+    act: formattingFontsSettings,
+    shoot: "dialog",
+  },
+  {
+    id: "formatting-fonts-picker",
+    title: "A formatting's font picker, open",
+    look: "Under Headings' field, as wide: Same as text first, then the recommended fonts under Recommended, each in its own face, Serif checked; then Installed's fonts under theirs, from the list Chrome gives, each in its own face.",
+    prefs: { formattingFonts: FORMATTING_FONTS },
+    act: async (page) => {
+      await page.evaluate(() => {
+        const families = ["Avenir Next", "Baskerville", "Didot", "Futura", "Georgia", "Gill Sans", "Menlo", "Optima"];
+        Object.assign(window, { queryLocalFonts: async () => families.map((family) => ({ family })) });
+      });
+      await formattingFontsSettings(page);
+      await page.getByRole("combobox", { name: "Headings" }).click();
+      await page.getByRole("option", { name: "Georgia" }).waitFor();
+    },
   },
   ...["ink", "indigo", "plum", "moss", "amber", "mono"].map((theme) => ({ id: `theme-${theme}`, title: `Theme: ${theme[0].toUpperCase()}${theme.slice(1)}`, look: "Text, links, tags and the chosen row read clearly; the accent stands out but isn't loud.", prefs: { theme }, note: PROSE })),
   ...[

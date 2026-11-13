@@ -354,7 +354,7 @@ export default {
 
   "settings.preview": "Vista previa",
   "settings.previewNote":
-    "# Fin de semana en la montaña\n\nUna mañana tranquila y luego el mercado. Comprar pan, queso y algo verde para la cena.\n\nSalir a mediodía para evitar el tráfico.\n\n## Equipaje\n- [x] Reservar la cabaña\n- [ ] Chubasqueros\n- [ ] Mapa de senderos",
+    "# Fin de semana en la montaña\n\nUna mañana tranquila y luego el **mercado**. Comprar pan, queso y *algo verde* para la cena.\n\nSalir a mediodía para evitar el tráfico.\n\n## Equipaje\n- [x] Reservar la cabaña\n- [ ] Chubasqueros\n- [ ] Mapa de senderos",
   "settings.fontFamily": "Familia tipográfica",
   "settings.fontRecommended": "Recomendados",
   "settings.fontInstalled": "Tipo de letra instalado",
@@ -366,6 +366,14 @@ export default {
   "settings.fontNotHere": "No hay ningún tipo de letra llamado “{name}” instalado aquí.",
   "settings.fontsFound": "{count, plural, one {# tipo de letra} other {# tipos de letra}}",
   "settings.fontSize": "Tamaño de letra",
+  "settings.formattingFonts": "Tipos de letra del formato",
+  "settings.fontHeadings": "Títulos",
+  "settings.fontCodeBlocks": "Bloques de código",
+  "settings.fontSameAsText": "Igual que el texto",
+  "settings.fontCodeFont": "Tipo de letra del código",
+  "settings.fontInstalledGroup": "Instalados",
+  "settings.fontNotUsedHere": "{name} no está instalado en este dispositivo, así que no se usa aquí.",
+  "settings.fontPluginOff": "{name} viene del complemento {plugin}, que está desactivado, así que no se usa.",
   "settings.fontSystem": "Sistema",
   "settings.fontSerif": "Con serifa",
   "settings.fontRounded": "Redondeada",
