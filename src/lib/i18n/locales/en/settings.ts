@@ -391,9 +391,9 @@ export default {
 
   // Text.
   "settings.preview": "Preview",
-  // A note shown in the preview, in Markdown. Keep its # headings and - [x] checkboxes.
+  // A note shown in the preview, in Markdown. Keep its # headings, **bold**, *italics* and - [x] checkboxes.
   "settings.previewNote":
-    "# Weekend in the mountains\n\nA slow morning, then the farmers market. Pick up bread, cheese and something green for dinner.\n\nLeave by noon to beat the traffic.\n\n## Packing\n- [x] Book the cabin\n- [ ] Rain jackets\n- [ ] Trail map",
+    "# Weekend in the mountains\n\nA slow morning, then the **farmers market**. Pick up bread, cheese and *something green* for dinner.\n\nLeave by noon to beat the traffic.\n\n## Packing\n- [x] Book the cabin\n- [ ] Rain jackets\n- [ ] Trail map",
   // Settings → Typography: the font notes are in. Recommended are those lines suggests; any other installed on this device can be chosen too.
   "settings.fontFamily": "Font family",
   "settings.fontRecommended": "Recommended",
@@ -407,6 +407,18 @@ export default {
   "settings.fontNotHere": "No font called “{name}” is installed here.",
   "settings.fontsFound": "{count, plural, one {# font} other {# fonts}}",
   "settings.fontSize": "Font size",
+  // Settings → Typography: a font of its own for each kind of formatting (headings, bold, code…).
+  "settings.formattingFonts": "Fonts for formatting",
+  "settings.fontHeadings": "Headings",
+  "settings.fontCodeBlocks": "Code blocks",
+  // The first choice for formatting's font: as the text around it is.
+  "settings.fontSameAsText": "Same as text",
+  // The first choice for code's font: the code font, as it always is unless another is chosen.
+  "settings.fontCodeFont": "Code font",
+  // Fonts installed on this device, under lines' recommended ones.
+  "settings.fontInstalledGroup": "Installed",
+  "settings.fontNotUsedHere": "{name} isn’t installed on this device, so it isn’t used here.",
+  "settings.fontPluginOff": "{name} comes from the {plugin} plugin, which is off, so it isn’t used.",
   "settings.fontSystem": "System",
   "settings.fontSerif": "Serif",
   "settings.fontRounded": "Rounded",

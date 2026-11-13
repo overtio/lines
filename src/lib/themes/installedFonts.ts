@@ -30,18 +30,18 @@ export function tidyFamilies(names: Iterable<string>): string[] {
   return [...families.values()].sort(collator.compare);
 }
 
-/** The families whose names have `query` in them: those starting with it first, then those with a word starting with it. */
-export function matchingFamilies(families: readonly string[], query: string): string[] {
+/** The fonts (by default, families' names) whose names have `query` in them: those starting with it first, then those with a word starting with it. */
+export function matching<T>(fonts: readonly T[], query: string, name: (font: T) => string = String): T[] {
   const typed = query.trim().toLowerCase();
-  if (!typed) return [...families];
-  const rank = (family: string) => {
-    const name = family.toLowerCase();
-    if (name.startsWith(typed)) return 0;
-    if (name.includes(` ${typed}`)) return 1;
-    return name.includes(typed) ? 2 : -1;
+  if (!typed) return [...fonts];
+  const rank = (font: T) => {
+    const words = name(font).toLowerCase();
+    if (words.startsWith(typed)) return 0;
+    if (words.includes(` ${typed}`)) return 1;
+    return words.includes(typed) ? 2 : -1;
   };
-  const ranked = families.map((family) => ({ family, rank: rank(family) })).filter(({ rank }) => rank >= 0);
-  return ranked.sort((a, b) => a.rank - b.rank).map(({ family }) => family);
+  const ranked = fonts.map((font) => ({ font, rank: rank(font) })).filter(({ rank }) => rank >= 0);
+  return ranked.sort((a, b) => a.rank - b.rank).map(({ font }) => font);
 }
 
 type LocalFonts = { queryLocalFonts?: () => Promise<{ family: string }[]> };

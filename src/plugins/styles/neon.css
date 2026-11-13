@@ -129,7 +129,6 @@
 
 /* In notes: headings in the display face and glowing, links and tags lit. */
 :root[data-style="neon"] .cm-lp-h {
-  font-family: var(--display);
   letter-spacing: 0.04em;
 }
 

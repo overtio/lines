@@ -939,6 +939,7 @@ const looks = (): AppStyle[] => [
     name: "Constructivist",
     description: t("styles.constructivist"),
     theme: "constructivist",
+    headingFont: { name: "Oswald", family: "var(--display)" },
     properties: {
       "radius-scale": "0",
       "card-shadow": "none",
@@ -976,6 +977,7 @@ const looks = (): AppStyle[] => [
     theme: "neon",
     settings: { caretShape: "thick", caretEffect: "glow", pointerTrail: "comet" },
     font: { name: "Chakra Petch", family: '"Chakra Petch", var(--font-mono)' },
+    headingFont: { name: "Orbitron", family: "var(--display)" },
     properties: {
       "font-mono": '"Share Tech Mono", ui-monospace, monospace',
       "radius-scale": "0.25",

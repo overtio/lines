@@ -181,6 +181,59 @@
   font-size: 1em;
 }
 
+/* A Markdown note's formatting in a font of its own, where Settings → Typography gives it one, as on screen (editor.css). */
+.doc-markdown :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-headings, inherit);
+}
+
+.doc-markdown strong {
+  font-family: var(--font-bold, inherit);
+}
+
+.doc-markdown em {
+  font-family: var(--font-italic, inherit);
+}
+
+.doc-markdown u {
+  font-family: var(--font-underline, inherit);
+}
+
+.doc-markdown s {
+  font-family: var(--font-strike, inherit);
+}
+
+.doc-markdown mark {
+  font-family: var(--font-highlight, inherit);
+}
+
+.doc-markdown a {
+  font-family: var(--font-link, inherit);
+}
+
+.doc-markdown .doc-mention {
+  font-family: var(--font-mention, inherit);
+}
+
+.doc-markdown blockquote {
+  font-family: var(--font-quote, inherit);
+}
+
+.doc-markdown ol > li > .doc-mark {
+  font-family: var(--font-number, inherit);
+}
+
+.doc-markdown .doc-inline-code {
+  font-family: var(--font-code, var(--font-mono));
+}
+
+.doc-markdown pre.doc-code {
+  font-family: var(--font-code-block, var(--font-mono));
+}
+
+.doc-markdown pre.doc-code code {
+  font-family: inherit;
+}
+
 .doc .doc-k {
   color: #a3227f;
 }

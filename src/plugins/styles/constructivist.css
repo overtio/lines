@@ -251,7 +251,6 @@
 /* In notes: headings in condensed capitals with a red bar under the first two; square red bullets;
    tags as red stamps; boxes in black. */
 :root[data-style="constructivist"] .cm-lp-h {
-  font-family: var(--display);
   font-weight: 700;
   letter-spacing: 0.02em;
 }

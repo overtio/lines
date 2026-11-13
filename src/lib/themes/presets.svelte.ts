@@ -4,6 +4,7 @@ import { prefs, readSettings, sameSpacing, type Stored } from "../prefs.svelte";
 import { announce, onAnnounce } from "../windows/channel";
 import { customThemes } from "./custom.svelte";
 import { readThemeFile, type ThemeFile } from "./file";
+import { sameFormattingFonts } from "./formattingFonts";
 import { schemePalettes } from "./names";
 
 /*
@@ -29,6 +30,7 @@ export const PRESET_KEYS = [
   "headingCustomColor",
   "font",
   "installedFont",
+  "formattingFonts",
   "spacing",
   "noteWidth",
   "fullWidth",
@@ -94,7 +96,9 @@ export const currentSettings = () => pick(prefs);
 
 /** Whether two presets' settings make the same look. */
 export function sameSettings(a: PresetSettings, b: PresetSettings) {
-  return PRESET_KEYS.every((key) => (key === "spacing" ? sameSpacing(a.spacing, b.spacing) : a[key] === b[key]));
+  return PRESET_KEYS.every((key) =>
+    key === "spacing" ? sameSpacing(a.spacing, b.spacing) : key === "formattingFonts" ? sameFormattingFonts(a.formattingFonts, b.formattingFonts) : a[key] === b[key],
+  );
 }
 
 /** A style's preset: its look and theme, the settings it brings, and lines' own for the rest. */

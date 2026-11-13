@@ -354,7 +354,7 @@ export default {
 
   "settings.preview": "Aperçu",
   "settings.previewNote":
-    "# Week-end à la montagne\n\nUne matinée tranquille, puis le marché. Prendre du pain, du fromage et quelque chose de vert pour le dîner.\n\nPartir à midi pour éviter les bouchons.\n\n## Bagages\n- [x] Réserver le chalet\n- [ ] Vestes de pluie\n- [ ] Carte des sentiers",
+    "# Week-end à la montagne\n\nUne matinée tranquille, puis le **marché**. Prendre du pain, du fromage et *quelque chose de vert* pour le dîner.\n\nPartir à midi pour éviter les bouchons.\n\n## Bagages\n- [x] Réserver le chalet\n- [ ] Vestes de pluie\n- [ ] Carte des sentiers",
   "settings.fontFamily": "Famille de polices",
   "settings.fontRecommended": "Recommandées",
   "settings.fontInstalled": "Police installée",
@@ -366,6 +366,14 @@ export default {
   "settings.fontNotHere": "Aucune police nommée « {name} » n’est installée ici.",
   "settings.fontsFound": "{count, plural, one {# police} other {# polices}}",
   "settings.fontSize": "Taille de police",
+  "settings.formattingFonts": "Polices de mise en forme",
+  "settings.fontHeadings": "Titres",
+  "settings.fontCodeBlocks": "Blocs de code",
+  "settings.fontSameAsText": "Comme le texte",
+  "settings.fontCodeFont": "Police du code",
+  "settings.fontInstalledGroup": "Installées",
+  "settings.fontNotUsedHere": "{name} n’est pas installée sur cet appareil : elle n’y est donc pas utilisée.",
+  "settings.fontPluginOff": "{name} vient de l’extension {plugin}, qui est désactivée : elle n’est donc pas utilisée.",
   "settings.fontSystem": "Système",
   "settings.fontSerif": "Serif",
   "settings.fontRounded": "Arrondie",
