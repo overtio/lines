@@ -4,7 +4,10 @@
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { longPress } from "../longPress";
+  import { coverOf } from "../library/text";
+  import { attachmentURL } from "../notes/attachments";
   import { notes } from "../notes/store.svelte";
+  import { plugins } from "../plugins/registry.svelte";
   import type { Filter } from "../notes/types";
   import { copyText } from "../platform";
   import { menuPoint } from "../popover";
@@ -102,14 +105,22 @@
   {#if open && feeds.subscriptions.length}
     <ul id="feeds-subscriptions" class="mt-0.5 grid gap-y-0.5" aria-label={t("feeds.subscriptions")}>
       {#each feeds.subscriptions as subscription (subscription.url)}
-        {@const { url, title } = subscription}
+        {@const { url, title, note } = subscription}
         {@const error = feeds.records.get(url)?.error}
         {@const unread = feeds.unread.get(url) ?? 0}
+        {@const entry = notes.get(note)}
+        {@const cover = entry && coverOf(entry.note.body)}
         <li class="pl-3.5">
-          <!-- A feed that failed: a quiet mark in its icon's place, and why, said and shown on pointing at it. -->
+          <!-- Its artwork, or its kind's icon; a feed that failed, a quiet mark there instead, and why, said and shown on pointing at it. -->
+          {#snippet artwork()}
+            {#await attachmentURL(cover!) then src}
+              {#if src}<img class="size-4 shrink-0 rounded-[3px] object-cover" {src} alt="" draggable="false" />{:else}<Icon name="rss" size={16} strokeWidth={1.75} class="shrink-0 text-muted" />{/if}
+            {/await}
+          {/snippet}
           <SidebarRow
-            icon={error ? "circle-alert" : "rss"}
+            icon={error ? "circle-alert" : (entry && plugins.libraryKind(entry.meta.type)?.icon) || "rss"}
             iconClass={error ? "shrink-0 text-faint" : undefined}
+            picture={cover && !error ? artwork : undefined}
             label={title || url}
             count={unread}
             active={filter?.feed === url}

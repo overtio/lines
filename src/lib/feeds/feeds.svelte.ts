@@ -1,11 +1,18 @@
 import { untrack } from "svelte";
+import { speak } from "../a11y";
 import { t } from "../i18n/index.svelte";
-import { propertyOf } from "../notes/properties";
+import { libraryNote } from "../library/note";
+import { clock, known } from "../library/text";
+import { dayOf } from "../notes/calendar";
+import { mentionOf, propertyOf } from "../notes/properties";
 import { isClosed, notes } from "../notes/store.svelte";
+import { plugins } from "../plugins/registry.svelte";
+import type { LibraryItem } from "../plugins/types";
 import { prefs } from "../prefs.svelte";
 import { fetchFeed, FetchError, type Validators } from "./fetch";
-import { findFeed, type Found } from "./find";
+import { findFeed, linkOf, NoFeed } from "./find";
 import { readOpml, writeOpml } from "./opml";
+import { plainText } from "./markdown";
 import { isFeed, NotAFeed, readFeed, type Feed } from "./parse";
 import { merge, newestFirst, type FeedRecord, type KeptPost } from "./posts";
 import { feedStorage, storageKey } from "./storage";
@@ -30,6 +37,9 @@ export interface Row {
   feed: string;
   post: KeptPost;
 }
+
+/** The library source of feeds' own links (src/plugins/feeds). */
+export const FEED_SOURCE = "feeds";
 
 /** How many feeds are fetched at once (never two from one site). */
 const AT_ONCE = 3;
@@ -63,6 +73,8 @@ function signature() {
 }
 
 class Feeds {
+  /** Feeds are on: their plugin is, which makes `feed` a kind of the library's (Settings → Plugins). */
+  on = $derived(!!plugins.libraryKind("feed"));
   /** What's kept of each feed, by its address. */
   records = $state.raw(new Map<string, FeedRecord>());
   loaded = $state(false);
@@ -146,14 +158,14 @@ class Feeds {
     $effect.root(() => {
       $effect(() => {
         const minutes = prefs.feedRefresh;
-        if (!minutes) return;
+        if (!minutes || !this.on) return;
         untrack(() => this.refresh(this.#due(minutes)));
         const timer = setInterval(() => this.refresh(this.#due(minutes)), minutes * 60_000);
         return () => clearInterval(timer);
       });
       $effect(() => {
         const fresh = [...this.#subscribed].filter((url) => !untrack(() => this.records.has(url) || this.fetching.has(url)));
-        if (!fresh.length || !prefs.feedRefresh) return;
+        if (!fresh.length || !prefs.feedRefresh || !this.on) return;
         // Still subscribed to (a link typed in has settled), and not fetched since.
         const timer = setTimeout(() => this.refresh(fresh.filter((url) => this.#subscribed.has(url) && !this.records.has(url))), SETTLE);
         return () => clearTimeout(timer);
@@ -261,22 +273,78 @@ class Feeds {
     return feedStorage.content(post.key);
   }
 
+  /** The note a post was saved to the Library as, if it was: the one with its link (an episode's, its sound). */
+  savedNote({ post }: Row) {
+    const [key, value] = post.audio ? ["audio", post.audio.url] : ["link", post.link];
+    if (!value) return undefined;
+    return notes.entries.find(({ note, meta }) => !note.trashed && propertyOf(meta.properties, key)?.value.trim() === value);
+  }
+
   /**
-   * Subscribes to the feed `input` means (its link, its site's, its page on Apple Podcasts): a note
-   * for it, with its posts kept from the fetch that found it. A feed already subscribed to isn't
-   * again. Returns the feed's address.
+   * Keeps a post in the Library, as a note made as any library note is: an `article`, or an
+   * `episode` whose `podcast` mentions its subscription's note. Returns the note's id.
    */
-  async subscribe(input: string, signal?: AbortSignal): Promise<string> {
-    const found = await findFeed(input, signal);
-    if (!this.#subscribed.has(found.url)) await this.#add(found);
+  async save(row: Row, signal?: AbortSignal): Promise<string> {
+    const saved = this.savedNote(row);
+    if (saved) return saved.note.id;
+    const { feed, post } = row;
+    const record = this.records.get(feed);
+    const show = this.subscription(feed)?.title || record?.title;
+    const published = post.date ? dayOf(post.date) : undefined;
+    const html = await this.content(post);
+    const item: LibraryItem = post.audio
+      ? {
+          type: "episode",
+          title: post.title,
+          link: post.link,
+          properties: known([
+            ["podcast", show && mentionOf(show)],
+            ["published", published],
+            ["duration", clock(post.duration)],
+            ["audio", post.audio.url],
+          ]),
+          cover: post.image ?? record?.image,
+          description: html ? plainText(html) : post.excerpt,
+        }
+      : {
+          type: "article",
+          title: post.title,
+          link: post.link,
+          properties: known([
+            ["author", post.author],
+            ["site", show],
+            ["published", published],
+          ]),
+          cover: post.image,
+          description: html ? plainText(html) : post.excerpt,
+        };
+    const body = await libraryNote(item, signal);
+    const id = crypto.randomUUID();
+    const now = Date.now();
+    await notes.insert({ id, body, createdAt: now, updatedAt: now, pinned: false, trashed: false });
+    return id;
+  }
+
+  /**
+   * Subscribes to the feed `input` means (its link, its site's, its podcast's page on Apple
+   * Podcasts): a note for it, made as any library note is (its artwork kept with it), with its
+   * posts kept from the fetch that found it. A feed already subscribed to isn't again. Returns the
+   * feed's address.
+   */
+  async subscribe(input: string, signal = new AbortController().signal): Promise<string> {
+    const link = linkOf(input);
+    if (!link) throw new NoFeed(input);
+    const found = await findFeed((await namedFeed(link, signal)) ?? link, signal);
+    if (!this.#subscribed.has(found.url)) await this.#add(found.url, found.feed, signal, found.validators);
     return found.url;
   }
 
-  /** A note for a feed found, with its posts kept from the fetch that found it. */
-  async #add(found: Found) {
-    await this.take(found.url, found.feed, found.validators);
+  /** A subscription's note, for a feed fetched (with its posts kept from that) or only known of. */
+  async #add(url: string, feed: Feed, signal?: AbortSignal, validators?: Validators) {
+    if (validators) await this.take(url, feed, validators);
+    const body = await libraryNote(feedItem(url, feed), signal);
     const now = Date.now();
-    await notes.insert({ id: crypto.randomUUID(), body: subscriptionNote(found), createdAt: now, updatedAt: now, pinned: false, trashed: false });
+    await notes.insert({ id: crypto.randomUUID(), body, createdAt: now, updatedAt: now, pinned: false, trashed: false });
   }
 
   /**
@@ -293,11 +361,9 @@ class Feeds {
       try {
         const response = await fetchFeed(outline.url);
         if (!response.changed || !isFeed(response.text)) throw new NotAFeed(outline.url);
-        await this.#add({ url: outline.url, feed: readFeed(response.text, response.url), validators: response.validators });
+        await this.#add(outline.url, readFeed(response.text, response.url), undefined, response.validators);
       } catch {
-        const now = Date.now();
-        const feed = { title: outline.title || outline.url, link: outline.site, posts: [] };
-        await notes.insert({ id: crypto.randomUUID(), body: subscriptionNote({ url: outline.url, feed, validators: {} }), createdAt: now, updatedAt: now, pinned: false, trashed: false });
+        await this.#add(outline.url, { title: outline.title || outline.url, link: outline.site, posts: [] });
       }
       done++;
       return next();
@@ -340,11 +406,46 @@ export function feedError(reason: string): string {
   }
 }
 
-/** A subscription's note: a podcast's or a site's, with its feed. */
-function subscriptionNote({ url, feed }: Found) {
-  const type = feed.posts.some((post) => post.audio) ? "podcast" : "feed";
-  const properties = [`type: ${type}`, feed.author && `author: ${feed.author}`, `feed: ${url}`, feed.link && `link: ${feed.link}`].filter(Boolean);
-  return ["---", ...properties, "---", `# ${feed.title}`, ...(feed.description ? ["", feed.description] : [])].join("\n");
+/** Saves a post to the Library, and says so, or that it couldn't be. */
+export async function savePost(row: Row) {
+  try {
+    await feeds.save(row);
+    speak(t("feeds.saved", { title: row.post.title }));
+  } catch (error) {
+    console.error("lines: couldn't save the post", error);
+    speak(t("feeds.couldntSave"));
+  }
+}
+
+/** A feed at `url` as the library keeps it: a podcast's (its posts have sound) or a site's, its artwork its cover. */
+export function feedItem(url: string, feed: Feed): LibraryItem {
+  return {
+    type: feed.posts.some((post) => post.audio) ? "podcast" : "feed",
+    title: feed.title,
+    link: feed.link,
+    properties: known([
+      ["author", feed.author],
+      ["feed", url],
+    ]),
+    cover: feed.image,
+    description: feed.description,
+  };
+}
+
+/**
+ * The feed a site's own library source says a link has, if one does: a podcast's page on Apple
+ * Podcasts names its podcast's. (Not the feeds' own source, which reads the link itself.)
+ */
+async function namedFeed(link: string, signal: AbortSignal): Promise<string | null> {
+  const url = new URL(link);
+  for (const source of plugins.librarySources) {
+    if (source.general || source.id === FEED_SOURCE || !source.recognizes(url)) continue;
+    const item = await source.lookup(url, signal).catch(() => null);
+    signal.throwIfAborted();
+    const feed = item?.properties.find(([key]) => key === "feed")?.[1];
+    if (feed) return feed;
+  }
+  return null;
 }
 
 export const feeds = new Feeds();

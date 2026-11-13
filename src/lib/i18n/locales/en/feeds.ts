@@ -2,6 +2,8 @@
 export default {
   // The Library's row of every feed's posts, and the list's title there.
   "feeds.title": "Feeds",
+  // One subscription, as a kind of note in the Library (a site's, not a podcast's).
+  "feeds.feed": "Feed",
   // The Feeds row, as screen readers hear it.
   "feeds.titleWithUnread": "Feeds, {count, plural, one {# unread} other {# unread}}",
   // The feeds subscribed to, nested under Feeds: the button that shows them, and their list.
@@ -50,6 +52,11 @@ export default {
   "feeds.didRead": "Marked as read",
   "feeds.didUnread": "Marked as unread",
   "feeds.openInBrowser": "Open in Browser",
+  // Keeping a post as a note in the Library (an article, or an episode), and opening that note once it is.
+  "feeds.save": "Save to Library",
+  "feeds.openSaved": "Open in Library",
+  "feeds.saved": "Saved “{title}” to the Library",
+  "feeds.couldntSave": "The post couldn’t be saved.",
   "feeds.copyLink": "Copy Link",
   // In the note's place, in the Feeds with no post open.
   "feeds.choosePost": "Choose a post to read it.",

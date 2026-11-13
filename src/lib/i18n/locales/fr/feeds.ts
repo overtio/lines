@@ -3,6 +3,7 @@ import type en from "../en/feeds";
 
 export default {
   "feeds.title": "Flux",
+  "feeds.feed": "Flux",
   "feeds.titleWithUnread": "Flux, {count, plural, one {# non lu} other {# non lus}}",
   "feeds.showSubscriptions": "Afficher les flux",
   "feeds.subscriptions": "Flux auxquels vous êtes abonné",
@@ -41,6 +42,10 @@ export default {
   "feeds.didRead": "Marqué comme lu",
   "feeds.didUnread": "Marqué comme non lu",
   "feeds.openInBrowser": "Ouvrir dans le navigateur",
+  "feeds.save": "Enregistrer dans la Bibliothèque",
+  "feeds.openSaved": "Ouvrir dans la Bibliothèque",
+  "feeds.saved": "« {title} » est enregistré dans la Bibliothèque",
+  "feeds.couldntSave": "L’article n’a pas pu être enregistré.",
   "feeds.copyLink": "Copier le lien",
   "feeds.choosePost": "Choisissez un article pour le lire.",
   "feeds.postLabel": "Article : {title}",

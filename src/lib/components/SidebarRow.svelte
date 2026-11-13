@@ -3,6 +3,7 @@
   // for its new name. Small, standard, or large: a tile, its icon in a circle of its color, its name
   // below, and its count big in the room beside both, a little right of its middle (Sidebar.svelte puts tiles two to a line). (`row` and `active`
   // are what App.svelte's F6 looks for.)
+  import type { Snippet } from "svelte";
   import type { HTMLButtonAttributes, HTMLInputAttributes } from "svelte/elements";
   import Icon from "../icons/Icon.svelte";
   import type { IconName } from "../icons/icons";
@@ -16,6 +17,8 @@
     iconClass?: string;
     /** The color chosen for it (a tag's, a type's), which its icon has chosen or not. */
     color?: PaletteColor;
+    /** A picture in its icon's place (a feed's artwork). */
+    picture?: Snippet;
     label: string;
     count?: number;
     active?: boolean;
@@ -25,7 +28,7 @@
     rename?: HTMLInputAttributes;
     size?: RowSize;
   };
-  let { icon, iconSize = 16, iconClass, color, label, count, active = false, marked = false, rename, size = "standard", class: className, ...rest }: Props = $props();
+  let { icon, iconSize = 16, iconClass, color, picture, label, count, active = false, marked = false, rename, size = "standard", class: className, ...rest }: Props = $props();
 
   const small = $derived(size === "small");
   const row = $derived([
@@ -40,7 +43,11 @@
 </script>
 
 {#snippet leading()}
-  <Icon name={icon} size={small ? iconSize - 2 : iconSize} strokeWidth={1.75} class={iconClass ?? ["shrink-0", color ? "text-(--look)" : active ? "text-accent" : "text-muted"].join(" ")} />
+  {#if picture}
+    {@render picture()}
+  {:else}
+    <Icon name={icon} size={small ? iconSize - 2 : iconSize} strokeWidth={1.75} class={iconClass ?? ["shrink-0", color ? "text-(--look)" : active ? "text-accent" : "text-muted"].join(" ")} />
+  {/if}
 {/snippet}
 
 {#if rename}

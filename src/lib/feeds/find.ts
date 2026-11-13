@@ -1,11 +1,9 @@
-import { webFetch } from "../platform";
-import { fetchFeed, FetchError, type Validators } from "./fetch";
+import { fetchFeed, type Validators } from "./fetch";
 import { isFeed, readFeed, type Feed } from "./parse";
 
 /*
- * Finding the feed someone means to subscribe to, from what they paste: the feed's own link, a
- * site's (whose pages say where its feed is), or a podcast's page on Apple Podcasts (whose feed
- * Apple's iTunes lookup gives, asked with nothing but the podcast's id).
+ * Finding the feed at a link: the feed itself, or a site's page, which says where its feed is.
+ * (A podcast's page on Apple Podcasts names its feed through its library source: feeds.svelte.ts.)
  */
 
 export interface Found {
@@ -38,28 +36,6 @@ export function linkOf(input: string): string | null {
   }
 }
 
-/** A podcast's id on Apple Podcasts, from a link to it (or to one of its episodes). */
-export function applePodcastId(url: string): string | null {
-  try {
-    const { hostname, pathname } = new URL(url);
-    if (!/^(?:podcasts|itunes)\.apple\.com$/.test(hostname)) return null;
-    return /\/id(\d+)/.exec(pathname)?.[1] ?? null;
-  } catch {
-    return null;
-  }
-}
-
-/** The feed of a podcast on Apple Podcasts, as Apple's lookup gives it. */
-async function appleFeed(id: string, signal?: AbortSignal): Promise<string> {
-  const fetch = await webFetch();
-  const response = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=podcast`, { signal });
-  if (!response.ok) throw new FetchError(`HTTP ${response.status}`, response.status);
-  const { results } = (await response.json()) as { results?: { feedUrl?: string }[] };
-  const feed = results?.find((result) => result.feedUrl)?.feedUrl;
-  if (!feed) throw new NoFeed(id);
-  return feed;
-}
-
 /** The feeds a page names (`<link rel="alternate" type="application/rss+xml">`), made whole, best first. */
 export function feedsNamedIn(html: string, base: string): string[] {
   const page = new DOMParser().parseFromString(html, "text/html");
@@ -79,16 +55,12 @@ export function feedsNamedIn(html: string, base: string): string[] {
   return [...new Set(urls)];
 }
 
-/** The feed `input` means; throws NoFeed if it can't be found, FetchError if it can't be fetched. */
-export async function findFeed(input: string, signal?: AbortSignal): Promise<Found> {
-  let url = linkOf(input);
-  if (!url) throw new NoFeed(input);
-  const apple = applePodcastId(url);
-  if (apple) url = await appleFeed(apple, signal);
-  const response = await fetchFeed(url, {}, signal);
-  if (!response.changed) throw new NoFeed(url);
+/** The feed at `link`, or that its page names; throws NoFeed if there's none, FetchError if it can't be fetched. */
+export async function findFeed(link: string, signal?: AbortSignal): Promise<Found> {
+  const response = await fetchFeed(link, {}, signal);
+  if (!response.changed) throw new NoFeed(link);
   // Its address as given, even if it was found further on: a redirect may be for now only.
-  if (isFeed(response.text)) return { url, feed: readFeed(response.text, response.url), validators: response.validators };
+  if (isFeed(response.text)) return { url: link, feed: readFeed(response.text, response.url), validators: response.validators };
   for (const named of feedsNamedIn(response.text, response.url).slice(0, TRIED)) {
     try {
       const feed = await fetchFeed(named, {}, signal);
@@ -97,5 +69,5 @@ export async function findFeed(input: string, signal?: AbortSignal): Promise<Fou
       if (signal?.aborted) throw error;
     }
   }
-  throw new NoFeed(url);
+  throw new NoFeed(link);
 }

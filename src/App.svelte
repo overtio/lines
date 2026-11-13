@@ -35,7 +35,7 @@
   import { lockedNotes } from "./lib/notes/locked.svelte";
   import { isClosed, notes } from "./lib/notes/store.svelte";
   import { plugins } from "./lib/plugins/registry.svelte";
-  import { feeds } from "./lib/feeds/feeds.svelte";
+  import { feeds, savePost } from "./lib/feeds/feeds.svelte";
   import { canPrint, copyText, isApple, isNewNoteShortcut, newNoteKey, openExternal } from "./lib/platform";
   import { saveAndShow } from "./lib/save";
   import { NOTE_MIN, ui, type MenuItem } from "./lib/ui.svelte";
@@ -660,6 +660,14 @@
           {/if}
         {:else if post}
           {@const { feed, post: shown } = post}
+          {@const saved = feeds.savedNote(post)}
+          <IconButton
+            icon={saved ? "bookmark" : "bookmark-plus"}
+            iconSize={17}
+            on={!!saved}
+            label={saved ? t("feeds.openSaved") : t("feeds.save")}
+            onclick={() => (saved ? notes.show(saved.note.id) : void savePost(post))}
+          />
           <IconButton
             icon="circle-dot"
             iconSize={17}

@@ -3,6 +3,7 @@
   import type { IconName } from "../icons/icons";
   import { formatDate } from "../format";
   import { t } from "../i18n/index.svelte";
+  import { feeds } from "../feeds/feeds.svelte";
   import { type Shelf, shelves } from "../library/shelves.svelte";
   import { lock } from "../lock/lock.svelte";
   import { notesOnDays } from "../notes/calendar";
@@ -22,6 +23,7 @@
   import { updates } from "../updates.svelte";
   import { openSettings } from "../windows/settings.svelte";
   import AddToLibrary from "./AddToLibrary.svelte";
+  import FeedRows from "./FeedRows.svelte";
   import IconButton from "./ui/IconButton.svelte";
   import SidebarDivider from "./SidebarDivider.svelte";
   import SidebarRow from "./SidebarRow.svelte";
@@ -49,7 +51,7 @@
   const ALWAYS: Place = "all";
 
   /** The types listed under Types: all but the Library's, which lists its own. */
-  const ownTypes = $derived(notes.types.filter(({ type }) => !shelves.of(type)));
+  const ownTypes = $derived(notes.types.filter(({ type }) => !plugins.libraryKind(type)));
 
   /** The Library's shelves with something on them, how much, in the order chosen; and those not hidden. */
   const shelfRows = $derived.by(() => {
@@ -270,6 +272,24 @@
     adding = null;
   }
 
+  /** The Library heading's button: Add to Library, or with feeds on, a menu of that and subscribing to a feed. */
+  function addToLibrary(button: HTMLElement) {
+    if (!feeds.on) return openAddToLibrary(button);
+    const { right, bottom } = button.getBoundingClientRect();
+    const items: MenuItem[] = [
+      { label: t("library.add.title"), icon: "plus", run: () => openAddToLibrary(button) },
+      {
+        label: t("feeds.subscribe"),
+        icon: "rss",
+        run: () => {
+          choose({ kind: "feeds" });
+          ui.subscribePrompt = { x: right, y: bottom + 4, align: "end" };
+        },
+      },
+    ];
+    ui.openMenu({ x: right, y: bottom + 4, align: "end", anchor: button, label: t("library.add.title"), items });
+  }
+
   /** The section of places being named in its heading, and the name typed so far. */
   let renamingGroup = $state<string | null>(null);
   let groupDraft = $state("");
@@ -475,7 +495,7 @@
               </button>
               {#if section.kind === "library"}
                 <!-- As tall as the heading: the button's room for a pointer reaches past it, not the heading. -->
-                <IconButton class="-my-1 text-faint" icon="plus" iconSize={15} label={t("library.add.title")} onclick={(event) => openAddToLibrary(event.currentTarget)} />
+                <IconButton class="-my-1 text-faint" icon="plus" iconSize={15} label={t("library.add.title")} onclick={(event) => addToLibrary(event.currentTarget)} />
               {/if}
             {/if}
           </h2>
@@ -520,6 +540,9 @@
           </ul>
         {:else if open && section.kind === "library"}
           <ul id="sidebar-library-list" class={ROWS} aria-labelledby="sidebar-library">
+            {#if feeds.on}
+              <FeedRows onchoose={choose} />
+            {/if}
             {#each shownShelves as { shelf, count } (shelf.key)}
               {@const size = sidebarLayout.sizeOf(`shelf:${shelf.key}`, "library")}
               <li data-tile={size === "large" || undefined}>

@@ -1,5 +1,5 @@
 import { describe, expect, mock, test } from "bun:test";
-import { clock, readDate, readDuration } from "../../src/lib/feeds/dates";
+import { readDate, readDuration } from "../../src/lib/feeds/dates";
 import { KEEP, merge, type Fetched, type KeptPost } from "../../src/lib/feeds/posts";
 import { writeOpml } from "../../src/lib/feeds/opml";
 import { stubApp } from "./stubs";
@@ -7,7 +7,7 @@ import { stubApp } from "./stubs";
 stubApp();
 mock.module("../../src/lib/release", () => ({ VERSION: "0.0.0", REPO: "https://github.com/overtio/lines" }));
 const { encodingOf } = await import("../../src/lib/feeds/fetch");
-const { applePodcastId, linkOf } = await import("../../src/lib/feeds/find");
+const { linkOf } = await import("../../src/lib/feeds/find");
 
 /*
  * Feeds' logic that needs no page: dates and durations as feeds write them, keeping posts across
@@ -42,10 +42,6 @@ describe("dates", () => {
   test("reads podcasts' durations, in seconds", () => {
     expect([readDuration("1882"), readDuration("31:22"), readDuration("1:02:03"), readDuration("45:00.5")]).toEqual([1882, 1882, 3723, 2701]);
     expect([readDuration(""), readDuration("half an hour"), readDuration("0")]).toEqual([undefined, undefined, undefined]);
-  });
-
-  test("shows a length as a player does", () => {
-    expect([clock(0), clock(65), clock(3723), clock(-3)]).toEqual(["0:00", "1:05", "1:02:03", "0:00"]);
   });
 });
 
@@ -100,13 +96,6 @@ describe("links", () => {
     expect(linkOf("feed:https://example.com/rss")).toBe("https://example.com/rss");
     expect(linkOf("example.com/blog")).toBe("https://example.com/blog");
     expect([linkOf("not a link"), linkOf("javascript:alert(1)"), linkOf("")]).toEqual([null, null, null]);
-  });
-
-  test("finds a podcast's id in its Apple Podcasts link, an episode's too", () => {
-    expect(applePodcastId("https://podcasts.apple.com/us/podcast/syntax-tasty-web-development-treats/id1253186678")).toBe("1253186678");
-    expect(applePodcastId("https://podcasts.apple.com/gb/podcast/some-episode/id1253186678?i=1000700000000")).toBe("1253186678");
-    expect(applePodcastId("https://itunes.apple.com/us/podcast/id1253186678")).toBe("1253186678");
-    expect(applePodcastId("https://example.com/podcast/id1253186678")).toBeNull();
   });
 
   test("decodes a feed as it says it's encoded", () => {

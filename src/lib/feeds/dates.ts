@@ -55,12 +55,3 @@ export function readDuration(text: string | null | undefined): number | undefine
   const seconds = trimmed.split(":").reduce((total, part) => total * 60 + Number(part), 0);
   return seconds > 0 ? Math.round(seconds) : undefined;
 }
-
-/** A length of time as a player shows it: `4:05`, `1:02:03`. */
-export function clock(seconds: number): string {
-  const whole = Math.max(0, Math.floor(seconds));
-  const h = Math.floor(whole / 3600);
-  const m = Math.floor((whole % 3600) / 60);
-  const s = String(whole % 60).padStart(2, "0");
-  return h ? `${h}:${String(m).padStart(2, "0")}:${s}` : `${m}:${s}`;
-}

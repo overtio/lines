@@ -1,10 +1,30 @@
 import { deflateSync } from "node:zlib";
+import type { Page, Route } from "playwright";
 import { zip } from "../../src/lib/zip";
 
 /*
  * Files for the browser tests to give the app, made here rather than kept: a picture, a sound, and a
- * Mechvibes sound pack.
+ * Mechvibes sound pack; and answering the app's requests for them, so nothing's fetched from the web.
  */
+
+/**
+ * Answers a request for `body` as a site that lets web pages have it would: the part asked for, if
+ * it asks for one (as audio does, to seek).
+ */
+export function answerFile(route: Route, body: Buffer, contentType: string) {
+  const headers = { "access-control-allow-origin": "*", "accept-ranges": "bytes" };
+  const range = /^bytes=(\d+)-(\d*)$/.exec(route.request().headers().range ?? "");
+  if (!range) return route.fulfill({ body, contentType, headers });
+  const start = Number(range[1]);
+  const end = range[2] ? Math.min(Number(range[2]), body.length - 1) : body.length - 1;
+  return route.fulfill({ status: 206, body: body.subarray(start, end + 1), contentType, headers: { ...headers, "content-range": `bytes ${start}-${end}/${body.length}` } });
+}
+
+/** Answers every request for a picture on the web (a feed's artwork, a cover) with a small square. */
+export function answerPictures(page: Page) {
+  const square = png(8, 8, () => [96, 132, 168]);
+  return page.route((url) => url.hostname !== "127.0.0.1" && /\.(?:png|jpe?g|gif|webp)$/i.test(url.pathname), (route) => answerFile(route, square, "image/png"));
+}
 
 const CRC = Array.from({ length: 256 }, (_, n) => {
   let c = n;

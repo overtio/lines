@@ -1,7 +1,8 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import type { Route } from "playwright";
-import { type App, noErrors, openApp } from "./app";
+import { type App, engine, noErrors, openApp } from "./app";
+import { answerPictures } from "./files";
 
 /*
  * Feeds as lines reads them, in the browser's own XML and HTML parsers: trimmed copies of real
@@ -190,14 +191,16 @@ describe("HTML as Markdown", () => {
   });
 });
 
-describe("finding a feed", () => {
-  const find = (input: string) =>
+describe("subscribing", () => {
+  const subscribe = (input: string) =>
     app.page.evaluate(async (input) => {
+      const { feeds, reading, notes } = window.testing;
       try {
-        const { url, feed } = await window.testing.reading.findFeed(input);
-        return { url, title: feed.title };
+        const url = await feeds.subscribe(input);
+        const subscription = feeds.subscription(url)!;
+        return { url, title: subscription.title, note: notes.get(subscription.note)!.note.body.split("\n# ")[0] };
       } catch (error) {
-        return { error: error instanceof window.testing.reading.NoFeed ? "no feed" : (error as Error).message };
+        return { error: error instanceof reading.NoFeed ? "no feed" : (error as Error).message };
       }
     }, input);
   /** Answers requests for `href` as a site that lets web pages read it. */
@@ -207,27 +210,36 @@ describe("finding a feed", () => {
       (route: Route) => route.fulfill({ body, contentType: type, headers: { "access-control-allow-origin": "*" } }),
     );
 
-  test("from the feed's link, a site's page, or Apple Podcasts", async () => {
+  test("to the feed's link, a site's, or a podcast's on Apple Podcasts: a note of the feed's, made as the Library makes one", async () => {
+    await answerPictures(app.page);
     await answer("https://site.example/", `<!doctype html><head><link rel="alternate" type="application/atom+xml" href="/atom.xml"><link rel="alternate" type="application/rss+xml" href="feed.xml"></head>`, "text/html");
     await answer("https://site.example/feed.xml", fixture("blog.rss"), "application/rss+xml");
-    await answer("https://itunes.apple.com/lookup?id=1253186678&entity=podcast", JSON.stringify({ resultCount: 1, results: [{ feedUrl: "https://feeds.megaphone.fm/FSI1483080183" }] }), "text/javascript");
+    await app.page.route(
+      (url) => url.href.startsWith("https://itunes.apple.com/lookup?id=1253186678"),
+      (route) => route.fulfill({ json: { resultCount: 1, results: [{ kind: "podcast", collectionName: "Syntax", artistName: "Wes Bos", feedUrl: "https://feeds.megaphone.fm/FSI1483080183" }] }, headers: { "access-control-allow-origin": "*" } }),
+    );
     await answer("https://feeds.megaphone.fm/FSI1483080183", fixture("podcast.rss"), "application/xml");
-    expect(await find("https://site.example/feed.xml")).toEqual({ url: "https://site.example/feed.xml", title: "Svelte blog" });
-    // RSS first, of the feeds the page names.
-    expect(await find("site.example")).toEqual({ url: "https://site.example/feed.xml", title: "Svelte blog" });
-    expect(await find("https://podcasts.apple.com/us/podcast/syntax-tasty-web-development-treats/id1253186678")).toEqual({
-      url: "https://feeds.megaphone.fm/FSI1483080183",
-      title: "Syntax - Tasty Web Development Treats",
-    });
+    const blog = await subscribe("https://site.example/feed.xml");
+    expect([blog.url, blog.title]).toEqual(["https://site.example/feed.xml", "Svelte blog"]);
+    // Its artwork kept as an attachment, as the Library keeps covers.
+    expect(blog.note).toMatch(/^---\ntype: feed\nfeed: https:\/\/site\.example\/feed\.xml\nlink: https:\/\/svelte\.dev\/blog\n---$/);
+    // RSS first, of the feeds the page names; one already subscribed to isn't again.
+    expect(await subscribe("site.example")).toEqual(blog);
+    const podcast = await subscribe("https://podcasts.apple.com/us/podcast/syntax-tasty-web-development-treats/id1253186678");
+    expect([podcast.url, podcast.title]).toEqual(["https://feeds.megaphone.fm/FSI1483080183", "Syntax - Tasty Web Development Treats"]);
+    expect(podcast.note).toContain("type: podcast\nauthor: Wes Bos & Scott Tolinski - Full Stack JavaScript Web Developers\nfeed: https://feeds.megaphone.fm/FSI1483080183");
+    const bodies = await app.page.evaluate(() => window.testing.notes.entries.map(({ note }) => note.body));
+    // (WebKit here can't store pictures, so has none, rather than one shown from the site.)
+    if (engine() === "chromium") expect(bodies.filter((body) => /!\[[^\]]*\]\(\.\.\/attachments\/[0-9a-f]{32}\.\w+\)/.test(body))).toHaveLength(2);
   });
 
   test("says when there's none, and when the site doesn't let web pages read it", async () => {
     await answer("https://nofeed.example/", "<!doctype html><title>Nothing</title>", "text/html");
     // A page sees a site that doesn't let it read it as one it couldn't reach (Playwright lets every answer of its own through).
     await app.page.route("https://closed.example/feed", (route) => route.abort("failed"));
-    expect(await find("https://nofeed.example/")).toEqual({ error: "no feed" });
-    expect(await find("not a link at all")).toEqual({ error: "no feed" });
-    expect(await find("https://closed.example/feed")).toEqual({ error: "blocked" });
+    expect(await subscribe("https://nofeed.example/")).toEqual({ error: "no feed" });
+    expect(await subscribe("not a link at all")).toEqual({ error: "no feed" });
+    expect(await subscribe("https://closed.example/feed")).toEqual({ error: "blocked" });
     // Which the browser says in the console.
     app.errors.length = 0;
   });

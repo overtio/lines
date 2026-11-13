@@ -1,7 +1,8 @@
 import { afterEach, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import type { Request } from "playwright";
-import { type App, noErrors, openApp } from "./app";
+import { type App, mod, noErrors, openApp } from "./app";
+import { answerPictures } from "./files";
 
 /*
  * The Feeds reader: subscribing, a feed's posts in the list, reading one in the note's place,
@@ -18,9 +19,10 @@ afterEach(async () => {
   await app.close();
 });
 
-/** Answers the blog's feed with `body`, or "not modified" when asked with the ETag it had; the requests it was sent. */
+/** Answers the blog's feed with `body`, or "not modified" when asked with the ETag it had, and its picture; the requests it was sent. */
 async function serveBlog(app: App, body = fixture("blog.rss"), etag = '"one"') {
   const asked: Request[] = [];
+  await answerPictures(app.page);
   await app.page.route(
     (url) => url.href === BLOG,
     (route) => {
@@ -124,6 +126,68 @@ test("refreshing asks whether the feed changed, keeps what was read, and adds ne
   expect(await rows.first().innerText()).toContain("Svelte 6");
   expect(await rows.first().textContent()).toContain("unread");
   expect(await rows.nth(1).textContent()).not.toContain("unread");
+});
+
+test("Feeds in the Library: its row and each feed's, counting what's unread; a feed's menu marks it read, and unsubscribes", async () => {
+  app = await openApp();
+  await serveBlog(app);
+  await openFeeds(app);
+  await subscribe(app, BLOG);
+  const page = app.page;
+  const sidebar = page.getByRole("navigation", { name: "Library" });
+  await sidebar.getByRole("button", { name: "Feeds, 2 unread" }).click();
+  await expect(page.locator("#note-list-title").innerText()).resolves.toBe("Feeds");
+  const blog = sidebar.getByRole("button", { name: "Svelte blog, 2 unread" });
+  await blog.click();
+  await expect(page.locator("#note-list-title").innerText()).resolves.toBe("Svelte blog");
+  // Not listed again under Types.
+  expect(await sidebar.getByRole("button", { name: /^Feed\b/ }).count()).toBe(0);
+
+  await blog.click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Mark All as Read" }).click();
+  await sidebar.getByRole("button", { name: "Svelte blog", exact: true }).waitFor();
+  await sidebar.getByRole("button", { name: "Feeds", exact: true }).waitFor();
+
+  await sidebar.getByRole("button", { name: "Svelte blog", exact: true }).click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Unsubscribe" }).click();
+  await sidebar.getByRole("button", { name: "Svelte blog", exact: true }).waitFor({ state: "detached" });
+  expect(await page.evaluate(() => window.testing.notes.entries.find((entry) => entry.meta.title === "Svelte blog")?.note.trashed)).toBe(true);
+});
+
+test("Save to Library keeps a post as an article, made as the Library makes notes, and then opens it", async () => {
+  app = await openApp({ timezone: "UTC" });
+  await serveBlog(app);
+  await openFeeds(app);
+  await subscribe(app, BLOG);
+  const page = app.page;
+  await page.locator(".note-list").getByRole("button", { name: /^What’s new in Svelte/ }).click();
+  await page.getByRole("button", { name: "Save to Library" }).click();
+  await page.getByRole("button", { name: "Open in Library" }).click();
+  await page.waitForFunction(() => window.testing.text()?.startsWith("---\ntype: article\n"));
+  expect(await app.text()).toStartWith(
+    "---\ntype: article\nauthor: Dani Sandoval\nsite: Svelte blog\npublished: 2026-10-31\nlink: https://svelte.dev/blog/whats-new-in-svelte-october-2026\nstatus: to read\n---\n# What’s new in Svelte: October 2026\n\nSvelteKit 3 is here! Check out the announcement post for the highlights",
+  );
+});
+
+test("a new note that's just a feed's link becomes a subscription, its posts kept from the one fetch", async () => {
+  app = await openApp();
+  const asked = await serveBlog(app);
+  const page = app.page;
+  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await page.waitForFunction(() => window.testing.text() === "# ");
+  await page.keyboard.press(`${mod()}+a`);
+  await page.keyboard.press("Backspace");
+  await page.evaluate((text) => {
+    const data = new DataTransfer();
+    data.setData("text/plain", text);
+    document.querySelector(".editor-pane [data-pane-content='main'] .cm-content")!.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
+  }, BLOG);
+  await page.waitForFunction(() => window.testing.text()?.startsWith("---\ntype: feed\n"));
+  expect(await app.text()).toStartWith(`---\ntype: feed\nfeed: ${BLOG}\nlink: https://svelte.dev/blog\n---\n# Svelte blog\n`);
+  await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: "Svelte blog, 2 unread" }).waitFor();
+  // Not fetched again as the subscription appeared.
+  await page.waitForTimeout(2500);
+  expect(asked.length).toBe(1);
 });
 
 test("searching finds posts by their words; Mark All as Read; trashing the note unsubscribes", async () => {

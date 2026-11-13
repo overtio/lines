@@ -5,6 +5,7 @@ import { arxiv } from "./arxiv";
 import { asciinema } from "./asciinema";
 import { changesPlugin } from "./changes";
 import { code } from "./code";
+import { feedsPlugin } from "./feeds";
 import { fonts } from "./fonts";
 import { giphy } from "./giphy";
 import { wallhaven } from "./wallhaven";
@@ -72,6 +73,7 @@ export const builtIn = (): Plugin[] => [
   wikidata(),
   musicbrainz(),
   applePodcasts(),
+  feedsPlugin(),
   webPages(),
   changesPlugin(),
   themes(),

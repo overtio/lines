@@ -1,12 +1,13 @@
 <script lang="ts">
   import type { Attachment } from "svelte/attachments";
   import { speak } from "../a11y";
-  import { clock } from "../feeds/dates";
-  import { feeds, type Row } from "../feeds/feeds.svelte";
+  import { feeds, type Row, savePost } from "../feeds/feeds.svelte";
   import { formatDate } from "../format";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
+  import { clock } from "../library/text";
   import { longPress } from "../longPress";
+  import { notes } from "../notes/store.svelte";
   import { copyText, openExternal } from "../platform";
   import { menuPoint } from "../popover";
   import { menuSections, ui } from "../ui.svelte";
@@ -48,12 +49,16 @@
   function showMenu(x: number, y: number) {
     menuOpen = true;
     const link = post.link;
+    const saved = feeds.savedNote(row);
     ui.openMenu({
       x,
       y,
       label: post.title,
       items: menuSections(
-        [post.read ? { label: t("feeds.markUnread"), icon: "circle-dot", run: () => setRead(false) } : { label: t("feeds.markRead"), icon: "check", run: () => setRead(true) }],
+        [
+          post.read ? { label: t("feeds.markUnread"), icon: "circle-dot", run: () => setRead(false) } : { label: t("feeds.markRead"), icon: "check", run: () => setRead(true) },
+          saved ? { label: t("feeds.openSaved"), icon: "bookmark", run: () => notes.show(saved.note.id) } : { label: t("feeds.save"), icon: "bookmark-plus", run: () => void savePost(row) },
+        ],
         link
           ? [
               { label: t("feeds.openInBrowser"), icon: "external-link", run: () => void openExternal(link) },
