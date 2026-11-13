@@ -627,7 +627,7 @@ const SCENES = [
     look: "Every feed's posts in the list, newest first: an unread dot in the row's margin, the titles lined up whether read or not, the excerpt two lines at most, where it's from and when under it (an episode with its headphones and length, and its play button clear of the text). The open post in the note's place, drawn as a note: its title, a smaller, quieter line of where it's from, by whom and when, then its text with its links, list and quote; the toolbar's Mark as Unread and Open in Browser lined up with the other buttons.",
     act: async (page) => {
       await subscribe(page, FEEDS);
-      await page.evaluate(() => window.testing.notes.setFilter({ kind: "feeds" }));
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Feeds/ }).click();
       await page.locator(".note-list").getByRole("button", { name: /^Jensen Huang/ }).click();
     },
   },
@@ -638,7 +638,7 @@ const SCENES = [
     prefs: { style, theme: style },
     act: async (page) => {
       await subscribe(page, FEEDS);
-      await page.evaluate(() => window.testing.notes.setFilter({ kind: "feeds" }));
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Feeds/ }).click();
       await page.locator(".note-list").getByRole("button", { name: /^SvelteKit 3 is here/ }).click();
     },
   })),
@@ -647,7 +647,7 @@ const SCENES = [
     title: "Subscribing to a feed",
     look: "The box under the + over the list: its heading, the field with the feed icon and its placeholder, the Subscribe button in the accent; on the web, the quiet line under it about which feeds the web can read.",
     act: async (page) => {
-      await page.evaluate(() => window.testing.notes.setFilter({ kind: "feeds" }));
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Feeds/ }).click();
       await page.locator(".note-list").getByRole("button", { name: "Subscribe to a Feed" }).first().click();
     },
   },

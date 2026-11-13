@@ -103,7 +103,7 @@
     {/if}
   </div>
   {#if open && feeds.subscriptions.length}
-    <ul id="feeds-subscriptions" class="mt-0.5 grid gap-y-0.5" aria-label={t("feeds.subscriptions")}>
+    <ul id="feeds-subscriptions" class="mt-0.5 grid grid-cols-1 gap-y-0.5" aria-label={t("feeds.subscriptions")}>
       {#each feeds.subscriptions as subscription (subscription.url)}
         {@const { url, title, note } = subscription}
         {@const error = feeds.records.get(url)?.error}
