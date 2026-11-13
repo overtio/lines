@@ -314,6 +314,17 @@ const SCENES = [
     shoot: "dialog",
   },
   {
+    id: "formatting-fonts-neon",
+    title: "Headings' font picker, in Neon",
+    look: "The preview's heading in Orbitron, Neon's display face; Headings' field says Orbitron, and its list starts with Orbitron drawn in it, then Recommended with Chakra Petch in System's place.",
+    prefs: { style: "neon", theme: "neon" },
+    act: async (page) => {
+      await formattingFontsSettings(page);
+      await page.getByRole("combobox", { name: "Headings" }).click();
+      await page.getByRole("option", { name: "Chakra Petch" }).waitFor();
+    },
+  },
+  {
     id: "formatting-fonts-picker",
     title: "A formatting's font picker, open",
     look: "Under Headings' field, as wide: Same as text first, then the recommended fonts under Recommended, each in its own face, Serif checked; then Installed's fonts under theirs, from the list Chrome gives, each in its own face.",
