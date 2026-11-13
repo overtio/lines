@@ -1,5 +1,6 @@
 import { t } from "../../lib/i18n/index.svelte";
 import { addLink, linkAdds } from "../../lib/library/addLink";
+import { isBookmarks } from "../../lib/library/bookmarks";
 import { linkLookups } from "../../lib/library/linkNotes";
 import type { LibraryKind, Plugin } from "../../lib/plugins/types";
 
@@ -124,6 +125,16 @@ const KINDS: LibraryKind[] = [
     cover: "tall",
     statuses: READ,
   },
+  {
+    // A bookmark, imported from a browser (docs/library.md), until it's looked up as what it is.
+    type: "resource",
+    name: t("library.resource"),
+    label: t("library.resources"),
+    icon: "bookmark",
+    properties: ["folder", "added"],
+    subtitle: ["folder"],
+    lookUp: true,
+  },
 ];
 
 export const library = (): Plugin => ({
@@ -136,5 +147,6 @@ export const library = (): Plugin => ({
     libraryKinds: KINDS,
     markdown: [{ editor: [linkLookups, linkAdds] }],
     linkActions: [{ label: t("library.add.title"), icon: "library", edits: true, run: (view, link) => void addLink(view, link) }],
+    fileImports: [{ id: "bookmarks", extensions: ["html", "htm", "json"], recognizes: isBookmarks, step: () => import("../../lib/components/settings/BookmarkImport.svelte") }],
   },
 });

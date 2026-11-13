@@ -42,6 +42,29 @@ export default {
   "library.lookingUp": "Recherche…",
   "library.failed": "Impossible de rechercher ce lien",
   "library.filled": "{title} a été ajouté à la bibliothèque",
+  "library.resource": "Ressource",
+  "library.resources": "Ressources",
+  "library.lookUpDetails": "Rechercher les détails",
+  "library.bookmarks.title": "Signets",
+  "library.bookmarks.note":
+    "Les signets exportés d’un navigateur (Chrome, Edge, Firefox, Safari, Brave, Arc…) ou de Pocket, Pinboard ou Raindrop deviennent des ressources de la bibliothèque, une note chacun. Rien n’est recherché à l’import ; chacun peut l’être ensuite, depuis son menu.",
+  "library.bookmarks.import": "Importer des signets…",
+  "library.bookmarks.reading": "Lecture…",
+  "library.bookmarks.found": "{count, plural, one {# signet} other {# signets}} dans {name}",
+  "library.bookmarks.there":
+    "{count, plural, one {# est déjà dans la bibliothèque, avec le même lien : laissé de côté} other {# sont déjà dans la bibliothèque, avec le même lien : laissés de côté}}",
+  "library.bookmarks.repeated": "{count, plural, one {# doublon dans le fichier : laissé de côté} other {# doublons dans le fichier : laissés de côté}}",
+  "library.bookmarks.other":
+    "{count, plural, one {# n’est pas une page web (un bookmarklet, une page du navigateur) : laissé de côté} other {# ne sont pas des pages web (bookmarklets, pages du navigateur) : laissés de côté}}",
+  "library.bookmarks.folderTags": "Étiqueter avec leurs dossiers",
+  "library.bookmarks.folderTagsNote": "Chacun reçoit ses dossiers comme étiquette, par exemple #dev/rust. Ils sont gardés de toute façon, dans sa propriété folder.",
+  "library.bookmarks.start": "{count, plural, one {Importer # ressource} other {Importer # ressources}}",
+  "library.bookmarks.importing": "Import… {done} sur {count}",
+  "library.bookmarks.imported":
+    "{count, plural, =0 {Rien de nouveau à importer} one {# ressource importée} other {# ressources importées}}{there, plural, =0 {} one { ; # y était déjà} other { ; # y étaient déjà}}",
+  "library.bookmarks.undo": "Annuler l’import",
+  "library.bookmarks.undone": "{count, plural, one {Import annulé : # ressource retirée} other {Import annulé : # ressources retirées}}",
+  "library.bookmarks.unreadable": "{name} n’est pas un fichier de signets que lines peut lire.",
   "library.settings.links": "Liens",
   "library.settings.lookUp": "Rechercher les liens",
   "library.settings.lookUpNote":

@@ -77,8 +77,8 @@ export interface NoteOptions {
 
 /**
  * The note's text for `item`: its properties (type first, then its own, the link and where it's
- * got to, `status`), its title as its heading, its cover and its summary. What came from elsewhere
- * reads as just that text (escape.ts): no tag, mention, link or picture is made of it.
+ * got to, `status`), its title as its heading, its cover, its summary and its tags. What came from
+ * elsewhere reads as just that text (escape.ts): no tag, mention, link or picture is made of it.
  */
 export function libraryNoteText(item: LibraryItem, { status, cover, mentions = [] }: NoteOptions = {}): string {
   const properties: [string, string][] = [["type", item.type], ...item.properties];
@@ -92,6 +92,7 @@ export function libraryNoteText(item: LibraryItem, { status, cover, mentions = [
   const parts = [`---\n${front.join("\n")}\n---\n# ${escapeMarkdown(title)}`];
   if (cover) parts.push(`![${escapeMarkdown(title.replace(/[[\]|]/g, ""))}|${cover.width}](${ATTACHMENT_PATH}${cover.name})`);
   if (item.description) parts.push(...summary(item.description).map(escapeMarkdown));
+  if (item.tags?.length) parts.push(item.tags.map((tag) => `#${tag}`).join(" "));
   return parts.join("\n\n") + "\n";
 }
 

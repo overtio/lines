@@ -42,6 +42,29 @@ export default {
   "library.lookingUp": "Buscando…",
   "library.failed": "No se ha podido buscar este enlace",
   "library.filled": "{title} se ha añadido a la biblioteca",
+  "library.resource": "Recurso",
+  "library.resources": "Recursos",
+  "library.lookUpDetails": "Buscar los detalles",
+  "library.bookmarks.title": "Marcadores",
+  "library.bookmarks.note":
+    "Los marcadores exportados de un navegador (Chrome, Edge, Firefox, Safari, Brave, Arc…) o de Pocket, Pinboard o Raindrop pasan a ser recursos de la biblioteca, una nota cada uno. No se busca nada al importarlos; cada uno puede buscarse después, desde su menú.",
+  "library.bookmarks.import": "Importar marcadores…",
+  "library.bookmarks.reading": "Leyendo…",
+  "library.bookmarks.found": "{count, plural, one {# marcador} other {# marcadores}} en {name}",
+  "library.bookmarks.there":
+    "{count, plural, one {# ya está en la biblioteca, con el mismo enlace: no se importa} other {# ya están en la biblioteca, con el mismo enlace: no se importan}}",
+  "library.bookmarks.repeated": "{count, plural, one {# repetido en el archivo: no se importa} other {# repetidos en el archivo: no se importan}}",
+  "library.bookmarks.other":
+    "{count, plural, one {# no es una página web (un bookmarklet, una página del navegador): no se importa} other {# no son páginas web (bookmarklets, páginas del navegador): no se importan}}",
+  "library.bookmarks.folderTags": "Etiquetar con sus carpetas",
+  "library.bookmarks.folderTagsNote": "Cada uno lleva sus carpetas como etiqueta, por ejemplo #dev/rust. Sus carpetas se guardan igualmente, en su propiedad folder.",
+  "library.bookmarks.start": "{count, plural, one {Importar # recurso} other {Importar # recursos}}",
+  "library.bookmarks.importing": "Importando… {done} de {count}",
+  "library.bookmarks.imported":
+    "{count, plural, =0 {Nada nuevo que importar} one {Se ha importado # recurso} other {Se han importado # recursos}}{there, plural, =0 {} one {; # ya estaba} other {; # ya estaban}}",
+  "library.bookmarks.undo": "Deshacer la importación",
+  "library.bookmarks.undone": "{count, plural, one {Importación deshecha: se ha quitado # recurso} other {Importación deshecha: se han quitado # recursos}}",
+  "library.bookmarks.unreadable": "{name} no es un archivo de marcadores que lines pueda leer.",
   "library.settings.links": "Enlaces",
   "library.settings.lookUp": "Buscar enlaces",
   "library.settings.lookUpNote":

@@ -10,6 +10,7 @@
   import { isClosed, notes, type Entry } from "../notes/store.svelte";
   import { longPress } from "../longPress";
   import { coarsePointer, copyText, isApple, isMacApp, reducedMotion } from "../platform";
+  import { lookUpDetails } from "../library/adding";
   import { shelfRow } from "../library/rows";
   import { setProperties } from "../notes/properties";
   import { dragNoteOut, handNoteOut } from "../notes/dragOut";
@@ -548,9 +549,12 @@
                 : { label: t("player.playEpisode"), icon: "play" as const, run: () => player.play(episode) },
             ]
           : [],
-        // On its shelf, where it's got to.
+        // On its shelf, where it's got to; or, only a link so far (a bookmark), what it is.
         shelf && !entry.note.trashed && !isClosed(entry.note)
-          ? (shelf.kind.statuses ?? []).map((status) => ({ label: status.label, checked: status.value === shelf.status?.value, run: () => setStatus(status) }))
+          ? [
+              ...(shelf.kind.statuses ?? []).map((status) => ({ label: status.label, checked: status.value === shelf.status?.value, run: () => setStatus(status) })),
+              ...(shelf.kind.lookUp ? [{ label: t("library.lookUpDetails"), icon: "search" as const, run: () => lookUpDetails(id) }] : []),
+            ]
           : [],
         [
           { label: leading.menuLabel, icon: leading.icon, run: () => perform(leading) },

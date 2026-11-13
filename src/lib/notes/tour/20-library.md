@@ -10,6 +10,7 @@ The next note, @[Frankenstein], is one, as a link to it becomes. It's in the sid
 
 - **Or search for it**, with the **+** beside Library in the sidebar: books in Open Library, movies and shows in Wikidata, music in MusicBrainz, podcasts in Apple's directory. **Blank** there starts one to fill in yourself.
 - **A link in any note**: right-click it → **Add to Library**, and it becomes a mention of its own library note.
+- **Your bookmarks**, from any browser: Settings → Library → **Import Bookmarks…** makes each a resource, with its folders, the day you saved it and its tags. Right-click one → **Look Up Details** when you want it filled in.
 - **Where you've got to.** Every book starts *to read*. Right-click it on its shelf to mark it Reading or Read; movies are to watch, music to listen to.
 - **One undo puts the link back**, if it isn't what you wanted. Changed while it's looked up, the note is left as you wrote it.
 - **Mention it** anywhere: @[Frankenstein] was written by @[Frankenstein].author in @[Frankenstein].year. And `@type.book` on a line of its own is your reading list:

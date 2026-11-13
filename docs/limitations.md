@@ -130,6 +130,8 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - Add to Library searches each catalog as it ranks things: Wikidata's search puts what's titled as typed and has the most Wikipedias first, but can miss what's new; MusicBrainz is asked once a second, so Music, which searches songs and albums, takes a moment more; only the first page of what each finds is shown.
 - A link added to the library from its menu becomes a mention as one change, which ⌘Z takes back; the library note made stays (it isn't taken back with it), in the Library. Done while the note's closed, the mention can't be taken back with ⌘Z.
 - A link being added shows how it's getting on in one pane: the same note open in two shows it in the first.
+- Bookmarks: Firefox's own `.jsonlz4` backups (the ones it makes by itself) aren't read, only its Backup… (`.json`) and its HTML export; Chrome's `Bookmarks` file in its profile folder isn't either (export it instead). Folders that are only a separator, and a bookmark's icon, keyword and whether it was private, aren't kept. A bookmark whose link only differs by its `#anchor` is a resource of its own.
+- Undo Import is there only while Settings shows what the import did; after, the resources are deleted as any notes are. Importing many makes the first sync after it long ([library.md](library.md#bookmarks)).
 - Looking links up hasn't been tried in the Mac, Windows, Linux, iOS or Android apps yet: the apps read pages through Rust (`webFetch`), which the browser tests don't reach.
 
 ## Math

@@ -50,6 +50,33 @@ export default {
   "library.nothing": "Nothing found for this link",
   // Said to screen readers once a note that was a link is filled in.
   "library.filled": "Added {title} to the Library",
+  // Bookmarks from a browser, each a resource: a note in the Library that's a link so far.
+  "library.resource": "Resource",
+  "library.resources": "Resources",
+  // A resource's menu on its shelf: makes it what its link is (a book, a video…) where a source knows it.
+  "library.lookUpDetails": "Look Up Details",
+  // Settings → Library → Bookmarks, and Settings → Export and Import when a bookmarks file is chosen.
+  "library.bookmarks.title": "Bookmarks",
+  "library.bookmarks.note":
+    "Bookmarks exported from a browser (Chrome, Edge, Firefox, Safari, Brave, Arc…) or from Pocket, Pinboard or Raindrop become resources in the Library, a note each. Nothing is looked up as they come in; each can be later, from its menu.",
+  "library.bookmarks.import": "Import Bookmarks…",
+  "library.bookmarks.reading": "Reading…",
+  // {name}: the file's name (or the files', listed).
+  "library.bookmarks.found": "{count, plural, one {# bookmark} other {# bookmarks}} in {name}",
+  "library.bookmarks.there": "{count, plural, one {# is in the Library already, with the same link: left out} other {# are in the Library already, with the same link: left out}}",
+  "library.bookmarks.repeated": "{count, plural, one {# repeat in the file: left out} other {# repeats in the file: left out}}",
+  "library.bookmarks.other":
+    "{count, plural, one {# isn’t a web page (a bookmarklet, a browser’s own page): left out} other {# aren’t web pages (bookmarklets, a browser’s own pages): left out}}",
+  "library.bookmarks.folderTags": "Tag with their folders",
+  "library.bookmarks.folderTagsNote": "Each gets its folders as a tag, like #dev/rust. Either way they’re kept, as its folder property.",
+  "library.bookmarks.start": "{count, plural, one {Import # Resource} other {Import # Resources}}",
+  // {done} and {count}: numbers, written the language's way.
+  "library.bookmarks.importing": "Importing… {done} of {count}",
+  "library.bookmarks.imported":
+    "{count, plural, =0 {Nothing new to import} one {Imported # resource} other {Imported # resources}}{there, plural, =0 {} one {; # was already there} other {; # were already there}}",
+  "library.bookmarks.undo": "Undo Import",
+  "library.bookmarks.undone": "{count, plural, one {Import undone: # resource removed} other {Import undone: # resources removed}}",
+  "library.bookmarks.unreadable": "{name} isn’t a file of bookmarks lines can read.",
   "library.settings.links": "Links",
   "library.settings.lookUp": "Look up links",
   "library.settings.lookUpNote":

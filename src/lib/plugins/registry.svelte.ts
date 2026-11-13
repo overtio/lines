@@ -101,6 +101,7 @@ class Plugins {
       .sort((a, b) => Number(!!a.general) - Number(!!b.general));
   });
   readonly linkActions = $derived(this.#from("linkActions"));
+  readonly fileImports = $derived(this.#from("fileImports"));
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).

@@ -54,6 +54,37 @@ Only what's typed is sent to the catalog searched.
 
 Right-click a link to a web page in any Markdown note (or put the cursor on it and press the menu key, or ⇧F10) for Open Link, Copy Link and **Add to Library**: lines looks the link up, makes a library note of what it is, and puts a mention of it in the link's place, `@[Dune: Part Two]`, as one change, which ⌘Z takes back (the library note stays, in the Library). The mention is of the note's title as it reads. It's never done unasked. If the library has a note with that link already, that's the one mentioned. If the link changed while it was looked up (typed into, or deleted), nothing is made or changed; if nothing can say what it is, the note says so after the link for a moment. Leave the note meanwhile and it goes on: the link is mentioned where it is in the note as stored (not taken back with ⌘Z, which is the note you're in's), and coming back while it's looked up shows how it's getting on. It gives up after 30 seconds.
 
+## Bookmarks
+
+Settings → Library → **Import Bookmarks…** makes each bookmark in a file a browser exported a **resource**: a note in the Library, under Resources, that's its link and its name so far. Settings → Export and Import → Import Files… recognizes a bookmarks file too, and asks the same.
+
+| From | The file |
+|---|---|
+| Chrome, Edge, Brave, Opera, Vivaldi, Arc | Bookmarks → Bookmark manager → ⋮ → Export bookmarks (an `.html` file) |
+| Firefox | Bookmarks → Manage Bookmarks → Import and Backup → Export Bookmarks to HTML…, or Backup… (a `.json` file) |
+| Safari | File → Export → Bookmarks… |
+| Pinboard, Raindrop, Pocket | Their HTML export |
+
+All but Firefox's backup are Netscape's bookmark file, a page of links every browser writes a little differently. lines reads it with the browser's own parser, in a document of its own, where nothing in it runs or loads; its icons are left out.
+
+```markdown
+---
+type: resource
+folder: Bookmarks bar / Dev / Rust
+added: 2023-11-14
+link: https://doc.rust-lang.org/book/
+---
+# The Rust Programming Language
+
+#rust #programming
+```
+
+- **Before anything's written**, it says what will happen: how many bookmarks there are, how many are in the Library already (a note there has the same link: left out), repeated in the file (imported once) or not web pages (bookmarklets, the browser's own pages, Firefox's saved searches: left out). **Tag with their folders** (off) gives each its folders as a nested tag, `#bookmarks-bar/dev/rust`; either way its folders are kept, as its `folder`.
+- **Then it imports them**, a few hundred at a time, showing how far it's got; five thousand take a second or two. After, it says what it did ("Imported 1,234 resources; 56 were already there"), and **Undo Import** there deletes them all again, but any changed since. Closing Settings leaves them in.
+- **Each is dated when it was bookmarked**, created and last changed then, so Resources lists the latest bookmarked first and they don't crowd the top of your notes; `added` is that day. A file that has no dates (Safari's) keeps its order, dated as it's imported. A bookmark's tags (Firefox's, Pinboard's, Raindrop's, Pocket's) are its `#tags`, as lines writes tags (`Web Browsers` is `#web-browsers`); what a bookmark says of itself (Firefox's and Safari's descriptions) is its text.
+- **Nothing is looked up** as they come in: thousands of bookmarks would ask thousands of sites. Right-click one on its shelf → **Look Up Details**, and it's looked up as a note that's just a link is: what its link is (a book, a video, an article…), where a source knows it, keeping its `folder`, `added` and tags. Or right-click its link in another note → Add to Library, which mentions it as it is.
+- Resources are filed, not in the Inbox. They're notes like any other, so with sync on, each is a file of its own in the synced folder or bucket: the first sync after importing thousands sends thousands of small files, which takes a while (a few minutes for 5,000 to a bucket), and every device then has them.
+
 ## Kinds of things
 
 | Type | In the Library | Properties, in this order | Status |
@@ -69,6 +100,7 @@ Right-click a link to a web page in any Markdown note (or put the cursor on it a
 | `article` | Articles | author, site, published | to read, reading, read |
 | `paper` | Papers | authors, year, arxiv | to read, reading, read |
 | `feed` | Feeds (by its posts) | author, feed | |
+| `resource` | Resources | folder, added | |
 
 Each has `link` (where it's from) and `status` after its own properties, and only the properties a source found. The keys and the `status` values are written in English, like `type`, so tables (`@type.book`), mentions (`@[Dune].author`) and the Library read them alike on every device; lines shows the status in its own language. A note's status is set from its row's menu on its shelf (or by writing it), and it keeps its date, so the list stays as it is. A status of your own (`status: abandoned`) is shown as written.
 

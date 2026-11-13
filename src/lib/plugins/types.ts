@@ -94,6 +94,25 @@ export interface Contributions {
   librarySources?: LibrarySource[];
   /** What a web link in a note can be used for, in its menu (right-click it) after Open and Copy: added to the Library, say. */
   linkActions?: LinkAction[];
+  /** Files lines imports as something other than a note in a language: a browser's bookmarks, as the Library's resources. */
+  fileImports?: FileImport[];
+}
+
+/**
+ * Files of a kind lines imports its own way (Settings → Export and Import → Import Files…), which
+ * asks what to do with them before doing it: a browser's exported bookmarks.
+ */
+export interface FileImport {
+  id: string;
+  /** The extensions of its files, for the file picker. */
+  extensions: string[];
+  /** Whether a file's text is one it reads (its start is enough), quickly. */
+  recognizes(text: string): boolean;
+  /**
+   * What says what importing the files would do, does it, and says what it did: rows of a card in
+   * Settings, given the files' names and text, and what to call when it's done with (Cancel).
+   */
+  step: () => Promise<{ default: Component<{ files: { name: string; text: string }[]; onclose: () => void }> }>;
 }
 
 /** A web link in a Markdown note: its whole Markdown (`[text](…)`, `<…>` or a bare address), where it is, its address and its text. */
@@ -130,6 +149,8 @@ export interface LibraryItem {
   cover?: string;
   /** What it's about, in a few plain sentences. */
   description?: string;
+  /** Tags it's filed under (a bookmark's), written as the note's `#tags`: lines' own, as `normalizeTag` makes them. */
+  tags?: string[];
 }
 
 /**
@@ -160,6 +181,12 @@ export interface LibraryKind {
   mentions?: string[];
   /** Where it's got to, in order (the first is where it starts): what's written, and what's shown. None for kinds without (a podcast). */
   statuses?: { value: string; label: string }[];
+  /**
+   * Its notes are a link and its name so far (a bookmark): their row's menu has Look Up Details, which
+   * makes one what its link is (a book, a video…) where a source knows it, keeping its properties
+   * and tags.
+   */
+  lookUp?: boolean;
 }
 
 /**
