@@ -147,6 +147,19 @@ describe("reading feeds", () => {
     expect(cut.posts.map((post) => post.title).slice(0, 2)).toEqual(["One", "Two"]);
   });
 
+  test("where a post is talked about: RSS's <comments>, Atom's replies page (not its comments' feed)", async () => {
+    const rss = await read(
+      `<rss version="2.0"><channel><title>News</title><link>https://news.example/</link><item><title>A</title><link>https://a.example/post</link><comments>https://news.example/item?id=1</comments></item><item><title>B</title><link>https://b.example/</link></item></channel></rss>`,
+      "https://news.example/rss",
+    );
+    expect(rss.posts.map((post) => post.comments)).toEqual(["https://news.example/item?id=1", undefined]);
+    const atom = await read(
+      `<feed xmlns="http://www.w3.org/2005/Atom"><title>Blog</title><entry><title>A</title><id>a</id><link href="/a"/><link rel="replies" type="application/atom+xml" href="/a/comments.xml"/><link rel="replies" type="text/html" href="/a#comments"/></entry><entry><title>B</title><id>b</id><link rel="replies" type="application/atom+xml" href="/b/comments.xml"/></entry></feed>`,
+      "https://blog.example/feed",
+    );
+    expect(atom.posts.map((post) => post.comments)).toEqual(["https://blog.example/a#comments", undefined]);
+  });
+
   test("a page isn't a feed", async () => {
     const refused = await app.page.evaluate(() => {
       try {
@@ -188,6 +201,17 @@ describe("HTML as Markdown", () => {
         "Some `` code with `ticks` `` and ~~gone~~ *spaced* .",
       ].join("\n\n"),
     );
+  });
+
+  test("a post that says nothing but links to itself or its comments says nothing of its own", async () => {
+    const saysMore = (html: string, own: string[]) => app.page.evaluate(([html, own]) => window.testing.reading.saysMore(html, "https://news.example/", own), [html, own] as const);
+    const own = ["https://a.example/post", "https://news.example/item?id=1"];
+    expect(await saysMore(`<a href="https://news.example/item?id=1">Comments</a>`, own)).toBe(false);
+    expect(await saysMore(`<p><a href="item?id=1">Comments</a> <a href="https://a.example/post">Link</a></p>`, own)).toBe(false);
+    expect(await saysMore("", own)).toBe(false);
+    expect(await saysMore(`<p>What it found.</p><a href="https://news.example/item?id=1">Comments</a>`, own)).toBe(true);
+    expect(await saysMore(`<a href="https://elsewhere.example/">Elsewhere</a>`, own)).toBe(true);
+    expect(await saysMore(`<img src="chart.png">`, own)).toBe(true);
   });
 
   test("a block within a line stays in it: code as code, anything else as its words", async () => {

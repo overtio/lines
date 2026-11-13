@@ -50,6 +50,20 @@
   color: var(--text-muted);
 }
 
+/* A post's title links to it, in the title's color, underlined only under the pointer; the links under it (its site, its comments) are as quiet as their line. */
+.cm-line.cm-post-title .cm-lp-link {
+  color: inherit;
+  text-decoration-color: transparent;
+}
+
+.cm-line.cm-post-title .cm-lp-link:hover {
+  text-decoration-color: currentColor;
+}
+
+.cm-line.cm-post-byline .cm-lp-link {
+  color: inherit;
+}
+
 /* An episode note's Play button, before its `audio` link (player/notePlay.ts): a small round button in the accent. */
 .cm-episode-play {
   display: inline-grid;

@@ -102,6 +102,39 @@ test("a post opens read-only in the note's place, marked read; Mark as Unread an
   await page.waitForFunction(() => document.activeElement?.closest("[data-post]") === document.querySelectorAll(".note-list [data-post]")[1]);
 });
 
+test("an aggregator's post (Hacker News'): its title links to it, the site it's of and its comments under it, and a click opens them", async () => {
+  app = await openApp({ timezone: "UTC" });
+  const page = app.page;
+  const news = "https://news.example/rss";
+  const feed = `<?xml version="1.0"?><rss version="2.0"><channel><title>Hacker News</title><link>https://news.example/</link><description>Links</description>
+    <item><title>Lonewolf 0.3 – A standalone XMPP server written in Rust</title><link>https://www.lonewolf.example/blog/0.3</link><pubDate>Fri, 13 Nov 2026 17:55:28 +0000</pubDate>
+    <comments>https://news.example/item?id=1</comments><description><![CDATA[<a href="https://news.example/item?id=1">Comments</a>]]></description></item></channel></rss>`;
+  await page.route(news, (route) => route.fulfill({ body: feed, contentType: "application/rss+xml", headers: { "access-control-allow-origin": "*" } }));
+  await openFeeds(app);
+  await subscribe(app, news);
+  await page.locator(".note-list [data-post]").first().click();
+  await page.getByRole("textbox", { name: "Post: Lonewolf 0.3 – A standalone XMPP server written in Rust" }).waitFor();
+  const byline = page.locator(".editor-pane .cm-post-byline");
+  await byline.waitFor();
+  expect(await byline.innerText()).toBe("Hacker News · lonewolf.example · November 13 · Comments");
+  // Its "Comments" is under its title, not again below. (What the page it links to says of itself is shown in the apps, which read pages.)
+  expect((await page.locator(".editor-pane .cm-content").innerText()).match(/Comments/g)).toHaveLength(1);
+
+  // A click on a link in what's only read opens it, whatever a click on a note's link does.
+  await page.evaluate(() => {
+    const opened: string[] = [];
+    Object.assign(window, { opened, open: (url: string) => void opened.push(url) });
+  });
+  await page.locator(".editor-pane .cm-post-title .cm-lp-link").click();
+  await byline.locator(".cm-lp-link", { hasText: "Comments" }).click();
+  await byline.locator(".cm-lp-link", { hasText: "lonewolf.example" }).click();
+  expect(await page.evaluate(() => (window as unknown as { opened: string[] }).opened)).toEqual([
+    "https://www.lonewolf.example/blog/0.3",
+    "https://news.example/item?id=1",
+    "https://www.lonewolf.example/blog/0.3",
+  ]);
+});
+
 test("refreshing asks whether the feed changed, keeps what was read, and adds new posts unread", async () => {
   app = await openApp();
   const asked = await serveBlog(app);
@@ -325,7 +358,11 @@ test("a post is only read: its links go to the web alone, its code never runs or
   await rows.first().click();
   await page.waitForFunction(() => document.querySelector(".editor-pane .cm-content")?.textContent?.includes("Open the report"));
   expect(await content.locator(".cm-lp-mention, .cm-lp-tag, .cm-lp-math, .katex").count()).toBe(0);
-  expect(await content.evaluate((element) => [...element.querySelectorAll<HTMLElement>("[data-href]")].map((link) => link.dataset.href))).toEqual(["https://site.example/"]);
+  // Its title, a link to it (its guid read as its address), and its one link to the web.
+  expect(await content.evaluate((element) => [...element.querySelectorAll<HTMLElement>("[data-href]")].map((link) => link.dataset.href))).toEqual([
+    "https://crafted.example/1",
+    "https://site.example/",
+  ]);
 
   await rows.nth(1).click();
   await page.waitForFunction(() => document.querySelector(".editor-pane .cm-content")?.textContent?.includes("Try our API"));

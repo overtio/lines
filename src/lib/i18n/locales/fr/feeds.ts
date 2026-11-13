@@ -42,6 +42,7 @@ export default {
   "feeds.markUnread": "Marquer comme non lu",
   "feeds.didRead": "Marqué comme lu",
   "feeds.didUnread": "Marqué comme non lu",
+  "feeds.comments": "Commentaires",
   "feeds.openInBrowser": "Ouvrir dans le navigateur",
   "feeds.save": "Enregistrer dans la Bibliothèque",
   "feeds.openSaved": "Ouvrir dans la Bibliothèque",
