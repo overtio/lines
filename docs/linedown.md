@@ -305,7 +305,7 @@ A link to a song, album, playlist, artist, podcast or episode on [Spotify](https
 
 - **Until it's played** it's a card like an audio file's, named by the link's text (or "Track on Spotify", where the text is only the site's name), saying the site's player loads when it's played. Nothing is asked of the site until then: its player loads from the site, which can then tell someone's listening.
 - **Played** (its button, or Enter with it selected), the card becomes the site's player, as wide as the note up to a column's width, which starts playing where the browser lets it (Chrome; in Safari a second press, in the player). SoundCloud's is in the theme's accent. Starting it pauses whatever else plays in lines (the podcast player, a sound in a note, another site's player), and the other way round.
-- **Spotify** plays 30 seconds of each song to someone not logged in to Spotify in that browser, and in Safari and the apps to everyone: their web views can't play the audio Spotify protects. **SoundCloud** plays whole tracks, as its site does.
+- **Spotify** plays 30 seconds of each song to someone not logged in to Spotify in that browser, and, it's likely, in Safari and the apps to everyone: WebKit has none of the protection (Widevine) Spotify's whole songs need in other browsers. **SoundCloud** plays whole tracks, as its site does.
 - Pasting a link to either on an empty line writes it as a link the player draws (`[Spotify](…)`); undo turns it back into the address. A bare address on a line of its own stays a link.
 - Like images, the players are drawn at the top level and in cards; within a line of text, in a list or in a quote, they're links. Printed, they're their links.
 
