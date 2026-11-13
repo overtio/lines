@@ -14,7 +14,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { chromium, webkit } from "playwright";
 import { build, preview } from "vite";
-import { png } from "../tests/browser/files.ts";
+import { answerFile, png, wav } from "../tests/browser/files.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const args = process.argv.slice(2);
@@ -166,6 +166,20 @@ async function subscribe(page, feeds) {
 }
 
 const FEEDS = { "https://svelte.dev/blog/rss.xml": "blog.rss", "https://daringfireball.net/feeds/main": "blog.atom", "https://feeds.megaphone.fm/FSI1483080183": "podcast.rss" };
+
+/** The podcast's latest episode played (a minute of sound), paused 12 seconds in. */
+async function playEpisode(page) {
+  const audio = wav(60_000);
+  await page.route((url) => url.hostname === "traffic.megaphone.fm", (route) => answerFile(route, audio, "audio/wav"));
+  await subscribe(page, { "https://feeds.megaphone.fm/FSI1483080183": "podcast.rss" });
+  await page.evaluate(() => window.testing.notes.setFilter({ kind: "feeds" }));
+  await page.locator(".note-list li").filter({ hasText: "1055:" }).getByRole("button", { name: "Play Episode" }).click();
+  await page.waitForFunction(() => window.testing.player.playing);
+  await page.evaluate(() => {
+    window.testing.player.pause();
+    window.testing.player.seek(12);
+  });
+}
 
 /** What takes each theme's own colors besides its accent: a highlight, callouts and line marks. */
 const THEME_COLORS = `# Colors
@@ -663,6 +677,26 @@ const SCENES = [
       await page.evaluate(() => window.testing.notes.setFilter({ kind: "feeds" }));
       await page.locator(".note-list").getByRole("button", { name: /^What’s new in Svelte/ }).click();
     },
+  },
+  ...[
+    ["", {}],
+    ["-neon", { style: "neon", theme: "neon" }],
+    ["-classic", { style: "classic", theme: "classic" }],
+    ["-pixel", { style: "pixel", theme: "pixel" }],
+  ].map(([suffix, prefs]) => ({
+    id: `player${suffix}`,
+    title: `The podcast player${suffix ? ` in ${suffix[1].toUpperCase()}${suffix.slice(2)}` : ""}`,
+    look: "At the bottom of the sidebar, over Set up sync: the episode's artwork, its title and show cut short, the close button lined up with them; the slider across with the time played and left under its ends; back 15, play and forward 30 centered, the speed at the end, all in line. The episode's row says how much is left, its play button clear of the text.",
+    prefs,
+    act: (page) => playEpisode(page),
+  })),
+  {
+    id: "player-phone",
+    title: "Phone: the podcast player",
+    look: "At the bottom of the list, above the screen's edge: the same player, nothing cut off, the list scrolling above it.",
+    width: 390,
+    height: 780,
+    act: (page) => playEpisode(page),
   },
   {
     id: "calendar-repeat",

@@ -26,6 +26,7 @@
   import AddToLibrary from "./AddToLibrary.svelte";
   import FeedRows from "./FeedRows.svelte";
   import IconButton from "./ui/IconButton.svelte";
+  import MiniPlayer from "./MiniPlayer.svelte";
   import SidebarDivider from "./SidebarDivider.svelte";
   import SidebarRow from "./SidebarRow.svelte";
   import { reorderable } from "./reorder";
@@ -647,6 +648,10 @@
         </button>
       {/if}
     </div>
+  {/if}
+
+  {#if ui.playerInSidebar}
+    <MiniPlayer />
   {/if}
 
   <footer class="flex shrink-0 items-center gap-1 border-t border-line px-2.5 pt-2 pb-[calc(10px_+_env(safe-area-inset-bottom))]">

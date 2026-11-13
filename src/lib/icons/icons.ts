@@ -203,6 +203,7 @@ import {
   Repeat,
   RefreshCw,
   RotateCcw,
+  RotateCw,
   Rows2,
   Rss,
   Ruler,
@@ -498,6 +499,9 @@ export const ICONS = {
   school: [School, "graduationcap.fill"],
   scissors: [Scissors, "scissors"],
   search: [Search, "magnifyingglass"],
+  // A podcast player's skips: back 15 seconds, forward 30 (player.svelte.ts).
+  "seek-back": [RotateCcw, "gobackward.15"],
+  "seek-forward": [RotateCw, "goforward.30"],
   send: [Send, "paperplane"],
   server: [Server, "server.rack"],
   settings: [Settings, "gearshape"],

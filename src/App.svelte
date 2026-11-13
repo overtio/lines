@@ -36,6 +36,8 @@
   import { isClosed, notes } from "./lib/notes/store.svelte";
   import { plugins } from "./lib/plugins/registry.svelte";
   import { feeds, savePost } from "./lib/feeds/feeds.svelte";
+  import { postEpisode } from "./lib/player/episodes";
+  import { player } from "./lib/player/player.svelte";
   import { canPrint, copyText, isApple, isNewNoteShortcut, newNoteKey, openExternal } from "./lib/platform";
   import { saveAndShow } from "./lib/save";
   import { NOTE_MIN, ui, type MenuItem } from "./lib/ui.svelte";
@@ -660,6 +662,16 @@
           {/if}
         {:else if post}
           {@const { feed, post: shown } = post}
+          {@const episode = postEpisode(post)}
+          {#if episode}
+            {@const playing = player.playing && player.episode?.key === episode.key}
+            <IconButton
+              icon={playing ? "pause" : "play"}
+              iconSize={17}
+              label={playing ? t("player.pauseEpisode") : t("player.playEpisode")}
+              onclick={() => (playing ? player.pause() : player.play(episode))}
+            />
+          {/if}
           {@const saved = feeds.savedNote(post)}
           <IconButton
             icon={saved ? "bookmark" : "bookmark-plus"}

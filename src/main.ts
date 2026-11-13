@@ -16,6 +16,7 @@ import Settings from "./lib/components/settings/Settings.svelte";
 import LockedNote from "./lib/components/LockedNote.svelte";
 import LockScreen from "./lib/components/LockScreen.svelte";
 import { feeds } from "./lib/feeds/feeds.svelte";
+import { player } from "./lib/player/player.svelte";
 import { lock } from "./lib/lock/lock.svelte";
 import { arrived, removeUnusedAttachments } from "./lib/notes/attachments";
 import { lockedNotes } from "./lib/notes/locked.svelte";
@@ -172,8 +173,9 @@ async function start() {
   );
   await sync.load();
   sync.start();
-  // Only the main window fetches feeds, as it syncs.
+  // Only the main window fetches feeds, as it syncs, and plays episodes.
   void feeds.start().catch((error) => console.error("lines: couldn't read the feeds kept", error));
+  void player.load();
   // Settings, in its own window, asks this one to sync, lock and add notes.
   if (isTauri) {
     serveSettings(

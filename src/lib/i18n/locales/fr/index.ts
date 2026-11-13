@@ -11,6 +11,7 @@ import list from "./list";
 import lock from "./lock";
 import models from "./models";
 import picker from "./picker";
+import player from "./player";
 import plugins from "./plugins";
 import print from "./print";
 import secrets from "./secrets";
@@ -33,6 +34,7 @@ export default {
   ...lock,
   ...models,
   ...picker,
+  ...player,
   ...plugins,
   ...print,
   ...secrets,

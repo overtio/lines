@@ -9,6 +9,7 @@ import { attachmentNames, saveAttachment } from "../lib/notes/attachments";
 import { noteKeys } from "../lib/notes/noteKeys.svelte";
 import { notes } from "../lib/notes/store.svelte";
 import { panes } from "../lib/panes.svelte";
+import { player } from "../lib/player/player.svelte";
 import { plugins } from "../lib/plugins/registry.svelte";
 import { prefs } from "../lib/prefs.svelte";
 import { customThemes } from "../lib/themes/custom.svelte";
@@ -40,6 +41,7 @@ const testing = {
   notes,
   noteKeys,
   feeds,
+  player,
   /** Reading feeds, their HTML and OPML, as lines does (lib/feeds/). */
   reading: { readFeed, isFeed, NotAFeed, NoFeed, htmlToMarkdown, readOpml },
   /** The app lock, to turn on as Settings does. */

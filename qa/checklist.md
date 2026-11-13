@@ -460,6 +460,17 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Settings → Library → Export OPML downloads `feeds.opml`, which another feed reader imports; Import OPML… subscribes to each feed in a file that isn't already, saying how many, fetching them a few at a time and never two from one site at once
 - [ ] With the app lock on, quit and reopen: before unlocking nothing's fetched; after, the posts and which were read are as they were
 
+## 11c. The podcast player
+
+- [ ] A podcast's episode in the Feeds has a play button at its row's end, its row's menu Play Episode, and an open episode a Play button over it; each starts it in the mini player, at the bottom of the sidebar (where the sidebar's a drawer or hidden, at the bottom of the note list)
+- [ ] The mini player shows the episode's artwork, title and show (clicking them opens the episode), a slider of where it's got to with the time played and left, back 15 s, play or pause, forward 30 s and the speed; × stops it and puts it away
+- [ ] It plays on while moving between notes, the Feeds, the Calendar and Settings, and in tabs
+- [ ] The speed goes round 0.75×, 1×, 1.25×, 1.5×, 1.75×, 2× and is kept for the next episode and after lines restarts
+- [ ] Paused, or lines quit, an episode starts again where it was; its row says how much is left; played to the end, it's Played, and starts from the beginning next time; Mark as Played / Unplayed in its row's menu
+- [ ] The slider moves by ← and → from the keyboard; screen readers hear "3:05 played, 28:17 left" and every button's name
+- [ ] [Mac] The keyboard's ⏯ key and Now Playing in Control Center show the episode, play, pause and skip it
+- [ ] [Apps] Episodes from their feeds' https addresses play (the apps' web view allows sound from the web); an http one plays over https, or says it couldn't be played
+
 ## 12. Menus, pickers and note info
 
 - [ ] Menus open at the pointer, stay inside the window, move with ↑ ↓, and close on Esc, a click outside, scroll or resize

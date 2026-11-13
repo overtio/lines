@@ -5,23 +5,36 @@ import type { FeedRecord } from "./posts";
 
 /*
  * Feeds' posts on this device, in a database of their own (`lines-feeds`): a record for each feed
- * (what it said of itself, its posts but their content, which were read), and each post's content
- * apart, read when it's opened. Each is stored under a random id, and with the app lock on,
- * encrypted like notes (lock/vault.ts), so nothing kept says what's subscribed to or read.
+ * (what it said of itself, its posts but their content, which were read), each post's content
+ * apart, read when it's opened, and where each episode was stopped (player/player.svelte.ts). Each
+ * is stored under a random id, and with the app lock on, encrypted like notes (lock/vault.ts), so
+ * nothing kept says what's subscribed to, read or listened to.
  */
 
 export const FEEDS_DB = "lines-feeds";
 const FEEDS = "feeds";
 const POSTS = "posts";
+const POSITIONS = "positions";
 
 interface Content {
   id: string;
   html: string;
 }
 
-const open = database(FEEDS_DB, 1, [FEEDS, POSTS]);
+/** Where an episode was stopped, by its key (a post's, or a hash of a note's audio). */
+export interface Position {
+  id: string;
+  /** In seconds. */
+  at: number;
+  /** It was listened to the end. */
+  played: boolean;
+  duration?: number;
+}
+
+const open = database(FEEDS_DB, 2, [FEEDS, POSTS, POSITIONS]);
 const feedStore = new ObjectStore<FeedRecord | Sealed>(FEEDS, open);
 const postStore = new ObjectStore<Content | Sealed>(POSTS, open);
+const positionStore = new ObjectStore<Position | Sealed>(POSITIONS, open);
 
 async function seal<T extends { id: string }>(store: string, value: T): Promise<T | Sealed> {
   return vault.sealing ? sealRecord(store, value.id, utf8(JSON.stringify(value))) : value;
@@ -61,11 +74,21 @@ export const feedStorage = {
     await feedStore.delete(record.id);
   },
 
+  /** Where each episode was stopped. */
+  positions(): Promise<Position[]> {
+    return positionStore.all().then((values) => Promise.all(values.map((value) => unseal<Position>(POSITIONS, value))));
+  },
+
+  async putPosition(position: Position) {
+    await positionStore.put(await seal(POSITIONS, position));
+  },
+
   /** Writes everything again, encrypted or not as the app lock now says. */
   async rewrite() {
     const stores = [
       [FEEDS, feedStore],
       [POSTS, postStore],
+      [POSITIONS, positionStore],
     ] as [string, ObjectStore<{ id: string } | Sealed>][];
     for (const [name, store] of stores) {
       for (const id of await store.ids()) {
