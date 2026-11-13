@@ -4,7 +4,7 @@ import { findFeed, looksLikeFeed, NoFeed } from "../../lib/feeds/find";
 import { isFeed, readFeed } from "../../lib/feeds/parse";
 import { t } from "../../lib/i18n/index.svelte";
 import { episodePlay } from "../../lib/player/notePlay";
-import { plugins } from "../../lib/plugins/registry.svelte";
+import { readsPages } from "../../lib/library/web";
 import type { LibraryKind, LibrarySource, Plugin } from "../../lib/plugins/types";
 
 /*
@@ -47,7 +47,7 @@ const site: LibrarySource = {
   id: "feeds-site",
   name: t("feeds.title"),
   general: true,
-  recognizes: (url) => (url.protocol === "https:" || url.protocol === "http:") && plugins.librarySources.some((each) => each.id === "web-pages"),
+  recognizes: (url) => (url.protocol === "https:" || url.protocol === "http:") && readsPages(),
   async lookup(url, signal) {
     try {
       const found = await findFeed(url.href, signal, namedFeed);

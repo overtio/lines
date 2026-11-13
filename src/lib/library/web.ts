@@ -1,7 +1,8 @@
 import { withTimeout } from "../pacing";
 import { isTauri, webFetch } from "../platform";
+import { plugins } from "../plugins/registry.svelte";
 import { REPO, VERSION } from "../release";
-import { type Page, readPage } from "./page";
+import { absolute, type Page, readPage } from "./page";
 
 /*
  * Asking the web what a link is, for the library's sources (src/plugins/): only what's needed (the
@@ -46,6 +47,24 @@ export async function getPage(url: string, signal: AbortSignal): Promise<Page | 
   const html = await response.text();
   return readPage(html.slice(0, PAGE_CHARACTERS), response.url || url);
 }
+
+/**
+ * What the page at `url` says of itself in a few words, for a link shown with none of its own (a
+ * feed's post that's only a link, as Hacker News' are): its description, and its picture where
+ * it's one to ask. Null when it says neither.
+ */
+export async function pageSummary(url: string, signal: AbortSignal): Promise<{ description?: string; image?: string } | null> {
+  const page = await getPage(url, signal);
+  if (!page) return null;
+  const said = (...keys: string[]) => keys.map((key) => page.meta.get(key)?.trim()).find(Boolean);
+  const description = said("og:description", "twitter:description", "description");
+  const picture = said("og:image", "og:image:url", "twitter:image");
+  const image = picture && absolute(picture, page.url);
+  return description || image ? { description, image: image && isPublic(image) ? image : undefined } : null;
+}
+
+/** Whether lines reads what pages say of themselves: while Web Pages is on, which it can be only in the apps. */
+export const readsPages = () => plugins.librarySources.some((source) => source.id === "web-pages");
 
 /**
  * Whether an address a page gave (its picture, its oEmbed) is one to ask: on the web at large over

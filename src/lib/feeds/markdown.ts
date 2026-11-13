@@ -33,6 +33,22 @@ export function plainText(html: string): string {
   return (body.textContent ?? "").replace(/\s+/g, " ").trim();
 }
 
+/**
+ * Whether a post's HTML says anything but links to `own` addresses (itself, its comments): Hacker
+ * News' posts say only "Comments", a link to theirs.
+ */
+export function saysMore(html: string, base: string, own: (string | undefined)[]): boolean {
+  const body = parse(html);
+  for (const link of body.querySelectorAll("a[href]")) {
+    try {
+      if (own.includes(new URL(link.getAttribute("href")!, base).href)) link.remove();
+    } catch {
+      // Not an address, so not one of its own.
+    }
+  }
+  return !!plainText(body.innerHTML) || !!body.querySelector("img, video, audio, iframe");
+}
+
 /** HTML as Markdown, its relative links and pictures read from `base`. */
 export function htmlToMarkdown(html: string, base?: string): string {
   return new Writer(base).blocks(parse(html)).join("\n\n").trim();
@@ -262,4 +278,7 @@ function inlineCode(code: string) {
 }
 
 /** A link's destination, in angle brackets where it has spaces or brackets in it. */
-const destination = (url: string) => (/[\s()<>]/.test(url) ? `<${url.replace(/[<>]/g, encodeURIComponent)}>` : url);
+export const destination = (url: string) => (/[\s()<>]/.test(url) ? `<${url.replace(/[<>]/g, encodeURIComponent)}>` : url);
+
+/** A link to `href` that reads as `text`, and only as that text. */
+export const markdownLink = (text: string, href: string) => `[${escapeMarkdown(text).replace(/]/g, "\\]")}](${destination(href)})`;

@@ -30,6 +30,8 @@ export interface Post {
   id: string;
   title: string;
   link?: string;
+  /** Where it's talked about: its comments' page (Hacker News'), if the feed says. */
+  comments?: string;
   author?: string;
   /** When it was published (or last updated, if that's all it says), in milliseconds. */
   date?: number;
@@ -310,6 +312,7 @@ function readItem(item: Element, base: string, ns: string | null): Post {
     id: guidText || link || `${title}\n${date ?? ""}\n${fingerprint(html)}`,
     title: title || excerptOf(html).slice(0, 80),
     link,
+    comments: web(text(item, "comments", ns), base),
     author: authorName(text(item, "author", ns) ?? tags.author),
     date,
     html,
@@ -355,7 +358,9 @@ function atomHtml(element: Element | undefined): string {
 
 /** The `href` of the first link with this `rel` (Atom's links without one are `alternate`). */
 function atomLink(parent: Element, ns: string | null, rel: string, base: string) {
-  const link = children(parent, "link", ns).find((each) => (each.getAttribute("rel") ?? "alternate") === rel && (rel !== "alternate" || !/xml/.test(each.getAttribute("type") ?? "")));
+  // A page, not a feed: an entry's replies may be a feed of its comments as well as their page.
+  const page = rel === "alternate" || rel === "replies";
+  const link = children(parent, "link", ns).find((each) => (each.getAttribute("rel") ?? "alternate") === rel && !(page && /xml/.test(each.getAttribute("type") ?? "")));
   return web(link?.getAttribute("href"), base);
 }
 
@@ -387,6 +392,7 @@ function readAtom(root: Element, url: string): Feed {
       id: text(entry, "id", ns) || link || `${title}\n${date ?? ""}\n${fingerprint(html)}`,
       title: title || excerptOf(html).slice(0, 80),
       link,
+      comments: atomLink(entry, ns, "replies", entryBase),
       author: name(entry) ?? entryTags.author ?? feedAuthor,
       date,
       html,

@@ -1,7 +1,7 @@
 import { EditorView } from "@codemirror/view";
 import { feeds } from "../lib/feeds/feeds.svelte";
 import { NoFeed } from "../lib/feeds/find";
-import { htmlToMarkdown } from "../lib/feeds/markdown";
+import { htmlToMarkdown, saysMore } from "../lib/feeds/markdown";
 import { readOpml } from "../lib/feeds/opml";
 import { isFeed, NotAFeed, readFeed } from "../lib/feeds/parse";
 import { lock } from "../lib/lock/lock.svelte";
@@ -43,7 +43,7 @@ const testing = {
   feeds,
   player,
   /** Reading feeds, their HTML and OPML, as lines does (lib/feeds/). */
-  reading: { readFeed, isFeed, NotAFeed, NoFeed, htmlToMarkdown, readOpml },
+  reading: { readFeed, isFeed, NotAFeed, NoFeed, htmlToMarkdown, saysMore, readOpml },
   /** The app lock, to turn on as Settings does. */
   lock,
   panes,

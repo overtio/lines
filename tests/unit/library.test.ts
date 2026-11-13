@@ -28,7 +28,7 @@ const { frontMatter, mentionOf, nameOf, readMention } = await import("../../src/
 const { computeMeta, extractTags } = await import("../../src/lib/notes/parse");
 const { plainLine } = await import("../../src/lib/notes/stats");
 const { pacing, withTimeout } = await import("../../src/lib/pacing");
-const { isPublic } = await import("../../src/lib/library/web");
+const { isPublic, pageSummary } = await import("../../src/lib/library/web");
 const { libraryNote } = await import("../../src/lib/library/note");
 const { subtitleOf } = await import("../../src/lib/library/rows");
 const { readPage, decodeEntities } = await import("../../src/lib/library/page");
@@ -641,6 +641,17 @@ describe("asking the web", () => {
     ]) {
       expect(isPublic(address), address).toBe(false);
     }
+  });
+
+  test("what a page says of itself in a few words: its description, and its picture made whole, if it's one to ask", async () => {
+    const signal = new AbortController().signal;
+    answers.set("https://article.example/post", '<head><meta property="og:description" content="Six hundred runs, and what they showed."><meta property="og:image" content="/cover.png"></head>');
+    answers.set("https://lan.example/post", '<head><meta name="description" content="On the network."><meta property="og:image" content="https://192.168.1.1/a.png"></head>');
+    answers.set("https://quiet.example/", "<head><title>Nothing said</title></head>");
+    expect(await pageSummary("https://article.example/post", signal)).toEqual({ description: "Six hundred runs, and what they showed.", image: "https://article.example/cover.png" });
+    expect(await pageSummary("https://lan.example/post", signal)).toEqual({ description: "On the network.", image: undefined });
+    expect(await pageSummary("https://quiet.example/", signal)).toBeNull();
+    expect(await pageSummary("https://gone.example/", signal)).toBeNull();
   });
 
   test("a cover that isn't on the web at large isn't asked for, and nothing's kept", async () => {

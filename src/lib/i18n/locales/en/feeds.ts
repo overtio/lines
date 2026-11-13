@@ -52,6 +52,8 @@ export default {
   "feeds.markUnread": "Mark as Unread",
   "feeds.didRead": "Marked as read",
   "feeds.didUnread": "Marked as unread",
+  // A link to where a post is talked about (its comments' page), under its title.
+  "feeds.comments": "Comments",
   "feeds.openInBrowser": "Open in Browser",
   // Keeping a post as a note in the Library (an article, or an episode), and opening that note once it is.
   "feeds.save": "Save to Library",

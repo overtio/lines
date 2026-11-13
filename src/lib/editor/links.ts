@@ -41,7 +41,8 @@ function clicked(event: MouseEvent, view: EditorView): { link: Link; action: Lin
   const modified = isApple ? event.metaKey : event.ctrlKey;
   // ⇧-click alone extends the selection, as on any text.
   let action: LinkAction = modified ? prefs.links[link.kind][event.shiftKey ? "modShiftClick" : "modClick"] : event.shiftKey ? "edit" : prefs.links[link.kind].click;
-  if (action === "edit" && coarsePointer.matches && !view.hasFocus) action = "open";
+  // Nothing to edit in what's only read (a feed's post), nor while a finger's only reading.
+  if (action === "edit" && (view.state.readOnly || (coarsePointer.matches && !view.hasFocus))) action = "open";
   return action === "edit" ? null : { link, action };
 }
 
