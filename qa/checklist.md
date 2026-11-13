@@ -40,6 +40,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Typing `#` at the start of a line leaves it as text, not a big heading; a space after it (`# `) makes the heading, and a letter (`#t`) a tag
 - [ ] Typing `-` (or `*`, `+`, `1.`) at the start of a line shows it as typed, no bullet; a letter after it (`-h`) stays text, a space (`- `) makes the bullet; Enter on an item still makes an empty one with its bullet
 - [ ] A tag in a heading (`# Hello #work`) is as big as the heading's text, its `#` icon as big as its name, on the heading's baseline, in every heading level, light and dark
+- [ ] In every font (Settings → Typography: System, Serif, Rounded, Mono, IBM Plex Sans, Fira Sans, Agave, an installed one), a tag's, a mention's and a short link's name sits with the same room above and below inside its pill, and its icon is centered on the name's capitals
 - [ ] Typing ` #` at a heading's end shows the `#` (Live and Hidden), the cursor after it, as the note list shows the title; a letter after it makes a tag; `# Plan ###` shows its `###`
 - [ ] `## ` typed at the start of an H1's text (its `#` hidden or shown, in Live, Visible and Hidden) makes it an H2 in place of `# ## …`, the first `#` typed never turning the text into a tag on the way (nor adding one to the sidebar), `### ` an H3, `# ` on an H2 an H1; ⌘Z just after leaves the marks as typed; a `# ` comment in a code block stays as typed
 - [ ] Clicking a checkbox ticks it; not in a trashed note

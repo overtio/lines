@@ -150,7 +150,7 @@
   width: 1em;
   height: 1em;
   margin-right: 0.3em;
-  vertical-align: -0.125em;
+  vertical-align: calc(0.5cap - 0.5em);
 }
 
 /* Only the mark, in front of a link with text of its own. */
@@ -210,10 +210,11 @@
   fill: currentColor;
 }
 
+/* Centered on the name's capitals, in any font. */
 .cm-lp-tag-icon {
   display: inline-flex;
   margin-right: 0.3em;
-  vertical-align: -0.1em;
+  vertical-align: calc(0.5cap - 0.425em);
   opacity: 0.7;
 }
 
@@ -244,10 +245,31 @@
   white-space: nowrap;
 }
 
+/*
+ * Fonts leave different room above and below their letters, and an inline box's background covers
+ * all of it: in a font with a deep descent (Agave), a chip's name rode high. Where the browser can,
+ * the chips' boxes start at the capitals' top and end at the baseline instead, with padding that
+ * matches the system font's look, so a name sits alike in every font.
+ */
+@supports (text-box: trim-both cap alphabetic) {
+  .cm-lp-tag,
+  .cm-lp-short-link {
+    text-box: trim-both cap alphabetic;
+    padding: 0.32em 0.4em 0.37em;
+  }
+
+  /* Not a property's value, which reads as text with a border under it (below). */
+  .cm-lp-mention:not(.cm-lp-mention-value) {
+    text-box: trim-both cap alphabetic;
+    padding: 0.31em 0.35em 0.26em;
+  }
+}
+
+/* Its icon is 14px (objects.ts), centered on the title's capitals in any font. */
 .cm-lp-mention-icon {
   display: inline-flex;
   margin-right: 0.25em;
-  vertical-align: -0.1em;
+  vertical-align: calc(0.5cap - 7px);
 }
 
 /*
