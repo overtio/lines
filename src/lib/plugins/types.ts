@@ -173,6 +173,12 @@ export interface LibrarySource {
   name: string;
   /** Reads any page rather than a site's, so it's asked after the rest. */
   general?: boolean;
+  /**
+   * Plugins it needs running, by id, besides its own: until they are, it isn't asked, nor named
+   * among the sources that work (a site's feed, found by reading its page, needs Web Pages, which
+   * reads pages: only in the apps, and only while it's on).
+   */
+  requires?: string[];
   /** Whether it's a link it knows; quick, and without asking anyone. */
   recognizes(url: URL): boolean;
   /** What the link is, or null if it isn't something the library keeps. Rejects when it can't be asked (offline). */
