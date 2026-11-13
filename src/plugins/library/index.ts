@@ -1,4 +1,5 @@
 import { t } from "../../lib/i18n/index.svelte";
+import { addLink, linkAdds } from "../../lib/library/addLink";
 import { linkLookups } from "../../lib/library/linkNotes";
 import type { LibraryKind, Plugin } from "../../lib/plugins/types";
 
@@ -133,6 +134,7 @@ export const library = (): Plugin => ({
   enabledByDefault: true,
   contributes: {
     libraryKinds: KINDS,
-    markdown: [{ editor: linkLookups }],
+    markdown: [{ editor: [linkLookups, linkAdds] }],
+    linkActions: [{ label: t("library.add.title"), icon: "library", edits: true, run: (view, link) => void addLink(view, link) }],
   },
 });

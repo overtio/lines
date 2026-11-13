@@ -159,6 +159,8 @@ export default {
   "editor.copyCode": "Copier le code",
   "editor.copyCell": "Copier la cellule",
   "editor.copied": "Copié",
+  "editor.link.open": "Ouvrir le lien",
+  "editor.link.copy": "Copier le lien",
   "editor.formatCode": "Mettre en forme le code",
   "editor.codeFormatted": "Code mis en forme",
   "editor.formatFailed": "Impossible de mettre en forme : {error}",

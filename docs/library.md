@@ -33,6 +33,26 @@ Dune: Part Two is a 2024 American epic space opera film directed by Denis Villen
 - What a source says is written as just that text: a `#` or `@` in a title, a value or a description is escaped (`\#`), so it makes no tag or mention, nor a heading, list, code block or picture; a value YAML would read as something else (`Star Wars: Episode IV`, `"Heroes"`, `*NSYNC`) is quoted. Each request gives up after 15 seconds (arXiv's 20).
 - Settings → Library → Look up links turns it off; then nothing is contacted.
 
+## Add to Library
+
+The + on the Library's heading in the sidebar opens Add to Library: choose what to search for (Books, Movies, Shows, Music, Podcasts, Papers, as the sources on can search), and type a title, or a name with it. The catalogs answer as you type, each result with its cover, who made it and when; ↓ moves into them, and ↵ or a click adds the one chosen. Paste a link there instead to look it up as a note that's just a link is. Something the Library has a note of already, by its link, opens that note rather than making another. **Blank** starts one of the kind chosen to fill in by hand. What's added is filed on its shelf, not in the Inbox.
+
+What's chosen is a new note on its shelf, opened at once with what the search said of it, then filled in from its page (its cover, and what it's about) as one change, which ⌘Z takes back.
+
+| Searching for | Searched in | On the web |
+|---|---|---|
+| Books | Open Library | Yes |
+| Movies, Shows | Wikidata, with posters from Wikipedia | Yes |
+| Music (songs and albums) | MusicBrainz, covers from the Cover Art Archive | Yes |
+| Podcasts | Apple's iTunes Search | Yes |
+| Papers | arXiv | No |
+
+Only what's typed is sent to the catalog searched.
+
+## A link in a note
+
+Right-click a link to a web page in any Markdown note (or put the cursor on it and press the menu key, or ⇧F10) for Open Link, Copy Link and **Add to Library**: lines looks the link up, makes a library note of what it is, and puts a mention of it in the link's place, `@[Dune: Part Two]`, as one change, which ⌘Z takes back (the library note stays, in the Library). The mention is of the note's title as it reads. It's never done unasked. If the library has a note with that link already, that's the one mentioned. If the link changed while it was looked up (typed into, or deleted), nothing is made or changed; if nothing can say what it is, the note says so after the link for a moment. Leave the note meanwhile and it goes on: the link is mentioned where it is in the note as stored (not taken back with ⌘Z, which is the note you're in's), and coming back while it's looked up shows how it's getting on. It gives up after 30 seconds.
+
 ## Kinds of things
 
 | Type | In the Library | Properties, in this order | Status |
@@ -50,7 +70,7 @@ Dune: Part Two is a 2024 American epic space opera film directed by Denis Villen
 
 Each has `link` (where it's from) and `status` after its own properties, and only the properties a source found. The keys and the `status` values are written in English, like `type`, so tables (`@type.book`), mentions (`@[Dune].author`) and the Library read them alike on every device; lines shows the status in its own language. A note's status is set from its row's menu on its shelf (or by writing it), and it keeps its date, so the list stays as it is. A status of your own (`status: abandoned`) is shown as written.
 
-A new note made while a shelf is shown starts as its kind, at its first status; the + on the Library's heading asks which kind.
+A new note made while a shelf is shown starts as its kind, at its first status, as Blank in Add to Library does.
 
 ## In the sidebar
 
@@ -78,4 +98,4 @@ Only what's needed is sent: the link, or an id read from it. Nothing from your n
 
 ## Not yet
 
-See [limitations.md](limitations.md#library) for what's missing, and the README's roadmap for what's planned: feeds and podcasts, a grid of covers, searching the catalogs to add something.
+See [limitations.md](limitations.md#library) for what's missing, and the README's roadmap for what's planned: feeds and podcasts, a grid of covers.

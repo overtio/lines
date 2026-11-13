@@ -444,8 +444,8 @@ class NotesStore {
       updatedAt: now,
       pinned: false,
       trashed: false,
-      // Made on a shelf of the Library, it's filed there.
-      ...(prefs.newNotes === "inbox" && f.kind !== "library" && { inbox: true }),
+      // One of the Library's kinds (made on its shelf, or from Add to Library), it's filed there.
+      ...(prefs.newNotes === "inbox" && !(made.type && plugins.libraryKind(made.type)) && { inbox: true }),
     };
     this.#templates.set(note.id, { body: note.body, made });
     if (this.filter.kind === "trash") this.filter = { kind: "all" };

@@ -5,6 +5,7 @@ import { speak } from "../a11y";
 import { editedNote } from "../editor/util";
 import { t } from "../i18n/index.svelte";
 import { notes } from "../notes/store.svelte";
+import type { LibraryItem } from "../plugins/types";
 import { prefs } from "../prefs.svelte";
 import { lookUp } from "./lookup";
 import { type LibraryNote, libraryNote } from "./note";
@@ -56,15 +57,24 @@ function stop(id: string) {
   lookup.abort?.abort();
 }
 
-/** Looks up the note's link once `delay` has passed with its text still `text`. */
-function lookUpNote(id: string, text: string, link: string, delay: number) {
+/** What's found for a note: what it is, or null if nothing is. */
+type Find = (signal: AbortSignal) => Promise<LibraryItem | null>;
+
+/** Finds what the note is with `find` once `delay` has passed with its text still `text`, and fills it in. */
+function lookUpNote(id: string, text: string, find: Find, delay: number) {
   stop(id);
   const lookup: Lookup = { text, state: "waiting" };
   lookups.set(id, lookup);
-  lookup.timer = setTimeout(() => void run(id, lookup, link), delay);
+  lookup.timer = setTimeout(() => void run(id, lookup, find), delay);
 }
 
-async function run(id: string, lookup: Lookup, link: string) {
+/**
+ * Fills in a library note just made from what a search said of it (Add to Library), as a note that
+ * was a link is filled in: with what `find` finds, its cover kept, while its text is still `text`.
+ */
+export const completeNote = (id: string, text: string, find: Find) => lookUpNote(id, text, find, 0);
+
+async function run(id: string, lookup: Lookup, find: Find) {
   const current = () => lookups.get(id) === lookup;
   if (!current()) return;
   if ((viewOf(id)?.state.doc.toString() ?? notes.get(id)?.note.body) !== lookup.text) return stop(id);
@@ -73,7 +83,7 @@ async function run(id: string, lookup: Lookup, link: string) {
   redraw(id);
   speak(t("library.lookingUp"));
   try {
-    const item = await lookUp(link, abort.signal);
+    const item = await find(abort.signal);
     const note = item && (await libraryNote(item, abort.signal));
     if (!current()) return;
     lookups.delete(id);
@@ -136,9 +146,14 @@ function linkIn(state: EditorState, id: string) {
   return state.doc.length <= MAX_TEXT ? linkNoteLink(state.doc.toString(), template) : null;
 }
 
-/** What the note says while its link is looked up, or when it couldn't be; screen readers hear it from `speak`. */
-class LookupWidget extends WidgetType {
-  constructor(readonly state: "looking" | "failed") {
+/** Where a link's lookup has got to, as the note shows it: looking, couldn't, or (asked for) found nothing. */
+export type LookupState = "looking" | "failed" | "nothing";
+
+const SAID = { looking: "library.lookingUp", failed: "library.failed", nothing: "library.nothing" } as const;
+
+/** What the note says while a link is looked up, or when it couldn't be; screen readers hear it from `speak`. */
+export class LookupWidget extends WidgetType {
+  constructor(readonly state: LookupState) {
     super();
   }
   eq(other: LookupWidget) {
@@ -148,7 +163,7 @@ class LookupWidget extends WidgetType {
     const el = document.createElement("span");
     el.className = `cm-library-lookup is-${this.state}`;
     el.setAttribute("aria-hidden", "true");
-    el.textContent = t(this.state === "looking" ? "library.lookingUp" : "library.failed");
+    el.textContent = t(SAID[this.state]);
     return el;
   }
 }
@@ -174,7 +189,7 @@ export const linkLookups = ViewPlugin.fromClass(
       const link = linkIn(update.state, id);
       if (!link || link === linkIn(update.startState, id) || !prefs.lookUpLinks || notes.get(id)?.note.locked) return stop(id);
       const pasted = update.transactions.some((tr) => tr.isUserEvent("input.paste") || tr.isUserEvent("input.drop"));
-      lookUpNote(id, update.state.doc.toString(), link, pasted ? 0 : TYPED_DELAY);
+      lookUpNote(id, update.state.doc.toString(), (signal) => lookUp(link, signal), pasted ? 0 : TYPED_DELAY);
     }
 
     draw() {

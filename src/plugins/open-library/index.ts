@@ -97,11 +97,38 @@ async function lookup(url: URL, signal: AbortSignal): Promise<LibraryItem | null
   };
 }
 
+/** A book as Open Library's search finds it. */
+interface Found {
+  key: string;
+  title: string;
+  author_name?: string[];
+  first_publish_year?: number;
+  cover_i?: number;
+}
+
+/** Books whose title or author is `text`, each its work's, with a small cover. */
+async function search(_type: string, text: string, signal: AbortSignal): Promise<LibraryItem[]> {
+  const params = new URLSearchParams({ q: text, fields: "key,title,author_name,first_publish_year,cover_i", limit: "20" });
+  const found = await getJson<{ docs?: Found[] }>(`${API}/search.json?${params}`, signal);
+  return (found?.docs ?? []).map((book) => ({
+    type: "book",
+    title: book.title,
+    link: `${API}${book.key}`,
+    properties: known([
+      ["author", names(book.author_name?.slice(0, 3) ?? [])],
+      ["year", book.first_publish_year],
+    ]),
+    cover: book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg` : undefined,
+  }));
+}
+
 const source: LibrarySource = {
   id: "open-library",
   name: "Open Library",
   recognizes: (url) => bookIn(url) !== null,
   lookup,
+  searches: ["book"],
+  search,
 };
 
 export const openLibrary = (): Plugin => ({

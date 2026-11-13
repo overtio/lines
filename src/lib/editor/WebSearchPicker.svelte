@@ -11,7 +11,8 @@
 
   /*
    * Something on the web to search and pick from, at the cursor: pictures (WebImagePicker.svelte),
-   * papers (PaperPicker.svelte). It opens on what `search` finds for nothing typed (what a library
+   * papers (PaperPicker.svelte), things for the library (AddToLibrary.svelte, under its button). It
+   * opens on what `search` finds for nothing typed (what a library
    * features, or `hint`), and searches as you type. ↵ in the field takes the first result; ↓ goes
    * into them, the arrow keys move between them (`columns` to a row) and ↵ takes one. More load on
    * scrolling to the end.
@@ -20,8 +21,14 @@
   type Props = {
     /** What's searched, as it's known: "Unsplash", "arXiv". */
     name: string;
+    /** What the picker and its field are called, if not "Search <name>". */
+    title?: string;
     /** Said under the results, linking to what's searched. */
-    credit: { text: string; href: string; title?: string };
+    credit?: { text: string; href: string; title?: string };
+    /** Above the field: what to search in, say. */
+    header?: Snippet;
+    /** Under the results, beside the credit: another way to go on. */
+    footer?: Snippet;
     search: (query: string, page: number, signal: AbortSignal) => Promise<SearchPage<T>>;
     /** Shown while nothing's typed and nothing's found for it. */
     hint?: string;
@@ -36,12 +43,15 @@
     itemClass: string;
     /** The popover's width, as a Tailwind class. */
     widthClass: string;
+    /** As tall as what it shows (rows of results, which grow as they're found), rather than always as tall as a grid of pictures fills. */
+    fit?: boolean;
     x: number;
     y: number;
     onchoose: (item: T) => void;
     onclose: () => void;
   };
-  let { name, credit, search, hint, columns, label, item, listClass, itemClass, widthClass, x, y, onchoose, onclose }: Props = $props();
+  let { name, title, credit, header, footer, search, hint, columns, label, item, listClass, itemClass, widthClass, fit = false, x, y, onchoose, onclose }: Props = $props();
+  const named = $derived(title ?? t("editor.web.search", { name }));
 
   /** How long typing pauses before it searches. */
   const PAUSE = 300;
@@ -99,6 +109,17 @@
   }
 
   void load();
+
+  /** Searches again for what's typed, now: what's searched has changed (another kind of thing to find). */
+  export function searchAgain() {
+    void load();
+  }
+
+  /** Closes it, something other than a result chosen (a footer's button). */
+  export function close() {
+    open = false;
+  }
+
   // Nothing more to wait for once it's closed.
   $effect(() => () => {
     clearTimeout(timer);
@@ -184,29 +205,33 @@
       sideOffset={6}
       collisionPadding={8}
       role="dialog"
-      aria-label={t("editor.web.search", { name })}
+      aria-label={named}
       onOpenAutoFocus={(event) => {
         event.preventDefault();
         field?.focus();
       }}
       onCloseAutoFocus={(event) => event.preventDefault()}
-      class="{floating} flex {widthClass} flex-col p-2.5"
+      class="{floating} flex {widthClass} max-h-(--bits-floating-available-height) flex-col p-2.5"
     >
+      {@render header?.()}
       <TextField
         bind:input={field}
         bind:value={query}
         type="search"
         icon="search"
-        placeholder={t("editor.web.search", { name })}
-        aria-label={t("editor.web.search", { name })}
+        placeholder={named}
+        aria-label={named}
         autocomplete="off"
         spellcheck="false"
         {oninput}
         onkeydown={onFieldKeydown}
         class="mb-2 [&_input::-webkit-search-cancel-button]:hidden"
       />
-      <!-- A fixed height, so the picker doesn't jump around while searching. -->
-      <div bind:this={scroller} class="-mx-1 h-[min(360px,calc(100dvh-150px))] overflow-x-hidden overflow-y-auto overscroll-contain p-1">
+      <!-- A fixed height, so a grid of pictures doesn't jump around while searching; or as tall as what's shown, up to that. -->
+      <div
+        bind:this={scroller}
+        class={["-mx-1 overflow-x-hidden overflow-y-auto overscroll-contain p-1", fit ? "max-h-[min(360px,calc(100dvh-150px))] min-h-0" : "h-[min(360px,calc(100dvh-150px))]"]}
+      >
         <div bind:this={list} role="listbox" tabindex="-1" aria-label={name} onkeydown={onListKeydown} class={[listClass, "transition-opacity", status === "searching" && "opacity-50"]}>
           {#each items as each, i (each.id)}
             <button
@@ -227,16 +252,23 @@
           <div {@attach loadsMore} class="h-px"></div>
         {/if}
         <!-- Said as it changes; shown while there are no results, or when more couldn't load. -->
-        <p role="status" class={items.length && status !== "failed" ? "sr-only" : "m-0 mt-10 mb-3 px-4 text-center text-sm text-faint"}>{message}</p>
+        <p role="status" class={items.length && status !== "failed" ? "sr-only" : ["m-0 px-4 text-center text-sm text-faint", fit ? "my-3" : "mt-10 mb-3"]}>{message}</p>
         {#if status === "failed"}
           <div class="flex justify-center"><Button variant="secondary" onclick={() => load(loadingMore)}>{t("editor.web.retry")}</Button></div>
         {/if}
       </div>
-      <button
-        class="mt-2 ml-1 cursor-pointer self-start text-left text-2xs text-faint underline-offset-2 hover:text-muted hover:underline"
-        title={credit.title}
-        onclick={() => openExternal(credit.href)}>{credit.text}</button
-      >
+      {#if credit || footer}
+        <div class="mt-2 flex items-center gap-3">
+          {#if credit}
+            <button
+              class="ml-1 min-w-0 cursor-pointer text-left text-2xs text-faint underline-offset-2 hover:text-muted hover:underline"
+              title={credit.title}
+              onclick={() => openExternal(credit.href)}>{credit.text}</button
+            >
+          {/if}
+          {@render footer?.()}
+        </div>
+      {/if}
     </Popover.Content>
   </Popover.Portal>
 </Popover.Root>

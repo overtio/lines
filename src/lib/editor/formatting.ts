@@ -258,6 +258,8 @@ function createToolbar(view: EditorView): TooltipView {
     },
     // Centred over the selection's first line, rather than starting where it starts.
     getCoords(pos) {
+      // Measured just as the editor turns to another note (WebKit), where the selection isn't: it's going.
+      if (pos > view.state.doc.length) return null as unknown as Rect;
       const range = view.state.selection.main;
       const end = view.coordsAtPos(range.to, -1);
       // The start can be scrolled out of the drawn part (⌘A at the bottom of a long note).

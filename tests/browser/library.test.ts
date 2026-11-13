@@ -19,13 +19,18 @@ const LINK = "https://youtu.be/dQw4w9WgXcQ";
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAQAAAAGCAIAAABrW6giAAAAEElEQVR4nGPQiFoARwyUcgAZmhsx2Z6P+QAAAABJRU5ErkJggg==", "base64");
 const CORS = { "access-control-allow-origin": "*" };
 
-/** Answers YouTube for the page, as it would, once `ready` (at once, if it's not given); the requests it was sent. */
-async function youtube(page: App["page"], ready?: Promise<unknown>) {
+/**
+ * Answers YouTube for the page, as it would, once `ready` (at once, if it's not given), with `title`;
+ * or not at all, `fail`ing. The requests it was sent.
+ */
+async function youtube(page: App["page"], ready?: Promise<unknown>, { title = "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)", fail = false } = {}) {
   const asked: string[] = [];
   await page.route("https://www.youtube.com/oembed**", async (route: Route) => {
     asked.push(route.request().url());
     await ready;
-    await route.fulfill({ headers: CORS, json: { title: "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)", author_name: "Rick Astley" } });
+    // Failing as an answer that can't be read does, without the browser saying so.
+    if (fail) return route.fulfill({ headers: CORS, contentType: "application/json", body: "{" });
+    await route.fulfill({ headers: CORS, json: { title, author_name: "Rick Astley" } });
   });
   await page.route("https://i.ytimg.com/**", (route: Route) => route.fulfill({ headers: { ...CORS, "content-type": "image/png" }, body: PNG }));
   return asked;
@@ -38,6 +43,12 @@ const paste = (page: App["page"], text: string) =>
     data.setData("text/plain", text);
     document.querySelector(".editor-pane [data-pane-content='main'] .cm-content")!.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
   }, text);
+
+/** Opens Add to Library, under the Library's +. */
+const addToLibrary = async (page: App["page"]) => {
+  await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: "Add to Library" }).click();
+  return page.getByRole("dialog", { name: "Add to Library" });
+};
 
 const TITLE = "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)";
 const filled = (page: App["page"]) => page.waitForFunction(() => window.testing.text()?.includes("\nchannel: Rick Astley\n"));
@@ -81,9 +92,10 @@ test("a link pasted into a note started on a shelf, its type and status, is fill
   app = await openApp();
   const { page } = app;
   await youtube(page);
-  await page.getByRole("button", { name: "New in Library" }).click();
-  await page.getByRole("menuitem", { name: "Video", exact: true }).click();
-  await page.waitForFunction(() => window.testing.text() === "---\ntype: video\nstatus: to watch\n---\n# ");
+  const picker = await addToLibrary(page);
+  await picker.getByRole("radio", { name: "Movies" }).click();
+  await picker.getByRole("button", { name: "Blank" }).click();
+  await page.waitForFunction(() => window.testing.text() === "---\ntype: movie\nstatus: to watch\n---\n# ");
   await page.evaluate(() => window.testing.place());
   await paste(page, LINK);
   await filled(page);
@@ -214,4 +226,171 @@ test("a shelf lists its items with what they're by and where they've got to, whi
   await page.keyboard.press(`${mod()}+z`);
   await page.waitForFunction(() => window.testing.notes.visible[0].note.body.includes("\nstatus: to read\n"));
   expect(await status()).toBe("to read");
+});
+
+/** Answers Open Library for the page, as it answered for Dune (trimmed); the requests it was sent. */
+async function openLibrary(page: App["page"]) {
+  const asked: string[] = [];
+  const answer = (json: unknown) => (route: Route) => {
+    asked.push(route.request().url());
+    return route.fulfill({ headers: CORS, json });
+  };
+  await page.route("https://openlibrary.org/search.json**", answer({ docs: [{ key: "/works/OL893414W", title: "Dune", author_name: ["Frank Herbert"], first_publish_year: 1965, cover_i: 11481354 }] }));
+  await page.route(
+    "https://openlibrary.org/works/OL893414W.json",
+    answer({ title: "Dune", description: "Set on the desert planet Arrakis, Dune is the story of the boy Paul Atreides.", authors: [{ author: { key: "/authors/OL79034A" } }], covers: [11481354] }),
+  );
+  await page.route("https://openlibrary.org/authors/OL79034A.json", answer({ name: "Frank Herbert" }));
+  await page.route("https://covers.openlibrary.org/**", (route: Route) => route.fulfill({ headers: { ...CORS, "content-type": "image/png" }, body: PNG }));
+  return asked;
+}
+
+test("Add to Library searches the kind chosen, and what's chosen is a note on its shelf, filled in from its page", async () => {
+  app = await openApp();
+  const { page } = app;
+  const asked = await openLibrary(page);
+  const picker = await addToLibrary(page);
+  // What can be searched from a web page: not papers (arXiv answers the apps only).
+  const kinds = picker.getByRole("radiogroup", { name: "What to search for" });
+  expect(await kinds.getByRole("radio").allInnerTexts()).toEqual(["Books", "Movies", "Shows", "Music", "Podcasts"]);
+  await page.keyboard.type("dune");
+  await picker.getByRole("option", { name: /^Dune, Frank Herbert · 1965/ }).waitFor();
+  // Only what was typed is sent.
+  expect(new URL(asked[0]).searchParams.get("q")).toBe("dune");
+  await page.keyboard.press("Enter");
+  await picker.waitFor({ state: "hidden" });
+  await page.waitForFunction(() => window.testing.text()?.startsWith("---\ntype: book\nauthor: Frank Herbert\nyear: 1965\nlink: https://openlibrary.org/works/OL893414W\nstatus: to read\n---\n# Dune"));
+  // Then the rest, from its page: what it's about.
+  await page.waitForFunction(() => window.testing.text()?.includes("Set on the desert planet Arrakis"));
+  expect(await page.locator("#note-list-title").innerText()).toBe("Books");
+  expect(await page.evaluate(() => window.testing.notes.selected?.note.inbox)).toBeFalsy();
+
+  // Chosen again, the note there is of it is opened, not another made.
+  const id = await page.evaluate(() => window.testing.notes.selectedId);
+  await app.open("# Elsewhere");
+  const once = await addToLibrary(page);
+  await page.keyboard.type("dune");
+  await once.getByRole("option", { name: /^Dune, Frank Herbert · 1965/ }).waitFor();
+  await page.keyboard.press("Enter");
+  await page.waitForFunction((id) => window.testing.notes.selectedId === id, id);
+  expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "book").length)).toBe(1);
+
+  // Blank: a note of the kind chosen, to fill in, filed on its shelf.
+  const again = await addToLibrary(page);
+  await again.getByRole("radio", { name: "Movies" }).click();
+  await again.getByRole("button", { name: "Blank" }).click();
+  await page.waitForFunction(() => window.testing.text() === "---\ntype: movie\nstatus: to watch\n---\n# ");
+  expect(await page.locator("#note-list-title").innerText()).toBe("Movies");
+  expect(await page.evaluate(() => window.testing.notes.selected?.note.inbox)).toBeFalsy();
+});
+
+test("Add to Library is as tall as what it shows", async () => {
+  app = await openApp();
+  const picker = await addToLibrary(app.page);
+  await picker.getByRole("status").waitFor();
+  // The field, the hint and Blank, with no room left empty under them.
+  expect((await picker.boundingBox())!.height).toBeLessThan(200);
+});
+
+test("a link pasted into Add to Library is looked up", async () => {
+  app = await openApp();
+  const { page } = app;
+  await youtube(page);
+  const picker = await addToLibrary(page);
+  await picker.getByRole("searchbox").fill(LINK);
+  await picker.getByRole("option", { name: /^Rick Astley - Never Gonna Give You Up/ }).click();
+  await filled(page);
+  expect(await page.locator("#note-list-title").innerText()).toBe("Videos");
+});
+
+test("a link in a note, added to the library from its menu, becomes a mention of its note; one ⌘Z puts the link back", async () => {
+  app = await openApp();
+  const { page } = app;
+  await youtube(page);
+  const before = `Watch ${LINK} tonight`;
+  await app.open(`# Plans\n\n${before}`);
+  await page.locator(".cm-content .cm-lp-link").click({ button: "right" });
+  const menu = page.getByRole("menu");
+  expect(await menu.getByRole("menuitem").allInnerTexts()).toEqual(["Open Link", "Copy Link", "Add to Library"]);
+  await menu.getByRole("menuitem", { name: "Add to Library" }).click();
+  const title = "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)";
+  await page.waitForFunction((title) => window.testing.text() === `# Plans\n\nWatch @[${title}] tonight`, title);
+  const made = await page.evaluate((title) => window.testing.notes.entries.filter((entry) => entry.meta.title === title).map((entry) => entry.meta.type), title);
+  expect(made).toEqual(["video"]);
+  await page.keyboard.press(`${mod()}+z`);
+  await page.waitForFunction((before) => window.testing.text() === `# Plans\n\n${before}`, before);
+
+  // Again: the note it made already is the one mentioned, not another.
+  await page.locator(".cm-content .cm-lp-link").click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Add to Library" }).click();
+  await page.waitForFunction((title) => window.testing.text() === `# Plans\n\nWatch @[${title}] tonight`, title);
+  expect(await page.evaluate((title) => window.testing.notes.entries.filter((entry) => entry.meta.title === title).length, title)).toBe(1);
+});
+
+test("a link added from its menu while its note is closed is mentioned there, where it was, and as the note made is titled", async () => {
+  app = await openApp();
+  const { page } = app;
+  let answer!: () => void;
+  // Written by the site with spaces and a `#` the note's title reads without and as text.
+  await youtube(page, new Promise<void>((resolve) => (answer = resolve)), { title: "Never  Gonna Give You Up #shorts" });
+  // The same address earlier, as the start of another link.
+  const id = await app.open(`# Plans\n\nFrom 0:42: ${LINK}?t=42\n\nWatch ${LINK} tonight`);
+  await page.locator(".cm-content .cm-lp-link").nth(1).click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Add to Library" }).click();
+  await page.locator(".cm-library-lookup").waitFor();
+  await app.open("# Elsewhere");
+  answer();
+  const mention = "@[Never Gonna Give You Up \\#shorts]";
+  await page.waitForFunction(([id, text]) => window.testing.notes.get(id)?.note.body === text, [id, `# Plans\n\nFrom 0:42: ${LINK}?t=42\n\nWatch ${mention} tonight`] as const);
+  expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.title === "Never Gonna Give You Up #shorts").length)).toBe(1);
+  // ⌘Z is still the open note's.
+  expect(await app.text()).toBe("# Elsewhere");
+});
+
+test("a link's lookup shows where it's got to in its note, left and come back to, and then goes", async () => {
+  app = await openApp();
+  const { page } = app;
+  let answer!: () => void;
+  await youtube(page, new Promise<void>((resolve) => (answer = resolve)), { fail: true });
+  const text = `# Plans\n\nWatch ${LINK} tonight`;
+  const id = await app.open(text);
+  await page.locator(".cm-content .cm-lp-link").click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Add to Library" }).click();
+  const shown = page.locator(".cm-library-lookup");
+  await shown.waitFor();
+  const elsewhere = await app.open("# Elsewhere");
+  await page.evaluate((id) => window.testing.notes.select(id), id);
+  await page.waitForFunction((text) => window.testing.text() === text, text);
+  expect(await shown.innerText()).toBe("Looking up…");
+
+  await page.evaluate((id) => window.testing.notes.select(id), elsewhere);
+  answer();
+  await page.waitForTimeout(4500);
+  await page.evaluate((id) => window.testing.notes.select(id), id);
+  await page.waitForFunction((text) => window.testing.text() === text, text);
+  await page.waitForTimeout(300);
+  expect(await shown.count()).toBe(0);
+});
+
+test("a link changed while it's looked up isn't added", async () => {
+  app = await openApp();
+  const { page } = app;
+  let answer!: () => void;
+  await youtube(page, new Promise<void>((resolve) => (answer = resolve)));
+  await app.open(`# Plans\n\nWatch ${LINK} tonight`);
+  await page.locator(".cm-content .cm-lp-link").click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Add to Library" }).click();
+  const shown = page.locator(".cm-library-lookup");
+  await shown.waitFor();
+  // Typed after it, it's still the link; typed into it, it isn't.
+  await page.evaluate((at) => window.testing.place(at), `# Plans\n\nWatch ${LINK}`.length);
+  await page.keyboard.type("!");
+  expect(await shown.count()).toBe(1);
+  await page.evaluate((at) => window.testing.place(at), `# Plans\n\nWatch ${LINK}`.length - 2);
+  await page.keyboard.type("x");
+  await shown.waitFor({ state: "detached" });
+  answer();
+  await page.waitForTimeout(500);
+  expect(await app.text()).toBe(`# Plans\n\nWatch ${LINK.slice(0, -2)}x${LINK.slice(-2)}! tonight`);
+  expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "video").length)).toBe(0);
 });

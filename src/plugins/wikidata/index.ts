@@ -171,11 +171,59 @@ async function lookup(link: URL, signal: AbortSignal): Promise<LibraryItem | nul
   };
 }
 
+/** A Wikipedia page's address. */
+const pageUrl = (wiki: string, title: string) => `https://${wiki}.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}`;
+
+/**
+ * Films or series titled `text`: Wikidata's search among items of the kind, the best known first
+ * (a title as typed, then those with the most Wikipedias), each with its poster from Wikipedia and
+ * its description ("2021 film directed by Denis Villeneuve"), linking to its Wikipedia page.
+ */
+async function search(type: string, text: string, signal: AbortSignal): Promise<LibraryItem[]> {
+  const classes = (KINDS[type] ?? []).map((id) => `P31=${id}`).join("|");
+  const found = await getJson<{ query?: { search?: { title: string }[] } }>(url({ action: "query", list: "search", srsearch: `${text} haswbstatement:${classes}`, srlimit: "15", srprop: "" }), signal);
+  const ids = found?.query?.search?.map((each) => each.title) ?? [];
+  if (!ids.length) return [];
+  const languages = [...new Set([language, "en"])].join("|");
+  const answer = await getJson<{ entities?: Record<string, Entity & { descriptions?: Record<string, { value: string }> }> }>(
+    url({ action: "wbgetentities", ids: ids.join("|"), props: "labels|descriptions|sitelinks", languages, languagefallback: "1" }),
+    signal,
+  );
+  const wanted = text.trim().toLowerCase();
+  const items = ids
+    .flatMap((id) => {
+      const entity = answer?.entities?.[id];
+      const title = entity?.labels?.[language]?.value ?? entity?.labels?.en?.value;
+      if (!entity || !title) return [];
+      const wiki = entity.sitelinks?.[`${language}wiki`] ? language : entity.sitelinks?.enwiki ? "en" : null;
+      return [{ id, entity, title, wiki, page: wiki && entity.sitelinks![`${wiki}wiki`].title, known: Object.keys(entity.sitelinks ?? {}).length }];
+    })
+    .sort((a, b) => Number(b.title.toLowerCase() === wanted) - Number(a.title.toLowerCase() === wanted) || b.known - a.known);
+  // Their posters, as each Wikipedia shows them at its top, asked of each Wikipedia once.
+  const posters = new Map<string, string>();
+  for (const wiki of new Set(items.flatMap((item) => (item.wiki ? [item.wiki] : [])))) {
+    const titles = items.filter((item) => item.wiki === wiki).map((item) => item.page!);
+    const params = new URLSearchParams({ action: "query", prop: "pageimages", titles: titles.join("|"), pithumbsize: "200", pilicense: "any", format: "json", origin: "*" });
+    const pages = await getJson<{ query?: { pages?: Record<string, { title: string; thumbnail?: { source: string } }> } }>(`https://${wiki}.wikipedia.org/w/api.php?${params}`, signal);
+    for (const page of Object.values(pages?.query?.pages ?? {})) if (page.thumbnail) posters.set(`${wiki}:${page.title}`, page.thumbnail.source);
+  }
+  return items.map(({ id, entity, title, wiki, page }) => ({
+    type,
+    title,
+    link: wiki && page ? pageUrl(wiki, page) : `https://www.wikidata.org/wiki/${id}`,
+    properties: [],
+    cover: wiki && page ? posters.get(`${wiki}:${page}`) : undefined,
+    description: entity.descriptions?.[language]?.value ?? entity.descriptions?.en?.value,
+  }));
+}
+
 const source: LibrarySource = {
   id: "wikidata",
   name: "Wikidata",
   recognizes: (url) => itemIn(url) !== null,
   lookup,
+  searches: ["movie", "show"],
+  search,
 };
 
 export const wikidata = (): Plugin => ({

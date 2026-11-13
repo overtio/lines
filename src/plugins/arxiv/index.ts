@@ -49,6 +49,8 @@ const library: LibrarySource = {
     const [paper] = (await search(arxivLinkId(url)!, 1, signal)).items;
     return paper ? paperItem(paper) : null;
   },
+  searches: ["paper"],
+  search: async (_type, text, signal) => (await search(text, 1, signal)).items.map(paperItem),
 };
 
 export const arxiv = (): Plugin => ({
