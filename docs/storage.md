@@ -18,7 +18,7 @@ Browser storage belongs to one site (origin) in one browser profile. Another bro
 | `lines-folders` | `folders` | The browser's handle to the folder chosen with **Save to a folder**, so lines can use it again after a reload |
 | `lines-feeds` | `feeds` | Each feed subscribed to: what it said of itself, its newest 200 posts (all but their content), which were read, and its ETag and Last-Modified for asking whether it changed |
 | `lines-feeds` | `posts` | Each post's content, as the feed gave it (HTML), read when the post is opened |
-| `lines-feeds` | `positions` | Where each podcast episode was stopped, and whether it was played to the end |
+| `lines-feeds` | `positions` | Where each podcast episode was stopped, and whether it was played to the end; and the episode in the player, to put back after the app lock or a restart |
 
 With the app lock on, the notes and attachments in `lines` and everything in `lines-feeds` are encrypted (see [sync.md](sync.md) and `src/lib/lock/vault.ts`). `lines-feeds` keeps each record under a random id (a feed's, a post's, an episode's note's), so nothing there says what's subscribed to or listened to. It isn't synced: subscriptions are notes and sync as notes do, and each device fetches the posts itself.
 

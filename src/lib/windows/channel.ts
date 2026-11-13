@@ -13,6 +13,8 @@ export type WindowMessage =
   | { type: "attachment"; id: string }
   /** Show this note in the main window. */
   | { type: "show"; id: string }
+  /** Play this episode in the main window's player (a floating note's Play). */
+  | { type: "play"; episode: import("../player/player.svelte").Episode }
   /** Preferences changed (theme, text, window look): all of them, as saved. */
   | { type: "prefs"; prefs: string }
   /** The app's language was chosen (i18n/index.svelte.ts). */

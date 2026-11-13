@@ -12,7 +12,7 @@ export default {
   "player.speed": "Vitesse : {speed}",
   "player.position": "Position dans l’épisode",
   "player.time": "{elapsed} écoutées, {left} restantes",
-  "player.couldntPlay": "Cet épisode n’a pas pu être lu.",
+  "player.couldntPlay": "Cet épisode n’a pas pu être lu. Appuyez sur Lire pour réessayer.",
   "player.playEpisode": "Lire l’épisode",
   "player.pauseEpisode": "Mettre l’épisode en pause",
   "player.played": "Écouté",

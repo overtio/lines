@@ -13,7 +13,7 @@
     const entry = notes.get(note);
     return entry ? noteEpisode(entry) : null;
   });
-  const playing = $derived(!!episode && player.playing && player.episode?.key === episode.key);
+  const playing = $derived(!!episode && player.isPlaying(episode.key));
   const label = $derived(playing ? t("player.pauseEpisode") : t("player.playEpisode"));
 </script>
 
@@ -25,7 +25,7 @@
     aria-label={label}
     title={label}
     onmousedown={(event) => event.preventDefault()}
-    onclick={() => (playing ? player.pause() : player.play(episode))}
+    onclick={() => player.toggle(episode)}
   >
     <Icon name={playing ? "pause" : "play"} size={13} strokeWidth={2.25} />
   </button>

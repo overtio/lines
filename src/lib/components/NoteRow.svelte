@@ -543,7 +543,7 @@
         // An episode's sound, played or paused.
         episode && !entry.note.trashed
           ? [
-              player.playing && player.episode?.key === episode.key
+              player.isPlaying(episode.key)
                 ? { label: t("player.pauseEpisode"), icon: "pause" as const, run: () => player.pause() }
                 : { label: t("player.playEpisode"), icon: "play" as const, run: () => player.play(episode) },
             ]

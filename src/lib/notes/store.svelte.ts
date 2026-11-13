@@ -498,11 +498,17 @@ class NotesStore {
 
   /**
    * Changes a note's text from outside its editor as something done for it in the background (a
-   * note that was a link filled in while another is open): ⌘Z stays with what was last done by hand.
+   * note that was a link filled in while another is open, an episode listened to its end): ⌘Z stays
+   * with what was last done by hand. `body` can be worked out from the text as it is, with what's
+   * typed in its editor handed over first. With `keepDate`, the note keeps its date.
    */
-  setText(id: string, body: string) {
-    if (!this.get(id) || this.get(id)!.note.body === body) return;
-    this.#patch(id, { body, updatedAt: Date.now() });
+  setText(id: string, body: string | ((body: string) => string), { keepDate = false } = {}) {
+    this.#handOver();
+    const was = this.get(id)?.note.body;
+    if (was === undefined) return;
+    const text = typeof body === "string" ? body : body(was);
+    if (text === was) return;
+    this.#patch(id, { body: text, ...(!keepDate && { updatedAt: Date.now() }) });
     this.#changedOutside([id]);
   }
 

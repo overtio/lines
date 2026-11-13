@@ -664,12 +664,12 @@
           {@const { feed, post: shown } = post}
           {@const episode = postEpisode(post)}
           {#if episode}
-            {@const playing = player.playing && player.episode?.key === episode.key}
+            {@const playing = player.isPlaying(episode.key)}
             <IconButton
               icon={playing ? "pause" : "play"}
               iconSize={17}
               label={playing ? t("player.pauseEpisode") : t("player.playEpisode")}
-              onclick={() => (playing ? player.pause() : player.play(episode))}
+              onclick={() => player.toggle(episode)}
             />
           {/if}
           {@const saved = feeds.savedNote(post)}

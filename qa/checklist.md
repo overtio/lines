@@ -463,13 +463,18 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 ## 11c. The podcast player
 
 - [ ] A podcast's episode in the Feeds has a play button at its row's end, its row's menu Play Episode, and an open episode a Play button over it; each starts it in the mini player, at the bottom of the sidebar (where the sidebar's a drawer or hidden, at the bottom of the note list)
-- [ ] An `episode` note (Save to Library on an episode, or an Apple Podcasts episode's link) has a round Play button before its `audio` link, and Play Episode in its row's menu; played to the end, its `status` becomes `listened` (⌘Z puts it back)
-- [ ] The mini player shows the episode's artwork, title and show (clicking them opens the episode), a slider of where it's got to with the time played and left, back 15 s, play or pause, forward 30 s and the speed; × stops it and puts it away
+- [ ] An `episode` note (Save to Library on an episode, or an Apple Podcasts episode's link) has a round Play button before its `audio` link, and Play Episode in its row's menu; played to the end, or stopped in its last 20 seconds, its `status` becomes `listened`, also while typing in it (what's typed stays); ⌘Z, in it or another note, doesn't undo that
+- [ ] The mini player shows the episode's artwork, title and show (clicking them opens the episode), a slider of where it's got to with the time played and left, both moving as it plays, back 15 s, play or pause, forward 30 s and the speed; × stops it and puts it away. Its artwork and controls line up with the sidebar's rows (Set up sync) at the left and its buttons at the right
+- [ ] Playing an episode pauses audio or video playing in a note, and playing those pauses the episode
+- [ ] Pausing an episode whose sound hasn't come yet stops its spinner, and it starts where it was when played again; choosing another meanwhile starts that one at its own place
+- [ ] An episode that couldn't be played says so; Play tries it again
+- [ ] [Desktop] Play in a floating note's episode plays it in the main window's mini player
+- [ ] Lock lines (or let it lock itself) while an episode plays, and unlock: it's in the mini player, paused where it got to; the same after quitting (⌘Q) and opening lines again
 - [ ] It plays on while moving between notes, the Feeds, the Calendar and Settings, and in tabs
 - [ ] The speed goes round 0.75×, 1×, 1.25×, 1.5×, 1.75×, 2× and is kept for the next episode and after lines restarts
-- [ ] Paused, or lines quit, an episode starts again where it was; its row says how much is left; played to the end, it's Played, and starts from the beginning next time; Mark as Played / Unplayed in its row's menu
-- [ ] The slider moves by ← and → from the keyboard; screen readers hear "3:05 played, 28:17 left" and every button's name
-- [ ] [Mac] The keyboard's ⏯ key and Now Playing in Control Center show the episode, play, pause and skip it
+- [ ] Paused, or lines quit, an episode starts again where it was; its row says how much is left; played to the end, it's Played, and starts from the beginning next time; Mark as Played / Unplayed in its row's menu (Mark as Played on the one playing puts the player away). Its row's play button is beside its date and length, never over its excerpt, in every style (Pixel too)
+- [ ] The slider moves 5 seconds with ← and → from the keyboard; dragging it shows the time where it's dragged, and the episode goes there when it's let go; screen readers hear "3:05 played, 28:17 left" and every button's name
+- [ ] [Mac] The keyboard's ⏯ key and Now Playing in Control Center show the episode, play, pause and skip it; ⏮ and ⏭ go back 15 s and forward 30 s
 - [ ] [Apps] Episodes from their feeds' https addresses play (the apps' web view allows sound from the web); an http one plays over https, or says it couldn't be played
 
 ## 12. Menus, pickers and note info

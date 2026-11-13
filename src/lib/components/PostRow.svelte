@@ -46,16 +46,10 @@
 
   /** An episode's: whether it's the one playing, and how far it was listened to. */
   const episode = $derived(postEpisode(row));
-  const playing = $derived(!!episode && player.playing && player.episode?.key === episode.key);
+  const playing = $derived(!!episode && player.isPlaying(episode.key));
   const position = $derived(episode && player.positionOf(episode.key));
   /** What's left of one begun, as a player shows it. */
   const left = $derived(position?.at ? clock((position.duration ?? post.duration ?? 0) - position.at) : undefined);
-
-  function play() {
-    if (!episode) return;
-    if (playing) player.pause();
-    else player.play(episode);
-  }
 
   function setRead(read: boolean) {
     feeds.setRead(row.feed, [post.id], read);
@@ -73,7 +67,7 @@
       items: menuSections(
         episode
           ? [
-              { label: playing ? t("player.pauseEpisode") : t("player.playEpisode"), icon: playing ? "pause" : "play", run: play },
+              { label: playing ? t("player.pauseEpisode") : t("player.playEpisode"), icon: playing ? "pause" : "play", run: () => player.toggle(episode) },
               position?.played
                 ? { label: t("player.markUnplayed"), icon: "circle-dot", run: () => player.setPlayed(episode.key, false) }
                 : { label: t("player.markPlayed"), icon: "check", run: () => player.setPlayed(episode.key, true) },
@@ -129,7 +123,7 @@
     {#if post.excerpt}
       <span class="line-clamp-2 text-sm leading-[1.45] text-muted" id="excerpt-{post.key}" aria-hidden="true">{post.excerpt}</span>
     {/if}
-    <span class={["mt-0.5 flex min-w-0 items-center gap-[5px] text-[11.5px] text-faint", selected && "in-data-[contrast=more]:text-muted", episode && "pr-8"]}>
+    <span class={["mt-0.5 flex min-w-0 items-center gap-[5px] text-[11.5px] text-faint", selected && "in-data-[contrast=more]:text-muted", episode && "min-h-[26px] pr-9"]}>
       {#if post.audio}<Icon name="headphones" size={12} class="shrink-0" /><span class="sr-only">{t("feeds.episode")}</span>{/if}
       <span class="min-w-0 truncate">{source}</span>
       {#if post.date}<span aria-hidden="true">·</span><time class="shrink-0" datetime={new Date(post.date).toISOString()}>{formatDate(post.date, now)}</time>{/if}
@@ -146,12 +140,12 @@
   <!-- Beside the row rather than in it, which a button can't be; by keyboard it's in the row's menu and over the open post. -->
   {#if episode}
     <IconButton
-      class="absolute right-1.5 bottom-1.5"
+      class="absolute right-1.5 bottom-2"
       icon={playing ? "pause" : "play"}
       iconSize={15}
       tabindex={-1}
       label={playing ? t("player.pauseEpisode") : t("player.playEpisode")}
-      onclick={play}
+      onclick={() => player.toggle(episode)}
     />
   {/if}
 </li>

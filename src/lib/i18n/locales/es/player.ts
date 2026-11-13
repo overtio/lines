@@ -12,7 +12,7 @@ export default {
   "player.speed": "Velocidad: {speed}",
   "player.position": "Posición en el episodio",
   "player.time": "{elapsed} escuchado, quedan {left}",
-  "player.couldntPlay": "No se ha podido reproducir este episodio.",
+  "player.couldntPlay": "No se ha podido reproducir este episodio. Reproducir lo intenta de nuevo.",
   "player.playEpisode": "Reproducir el episodio",
   "player.pauseEpisode": "Pausar el episodio",
   "player.played": "Escuchado",

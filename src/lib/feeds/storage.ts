@@ -1,12 +1,14 @@
 import { fromUtf8, utf8 } from "../crypto";
 import { isSealed, openRecord, sealRecord, vault, type Sealed } from "../lock/vault";
 import { database, ObjectStore } from "../notes/storage";
+import type { Episode } from "../player/player.svelte";
 import type { FeedRecord } from "./posts";
 
 /*
  * Feeds' posts on this device, in a database of their own (`lines-feeds`): a record for each feed
  * (what it said of itself, its posts but their content, which were read), each post's content
- * apart, read when it's opened, and where each episode was stopped (player/player.svelte.ts). Each
+ * apart, read when it's opened, and where each episode was stopped, with the one in the player
+ * (player/player.svelte.ts). Each
  * is stored under a random id, and with the app lock on, encrypted like notes (lock/vault.ts), so
  * nothing kept says what's subscribed to, read or listened to.
  */
@@ -21,7 +23,7 @@ interface Content {
   html: string;
 }
 
-/** Where an episode was stopped, by its key (a post's, or a hash of a note's audio). */
+/** Where an episode was stopped, by its key (its post's, or its note's id). */
 export interface Position {
   id: string;
   /** In seconds. */
@@ -31,10 +33,17 @@ export interface Position {
   duration?: number;
 }
 
+/** The episode in the player, kept among the positions under an id no key is. */
+const IN_PLAYER = "in-player";
+interface InPlayer {
+  id: typeof IN_PLAYER;
+  episode: Episode;
+}
+
 const open = database(FEEDS_DB, 2, [FEEDS, POSTS, POSITIONS]);
 const feedStore = new ObjectStore<FeedRecord | Sealed>(FEEDS, open);
 const postStore = new ObjectStore<Content | Sealed>(POSTS, open);
-const positionStore = new ObjectStore<Position | Sealed>(POSITIONS, open);
+const positionStore = new ObjectStore<Position | InPlayer | Sealed>(POSITIONS, open);
 
 async function seal<T extends { id: string }>(store: string, value: T): Promise<T | Sealed> {
   return vault.sealing ? sealRecord(store, value.id, utf8(JSON.stringify(value))) : value;
@@ -74,13 +83,21 @@ export const feedStorage = {
     await feedStore.delete(record.id);
   },
 
-  /** Where each episode was stopped. */
-  positions(): Promise<Position[]> {
-    return positionStore.all().then((values) => Promise.all(values.map((value) => unseal<Position>(POSITIONS, value))));
+  /** Where each episode was stopped, and the one that was in the player, if one was. */
+  async positions(): Promise<{ positions: Position[]; inPlayer?: Episode }> {
+    const all = await Promise.all((await positionStore.all()).map((value) => unseal<Position | InPlayer>(POSITIONS, value)));
+    const inPlayer = all.find((each): each is InPlayer => each.id === IN_PLAYER);
+    return { positions: all.filter((each): each is Position => each !== inPlayer), inPlayer: inPlayer?.episode };
   },
 
   async putPosition(position: Position) {
     await positionStore.put(await seal(POSITIONS, position));
+  },
+
+  /** Keeps which episode is in the player (none, once it's closed). */
+  async putInPlayer(episode: Episode | null) {
+    if (episode) await positionStore.put(await seal(POSITIONS, { id: IN_PLAYER, episode }));
+    else await positionStore.delete(IN_PLAYER);
   },
 
   /** Writes everything again, encrypted or not as the app lock now says. */

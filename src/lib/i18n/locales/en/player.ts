@@ -14,7 +14,7 @@ export default {
   // The slider of where the episode's got to, and what it says.
   "player.position": "Position in the episode",
   "player.time": "{elapsed} played, {left} left",
-  "player.couldntPlay": "This episode couldn’t be played.",
+  "player.couldntPlay": "This episode couldn’t be played. Play tries again.",
   // A post's and a note's: playing its episode, and whether it was listened to.
   "player.playEpisode": "Play Episode",
   "player.pauseEpisode": "Pause Episode",

@@ -1,6 +1,5 @@
 import { readDuration } from "../feeds/dates";
 import { feeds, type Row } from "../feeds/feeds.svelte";
-import { fingerprint } from "../feeds/posts";
 import { t } from "../i18n/index.svelte";
 import { coverOf } from "../library/text";
 import { propertyOf, readMention, setProperties } from "../notes/properties";
@@ -22,7 +21,7 @@ export function postEpisode({ feed, post }: Row): Episode | null {
   };
 }
 
-/** An `episode` note as an episode to play, if its `audio` is a link to it; its place kept by that link. */
+/** An `episode` note as an episode to play, if its `audio` is a link to it; its place kept by the note. */
 export function noteEpisode({ note, meta }: Entry): Episode | null {
   if (meta.type !== "episode" || note.locked) return null;
   const value = (key: string) => propertyOf(meta.properties, key)?.value.trim() || undefined;
@@ -30,7 +29,7 @@ export function noteEpisode({ note, meta }: Entry): Episode | null {
   if (!audio || !/^https?:\/\/\S+$/i.test(audio)) return null;
   const podcast = value("podcast");
   return {
-    key: fingerprint(audio),
+    key: note.id,
     audio,
     title: meta.title || t("list.untitled"),
     // A mention of the podcast's note reads as its title.
@@ -41,10 +40,9 @@ export function noteEpisode({ note, meta }: Entry): Episode | null {
   };
 }
 
-// An `episode` note played to its end is listened to, as its row's menu would mark it (⌘Z puts it back).
+// An `episode` note played to its end, or stopped near it, is listened to: by lines, not by hand,
+// so ⌘Z stays with what was done last.
 player.onPlayed(({ from }) => {
-  if (!("note" in from)) return;
-  const entry = notes.get(from.note);
-  if (!entry || entry.meta.type !== "episode" || propertyOf(entry.meta.properties, "status")?.value.trim() === "listened") return;
-  notes.edit(from.note, setProperties(entry.note.body, { status: "listened" }), t("library.didUndoStatus"), { keepDate: true });
+  if (!("note" in from) || notes.get(from.note)?.meta.type !== "episode") return;
+  notes.setText(from.note, (body) => setProperties(body, { status: "listened" }), { keepDate: true });
 });

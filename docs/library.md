@@ -114,9 +114,9 @@ Subscribe to blogs, sites and podcasts, and read their posts in lines.
 ## The podcast player
 
 - An episode plays in lines: the play button on an episode's row in the Feeds, or over an open one; on an `episode` note, the button before its `audio` link, or Play Episode in its row's menu. The mini player sits at the bottom of the sidebar (or of the note list, where the sidebar's a drawer or hidden): the episode's artwork, title and show, which open it; where it's got to, with the time played and left; back 15 seconds, play or pause, forward 30, and the speed (0.75× to 2×, kept for the next).
-- It plays on across notes, tabs and views: there's one player for all of lines.
-- Where each episode was stopped is kept on this device, a feed's episode by its post, a note's by its `audio` link, and it starts there next time; an episode's row says how much is left. Played to the end it's Played (its row's menu marks it played or not), and an `episode` note's `status` becomes `listened` (⌘Z puts it back).
-- The system's media controls (media keys, the Mac's Now Playing) show what's playing and play, pause and skip it.
+- It plays on across notes, tabs and views: there's one player for all of lines, in the main window (a floating note's Play asks it to play there). Playing an episode pauses audio or video playing in a note, and the other way round. The slider's arrow keys go 5 seconds.
+- Where each episode was stopped is kept on this device, a feed's episode by its post, a note's by the note, and it starts there next time; an episode's row says how much is left. Locked or quit while it plays, it's back in the player afterwards, paused where it was. Played to the end, or stopped in its last 20 seconds, it's Played (its row's menu marks it played or not; Mark as Played on the one playing puts the player away), and an `episode` note's `status` becomes `listened`: done by lines, not by you, so ⌘Z doesn't undo it. One that couldn't be played plays when Play is pressed again.
+- The system's media controls (media keys, the Mac's Now Playing) show what's playing and play, pause and skip it; previous and next go back 15 seconds and forward 30.
 - Episodes play from their feeds' addresses, over https (an `http:` one is asked for over https), as the apps' web views allow; nothing is downloaded to listen to offline yet.
 
 ## Not yet
