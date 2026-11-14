@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import type { Page } from "playwright";
 import { type App, choose, clickMod, engine, mod, noErrors, openApp, toggle } from "./app";
+import { answerPictures } from "./files";
 
 let app: App;
 beforeEach(async () => {
@@ -278,6 +279,40 @@ test("a click into a note that isn't focused keeps it where it was, though focus
   expect(result.scrolled).toBeGreaterThan(1000);
   expect(Math.abs(result.kept - result.scrolled)).toBeLessThan(40);
   expect(result.after).toBe(900);
+});
+
+test("a note opened again is drawn where it stays from its first frame: its text isn't pushed down as its pictures come in, nor sideways by a scroll bar", async () => {
+  const page = app.page;
+  // Scroll bars that take room, as on a Mac with a mouse, or with Show scroll bars: Always.
+  await page.addStyleTag({ content: "* { scrollbar-width: auto !important; scrollbar-color: auto !important } ::-webkit-scrollbar { width: 15px }" });
+  await answerPictures(page);
+  // A cover that isn't on this device, and a picture from the web.
+  const pictured = await app.open(`---\ntype: show\nyear: 2020\n---\n# Pictured\n\n![Cover|240](../attachments/${"0".repeat(32)}.png)\n\n![Still](https://pictures.example/still.png)\n\nThe text under them.`);
+  await page.locator(".editor-pane .cm-lp-image-missing", { hasText: "on this device" }).waitFor();
+  await page.locator(".editor-pane img.cm-lp-image").waitFor();
+  // Room under the text so the note scrolls by less than the cover's placeholder is tall: without it, no scroll bar.
+  await page.evaluate(() => {
+    const { scrollDOM, contentDOM } = window.testing.editor()!;
+    const end = contentDOM.lastElementChild!.getBoundingClientRect().bottom - scrollDOM.getBoundingClientRect().top + scrollDOM.scrollTop;
+    document.querySelector<HTMLElement>(".editor-pane")!.style.setProperty("--editor-pad-bottom", `${scrollDOM.clientHeight + 30 - end}px`);
+  });
+  const other = await app.open("# Another note");
+  const back = await page.evaluate(async (id) => {
+    /** Where the text under the pictures is, and the text's left edge. */
+    const where = () => {
+      const content = window.testing.editor()!.contentDOM;
+      const line = [...content.querySelectorAll(".cm-line")].find((each) => each.textContent === "The text under them.");
+      return { top: line?.getBoundingClientRect().top, left: content.getBoundingClientRect().left };
+    };
+    window.testing.notes.select(id);
+    const first = await new Promise<ReturnType<typeof where>>((resolve) => requestAnimationFrame(() => resolve(where())));
+    // Its pictures looked up and loaded again.
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    return { first, settled: where() };
+  }, pictured);
+  expect(other).not.toBe(pictured);
+  expect(back.first.top).toBeDefined();
+  expect(back.first).toEqual(back.settled);
 });
 
 // Not on Linux, where Chrome takes a press in selected text as the start of dragging that text, as it
