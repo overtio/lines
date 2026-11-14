@@ -110,6 +110,7 @@ export default {
 
   "editor.outline": "Plan",
   "editor.outline.headings": "Titres",
+  "editor.properties": "Propriétés",
 
   "editor.format": "Mise en forme",
   "editor.format.bold": "Gras",

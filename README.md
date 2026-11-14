@@ -126,7 +126,7 @@ Put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block), or, with Sp
 - **Typing sounds.** Hear a keyboard as you type: creamy or clacky linears, tactile, clicky, Topre, or a typewriter that rings its bell at Return. Or add a recorded one: any [Mechvibes](https://mechvibes.com) sound pack, from a .zip or its folder. Off to begin with.
 - **Focus mode** hides everything but the note (<kbd>⇧⌘\\</kbd>).
 - **Fits any screen**: three columns on a desktop, a drawer on a tablet, a stack on a phone. Drag the columns to resize them.
-- **Your layout.** Put the sidebar and the note list on the left or the right, each its own way, and turn on tabs for the notes you open, as in a code editor (Settings → Layout). Scroll bars can be turned off everywhere, the toolbars kept out of sight until you reach for them, and icons swapped for words.
+- **Your layout.** Put the sidebar and the note list on the left or the right, each its own way, a note's properties beside its text or after it, and turn on tabs for the notes you open, as in a code editor (Settings → Layout). Scroll bars can be turned off everywhere, the toolbars kept out of sight until you reach for them, and icons swapped for words.
 - **Outline.** Turn on short lines beside the note, on its right or left, one for each heading, darker for the part you're reading. Point at them to see the headings by name, and click one to glide there. Markdown and LaTeX notes both have it.
 - **Native touches**: SF Symbols on Apple devices, see-through windows on the Mac (all of the window, or only its sidebar, or its sidebar and note list), and Settings in its own window if you like.
 - **Updates itself** (desktop apps). A new version downloads in the background once it's been out a week, and installs when you quit lines, or straight away with Restart to update. Choose how long to wait, or turn it off, in Settings → About.
@@ -369,6 +369,7 @@ src/
       linkMenu.ts            A web link's menu (Open, Copy, and what plugins add: Add to Library)
       outline.svelte.ts      The outline beside a note: its languages' headings, the part being read, gliding to one
       OutlineRail.svelte     The outline's lines and its card of headings
+      propertiesApart.ts     A note's properties beside its text or after it, in an editor of their own over its start
       dragBlocks.ts          Grips for dragging lines and blocks to move them
       cursor.ts              Draws the text cursor (WebKit can leave a stray native caret behind)
       rendered.ts            Code blocks drawn by renderer plugins (```mermaid): live, resizable, with their buttons; or to work in (```csv)
@@ -583,6 +584,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [x] Resizable sidebar and note list, each on the left or the right
 - [x] Tabs for open notes, with preview tabs (off by default)
 - [x] An outline of a note's headings beside it (off by default)
+- [x] A note's properties at its top, beside its text or after it
 - [x] Choose what a click, ⌘-click and ⇧⌘-click do on links, tags and mentions
 - [x] Several notes at once: select, tag, pin and trash them together
 - [x] Plugins: formats, math and diagram engines, typesetters, themes and icon sets, each turned off or on in Settings → Plugins

@@ -328,7 +328,7 @@ export default {
   "settings.invertNote": "The theme’s colors turned around, light for dark, each as far from the others as before. Light or dark chooses which of them are turned. Pictures in notes stay as they are.",
   "settings.icons": "Icons",
   "settings.sfSymbolsNote": "SF Symbols are available in the Mac and iPhone apps.",
-  // Settings → Layout: which side the sidebar and the note list are on, tabs and the outline.
+  // Settings → Layout: which side the sidebar and the note list are on, tabs, the outline, and where a note's properties show.
   "settings.sidebarSide": "Sidebar",
   "settings.listSide": "Note list",
   "settings.sideLeft": "Left",
@@ -338,6 +338,10 @@ export default {
   "settings.outline": "Show an outline beside the note",
   "settings.outlineNote": "A short line beside the note for each of its headings, darker for the part you’re reading. Point at them to see the headings, and choose one to go there. Shown when a note has two or more headings and there’s room beside it.",
   "settings.outlineSide": "Outline side",
+  "settings.propertiesPlace": "Properties",
+  "settings.propertiesPlaceNote": "Where a note’s properties show. On the left or right they need room beside the note, and show at the top without it. Its file keeps them at its top either way.",
+  "settings.placeTop": "Top",
+  "settings.placeBottom": "Bottom",
   "settings.sidebarAbout": "Version and GitHub in the sidebar",
   "settings.sidebarAboutNote": "The version badge and the button to lines' source, at the bottom of the sidebar. Off, a new version ready to install still shows its restart button there.",
   "settings.scrollbars": "Scroll bars",

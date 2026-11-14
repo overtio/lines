@@ -110,6 +110,7 @@ export default {
 
   "editor.outline": "Esquema",
   "editor.outline.headings": "Encabezados",
+  "editor.properties": "Propiedades",
 
   "editor.format": "Formato",
   "editor.format.bold": "Negrita",

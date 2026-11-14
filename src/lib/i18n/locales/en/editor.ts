@@ -131,6 +131,8 @@ export default {
   // The outline beside a note (Settings → Layout): its headings, by name when pointed at.
   "editor.outline": "Outline",
   "editor.outline.headings": "Headings",
+  // A note's properties drawn beside it or after it (Settings → Layout), for screen readers.
+  "editor.properties": "Properties",
 
   // The toolbar over selected text.
   "editor.format": "Format",

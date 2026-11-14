@@ -12,7 +12,19 @@
   import { objectsChanged } from "./objects";
   import { outline, outlineCompartment } from "./outline.svelte";
   import { reopened } from "./markers";
-  import { copyOnSelectCompartment, createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment, spelling, spellingCompartment, steadyScroller } from "./setup";
+  import { propertiesApart } from "./propertiesApart";
+  import {
+    copyOnSelectCompartment,
+    createExtensions,
+    formatCompartment,
+    formatEditing,
+    propertiesCompartment,
+    readOnly,
+    readOnlyCompartment,
+    spelling,
+    spellingCompartment,
+    steadyScroller,
+  } from "./setup";
   import { copyOnSelect } from "./copyOnSelect";
   import { symbolsChanged } from "./symbols";
   import { changesBetween, editedNote } from "./util";
@@ -195,10 +207,14 @@
     untrack(() => applyFormat());
   });
 
-  /** Whether the note can be edited, the outline beside it (Settings → Layout), and its spelling and copying what's selected (Settings → Editor). */
+  /**
+   * Whether the note can be edited, the outline beside it and where its properties are (Settings →
+   * Layout), and its spelling and copying what's selected (Settings → Editor).
+   */
   const setUp = () => [
     readOnlyCompartment.reconfigure(readOnly(viewOnly)),
     outlineCompartment.reconfigure(prefs.outline ? outline : []),
+    propertiesCompartment.reconfigure(propertiesApart(prefs.propertiesPlace)),
     spellingCompartment.reconfigure(spelling(prefs.spellcheck)),
     copyOnSelectCompartment.reconfigure(copyOnSelect(prefs.copyOnSelect)),
   ];

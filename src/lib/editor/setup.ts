@@ -351,18 +351,17 @@ export const formatCompartment = new Compartment();
 /** Each language's editing as last made, so a note opened in it again isn't set up again. */
 const made = new WeakMap<NoteLanguage, { editor: Extension; mode: MarkdownMode; editing: Extension }>();
 
-/**
- * A language's own editing, the marks in the margin every language has (markers.ts), and how its
- * markup shows (markupMode.ts): as written, it's only colored.
- */
+/** How markup shows (markupMode.ts): as written, it's only colored. */
+const markupShown = (mode: MarkdownMode): Extension => [markupMode.of(mode), mode === "source" ? syntaxHighlighting(sourceStyle) : []];
+
+/** A language's own editing, the marks in the margin every language has (markers.ts), and how its markup shows. */
 export function formatEditing(format = DEFAULT_LANGUAGE): Extension {
   const language = plugins.language(format);
   const editor = language.editor();
   const mode = prefs.markdownMode;
   let found = made.get(language);
   if (found?.editor !== editor || found.mode !== mode) {
-    const source = mode === "source" ? syntaxHighlighting(sourceStyle) : [];
-    found = { editor, mode, editing: [editor, lineMarkers(language), markupMode.of(mode), source] };
+    found = { editor, mode, editing: [editor, lineMarkers(language), markupShown(mode)] };
     made.set(language, found);
   }
   return found.editing;
@@ -376,6 +375,8 @@ export function readOnly(value: boolean): Extension {
 
 export const spellingCompartment = new Compartment();
 export const copyOnSelectCompartment = new Compartment();
+/** A note's properties drawn apart from its text, or at its top as they are (propertiesApart.ts). */
+export const propertiesCompartment = new Compartment();
 
 /** Whether the system checks a note's spelling, and corrects it as you type (Settings → Editor). */
 export const spelling = (on: boolean): Extension =>
@@ -436,6 +437,28 @@ export const steadyScroller: Extension = [
   ),
 ];
 
+/**
+ * The editor of a note's properties drawn apart from its text (propertiesApart.ts), from the note's
+ * own `note`: a Markdown note's, its settings too, but none of what's the note's alone, its history,
+ * marks in its margin and find bar, which stay in the note's editor.
+ */
+export function propertiesEditing(note: EditorState): Extension[] {
+  return [
+    EditorView.lineWrapping,
+    readOnlyCompartment.of(readOnlyCompartment.get(note) ?? []),
+    spellingCompartment.of(spellingCompartment.get(note) ?? []),
+    copyOnSelectCompartment.of(copyOnSelectCompartment.get(note) ?? []),
+    EditorView.contentAttributes.of({ autocapitalize: "sentences", "aria-label": message("editor.properties"), lang: "" }),
+    plugins.language(DEFAULT_LANGUAGE).editor(),
+    markupShown(prefs.markdownMode),
+    cursor,
+    syntaxHighlighting(highlightStyle),
+    phrases,
+    keymap.of([...defaultKeymap, indentWithTab]),
+    theme,
+  ];
+}
+
 /** A note's editor, set up for its language (`format`) from the start. */
 export function createExtensions(onChange: () => void, format?: string): Extension[] {
   return [
@@ -465,6 +488,7 @@ export function createExtensions(onChange: () => void, format?: string): Extensi
     keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap.filter((binding) => binding.key !== "Mod-d"), indentWithTab]),
     readOnlyCompartment.of(readOnly(false)),
     outlineCompartment.of([]),
+    propertiesCompartment.of([]),
     theme,
     EditorView.updateListener.of((update) => {
       if (update.docChanged) onChange();
