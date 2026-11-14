@@ -162,6 +162,12 @@ export function yearOf(date: unknown): string | undefined {
   return typeof date === "string" ? /\b(\d{4})\b/.exec(date)?.[1] : undefined;
 }
 
+/** A season of a year as anime are said to come out in, in English as values are written: `Fall 2023`. */
+export function seasonOf(season: unknown, year: unknown): string | undefined {
+  const name = typeof season === "string" ? /^(winter|spring|summer|fall)$/i.exec(season.trim())?.[1] : undefined;
+  return name && yearOf(year) ? `${name[0].toUpperCase()}${name.slice(1).toLowerCase()} ${yearOf(year)}` : undefined;
+}
+
 /** Seconds in an ISO 8601 duration (`PT2H46M`, `P0DT3M34S`), or undefined for anything else. */
 export function isoSeconds(duration: unknown): number | undefined {
   if (typeof duration !== "string") return undefined;

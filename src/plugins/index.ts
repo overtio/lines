@@ -1,5 +1,6 @@
 import { isApple } from "../lib/platform";
 import type { Plugin } from "../lib/plugins/types";
+import { anilist } from "./anilist";
 import { applePodcasts } from "./apple-podcasts";
 import { arxiv } from "./arxiv";
 import { asciinema } from "./asciinema";
@@ -21,6 +22,7 @@ import { markdown } from "./markdown";
 import { mermaid } from "./mermaid";
 import { models } from "./models";
 import { musicbrainz } from "./musicbrainz";
+import { myanimelist } from "./myanimelist";
 import { openLibrary } from "./open-library";
 import { paper } from "./paper";
 import { pdfReader } from "./pdf-reader";
@@ -78,6 +80,8 @@ export const builtIn = (): Plugin[] => [
   openLibrary(),
   wikidata(),
   musicbrainz(),
+  anilist(),
+  myanimelist(),
   spotify(),
   soundcloud(),
   applePodcasts(),

@@ -203,7 +203,7 @@ test("notes that are just a link aren't looked up as they open or as they're wri
   const settings = await app.settings("Library");
   // On the web, only the sources that work there are named, each once: not Web Pages, nor Feeds' own for a site's page, which reads it.
   await expect(settings.getByText("In the browser, only", { exact: false }).innerText()).resolves.toBe(
-    "In the browser, only YouTube, Open Library, Wikidata, MusicBrainz, SoundCloud, Apple Podcasts, and Feeds can be asked: other sites don’t let web pages read them. The lines app reads any page.",
+    "In the browser, only YouTube, Open Library, Wikidata, MusicBrainz, AniList, MyAnimeList, SoundCloud, Apple Podcasts, and Feeds can be asked: other sites don’t let web pages read them. The lines app reads any page.",
   );
   await toggle(settings, "Look up links", false);
   await app.closeSettings();
@@ -276,7 +276,7 @@ test("Add to Library searches the kind chosen, and what's chosen is a note on it
   const picker = await addToLibrary(page);
   // What can be searched from a web page: not papers (arXiv answers the apps only).
   const kinds = picker.getByRole("radiogroup", { name: "What to search for" });
-  expect(await kinds.getByRole("radio").allInnerTexts()).toEqual(["Books", "Movies", "Shows", "Music", "Podcasts"]);
+  expect(await kinds.getByRole("radio").allInnerTexts()).toEqual(["Books", "Movies", "Shows", "Anime", "Music", "Podcasts"]);
   await page.keyboard.type("dune");
   await picker.getByRole("option", { name: /^Dune, Frank Herbert · 1965/ }).waitFor();
   // Only what was typed is sent.
@@ -306,6 +306,61 @@ test("Add to Library searches the kind chosen, and what's chosen is a note on it
   await page.waitForFunction(() => window.testing.text() === "---\ntype: movie\nstatus: to watch\n---\n# ");
   expect(await page.locator("#note-list-title").innerText()).toBe("Movies");
   expect(await page.evaluate(() => window.testing.notes.selected?.note.inbox)).toBeFalsy();
+});
+
+test("anime: searched for on AniList, and a link to MyAnimeList pasted into a new note, each a note on Anime with its ids", async () => {
+  app = await openApp();
+  const { page } = app;
+  // Trimmed from AniList's and Jikan's answers (November 2026).
+  const sent: string[] = [];
+  await page.route("https://graphql.anilist.co/", async (route: Route) => {
+    sent.push(route.request().postData() ?? "");
+    const media = {
+      id: 154587,
+      idMal: 52991,
+      format: "TV",
+      episodes: 28,
+      season: "FALL",
+      seasonYear: 2023,
+      title: { romaji: "Sousou no Frieren", english: "Frieren: Beyond Journey's End" },
+      coverImage: { extraLarge: "https://s4.anilist.co/large.png", medium: "https://s4.anilist.co/medium.png" },
+      siteUrl: "https://anilist.co/anime/154587",
+      studios: { nodes: [{ name: "MADHOUSE" }] },
+      description: "The adventure is over but life goes on for an elf mage.",
+    };
+    await route.fulfill({ headers: CORS, json: { data: route.request().postData()?.includes("Page(") ? { Page: { media: [media] } } : { Media: media } } });
+  });
+  await page.route("https://s4.anilist.co/**", (route: Route) => route.fulfill({ headers: { ...CORS, "content-type": "image/png" }, body: PNG }));
+  await page.route("https://api.jikan.moe/v4/anime/5114/full", (route: Route) =>
+    route.fulfill({
+      headers: CORS,
+      json: { data: { mal_id: 5114, url: "https://myanimelist.net/anime/5114/Fullmetal_Alchemist__Brotherhood", titles: [{ type: "Default", title: "Fullmetal Alchemist: Brotherhood" }], type: "TV", episodes: 64, season: "spring", year: 2009, studios: [{ name: "Bones" }], synopsis: "Two brothers search for the Philosopher's Stone." } },
+    }),
+  );
+
+  const picker = await addToLibrary(page);
+  await picker.getByRole("radio", { name: "Anime" }).click();
+  await picker.getByRole("searchbox").fill("frieren");
+  await picker.getByRole("option", { name: /^Frieren: Beyond Journey's End, MADHOUSE · 2023/ }).waitFor();
+  // Only what was typed is sent.
+  expect(JSON.parse(sent.at(-1)!).variables).toEqual({ search: "frieren" });
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(() =>
+    window.testing.text()?.startsWith("---\ntype: anime\nformat: TV\nstudio: MADHOUSE\nyear: 2023\nseason: Fall 2023\nepisodes: 28\nanilist: 154587\nmal: 52991\nlink: https://anilist.co/anime/154587\nstatus: to watch\n---\n# Frieren: Beyond Journey's End"),
+  );
+  await page.waitForFunction(() => window.testing.text()?.includes("life goes on for an elf mage"));
+  expect(await page.locator("#note-list-title").innerText()).toBe("Anime");
+
+  // Its menu on its shelf has the statuses anime lists have.
+  await page.locator(".note-list [data-id]").filter({ hasText: "Frieren" }).click({ button: "right" });
+  expect(await page.getByRole("menuitemcheckbox").allInnerTexts()).toEqual(["To Watch", "Watching", "Watched", "On Hold", "Dropped"]);
+  await page.keyboard.press("Escape");
+
+  await app.open("");
+  await page.evaluate(() => window.testing.place());
+  await paste(page, "https://myanimelist.net/anime/5114/Fullmetal_Alchemist__Brotherhood");
+  await page.waitForFunction(() => window.testing.text()?.includes("\nmal: 5114\n"));
+  expect(await app.text()).toStartWith("---\ntype: anime\nformat: TV\nstudio: Bones\nyear: 2009\nseason: Spring 2009\nepisodes: 64\nmal: 5114\n");
 });
 
 test("Add to Library is as tall as what it shows", async () => {

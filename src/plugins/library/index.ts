@@ -22,6 +22,12 @@ const WATCHED = [
   { value: "watching", label: t("library.status.watching") },
   { value: "watched", label: t("library.status.watched") },
 ];
+/** As anime lists have them (AniList's, MyAnimeList's): put aside for now, or given up on, besides. */
+const WATCHED_LISTS = [
+  ...WATCHED,
+  { value: "on hold", label: t("library.status.onHold") },
+  { value: "dropped", label: t("library.status.dropped") },
+];
 const LISTENED = [
   { value: "to listen", label: t("library.status.toListen") },
   { value: "listening", label: t("library.status.listening") },
@@ -58,6 +64,17 @@ const KINDS: LibraryKind[] = [
     subtitle: ["creator", "year"],
     cover: "tall",
     statuses: WATCHED,
+  },
+  {
+    // Japanese animation, series and films. Its ids on AniList and MyAnimeList say which it is there (plugins/anilist, plugins/myanimelist).
+    type: "anime",
+    name: t("library.anime"),
+    label: t("library.animeShelf"),
+    icon: "tv-minimal-play",
+    properties: ["format", "studio", "year", "season", "episodes", "anilist", "mal"],
+    subtitle: ["studio", "year"],
+    cover: "tall",
+    statuses: WATCHED_LISTS,
   },
   {
     type: "video",
