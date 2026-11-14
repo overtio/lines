@@ -13,6 +13,8 @@ export default {
   "feeds.getPicture": "Obtenir son image",
   "feeds.gotPicture": "{title} a son image.",
   "feeds.noPicture": "Il n’y a pas d’image pour {title}.",
+  "feeds.getPictures": "Obtenir les images manquantes",
+  "feeds.gotPictures": "{count, plural, =0 {Aucune image trouvée} one {Une image trouvée pour # flux} other {Des images trouvées pour # flux}}",
   "feeds.unsubscribe": "Se désabonner",
   "feeds.unsubscribed": "Vous êtes désabonné de {title}. Sa note est dans la Corbeille.",
   "feeds.refresh": "Actualiser les flux",

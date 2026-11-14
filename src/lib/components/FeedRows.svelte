@@ -68,9 +68,12 @@
   }
 
   function rowMenu(x: number, y: number) {
+    const bare = feeds.withoutPictures(urls());
     onmenu(label, [
       { label: t("feeds.refresh"), icon: "refresh", run: () => feeds.refresh(urls()) },
       { label: t("feeds.readAll"), icon: "check-check", run: () => readAll(urls()) },
+      // Its sites' feeds subscribed to without a picture (made before lines gave them their sites' icons) given theirs.
+      ...(bare.length ? [{ label: t("feeds.getPictures"), icon: "image" as const, run: () => void getPictures(bare) }] : []),
       "separator",
       { label: t("feeds.subscribe"), icon: "plus", run: () => (ui.subscribePrompt = { x, y }) },
     ], x, y);
@@ -105,6 +108,10 @@
   }
 
   const pictured = (note: string) => !!coverOf(notes.get(note)?.note.body ?? "");
+
+  async function getPictures(urls: string[]) {
+    speak(t("feeds.gotPictures", { count: await feeds.givePictures(urls) }));
+  }
 
   async function getPicture(url: string, title: string) {
     speak(t((await feeds.givePicture(url)) ? "feeds.gotPicture" : "feeds.noPicture", { title }));

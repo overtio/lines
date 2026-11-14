@@ -466,6 +466,27 @@ class Feeds {
     return true;
   }
 
+  /** Of `urls`, the sites' feeds whose notes have no picture: a podcast's is its artwork, which it's subscribed with or not. */
+  withoutPictures(urls: string[]): string[] {
+    return urls.filter((url) =>
+      this.notesOf(url).some((id) => {
+        const entry = notes.get(id);
+        return entry?.meta.type === "feed" && !coverOf(entry.note.body);
+      }),
+    );
+  }
+
+  /** Gives each of `urls` its picture (givePicture), a few at a time, as feeds are fetched. How many had one to give. */
+  async givePictures(urls: string[]): Promise<number> {
+    const left = [...urls];
+    let given = 0;
+    const turn = async () => {
+      for (let url = left.shift(); url; url = left.shift()) if (await this.givePicture(url)) given++;
+    };
+    await Promise.all(Array.from({ length: AT_ONCE }, turn));
+    return given;
+  }
+
   /**
    * Subscribes to the feeds an OPML file lists that aren't already, each fetched in its turn as
    * feeds are refreshed, for what it says of itself; one that can't be, a note of what the file

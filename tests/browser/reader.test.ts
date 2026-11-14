@@ -427,6 +427,48 @@ test("Get Its Picture, in a subscription's menu, gives one without a picture its
   await page.keyboard.press("Escape");
 });
 
+test("Get Missing Pictures, in RSS Feeds' menu, gives each of its feeds without a picture its site's icon and says how many; not a podcast's", async () => {
+  app = await openApp();
+  const page = app.page;
+  const cors = { "access-control-allow-origin": "*" };
+  const asked: string[] = [];
+  // Neither site names an icon as it's subscribed to; then one does. A podcast's artwork can't be had.
+  let named = false;
+  await page.route("https://plain.example/", (route) =>
+    route.fulfill({ body: named ? '<html><head><link rel="icon" href="/mark.png"></head></html>' : "<html></html>", contentType: "text/html", headers: cors }),
+  );
+  await page.route("https://plain.example/mark.png", (route) => route.fulfill({ body: png(32, 32, () => [24, 23, 23]), contentType: "image/png", headers: cors }));
+  await page.route("https://quiet.example/", (route) => route.fulfill({ body: "<html></html>", contentType: "text/html", headers: cors }));
+  await page.route((url) => url.hostname === "syntax.fm", (route) => {
+    asked.push(route.request().url());
+    return route.fulfill({ body: "", contentType: "text/html", headers: cors });
+  });
+  const PODCAST = "https://feeds.megaphone.fm/FSI1483080183";
+  const feeds: Record<string, string> = {
+    "https://plain.example/feed.xml": fixture("plain.rss"),
+    "https://quiet.example/feed.xml": '<rss version="2.0"><channel><title>Quiet</title><link>https://quiet.example/</link><item><title>Hello</title><guid>1</guid></item></channel></rss>',
+    [PODCAST]: fixture("podcast.rss"),
+  };
+  for (const [url, body] of Object.entries(feeds)) {
+    await page.route(url, (route) => route.fulfill({ body, contentType: "application/rss+xml", headers: cors }));
+    await page.evaluate((url) => window.testing.feeds.subscribe(url), url);
+  }
+  // A podcast's picture is its artwork, left to its own menu.
+  expect(await page.evaluate((urls) => window.testing.feeds.withoutPictures(urls), Object.keys(feeds))).toEqual(["https://plain.example/feed.xml", "https://quiet.example/feed.xml"]);
+
+  named = true;
+  const sidebar = page.getByRole("navigation", { name: "Library" });
+  await sidebar.getByRole("button", { name: /^RSS Feeds/ }).click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Get Missing Pictures" }).click();
+  // In WebKit's test browser, which can't keep a picture, none is found.
+  const found = engine() === "chromium" ? "Found a picture for 1 feed" : "No pictures found";
+  await page.waitForFunction((text) => document.querySelector("body > [aria-live=polite].sr-only")?.textContent === text, found);
+  expect(asked).toEqual([]);
+  if (engine() !== "chromium") return;
+  await sidebar.getByRole("button", { name: /^Plain Notes/ }).locator("img").waitFor();
+  expect(await page.evaluate((urls) => window.testing.feeds.withoutPictures(urls), Object.keys(feeds))).toEqual(["https://quiet.example/feed.xml"]);
+});
+
 test("a site's icon file (.ico) or drawing (.svg, whatever it's said to be) is kept as a PNG at its own size, a drawing at 128 pixels; one too big to draw isn't", async () => {
   app = await openApp();
   const drawn = await app.page.evaluate(
