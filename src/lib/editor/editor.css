@@ -66,9 +66,10 @@
 
 /*
  * Room for the scroll bar where it takes room (shown always, or with a mouse on a Mac), so a note's
- * text doesn't move sideways as it comes and goes: as another note opens, or a picture in it loads.
+ * text doesn't move sideways as it comes and goes: as another note opens, or a picture in it loads
+ * (setup.ts, steadyScroller). Not in Settings' previews, which don't scroll.
  */
-.cm-editor.cm-page > .cm-scroller {
+.cm-editor.cm-steady > .cm-scroller {
   scrollbar-gutter: stable;
 }
 
@@ -1530,7 +1531,9 @@
   white-space: nowrap;
 }
 
+/* Its line kept while it's looked up, so the card doesn't grow as it's filled in. */
 .cm-lp-file-meta {
+  min-height: 1lh;
   color: var(--text-faint);
   font-size: 0.74em;
 }
@@ -2635,6 +2638,25 @@
 }
 
 :root[data-paper][data-scheme="dark"] .cm-editor.cm-page:not(.cm-sheet-note) > .cm-scroller {
+  background-image: var(--paper-dark);
+}
+
+/*
+ * The note's paper stops at the room kept for a scroll bar (it's painted under what scrolls), so
+ * under that room the same paper, still, lined up with the note's at its top.
+ */
+:root[data-paper]:not([data-backdrop]) .cm-editor.cm-steady:not(.cm-sheet-note)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--paper-light);
+  background-size: var(--paper-size);
+  background-position: var(--paper-position);
+  clip-path: inset(0 0 0 calc(100% - var(--scroll-gutter, 0px)));
+  pointer-events: none;
+}
+
+:root[data-paper][data-scheme="dark"]:not([data-backdrop]) .cm-editor.cm-steady:not(.cm-sheet-note)::before {
   background-image: var(--paper-dark);
 }
 

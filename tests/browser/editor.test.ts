@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import type { Page } from "playwright";
 import { type App, choose, clickMod, engine, mod, noErrors, openApp, toggle } from "./app";
-import { answerPictures } from "./files";
+import { png } from "./files";
 
 let app: App;
 beforeEach(async () => {
@@ -281,38 +281,120 @@ test("a click into a note that isn't focused keeps it where it was, though focus
   expect(result.after).toBe(900);
 });
 
-test("a note opened again is drawn where it stays from its first frame: its text isn't pushed down as its pictures come in, nor sideways by a scroll bar", async () => {
-  const page = app.page;
+describe("a note opened again", () => {
   // Scroll bars that take room, as on a Mac with a mouse, or with Show scroll bars: Always.
-  await page.addStyleTag({ content: "* { scrollbar-width: auto !important; scrollbar-color: auto !important } ::-webkit-scrollbar { width: 15px }" });
-  await answerPictures(page);
-  // A cover that isn't on this device, and a picture from the web.
-  const pictured = await app.open(`---\ntype: show\nyear: 2020\n---\n# Pictured\n\n![Cover|240](../attachments/${"0".repeat(32)}.png)\n\n![Still](https://pictures.example/still.png)\n\nThe text under them.`);
-  await page.locator(".editor-pane .cm-lp-image-missing", { hasText: "on this device" }).waitFor();
-  await page.locator(".editor-pane img.cm-lp-image").waitFor();
-  // Room under the text so the note scrolls by less than the cover's placeholder is tall: without it, no scroll bar.
-  await page.evaluate(() => {
-    const { scrollDOM, contentDOM } = window.testing.editor()!;
-    const end = contentDOM.lastElementChild!.getBoundingClientRect().bottom - scrollDOM.getBoundingClientRect().top + scrollDOM.scrollTop;
-    document.querySelector<HTMLElement>(".editor-pane")!.style.setProperty("--editor-pad-bottom", `${scrollDOM.clientHeight + 30 - end}px`);
+  const shownScrollBars = "* { scrollbar-width: auto !important; scrollbar-color: auto !important } ::-webkit-scrollbar { width: 15px }";
+  /** An attachment that isn't on this device. */
+  const missing = (n: number, ext = "png") => `../attachments/${String(n).padStart(32, "0")}.${ext}`;
+
+  /**
+   * Opens note `id`, from another: where its line `text` is, the text's left edge, what shows in its
+   * pictures' place and how many files' cards it has, as the switch itself draws it (before anything
+   * it waits for, as looking attachments up or loading pictures, can come in), and once its pictures
+   * have loaded and its attachments been looked for.
+   */
+  const reopen = (id: string, text: string) =>
+    app.page.evaluate(
+      async ([id, text]) => {
+        const content = () => window.testing.editor()!.contentDOM;
+        const where = () => ({
+          top: [...content().querySelectorAll(".cm-line")].find((each) => each.textContent === text)?.getBoundingClientRect().top,
+          left: content().getBoundingClientRect().left,
+          placeholders: [...content().querySelectorAll(".cm-lp-image-missing")].map((each) => each.textContent),
+          cards: content().querySelectorAll(".cm-lp-file").length,
+        });
+        const body = window.testing.notes.get(id)!.note.body;
+        window.testing.notes.select(id);
+        for (let i = 0; i < 100 && window.testing.editor()!.state.doc.toString() !== body; i++) await Promise.resolve();
+        // And what the editor draws once it has measured, as it does before the frame: done now, so
+        // nothing the switch waits for comes in first.
+        (window.testing.editor() as unknown as { measure(): void }).measure();
+        const first = where();
+        await window.testing.until(
+          () => [...content().querySelectorAll("img")].every((img) => img.complete) && [...content().querySelectorAll(".cm-lp-file-meta")].every((meta) => meta.textContent),
+        );
+        await new Promise(requestAnimationFrame);
+        return { first, settled: where() };
+      },
+      [id, text] as const,
+    );
+
+  test("its text is where it stays from the first frame: not pushed down as its pictures and sounds come in, nor sideways by a scroll bar", async () => {
+    const page = app.page;
+    await page.addStyleTag({ content: shownScrollBars });
+    // A picture from the web, slow to come.
+    const still = png(240, 160, (x, y) => [x, y, 160]);
+    await page.route("https://pictures.example/still.png", async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      await route.fulfill({ body: still, contentType: "image/png" });
+    });
+    // And one on this device, where it can be kept: WebKit run by Playwright can't keep a file in IndexedDB.
+    const kept =
+      engine() === "chromium" ? await page.evaluate((bytes) => window.testing.saveAttachment(new File([new Uint8Array(bytes)], "kept.png", { type: "image/png" })), [...still]) : null;
+    const pictured = await app.open(
+      `---\ntype: show\nyear: 2020\n---\n# Pictured\n\n![Cover|240](${missing(1)})\n\n![Still](https://pictures.example/still.png)\n\n${kept ? `![Kept](../attachments/${kept})\n\n` : ""}[Song.mp3](${missing(2, "mp3")})\n\nThe text under them.`,
+    );
+    await page.locator(".editor-pane .cm-lp-image-missing", { hasText: "on this device" }).waitFor();
+    await page.locator(".editor-pane .cm-lp-file", { hasText: "on this device" }).waitFor();
+    await page.waitForFunction((count) => [...document.querySelectorAll<HTMLImageElement>(".editor-pane img.cm-lp-image")].filter((img) => img.complete).length === count, kept ? 2 : 1);
+    // Room under the text so the note scrolls by less than the cover's placeholder is tall: without it, no scroll bar.
+    await page.evaluate(() => {
+      const { scrollDOM, contentDOM } = window.testing.editor()!;
+      const end = contentDOM.lastElementChild!.getBoundingClientRect().bottom - scrollDOM.getBoundingClientRect().top + scrollDOM.scrollTop;
+      document.querySelector<HTMLElement>(".editor-pane")!.style.setProperty("--editor-pad-bottom", `${scrollDOM.clientHeight + 30 - end}px`);
+    });
+    await app.open("# Another note");
+    const { first, settled } = await reopen(pictured, "The text under them.");
+    expect(first.top).toBeDefined();
+    expect(first.top).toBe(settled.top);
+    expect(first.left).toBe(settled.left);
+    // The cover says it isn't here from the start, and the sound is its card.
+    expect(first.placeholders).toEqual(settled.placeholders);
+    expect(settled.placeholders).toEqual([expect.stringContaining("on this device")]);
+    expect(first.cards).toBe(1);
   });
-  const other = await app.open("# Another note");
-  const back = await page.evaluate(async (id) => {
-    /** Where the text under the pictures is, and the text's left edge. */
-    const where = () => {
-      const content = window.testing.editor()!.contentDOM;
-      const line = [...content.querySelectorAll(".cm-line")].find((each) => each.textContent === "The text under them.");
-      return { top: line?.getBoundingClientRect().top, left: content.getBoundingClientRect().left };
-    };
-    window.testing.notes.select(id);
-    const first = await new Promise<ReturnType<typeof where>>((resolve) => requestAnimationFrame(() => resolve(where())));
-    // Its pictures looked up and loaded again.
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    return { first, settled: where() };
-  }, pictured);
-  expect(other).not.toBe(pictured);
-  expect(back.first.top).toBeDefined();
-  expect(back.first).toEqual(back.settled);
+
+  test("pictures it doesn't show yet are counted at the height they were drawn at", async () => {
+    const page = app.page;
+    const many = await app.open(`# Many\n\n${Array.from({ length: 60 }, () => `![Cover](${missing(1)})`).join("\n")}\n\nThe end.`);
+    await page.locator(".editor-pane .cm-lp-image-missing", { hasText: "on this device" }).first().waitFor();
+    // Measured, the frame after.
+    await page.evaluate(() => new Promise(requestAnimationFrame));
+    await app.open("# Another note");
+    // How tall the note is taken to be in the frame it's drawn in, with most of its pictures out of sight…
+    await reopen(many, "The end.");
+    const estimated = await page.evaluate(() => window.testing.editor()!.lineBlockAt(window.testing.editor()!.state.doc.length).bottom);
+    // …and how tall it is with them all drawn, in a window tall enough.
+    await page.setViewportSize({ width: 1280, height: 9000 });
+    await page.waitForFunction(() => document.querySelectorAll(".editor-pane .cm-lp-image-block").length === 60);
+    const drawn = await page.evaluate(async () => {
+      await new Promise(requestAnimationFrame);
+      return window.testing.editor()!.lineBlockAt(window.testing.editor()!.state.doc.length).bottom;
+    });
+    // Within what CodeMirror's guesses at its lines of text are out by; at 200 px a picture, they'd be thousands.
+    expect(Math.abs(estimated - drawn)).toBeLessThan(20);
+  });
+
+  // WebKit keeps room only for its own scroll bars, not ones styled as these are; Chromium keeps it
+  // even for its hidden ones, as Playwright has them.
+  test("a note's text has the same left edge whether it scrolls or not; Settings' previews, which don't scroll, keep no room for a scroll bar", async () => {
+    if (engine() !== "chromium") return;
+    const page = app.page;
+    await page.addStyleTag({ content: shownScrollBars });
+    const edge = () =>
+      page.evaluate(() => {
+        const { scrollDOM, contentDOM } = window.testing.editor()!;
+        return { left: contentDOM.getBoundingClientRect().left, room: scrollDOM.offsetWidth - scrollDOM.clientWidth };
+      });
+    await app.open("# Short\n\nA line.");
+    const short = await edge();
+    await app.open(`# Long\n\n${"A paragraph of the note.\n\n".repeat(80)}`);
+    const long = await edge();
+    expect(short.room).toBeGreaterThan(0);
+    expect(long.left).toBe(short.left);
+    const preview = (await app.settings("Typography")).locator(".cm-scroller").first();
+    expect(await preview.evaluate((scroller: HTMLElement) => scroller.offsetWidth - scroller.clientWidth)).toBe(0);
+  });
 });
 
 // Not on Linux, where Chrome takes a press in selected text as the start of dragging that text, as it

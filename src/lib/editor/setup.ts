@@ -5,7 +5,7 @@ import type { Parser } from "@lezer/common";
 import { type MarkdownParser, parseCode } from "@lezer/markdown";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { Compartment, EditorState, type Line, Prec, type Extension, type StateCommand } from "@codemirror/state";
-import { EditorView, keymap, placeholder } from "@codemirror/view";
+import { EditorView, keymap, placeholder, ViewPlugin, type ViewUpdate } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
 import { cards } from "./cards";
 import { codeLanguage } from "./codeLanguages";
@@ -408,6 +408,33 @@ export function readingExtensions(label: string): Extension[] {
     theme,
   ];
 }
+
+/**
+ * The scroller of a note opened in the note's place (Editor.svelte), keeping room for a scroll bar
+ * where one takes room (editor.css), so the note's text doesn't move sideways as one comes and goes:
+ * as another note opens, or a picture in it loads. How wide that room is (`--scroll-gutter`) lets
+ * the paper reach the edge under it.
+ */
+export const steadyScroller: Extension = [
+  EditorView.editorAttributes.of({ class: "cm-steady" }),
+  ViewPlugin.fromClass(
+    class {
+      constructor(view: EditorView) {
+        this.measure(view);
+      }
+      update(update: ViewUpdate) {
+        if (update.geometryChanged) this.measure(update.view);
+      }
+      measure(view: EditorView) {
+        view.requestMeasure({
+          key: this,
+          read: () => view.scrollDOM.offsetWidth - view.scrollDOM.clientWidth,
+          write: (width) => view.dom.style.setProperty("--scroll-gutter", `${width}px`),
+        });
+      }
+    },
+  ),
+];
 
 /** A note's editor, set up for its language (`format`) from the start. */
 export function createExtensions(onChange: () => void, format?: string): Extension[] {

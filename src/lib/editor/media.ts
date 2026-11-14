@@ -1,6 +1,6 @@
 import { type EditorView, ViewPlugin, type ViewUpdate } from "@codemirror/view";
 import { mount, unmount } from "svelte";
-import { attachmentURL, type MediaKind, wasMissing, whenArrived } from "../notes/attachments";
+import { attachmentHere, attachmentURL, type MediaKind, whenArrived } from "../notes/attachments";
 import { oneAtATime } from "../playing";
 import type { Shown } from "../plugins/types";
 import { setWidth } from "./actions";
@@ -151,7 +151,7 @@ export function mediaElement(
       else if (!shown || media) put(card());
     });
   // One that wasn't on this device last time is its card from the start, rather than nothing until it's been looked for.
-  if (wasMissing(name)) put(card());
+  if (attachmentHere(name) === false) put(card());
   show();
   return {
     dom,

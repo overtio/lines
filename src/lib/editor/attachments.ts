@@ -9,6 +9,7 @@ import type { IconName } from "../icons/icons";
 import {
   ATTACHMENT_PATH,
   attachmentFileName,
+  attachmentHere,
   attachmentName,
   attachmentURL,
   extensionOf,
@@ -20,7 +21,6 @@ import {
   openAttachment,
   withWidth,
   saveAttachment,
-  wasMissing,
   whenArrived,
 } from "../notes/attachments";
 import { speak } from "../a11y";
@@ -89,13 +89,18 @@ export function imageElement(src: string, label: string, onChange: () => void): 
     img.style.setProperty("--image-ratio", `${last.width / last.height}`);
   }
   const message = (key: MessageKey) => dom.replaceChildren(placeholder(t(key)));
-  // Until it's known what shows, what did last time, or the room a placeholder takes, in case it's that.
-  const before = name && wasMissing(name) ? "editor.imageNotHere" : last === "failed" ? "editor.imageFailed" : null;
-  dom.append(placeholder(before ? t(before) : ""));
-  /** Shows the image at `url`: at once if its size is known (or it's at hand, loaded before), else once it has loaded. */
+  // Until it's known what shows: the image, if its size is known or it's here (a web image is, likely);
+  // what showed in its place last time; or, for an attachment not looked for yet, the room its
+  // placeholder takes, as it may well not be on this device.
+  const here = name ? attachmentHere(name) : true;
+  if (here === false) message("editor.imageNotHere");
+  else if (last === "failed") message("editor.imageFailed");
+  else if (here === undefined && !sized) dom.append(placeholder(""));
+  else dom.append(img);
+  /** Shows the image at `url`, in place of what's there at once if its size is known (or it's at hand, loaded before), else once it has loaded. */
   const show = (url: string) => {
     img.src = url;
-    if (sized || (img.complete && img.naturalWidth)) dom.replaceChildren(img);
+    if (img.parentNode !== dom && (sized || (img.complete && img.naturalWidth))) dom.replaceChildren(img);
   };
   img.onload = () => {
     if (img.naturalWidth && img.naturalHeight) seen.set(src, { width: img.naturalWidth, height: img.naturalHeight });
