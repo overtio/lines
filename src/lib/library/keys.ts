@@ -51,9 +51,12 @@ export function isbnKey(isbn: string): string | null {
   return /^97[89]\d{10}$/.test(digits) && check13(digits.slice(0, 12)) === Number(digits[12]) ? digits : null;
 }
 
+/** A link as one of what tells a thing (`LibraryItem.ids`): another address of its page. */
+export const linkId = (link: string) => `link:${linkKey(link)}`;
+
 /** What a link is to: the page, written loosely, and the ids the sources know it by. */
 function linkKeys(link: string): string[] {
-  const keys = [`link:${linkKey(link)}`];
+  const keys = [linkId(link)];
   let url: URL;
   try {
     url = new URL(link.trim());

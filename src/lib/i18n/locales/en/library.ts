@@ -54,6 +54,8 @@ export default {
   "library.openIt": "Open",
   // Its name to screen readers.
   "library.openItLabel": "Open it in your Library",
+  // Add to Library's result for a page on the web, where what it is can't be read.
+  "library.keptAsPage": "Kept as a page: the app can tell what it is",
   // Its button moving what was typed into a note made for something the Library has into that one's note, and its name to screen readers.
   "library.merge": "Merge",
   "library.mergeLabel": "Move what you wrote to the note in your Library",

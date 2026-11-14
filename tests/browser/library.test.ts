@@ -787,7 +787,8 @@ test("a page nothing can say more of, added on purpose, is kept as a resource to
   await homePage(page);
   const picker = await addToLibrary(page);
   await picker.getByRole("searchbox").fill(HOME);
-  await picker.getByRole("option", { name: /^Intent/ }).click();
+  // On the web, where a page can't be asked what it is, kept as one, and saying so.
+  await picker.getByRole("option", { name: "Intent, Kept as a page: the app can tell what it is" }).click();
   const day = await today(page);
   await page.waitForFunction((text) => window.testing.text() === text, resourceText(day));
   expect(await page.locator("#note-list-title").innerText()).toBe("Resources");
@@ -823,6 +824,38 @@ test("a note that's only a link to such a page stays as it is: nothing is guesse
   await page.waitForTimeout(1500);
   expect(await app.text()).toBe(`# ${HOME}`);
   expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "resource").length)).toBe(0);
+});
+
+test("a page added is kept by its own link, whatever it calls itself; one saying it isn't there isn't kept", async () => {
+  app = await openApp();
+  const { page } = app;
+  const html = (body: string) => ({ headers: { ...CORS, "content-type": "text/html; charset=utf-8" }, body });
+  // A one-page app, each of its pages naming its home page as itself.
+  await page.route(
+    (url) => url.hostname === "app.example",
+    (route: Route) => route.fulfill(html(`<title>${new URL(route.request().url()).pathname === "/" ? "App" : "Install – App"}</title><link rel="canonical" href="https://app.example/">`)),
+  );
+  const picker = await addToLibrary(page);
+  await picker.getByRole("searchbox").fill("https://app.example/docs/install");
+  await picker.getByRole("option", { name: /^Install – App/ }).click();
+  await page.waitForFunction(() => window.testing.text()?.includes("\nlink: https://app.example/docs/install\n"));
+  // Its home page is another.
+  const home = await addToLibrary(page);
+  await home.getByRole("searchbox").fill("https://app.example/");
+  await home.getByRole("option", { name: /^App/ }).click();
+  await page.waitForFunction(() => window.testing.text()?.includes("\nlink: https://app.example/\n"));
+  const resources = () => page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "resource").length);
+  expect(await resources()).toBe(2);
+
+  // A page that answers, saying it isn't there: the link stays a link, not a mention of "Page not found".
+  await page.route((url) => url.hostname === "docs.example", (route: Route) => route.fulfill(html("<title>Page not found | Docs</title>")));
+  const link = "https://docs.example/gone";
+  await app.open(`# Tools\n\nSee ${link} soon`);
+  await page.locator(".cm-content .cm-lp-link").click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Add to Library" }).click();
+  await page.waitForFunction(() => document.querySelector(".cm-library-lookup")?.textContent === "Couldn’t look this link up");
+  expect(await app.text()).toBe(`# Tools\n\nSee ${link} soon`);
+  expect(await resources()).toBe(2);
 });
 
 test("a page that can't be reached, added on purpose, says so, and nothing is made", async () => {

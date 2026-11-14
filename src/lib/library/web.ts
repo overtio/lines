@@ -41,8 +41,25 @@ export async function getJson<T>(url: string, signal: AbortSignal): Promise<T | 
   return (await response.json()) as T;
 }
 
-/** What a page says about itself (page.ts); null if it isn't a page (an image, a PDF) or isn't there. */
-export async function getPage(url: string, signal: AbortSignal): Promise<Page | null> {
+/**
+ * The pages read for each lookup, by its signal: what Web Pages read of a page is what a resource is
+ * made of (lookup.ts), rather than reading it twice; another lookup reads it afresh.
+ */
+const readings = new WeakMap<AbortSignal, Map<string, Promise<Page | null>>>();
+
+/** What a page says about itself (page.ts); null if it isn't a page (an image, a PDF) or isn't there. Asked again with the same signal, the same reading. */
+export function getPage(url: string, signal: AbortSignal): Promise<Page | null> {
+  const read = readings.get(signal) ?? new Map<string, Promise<Page | null>>();
+  readings.set(signal, read);
+  let page = read.get(url);
+  if (!page) {
+    page = readFrom(url, signal);
+    read.set(url, page);
+  }
+  return page;
+}
+
+async function readFrom(url: string, signal: AbortSignal): Promise<Page | null> {
   const response = await request(url, signal, { headers: { accept: "text/html,application/xhtml+xml" } });
   if (response.status === 404 || response.status === 410) return null;
   if (!response.ok) throw new LookupError(`${new URL(url).hostname} answered ${response.status}`);
