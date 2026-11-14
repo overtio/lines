@@ -151,6 +151,22 @@ test("a Hacker News post's discussion is under it: ranked, threaded, the poster 
   await page.locator(".editor-pane .cm-post-byline .cm-lp-link", { hasText: "Comments" }).waitFor();
 });
 
+test("a comment's text can be selected to copy, and the click that ends selecting it opens nothing", async () => {
+  await openStory();
+  const page = app.page;
+  await headers(page).first().waitFor();
+  const text = region(page).locator("[data-comment] p").first();
+  const box = (await text.boundingBox())!;
+  await page.mouse.move(box.x + 2, box.y + 8);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width - 4, box.y + box.height - 8, { steps: 8 });
+  await page.mouse.up();
+  const selected = await page.evaluate(() => window.getSelection()?.toString().trim() ?? "");
+  expect(selected.length).toBeGreaterThan(20);
+  expect((await text.textContent())!.replace(/\s+/g, " ")).toContain(selected.split(/\s+/).slice(0, 3).join(" "));
+  expect(await opened(page)).toEqual([]);
+});
+
 test("the keyboard: one stop for Tab, the arrows and J and K from comment to comment, folding, Home and End, a comment's links", async () => {
   await openStory();
   const page = app.page;
@@ -295,9 +311,14 @@ async function deepThread(width: number, height: number) {
   await openStory(answers, { width, height });
   const page = app.page;
   await headers(page).first().waitFor();
-  return page.evaluate(() => {
-    // Every comment laid out, to be measured: those out of view aren't (content-visibility).
+  await page.evaluate(async () => {
+    // Every comment laid out, to be measured: those out of view aren't (content-visibility). Linux's
+    // WebKit could measure some before they'd moved into place, so with the fonts in, after two frames.
     for (const comment of document.querySelectorAll<HTMLElement>("[data-comment]")) comment.style.contentVisibility = "visible";
+    await document.fonts.ready;
+    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+  });
+  return page.evaluate(() => {
     return [...document.querySelectorAll<HTMLElement>("[data-comment]")]
       .filter((comment) => comment.querySelector("p")?.textContent?.startsWith("Depth "))
       .map((comment) => {
@@ -317,7 +338,8 @@ function expectDrawnIn(shapes: Awaited<ReturnType<typeof deepThread>>, inline: n
       if (depth) expect(shape.left).toBeGreaterThan(shapes[depth - 1].left);
     } else {
       expect(shape.says).toBe(`↳ reply to person${depth}`);
-      expect(shape.left).toBe(shapes[inline - 1].left);
+      // In line with it, to the pixel (a cold layout in Linux's WebKit can round a half pixel either way).
+      expect(Math.abs(shape.left - shapes[inline - 1].left)).toBeLessThanOrEqual(1);
     }
   }
 }
