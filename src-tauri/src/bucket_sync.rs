@@ -6,12 +6,18 @@
 //! It goes where the plugin may (capabilities/default.json), and only gets and puts.
 
 use std::sync::OnceLock;
+use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 use tauri::ipc::{InvokeBody, Request, Response};
 use tauri_plugin_http::reqwest::{self, header, Url};
 
 use crate::folder_sync::percent_decode;
+
+/// A bucket that doesn't connect in this long, or stops sending for the other, is given up on. A
+/// transfer as a whole takes as long as it needs: a large file on a slow line takes minutes.
+const CONNECT_TIMEOUT: Duration = Duration::from_secs(30);
+const READ_TIMEOUT: Duration = Duration::from_secs(60);
 
 /// The request as the page signed it.
 #[derive(Deserialize)]
@@ -46,19 +52,20 @@ pub async fn sync_bucket_transfer(request: Request<'_>) -> Result<Response, Fail
     .and_then(percent_decode)
     .ok_or_else(|| Failure::unsent("Missing request"))?;
   let signed = serde_json::from_str(&signed).map_err(Failure::unsent)?;
-  transfer(signed, file(request.body())?).await.map(Response::new)
+  transfer(client(), signed, file(request.body())?).await.map(Response::new)
 }
 
 /// The file in the request body: its bytes, or from Android, where Tauri's IPC sends every body as
 /// JSON, a number for each.
 fn file(body: &InvokeBody) -> Result<Vec<u8>, Failure> {
   match body {
+    // Copied: Tauri only lends a command its body, and the request needs one of its own.
     InvokeBody::Raw(bytes) => Ok(bytes.clone()),
     InvokeBody::Json(numbers) => Vec::deserialize(numbers).map_err(Failure::unsent),
   }
 }
 
-async fn transfer(signed: Signed, file: Vec<u8>) -> Result<Vec<u8>, Failure> {
+async fn transfer(client: &reqwest::Client, signed: Signed, file: Vec<u8>) -> Result<Vec<u8>, Failure> {
   let url = Url::parse(&signed.url).map_err(Failure::unsent)?;
   if !reachable(&url) {
     return Err(Failure::unsent(format!("Not a bucket lines may reach: {url}")));
@@ -69,9 +76,9 @@ async fn transfer(signed: Signed, file: Vec<u8>) -> Result<Vec<u8>, Failure> {
     headers.append(name, header::HeaderValue::from_str(value).map_err(Failure::unsent)?);
   }
   let request = match signed.method.as_str() {
-    "GET" => client().get(url),
+    "GET" => client.get(url),
     // Its length even when that's 0: a bucket needs it, and hyper would leave it out.
-    "PUT" => client().put(url).header(header::CONTENT_LENGTH, file.len()).body(file),
+    "PUT" => client.put(url).header(header::CONTENT_LENGTH, file.len()).body(file),
     method => return Err(Failure::unsent(format!("Not a transfer: {method}"))),
   };
   let response = request.headers(headers).send().await.map_err(Failure::unsent)?;
@@ -97,12 +104,17 @@ fn reachable(url: &Url) -> bool {
 /// good only where it was signed for.
 fn client() -> &'static reqwest::Client {
   static CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
-  CLIENT.get_or_init(|| {
-    reqwest::Client::builder()
-      .redirect(reqwest::redirect::Policy::none())
-      .build()
-      .expect("couldn't make an HTTP client")
-  })
+  CLIENT.get_or_init(|| client_waiting(READ_TIMEOUT))
+}
+
+/// A client that waits `read` at most for each next bytes from the bucket.
+fn client_waiting(read: Duration) -> reqwest::Client {
+  reqwest::Client::builder()
+    .connect_timeout(CONNECT_TIMEOUT)
+    .read_timeout(read)
+    .redirect(reqwest::redirect::Policy::none())
+    .build()
+    .expect("couldn't make an HTTP client")
 }
 
 #[cfg(test)]
@@ -150,6 +162,11 @@ mod tests {
     Signed { method: method.into(), url: url.into(), headers: headers.map(|(name, value)| (name.into(), value.into())).into() }
   }
 
+  /// Sends a signed request as the command does.
+  fn send(method: &str, url: &str, file: Vec<u8>) -> Result<Vec<u8>, Failure> {
+    block_on(transfer(client(), signed(method, url), file))
+  }
+
   /// Every byte value, a few megabytes of them.
   fn photo() -> Vec<u8> {
     (0..3_000_000).map(|i| (i % 251) as u8).collect()
@@ -158,7 +175,7 @@ mod tests {
   #[test]
   fn puts_a_file_as_it_is() {
     let (url, bucket) = bucket("200 OK", Vec::new());
-    assert_eq!(block_on(transfer(signed("PUT", &format!("{url}a.png")), photo())), Ok(Vec::new()));
+    assert_eq!(send("PUT", &format!("{url}a.png"), photo()), Ok(Vec::new()));
     let sent = bucket.join().unwrap();
     assert!(sent.head.starts_with("PUT /notes/attachments/a.png HTTP/1.1\r\n"), "{}", sent.head);
     assert!(sent.head.contains("\r\nauthorization: AWS4-HMAC-SHA256 Credential=key/20261113/auto/s3/aws4_request\r\n"));
@@ -170,14 +187,14 @@ mod tests {
   #[test]
   fn an_empty_file_is_put_with_its_length() {
     let (url, bucket) = bucket("200 OK", Vec::new());
-    assert_eq!(block_on(transfer(signed("PUT", &format!("{url}a.txt")), Vec::new())), Ok(Vec::new()));
+    assert_eq!(send("PUT", &format!("{url}a.txt"), Vec::new()), Ok(Vec::new()));
     assert!(bucket.join().unwrap().head.contains("\r\ncontent-length: 0\r\n"));
   }
 
   #[test]
   fn gets_a_file_as_it_is() {
     let (url, bucket) = bucket("200 OK", photo());
-    assert!(block_on(transfer(signed("GET", &format!("{url}a.png")), Vec::new())) == Ok(photo()));
+    assert!(send("GET", &format!("{url}a.png"), Vec::new()) == Ok(photo()));
     assert!(bucket.join().unwrap().head.starts_with("GET /notes/attachments/a.png HTTP/1.1\r\n"));
   }
 
@@ -186,8 +203,30 @@ mod tests {
     let error = "<Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>";
     let (url, bucket) = bucket("403 Forbidden", error.into());
     let failure = Failure { status: Some(403), text: error.into() };
-    assert_eq!(block_on(transfer(signed("GET", &format!("{url}a.png")), Vec::new())), Err(failure));
+    assert_eq!(send("GET", &format!("{url}a.png"), Vec::new()), Err(failure));
     bucket.join().unwrap();
+  }
+
+  #[test]
+  fn gives_up_on_a_bucket_that_stops_sending() {
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let url = format!("http://127.0.0.1:{}/notes/attachments/a.png", listener.local_addr().unwrap().port());
+    // The start of a file, and then nothing, the connection still open.
+    std::thread::spawn(move || {
+      let (mut stream, _) = listener.accept().unwrap();
+      let mut reader = BufReader::new(stream.try_clone().unwrap());
+      let mut line = String::new();
+      while line != "\r\n" {
+        line.clear();
+        reader.read_line(&mut line).unwrap();
+      }
+      stream.write_all(b"HTTP/1.1 200 OK\r\ncontent-length: 1000\r\n\r\n0123456789").unwrap();
+      std::thread::sleep(Duration::from_secs(10));
+    });
+    let started = std::time::Instant::now();
+    let failure = block_on(transfer(&client_waiting(Duration::from_millis(200)), signed("GET", &url), Vec::new()));
+    assert_eq!(failure.unwrap_err().status, None);
+    assert!(started.elapsed() < Duration::from_secs(2), "{:?}", started.elapsed());
   }
 
   #[test]
@@ -197,9 +236,9 @@ mod tests {
     }
     for url in ["http://s3.example.com/notes", "http://192.168.1.2:9000/notes", "file:///etc/hosts", "ftp://example.com/notes"] {
       assert!(!reachable(&Url::parse(url).unwrap()), "{url}");
-      assert_eq!(block_on(transfer(signed("GET", url), Vec::new())).unwrap_err().status, None);
+      assert_eq!(send("GET", url, Vec::new()).unwrap_err().status, None);
     }
-    let deleted = block_on(transfer(signed("DELETE", "https://s3.example.com/notes/attachments/a.png"), Vec::new()));
+    let deleted = send("DELETE", "https://s3.example.com/notes/attachments/a.png", Vec::new());
     assert_eq!(deleted, Err(Failure::unsent("Not a transfer: DELETE")));
   }
 
