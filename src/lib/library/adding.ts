@@ -72,7 +72,7 @@ export function addBlank(type: string) {
 }
 
 /** Shows the shelf a kind's notes are on, where the note added goes; on a phone, the sidebar's drawer closes for it. */
-function showShelf(type: string) {
+export function showShelf(type: string) {
   const shelf = shelves.of(type);
   if (shelf) notes.setFilter({ kind: "library", shelf: shelf.key });
   ui.closeDrawer();

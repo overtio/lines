@@ -692,6 +692,14 @@
             {@render title(false)}
             {#if shelf.subtitle}<span class="truncate text-sm leading-[1.45] text-muted">{shelf.subtitle}</span>{/if}
             {@render details()}
+            {#if shelf.progress !== null}
+              {@const percent = Math.floor(shelf.progress * 100)}
+              <!-- How far through a book it is, as reading it wrote. -->
+              <span class="mt-1 block h-[3px] w-full max-w-36 overflow-hidden rounded-full bg-line">
+                <span class="block h-full rounded-full bg-accent" style:width="{percent}%"></span>
+                <span class="sr-only">{t("books.progress", { percent })}</span>
+              </span>
+            {/if}
           </span>
         </span>
       {:else}

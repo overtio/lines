@@ -1,6 +1,7 @@
 <script lang="ts">
   import { t } from "../i18n/index.svelte";
   import WebSearchPicker from "../editor/WebSearchPicker.svelte";
+  import { addBookFile } from "../books/adding";
   import { addBlank, addToLibrary } from "../library/adding";
   import { lookUp } from "../library/lookup";
   import { subtitleOf } from "../library/rows";
@@ -67,6 +68,10 @@
   const names = $derived([...new Set(current?.asked.map(({ source }) => source.name))].join(", "));
 
   const label = ({ item }: Found) => [item.title, about(item)].filter(Boolean).join(", ");
+
+  /** On Books, the kinds of files a book can be added from, as a reader reads them: `.pdf`, `.epub`. */
+  const bookFiles = $derived(current?.shelf.kinds.some((kind) => kind.type === "book") ? plugins.bookReaders.flatMap((reader) => reader.extensions.map((ext) => `.${ext}`)) : []);
+  let fileInput = $state<HTMLInputElement>();
 </script>
 
 <WebSearchPicker
@@ -109,6 +114,21 @@
     </span>
   {/snippet}
   {#snippet footer()}
+    {#if bookFiles.length}
+      <input
+        class="hidden"
+        type="file"
+        accept={bookFiles.join(",")}
+        bind:this={fileInput}
+        onchange={() => {
+          const file = fileInput?.files?.[0];
+          if (!file) return;
+          picker?.close();
+          void addBookFile(file);
+        }}
+      />
+      <Button variant="quiet" icon="book-open" onclick={() => fileInput?.click()}>{t("books.fromFile")}</Button>
+    {/if}
     {#if current}
       <Button
         class="ml-auto"

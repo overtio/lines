@@ -1,0 +1,101 @@
+/* A PDF read in a note's place (read.ts): its pages down the middle, each a canvas under pdf.js's text layer. */
+
+.pdf-reader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  overflow: auto;
+  outline: none;
+  overscroll-behavior: contain;
+}
+
+/* Paginated, each page has the whole view, centered in it by its margins (read.ts), so the next is out of sight. */
+.pdf-reader[data-flow="paginated"] {
+  overflow: hidden;
+  gap: 0;
+  padding: 0;
+}
+
+.pdf-page {
+  position: relative;
+  flex: none;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.pdf-page canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* pdf.js's text layer (its pdf_viewer.css): each run of text where the page draws it, transparent, to choose and read aloud. */
+.pdf-reader .textLayer {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  line-height: 1;
+  text-align: initial;
+  text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  caret-color: var(--text);
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+}
+
+.pdf-reader .textLayer :is(span, br) {
+  position: absolute;
+  color: transparent;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+  user-select: text;
+}
+
+.pdf-reader .textLayer > :not(.markedContent),
+.pdf-reader .textLayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+}
+
+.pdf-reader .textLayer .markedContent {
+  display: contents;
+}
+
+.pdf-reader .textLayer ::selection {
+  background: var(--selection);
+  color: transparent;
+}
+
+.pdf-reader .textLayer br::selection {
+  background: transparent;
+}
+
+.pdf-reader .textLayer .endOfContent {
+  display: block;
+  position: absolute;
+  inset: 100% 0 0;
+  z-index: 0;
+  cursor: default;
+  user-select: none;
+}
+
+.pdf-reader .textLayer.selecting .endOfContent {
+  top: 0;
+}
+
+.pdf-reader ::highlight(lines-mark) {
+  background-color: var(--highlight);
+  color: transparent;
+}

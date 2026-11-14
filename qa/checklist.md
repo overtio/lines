@@ -503,6 +503,21 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] [Mac] The keyboard's ⏯ key and Now Playing in Control Center show the episode, play, pause and skip it; ⏮ and ⏭ go back 15 s and forward 30 s
 - [ ] [Apps] Episodes from their feeds' https addresses play (the apps' web view allows sound from the web); an http one plays over https, or says it couldn't be played
 
+## 11d. Books you keep
+
+- [ ] Add to Library on Books has Add a Book from a File…; a PDF or EPUB chosen there, or dropped on the note list or sidebar, is a `book` note on Books with its title, author, cover and the file under it; adding the same file again, or dropping it twice at once, opens one note; a file that isn't a book, or can't be read, says so
+- [ ] A library note with a PDF or EPUB has the open book over it; it shows the book in the note's place (pressed while it's shown), and again goes back to the note
+- [ ] A PDF: pages as printed (in the dark theme too), the paintbrush draws them in the theme's colors with their pictures as they are; the text choosable; Pages fits a page to the view with nothing of the next under it (on a phone too), Scroll fits its width; ← → Page Up Page Down and the space bar turn pages, the wheel or a swipe too in Pages
+- [ ] An EPUB: the notes' font and size and the theme's colors, its italics and pictures kept, a column as wide as a note's; Pages and Scroll; the keys turn pages while the book has them too, and ⌘Z, ⌘⇧F work there as anywhere
+- [ ] Contents lists the outline or table of contents, nested by indent, no longer than the window; Search the book lists matches under their chapter or page, wrapping, scrolling within the window, and opens each marked
+- [ ] Text chosen, then Keep Quote or ⌘⇧H: a quote at the note's end with a link to its page or chapter; ⌘Z takes it back; the link (⌘-click) opens the book there, or with PDF Reader off, the file in its app
+- [ ] Closing the reader after reading on writes `progress` and `status: reading` (`read` at the end) into the note; going to the last chapter by the contents doesn't; a note further on than this device leaves it as it is; its row on Books shows a line of how far through; the book opens where it was left
+- [ ] Lock lines (or let it lock itself; reading in an EPUB counts as using lines) or quit while reading: `progress` is written first
+- [ ] Phone: the reader's toolbar on one row, Pages and Scroll and Keep Quote as icons, the search field's placeholder whole
+- [ ] Screen readers hear the book's text (one document for a PDF, not a region per page), its place under it (Page 3 of 300, a chapter's name), and every button's name
+- [ ] An EPUB's links to the web open in the browser, its links to its own chapters go there, and nothing in it leads its frame away
+- [ ] Settings → Plugins → PDF Reader or EPUB Reader off: no Read button for its books, the file stays a card that opens in its app
+
 ## 12. Menus, pickers and note info
 
 - [ ] Menus open at the pointer, stay inside the window, move with ↑ ↓, and close on Esc, a click outside, scroll or resize

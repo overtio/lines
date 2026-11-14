@@ -23,6 +23,8 @@ import { models } from "./models";
 import { musicbrainz } from "./musicbrainz";
 import { openLibrary } from "./open-library";
 import { paper } from "./paper";
+import { pdfReader } from "./pdf-reader";
+import { epubReader } from "./epub-reader";
 import { pele } from "./pele";
 import { readwise } from "./readwise";
 import { secrets } from "./secrets";
@@ -84,6 +86,9 @@ export const builtIn = (): Plugin[] => [
   hackerNews(),
   // Bringing a library in from another app.
   readwise(),
+  // Books kept with library notes, read in the note's place.
+  pdfReader(),
+  epubReader(),
   changesPlugin(),
   themes(),
   styles(),

@@ -15,6 +15,8 @@ import FloatingNote from "./lib/components/FloatingNote.svelte";
 import Settings from "./lib/components/settings/Settings.svelte";
 import LockedNote from "./lib/components/LockedNote.svelte";
 import LockScreen from "./lib/components/LockScreen.svelte";
+import { addBookFile, bookTypes, isBook } from "./lib/books/adding";
+import { reading } from "./lib/books/reading.svelte";
 import { feeds } from "./lib/feeds/feeds.svelte";
 import { imports } from "./lib/library/imports.svelte";
 import { player } from "./lib/player/player.svelte";
@@ -35,15 +37,19 @@ import { updates } from "./lib/updates.svelte";
 if (isMacApp) document.documentElement.dataset.platform = "mac-app";
 
 // Something dragged in and let go where nothing takes it (the editor takes files and text, the panes
-// and the sidebar a note: panes.svelte.ts) is dropped nowhere, not opened in lines' place. Text
-// fields take what they take.
+// and the sidebar a note: panes.svelte.ts) is dropped nowhere, not opened in lines' place, but for
+// a book's file (a PDF, an EPUB), which is added to the Library (books/adding.ts). Text fields take
+// what they take.
 for (const type of ["dragover", "drop"] as const) {
   addEventListener(type, (event) => {
     const target = event.target as Element | null;
     const editable = target?.closest("[contenteditable]")?.getAttribute("contenteditable");
     if (event.defaultPrevented || target?.closest("input, textarea") || editable === "true" || editable === "") return;
     event.preventDefault();
-    if (event.dataTransfer) event.dataTransfer.dropEffect = "none";
+    if (!event.dataTransfer) return;
+    const book = [...event.dataTransfer.items].some((item) => item.kind === "file" && bookTypes().includes(item.type));
+    event.dataTransfer.dropEffect = book ? "copy" : "none";
+    if (type === "drop") for (const file of [...event.dataTransfer.files].filter(isBook)) void addBookFile(file);
   });
 }
 
@@ -64,11 +70,11 @@ if (isTauri) {
     event.preventDefault();
     void import("@tauri-apps/api/core").then(({ invoke }) => invoke("toggle_devtools"));
   });
-  // Quitting the Mac app waits for every window to store what's typed in it, and where the episode playing is (src-tauri/src/quit.rs).
+  // Quitting the Mac app waits for every window to store what's typed in it, and where the episode playing and the book read are (src-tauri/src/quit.rs).
   if (isMacApp) {
     void import("@tauri-apps/api/event").then(({ listen }) =>
       listen("quit", async () => {
-        await Promise.all([notes.leave(), player.keep()]);
+        await Promise.all([reading.leave(), notes.leave(), player.keep()]);
         await (await import("@tauri-apps/api/core")).invoke("quit_ready");
       }),
     );
@@ -85,11 +91,11 @@ const label = windowLabel();
 const floatingId = label.startsWith("note-") ? label.slice("note-".length) : null;
 const isMain = !floatingId && !isSettingsWindow;
 
-// Closing the main window (and so quitting, on Windows and Linux) waits for what's typed in it to be stored, and where the episode playing is.
+// Closing the main window (and so quitting, on Windows and Linux) waits for what's typed in it to be stored, and where the episode playing and the book read are.
 if (isDesktopApp && isMain) {
   void import("@tauri-apps/api/window").then(({ getCurrentWindow }) =>
     getCurrentWindow().onCloseRequested(async () => {
-      await Promise.all([notes.leave(), player.keep()]);
+      await Promise.all([reading.leave(), notes.leave(), player.keep()]);
     }),
   );
 }
@@ -98,7 +104,7 @@ if (isDesktopApp && isMain) {
 void onAnnounce(async (message) => {
   if (message.type === "lock") {
     // Locked, or the lock was turned on or off: whatever this window had in memory goes.
-    await Promise.all([notes.flush(), player.keep()]);
+    await Promise.all([reading.leave(), notes.flush(), player.keep()]);
     location.reload();
   } else if (message.type === "unlocked") {
     if (lock.locked && !isMain) location.reload();

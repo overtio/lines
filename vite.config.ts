@@ -69,6 +69,41 @@ function excalidrawFonts(): Plugin {
   };
 }
 
+/** pdf.js's own files, which a PDF that needs them has it fetch (src/plugins/pdf-reader/read.ts). */
+const PDFJS = fileURLToPath(new URL("node_modules/pdfjs-dist/", import.meta.url));
+const PDFJS_DATA: Record<string, RegExp> = {
+  // Character maps, for Chinese, Japanese and Korean text in fonts a PDF doesn't carry.
+  cmaps: /\.bcmap$/,
+  // The standard fonts, for PDFs that name them without carrying them.
+  standard_fonts: /\.(?:pfb|ttf)$|^LICENSE/,
+  // Decoders of JPEG 2000 and JBIG2 pictures, and of color profiles; not its JavaScript engine, as PDFs' scripts don't run.
+  wasm: /^(?:openjpeg|jbig2|qcms_bg)\.wasm$|^LICENSE_(?:PDFJS_)?(?:OPENJPEG|JBIG2|QCMS)$/,
+  iccs: /\.icc$/,
+};
+const TYPES: Record<string, string> = { wasm: "application/wasm", ttf: "font/ttf" };
+
+/** Serves pdf.js's files under pdfjs/, so PDFs with them read offline and in the apps; about 2.4 MB, none loaded until a PDF asks, with their licenses. */
+function pdfjsData(): Plugin {
+  const files = () => Object.entries(PDFJS_DATA).flatMap(([dir, wanted]) => readdirSync(join(PDFJS, dir)).filter((name) => wanted.test(name)).map((name) => `${dir}/${name}`));
+  return {
+    name: "lines:pdfjs-data",
+    configureServer(server) {
+      server.middlewares.use("/pdfjs/", (req, res) => {
+        const path = decodeURIComponent(req.url!.split("?")[0]).replace(/^\//, "");
+        if (!files().includes(path)) {
+          res.statusCode = 404;
+          return res.end();
+        }
+        res.setHeader("Content-Type", TYPES[path.slice(path.lastIndexOf(".") + 1)] ?? "application/octet-stream");
+        createReadStream(join(PDFJS, path)).pipe(res);
+      });
+    },
+    generateBundle() {
+      for (const path of files()) this.emitFile({ type: "asset", fileName: `pdfjs/${path}`, source: readFileSync(join(PDFJS, path)) });
+    },
+  };
+}
+
 /** Settings' files: a section's each, named for it (`ThemeSection.svelte`), and the parts they're made of. */
 const SETTINGS = fileURLToPath(new URL("src/lib/components/settings/", import.meta.url));
 /** Plugins' folders, where a plugin's own page of settings is named for it (`MascotsSettings.svelte`). */
@@ -125,7 +160,7 @@ function settingsSearch(): Plugin {
 
 // https://v2.tauri.app/start/frontend/vite/
 export default defineConfig({
-  plugins: [svelte(), tailwindcss(), reloadOnStateChange(), excalidrawFonts(), settingsSearch()],
+  plugins: [svelte(), tailwindcss(), reloadOnStateChange(), excalidrawFonts(), pdfjsData(), settingsSearch()],
   define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   clearScreen: false,
   server: {

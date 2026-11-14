@@ -1,5 +1,6 @@
 import type { Messages } from "../../index.svelte";
 import app from "./app";
+import books from "./books";
 import calendar from "./calendar";
 import editor from "./editor";
 import feeds from "./feeds";
@@ -24,6 +25,7 @@ import sync from "./sync";
 
 export default {
   ...app,
+  ...books,
   ...calendar,
   ...editor,
   ...feeds,

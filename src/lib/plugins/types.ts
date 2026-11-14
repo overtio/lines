@@ -67,6 +67,8 @@ export interface Contributions {
   renderers?: Renderer[];
   /** Ways to show attached files of some kinds in a note, rather than as a card naming them: a 3D model to turn. */
   files?: FileView[];
+  /** Ways to read books kept with a note (a PDF, an EPUB) in the note's place, keeping where you are and quotes from them. */
+  bookReaders?: BookReader[];
   /** Ways to make a note's PDF other than lines' own pages, like TeX for LaTeX notes. */
   typesetters?: Typesetter[];
   /** Engines that work out formulas (`=SUM(B2:B4)`) in tables and spreadsheets. */
@@ -895,6 +897,89 @@ export interface ViewedFile {
 export interface Shown {
   /** Takes the keyboard, as Enter on it does while it's selected: a recording starts playing. */
   focus?(): void;
+  destroy(): void;
+}
+
+/**
+ * Reads books of some kinds kept with a note, a link to the file on a line of its own
+ * (`[Emma.epub](../attachments/….epub)`), in the note's place (lib/books/): a PDF's pages, an EPUB's
+ * chapters. A place in a book is text its reader writes and reads back (`page=12`, an EPUB CFI),
+ * which a quote kept from it links to after the book's file: `../attachments/….pdf#page=12`.
+ */
+export interface BookReader {
+  id: string;
+  /** The extensions of the files it reads, in lowercase: ["epub"]. */
+  extensions: string[];
+  /** Their media types, which is all a drag says of its files until they're dropped: ["application/epub+zip"]. */
+  types: string[];
+  /** What the book says of itself, from its file's bytes (which it may take over, as pdf.js does), to fill in its note when it's added from its file. */
+  details(bytes: Uint8Array<ArrayBuffer>): Promise<BookDetails>;
+  /** Shows the book in `dom`, at `book.at`, once it's read the file. */
+  open(dom: HTMLElement, book: OpenBook): Promise<Reading>;
+}
+
+export interface BookDetails {
+  title?: string;
+  /** In the order the book kind writes them: author, year, pages, publisher, isbn. */
+  properties: [key: string, value: string][];
+  /** Its cover, to keep with the note. */
+  cover?: Blob;
+  description?: string;
+}
+
+/** A place in a book: where, as its reader writes it; how far through, 0 to 1; and what it's called ("Page 12", a chapter's title). */
+export interface BookPlace {
+  at: string;
+  progress: number;
+  label: string;
+}
+
+/** Pages to turn, or one long page to scroll. */
+export type BookFlow = "paginated" | "scrolled";
+
+export interface OpenBook {
+  data: Blob;
+  /** Its note's title, for screen readers. */
+  title: string;
+  /** Where to open it, a place it gave; its start if none. */
+  at?: string;
+  flow: BookFlow;
+  /** Its pages in the theme's colors rather than as printed, where the reader draws them (a PDF's), its pictures left as they are. */
+  themeColors: boolean;
+  /**
+   * Called as the place shown changes: `read` when it got there by reading on (a page turned, the
+   * view scrolled), not by going to a place (the contents, a search, a quote's link).
+   */
+  moved(place: BookPlace, read: boolean): void;
+  /** Called as text is chosen in it, or no longer is. */
+  selected(chosen: boolean): void;
+  /** Keys pressed in a document of its own (an EPUB's frame), for lines: to turn pages with, or its shortcuts (⌘Z); whether lines took the key. */
+  keydown(event: KeyboardEvent): boolean;
+  /** Something else done in a document of its own (the pointer moved, the wheel turned), which counts as using lines (the app lock's). */
+  active(): void;
+}
+
+/** A book open in a reader. */
+export interface Reading {
+  /** Its table of contents, in order, each entry with its depth (0 at the top). */
+  contents: { label: string; at: string; depth: number }[];
+  /** Its pages turn from right to left (an Arabic or Hebrew book): ← goes on. */
+  rtl?: boolean;
+  /** Goes to a place it gave, marking `mark` there (a search's match), if given. */
+  go(at: string, mark?: string): void;
+  /** The next page, or screen, or the one before. */
+  turn(forward: boolean): void;
+  setFlow(flow: BookFlow): void;
+  /** Draws its pages in the theme's colors, or as printed; only a reader that draws pages has it. */
+  setThemeColors?(on: boolean): void;
+  /** The text chosen in it and where it starts, or null. */
+  selection(): (BookPlace & { text: string }) | null;
+  /** Where `query` is in it, each with the words around it; at most `limit`. */
+  search(query: string, limit: number, signal: AbortSignal): Promise<(BookPlace & { excerpt: string })[]>;
+  /** Takes the keyboard, so the keys that scroll it do. */
+  focus(): void;
+  /** Its place changed size, or the theme or text size changed. */
+  layout(): void;
   destroy(): void;
 }
 

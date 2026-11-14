@@ -90,11 +90,42 @@ export function zip(entries: ZipEntry[]): Uint8Array<ArrayBuffer> {
   return out;
 }
 
+/** A file in a ZIP: how big it is unpacked, and its bytes, inflated when asked for. */
+export interface ZippedFile {
+  /** Its size unpacked, as the ZIP says. */
+  size: number;
+  /** Its bytes; rejects for one bigger than the ZIP says it is, or than the limit. */
+  read(): Promise<Uint8Array<ArrayBuffer>>;
+}
+
+/** The most a file in a ZIP is unpacked to, by default: many times any picture or chapter in a book. */
+const LIMIT = 256 * 1024 * 1024;
+
+/** A file in a ZIP that unpacks to more than it should: a damaged ZIP, or one made to fill memory. */
+const tooBig = () => new Error("A file in the ZIP is bigger than it says");
+
+/** Inflates `stored`, stopping as soon as it comes to more than `size` bytes. */
+async function inflate(stored: Uint8Array<ArrayBuffer>, size: number): Promise<Uint8Array<ArrayBuffer>> {
+  const chunks: Uint8Array<ArrayBuffer>[] = [];
+  let length = 0;
+  const reader = new Blob([stored]).stream().pipeThrough(new DecompressionStream("deflate-raw")).getReader();
+  for (let chunk = await reader.read(); !chunk.done; chunk = await reader.read()) {
+    length += chunk.value.length;
+    if (length > size) {
+      await reader.cancel();
+      throw tooBig();
+    }
+    chunks.push(chunk.value);
+  }
+  return new Uint8Array(await new Blob(chunks).arrayBuffer());
+}
+
 /**
  * The files in a ZIP by name (folders left out), stored or deflated, as nearly every ZIP has them;
- * inflated by the browser's own DecompressionStream. Not ZIP64, nor encrypted files.
+ * each inflated by the browser's own DecompressionStream only when it's read, to no more than the
+ * size the ZIP gives it, nor `limit`. Not ZIP64, nor encrypted files.
  */
-export async function unzip(data: Uint8Array<ArrayBuffer>): Promise<Map<string, Uint8Array<ArrayBuffer>>> {
+export function zipEntries(data: Uint8Array<ArrayBuffer>, limit = LIMIT): Map<string, ZippedFile> {
   const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
   // The end of the central directory, which a comment of up to 64 KB can follow.
   let end = -1;
@@ -106,24 +137,34 @@ export async function unzip(data: Uint8Array<ArrayBuffer>): Promise<Map<string, 
   }
   if (end < 0) throw new Error("Not a ZIP file");
   const names = new TextDecoder();
-  const files = new Map<string, Uint8Array<ArrayBuffer>>();
+  const files = new Map<string, ZippedFile>();
   let at = view.getUint32(end + 16, true);
   for (let count = view.getUint16(end + 10, true); count > 0; count--) {
     if (view.getUint32(at, true) !== 0x02014b50) throw new Error("A damaged ZIP file");
     const method = view.getUint16(at + 10, true);
-    const size = view.getUint32(at + 20, true);
+    const packed = view.getUint32(at + 20, true);
+    const size = view.getUint32(at + 24, true);
     const nameLength = view.getUint16(at + 28, true);
     const local = view.getUint32(at + 42, true);
     const name = names.decode(data.subarray(at + 46, at + 46 + nameLength));
     at += 46 + nameLength + view.getUint16(at + 30, true) + view.getUint16(at + 32, true);
-    if (name.endsWith("/")) continue;
+    if (name.endsWith("/") || (method !== 0 && method !== 8)) continue;
     const start = local + 30 + view.getUint16(local + 26, true) + view.getUint16(local + 28, true);
-    const stored = data.subarray(start, start + size);
-    if (method === 0) files.set(name, stored);
-    else if (method === 8) {
-      const inflated = new Blob([stored]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
-      files.set(name, new Uint8Array(await new Response(inflated).arrayBuffer()));
-    }
+    const stored = data.subarray(start, start + packed);
+    files.set(name, {
+      size,
+      async read() {
+        if (size > limit || (method === 0 && packed !== size)) throw tooBig();
+        return method === 0 ? stored : inflate(stored, size);
+      },
+    });
   }
+  return files;
+}
+
+/** Every file in a ZIP by name, inflated (zipEntries). */
+export async function unzip(data: Uint8Array<ArrayBuffer>): Promise<Map<string, Uint8Array<ArrayBuffer>>> {
+  const files = new Map<string, Uint8Array<ArrayBuffer>>();
+  for (const [name, file] of zipEntries(data)) files.set(name, await file.read());
   return files;
 }

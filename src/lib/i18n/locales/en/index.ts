@@ -3,6 +3,7 @@
  * own; a message's key starts with its area. Other languages mirror these files (docs/translations.md).
  */
 import app from "./app";
+import books from "./books";
 import calendar from "./calendar";
 import editor from "./editor";
 import feeds from "./feeds";
@@ -27,6 +28,7 @@ import sync from "./sync";
 
 export default {
   ...app,
+  ...books,
   ...calendar,
   ...editor,
   ...feeds,

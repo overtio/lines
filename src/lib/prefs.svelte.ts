@@ -1,5 +1,6 @@
 import { locale, t } from "./i18n/index.svelte";
 import { isMacApp } from "./platform";
+import type { BookFlow } from "./plugins/types";
 import { CURRENCIES, DATE_STYLES, type DateStyle, localCurrency, MONEY_STYLES, type MoneyStyle, NEGATIVE_STYLES, type NegativeStyle } from "./sheets/display";
 import { type FormattingFonts, readFormattingFonts, sameFormattingFonts } from "./themes/formattingFonts";
 import { familyName, installedFamily } from "./themes/installedFonts";
@@ -37,6 +38,8 @@ export const FEEDS_IN_SIDEBAR = ["kind", "together"] as const;
 export type FeedsInSidebar = (typeof FEEDS_IN_SIDEBAR)[number];
 /** How fast podcast episodes play (the player's speed), remembered. */
 export const PLAYBACK_RATES = [0.75, 1, 1.25, 1.5, 1.75, 2] as const;
+
+export const BOOK_FLOWS = ["paginated", "scrolled"] as const;
 export type PlaybackRate = (typeof PLAYBACK_RATES)[number];
 /** The paper a note's PDF is laid out on. */
 export type Paper = "a4" | "letter";
@@ -203,6 +206,10 @@ export interface Stored {
   feedRefresh: FeedRefresh;
   feedsInSidebar: FeedsInSidebar;
   playbackRate: PlaybackRate;
+  /** Books are read a page at a time, or scrolled (BookReader.svelte). */
+  bookFlow: BookFlow;
+  /** PDFs' pages drawn in the theme's colors, rather than as printed. */
+  bookThemeColors: boolean;
   spacing: Spacing;
   /** How wide a note's text runs before wrapping, in px; or all the room there is, with the side margins kept. */
   noteWidth: number;
@@ -391,6 +398,8 @@ const DEFAULTS: Stored = {
   feedRefresh: 30,
   feedsInSidebar: "kind",
   playbackRate: 1,
+  bookFlow: "paginated",
+  bookThemeColors: false,
   spacing: DEFAULT_SPACING,
   noteWidth: 720,
   fullWidth: false,
@@ -552,6 +561,8 @@ function read(json?: string): Stored {
     feedRefresh: oneOf(raw.feedRefresh, FEED_REFRESH, DEFAULTS.feedRefresh),
     feedsInSidebar: oneOf(raw.feedsInSidebar, FEEDS_IN_SIDEBAR, DEFAULTS.feedsInSidebar),
     playbackRate: oneOf(raw.playbackRate, PLAYBACK_RATES, DEFAULTS.playbackRate),
+    bookFlow: oneOf(raw.bookFlow, BOOK_FLOWS, DEFAULTS.bookFlow),
+    bookThemeColors: flag(raw.bookThemeColors, DEFAULTS.bookThemeColors),
     spacing: Object.fromEntries(
       SPACING_FIELDS.map(({ key, min, max }) => [key, clamp(spacing[key], min, max, DEFAULT_SPACING[key])]),
     ) as unknown as Spacing,
@@ -665,6 +676,8 @@ class Prefs {
   feedRefresh = $state<FeedRefresh>(this.#initial.feedRefresh);
   feedsInSidebar = $state<FeedsInSidebar>(this.#initial.feedsInSidebar);
   playbackRate = $state<PlaybackRate>(this.#initial.playbackRate);
+  bookFlow = $state<BookFlow>(this.#initial.bookFlow);
+  bookThemeColors = $state(this.#initial.bookThemeColors);
   windowOpacity = $state(this.#initial.windowOpacity);
   windowBlur = $state(this.#initial.windowBlur);
   windowSeeThrough = $state(this.#initial.windowSeeThrough);
@@ -871,6 +884,8 @@ class Prefs {
       feedRefresh: this.feedRefresh,
       feedsInSidebar: this.feedsInSidebar,
       playbackRate: this.playbackRate,
+      bookFlow: this.bookFlow,
+      bookThemeColors: this.bookThemeColors,
       spacing: $state.snapshot(this.spacing),
       noteWidth: this.noteWidth,
       fullWidth: this.fullWidth,
@@ -986,6 +1001,8 @@ class Prefs {
     this.feedRefresh = next.feedRefresh;
     this.feedsInSidebar = next.feedsInSidebar;
     this.playbackRate = next.playbackRate;
+    this.bookFlow = next.bookFlow;
+    this.bookThemeColors = next.bookThemeColors;
     if (!sameSpacing(this.spacing, next.spacing)) this.spacing = next.spacing;
     this.noteWidth = next.noteWidth;
     this.fullWidth = next.fullWidth;
