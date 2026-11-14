@@ -18,6 +18,11 @@ Each of these has only run in Chrome, through the end-to-end tests (two browser 
 - After the browser restarts, it asks again before lines may use the folder; until someone clicks Allow access in Settings → Sync, sync shows an error.
 - The browser blocks some folders (the home folder itself, system folders, Downloads on some systems).
 
+## Attachments in a bucket
+
+- The apps send an attachment to the bucket, and bring one back, as it is, from their native side. On Android it still reaches that side as JSON, a number for each byte, which is all Tauri's messages there can carry: an attachment of tens of megabytes takes a lot of memory to upload and seconds to send.
+- Tried only against a stand-in bucket, from the native side and in WebKit, not yet in the Mac, Windows, Linux, iPhone or Android apps themselves, nor with a real provider.
+
 ## The web app's own storage
 
 Where the web app keeps everything is in [storage.md](storage.md).

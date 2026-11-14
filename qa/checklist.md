@@ -627,6 +627,7 @@ Platforms in brackets: **[Mac]** Mac app only, **[Desktop]** desktop apps, **[Ap
 - [ ] Deleting every synced note for good on one device: the other stops syncing and says so, deleting nothing; Settings → Sync offers Delete them here too… (asks in the panel, Cancel backs out, the confirm button has focus; notes written there since are kept and uploaded) and Upload them again; either way sync carries on. [Desktop] the same in the Settings window
 - [ ] [Web] With lines open in two tabs, sync runs in one pass at a time: a conflict makes one conflicted copy, not two; connecting or switching in one tab, the other follows; opening a second tab doesn't delete images the first could still bring back with ⌘Z
 - [ ] Images and files sync both ways, an empty file too [Desktop: through a cloud drive]
+- [ ] [Apps] Through a bucket, a large attachment (a recording or PDF of 50 MB or more) goes up and comes down on another device as fast as the connection allows, lines staying responsive and its memory near the file's size (Activity Monitor, or Xcode on iPhone)
 - [ ] Folder sync keeps working offline; a bucket says Offline and catches up
 - [ ] [Desktop] A drive's own copy of a note beside it (`<id> (… conflicted copy …).md`, `<id> 2.md`, `<id> (1).md`, `<id>-MacBook.md`, made by editing a note on two computers while the drive is offline) comes in as a "(conflicted copy)" note on both, and the drive's file is gone from the folder
 
