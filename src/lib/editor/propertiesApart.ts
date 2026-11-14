@@ -1,6 +1,6 @@
 import { closeCompletion } from "@codemirror/autocomplete";
 import { redo, undo } from "@codemirror/commands";
-import { getSearchQuery, searchPanelOpen } from "@codemirror/search";
+import { getSearchQuery, searchKeymap, searchPanelOpen } from "@codemirror/search";
 import {
   Annotation,
   type ChangeSpec,
@@ -15,10 +15,10 @@ import {
   StateField,
   Transaction,
 } from "@codemirror/state";
-import { BlockType, Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
-import { prefs, type PropertiesPlace } from "../prefs.svelte";
+import { Decoration, type DecorationSet, EditorView, keymap, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
+import type { PropertiesPlace, Side } from "../prefs.svelte";
 import { frontMatterField, heldProperties, objectsChanged } from "./objects";
-import { copyOnSelectCompartment, propertiesEditing, readOnlyCompartment, spellingCompartment } from "./setup";
+import { copyOnSelectCompartment, formatCompartment, propertiesEditing, readOnlyCompartment, spellingCompartment } from "./setup";
 import { symbolsChanged } from "./symbols";
 import { changesBetween } from "./util";
 
@@ -36,7 +36,14 @@ import { changesBetween } from "./util";
 
 type Place = Exclude<PropertiesPlace, "top">;
 
-const placeFacet = Facet.define<Place, Place>({ combine: (places) => places[0] ?? "right" });
+interface Placing {
+  place: Place;
+  /** The side the outline's on, which they keep clear of there; null with it off. */
+  outline: Side | null;
+}
+
+const placing = Facet.define<Placing, Placing>({ combine: (values) => values[0] ?? { place: "right", outline: null } });
+const placeOf = (state: EditorState) => state.facet(placing).place;
 
 /** A change the properties' editor passed on to the note's. */
 const fromPane = Annotation.define<true>();
@@ -78,7 +85,9 @@ const apart = StateField.define<Apart>({
   update(value, tr) {
     let { end, room, height } = value;
     for (const effect of tr.effects) if (effect.is(measured)) ({ room, height } = effect.value);
-    if (tr.docChanged || tr.selection) {
+    // Another language (LaTeX, code), whose editor reads no properties, or Markdown again.
+    if (tr.reconfigured) end = endOf(tr.state);
+    else if (tr.docChanged || tr.selection) {
       const found = endOf(tr.state);
       end = found >= 0 ? found : held(end, tr);
     }
@@ -125,29 +134,39 @@ class Room extends WidgetType {
 
 const hidden = Decoration.replace({ block: true });
 
-const decorations = EditorView.decorations.compute(["doc", apart, placeFacet], (state) => {
+const decorations = EditorView.decorations.compute(["doc", apart, placing], (state) => {
   const end = drawnEnd(state);
   if (end < 0) return Decoration.none;
   const ranges: Range<Decoration>[] = [hidden.range(0, end)];
-  if (state.facet(placeFacet) === "bottom") {
-    ranges.push(Decoration.widget({ widget: new Room(state.field(apart).height), block: true, side: 1 }).range(state.doc.length));
+  if (placeOf(state) === "bottom") {
+    // After anything else drawn below the last line (a diagram, under its code).
+    ranges.push(Decoration.widget({ widget: new Room(state.field(apart).height), block: true, side: 1000 }).range(state.doc.length));
   }
   return Decoration.set(ranges);
 });
 
-/** Typed, pasted, deleted or moved in the note's text. */
+/** Typed, deleted or moved in the note's text. */
 const EDITS = ["input", "delete", "move"];
 
 /**
  * The line break between the properties and the text, which Backspace at the start of the text
- * would take, joining its first line to their closing `---` out of sight: it does nothing there.
+ * would take, joining its first line to their closing `---` out of sight: what's deleted keeps it
+ * (Backspace there does nothing), and a line isn't moved over it. Find's Replace replaces as asked.
  */
 const keepBreak = EditorState.transactionFilter.of((tr) => {
   const end = drawnEnd(tr.startState);
-  if (end < 0 || !EDITS.some((event) => tr.isUserEvent(event))) return tr;
+  if (end < 0 || !tr.docChanged || !EDITS.some((event) => tr.isUserEvent(event)) || tr.isUserEvent("input.replace")) return tr;
+  const kept: ChangeSpec[] = [];
   let joins = false;
-  tr.changes.iterChangedRanges((from, to) => (joins ||= from <= end && to > end));
-  return joins ? {} : tr;
+  tr.changes.iterChanges((from, to, _fromB, _toB, insert) => {
+    if (from > end || to <= end) return kept.push({ from, to, insert });
+    joins = true;
+    kept.push({ from, to: end, insert }, { from: end + 1, to: Math.max(end + 1, to) });
+  });
+  if (!joins) return tr;
+  if (tr.isUserEvent("move")) return {};
+  const changes = tr.startState.changes(kept);
+  return { changes, selection: tr.startState.selection.map(changes), userEvent: tr.annotation(Transaction.userEvent), scrollIntoView: tr.scrollIntoView };
 });
 
 /** The cursor moved by keys or the pointer in the note stays in its text, out of the properties hidden there. */
@@ -251,6 +270,8 @@ class PropertiesPane {
   #layout: Layout | null = null;
   /** Where the note's text is laid beside the properties, as last set ("" where it isn't). */
   #text = "";
+  /** The cursor in the note's text, last, for it to go back to from the properties. */
+  #inText: EditorSelection | null = null;
   #gone = false;
 
   constructor(readonly view: EditorView) {
@@ -258,33 +279,67 @@ class PropertiesPane {
     this.#resized.observe(view.scrollDOM, { box: "border-box" });
     for (const el of [view.contentDOM, this.host]) this.#resized.observe(el);
     this.#restyled.observe(document.documentElement, { attributeFilter: ["style"] });
-    if (drawnEnd(view.state) >= 0) this.open();
+    view.contentDOM.addEventListener("focus", this.#noteFocused);
+    // Beside the text, whether there's room is known before an editor's made for them, which would
+    // only go again where there isn't (a narrow window, a phone).
+    if (placeOf(view.state) !== "bottom") this.write(this.read(view));
+    if (drawnEnd(view.state) >= 0 && this.#layout?.room !== false) this.open();
     this.measure();
   }
 
   update(update: ViewUpdate) {
     const { state, startState } = update;
-    if (state.facet(placeFacet) !== startState.facet(placeFacet)) {
+    const moved = placeOf(state) !== placeOf(startState);
+    // Made again for another place, or when the note's editing is (Show Markdown, plugins).
+    if (moved || formatCompartment.get(state) !== formatCompartment.get(startState)) {
+      const focused = this.pane?.hasFocus;
       this.close();
-      this.#layout = null;
+      if (moved) this.#layout = null;
+      if (focused && drawnEnd(state) >= 0) queueMicrotask(() => this.pane?.focus());
     }
     const end = drawnEnd(state);
     if (end < 0) this.close();
     else if (!this.pane) this.open();
     else this.follow(update, end);
-    // The cursor goes where the selection is: the note's put in the properties (undo, `/properties`,
-    // the closing `---` typed), or the properties' out of them (undo, Enter at their end).
-    if (this.pane) {
-      if (update.view.hasFocus && inProperties(state, end)) focusLater(this.pane);
-      else if (this.pane.hasFocus && !inProperties(state, end)) focusLater(update.view);
+    const inside = inProperties(state, end);
+    this.#inText = inside ? (this.#inText && update.docChanged ? this.#inText.map(update.changes) : this.#inText) : state.selection;
+    // The cursor goes where a change puts it: into the properties by the note's own (undo,
+    // `/properties`, the closing `---` typed), or out of them (Enter at their end, undo). Focus
+    // moved by itself (Tab, a tap) stays where it went.
+    if (this.pane && update.transactions.some((tr) => tr.selection || tr.docChanged)) {
+      if (inside && update.view.hasFocus) focusLater(this.pane);
+      else if (!inside && this.pane.hasFocus) focusLater(update.view);
     }
-    if (update.geometryChanged || update.viewportChanged || end !== drawnEnd(startState)) this.measure();
+    if (update.geometryChanged || update.viewportChanged || end !== drawnEnd(startState) || state.facet(placing) !== startState.facet(placing)) this.measure();
   }
+
+  /**
+   * The note's text focused with its cursor in the properties (once what focused it is done, a click
+   * having put it where it clicked): from them (⇧Tab), the cursor goes back into the text; from
+   * anywhere else (Find closed, F6), focus goes on into them.
+   */
+  #noteFocused = (event: FocusEvent) => {
+    const from = event.relatedTarget instanceof Node ? event.relatedTarget : null;
+    setTimeout(() => {
+      const { view, pane } = this;
+      const end = drawnEnd(view.state);
+      if (this.#gone || !pane || !view.hasFocus || !inProperties(view.state, end)) return;
+      if (from && pane.dom.contains(from)) view.dispatch({ selection: this.#inText ?? EditorSelection.cursor(end + 1) });
+      else pane.focus();
+    });
+  };
+
+  /** The properties focused by themselves (Tab, a tap): the note's cursor is theirs, for undo and Find to start from. */
+  #paneFocused = () =>
+    queueMicrotask(() => {
+      const { view, pane } = this;
+      if (pane?.hasFocus && !pane.state.selection.eq(view.state.selection)) view.dispatch({ selection: pane.state.selection, annotations: fromPane.of(true), filter: false });
+    });
 
   open() {
     const { view } = this;
     const end = drawnEnd(view.state);
-    const place = view.state.facet(placeFacet);
+    const place = placeOf(view.state);
     this.host.className = place === "bottom" ? "cm-props-apart" : "cm-props-apart is-beside";
     this.pane = new EditorView({
       state: EditorState.create({
@@ -300,8 +355,10 @@ class PropertiesPane {
       parent: this.host,
       dispatchTransactions: (trs, pane) => this.fromPane(trs, pane),
     });
+    this.pane.contentDOM.addEventListener("focus", this.#paneFocused);
+    // Out of sight and out of reach until they're where they go.
     if (this.#layout) this.place(this.#layout);
-    else this.host.style.opacity = "0";
+    else Object.assign(this.host.style, { opacity: "0", pointerEvents: "none" });
     view.scrollDOM.append(this.host);
   }
 
@@ -368,7 +425,7 @@ class PropertiesPane {
    */
   enter(down: boolean) {
     const { view, pane } = this;
-    if (!pane || down !== (view.state.facet(placeFacet) === "bottom")) return false;
+    if (!pane || down !== (placeOf(view.state) === "bottom")) return false;
     const { state } = view;
     const range = state.selection.main;
     const leaving = down
@@ -386,7 +443,7 @@ class PropertiesPane {
   /** ↓ from the properties beside the text goes into its first line; ↑ from those after it, into its last. */
   leave(down: boolean) {
     const { view, pane } = this;
-    if (!pane || down === (view.state.facet(placeFacet) === "bottom")) return false;
+    if (!pane || down === (placeOf(view.state) === "bottom")) return false;
     const { doc } = pane.state;
     const range = pane.state.selection.main;
     const lines = pane.state.field(frontMatterField, false)?.lines ?? doc.lines + 1;
@@ -408,7 +465,7 @@ class PropertiesPane {
   }
 
   read(view: EditorView): Layout {
-    const place = view.state.facet(placeFacet);
+    const place = placeOf(view.state);
     const scroller = view.scrollDOM;
     const box = scroller.getBoundingClientRect();
     const style = getComputedStyle(view.dom);
@@ -416,10 +473,12 @@ class PropertiesPane {
     // Down the scroller's own content, so they scroll with the note (it doesn't scroll across).
     const y = (top: number) => top + view.documentTop - box.top + scroller.scrollTop;
     if (place === "bottom") {
+      // Where the room kept for them starts, after the last line and all that's drawn with it (a
+      // table, a picture, a diagram under its code).
       const text = textColumn(view);
       const block = view.lineBlockAt(view.state.doc.length);
-      const rows = typeof block.type === "number" ? [block] : block.type.filter((part) => part.type === BlockType.Text);
-      return { room: true, top: y(rows[rows.length - 1].bottom) + size, left: text.left - box.left, width: text.right - text.left, height: Math.ceil(this.host.offsetHeight + size) };
+      const room = typeof block.type === "number" ? undefined : block.type.find((part) => part.widget instanceof Room);
+      return { room: true, top: y(room?.top ?? block.bottom) + size, left: text.left - box.left, width: text.right - text.left, height: Math.ceil(this.host.offsetHeight + size) };
     }
     // Beside it, the text and the properties are a two-column page, centred in the scroller (its
     // whole width, so a scroll bar coming and going doesn't move them). Short of room, they're as
@@ -428,7 +487,7 @@ class PropertiesPane {
     // the room between pages around and between them.
     const pad = parseFloat(getComputedStyle(view.contentDOM).paddingLeft);
     const page = parseFloat(style.getPropertyValue("--page-gap")) || 0;
-    const outline = prefs.outline && prefs.outlineSide === place ? OUTLINE : 0;
+    const outline = view.state.facet(placing).outline === place ? OUTLINE : 0;
     const gap = page ? pad + page * 1.5 : GAP;
     const margin = page ? page + outline : Math.max(pad, EDGE + outline);
     /** Between the text and its page's edge, and between them and their card's. */
@@ -462,7 +521,7 @@ class PropertiesPane {
   }
 
   place({ top, left, width }: Layout) {
-    Object.assign(this.host.style, { top: `${top}px`, left: `${left}px`, width: `${width}px`, opacity: "" });
+    Object.assign(this.host.style, { top: `${top}px`, left: `${left}px`, width: `${width}px`, opacity: "", pointerEvents: "" });
   }
 
   /** The note's text column beside the properties (editor.css), or where it goes without them; measured again once it moves. */
@@ -481,6 +540,7 @@ class PropertiesPane {
 
   destroy() {
     this.#gone = true;
+    this.view.contentDOM.removeEventListener("focus", this.#noteFocused);
     this.#resized.disconnect();
     this.#restyled.disconnect();
     this.close();
@@ -496,7 +556,7 @@ const noteKeys = Prec.high(
   ]),
 );
 
-/** The properties' keys: out into the note's text, and its undo and redo (the history is the note's). */
+/** The properties' keys: out into the note's text, and its undo and redo and find bar (the note's, as its history is). */
 const paneKeys = (owner: PropertiesPane) =>
   Prec.high(
     keymap.of([
@@ -505,16 +565,23 @@ const paneKeys = (owner: PropertiesPane) =>
       { key: "Mod-z", run: () => undo(owner.view), preventDefault: true },
       { key: "Mod-y", mac: "Mod-Shift-z", run: () => redo(owner.view), preventDefault: true },
       { linux: "Ctrl-Shift-z", run: () => redo(owner.view), preventDefault: true },
+      ...searchKeymap
+        .filter((binding) => binding.key !== "Mod-d")
+        .map(({ run, shift, ...binding }) => ({ ...binding, run: run && (() => run(owner.view)), shift: shift && (() => shift(owner.view)) })),
     ]),
   );
 
 const drawnApart: Extension = [apart, heldLines, decorations, keepBreak, keepOut, scrollHandler, noteKeys, panes];
-const places = new Map<Place, Extension>();
+const placings = new Map<string, Extension>();
 
-/** A note's properties where Settings → Layout puts them: at its top as they are, or apart from its text (Editor.svelte). */
-export function propertiesApart(place: PropertiesPlace): Extension {
+/**
+ * A note's properties where Settings → Layout puts them: at its top as they are, or apart from its
+ * text, clear of the outline on `outline`'s side (null with it off) (Editor.svelte).
+ */
+export function propertiesApart(place: PropertiesPlace, outline: Side | null): Extension {
   if (place === "top") return [];
-  let found = places.get(place);
-  if (!found) places.set(place, (found = [placeFacet.of(place), drawnApart]));
+  const key = `${place} ${outline}`;
+  let found = placings.get(key);
+  if (!found) placings.set(key, (found = [placing.of({ place, outline }), drawnApart]));
   return found;
 }

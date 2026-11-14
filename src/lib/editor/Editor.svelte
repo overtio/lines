@@ -214,7 +214,7 @@
   const setUp = () => [
     readOnlyCompartment.reconfigure(readOnly(viewOnly)),
     outlineCompartment.reconfigure(prefs.outline ? outline : []),
-    propertiesCompartment.reconfigure(propertiesApart(prefs.propertiesPlace)),
+    propertiesCompartment.reconfigure(propertiesApart(prefs.propertiesPlace, prefs.outline ? prefs.outlineSide : null)),
     spellingCompartment.reconfigure(spelling(prefs.spellcheck)),
     copyOnSelectCompartment.reconfigure(copyOnSelect(prefs.copyOnSelect)),
   ];
