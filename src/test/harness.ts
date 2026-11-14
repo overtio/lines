@@ -4,6 +4,8 @@ import { feeds } from "../lib/feeds/feeds.svelte";
 import { NoFeed } from "../lib/feeds/find";
 import { htmlToMarkdown, saysMore } from "../lib/feeds/markdown";
 import { readOpml } from "../lib/feeds/opml";
+import { siteIcon } from "../lib/library/icon";
+import { iconPicture } from "../lib/pictures";
 import { isFeed, NotAFeed, readFeed } from "../lib/feeds/parse";
 import { htmlToText } from "../lib/feeds/text";
 import { readBookmarks } from "../lib/library/bookmarks";
@@ -47,8 +49,8 @@ const testing = {
   noteKeys,
   feeds,
   player,
-  /** Reading feeds, their HTML and OPML (lib/feeds/), bookmarks files (lib/library/bookmarks.ts) and transcripts (plugins/feeds/transcripts.ts), as lines does. */
-  reading: { readFeed, isFeed, NotAFeed, NoFeed, htmlToMarkdown, saysMore, readOpml, readBookmarks, readTranscript, sentences },
+  /** Reading feeds, their HTML and OPML (lib/feeds/), bookmarks files (lib/library/bookmarks.ts), transcripts (plugins/feeds/transcripts.ts) and sites' icons, as lines does. */
+  reading: { readFeed, isFeed, NotAFeed, NoFeed, htmlToMarkdown, saysMore, readOpml, readBookmarks, readTranscript, sentences, siteIcon, iconPicture },
   /** Reading a discussion: its comments' HTML (lib/feeds/text.ts), and Hacker News' threads (plugins/hacker-news/). */
   discussions: { htmlToText, readThread },
   /** The app lock, to turn on as Settings does. */

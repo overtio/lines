@@ -14,7 +14,7 @@
   import Icon from "../icons/Icon.svelte";
   import { longPress } from "../longPress";
   import { coverOf } from "../library/text";
-  import { attachmentURL } from "../notes/attachments";
+  import { arrivedURL } from "../notes/attachments";
   import { notes } from "../notes/store.svelte";
   import { plugins } from "../plugins/registry.svelte";
   import type { Filter } from "../notes/types";
@@ -22,6 +22,7 @@
   import { menuPoint } from "../popover";
   import type { RowSize } from "../sidebarLayout.svelte";
   import { type MenuItem, menuSections, ui } from "../ui.svelte";
+  import { fitPicture, TONE_BACKING } from "./fitPicture";
   import SidebarRow from "./SidebarRow.svelte";
 
   // A row of the Library's feeds: a kind of feed's posts (RSS, Atom, podcasts'), or every feed's,
@@ -67,9 +68,12 @@
   }
 
   function rowMenu(x: number, y: number) {
+    const bare = feeds.withoutPictures(urls());
     onmenu(label, [
       { label: t("feeds.refresh"), icon: "refresh", run: () => feeds.refresh(urls()) },
       { label: t("feeds.readAll"), icon: "check-check", run: () => readAll(urls()) },
+      // Its sites' feeds subscribed to without a picture (made before lines gave them their sites' icons) given theirs.
+      ...(bare.length ? [{ label: t("feeds.getPictures"), icon: "image" as const, run: () => void getPictures(bare) }] : []),
       "separator",
       { label: t("feeds.subscribe"), icon: "plus", run: () => (ui.subscribePrompt = { x, y }) },
     ], x, y);
@@ -89,6 +93,8 @@
         [
           { label: t("feeds.openNote"), icon: "file-text", run: () => notes.show(note) },
           { label: t("feeds.copyFeedLink"), icon: "link", run: () => void copyText(url).then(() => speak(t("list.copied"))) },
+          // Asked for, as a subscription's picture is only had when it's made: one taken out of its note stays out.
+          ...(pictured(note) ? [] : [{ label: t("feeds.getPicture"), icon: "image" as const, run: () => void getPicture(url, title) }]),
         ],
         // Its notes are the subscription: to the Trash with every one, which ⌘Z (or Restore) undoes.
         [{ label: t("feeds.unsubscribe"), icon: "trash", danger: true, run: () => {
@@ -99,6 +105,16 @@
       ),
       onclose: () => (menuFor = null),
     });
+  }
+
+  const pictured = (note: string) => !!coverOf(notes.get(note)?.note.body ?? "");
+
+  async function getPictures(urls: string[]) {
+    speak(t("feeds.gotPictures", { count: await feeds.givePictures(urls) }));
+  }
+
+  async function getPicture(url: string, title: string) {
+    speak(t((await feeds.givePicture(url)) ? "feeds.gotPicture" : "feeds.noPicture", { title }));
   }
 
   function oncontextmenu(event: MouseEvent, open: (x: number, y: number) => void, opened: boolean) {
@@ -151,18 +167,19 @@
         {@const count = feeds.unread.get(url) ?? 0}
         {@const entry = notes.get(note)}
         {@const cover = entry && coverOf(entry.note.body)}
+        {@const glyph = (entry && plugins.libraryKind(entry.meta.type)?.icon) || "rss"}
         <li class="pl-3.5">
-          <!-- Its artwork, or its kind's icon; a feed that failed, a quiet mark there instead, and why, said and shown on pointing at it. -->
+          <!-- Its artwork (once it's here), or its kind's icon; a feed that failed, a quiet mark there instead, and why, said and shown on pointing at it. -->
           {#snippet artwork()}
-            {#await attachmentURL(cover!)}
-              <span class="size-4 shrink-0 rounded-[calc(3px*var(--radius-scale))] bg-hover"></span>
+            {#await arrivedURL(cover!)}
+              <Icon name={glyph} size={16} strokeWidth={1.75} class="shrink-0 text-muted" />
             {:then src}
-              {#if src}<img class="size-4 shrink-0 rounded-[calc(3px*var(--radius-scale))] object-cover" {src} alt="" draggable="false" />{:else}<Icon name="rss" size={16} strokeWidth={1.75} class="shrink-0 text-muted" />{/if}
+              {#if src}<img class="size-4 shrink-0 rounded-[calc(3px*var(--radius-scale))] object-cover {TONE_BACKING}" {src} alt="" draggable="false" {@attach fitPicture} />{:else}<Icon name={glyph} size={16} strokeWidth={1.75} class="shrink-0 text-muted" />{/if}
             {/await}
           {/snippet}
           <SidebarRow
             size={size === "small" ? "small" : "standard"}
-            icon={error ? "circle-alert" : (entry && plugins.libraryKind(entry.meta.type)?.icon) || "rss"}
+            icon={error ? "circle-alert" : glyph}
             iconClass={error ? "shrink-0 text-faint" : undefined}
             picture={cover && !error ? artwork : undefined}
             label={title || url}

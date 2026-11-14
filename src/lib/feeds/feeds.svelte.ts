@@ -2,8 +2,9 @@ import { untrack } from "svelte";
 import { SvelteMap } from "svelte/reactivity";
 import { speak } from "../a11y";
 import { t } from "../i18n/index.svelte";
-import { libraryNote } from "../library/note";
-import { clock, known } from "../library/text";
+import { coverOfItem, libraryNote } from "../library/note";
+import { clock, coverOf, known, withCover } from "../library/text";
+import { putAttachment } from "../notes/attachments";
 import { dayOf } from "../notes/calendar";
 import { propertyOf } from "../notes/properties";
 import { isClosed, notes } from "../notes/store.svelte";
@@ -438,6 +439,52 @@ class Feeds {
     await this.take(found.url, found.feed, found.validators);
     await this.#write(feedItem(found.url, found.feed), signal);
     return found.url;
+  }
+
+  /**
+   * Gives the notes subscribing to a feed its picture where they have none, when asked (a feed's
+   * menu): its artwork, or a site's feed with none its site's icon, as a new subscription's note is
+   * made with. Never by itself, so a picture taken out of a note stays out. Whether there was one
+   * to give.
+   */
+  async givePicture(url: string): Promise<boolean> {
+    const record = this.records.get(url);
+    const cover = record && (await coverOfItem(feedItem(url, record)));
+    if (!cover) return false;
+    try {
+      await putAttachment(cover.name, cover.picture);
+    } catch (error) {
+      console.warn("lines: couldn't keep a feed's picture", error);
+      return false;
+    }
+    for (const id of this.notesOf(url)) {
+      // As the note is now: not one locked or trashed meanwhile (a closed locked note's text isn't there to add to), nor one given a picture.
+      const entry = notes.get(id);
+      if (!entry || entry.note.locked || entry.note.trashed) continue;
+      notes.setText(id, (body) => (coverOf(body) ? body : withCover(body, entry.meta.title, cover)), { keepDate: true });
+    }
+    return true;
+  }
+
+  /** Of `urls`, the sites' feeds whose notes have no picture: a podcast's is its artwork, which it's subscribed with or not. */
+  withoutPictures(urls: string[]): string[] {
+    return urls.filter((url) =>
+      this.notesOf(url).some((id) => {
+        const entry = notes.get(id);
+        return entry?.meta.type === "feed" && !coverOf(entry.note.body);
+      }),
+    );
+  }
+
+  /** Gives each of `urls` its picture (givePicture), a few at a time, as feeds are fetched. How many had one to give. */
+  async givePictures(urls: string[]): Promise<number> {
+    const left = [...urls];
+    let given = 0;
+    const turn = async () => {
+      for (let url = left.shift(); url; url = left.shift()) if (await this.givePicture(url)) given++;
+    };
+    await Promise.all(Array.from({ length: AT_ONCE }, turn));
+    return given;
   }
 
   /**

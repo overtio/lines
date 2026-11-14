@@ -33,8 +33,8 @@ const CRC = Array.from({ length: 256 }, (_, n) => {
 });
 const crc32 = (data: Uint8Array) => (data.reduce((crc, byte) => CRC[(crc ^ byte) & 0xff] ^ (crc >>> 8), 0xffffffff) ^ 0xffffffff) >>> 0;
 
-/** A PNG `width` × `height`, each pixel the color `at(x, y)` gives, as [r, g, b]. */
-export function png(width: number, height: number, at: (x: number, y: number) => [number, number, number]) {
+/** A PNG `width` × `height`, each pixel the color `at(x, y)` gives, as [r, g, b], or [r, g, b, a] for one you can see through. */
+export function png(width: number, height: number, at: (x: number, y: number) => [number, number, number] | [number, number, number, number]) {
   const chunk = (type: string, data: Uint8Array) => {
     const out = Buffer.alloc(12 + data.length);
     out.writeUInt32BE(data.length, 0);
@@ -46,12 +46,27 @@ export function png(width: number, height: number, at: (x: number, y: number) =>
   const header = Buffer.alloc(13);
   header.writeUInt32BE(width, 0);
   header.writeUInt32BE(height, 4);
-  header.set([8, 2, 0, 0, 0], 8);
-  const rows = Buffer.alloc(height * (1 + width * 3));
+  const channels = at(0, 0).length;
+  header.set([8, channels === 4 ? 6 : 2, 0, 0, 0], 8);
+  const rows = Buffer.alloc(height * (1 + width * channels));
   for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) rows.set(at(x, y), y * (1 + width * 3) + 1 + x * 3);
+    for (let x = 0; x < width; x++) rows.set(at(x, y), y * (1 + width * channels) + 1 + x * channels);
   }
   return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk("IHDR", header), chunk("IDAT", deflateSync(rows)), chunk("IEND", new Uint8Array())]);
+}
+
+/** An icon file (.ico), as a site's favicon.ico is, holding one PNG `side` pixels square. */
+export function ico(picture: Buffer, side: number) {
+  const header = Buffer.alloc(22);
+  header.writeUInt16LE(1, 2);
+  header.writeUInt16LE(1, 4);
+  header.writeUInt8(side % 256, 6);
+  header.writeUInt8(side % 256, 7);
+  header.writeUInt16LE(1, 10);
+  header.writeUInt16LE(32, 12);
+  header.writeUInt32LE(picture.length, 14);
+  header.writeUInt32LE(header.length, 18);
+  return Buffer.concat([header, picture]);
 }
 
 /** A short click, as a WAV file: 16-bit mono at 22,050 Hz. */

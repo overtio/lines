@@ -14,7 +14,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { chromium, webkit } from "playwright";
 import { build, preview } from "vite";
-import { answerFile, png, wav } from "../tests/browser/files.ts";
+import { answerFile, ico, png, wav } from "../tests/browser/files.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const args = process.argv.slice(2);
@@ -217,14 +217,18 @@ async function searchLibrary(page) {
 
 /**
  * Feeds subscribed to, answered from the tests' copies of real ones (tests/browser/feeds/), their
- * pictures a plain square: nothing's fetched from the web.
+ * pictures a plain square (as big as artwork, so it's drawn as artwork is), and what `sites` gives
+ * (a site's page, its icon), by address: nothing's fetched from the web.
  */
-async function subscribe(page, feeds) {
+async function subscribe(page, feeds, sites = {}) {
   const cors = { "access-control-allow-origin": "*" };
+  // Nothing else of the web (a site's page, looked through for its icon) is asked for: answered with nothing, after any of the scene's own answers.
+  await page.context().route((url) => url.protocol.startsWith("http") && url.hostname !== "127.0.0.1", (route) => route.fulfill({ body: "", contentType: "text/plain", headers: cors }));
   await page.route(
     (url) => /\.(png|jpe?g|gif)(\?|$)/.test(url.pathname) && url.hostname !== "127.0.0.1",
-    (route) => route.fulfill({ body: png(8, 8, () => [96, 132, 168]), contentType: "image/png", headers: cors }),
+    (route) => route.fulfill({ body: png(64, 64, () => [96, 132, 168]), contentType: "image/png", headers: cors }),
   );
+  for (const [url, [body, contentType]] of Object.entries(sites)) await page.route(url, (route) => route.fulfill({ body, contentType, headers: cors }));
   for (const [url, fixture] of Object.entries(feeds)) {
     const body = readFileSync(`${root}tests/browser/feeds/${fixture}`, "utf8");
     await page.route((asked) => asked.href === url, (route) => route.fulfill({ body, contentType: "application/rss+xml", headers: cors }));
@@ -233,6 +237,29 @@ async function subscribe(page, feeds) {
 }
 
 const FEEDS = { "https://svelte.dev/blog/rss.xml": "blog.rss", "https://daringfireball.net/feeds/main": "blog.atom", "https://feeds.megaphone.fm/FSI1483080183": "podcast.rss" };
+
+/**
+ * Sites' icons for feeds that give no picture of their own: Hacker News' Y (named by its page here,
+ * as Playwright answers no request for a favicon.ico), a blog's icon for phones, and a blog's black
+ * mark on nothing, which a dark theme puts on a tile.
+ */
+const SITE_ICONS = {
+  "https://news.ycombinator.com/": ['<html><head><link rel="icon" href="y18.ico"></head></html>', "text/html"],
+  "https://news.ycombinator.com/y18.ico": [
+    ico(png(18, 18, (x, y) => (Math.abs(x - 8.5) <= (y < 9 ? 1.2 + (9 - y) * 0.75 : 1) && Math.abs(x - 8.5) >= (y < 9 ? (9 - y) * 0.75 - 1.2 : -1) && y >= 3 && y <= 14 ? [255, 255, 255] : [255, 102, 0])), 18),
+    "image/x-icon",
+  ],
+  "https://daringfireball.net/": ['<html><head><link rel="apple-touch-icon" href="/touch-icon"></head></html>', "text/html"],
+  "https://daringfireball.net/touch-icon": [png(180, 180, (x, y) => (Math.hypot(x - 90, y - 90) < 52 ? [236, 239, 244] : [74, 85, 104])), "image/png"],
+  "https://plain.example/": ['<html><head><link rel="icon" href="/mark.png" sizes="32x32"></head></html>', "text/html"],
+  "https://plain.example/mark.png": [png(32, 32, (x, y) => (Math.hypot(x - 15.5, y - 15.5) < 14 && Math.hypot(x - 15.5, y - 15.5) > 8 ? [24, 23, 23, 255] : [0, 0, 0, 0])), "image/png"],
+};
+const ICON_FEEDS = {
+  "https://news.ycombinator.com/rss": "hn.rss",
+  "https://plain.example/feed.xml": "plain.rss",
+  "https://daringfireball.net/feeds/main": "blog.atom",
+  "https://feeds.megaphone.fm/FSI1483080183": "podcast.rss",
+};
 
 /** lines' own look, and three styles with their themes: a scene taken in each, `-neon` after its id. */
 const LOOKS = [
@@ -796,6 +823,17 @@ const SCENES = [
       await page.locator(".note-list").getByRole("button", { name: /^Jensen Huang/ }).click();
     },
   },
+  ...LOOKS.filter(([suffix]) => suffix !== "-classic").map(([suffix, prefs]) => ({
+    id: `feeds-icons${suffix}`,
+    title: `Feeds' pictures: a site's icon, as a podcast's artwork${inLook(suffix)}`,
+    look: "Under RSS Feeds, Hacker News with its orange Y and Plain Notes with its black ring (in a dark theme on a light rounded tile, so it doesn't vanish; in a light one as it is); under Atom Feeds, Daring Fireball with its site's icon; under Podcast Feeds, the podcast's artwork: each the same small rounded square beside its title, lined up with the rows' icons, crisp, the Y not blurred or stretched.",
+    prefs,
+    act: async (page) => {
+      await subscribe(page, ICON_FEEDS, SITE_ICONS);
+      await page.waitForFunction(() => window.testing.notes.entries.filter((entry) => entry.note.body.includes("](../attachments/")).length === 4);
+      await page.getByRole("navigation", { name: "Library" }).locator("li li img").nth(3).waitFor();
+    },
+  })),
   {
     id: "feeds-together",
     title: "The Feeds together (Settings → Library → Feeds in the sidebar)",

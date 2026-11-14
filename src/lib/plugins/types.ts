@@ -232,6 +232,8 @@ export interface LibraryItem {
   properties: [key: string, value: string][];
   /** A picture of it (a poster, a cover, artwork), downloaded and kept with the note. */
   cover?: string;
+  /** A site whose icon is its picture where it has none of its own (a feed's): kept, at its own size, as its cover. */
+  icon?: string;
   /** What it's about, in a few plain sentences. */
   description?: string;
   /** Tags it's filed under (a bookmark's), written as the note's `#tags`: lines' own, as `normalizeTag` makes them. */

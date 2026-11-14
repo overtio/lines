@@ -6,6 +6,7 @@
   import Icon from "../icons/Icon.svelte";
   import { attachmentURL } from "../notes/attachments";
   import type { LibraryKind } from "../plugins/types";
+  import { fitPicture, TONE_BACKING } from "./fitPicture";
 
   let { name = null, src, kind, small = false }: { name?: string | null; src?: string; kind: LibraryKind; small?: boolean } = $props();
 
@@ -24,12 +25,13 @@
 
 {#snippet picture(url: string)}
   <img
-    class="size-full rounded-sm object-cover shadow-[0_0_0_1px_color-mix(in_srgb,var(--ink)_8%,transparent)]"
+    class="size-full rounded-sm bg-hover object-cover shadow-[0_0_0_1px_color-mix(in_srgb,var(--ink)_8%,transparent)] {TONE_BACKING}"
     src={url}
     alt=""
     draggable="false"
     loading="lazy"
     onerror={() => (broken = true)}
+    {@attach fitPicture}
   />
 {/snippet}
 

@@ -5,7 +5,9 @@ import { backoff, DAY, KEEP, merge, type KeptPost } from "../../src/lib/feeds/po
 import { writeOpml } from "../../src/lib/feeds/opml";
 import { Thread } from "../../src/lib/feeds/thread.svelte";
 import type { DiscussionComment } from "../../src/lib/plugins/types";
+import { drawable, isDrawing, pictureSize } from "../../src/lib/pictures";
 import { storyId, storyPage } from "../../src/plugins/hacker-news/links";
+import { ico, png } from "../browser/files";
 import { stubApp } from "./stubs";
 
 stubApp();
@@ -13,6 +15,7 @@ mock.module("../../src/lib/release", () => ({ VERSION: "0.0.0", REPO: "https://g
 const { encodingOf, readAtMost } = await import("../../src/lib/feeds/fetch");
 const { linkOf, usualFeeds } = await import("../../src/lib/feeds/find");
 const { formatAgo } = await import("../../src/lib/format");
+const { iconsOf, iconToAsk } = await import("../../src/lib/library/icon");
 
 /*
  * Feeds' logic that needs no page: dates and durations as feeds write them, keeping posts across
@@ -171,6 +174,63 @@ describe("mending a feed that isn't quite XML", () => {
     expect(performance.now() - start).toBeLessThan(500);
     expect(unclosed).toBe(crafted[0]);
     expect(many).toBe(crafted[1].replaceAll("&c", "&amp;c"));
+  });
+});
+
+describe("a site's icon", () => {
+  type Link = { rel?: string; href: string; type?: string; sizes?: string };
+  const page = (...links: Link[]) => ({ url: "https://example.com/", title: "", data: [], meta: new Map(), links: links.map((link) => ({ rel: "icon", type: "", title: "", sizes: "", ...link })) });
+
+  test("the largest picture its page names (a phone's, which says no size, is 180 pixels), a drawing last, none not on the web at large", () => {
+    const named = page(
+      { href: "https://example.com/16.png", sizes: "16x16" },
+      { rel: "apple-touch-icon", href: "https://example.com/touch.png" },
+      { href: "https://example.com/mark.svg", type: "image/svg+xml" },
+      { rel: "shortcut icon", href: "https://example.com/32.png", sizes: "32x32" },
+      { rel: "stylesheet", href: "https://example.com/style.css" },
+      { href: "http://example.com/plain.png", sizes: "64x64" },
+    );
+    expect(iconsOf(named)).toEqual(["https://example.com/touch.png", "https://example.com/32.png", "https://example.com/16.png", "https://example.com/mark.svg"]);
+    expect(iconToAsk(named, "https://example.com/")).toBe("https://example.com/touch.png");
+  });
+
+  test("else the favicon.ico at the site's root, as Hacker News' Y is", () => {
+    expect(iconToAsk(null, "https://news.ycombinator.com/news")).toBe("https://news.ycombinator.com/favicon.ico");
+    expect(iconToAsk(page(), "https://example.com/blog/")).toBe("https://example.com/favicon.ico");
+  });
+});
+
+describe("a picture's size, read from its file before it's drawn", () => {
+  const bytes = (...parts: (string | number[])[]) => new Uint8Array(parts.flatMap((part) => (typeof part === "string" ? [...part].map((char) => char.charCodeAt(0)) : part)));
+
+  test("as PNG, GIF, JPEG, BMP, WebP and icon files say it", () => {
+    expect(pictureSize(png(18, 12, () => [0, 0, 0]))).toEqual({ width: 18, height: 12 });
+    expect(pictureSize(bytes("GIF89a", [0x40, 0x01, 0xf0, 0x00]))).toEqual({ width: 320, height: 240 });
+    // A JPEG's start, a table (stepped over), then its frame's header.
+    expect(pictureSize(bytes([0xff, 0xd8, 0xff, 0xdb, 0x00, 0x04, 0, 0, 0xff, 0xc0, 0x00, 0x11, 8, 0x01, 0xe0, 0x02, 0x80, 3]))).toEqual({ width: 640, height: 480 });
+    // A BMP drawn top down says its height less than nothing.
+    expect(pictureSize(bytes("BM", Array(16).fill(0), [32, 0, 0, 0], [0xf0, 0xff, 0xff, 0xff]))).toEqual({ width: 32, height: 16 });
+    expect(pictureSize(bytes("RIFF", [0, 0, 0, 0], "WEBP", "VP8X", [10, 0, 0, 0], [0, 0, 0, 0], [0x3f, 0x01, 0x00], [0xef, 0x00, 0x00]))).toEqual({ width: 320, height: 240 });
+    // An icon file: by the PNG inside it, or where it holds another kind of picture, as its entry says (0 for 256).
+    expect(pictureSize(ico(png(48, 48, () => [0, 0, 0]), 48))).toEqual({ width: 48, height: 48 });
+    expect(pictureSize(bytes([0, 0, 1, 0, 1, 0], [0, 0, 0, 0, 1, 0, 32, 0], [0, 0, 0, 0], [22, 0, 0, 0]))).toEqual({ width: 256, height: 256 });
+    expect(pictureSize(bytes("<html>"))).toBeNull();
+  });
+
+  test("one that says it's more than 8,192 pixels across isn't drawn, nor one whose size can't be told", () => {
+    expect(drawable(png(16, 16, () => [0, 0, 0]))).toBe(true);
+    expect(drawable(png(9000, 1, () => [0, 0, 0]))).toBe(false);
+    expect(drawable(bytes("GIF89a", [0xff, 0xff, 0x01, 0x00]))).toBe(false);
+    expect(drawable(bytes("not a picture"))).toBe(false);
+  });
+
+  test("a drawing (SVG) is told by its text, whatever it was said to be", () => {
+    const text = (words: string) => new TextEncoder().encode(words);
+    expect(isDrawing(text('<svg xmlns="http://www.w3.org/2000/svg"/>'))).toBe(true);
+    expect(isDrawing(text('\uFEFF<?xml version="1.0"?>\n<!-- A mark -->\n<svg xmlns="http://www.w3.org/2000/svg"/>'))).toBe(true);
+    expect(isDrawing(text('<?xml version="1.0"?><rss version="2.0"/>'))).toBe(false);
+    expect(isDrawing(text("<html><body>Not found</body></html>"))).toBe(false);
+    expect(isDrawing(png(4, 4, () => [0, 0, 0]))).toBe(false);
   });
 });
 

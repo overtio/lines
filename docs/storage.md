@@ -16,7 +16,7 @@ Browser storage belongs to one site (origin) in one browser profile. Another bro
 | `lines` | `attachments` | Images and files added to notes, named by their content hash |
 | `lines` | `sync` | What was last exchanged with the sync folder or bucket, per note, to tell which side changed |
 | `lines-folders` | `folders` | The browser's handle to the folder chosen with **Save to a folder**, so lines can use it again after a reload |
-| `lines-feeds` | `feeds` | Each feed subscribed to: what it said of itself and what it's written in (RSS, Atom or RSS 1.0, for the sidebar's rows by kind), its newest 200 posts (all but their content), which were read, and its ETag and Last-Modified for asking whether it changed |
+| `lines-feeds` | `feeds` | Each feed subscribed to: what it said of itself and what it's written in (RSS, Atom or RSS 1.0, for the sidebar's rows by kind), its newest 200 posts (all but their content), which were read, and its ETag and Last-Modified for asking whether it changed (its picture is its note's cover, an attachment) |
 | `lines-feeds` | `posts` | Each post's content, as the feed gave it (HTML), read when the post is opened |
 | `lines-feeds` | `positions` | Where each podcast episode was stopped, and whether it was played to the end; the episode in the player, to put back after the app lock or a restart; and where each book kept with a note was left, and how far it's been read, by the note |
 

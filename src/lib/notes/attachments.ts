@@ -220,12 +220,37 @@ export function attachmentURL(name: string): Promise<string | null> {
  */
 export const attachmentHere = (name: string): boolean | undefined => here.get(name);
 
-/** Calls `callback` when an attachment that wasn't here arrives (from sync, or another window). */
+/** How long an attachment that isn't here is waited for by arrivedURL. */
+const ARRIVAL_WAIT = 10_000;
+
+/**
+ * A URL for showing an attachment once it's here: at once if it is, else when it arrives (a cover
+ * kept just after its note, or synced) within a few seconds; null if it doesn't.
+ */
+export async function arrivedURL(name: string): Promise<string | null> {
+  const url = await attachmentURL(name);
+  if (url) return url;
+  return new Promise((resolve) => {
+    const stop = whenArrived(name, () => {
+      clearTimeout(timer);
+      void attachmentURL(name).then(resolve);
+    });
+    const timer = setTimeout(() => {
+      stop();
+      resolve(null);
+    }, ARRIVAL_WAIT);
+  });
+}
+
+/** Calls `callback` when an attachment that wasn't here arrives (from sync, or another window). What it returns stops waiting. */
 export function whenArrived(name: string, callback: () => void) {
   let set = waiting.get(name);
   if (!set) waiting.set(name, (set = new Set()));
   set.add(callback);
-  return () => set.delete(callback);
+  return () => {
+    set.delete(callback);
+    if (!set.size && waiting.get(name) === set) waiting.delete(name);
+  };
 }
 
 /** An attachment was stored, here or in another window. */

@@ -1,14 +1,16 @@
+import { readAtMost } from "../feeds/fetch";
 import { attachmentNameOf, putAttachment } from "../notes/attachments";
-import { smaller } from "../pictures";
+import { drawable, smaller } from "../pictures";
 import { plugins } from "../plugins/registry.svelte";
 import type { LibraryItem } from "../plugins/types";
+import { iconCover } from "./icon";
 import { firstStatus } from "./shelves.svelte";
 import { libraryNoteText } from "./text";
 import { isPublic, request } from "./web";
 
 /** The longest side a cover is kept at: sharp in a note on a Retina screen, and light to sync. */
 const COVER_SIDE = 1200;
-/** The most a cover may weigh as it's downloaded: anything heavier isn't one. */
+/** The most a cover may weigh as it's downloaded: it stops being read past that. */
 const COVER_BYTES = 20_000_000;
 /** How wide a note shows its cover, by its kind's shape: enough to know it by, leaving room for the rest. */
 export const COVER_WIDTH = { tall: 240, square: 240, wide: 400 };
@@ -19,18 +21,28 @@ export interface LibraryNote {
   keep(): Promise<void>;
 }
 
+/** A cover to keep with a note: the picture, the attachment's name it's kept under, and how wide the note shows it. */
+export interface Cover {
+  picture: Blob;
+  name: string;
+  width: number;
+}
+
 /**
  * The picture at `url`, ready to keep with a note (no larger than it needs to be); nothing where it
  * can't be had (on the web, a site that doesn't let pages download it), or where it isn't on the
- * web at large (a page can't have lines fetch from this computer's network).
+ * web at large (a page can't have lines fetch from this computer's network), or says it's too big to
+ * draw.
  */
 async function coverAt(url: string, signal?: AbortSignal): Promise<Blob | undefined> {
   if (!isPublic(url)) return undefined;
   try {
     const response = await request(url, signal ?? new AbortController().signal);
-    if (!response.ok || !(response.headers.get("content-type") ?? "").startsWith("image/")) return undefined;
+    const type = response.headers.get("content-type") ?? "";
+    if (!response.ok || !type.startsWith("image/")) return undefined;
     if (Number(response.headers.get("content-length")) > COVER_BYTES) return undefined;
-    return await smaller(await response.blob(), COVER_SIDE);
+    const bytes = await readAtMost(response.body, COVER_BYTES);
+    return drawable(bytes) ? await smaller(new Blob([bytes as BlobPart], { type }), COVER_SIDE) : undefined;
   } catch (error) {
     signal?.throwIfAborted();
     console.warn("lines: couldn't get a cover", error);
@@ -45,14 +57,22 @@ async function coverAt(url: string, signal?: AbortSignal): Promise<Blob | undefi
  * brought from another app can say where it's got to instead (`status`, or null for nowhere).
  */
 export async function libraryNote(item: LibraryItem, signal?: AbortSignal, { status = firstStatus(item.type) }: { status?: string | null } = {}): Promise<LibraryNote> {
-  const kind = plugins.libraryKind(item.type);
-  const picture = item.cover ? await coverAt(item.cover, signal) : undefined;
-  const name = picture && (await attachmentNameOf(picture));
-  const cover = name ? { name, width: COVER_WIDTH[kind?.cover ?? "square"] } : undefined;
+  const cover = await coverOfItem(item, signal);
   return {
-    text: libraryNoteText(item, { status: status ?? undefined, cover, mentions: kind?.mentions }),
+    text: libraryNoteText(item, { status: status ?? undefined, cover, mentions: plugins.libraryKind(item.type)?.mentions }),
     keep: async () => {
-      if (picture && name) await putAttachment(name, picture);
+      if (cover) await putAttachment(cover.name, cover.picture);
     },
   };
+}
+
+/** The cover of a note for `item`: its picture, else its site's icon (a feed's that has none); nothing where neither can be had. */
+export async function coverOfItem(item: LibraryItem, signal?: AbortSignal): Promise<Cover | undefined> {
+  return (item.cover && (await coverFor(item.cover, item.type, signal))) || (item.icon ? await iconCover(item.icon) : undefined);
+}
+
+/** The picture at `url` as the cover of a note of `type`, at the width its kind's covers are shown; nothing where it can't be had. */
+export async function coverFor(url: string, type: string, signal?: AbortSignal): Promise<Cover | undefined> {
+  const picture = await coverAt(url, signal);
+  return picture && { picture, name: await attachmentNameOf(picture), width: COVER_WIDTH[plugins.libraryKind(type)?.cover ?? "square"] };
 }
