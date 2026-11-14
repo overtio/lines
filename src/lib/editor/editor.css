@@ -513,6 +513,17 @@
   background: none;
 }
 
+/*
+ * The note's text beside them: the two a two-column page, centred, the text narrowed where there
+ * isn't room for both at their widths (propertiesApart.ts works them out). A backdrop's page too.
+ */
+.cm-editor.cm-page > .cm-scroller[data-props-beside] > .cm-content {
+  flex-grow: 0 !important;
+  width: var(--props-text-width) !important;
+  max-width: none !important;
+  margin-inline: var(--props-text-left) 0 !important;
+}
+
 .cm-props-beside .cm-line.cm-lp-props-fence:not(.is-active) {
   padding-block: 0 !important;
   background: none;

@@ -219,6 +219,8 @@ const OUTLINE = 44;
 /** How narrow properties beside the text can be, and how wide they get, in the text's ems. */
 const NARROWEST = 16;
 const WIDEST = 22;
+/** How narrow the text gets to make room for them, in its ems (unless it's chosen narrower): a comfortable measure still. */
+const READABLE = 30;
 
 interface Layout {
   room: boolean;
@@ -228,6 +230,8 @@ interface Layout {
   width: number;
   /** For after the text: how much room to keep there. */
   height: number;
+  /** Beside the text: where its column (with its padding) goes in the scroller, and how wide it is. */
+  text?: { left: number; width: number };
 }
 
 /** Focuses `view` once the update it's in is done. */
@@ -236,12 +240,24 @@ const focusLater = (view: EditorView) => queueMicrotask(() => view.dom.isConnect
 class PropertiesPane {
   pane: EditorView | null = null;
   readonly host = document.createElement("div");
+  /**
+   * Laid out again, with the editor's own measuring (so in step with its lines, and never while the
+   * browser is still resizing things), when the scroller is resized (the window, a pane), or the
+   * text's width or their height changes.
+   */
   readonly #resized = new ResizeObserver(() => this.measure());
+  /** The note's width, its margins or the text's size changed (Settings → Typography), on the page's root. */
+  readonly #restyled = new MutationObserver(() => this.measure());
   #layout: Layout | null = null;
+  /** Where the note's text is laid beside the properties, as last set ("" where it isn't). */
+  #text = "";
   #gone = false;
 
   constructor(readonly view: EditorView) {
-    for (const el of [view.scrollDOM, view.contentDOM, this.host]) this.#resized.observe(el);
+    // The scroller's whole box, which a scroll bar coming and going leaves as it is.
+    this.#resized.observe(view.scrollDOM, { box: "border-box" });
+    for (const el of [view.contentDOM, this.host]) this.#resized.observe(el);
+    this.#restyled.observe(document.documentElement, { attributeFilter: ["style"] });
     if (drawnEnd(view.state) >= 0) this.open();
     this.measure();
   }
@@ -289,8 +305,9 @@ class PropertiesPane {
     view.scrollDOM.append(this.host);
   }
 
-  /** Drawn in the note again, the properties keep the cursor that was in them. */
+  /** Drawn in the note again, the properties keep the cursor that was in them; its text goes back to where it was. */
   close() {
+    this.layText(undefined);
     const { pane } = this;
     if (!pane) return;
     this.pane = null;
@@ -384,43 +401,61 @@ class PropertiesPane {
     return true;
   }
 
-  measure = () => {
+  /** Lays them out with the editor's next measuring: while there are properties, or once to begin with. */
+  measure() {
     if (this.#gone || (this.#layout && this.view.state.field(apart).end < 0)) return;
     this.view.requestMeasure({ key: this, read: (view) => this.read(view), write: (layout) => this.write(layout) });
-  };
+  }
 
   read(view: EditorView): Layout {
     const place = view.state.facet(placeFacet);
     const scroller = view.scrollDOM;
     const box = scroller.getBoundingClientRect();
-    const text = textColumn(view);
     const style = getComputedStyle(view.dom);
     const size = parseFloat(style.fontSize);
-    // In the scroller's own coordinates, so they scroll with the note.
-    const x = (left: number) => left - box.left + scroller.scrollLeft;
+    // Down the scroller's own content, so they scroll with the note (it doesn't scroll across).
     const y = (top: number) => top + view.documentTop - box.top + scroller.scrollTop;
     if (place === "bottom") {
+      const text = textColumn(view);
       const block = view.lineBlockAt(view.state.doc.length);
       const rows = typeof block.type === "number" ? [block] : block.type.filter((part) => part.type === BlockType.Text);
-      return { room: true, top: y(rows[rows.length - 1].bottom) + size, left: x(text.left), width: text.right - text.left, height: Math.ceil(this.host.offsetHeight + size) };
+      return { room: true, top: y(rows[rows.length - 1].bottom) + size, left: text.left - box.left, width: text.right - text.left, height: Math.ceil(this.host.offsetHeight + size) };
     }
-    // Over a backdrop, outside the note's page (the text column's padding), on a card of their own
-    // with half the room between pages around their text (editor.css), and that room around it.
-    const page = parseFloat(style.getPropertyValue("--page-gap"));
-    const gap = page ? text.left - view.contentDOM.getBoundingClientRect().left + page * 1.5 : GAP;
-    const edge = (page ? page * 1.5 : EDGE) + (prefs.outline && prefs.outlineSide === place ? OUTLINE : 0);
-    const free = (place === "right" ? box.left + scroller.clientWidth - text.right : text.left - box.left) - gap - edge;
-    const width = Math.min(free, WIDEST * size);
-    const left = place === "right" ? text.right + gap : text.left - gap - width;
+    // Beside it, the text and the properties are a two-column page, centred in the scroller (its
+    // whole width, so a scroll bar coming and going doesn't move them). Short of room, they're as
+    // narrow as they go, and then the text narrows, down to a comfortable measure; past that they're
+    // at the top. Over a backdrop, the text's page and their card (editor.css) are what's centred,
+    // the room between pages around and between them.
+    const pad = parseFloat(getComputedStyle(view.contentDOM).paddingLeft);
+    const page = parseFloat(style.getPropertyValue("--page-gap")) || 0;
+    const outline = prefs.outline && prefs.outlineSide === place ? OUTLINE : 0;
+    const gap = page ? pad + page * 1.5 : GAP;
+    const margin = page ? page + outline : Math.max(pad, EDGE + outline);
+    /** Between the text and its page's edge, and between them and their card's. */
+    const inset = page ? { text: pad, them: page / 2 } : { text: 0, them: 0 };
+    const room = box.width - 2 * margin - inset.text - inset.them - gap;
+    const chosen = Math.min(parseFloat(style.getPropertyValue("--editor-width")) || Infinity, box.width - 2 * page) - 2 * pad;
+    const width = Math.min(Math.max(room - chosen, NARROWEST * size), WIDEST * size);
+    const narrowed = Math.min(chosen, room - width);
+    const start = (box.width - (inset.text + narrowed + gap + width + inset.them)) / 2;
+    const textLeft = place === "right" ? start + inset.text : start + inset.them + width + gap;
     const first = view.lineBlockAt(Math.max(0, view.state.field(apart).end + 1));
-    return { room: width >= NARROWEST * size, top: y(first.top), left: x(left), width, height: 0 };
+    return {
+      room: narrowed >= Math.min(chosen, READABLE * size),
+      top: y(first.top),
+      left: place === "right" ? textLeft + narrowed + gap : start + inset.them,
+      width,
+      height: 0,
+      text: { left: textLeft - pad, width: narrowed + 2 * pad },
+    };
   }
 
   write(layout: Layout) {
     if (this.#gone) return;
     this.#layout = layout;
     this.place(layout);
-    const { room, height } = this.view.state.field(apart);
+    const { end, room, height } = this.view.state.field(apart);
+    this.layText(layout.room && end >= 0 ? layout.text : undefined);
     if (layout.room !== room || layout.height !== height) {
       queueMicrotask(() => !this.#gone && this.view.state.field(apart, false) && this.view.dispatch({ effects: measured.of(layout) }));
     }
@@ -430,9 +465,24 @@ class PropertiesPane {
     Object.assign(this.host.style, { top: `${top}px`, left: `${left}px`, width: `${width}px`, opacity: "" });
   }
 
+  /** The note's text column beside the properties (editor.css), or where it goes without them; measured again once it moves. */
+  layText(text: Layout["text"]) {
+    const laid = text ? `${text.left} ${text.width}` : "";
+    if (laid === this.#text) return;
+    this.#text = laid;
+    const { scrollDOM } = this.view;
+    for (const [name, px] of [["--props-text-left", text?.left], ["--props-text-width", text?.width]] as const) {
+      if (px === undefined) scrollDOM.style.removeProperty(name);
+      else scrollDOM.style.setProperty(name, `${px}px`);
+    }
+    scrollDOM.toggleAttribute("data-props-beside", !!text);
+    this.view.requestMeasure();
+  }
+
   destroy() {
     this.#gone = true;
     this.#resized.disconnect();
+    this.#restyled.disconnect();
     this.close();
   }
 }

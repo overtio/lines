@@ -1166,8 +1166,8 @@ test("Show Markdown: Hidden shows a note's properties without their `---` lines 
 
 describe("properties drawn apart (Settings → Layout → Properties)", () => {
   const NOTE = "---\ntype: person\nfullname: Ada Lovelace\nborn: 1815\n---\n# Ada\n\nShe wrote the first program.\n\nThe end.";
-  /** Wide enough for them beside the note's text, with the sidebar and the list shown. */
-  const WIDE = 2000;
+  /** A MacBook's window, the sidebar and the list shown: room for them beside the text, once it's narrowed. */
+  const WIDE = 1512;
 
   /** The app again, with the properties drawn at `place`, in a window `width` wide. */
   async function reopen(place: string, width = 1280) {
@@ -1198,8 +1198,16 @@ describe("properties drawn apart (Settings → Layout → Properties)", () => {
       if (place === "left") expect(drawn.x + drawn.width).toBeLessThan(text.x);
       if (place === "right") expect(drawn.x).toBeGreaterThan(text.x + text.width);
       if (place === "bottom") expect(drawn.y).toBeGreaterThan(text.y + text.height);
-      // Beside the text, level with its first line.
-      if (place !== "bottom") expect(Math.abs(drawn.y - title.y)).toBeLessThan(4);
+      if (place !== "bottom") {
+        // Level with the text's first line; the two a two-column page, centred, the text narrowed
+        // for them (from 640 px) but no narrower than 30 of its ems.
+        expect(Math.abs(drawn.y - title.y)).toBeLessThan(4);
+        const scroller = (await app.page.locator(".editor-pane .cm-editor:not(.cm-props) > .cm-scroller").first().boundingBox())!;
+        const [from, to] = place === "left" ? [drawn.x, text.x + text.width] : [text.x, drawn.x + drawn.width];
+        expect(Math.abs(from - scroller.x - (scroller.x + scroller.width - to))).toBeLessThan(2);
+        expect(text.width).toBeLessThan(640);
+        expect(text.width).toBeGreaterThanOrEqual(30 * 17);
+      }
       expect(await properties().locator(".cm-lp-prop-type-icon").count()).toBe(1);
       expect(await noteText()).not.toContain("Lovelace");
       expect(await app.text()).toBe(NOTE);
@@ -1290,6 +1298,12 @@ describe("properties drawn apart (Settings → Layout → Properties)", () => {
     await app.page.setViewportSize({ width: WIDE, height: 820 });
     await properties().waitFor();
     expect(await noteText()).not.toContain("Lovelace");
+    // A note without them has its text where it always is, centred, as wide as it's chosen.
+    await app.open("# Plain\n\nText");
+    const scroller = (await app.page.locator(".editor-pane .cm-editor > .cm-scroller").first().boundingBox())!;
+    const content = (await app.page.locator(".editor-pane .cm-editor > .cm-scroller > .cm-content").first().boundingBox())!;
+    expect(content.width).toBe(720);
+    expect(Math.abs(content.x - scroller.x - (scroller.x + scroller.width - content.x - content.width))).toBeLessThan(16);
   });
 
   test("`/properties` puts them in their place with the cursor in them, and Find reaches them there", async () => {

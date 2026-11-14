@@ -311,7 +311,7 @@ export default {
   "settings.outlineNote": "Un petit trait à côté de la note pour chacun de ses titres, plus foncé pour la partie que vous lisez. Survolez-les pour voir les titres, et choisissez-en un pour y aller. Affiché quand une note a au moins deux titres et qu’il y a de la place à côté.",
   "settings.outlineSide": "Côté du plan",
   "settings.propertiesPlace": "Propriétés",
-  "settings.propertiesPlaceNote": "Où s’affichent les propriétés d’une note. À gauche ou à droite, il leur faut de la place à côté de la note, sinon elles s’affichent en haut. Son fichier les garde en haut dans tous les cas.",
+  "settings.propertiesPlaceNote": "Où s’affichent les propriétés d’une note. À gauche ou à droite, le texte de la note leur fait de la place, en se rétrécissant un peu s’il le faut ; dans une fenêtre trop étroite pour les deux, elles s’affichent en haut. Son fichier les garde en haut dans tous les cas.",
   "settings.placeTop": "En haut",
   "settings.placeBottom": "En bas",
   "settings.sidebarAbout": "Version et GitHub dans la barre latérale",

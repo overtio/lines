@@ -339,7 +339,7 @@ export default {
   "settings.outlineNote": "A short line beside the note for each of its headings, darker for the part you’re reading. Point at them to see the headings, and choose one to go there. Shown when a note has two or more headings and there’s room beside it.",
   "settings.outlineSide": "Outline side",
   "settings.propertiesPlace": "Properties",
-  "settings.propertiesPlaceNote": "Where a note’s properties show. On the left or right they need room beside the note, and show at the top without it. Its file keeps them at its top either way.",
+  "settings.propertiesPlaceNote": "Where a note’s properties show. On the left or right, the note’s text makes room for them, narrowing a little if it must; in a window too narrow for both, they show at the top. Its file keeps them at its top either way.",
   "settings.placeTop": "Top",
   "settings.placeBottom": "Bottom",
   "settings.sidebarAbout": "Version and GitHub in the sidebar",

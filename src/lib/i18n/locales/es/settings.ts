@@ -311,7 +311,7 @@ export default {
   "settings.outlineNote": "Una línea corta junto a la nota por cada uno de sus encabezados, más oscura en la parte que estás leyendo. Pasa el puntero por encima para ver los encabezados y elige uno para ir allí. Aparece cuando una nota tiene dos o más encabezados y hay espacio a su lado.",
   "settings.outlineSide": "Lado del esquema",
   "settings.propertiesPlace": "Propiedades",
-  "settings.propertiesPlaceNote": "Dónde aparecen las propiedades de una nota. A la izquierda o a la derecha necesitan espacio junto a la nota, y sin él aparecen arriba. Su archivo las mantiene arriba en cualquier caso.",
+  "settings.propertiesPlaceNote": "Dónde aparecen las propiedades de una nota. A la izquierda o a la derecha, el texto de la nota les deja sitio, estrechándose un poco si hace falta; en una ventana demasiado estrecha para ambos, aparecen arriba. Su archivo las mantiene arriba en cualquier caso.",
   "settings.placeTop": "Arriba",
   "settings.placeBottom": "Abajo",
   "settings.sidebarAbout": "Versión y GitHub en la barra lateral",
