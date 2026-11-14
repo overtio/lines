@@ -64,6 +64,8 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - On the web, a site's answer can't be read either unless it allows it: a feed that says to wait (with Retry-After) or that it's gone looks like one that couldn't be reached, so it's asked again as one that failed, later each time, a day at most.
 - **Each device fetches the posts itself.** Subscriptions are notes and sync, and so does what's done with posts (read, unread, dismissed, restored), but the posts themselves are kept on each device. Posts read before lines synced this stay as each device had them.
 - **A post is known by its id**, its guid (a JSON Feed item's `id`), or else its link (and its title, where the feed's other posts share the link), or else its title, date and text. A feed that changes a post's guid, or edits a post that has neither guid nor link, makes it a new post: unread, and back in the list if it was dismissed. Where an episode was stopped is still per device.
+- Filters read a post's title, author, categories and the start of its text, its first 2,000 characters; words further on aren't matched. A stream has no filters of its own, only its feeds'. Filters match words and phrases as written: no wildcards or regular expressions, and no "and" (a post with both of two words). In Chinese, Japanese, Thai, Lao, Khmer, Burmese and Korean a word is found anywhere in the text, so a short one can match within a longer word.
+- **Feeds don't learn what interests you yet.** Planned: a filter that learns from what you read, save to the Library and mark Not Interesting, with a small model trained on the device or an AI agent of your choosing, to keep, hide or rank posts. What it learns from is kept with each post on the device already (read, dismissed and why, saved). Nothing about it would leave the device unless you chose an agent that does.
 - Only the newest 200 posts of each feed are kept, dismissed ones too. Older ones go, and so does their content, unless saved to the Library.
 - A post can't be swiped away on a phone yet, as a note can: its menu (a long press) and the Dismiss button on its row, or over it, do it.
 - A post is shown as Markdown made from its HTML: what Markdown can't say (layouts, embedded players, forms, styling) is left out, and embedded videos are links. Its pictures load from the web each time it's opened.
@@ -525,6 +527,7 @@ What isn't done yet is in [secrets.md](secrets.md#not-yet).
 - On the web, each tab unlocks on its own.
 - There's no Face ID on iPhone yet; the passphrase works there.
 - A forgotten passphrase means erasing the device. Synced notes come back from sync storage.
+- The words hidden in every feed (Settings → Library → Feed filters) are kept in localStorage, not encrypted by the app lock, as other settings aren't; a feed's own filters are on its note, encrypted with it. Erase This Device clears them.
 
 ## Locked notes
 

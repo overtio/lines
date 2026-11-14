@@ -45,6 +45,11 @@
   } = $props();
 
   const post = $derived(row.post);
+  /** Kept out of the list by a filter (filters.ts): shown among the posts dismissed, saying why. */
+  const filtered = $derived.by(() => {
+    const out = feeds.outOf(post);
+    return out && "filtered" in out ? out.filtered : null;
+  });
   const source = $derived(feeds.subscription(row.feed)?.title ?? feeds.records.get(row.feed)?.title ?? "");
   let menuOpen = $state(false);
 
@@ -153,6 +158,9 @@
         {/if}
         {#if post.dismissed === "uninteresting"}
           <span aria-hidden="true">·</span><span class="flex shrink-0 items-center gap-0.5"><Icon name="thumbs-down" size={12} />{t("feeds.wasUninteresting")}</span>
+        {:else if filtered}
+          <!-- Which of the words it's hidden for, or that it has none of those its feed keeps. -->
+          <span aria-hidden="true">·</span><span class="flex min-w-0 items-center gap-0.5"><Icon name="funnel" size={12} class="shrink-0" /><span class="truncate">{filtered.term ? t("feeds.filters.hiddenFor", { term: filtered.term }) : t("feeds.filters.notKept")}</span></span>
         {/if}
       </span>
     </button>

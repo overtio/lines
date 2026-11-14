@@ -39,6 +39,8 @@ export interface Post {
   /** Where it's talked about: its comments' page (Hacker News'), if the feed says. */
   comments?: string;
   author?: string;
+  /** Its categories or tags, as the feed names them, if it does. */
+  categories?: string[];
   /** When it was published (or last updated, if that's all it says), in milliseconds. */
   date?: number;
   /** Its content, as HTML. */
@@ -214,6 +216,19 @@ function children(parent: Element, name: string, ns: string | null): Element[] {
 
 const child = (parent: Element, name: string, ns: string | null): Element | undefined => children(parent, name, ns)[0];
 
+/** A post's categories or tags (RSS's `<category>`, Atom's terms, Dublin Core's subjects), each once, if it has any. */
+const categoriesOf = (item: Element, ns: string | null) =>
+  namesOnce([
+    ...children(item, "category", ns).map((category) => category.getAttribute("label") ?? category.getAttribute("term") ?? category.textContent),
+    ...children(item, "subject", NS.dc).map((subject) => subject.textContent),
+  ]);
+
+/** These names (those that are text), trimmed and each once; none if there are none. */
+function namesOnce(names: unknown[]): string[] | undefined {
+  const found = names.flatMap((name) => (typeof name === "string" && name.trim() ? [name.trim()] : []));
+  return found.length ? [...new Set(found)] : undefined;
+}
+
 /** The trimmed text of the first child named so, if it has any. */
 function text(parent: Element, name: string, ns: string | null): string | undefined {
   return child(parent, name, ns)?.textContent?.trim() || undefined;
@@ -361,6 +376,7 @@ function readItem(item: Element, base: string, ns: string | null): Post {
     link,
     comments,
     author: authorName(text(item, "author", ns) ?? tags.author),
+    categories: categoriesOf(item, ns),
     date,
     html,
     // A post's relative links are from its own page, if it has one.
@@ -444,6 +460,7 @@ function readAtom(root: Element, url: string): Feed {
       link,
       comments,
       author: name(entry) ?? entryTags.author ?? feedAuthor,
+      categories: categoriesOf(entry, ns),
       date,
       html,
       base: content ? baseOf(content, entryBase) : entryBase,
@@ -524,6 +541,7 @@ function readJson(feed: Fields, url: string): Feed {
       base,
       excerpt: excerptOf(summary ? textHtml(summary) : html, base, [link]),
       image: address(textOf(item.image) ?? textOf(item.banner_image), base),
+      categories: namesOnce(Array.isArray(item.tags) ? item.tags : []),
       audio,
       duration: typeof seconds === "number" && seconds > 0 ? Math.round(seconds) : undefined,
     };

@@ -12,9 +12,16 @@
   import Segmented from "../ui/Segmented.svelte";
   import Select from "../ui/Select.svelte";
   import Switch from "../ui/Switch.svelte";
+  import TextField from "../ui/TextField.svelte";
+  import { termsOf, writeTerms } from "../../feeds/filters";
+  import { mutedWords } from "../../feeds/muted.svelte";
 
   // The feeds' part of Settings → Library: how they're listed in the sidebar, how often they're
-  // fetched, whether a post read leaves the list, and OPML in and out.
+  // fetched, whether a post read leaves the list, and OPML in and out; and the words hidden in every
+  // feed (feeds/filters.ts), which sync.
+
+  /** What's typed, starting as they are. */
+  let muted = $derived(writeTerms(mutedWords.words));
 
   const inSidebar = [
     { id: "kind", label: t("feeds.byKind") },
@@ -87,5 +94,20 @@
         <Callout tone="danger" class="mt-2 w-full">{error}</Callout>
       {/if}
     {/snippet}
+  </FieldRow>
+</FieldGroup>
+
+<FieldGroup title={t("feeds.filters.group")}>
+  <FieldRow label={t("feeds.filters.everywhere")} note={t("feeds.filters.everywhereNote")}>
+    <!-- Kept as it's left, or on Enter. -->
+    <TextField
+      class="w-[min(280px,100%)]"
+      bind:value={muted}
+      aria-label={t("feeds.filters.everywhere")}
+      placeholder={t("feeds.filters.excludeExample")}
+      autocomplete="off"
+      spellcheck="false"
+      onchange={() => mutedWords.set(termsOf(muted))}
+    />
   </FieldRow>
 </FieldGroup>

@@ -96,6 +96,8 @@ class UIState {
   tagPrompt = $state.raw<TagPrompt | null>(null);
   /** Where the box to subscribe to a feed opens, while it's open. */
   subscribePrompt = $state.raw<Omit<TagPrompt, "ids"> | null>(null);
+  /** The feed whose own filters are being set (FeedFilters.svelte), while they are. */
+  feedFilters = $state<string | null>(null);
   /** The box a stream's name is typed in, while it's open: a new one for `feed`, or `rename`'s new name. */
   streamPrompt = $state.raw<(Omit<TagPrompt, "ids"> & { feed?: string; rename?: string }) | null>(null);
   /**

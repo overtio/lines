@@ -224,6 +224,22 @@ describe("reading feeds", () => {
     expect(json.posts.map((post) => post.id)).toEqual(["https://a.example/story\nFirst take", "https://a.example/story\nSecond take", "https://b.example/", "7"]);
   });
 
+  test("a post's categories: RSS's, Dublin Core's subjects, Atom's terms (or labels), JSON Feed's tags, each once", async () => {
+    const rss = await read(
+      `<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>News</title><item><title>A</title><guid>a</guid><category domain="x">Rust</category><category>Web</category><category>Rust</category><dc:subject>Compilers</dc:subject></item><item><title>B</title><guid>b</guid></item></channel></rss>`,
+      "https://news.example/rss",
+    );
+    expect(rss.posts.map((post) => post.categories)).toEqual([["Rust", "Web", "Compilers"], undefined]);
+    const atom = await read(`<feed xmlns="http://www.w3.org/2005/Atom"><title>Blog</title><entry><title>A</title><id>a</id><category term="svelte"/><category term="js" label="JavaScript"/></entry></feed>`, "https://blog.example/feed");
+    expect(atom.posts[0].categories).toEqual(["svelte", "JavaScript"]);
+    const items = [
+      { id: "a", content_text: "A", tags: ["engines", " Rust ", 7, "engines", ""] },
+      { id: "b", content_text: "B", tags: "engines" },
+    ];
+    const json = await read(JSON.stringify({ version: "https://jsonfeed.org/version/1.1", title: "Blog", items }), "https://blog.example/feed.json");
+    expect(json.posts.map((post) => post.categories)).toEqual([["engines", "Rust"], undefined]);
+  });
+
   test("a page isn't a feed", async () => {
     const refused = await app.page.evaluate(() => {
       try {

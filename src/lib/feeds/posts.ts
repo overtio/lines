@@ -1,3 +1,4 @@
+import type { Filtered } from "./filters";
 import type { Dismissal } from "./marks";
 import type { Feed, Post } from "./parse";
 
@@ -18,6 +19,8 @@ export interface KeptPost extends Omit<Post, "html"> {
   read: boolean;
   /** Taken out of the lists, and why: done with, or not interesting. */
   dismissed?: Dismissal;
+  /** Kept out of the lists by its feed's filters, or those of every feed (filters.ts), as they were when `FeedRecord.filters` says. */
+  filtered?: Filtered;
   /** When it was first seen here: its place among posts with no date. */
   seen: number;
   /** When a fetch last had it in the feed (`FeedRecord.fetchedAt` while it's still there). */
@@ -37,6 +40,8 @@ export interface FeedRecord extends Omit<Feed, "posts"> {
   checked?: number;
   /** When it was last fetched and read, its posts as they were then (`KeptPost.listed`). */
   fetchedAt?: number;
+  /** The filters its posts' verdicts (`KeptPost.filtered`) were made with (filters.ts `filterKey`). */
+  filters?: string;
   /** Why the last try failed, if it did. */
   error?: string;
   /** How many tries in a row have failed. */

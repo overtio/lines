@@ -365,7 +365,7 @@
     <!-- The posts dismissed, as the Trash's notes are shown: what they are, and the way back to the list. -->
     {#if feedView.dismissed}
       <div class="mx-3 mb-2 flex items-center justify-between gap-2 rounded-lg bg-input px-2.5 py-2 text-xs text-muted">
-        <span>{t("feeds.dismissedHint")}</span>
+        <span>{t("feeds.outHint")}</span>
         <button class="-my-1 min-h-6 font-semibold whitespace-nowrap text-accent coarse:-my-3 coarse:min-h-11" onclick={() => notes.setFilter(withoutDismissed(feedView))}>
           {t("feeds.hideDismissed")}
         </button>
@@ -379,7 +379,7 @@
           <p class="m-0">{t("feeds.none")}</p>
           <Button variant="quiet" icon="plus" onclick={(event) => openSubscribe(event, "center")}>{t("feeds.subscribe")}</Button>
         {:else if feedView.dismissed}
-          <p class="m-0">{t("feeds.noDismissed")}</p>
+          <p class="m-0">{t("feeds.noneOut")}</p>
         {:else if caughtUp}
           <p class="m-0">{t("feeds.allCaughtUp")}</p>
           <Button variant="quiet" icon="archive" onclick={() => notes.setFilter({ ...feedView, dismissed: true })}>{t("feeds.showDismissed")}</Button>

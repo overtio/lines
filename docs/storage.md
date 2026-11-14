@@ -16,12 +16,13 @@ Browser storage belongs to one site (origin) in one browser profile. Another bro
 | `lines` | `attachments` | Images and files added to notes, named by their content hash |
 | `lines` | `sync` | What was last exchanged with the sync folder or bucket, per note, to tell which side changed |
 | `lines-folders` | `folders` | The browser's handle to the folder chosen with **Save to a folder**, so lines can use it again after a reload |
-| `lines-feeds` | `feeds` | Each feed subscribed to: what it said of itself and what it's written in (RSS, Atom, RSS 1.0 or JSON Feed, for the sidebar's rows by kind), its newest 200 posts (all but their content), which were read and which dismissed (and why), and its ETag and Last-Modified for asking whether it changed (its picture is its note's cover, an attachment) |
+| `lines-feeds` | `feeds` | Each feed subscribed to: what it said of itself and what it's written in (RSS, Atom, RSS 1.0 or JSON Feed, for the sidebar's rows by kind), its newest 200 posts (all but their content), which were read and which dismissed (and why), which its filters keep out, and its ETag and Last-Modified for asking whether it changed (its picture is its note's cover, an attachment) |
 | `lines-feeds` | `posts` | Each post's content, as the feed gave it (HTML), read when the post is opened |
+| `lines-feeds` | `words` | What filters read of each feed's posts (each one's title, author, categories and the start of its text, in lower case, Latin and Greek letters without accents), read only when the filters change, and written when a post does |
 | `lines-feeds` | `marks` | What was done with each feed's posts, as it syncs (`feeds/`, [sync.md](sync.md#how-it-works)): when each was read, marked unread, dismissed or restored, by a fingerprint of its id, and when it was last in its feed; and Dismiss All's watermark |
 | `lines-feeds` | `positions` | Where each podcast episode was stopped, and whether it was played to the end; the episode in the player, to put back after the app lock or a restart; and where each book kept with a note was left, and how far it's been read, by the note |
 
-With the app lock on, the notes and attachments in `lines` and everything in `lines-feeds` are encrypted (see [sync.md](sync.md) and `src/lib/lock/vault.ts`). `lines-feeds` keeps each record under a random id (a feed's, a post's, its marks', an episode's note's), so nothing there says what's subscribed to or listened to. Most of it isn't synced: subscriptions are notes and sync as notes do, and each device fetches the posts itself; the marks sync, as `feeds/`.
+With the app lock on, the notes and attachments in `lines` and everything in `lines-feeds` are encrypted (see [sync.md](sync.md) and `src/lib/lock/vault.ts`). `lines-feeds` keeps each record under a random id (a feed's, a post's, its marks', an episode's note's), so nothing there says what's subscribed to or listened to. Most of it isn't synced: subscriptions are notes and sync as notes do, and each device fetches the posts itself; the marks sync, as `feeds/`, with the words hidden in every feed.
 
 ### localStorage
 
@@ -32,6 +33,7 @@ With the app lock on, the notes and attachments in `lines` and everything in `li
 | `lines.plugins` | Plugins turned off or on in Settings |
 | `lines.tabs` | The open tabs, when tabs are on |
 | `lines.tagIcons`, `lines.typeIcons` | Icons given to tags and types |
+| `lines.mutedWords` | The words and phrases hidden in every feed (Settings → Library → Feed filters), and when they were set; they sync as `feeds/muted.json`. Not encrypted by the app lock |
 | `lines.sync` | Where notes sync to: the folder (its name and an id for its handle) or the bucket and its keys. Encrypted while the app lock is on |
 | `lines.sync.shared` | The tag and a hash of each file of feeds' marks as last exchanged with the sync folder or bucket, so only those changed are read or written |
 | `lines.sync.leftovers` | Set only while encrypted copies are being removed after turning end-to-end encryption off |

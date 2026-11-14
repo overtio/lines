@@ -6,7 +6,7 @@ import { coverOfItem, libraryNote } from "../library/note";
 import { clock, coverOf, known, withCover } from "../library/text";
 import { putAttachment } from "../notes/attachments";
 import { dayOf } from "../notes/calendar";
-import { propertyOf } from "../notes/properties";
+import { type Property, propertyOf, setProperties } from "../notes/properties";
 import { isClosed, notes } from "../notes/store.svelte";
 import type { Filter } from "../notes/types";
 import { plugins } from "../plugins/registry.svelte";
@@ -16,6 +16,7 @@ import type { SharedFolder } from "../sync/engine.svelte";
 import { ui } from "../ui.svelte";
 import { fetchFeed, FetchError, type Validators } from "./fetch";
 import { findFeed, linkOf, NoFeed } from "./find";
+import { filterKey, type Filtered, MUTED_FILE, postFilter, readMuted, termsOf, termsValue, wordsOf, writeMuted, writeTerms } from "./filters";
 import { FEED_GROUPS, type FeedGroup, groupOf } from "./groups";
 import {
   applyMarks,
@@ -35,12 +36,13 @@ import {
   withoutDismissal,
   writeShard,
 } from "./marks";
+import { mutedWords } from "./muted.svelte";
 import { readOpml, writeOpml } from "./opml";
 import { cleanStream, streamKey, streamsOf, withoutStream, withStream, writeStreams } from "./streams";
 import { plainText } from "./markdown";
 import { feedItem } from "./item";
 import { isFeed, NotAFeed, readFeed, type Feed } from "./parse";
-import { backoff, DAY, merge, newestFirst, type FeedRecord, type KeptPost } from "./posts";
+import { backoff, DAY, fingerprint, merge, newestFirst, type FeedRecord, type KeptPost } from "./posts";
 import { feedStorage } from "./storage";
 
 /*
@@ -59,6 +61,9 @@ export interface Subscription {
   title: string;
   /** The streams it's in (streams.ts), as its notes name them. */
   streams: string[];
+  /** Its own filters (filters.ts): the words and phrases its posts are kept for, and those they're hidden for. */
+  include: string[];
+  exclude: string[];
 }
 
 /** A stream (streams.ts): its name, its feeds, and how many of their posts are unread. */
@@ -77,8 +82,8 @@ export interface Row {
 /** What the list shows in the Feeds: posts. */
 export type FeedsFilter = Extract<Filter, { kind: "feeds" }>;
 
-/** Whether a post is out of the lists: dismissed. Filters that hide posts would take them out here too. */
-export const isOut = (post: KeptPost) => !!post.dismissed;
+/** Why a post is out of the lists: dismissed, or kept out by a filter (filters.ts). */
+export type Out = { dismissed: Dismissal } | { filtered: Filtered };
 
 /** These posts' ids, by their feeds' addresses. */
 function byFeed(posts: { feed: string; id: string }[]): Map<string, string[]> {
@@ -92,6 +97,16 @@ function byFeed(posts: { feed: string; id: string }[]): Map<string, string[]> {
 }
 
 const idsOf = (rows: Row[]) => rows.map(({ feed, post }) => ({ feed, id: post.id }));
+
+/** A post with this verdict of its feed's filters (null: kept in); the same post if it had it already. */
+function judged(post: KeptPost, filtered: Filtered | null | undefined): KeptPost {
+  if (filtered?.term === post.filtered?.term && !filtered === !post.filtered) return post;
+  const { filtered: _, ...rest } = post;
+  return filtered ? { ...rest, filtered } : rest;
+}
+
+/** What filters read of a post is read of: its content (its fingerprint), and what's said of it. */
+const readOf = ({ version, title, author, categories }: KeptPost) => fingerprint(JSON.stringify([version, title, author, categories]));
 
 /** The library source of feeds' own links (src/plugins/feeds). */
 export const FEED_SOURCE = "feeds";
@@ -118,22 +133,31 @@ export function feedOf(properties: Parameters<typeof propertyOf>[0]): string | n
 /** The note (not in the Trash) whose `key` property is `value`: a post saved to the Library, by its link or its sound. */
 export const savedWith = (key: string, value: string) => notes.entries.find(({ note, meta }) => !note.trashed && propertyOf(meta.properties, key)?.value.trim() === value);
 
+/** A subscription's note's own filters, as written: its `include:` and `exclude:` (filters.ts). */
+const filtersOf = (properties: Parameters<typeof propertyOf>[0]) => ({
+  include: termsOf(propertyOf(properties, "include")?.value ?? ""),
+  exclude: termsOf(propertyOf(properties, "exclude")?.value ?? ""),
+});
+
 /**
  * Every subscription as one line each, so typing that changes none leaves it the same and nothing
- * below redraws: its feed, its note, its title and its streams.
+ * below redraws: its feed, its note, its title, its streams and its filters.
  */
 function signature() {
-  const found = new Map<string, { note: string; title: string; updated: number; streams: string[] }>();
+  const found = new Map<string, { note: string; title: string; updated: number; lists: string[][] }>();
   for (const { note, meta } of notes.entries) {
     if (note.trashed) continue;
     const url = feedOf(meta.properties);
     if (!url) continue;
     const other = found.get(url);
-    // A feed's streams are its subscription's, the note edited last: a second note never puts it in two.
-    if (!other || note.updatedAt > other.updated) found.set(url, { note: note.id, title: meta.title, updated: note.updatedAt, streams: streamsOf(meta.properties) });
+    // A feed's streams and filters are its subscription's, the note edited last: a second note never adds to them.
+    if (!other || note.updatedAt > other.updated) {
+      const { include, exclude } = filtersOf(meta.properties);
+      found.set(url, { note: note.id, title: meta.title, updated: note.updatedAt, lists: [streamsOf(meta.properties), include, exclude] });
+    }
   }
-  // A stream's name has no comma (streams.ts).
-  return [...found].map(([url, { note, title, streams }]) => `${url}\t${note}\t${title}\t${streams.join(",")}`).join("\n");
+  // Neither a stream's name nor a filter's words have commas (streams.ts, filters.ts).
+  return [...found].map(([url, { note, title, lists }]) => [url, note, title, ...lists.map((list) => list.join(","))].join("\t")).join("\n");
 }
 
 class Feeds {
@@ -179,14 +203,44 @@ class Feeds {
       ? this.#signature
           .split("\n")
           .map((line) => {
-            const [url, note, title, streams] = line.split("\t");
-            return { url, note, title, streams: streams ? streams.split(",") : [] };
+            const [url, note, title, ...lists] = line.split("\t");
+            const [streams, include, exclude] = lists.map((list) => (list ? list.split(",") : []));
+            return { url, note, title, streams, include, exclude };
           })
           .sort((a, b) => a.title.localeCompare(b.title))
       : [],
   );
 
   #subscribed = $derived(new Set(this.subscriptions.map((subscription) => subscription.url)));
+
+  /** Each feed's filters (filters.ts), its own with the words hidden in every feed: what they are (`key`), and the test, made once. */
+  #filters = $derived(
+    new Map(
+      this.subscriptions.map(({ url, include, exclude }) => {
+        const hidden = [...exclude, ...mutedWords.words];
+        return [url, { key: filterKey(include, hidden), test: postFilter(include, hidden) }];
+      }),
+    ),
+  );
+  /** The feeds kept whose posts' verdicts were made with other filters than theirs now, a line each. */
+  #stale = $derived(
+    [...this.#filters]
+      .filter(([url, { key }]) => this.records.has(url) && this.records.get(url)!.filters !== key)
+      .map(([url]) => url)
+      .join("\n"),
+  );
+  /** The feeds whose posts' verdicts are being made again. */
+  #refiltering = new Set<string>();
+
+  /**
+   * Why a post is out of the lists, if it is: dismissed, or kept out by its feed's filters or those
+   * of every feed, as was found when it was fetched or they changed. (One step, so a filter that
+   * learns what's interesting can take posts out here too.)
+   */
+  outOf(post: KeptPost): Out | null {
+    if (post.dismissed) return { dismissed: post.dismissed };
+    return post.filtered ? { filtered: post.filtered } : null;
+  }
 
   /** Every post of the feeds subscribed to, newest first. */
   #all = $derived.by(() => {
@@ -197,7 +251,7 @@ class Feeds {
 
   /** How many posts each feed has unread in its list (not dismissed), by its address. */
   unread = $derived(
-    new Map([...this.#subscribed].map((url) => [url, this.records.get(url)?.posts.reduce((count, post) => (post.read || isOut(post) ? count : count + 1), 0) ?? 0])),
+    new Map([...this.#subscribed].map((url) => [url, this.records.get(url)?.posts.reduce((count, post) => (post.read || this.outOf(post) ? count : count + 1), 0) ?? 0])),
   );
 
   totalUnread = $derived([...this.unread.values()].reduce((sum, count) => sum + count, 0));
@@ -249,7 +303,7 @@ class Feeds {
     const chosen = new Set(this.feedsOf(filter));
     const rows = filter.feed ? this.posts(filter.feed) : filter.group || filter.stream ? this.#all.filter(({ feed }) => chosen.has(feed)) : this.#all;
     return rows.filter(({ feed, post }) => {
-      if (isOut(post) !== out) return false;
+      if (!!this.outOf(post) !== out) return false;
       if (!terms.length) return true;
       const text = `${post.title.toLowerCase()} ${post.excerpt.toLowerCase()} ${titles.get(feed) ?? ""}`;
       return terms.every((term) => text.includes(term));
@@ -295,6 +349,16 @@ class Feeds {
     this.#rewriteStreams((streams, feed) => (feed === url ? withoutStream(streams, name) : streams));
   }
 
+  /** Sets a feed's own filters (filters.ts): each note subscribing to it says them, or none. */
+  setFilters(url: string, include: string[], exclude: string[]) {
+    this.#editSubscriptions((body, properties, feed) => {
+      if (feed !== url) return body;
+      const own = filtersOf(properties);
+      if (writeTerms(own.include) === writeTerms(include) && writeTerms(own.exclude) === writeTerms(exclude)) return body;
+      return setProperties(body, { include: include.length ? termsValue(include) : null, exclude: exclude.length ? termsValue(exclude) : null });
+    });
+  }
+
   /** Renames a stream: each of its feeds' notes names it so (one in both is in it once), and its list stays shown. */
   renameStream(from: string, to: string) {
     if (!cleanStream(to) || cleanStream(to) === from) return;
@@ -310,17 +374,23 @@ class Feeds {
     if (filter.kind === "feeds" && filter.stream && streamKey(filter.stream) === streamKey(name)) notes.setFilter({ kind: "feeds" });
   }
 
-  /**
-   * Changes the streams of subscriptions' notes (`change` of each's streams and feed), as edits are
-   * dated, so sync weighs them as it does any edit, against one made on another device meanwhile.
-   */
+  /** Changes the streams of subscriptions' notes (`change` of each's streams and feed). */
   #rewriteStreams(change: (streams: string[], feed: string) => string[]) {
+    this.#editSubscriptions((body, properties, feed) => {
+      const streams = streamsOf(properties);
+      const changed = change(streams, feed);
+      return changed.join("\n") === streams.join("\n") ? body : writeStreams(body, changed);
+    });
+  }
+
+  /**
+   * Changes subscriptions' notes (`change` of each's text, properties and feed), as edits are dated,
+   * so sync weighs them as it does any edit, against one made on another device meanwhile.
+   */
+  #editSubscriptions(change: (body: string, properties: Property[], feed: string) => string) {
     for (const { note, meta } of notes.entries) {
       const feed = !note.trashed && !note.locked && feedOf(meta.properties);
-      if (!feed) continue;
-      const streams = streamsOf(meta.properties);
-      const changed = change(streams, feed);
-      if (changed.join("\n") !== streams.join("\n")) notes.setText(note.id, (body) => writeStreams(body, changed));
+      if (feed) notes.setText(note.id, (body) => change(body, meta.properties, feed));
     }
   }
 
@@ -355,6 +425,49 @@ class Feeds {
   }
 
   /**
+   * Each post's verdict (filters.ts) made again, with its feed's filters as they are now, from what
+   * filters read of it (kept apart, storage.ts); none read, as with no filters, is none made.
+   */
+  async #refilter(url: string) {
+    const filter = this.#filters.get(url);
+    const record = this.records.get(url);
+    if (this.#refiltering.has(url) || !filter || !record || record.filters === filter.key) return;
+    this.#refiltering.add(url);
+    try {
+      const words = filter.test ? await this.#wordsOf(record.id, record.posts) : {};
+      const now = this.records.get(url);
+      if (now) this.#set(url, { ...now, filters: filter.key, posts: now.posts.map((post) => judged(post, filter.test?.(words[post.id] ?? wordsOf(post)))) });
+    } catch (error) {
+      console.error(`lines: couldn't filter the posts of ${url}`, error);
+    } finally {
+      this.#refiltering.delete(url);
+    }
+    // Changed again meanwhile.
+    if (this.#filters.get(url)?.key !== filter.key) void this.#refilter(url);
+  }
+
+  /**
+   * What filters read of each of a feed's posts (filters.ts), by id, kept apart from it (storage.ts)
+   * and read again only for a post that changed: of its content as the feed just gave it (`html`, by
+   * id), or else as stored.
+   */
+  async #wordsOf(id: string, posts: readonly KeptPost[], html = new Map<string, string>()): Promise<Record<string, string>> {
+    const kept = (await feedStorage.words(id)) ?? {};
+    let changed = posts.length !== Object.keys(kept).length;
+    const read = await Promise.all(
+      posts.map(async (post) => {
+        const of = readOf(post);
+        if (kept[post.id]?.of === of) return [post.id, kept[post.id]] as const;
+        changed = true;
+        const content = html.get(post.id) ?? (await this.content(post).catch(() => undefined));
+        return [post.id, { of, words: wordsOf(post, content === undefined ? post.excerpt : plainText(content)) }] as const;
+      }),
+    );
+    if (changed) await feedStorage.putWords({ id, words: Object.fromEntries(read) });
+    return Object.fromEntries(read.map(([post, { words }]) => [post, words]));
+  }
+
+  /**
    * In the main window, once notes are loaded: fetches the feeds due, then again as often as
    * Settings says, and new subscriptions once their link is typed in.
    */
@@ -378,6 +491,12 @@ class Feeds {
           for (const url of fresh) if (this.#subscribed.has(url) && !this.records.has(url)) void this.#request(url);
         }, SETTLE);
         return () => clearTimeout(timer);
+      });
+      // Posts' verdicts made again once their feed's filters change, or those of every feed.
+      $effect(() => {
+        const stale = this.#stale;
+        // Once the effect's done: what each changes is what it's made of.
+        if (stale) queueMicrotask(() => stale.split("\n").forEach((url) => void this.#refilter(url)));
       });
     });
   }
@@ -476,12 +595,17 @@ class Feeds {
       const left = was.get(post.id);
       return left ? { ...withoutDismissal(post), read: left.read, ...(left.dismissed && { dismissed: left.dismissed }) } : post;
     };
+    // Whether filters keep each post out (filters.ts), of what they read of it.
+    const id = now?.id ?? crypto.randomUUID();
+    const filter = this.#filters.get(url);
+    const words = filter?.test ? await this.#wordsOf(id, posts, new Map(feed.posts.map((post) => [post.id, post.html]))) : {};
     const { posts: _, ...rest } = feed;
     this.#set(url, {
       ...rest,
-      id: now?.id ?? crypto.randomUUID(),
+      id,
       url,
-      posts: applyMarks(posts.map(asLeft), this.#marks[url]),
+      posts: applyMarks(posts.map(asLeft), this.#marks[url]).map((post) => judged(post, filter?.test?.(words[post.id] ?? wordsOf(post)))),
+      ...(filter && { filters: filter.key }),
       ...validators,
       checked: fetchedAt,
       fetchedAt,
@@ -509,23 +633,30 @@ class Feeds {
   }
 
   /**
-   * The feeds' marks, a file for each feed in `feeds/`, which sync merges with other devices' a file
-   * at a time (sync/engine.svelte.ts), once what's kept here is read.
+   * The feeds' marks, a file for each feed in `feeds/`, and the words hidden in every feed, which
+   * sync merges with other devices' a file at a time (sync/engine.svelte.ts), once what's kept here
+   * is read.
    */
   readonly marksFolder: SharedFolder = {
     dir: MARKS_DIR,
     ready: () => this.loaded,
     names: () => {
       const named = notes.entries.map(({ meta }) => feedOf(meta.properties)).filter((url): url is string => !!url);
-      return [...new Set([...named, ...this.records.keys(), ...Object.keys(this.#marks)].map(shardOf))];
+      return [...new Set([...named, ...this.records.keys(), ...Object.keys(this.#marks)].map(shardOf)), MUTED_FILE];
     },
     files: () => {
       const shards = new Map<string, Marks>();
       for (const [feed, marks] of Object.entries(this.#marks)) shards.set(shardOf(feed), { ...shards.get(shardOf(feed)), [feed]: marks });
-      return new Map([...shards].map(([name, marks]) => [name, writeShard(marks)]));
+      const files = new Map([...shards].map(([name, marks]) => [name, writeShard(marks)]));
+      // Beside them, the words hidden in every feed (filters.ts), once they've been set.
+      if (mutedWords.muted.at) files.set(MUTED_FILE, writeMuted(mutedWords.muted));
+      return files;
     },
-    merge: (_, text) => this.#takeMarks(readShard(text)),
-    onChange: (listener) => void this.#markListeners.add(listener),
+    merge: (name, text) => (name === MUTED_FILE ? mutedWords.merge(readMuted(text)) : this.#takeMarks(readShard(text))),
+    onChange: (listener) => {
+      this.#markListeners.add(listener);
+      mutedWords.onChange(listener);
+    },
   };
 
   /**
@@ -637,7 +768,7 @@ class Feeds {
    * so clearing a backlog leaves little to sync.
    */
   dismissAll(urls: Iterable<string>): number {
-    const rows = [...urls].flatMap((feed) => (this.records.get(feed)?.posts ?? []).filter((post) => !isOut(post)).map((post) => ({ feed, post })));
+    const rows = [...urls].flatMap((feed) => (this.records.get(feed)?.posts ?? []).filter((post) => !this.outOf(post)).map((post) => ({ feed, post })));
     if (!rows.length) return 0;
     const now = Date.now();
     const before = now - CLEAR_MARGIN;

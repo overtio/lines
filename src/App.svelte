@@ -10,6 +10,7 @@
   import TagPrompt from "./lib/components/TagPrompt.svelte";
   import SubscribePrompt from "./lib/components/SubscribePrompt.svelte";
   import StreamPrompt from "./lib/components/StreamPrompt.svelte";
+  import FeedFilters from "./lib/components/FeedFilters.svelte";
   import PostView from "./lib/components/PostView.svelte";
   import BookReader from "./lib/components/BookReader.svelte";
   import LockedNoteView from "./lib/components/LockedNoteView.svelte";
@@ -862,3 +863,4 @@
 <TagPrompt />
 <SubscribePrompt />
 <StreamPrompt />
+<FeedFilters />
