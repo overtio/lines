@@ -4,7 +4,7 @@ Linedown is the Markdown that lines reads and writes: [CommonMark](https://commo
 
 Everything here is plain text that other Markdown apps open without trouble. An app that doesn't know an addition shows its characters as they are (`==highlight==`, `#tag`), or, for cards and callouts, as a Pandoc fenced div.
 
-How much of it shows as you write is a setting (Settings → Editor → Show Markdown), and the text is the same in each: as written, only colored (Source); drawn, with every mark in sight (Visible); drawn, with the marks hidden but where you're writing (Live, the first choice); or drawn, with marks that only style text (`**`, a heading's `#`, a list's marker) never shown, as in Bear or Notion (Hidden).
+How much of it shows as you write is a setting (Settings → Editor → Show Markdown), and the text is the same in each: as written, only colored (Source); drawn, with every mark in sight (Visible); drawn, with the marks hidden but where you're writing (Live, the first choice); or drawn, with marks that only style text (`**`, a heading's `#`, a list's marker, the properties' `---` lines and colons) never shown, as in Bear or Notion (Hidden).
 
 Each kind of formatting is in the theme's color for it: headings, bold, italics and the rest in the color of the text they're in, links, mentions and list markers in the accent, quotes and sixth-level headings in grey, unless a theme of your own gives one a color of its own ([themes.md](themes.md#your-own-themes)).
 
