@@ -119,6 +119,42 @@ describe("reading feeds", () => {
     expect(second.excerpt).toBe("Astronomers re-analyzed the data — and the ring is still there.");
   });
 
+  test("JSON Feed: its items' HTML or text, authors (1.1's and 1.0's), dates, pictures and sound, and fields of the wrong kind passed over", async () => {
+    const feed = await read(fixture("blog.json"), "https://linked.example/feed.json");
+    expect([feed.format, feed.title, feed.link, feed.description, feed.author, feed.image]).toEqual([
+      "json",
+      "Linked & Loaded",
+      "https://linked.example/",
+      "Links, and what I make of them",
+      "Ada Lovelace",
+      "https://linked.example/icon-512.png",
+    ]);
+    // The same id twice is one post, and what isn't an item isn't one.
+    expect(feed.posts).toHaveLength(5);
+    const [first, untitled, episode, linked, odd] = feed.posts;
+    expect([first.id, first.title, first.link, first.author, iso(first.date), first.image, first.excerpt]).toEqual([
+      "https://linked.example/2026/11/engines",
+      "On engines",
+      "https://linked.example/2026/11/engines",
+      "Ada Lovelace",
+      "2026-11-13T14:30:00.000Z",
+      "https://linked.example/img/engine.png",
+      "Why the engine matters.",
+    ]);
+    expect(await markdown(first.html, first.base)).toBe("Read [my notes](https://linked.example/2026/10/notes) first.");
+    // Text is only ever text: its tags and entities are what it says, not markup.
+    expect([untitled.id, untitled.author, iso(untitled.date), untitled.link, untitled.base]).toEqual(["42", "Charles Babbage", "2026-11-12T08:00:00.000Z", undefined, "https://linked.example/"]);
+    expect(untitled.title).toStartWith("No title, plain text with <b>angle brackets</b> & an &amp; written out.");
+    const text = await markdown(untitled.html, untitled.base);
+    expect(text).toEndWith("\n\nA second paragraph.");
+    expect(text).not.toContain("**");
+    expect(episode).toMatchObject({ id: "ep-7", title: "Episode 7", audio: { url: "https://cdn.linked.example/7.mp3", type: "audio/mpeg" }, duration: 1835 });
+    expect([odd.title, odd.link]).toEqual(["Fields of the wrong kind", undefined]);
+    // A title is plain text; a link post links elsewhere, but its own links are its site's.
+    expect([linked.title, linked.link]).toEqual(["Why </script> breaks inline <b>JSON</b> & AT&amp;T", "https://other.example/story"]);
+    expect(await markdown(linked.html, linked.base)).toBe("See [about](https://linked.example/about).");
+  });
+
   test("a broken feed is mended: whitespace first, bare &s, HTML's entities, a prefix never declared", async () => {
     const feed = await read(fixture("broken.rss"), "https://tomandjerry.example/feed");
     expect([feed.title, feed.link, feed.description, feed.image]).toEqual([
@@ -317,6 +353,29 @@ describe("subscribing", () => {
     const bodies = await app.page.evaluate(() => window.testing.notes.entries.map(({ note }) => note.body));
     // (WebKit here can't store pictures, so has none, rather than one shown from the site.)
     if (engine() === "chromium") expect(bodies.filter((body) => /!\[[^\]]*\]\(\.\.\/attachments\/[0-9a-f]{32}\.\w+\)/.test(body))).toHaveLength(2);
+  });
+
+  test("to a JSON Feed a site's page names, by 1.1's type or 1.0's, but not the site's API", async () => {
+    const asked: string[] = [];
+    const json = (title: string) => JSON.stringify({ version: "https://jsonfeed.org/version/1", title, home_page_url: "https://json.example/", items: [{ id: "1", url: "https://json.example/1", content_text: "Hello" }] });
+    await app.page.route(
+      (url) => url.hostname === "json.example" && url.pathname.startsWith("/wp-json"),
+      (route) => {
+        asked.push(route.request().url());
+        return route.fulfill({ json: { id: 2 }, headers: { "access-control-allow-origin": "*" } });
+      },
+    );
+    await answer("https://json.example/", `<!doctype html><head><link rel="alternate" type="application/json" href="/wp-json/wp/v2/pages/2"><link rel="alternate" type="application/feed+json" href="/feed.json"></head>`, "text/html");
+    await answer("https://json.example/feed.json", json("JSON Blog"), "application/feed+json");
+    await answer("https://older.example/", `<!doctype html><head><link rel="alternate" type="application/json" title="JSON Feed" href="https://older.example/feeds/json-feed"></head>`, "text/html");
+    await answer("https://older.example/feeds/json-feed", json("Older JSON Blog"), "application/json");
+    const blog = await subscribe("json.example");
+    expect([blog.url, blog.title]).toEqual(["https://json.example/feed.json", "JSON Blog"]);
+    expect(blog.note).toContain("type: feed\nfeed: https://json.example/feed.json");
+    expect(asked).toEqual([]);
+    expect(await app.page.evaluate(() => window.testing.feeds.groupOf.get("https://json.example/feed.json"))).toBe("json");
+    const older = await subscribe("https://older.example/");
+    expect([older.url, older.title]).toEqual(["https://older.example/feeds/json-feed", "Older JSON Blog"]);
   });
 
   test("a site's page that names no feed: where sites usually keep theirs, beside the page first, one request at a time, giving up on a site that asks to be left alone", async () => {

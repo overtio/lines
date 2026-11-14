@@ -71,6 +71,7 @@ export default {
   "feeds.opmlTitle": "Flux de lines",
   "feeds.group.rss": "Flux RSS",
   "feeds.group.atom": "Flux Atom",
+  "feeds.group.json": "Flux JSON",
   "feeds.group.podcast": "Flux de podcasts",
   "feeds.showGroup": "Afficher les flux de {group}",
   "feeds.inSidebar": "Flux dans la barre latérale",

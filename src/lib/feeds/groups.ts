@@ -2,10 +2,10 @@ import type { FeedRecord } from "./posts";
 
 /*
  * The kinds of feeds the sidebar lists apart (Settings → Library → Feeds in the sidebar): RSS,
- * Atom and podcasts'. A podcast's feed is a podcast's whatever it's written in.
+ * Atom, JSON Feed and podcasts'. A podcast's feed is a podcast's whatever it's written in.
  */
 
-export const FEED_GROUPS = ["rss", "atom", "podcast"] as const;
+export const FEED_GROUPS = ["rss", "atom", "json", "podcast"] as const;
 export type FeedGroup = (typeof FEED_GROUPS)[number];
 
 /**
@@ -16,5 +16,5 @@ export type FeedGroup = (typeof FEED_GROUPS)[number];
  */
 export function groupOf(record: Pick<FeedRecord, "format" | "posts"> | undefined, noteType: string | undefined): FeedGroup {
   if (noteType === "podcast" || record?.posts.some((post) => post.audio)) return "podcast";
-  return record?.format === "atom" ? "atom" : "rss";
+  return record?.format === "atom" || record?.format === "json" ? record.format : "rss";
 }
