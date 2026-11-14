@@ -6,9 +6,9 @@ Paste a link to a book, a movie, a video, a song, a podcast or an article into a
 https://openlibrary.org/works/OL450063W
 ```
 
-The next note, @[Frankenstein], is one, as a link to it becomes. It's in the sidebar's **Library**, under Books, with its cover beside it. Movies, shows, videos, music, podcasts, articles and papers each have a shelf there too.
+The next note, @[Frankenstein], is one, as a link to it becomes. It's in the sidebar's **Library**, under Books, with its cover beside it. Movies, shows, anime, videos, music, podcasts, articles and papers each have a shelf there too.
 
-- **Or search for it**, with the **+** beside Library in the sidebar: books in Open Library, movies and shows in Wikidata, music in MusicBrainz, podcasts in Apple's directory. **Blank** there starts one to fill in yourself.
+- **Or search for it**, with the **+** beside Library in the sidebar: books in Open Library, movies and shows in Wikidata, anime in AniList, music in MusicBrainz, podcasts in Apple's directory. **Blank** there starts one to fill in yourself.
 - **A link in any note**: right-click it → **Add to Library**, and it becomes a mention of its own library note.
 - **Your highlights from Readwise**: Settings → Library → **Readwise** brings your books, articles and podcasts over, each with its highlights as quotes, and what you saved in Reader.
 - **Your bookmarks**, from any browser: Settings → Library → **Import Bookmarks…** makes each a resource, with its folders, the day you saved it and its tags. Right-click one → **Look Up Details** when you want it filled in.

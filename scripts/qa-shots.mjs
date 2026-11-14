@@ -145,6 +145,7 @@ const seedLibrary = (page) =>
       ["album", "Kid A", { artist: "Radiohead", year: "2000", tracks: "10" }, "listened", square("#d2dde4", "#56677a"), "", "5/5"],
       ["song", "Never Gonna Give You Up", { artist: "Rick Astley", album: "Whenever You Need Somebody", year: "1987", duration: "3:33" }, "to listen", square("#7aa7d8", "#1f3554"), ""],
       ["video", "How Dune Was Made", { channel: "Behind the Scenes", duration: "14:02" }, "to watch", [640, 360, "#b98a50", "#2f1a0b"], ""],
+      ["anime", "Frieren: Beyond Journey's End", { format: "TV", studio: "Madhouse", year: "2023", season: "Fall 2023", episodes: "28", anilist: "154587", mal: "52991" }, "watching", tall("#8fc3c9", "#20364a"), "The adventure is over but life goes on for an elf mage just beginning to learn what living is all about.", "5/5"],
     ];
     const now = Date.now();
     for (const [i, [type, title, properties, status, picture, about, rating]] of items.entries()) {
@@ -1149,6 +1150,16 @@ const SCENES = [
     },
     schemes: style === "lines" ? ["light", "dark"] : ["light"],
   })),
+  {
+    id: "library-anime",
+    title: "The Anime shelf, and an anime",
+    look: "Anime in the Library between Shows and Videos, its icon a TV with a play button; Frieren on it, its tall cover, Madhouse · 2023 under its title, Watching and five stars; open, its format, studio, year, season, episodes and its ids on AniList and MyAnimeList, lined up as other properties.",
+    act: async (page) => {
+      await seedLibrary(page);
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Anime/ }).click();
+      await page.locator(".note-list [data-id]").first().click();
+    },
+  },
   {
     id: "ratings-marks",
     title: "A rating in stars, and scores on lines of their own",

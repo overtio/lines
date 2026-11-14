@@ -10,7 +10,7 @@ import { pacing } from "../../lib/pacing";
 export const API = "https://graphql.anilist.co";
 const paced = pacing(1000);
 
-/** What AniList answers to `query` with `variables`. Rejects offline, and on AniList's own errors (a 429 says when to ask again). */
+/** What AniList answers to `query` with `variables`; what isn't there is null in it (a 404's). Rejects offline, and on AniList's other errors. */
 export function ask<T>(query: string, variables: Record<string, unknown>, signal: AbortSignal): Promise<T> {
   return paced(async () => {
     const response = await request(API, signal, {
@@ -19,7 +19,7 @@ export function ask<T>(query: string, variables: Record<string, unknown>, signal
       body: JSON.stringify({ query, variables }),
     });
     const answer = (await response.json().catch(() => null)) as { data?: T; errors?: { message: string; status?: number }[] } | null;
-    if (!response.ok || !answer?.data) throw new LookupError(`AniList answered ${response.status}${answer?.errors?.[0] ? `: ${answer.errors[0].message}` : ""}`);
+    if ((!response.ok && response.status !== 404) || !answer?.data) throw new LookupError(`AniList answered ${response.status}${answer?.errors?.[0] ? `: ${answer.errors[0].message}` : ""}`);
     return answer.data;
   }, signal);
 }

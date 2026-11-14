@@ -645,7 +645,9 @@ describe("AniList and MyAnimeList", () => {
     });
     expect(JSON.parse(asked[0].replace("POST https://graphql.anilist.co ", "")).variables).toEqual({ id: 154587 });
     answers.set("https://graphql.anilist.co", { data: { Media: null }, errors: [{ message: "Not Found.", status: 404 }] });
-    await expect(look(anilist.anilist, "https://anilist.co/anime/1")).rejects.toThrow("AniList answered");
+    expect(await look(anilist.anilist, "https://anilist.co/anime/1")).toBeNull();
+    answers.set("https://graphql.anilist.co", 500);
+    await expect(look(anilist.anilist, "https://anilist.co/anime/1")).rejects.toThrow("AniList answered 500");
   });
 
   test("AniList: anime searched for, the words sent alone, their covers small", async () => {

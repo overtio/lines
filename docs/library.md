@@ -1,6 +1,6 @@
 # Library
 
-Books, movies, shows, videos, music, podcasts, articles and papers, kept in lines as notes. Each is an ordinary Markdown note with a `type` (`book`, `movie`…), so it's searched, mentioned, synced and exported like any other, and listed in the sidebar's **Library**, a row for each kind with something in it, its notes with their covers and where you've got to.
+Books, movies, shows, anime, videos, music, podcasts, articles and papers, kept in lines as notes. Each is an ordinary Markdown note with a `type` (`book`, `movie`…), so it's searched, mentioned, synced and exported like any other, and listed in the sidebar's **Library**, a row for each kind with something in it, its notes with their covers and where you've got to.
 
 ## A note that's just a link
 
@@ -36,7 +36,7 @@ Dune: Part Two is a 2024 American epic space opera film directed by Denis Villen
 
 ## Add to Library
 
-The + on the Library's heading in the sidebar opens Add to Library (with feeds on, it's in the +'s menu, beside Subscribe to a Feed): choose what to search for (Books, Movies, Shows, Music, Podcasts, Papers, as the sources on can search), and type a title, or a name with it. The catalogs answer as you type, each result with its cover, who made it and when; ↓ moves into them, and ↵ or a click adds the one chosen. Paste a link there instead to look it up as a note that's just a link is. Something the Library has a note of already, by its link, opens that note rather than making another. **Blank** starts one of the kind chosen to fill in by hand. What's added is filed on its shelf, not in the Inbox.
+The + on the Library's heading in the sidebar opens Add to Library (with feeds on, it's in the +'s menu, beside Subscribe to a Feed): choose what to search for (Books, Movies, Shows, Anime, Music, Podcasts, Papers, as the sources on can search), and type a title, or a name with it. The catalogs answer as you type, each result with its cover, who made it and when; ↓ moves into them, and ↵ or a click adds the one chosen. Paste a link there instead to look it up as a note that's just a link is. Something the Library has a note of already, by its link, opens that note rather than making another. **Blank** starts one of the kind chosen to fill in by hand. What's added is filed on its shelf, not in the Inbox.
 
 What's chosen is a new note on its shelf, opened at once with what the search said of it, then filled in from its page (its cover, and what it's about) as one change, which ⌘Z takes back.
 
@@ -44,6 +44,7 @@ What's chosen is a new note on its shelf, opened at once with what the search sa
 |---|---|---|
 | Books | Open Library | Yes |
 | Movies, Shows | Wikidata, with posters from Wikipedia | Yes |
+| Anime | AniList (none for adults only) | Yes |
 | Music (songs and albums) | MusicBrainz, covers from the Cover Art Archive | Yes |
 | Podcasts | Apple's iTunes Search | Yes |
 | Papers | arXiv | No |
@@ -92,6 +93,7 @@ link: https://doc.rust-lang.org/book/
 | `book` | Books | author, year, pages, publisher, isbn | to read, reading, read |
 | `movie` | Movies | director, year, runtime, genre | to watch, watching, watched |
 | `show` | Shows | creator, year, seasons, genre | to watch, watching, watched |
+| `anime` | Anime | format, studio, year, season, episodes, anilist, mal | to watch, watching, watched, on hold, dropped |
 | `video` | Videos | channel, published, duration | to watch, watching, watched |
 | `song` | Music | artist, album, year, duration | to listen, listening, listened |
 | `album` | Music | artist, year, tracks | to listen, listening, listened |
@@ -144,6 +146,8 @@ Each source is a plugin, which can be turned off in Settings → Plugins, and ot
 | YouTube | youtube.com and youtu.be videos, Shorts | the video's link, to YouTube's oEmbed; in the apps, the video's page | Yes: title, channel and picture. When it came out, how long it is and what it's about only in the apps |
 | Open Library | openlibrary.org books, and an ISBN in a link (a bookshop's, or Amazon's, whose number for a book is its ISBN-10) | the book's id or ISBN | Yes |
 | Wikidata | IMDb, The Movie Database, Letterboxd, Wikipedia and Wikidata links to films, series and books | the id in the link (or the page's title) to Wikidata, and the item's page title to Wikipedia, for its summary and poster | Yes |
+| AniList | anilist.co anime | the id in the link, or what's searched for, to AniList's API | Yes |
+| MyAnimeList | myanimelist.net anime | the id in the link, to [Jikan](https://jikan.moe), an open API that reads MyAnimeList for apps without an account | Yes, as Jikan lets web pages ask it |
 | MusicBrainz | musicbrainz.org songs and albums, and Spotify, Apple Music, Bandcamp, Deezer and Tidal links it knows (most albums, fewer songs); covers from the Cover Art Archive | the id in the link, or the link | Yes |
 | SoundCloud | soundcloud.com tracks, and someone's sounds when they're a podcast (SoundCloud's feed of them has any) | the link, to SoundCloud's oEmbed; in the apps the track's page, for its length, and the person's feed | Tracks: title, artist, cover, what it's about. Someone's podcast only in the apps: SoundCloud doesn't let web pages read their feed. A set (an album or a playlist, which SoundCloud doesn't say) isn't looked up |
 | Apple Podcasts | podcasts.apple.com podcasts, and their latest 200 episodes | the podcast's and episode's ids, to Apple's iTunes Search API; the podcast's feed, for what it's about | Yes; what a podcast is about only where its feed lets web pages read it (few do) |
@@ -152,6 +156,8 @@ Each source is a plugin, which can be turned off in Settings → Plugins, and ot
 | Web Pages | any page | the link, to its own site | No: sites don't let web pages read them |
 
 Web Pages reads what a page says about itself for search engines and for links shared elsewhere: its JSON-LD (schema.org's Book, Movie, TVSeries, VideoObject, MusicRecording, MusicAlbum, PodcastSeries, PodcastEpisode, Article, BlogPosting, NewsArticle, ScholarlyArticle…), its Open Graph tags (`og:type` of `video.movie`, `music.song`, `book`, `article`…), and an oEmbed it points to. That covers most sites: Letterboxd, Goodreads, Spotify, Bandcamp, Substack, blogs and news. The page is only read, never run or shown. IMDb doesn't answer apps, so its links are looked up through Wikidata.
+
+An anime looked up on AniList has its ids on both sites, `anilist` and `mal` (AniList knows MyAnimeList's); one looked up on MyAnimeList has its `mal`. Its title is its English one where it has one, else as it's written in Latin letters (`Sousou no Frieren`); its season, `Fall 2023`; its format as AniList and MyAnimeList say it (TV, Movie, OVA, ONA, Special…). AniList is asked once a second at most (it asks for no more than 90 requests a minute), and Jikan once a second (it asks for three a second and sixty a minute).
 
 Only what's needed is sent: the link, or an id read from it. Nothing from your notes. In the apps, lines says it's `lines/<version> (https://github.com/overtio/lines)` to the services it asks, as MusicBrainz and Wikimedia ask apps to; nothing about you. MusicBrainz is asked once a second at most, and arXiv every three seconds, as they ask.
 
