@@ -20,6 +20,10 @@ describe("feeds by kind", () => {
     expect(groupOf(record("atom", []), "podcast")).toBe("podcast");
   });
 
+  test("a YouTube channel's feed is videos', whatever it's written in", () => {
+    expect([groupOf(record("atom"), "channel"), groupOf(undefined, "channel")]).toEqual(["video", "video"]);
+  });
+
   test("one kept from before its format was, or not fetched yet, is with RSS, or with podcasts if its note is one", () => {
     expect([groupOf(record(undefined), "feed"), groupOf(undefined, "feed"), groupOf(undefined, undefined)]).toEqual(["rss", "rss", "rss"]);
     expect(groupOf(undefined, "podcast")).toBe("podcast");

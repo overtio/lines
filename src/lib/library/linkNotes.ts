@@ -86,7 +86,7 @@ async function run(id: string, lookup: Lookup, find: Find) {
   speak(t("library.lookingUp"));
   try {
     const item = await find(abort.signal);
-    const note = item && (await libraryNote(item, abort.signal));
+    const note = item && (await libraryNote(item, notes.entries, abort.signal));
     if (!current()) return;
     if (!item && lookup.asked) return say(id, lookup, "nothing");
     lookups.delete(id);

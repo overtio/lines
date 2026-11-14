@@ -6,6 +6,7 @@ import type { LibraryItem } from "../plugins/types";
 import { ui } from "../ui.svelte";
 import { completeNote } from "./linkNotes";
 import { lookUp } from "./lookup";
+import { namedValues } from "./note";
 import { firstStatus, shelves } from "./shelves.svelte";
 import { known, libraryNoteText } from "./text";
 
@@ -37,7 +38,7 @@ export function addToLibrary(item: LibraryItem, whole = false) {
     notes.select(existing.note.id);
     return existing.note.id;
   }
-  const text = libraryNoteText(item, { status: firstStatus(item.type), mentions: plugins.libraryKind(item.type)?.mentions });
+  const text = libraryNoteText(item, { status: firstStatus(item.type), written: namedValues(item, notes.entries) });
   // Added, not made like a new note: one left as it is isn't discarded as untouched.
   const id = notes.add(text);
   notes.pendingFocus = id;

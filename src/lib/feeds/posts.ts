@@ -65,8 +65,10 @@ export function merge(kept: readonly KeptPost[], fetched: readonly Post[], now: 
     const key = was?.key ?? newKey();
     const version = fingerprint(html);
     if (was?.version !== version) changed.push({ key, html });
+    // A guessed date ("3 days ago") doesn't move one known: an exact one replaces it.
+    const dated = post.approximate && was?.date !== undefined ? { date: was.date, approximate: was.approximate } : {};
     // Posts with no date keep the feed's order: its first is the newest.
-    return { ...post, key, version, read: was?.read ?? false, seen: was?.seen ?? now - i };
+    return { ...post, ...dated, key, version, read: was?.read ?? false, seen: was?.seen ?? now - i };
   });
   posts.push(...kept.filter((post) => !listed.has(post.id)));
   posts.sort(newestFirst);

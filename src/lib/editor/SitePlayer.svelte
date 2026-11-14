@@ -4,6 +4,8 @@
 
   /** How long a player has to say it's ready before it's taken to have failed: offline, or what it plays is gone. */
   const READY_WITHIN = 10_000;
+  /** How often one that has to be spoken to first is, until it answers. */
+  const GREET_EVERY = 250;
 </script>
 
 <script lang="ts">
@@ -76,7 +78,7 @@
     frame?.focus();
   }
 
-  /** A player that hasn't said it's ready within a while couldn't be loaded. */
+  /** A player that hasn't said it's ready within a while couldn't be loaded. One that says nothing till it's spoken to is, till then. */
   function watch(element: HTMLIFrameElement) {
     const timer = setTimeout(async () => {
       if (ready || !element.isConnected) return;
@@ -85,7 +87,18 @@
       await tick();
       changed();
     }, READY_WITHIN);
-    return () => clearTimeout(timer);
+    // Once it's the site's page, which is all a message to the site reaches.
+    let greeting: ReturnType<typeof setInterval> | undefined;
+    const greet = () => {
+      send(player.greet);
+      greeting = setInterval(() => (ready ? clearInterval(greeting) : send(player.greet)), GREET_EVERY);
+    };
+    if (player.greet !== undefined) element.addEventListener("load", greet, { once: true });
+    return () => {
+      clearTimeout(timer);
+      clearInterval(greeting);
+      element.removeEventListener("load", greet);
+    };
   }
 
   /** The block's buttons, beside it while there's room, as other blocks' are. */
@@ -107,11 +120,12 @@
     bind:this={frame}
     {@attach watch}
     class="cm-lp-site-frame"
-    style:height="{player.height}px"
+    style:height={player.height && `${player.height}px`}
+    style:aspect-ratio={player.ratio}
     src={player.src}
     title={t("editor.sitePlayer.frame", { site: player.site, title })}
     allow="autoplay; encrypted-media"
-    referrerpolicy="no-referrer"
+    referrerpolicy={player.referrer ?? "no-referrer"}
     sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
   ></iframe>
   {@render actions()}
@@ -121,6 +135,15 @@
     {t("editor.sitePlayer.failed", { site: player.site })}
     <button type="button" class="cm-lp-site-open cm-lp-own-input" onclick={() => openExternal(player.link)}>{open}</button>
   </span>
+{:else if player.poster}
+  <!-- A video's picture, Play over it; its player is loaded only once it's played. -->
+  <span class="cm-lp-site-poster" role="group" aria-label={title} style:aspect-ratio={player.ratio}>
+    <img src={player.poster} alt="" draggable="false" />
+    <button type="button" class="cm-lp-site-play cm-lp-own-input" aria-label={t("editor.sitePlayer.play", { site: player.site })} title={player.note ?? t("editor.sitePlayer.loads", { site: player.site })} onclick={play}>
+      <Icon name="play" size={20} strokeWidth={2.25} />
+    </button>
+  </span>
+  {@render actions()}
 {:else}
   <span class="cm-lp-file cm-lp-site-card" role="group" aria-label={title}>
     <button type="button" class="cm-lp-file-icon cm-lp-site-play cm-lp-own-input" aria-label={t("editor.sitePlayer.play", { site: player.site })} title={t("editor.sitePlayer.play", { site: player.site })} onclick={play}>

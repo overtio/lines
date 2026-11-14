@@ -4,6 +4,7 @@ import type { EditorView } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";
 import type { MarkdownConfig } from "@lezer/markdown";
 import type { Component } from "svelte";
+import type { Feed } from "../feeds/parse";
 import type { PaletteColor } from "../palette";
 import type { SlashCommand } from "../editor/slashCommands";
 import type { IconName } from "../icons/icons";
@@ -230,6 +231,11 @@ export interface LibraryItem {
   link?: string;
   /** Its properties, in the order they're written, before `link` and `status`: `["author", "Frank Herbert"]`. */
   properties: [key: string, value: string][];
+  /**
+   * The pages of what its properties its kind `mentions` name, by key (a video's channel's): the
+   * library's note with that link is mentioned, or else the page linked to by its name.
+   */
+  linked?: Record<string, string>;
   /** A picture of it (a poster, a cover, artwork), downloaded and kept with the note. */
   cover?: string;
   /** A site whose icon is its picture where it has none of its own (a feed's): kept, at its own size, as its cover. */
@@ -264,7 +270,11 @@ export interface LibraryKind {
   subtitle: string[];
   /** The shape its covers come in, which its rows show them in: a book's tall, an album's square (the first), a video's wide. */
   cover?: "square" | "tall" | "wide";
-  /** Its properties whose value is another note's title (an episode's `podcast`), which its notes write as a mention of it. */
+  /**
+   * Its properties whose value names something with a note of its own (an episode's `podcast`, a
+   * video's `channel`), which its notes write as a mention of that note while it's in the Library;
+   * else as a link to its page (`LibraryItem.linked`), or as just its name.
+   */
   mentions?: string[];
   /** Where it's got to, in order (the first is where it starts): what's written, and what's shown. None for kinds without (a podcast). */
   statuses?: { value: string; label: string }[];
@@ -309,6 +319,17 @@ export interface LibrarySource {
    * Subscribe asks, and so does looking for a site's feed among the links on its page.
    */
   feed?(url: URL, signal: AbortSignal): Promise<string | null>;
+  /**
+   * What subscribing to a link it knows makes, if it's a subscription of a kind of its own (a
+   * YouTube channel): the library item, its `feed` among its properties. Subscribe asks first.
+   */
+  subscription?(url: URL, signal: AbortSignal): Promise<LibraryItem | null>;
+  /**
+   * A feed it knows (by its address) read another way when the feed itself can't be had (YouTube's,
+   * which goes missing, from the channel's page); null for one it doesn't know. Rejects when that
+   * can't be read either, or doesn't read as it should (a page changed): never a feed of guesses.
+   */
+  feedInstead?(feed: URL, signal: AbortSignal): Promise<Feed | null>;
 }
 
 /** A font to write notes in, which the plugin brings with it (`@font-face`) so it's there on every computer. */

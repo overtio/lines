@@ -1,3 +1,4 @@
+import { unescapeMarkdown } from "../notes/escape";
 import { propertyOf, readMention } from "../notes/properties";
 import type { Note, NoteMeta } from "../notes/types";
 import { plugins } from "../plugins/registry.svelte";
@@ -23,13 +24,19 @@ export interface ShelfRow {
 
 const rows = new WeakMap<Note, ShelfRow | null>();
 
+/** A value that's a link, `[Veritasium](https://…)`: its text. */
+const linkText = (text: string) => {
+  const words = /^\[((?:\\.|[^\\\]])*)\]\((?:<[^>]*>|[^\s)]*)\)$/.exec(text)?.[1];
+  return words === undefined ? undefined : unescapeMarkdown(words);
+};
+
 /**
  * What something of a kind is by and from, as its row says it: its kind's `subtitle` properties,
  * joined (`Frank Herbert · 1965`); one its kind writes as a mention (an episode's podcast,
- * `@[The Daily]`) as the note's title.
+ * `@[The Daily]`) as the note's title, or as a link to its page (a video's channel's) as its name.
  */
 export function subtitleOf(kind: LibraryKind, value: (key: string) => string | undefined): string {
-  const shown = (key: string, text: string) => (kind.mentions?.includes(key) && readMention(text)?.name) || text;
+  const shown = (key: string, text: string) => (kind.mentions?.includes(key) && (readMention(text)?.name ?? linkText(text))) || text;
   return kind.subtitle.flatMap((key) => {
     const text = value(key);
     return text ? [shown(key, text)] : [];

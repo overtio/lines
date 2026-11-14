@@ -66,6 +66,7 @@ const KINDS: LibraryKind[] = [
     icon: "square-play",
     properties: ["channel", "published", "duration"],
     subtitle: ["channel", "duration"],
+    mentions: ["channel"],
     cover: "wide",
     statuses: WATCHED,
   },

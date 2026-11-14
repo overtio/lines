@@ -73,6 +73,7 @@ export default {
   "feeds.group.atom": "Feeds Atom",
   "feeds.group.json": "Feeds JSON",
   "feeds.group.podcast": "Feeds de pódcasts",
+  "feeds.group.video": "Feeds de vídeos",
   "feeds.showGroup": "Mostrar los feeds de {group}",
   "feeds.inSidebar": "Feeds en la barra lateral",
   "feeds.inSidebarNote": "Por tipo: una fila en la Biblioteca para los feeds RSS, otra para los Atom y otra para los de pódcasts (el de un pódcast, esté en el formato que esté). Juntos: una sola fila, Feeds.",

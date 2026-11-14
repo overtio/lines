@@ -99,6 +99,7 @@ export default {
   "feeds.group.atom": "Atom Feeds",
   "feeds.group.json": "JSON Feeds",
   "feeds.group.podcast": "Podcast Feeds",
+  "feeds.group.video": "Video Feeds",
   "feeds.showGroup": "Show the feeds in {group}",
   "feeds.inSidebar": "Feeds in the sidebar",
   "feeds.inSidebarNote": "By Kind: a row each in the Library for RSS, Atom and podcasts’ feeds (a podcast’s whatever it’s written in). Together: one Feeds row for them all.",

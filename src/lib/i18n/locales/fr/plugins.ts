@@ -123,7 +123,10 @@ export default {
   "plugins.webPages.description":
     "Recherche un lien vers n’importe quelle page d’après ce qu’elle dit être (un livre, un film, un article…), comme la plupart des sites le disent aux moteurs de recherche : IMDb, Letterboxd, Goodreads, Spotify, Bandcamp, Substack, blogs et actualités. Le lien est envoyé à son site.",
   "plugins.webPages.apps": "Nécessite l’app lines : les sites ne se laissent pas lire par les pages web.",
-  "plugins.youtube.description": "Recherche les liens vers les vidéos YouTube : leur titre, leur chaîne et leur image, et dans les apps leur date de publication et leur durée. Le lien est envoyé à YouTube.",
+  "plugins.youtube.description": "Recherche les liens vers les vidéos YouTube (leur titre, leur chaîne et leur image, et dans les apps leur date de publication et leur durée) et vers ses chaînes, auxquelles on s’abonne pour leurs vidéos ; lit une vidéo dont le lien est seul sur sa ligne. Seuls les liens vont à YouTube, et son lecteur ne se charge qu’une fois la lecture lancée.",
+  "plugins.youtube.channel": "Chaîne",
+  "plugins.youtube.channels": "Chaînes",
+  "plugins.youtube.video": "Vidéo",
   "plugins.openLibrary.description": "Recherche les livres par un lien vers Open Library ou un ISBN dans un lien (celui d’une librairie, ou d’Amazon) : auteur, année, pages et couverture. L’ISBN ou l’identifiant du livre est envoyé à Open Library.",
   "plugins.wikidata.description":
     "Recherche les films, séries et livres par un lien vers IMDb, The Movie Database, Letterboxd, Wikipédia ou Wikidata : réalisation, année, durée, genre et sujet, d’après Wikipédia. L’identifiant du lien est envoyé à Wikidata et Wikipédia.",
