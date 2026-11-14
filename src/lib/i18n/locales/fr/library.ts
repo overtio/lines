@@ -38,6 +38,12 @@ export default {
   "library.add.hintLink": "Collez un lien pour le rechercher.",
   "library.add.blank": "Vierge",
   "library.nothing": "Rien n’a été trouvé pour ce lien",
+  "library.already": "Déjà dans votre bibliothèque",
+  "library.openIt": "Ouvrir",
+  "library.openItLabel": "L’ouvrir dans votre bibliothèque",
+  "library.merge": "Fusionner",
+  "library.mergeLabel": "Déplacer ce que vous avez écrit vers la note de votre bibliothèque",
+  "library.merged": "Ce que vous avez écrit est maintenant dans {title}",
   "library.empty": "Appuyez sur + pour ajouter quelque chose, ou collez un lien dans une nouvelle note",
   "library.lookingUp": "Recherche…",
   "library.failed": "Impossible de rechercher ce lien",
@@ -71,6 +77,9 @@ export default {
   "library.bookmarks.undone": "{count, plural, one {Import annulé : # ressource retirée} other {Import annulé : # ressources retirées}}",
   "library.bookmarks.unreadable": "{name} n’est pas un fichier de signets que lines peut lire.",
   "library.settings.links": "Liens",
+  "library.settings.countAgain": "Compter les ajouts répétés",
+  "library.settings.countAgainNote":
+    "Ajouter quelque chose qui est déjà dans la bibliothèque ouvre sa note. Ceci le compte aussi, dans times added, pour que vous voyiez ce qui revient souvent.",
   "library.settings.lookUp": "Rechercher les liens",
   "library.settings.lookUpNote":
     "Une nouvelle note qui n’est qu’un lien est complétée avec ce qu’il désigne : un livre, un film, un morceau, un article… avec sa couverture et ses détails, tirés du site et de catalogues ouverts. Seul le lien est envoyé, et annuler rétablit le lien.",

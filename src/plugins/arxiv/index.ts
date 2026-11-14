@@ -45,6 +45,11 @@ const library: LibrarySource = {
   id: "arxiv",
   name: "arXiv",
   recognizes: (url) => arxivLinkId(url) !== null,
+  // Any version of a paper is the paper.
+  key: (url) => {
+    const id = arxivLinkId(url);
+    return id && `arxiv:${id.replace(/v\d+$/, "")}`;
+  },
   async lookup(url, signal) {
     const [paper] = (await search(arxivLinkId(url)!, 1, signal)).items;
     return paper ? paperItem(paper) : null;

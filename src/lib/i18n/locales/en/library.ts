@@ -48,6 +48,17 @@ export default {
   "library.lookingUp": "Looking up…",
   "library.failed": "Couldn’t look this link up",
   "library.nothing": "Nothing found for this link",
+  // Said, faintly at the end of its note and to screen readers, when what's added is in the Library already.
+  "library.already": "Already in your Library",
+  // Its button, opening the note the Library has.
+  "library.openIt": "Open",
+  // Its name to screen readers.
+  "library.openItLabel": "Open it in your Library",
+  // Its button moving what was typed into a note made for something the Library has into that one's note, and its name to screen readers.
+  "library.merge": "Merge",
+  "library.mergeLabel": "Move what you wrote to the note in your Library",
+  // Said to screen readers once it's merged.
+  "library.merged": "What you wrote is now in {title}",
   // Said to screen readers once a note that was a link is filled in.
   "library.filled": "Added {title} to the Library",
   // Bookmarks from a browser, each a resource: a note in the Library that's a link so far.
@@ -84,6 +95,9 @@ export default {
   "library.bookmarks.undone": "{count, plural, one {Import undone: # resource removed} other {Import undone: # resources removed}}",
   "library.bookmarks.unreadable": "{name} isn’t a file of bookmarks lines can read.",
   "library.settings.links": "Links",
+  "library.settings.countAgain": "Count adding again",
+  "library.settings.countAgainNote":
+    "Adding something the Library has already opens its note. This also counts it there, as times added, so you can tell what keeps coming up.",
   "library.settings.lookUp": "Look up links",
   "library.settings.lookUpNote":
     "A new note that’s just a link is filled in with what it is: a book, a movie, a song, an article… with its cover and details, from the site and open catalogs. Only the link is sent, and undoing puts it back.",

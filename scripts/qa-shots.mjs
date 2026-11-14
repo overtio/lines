@@ -1310,6 +1310,29 @@ const SCENES = [
     },
     shoot: ".editor-pane",
   },
+  {
+    id: "library-already",
+    title: "A link to what the Library has, in a note that wasn't made for it",
+    look: "After the link, on its line, “Already in your Library” small and faint, then Open in the accent a little apart, not underlined until pointed at; nothing else changed in the note.",
+    act: async (page) => {
+      await page.route("https://www.youtube.com/oembed**", (route) =>
+        route.fulfill({ headers: { "access-control-allow-origin": "*" }, json: { title: "Never Gonna Give You Up", author_name: "Rick Astley" } }),
+      );
+      await page.evaluate(() => {
+        const body = "---\ntype: video\nchannel: Rick Astley\nlink: https://www.youtube.com/watch?v=dQw4w9WgXcQ\nstatus: to watch\n---\n# Never Gonna Give You Up\n";
+        return window.testing.notes.insert({ id: crypto.randomUUID(), body, createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+      });
+      await page.evaluate(() => window.testing.open(""));
+      await page.evaluate(() => window.testing.place());
+      await page.evaluate(() => {
+        const data = new DataTransfer();
+        data.setData("text/plain", "https://youtu.be/dQw4w9WgXcQ");
+        document.querySelector(".editor-pane [data-pane-content='main'] .cm-content").dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
+      });
+      await page.locator(".cm-library-open").waitFor();
+    },
+    shoot: ".editor-pane",
+  },
   ...["lines", "classic", "pixel", "neon"].map((style) => ({
     id: `site-players-${style}`,
     title: `Spotify and SoundCloud links before they're played, in ${style[0].toUpperCase()}${style.slice(1)}`,

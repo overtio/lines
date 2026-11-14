@@ -55,7 +55,7 @@ The editor is CodeMirror, whose text is real text a screen reader reads, with it
 - An image's or video's resize handle is for a pointer only; from the keyboard, the width is the number after the bar in its Markdown (`![Lake|400](…)`, `[Sky.mp4|400](…)`), shown while the cursor is on its line. A diagram's is the same, with its width after the language on its first line (` ```mermaid |400 `).
 - Symbols shown for typed characters (`->` as →, `!=` as ≠) are read as the symbol ("right arrow", "not equal to"), as they look. With the cursor touching one, the typed characters are there to read and edit; Settings → Typography → Font ligatures turns them off for anyone who'd rather hear the characters.
 - Menus (`/`, `\`, `@`) are CodeMirror's autocomplete, a listbox the screen reader follows.
-- Everything a click opens in a note, ⌥↵ opens from the cursor: a link, an attached file, a mention's note (made if it isn't there yet), a tag's notes. Buttons drawn in a note (copy, format, a table's controls) are reached with Esc, then Tab, as CodeMirror leaves the editor.
+- Everything a click opens in a note, ⌥↵ opens from the cursor: a link, an attached file, a mention's note (made if it isn't there yet), a tag's notes. Buttons drawn in a note (copy, format, a table's controls, Open after a link the Library has already, named "Open it in your Library") are reached with Esc, then Tab, as CodeMirror leaves the editor.
 - The format toolbar over selected text is a toolbar: Tab into it, ← and → between its buttons, Esc back to the text.
 
 ## Spreadsheets

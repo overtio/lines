@@ -25,6 +25,8 @@ const FEED: LibraryKind = {
   icon: "rss",
   properties: ["author", "feed"],
   subtitle: ["author"],
+  ids: ["feed"],
+  sharedLinks: true,
   shelf: false,
 };
 

@@ -115,6 +115,21 @@ export function coverOf(body: string): string | null {
   return /!\[[^\]\n]*\]\(\.\.\/attachments\/([0-9a-f]{32}\.[a-z0-9]+)(?:\|\d+)?\)/.exec(body)?.[1] ?? null;
 }
 
+/** How wide a note shows its cover, by its kind's shape: enough to know it by, leaving room for the rest. */
+export const COVER_WIDTH = { tall: 240, square: 240, wide: 400 };
+
+/** A cover as lines puts it in a library note: an attachment right under its title, as wide as it makes covers. */
+const LIBRARY_COVER = new RegExp(`\\n# [^\\n]*\\n\\n!\\[[^\\]\\n]*\\|(?:${[...new Set(Object.values(COVER_WIDTH))].join("|")})\\]\\(\\.\\.\\/attachments\\/([0-9a-f]{32}\\.[a-z0-9]+)\\)(?:\\n|$)`);
+
+/** The cover lines put in a library note, if it has one; not a picture put somewhere by hand. */
+export const libraryCoverOf = (body: string): string | null => LIBRARY_COVER.exec(body)?.[1] ?? null;
+
+/** `body` without its cover `name` (the paragraph that's only it), or with `to`, another attachment's name, in its place. */
+export function replaceCover(body: string, name: string, to?: string): string {
+  const line = new RegExp(`(\\n*)(!\\[[^\\]\\n]*\\]\\(\\.\\.\\/attachments\\/)${name.replace(/\./g, "\\.")}(\\)|\\|\\d+\\))`);
+  return body.replace(line, (_, before: string, start: string, end: string) => (to ? `${before}${start}${to}${end}` : ""));
+}
+
 /**
  * The link a note is, if that's all it is: one http(s) address, bare, in `<…>`, or as a Markdown
  * link (`[text](…)`, as pasting can make it), with nothing else but space around it.

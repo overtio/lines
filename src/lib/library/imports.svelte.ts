@@ -2,6 +2,7 @@ import { notes } from "../notes/store.svelte";
 import type { Note } from "../notes/types";
 import { plugins } from "../plugins/registry.svelte";
 import type { LibraryItem } from "../plugins/types";
+import { keepCover } from "./covers";
 import { libraryNote } from "./note";
 
 /*
@@ -90,7 +91,9 @@ class Imports {
         const made = await inTurns(add.slice(from, from + BATCH), COVERS, (each, i) => this.#make(each, now - (from + i), signal));
         await notes.insert(...made.map(({ note }) => note));
         for (const { note } of made) wrote.added.set(note.id, note.body);
-        await Promise.all(made.map(({ keep }) => keep().catch((error) => console.warn("lines: couldn't keep a cover", error))));
+        await Promise.all(made.map(({ note, library }) => keepCover(library, note.id)));
+        // As they are now: a cover that couldn't be kept is out of its note, which Undo takes back all the same.
+        for (const { note } of made) wrote.added.set(note.id, notes.get(note.id)?.note.body ?? note.body);
         progress();
         await breathe();
       }
@@ -114,7 +117,7 @@ class Imports {
     this.state = { id, kind: "done", added: wrote.added.size, appended: wrote.appended.length, stopped: signal.aborted, failed };
   }
 
-  /** The note for `made`, its cover downloaded (kept with `keep()` once it's written). */
+  /** The note for `made`, its cover downloaded (kept with `keepCover` once it's written). */
   async #make({ item, status, more, created, updated }: NewNote, undated: number, signal: AbortSignal) {
     const written = await libraryNote(item, signal, { status });
     const time = created ?? undated;
@@ -126,7 +129,7 @@ class Imports {
       pinned: false,
       trashed: false,
     };
-    return { note, keep: written.keep };
+    return { note, library: written };
   }
 
   /** Stops the import under way between notes, keeping what it wrote, which Undo takes back. */

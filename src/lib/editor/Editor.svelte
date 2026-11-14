@@ -110,14 +110,17 @@
     if (scroll) view.dispatch({ effects: scroll });
     else view.scrollDOM.scrollTop = 0;
 
-    if (notes.pendingFocus === id) {
-      notes.pendingFocus = null;
-      // The title's line, after the properties of a note made under a type.
-      const { doc } = view.state;
-      const titleLine = doc.line(Math.min(doc.lines, (frontMatter(doc.toString())?.lines ?? 0) + 1));
-      view.dispatch({ selection: EditorSelection.cursor(titleLine.to) });
-      view.focus();
-    }
+    if (notes.pendingFocus === id) focusTitle();
+  }
+
+  /** The keyboard in the open note at its title's end, after its properties, as `pendingFocus` asks. */
+  function focusTitle() {
+    if (!view) return;
+    notes.pendingFocus = null;
+    const { doc } = view.state;
+    const titleLine = doc.line(Math.min(doc.lines, (frontMatter(doc.toString())?.lines ?? 0) + 1));
+    view.dispatch({ selection: EditorSelection.cursor(titleLine.to) });
+    view.focus();
   }
 
   /** Apply a change that arrived from elsewhere (sync), touching only the parts that differ. */
@@ -157,6 +160,11 @@
   $effect(() => {
     const note = id;
     untrack(() => open(note));
+  });
+
+  // Asked for the note open already (one the Library has, opened in a new one's place).
+  $effect(() => {
+    if (notes.pendingFocus && notes.pendingFocus === id) untrack(() => currentId === id && focusTitle());
   });
 
   $effect(() => {

@@ -238,6 +238,11 @@ export interface LibraryItem {
   description?: string;
   /** Tags it's filed under (a bookmark's), written as the note's `#tags`: lines' own, as `normalizeTag` makes them. */
   tags?: string[];
+  /**
+   * What else it's known as, as sources' `key`s write it (Wikidata says a film's IMDb id,
+   * `imdb:tt8962124`), so a note of it made from another link is found (library/same.ts). Not written in the note.
+   */
+  ids?: string[];
 }
 
 /**
@@ -274,6 +279,13 @@ export interface LibraryKind {
    * and tags.
    */
   lookUp?: boolean;
+  /** Its properties that say which thing a note is, besides its link (library/same.ts): a book's `isbn`, a feed's `feed`. */
+  ids?: string[];
+  /**
+   * Its notes' links aren't theirs alone (an episode's is often its show's page; a podcast's or a
+   * feed's, its site's home page, which a bookmark of the site has too): they're told apart by their `ids` alone.
+   */
+  sharedLinks?: boolean;
 }
 
 /**
@@ -295,6 +307,11 @@ export interface LibrarySource {
   requires?: string[];
   /** Whether it's a link it knows; quick, and without asking anyone. */
   recognizes(url: URL): boolean;
+  /**
+   * What a link it knows is to, however it's written, as an id of the source's (`imdb:tt8962124`,
+   * `youtube:dQw4w9WgXcQ`): how the Library tells it has that thing already (library/same.ts).
+   */
+  key?(url: URL): string | null;
   /** What the link is, or null if it isn't something the library keeps. Rejects when it can't be asked (offline). */
   lookup(url: URL, signal: AbortSignal): Promise<LibraryItem | null>;
   /** The kinds it can search for, by type, in Add to Library. */

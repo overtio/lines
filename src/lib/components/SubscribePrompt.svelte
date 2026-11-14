@@ -28,11 +28,11 @@
     error = null;
     speak(t("feeds.finding"));
     try {
-      const url = await feeds.subscribe(value, abort.signal);
+      const { url, again } = await feeds.subscribe(value, abort.signal);
       if (abort.signal.aborted) return;
       close();
       notes.setFilter({ kind: "feeds", feed: url });
-      speak(t("feeds.subscribed", { title: feeds.subscription(url)?.title ?? url }));
+      speak(again ? t("library.already") : t("feeds.subscribed", { title: feeds.subscription(url)?.title ?? url }));
     } catch (failure) {
       if (abort.signal.aborted) return;
       error = failure instanceof NoFeed ? t("feeds.noFeedThere") : failure instanceof FetchError ? feedError(failure.message) : feedError(String(failure));

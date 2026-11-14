@@ -1,4 +1,5 @@
 import { t } from "../../lib/i18n/index.svelte";
+import { isbnKey } from "../../lib/library/keys";
 import { known, names, yearOf } from "../../lib/library/text";
 import { getJson } from "../../lib/library/web";
 import type { LibraryItem, LibrarySource, Plugin } from "../../lib/plugins/types";
@@ -126,6 +127,13 @@ const source: LibrarySource = {
   id: "open-library",
   name: "Open Library",
   recognizes: (url) => bookIn(url) !== null,
+  key: (url) => {
+    const found = bookIn(url);
+    if (!found) return null;
+    if (!("isbn" in found)) return `openlibrary:${"work" in found ? found.work : found.edition}`;
+    const isbn = isbnKey(found.isbn);
+    return isbn && `isbn:${isbn}`;
+  },
   lookup,
   searches: ["book"],
   search,

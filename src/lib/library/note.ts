@@ -1,23 +1,22 @@
 import { readAtMost } from "../feeds/fetch";
 import { attachmentNameOf, putAttachment } from "../notes/attachments";
-import { drawable, smaller } from "../pictures";
+import { drawablePicture, smaller } from "../pictures";
 import { plugins } from "../plugins/registry.svelte";
 import type { LibraryItem } from "../plugins/types";
 import { iconCover } from "./icon";
 import { firstStatus } from "./shelves.svelte";
-import { libraryNoteText } from "./text";
+import { COVER_WIDTH, libraryNoteText } from "./text";
 import { isPublic, request } from "./web";
 
 /** The longest side a cover is kept at: sharp in a note on a Retina screen, and light to sync. */
 const COVER_SIDE = 1200;
 /** The most a cover may weigh as it's downloaded: it stops being read past that. */
 const COVER_BYTES = 20_000_000;
-/** How wide a note shows its cover, by its kind's shape: enough to know it by, leaving room for the rest. */
-export const COVER_WIDTH = { tall: 240, square: 240, wide: 400 };
 
 /** A library note to write: its text, and its cover to keep once it's written (the text links to it). */
 export interface LibraryNote {
   text: string;
+  /** Keeps its cover, now the note's written (covers.ts's keepCover, which takes it out of the note if it can't be). */
   keep(): Promise<void>;
 }
 
@@ -30,19 +29,21 @@ export interface Cover {
 
 /**
  * The picture at `url`, ready to keep with a note (no larger than it needs to be); nothing where it
- * can't be had (on the web, a site that doesn't let pages download it), or where it isn't on the
- * web at large (a page can't have lines fetch from this computer's network), or says it's too big to
- * draw.
+ * can't be had (on the web, a site that doesn't let pages download it), where it isn't on the web
+ * at large (a page can't have lines fetch from this computer's network), where its bytes aren't a
+ * picture lines keeps (a drawing, an SVG, is a logo or a diagram, not a cover), or where they say
+ * it's too big to draw.
  */
-async function coverAt(url: string, signal?: AbortSignal): Promise<Blob | undefined> {
-  if (!isPublic(url)) return undefined;
+export async function coverAt(url: string, signal?: AbortSignal): Promise<Blob | undefined> {
+  if (!isPublic(url) || /\.svg(?:$|[/.])/i.test(new URL(url).pathname)) return undefined;
   try {
     const response = await request(url, signal ?? new AbortController().signal);
-    const type = response.headers.get("content-type") ?? "";
-    if (!response.ok || !type.startsWith("image/")) return undefined;
-    if (Number(response.headers.get("content-length")) > COVER_BYTES) return undefined;
+    if (!response.ok || Number(response.headers.get("content-length")) > COVER_BYTES) return undefined;
+    // What it is by its bytes, whatever it's called: an app's download says no type, a file host says
+    // `application/octet-stream`, and a server can say the wrong one. No more of them than a cover can be.
     const bytes = await readAtMost(response.body, COVER_BYTES);
-    return drawable(bytes) ? await smaller(new Blob([bytes as BlobPart], { type }), COVER_SIDE) : undefined;
+    const picture = drawablePicture(bytes);
+    return picture ? await smaller(new Blob([bytes], { type: picture.type }), COVER_SIDE) : undefined;
   } catch (error) {
     signal?.throwIfAborted();
     console.warn("lines: couldn't get a cover", error);

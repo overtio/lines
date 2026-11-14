@@ -1,4 +1,4 @@
-import { linkKey } from "../../lib/library/bookmarks";
+import { keysOf as libraryKeys, linkKey } from "../../lib/library/keys";
 import type { ImportWork, NewNote } from "../../lib/library/imports.svelte";
 import { nameOf, propertyOf } from "../../lib/notes/properties";
 import type { Entry } from "../../lib/notes/store.svelte";
@@ -104,7 +104,7 @@ class Notes {
     };
     keep(this.#ids, readwise && `readwise:${readwise}`);
     keep(this.#ids, reader && `reader:${reader}`);
-    keep(this.#links, link && linkKey(link));
+    for (const key of link ? libraryKeys({ link }) : []) keep(this.#links, key);
     if (type && by) {
       const key = titleKey(type, title, by);
       const same = this.#titles.get(key);
@@ -119,7 +119,7 @@ class Notes {
     const found =
       (readwise && this.#ids.get(`readwise:${readwise}`)) ||
       (reader && this.#ids.get(`reader:${reader}`)) ||
-      (link && this.#links.get(linkKey(link))) ||
+      (link && libraryKeys({ link }).map((key) => this.#links.get(key)).find(Boolean)) ||
       (type && by && this.#titles.get(titleKey(type, title, by))?.find((each) => !each.link || !link || linkKey(each.link) === linkKey(link))?.target);
     if (found) return found;
     const target: Target = { title, source, highlights: [], take: takes("") };

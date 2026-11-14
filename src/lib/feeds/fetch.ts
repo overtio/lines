@@ -57,7 +57,7 @@ export function encodingOf(bytes: Uint8Array, contentType: string): string {
 }
 
 /** A body read as it comes, given up on (and stopped) once it's more than `limit` bytes, whatever its length said. */
-export async function readAtMost(body: ReadableStream<Uint8Array> | null, limit: number): Promise<Uint8Array> {
+export async function readAtMost(body: ReadableStream<Uint8Array> | null, limit: number): Promise<Uint8Array<ArrayBuffer>> {
   if (!body) return new Uint8Array();
   const reader = body.getReader();
   const chunks: Uint8Array[] = [];

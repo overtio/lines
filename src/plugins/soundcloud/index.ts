@@ -161,6 +161,10 @@ const source: LibrarySource = {
   id: "soundcloud",
   name: "SoundCloud",
   recognizes: (url) => soundcloudIn(url) !== null,
+  key: (url) => {
+    const found = soundcloudIn(url);
+    return found && `soundcloud:${found.page.slice("https://soundcloud.com/".length).toLowerCase()}`;
+  },
   lookup,
   async feed(url, signal) {
     const found = soundcloudIn(url);

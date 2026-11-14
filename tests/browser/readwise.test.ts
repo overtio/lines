@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import type { Request, Route } from "playwright";
-import { type App, noErrors, openApp } from "./app";
+import { type App, engine, noErrors, openApp } from "./app";
 
 /*
  * Moving from Readwise: Settings → Library's Readwise, with the token sent to Readwise and nowhere
@@ -110,7 +110,9 @@ test("says what Readwise has before writing anything, imports it with its highli
   expect(new Set(authorized)).toEqual(new Set([`Token ${TOKEN} https://readwise.io`]));
 
   const moby = (await bodyOf(page, "Moby-Dick"))!;
-  expect(moby).toMatch(/^---\ntype: book\nauthor: Herman Melville\nreadwise: 1001\n---\n# Moby-Dick\n\n!\[Moby-Dick\|240\]\(\.\.\/attachments\/[0-9a-f]{32}\.[a-z]+\)\n\n#classics\n\nRead on the train/);
+  // Its cover kept with it; WebKit here can't store pictures, and so takes it out of the note again.
+  const cover = engine() === "chromium" ? "!\\[Moby-Dick\\|240\\]\\(\\.\\.\\/attachments\\/[0-9a-f]{32}\\.[a-z]+\\)\\n\\n" : "";
+  expect(moby).toMatch(new RegExp(`^---\\ntype: book\\nauthor: Herman Melville\\nreadwise: 1001\\n---\\n# Moby-Dick\\n\\n${cover}#classics\\n\\nRead on the train`));
   expect(moby).toContain("## Highlights\n\n> Call me Ishmael.\n> — Location 12 · ");
   expect(moby).toContain("\n> — Location 2210 · ");
   // Where each has got to, from Reader, with Reader's id.

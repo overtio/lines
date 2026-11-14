@@ -34,6 +34,9 @@
       {#if !isTauri && names}<Callout class="mt-3 text-xs">{t("library.settings.web", { names })}</Callout>{/if}
     {/snippet}
   </FieldRow>
+  <FieldRow label={t("library.settings.countAgain")} note={t("library.settings.countAgainNote")}>
+    <Switch label={t("library.settings.countAgain")} checked={prefs.countAddedAgain} onchange={(on) => (prefs.countAddedAgain = on)} />
+  </FieldRow>
 </FieldGroup>
 
 {#each plugins.libraryImports as source (source.id)}

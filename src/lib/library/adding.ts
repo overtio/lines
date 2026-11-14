@@ -1,11 +1,11 @@
 import { propertyOf } from "../notes/properties";
 import { notes } from "../notes/store.svelte";
 import { plugins } from "../plugins/registry.svelte";
-import type { Entry } from "../notes/store.svelte";
 import type { LibraryItem } from "../plugins/types";
 import { ui } from "../ui.svelte";
-import { completeNote } from "./linkNotes";
+import { completeNote, openNote, tell } from "./linkNotes";
 import { lookUp } from "./lookup";
+import { addedAgain, libraryNoteOf } from "./same";
 import { firstStatus, shelves } from "./shelves.svelte";
 import { known, libraryNoteText } from "./text";
 
@@ -14,27 +14,20 @@ import { known, libraryNoteText } from "./text";
  * looked up there, as a new note on its shelf, opened; or the note there is of it already.
  */
 
-/** A library note's `link`, if it's one, and not in the Trash. */
-export const libraryLinkOf = ({ note, meta }: Entry) => (!note.trashed && plugins.libraryKind(meta.type) ? propertyOf(meta.properties, "link")?.value : undefined);
-
-/** The library note there is already of something, by its `link` (any of `links`), if there's one. */
-export function libraryNoteOf(...links: (string | undefined)[]) {
-  const wanted = new Set(links.filter(Boolean));
-  return notes.entries.find((entry) => wanted.has(libraryLinkOf(entry) ?? ""));
-}
-
 /**
  * Makes `item` a note at once, from what's known of it, opened on its shelf and filed; then fills it
  * in (its cover kept, and what its page says of it besides, for what a search found) as one change,
- * as a note that was a link is. `whole` for an item looked up by its link already. One there is of
- * it already, by its link, is opened instead.
+ * as a note that was a link is. `whole` for an item looked up by its link already. One the Library
+ * has of it already is opened instead, added again.
  */
 export function addToLibrary(item: LibraryItem, whole = false) {
-  const existing = libraryNoteOf(item.link);
+  const existing = libraryNoteOf(item);
   showShelf(existing?.meta.type ?? item.type);
   notes.query = "";
   if (existing) {
-    notes.select(existing.note.id);
+    addedAgain(existing, item);
+    openNote(existing.note.id);
+    tell(existing.note.id, "already");
     return existing.note.id;
   }
   const text = libraryNoteText(item, { status: firstStatus(item.type), mentions: plugins.libraryKind(item.type)?.mentions });
@@ -43,7 +36,7 @@ export function addToLibrary(item: LibraryItem, whole = false) {
   notes.pendingFocus = id;
   notes.select(id);
   const { link } = item;
-  completeNote(id, text, async (signal) => (whole || !link ? item : ((await lookUp(link, signal).catch(() => null)) ?? item)));
+  completeNote(id, text, async (signal) => (whole || !link ? item : ((await lookUp(link, signal).catch(() => null)) ?? item)), { fresh: true });
   return id;
 }
 

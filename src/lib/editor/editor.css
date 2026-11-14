@@ -3131,6 +3131,21 @@
   white-space: nowrap;
 }
 
+/* What the Library has already, opened from where it was added again: a quiet link beside the words. */
+.cm-library-open {
+  margin-left: 0.5em;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.cm-library-open:hover {
+  text-decoration: underline;
+}
+
 .cm-library-lookup.is-looking::before {
   content: "";
   display: inline-block;

@@ -125,6 +125,10 @@ const source: LibrarySource = {
   id: "apple-podcasts",
   name: "Apple Podcasts",
   recognizes: (url) => podcastIn(url) !== null,
+  key: (url) => {
+    const found = podcastIn(url);
+    return found && `apple-podcasts:${found.id}${found.episode ? `/${found.episode}` : ""}`;
+  },
   lookup,
   searches: ["podcast"],
   search,

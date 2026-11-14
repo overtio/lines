@@ -15,34 +15,37 @@
     tall: ["h-15 w-10", "h-12 w-8"],
     wide: ["h-11.25 w-20", "h-9 w-16"],
   };
-  /** A picture from the web that didn't load. */
-  let broken = $state(false);
+  /**
+   * The picture that didn't load, from the web or kept (one that isn't a picture lines can show), by
+   * its address or name: its kind's icon instead, until the cover's another (mended).
+   */
+  let failed = $state<string | null>(null);
 </script>
 
 {#snippet placeholder()}
   <span class="grid size-full place-items-center rounded-sm bg-hover text-faint"><Icon name={kind.icon} size={small ? 16 : 18} /></span>
 {/snippet}
 
-{#snippet picture(url: string)}
+{#snippet picture(url: string, cover: string)}
   <img
     class="size-full rounded-sm bg-hover object-cover shadow-[0_0_0_1px_color-mix(in_srgb,var(--ink)_8%,transparent)] {TONE_BACKING}"
     src={url}
     alt=""
     draggable="false"
     loading="lazy"
-    onerror={() => (broken = true)}
+    onerror={() => (failed = cover)}
     {@attach fitPicture}
   />
 {/snippet}
 
 <span class={["ui-cover block shrink-0", SHAPES[kind.cover ?? "square"][small ? 1 : 0]]} aria-hidden="true">
-  {#if src && !broken}
-    {@render picture(src)}
+  {#if src && failed !== src}
+    {@render picture(src, src)}
   {:else if name}
     {#await attachmentURL(name)}
       <span class="block size-full rounded-sm bg-hover"></span>
     {:then url}
-      {#if url}{@render picture(url)}{:else}{@render placeholder()}{/if}
+      {#if url && failed !== name}{@render picture(url, name)}{:else}{@render placeholder()}{/if}
     {/await}
   {:else}
     {@render placeholder()}

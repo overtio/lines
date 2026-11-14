@@ -36,6 +36,10 @@ const source: LibrarySource = {
   id: "youtube",
   name: "YouTube",
   recognizes: (url) => youtubeId(url) !== null,
+  key: (url) => {
+    const id = youtubeId(url);
+    return id && `youtube:${id}`;
+  },
   async lookup(url, signal) {
     const id = youtubeId(url)!;
     const link = `https://www.youtube.com/watch?v=${id}`;

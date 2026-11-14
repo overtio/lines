@@ -1,6 +1,7 @@
 import { readDuration } from "../feeds/dates";
-import { feeds, type Row, savedWith } from "../feeds/feeds.svelte";
+import { feeds, type Row } from "../feeds/feeds.svelte";
 import { t } from "../i18n/index.svelte";
+import { libraryNoteOf } from "../library/same";
 import { coverOf } from "../library/text";
 import { propertyOf, readMention, setProperties } from "../notes/properties";
 import { type Entry, notes } from "../notes/store.svelte";
@@ -68,7 +69,7 @@ export function postOf({ from, audio }: Episode): Row | undefined {
  */
 export function soundEpisode(audio: string): Episode | null {
   if (!isWeb(audio)) return null;
-  const saved = savedWith("audio", audio);
+  const saved = libraryNoteOf({ type: "episode", properties: [["audio", audio]] });
   const ofNote = saved && noteEpisode(saved);
   if (ofNote) return ofNote;
   const row = postWithSound(audio);

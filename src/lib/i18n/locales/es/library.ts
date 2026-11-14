@@ -38,6 +38,12 @@ export default {
   "library.add.hintLink": "Pega un enlace para buscarlo.",
   "library.add.blank": "En blanco",
   "library.nothing": "No se ha encontrado nada para este enlace",
+  "library.already": "Ya está en tu biblioteca",
+  "library.openIt": "Abrir",
+  "library.openItLabel": "Abrirlo en tu biblioteca",
+  "library.merge": "Combinar",
+  "library.mergeLabel": "Llevar lo que escribiste a la nota de tu biblioteca",
+  "library.merged": "Lo que escribiste está ahora en {title}",
   "library.empty": "Pulsa + para añadir algo, o pega un enlace en una nota nueva",
   "library.lookingUp": "Buscando…",
   "library.failed": "No se ha podido buscar este enlace",
@@ -71,6 +77,9 @@ export default {
   "library.bookmarks.undone": "{count, plural, one {Importación deshecha: se ha quitado # recurso} other {Importación deshecha: se han quitado # recursos}}",
   "library.bookmarks.unreadable": "{name} no es un archivo de marcadores que lines pueda leer.",
   "library.settings.links": "Enlaces",
+  "library.settings.countAgain": "Contar cuando se añade otra vez",
+  "library.settings.countAgainNote":
+    "Al añadir algo que ya está en la biblioteca, se abre su nota. Además se cuenta en ella, como times added, para que veas lo que vuelve a aparecer.",
   "library.settings.lookUp": "Buscar enlaces",
   "library.settings.lookUpNote":
     "Una nota nueva que es solo un enlace se completa con lo que es: un libro, una película, una canción, un artículo… con su portada y sus datos, del propio sitio y de catálogos abiertos. Solo se envía el enlace, y al deshacer vuelve a ser el enlace.",

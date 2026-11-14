@@ -1,9 +1,8 @@
 import { speak } from "../a11y";
 import { t } from "../i18n/index.svelte";
 import { showShelf } from "../library/adding";
-import { COVER_WIDTH } from "../library/note";
 import { firstStatus } from "../library/shelves.svelte";
-import { libraryNoteText } from "../library/text";
+import { COVER_WIDTH, libraryNoteText } from "../library/text";
 import { ATTACHMENT_PATH, attachmentNameOf, putAttachment, saveAttachment } from "../notes/attachments";
 import { escapeMarkdown } from "../notes/escape";
 import { notes } from "../notes/store.svelte";
