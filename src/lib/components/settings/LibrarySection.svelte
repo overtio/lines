@@ -7,24 +7,16 @@
   import { locale, t } from "../../i18n/index.svelte";
   import { isTauri } from "../../platform";
   import { plugins } from "../../plugins/registry.svelte";
-  import type { LibraryImport } from "../../plugins/types";
   import { prefs } from "../../prefs.svelte";
   import Callout from "../ui/Callout.svelte";
   import FieldGroup from "../ui/FieldGroup.svelte";
   import FieldRow from "../ui/FieldRow.svelte";
   import Switch from "../ui/Switch.svelte";
-  import CardBlock from "./CardBlock.svelte";
   import FeedSettings from "./FeedSettings.svelte";
+  import ImportGroup from "./ImportGroup.svelte";
 
   /** The sources a web page can ask: those on that let it (the rest are the apps' alone). */
   const names = $derived(new Intl.ListFormat(locale, { type: "conjunction" }).format(plugins.librarySources.map((source) => source.name)));
-
-  /** An import's rows, loaded the first time they're shown. */
-  const panelOf = (source: LibraryImport) =>
-    source.panel().catch((error) => {
-      console.error(`lines: couldn't load the ${source.id} import`, error);
-      throw error;
-    });
 </script>
 
 <FieldGroup title={t("library.settings.links")} note={t("library.settings.sources")}>
@@ -36,18 +28,8 @@
   </FieldRow>
 </FieldGroup>
 
-{#each plugins.libraryImports as source (source.id)}
-  {#await panelOf(source) then { default: Panel }}
-    <FieldGroup title={source.name} note={source.note}>
-      <Panel />
-    </FieldGroup>
-  {:catch}
-    <FieldGroup title={source.name} note={source.note}>
-      <CardBlock>
-        <Callout tone="danger" class="w-full">{t("library.import.unavailable")}</Callout>
-      </CardBlock>
-    </FieldGroup>
-  {/await}
+{#each plugins.imports.filter((source) => source.into === "library") as source (source.id)}
+  <ImportGroup {source} />
 {/each}
 
 {#if feeds.on}

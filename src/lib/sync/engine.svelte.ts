@@ -127,7 +127,9 @@ function alone<T>(work: () => Promise<T>): Promise<T> {
 const driveCopyOf = (name: string) => /^([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})[ -]./i.exec(name)?.[1];
 
 function conflictCopy(note: Note): Note {
-  const copy = { ...note, id: crypto.randomUUID(), createdAt: Date.now(), pinned: false };
+  // Not where the note came from: links and importing again find the note itself.
+  const { source: _, ...rest } = note;
+  const copy = { ...rest, id: crypto.randomUUID(), createdAt: Date.now(), pinned: false };
   // A locked note that isn't open can't be changed; its title can.
   if (note.locked && !note.locked.open) {
     return { ...copy, locked: { ...note.locked, title: t("sync.conflicted", { title: note.locked.title || t("sync.untitled") }) } };

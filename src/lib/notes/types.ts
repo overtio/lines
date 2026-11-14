@@ -25,6 +25,31 @@ export interface Note {
   format?: string;
   /** Set for a note locked with the locked-notes password (see notes/noteKeys.svelte.ts). */
   locked?: NoteLock;
+  /** Where it came from, for a note imported from another app. */
+  source?: NoteSource;
+  /**
+   * Lines of its synced file's header this version doesn't know (a newer one's), by key, kept as
+   * they were and written back with it, so they're not lost when it's edited here (sync/format.ts).
+   */
+  header?: Record<string, string>;
+}
+
+/**
+ * A note imported from another app, as that app knew it (imports/notes.ts): so importing again
+ * knows it's here, and links brought with it find it by the name it had there once it's renamed.
+ */
+export interface NoteSource {
+  /** The import's id: "obsidian". */
+  app: string;
+  /**
+   * What it came from, for an app whose ids are only its own (an Obsidian vault's paths): an id
+   * lines gave it when it was first imported, and its name then.
+   */
+  collection?: { id: string; name: string };
+  /** Its id there: Bear's, or its path in an Obsidian vault. */
+  id: string;
+  /** What it was called there, which links to it use. */
+  name: string;
 }
 
 /** The key a locked note is encrypted with, locked with the password. Notes locked with the same password share it. */

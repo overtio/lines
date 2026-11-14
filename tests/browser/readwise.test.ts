@@ -124,7 +124,7 @@ test("says what Readwise has before writing anything, imports it with its highli
   expect((await noteOf(page, "Walden"))!.updatedAt).toBe(waldenDate);
 
   await group.getByRole("button", { name: "Undo Import" }).click();
-  await group.getByText("Import undone: the 7 notes it added are removed. The note it added to is as it was.").waitFor();
+  await group.getByText("Import undone: the 7 notes it added are in the Trash. The note it added to is as it was.").waitFor();
   expect(await bodyOf(page, "Moby-Dick")).toBeUndefined();
   expect(await bodyOf(page, "Walden")).toBe(WALDEN);
   expect(await page.evaluate((id) => window.testing.notes.get(id)?.note.updatedAt, walden)).toBe(waldenDate);
@@ -193,8 +193,8 @@ test("stopped partway, what's written is kept, and Undo takes it back", async ()
   await group.getByText("Added 250 notes.").waitFor();
   expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "article").length)).toBe(250);
   await group.getByRole("button", { name: "Undo Import" }).click();
-  await group.getByText("Import undone: the 250 notes it added are removed.").waitFor();
-  expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "article").length)).toBe(0);
+  await group.getByText("Import undone: the 250 notes it added are in the Trash.").waitFor();
+  expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "article" && !entry.note.trashed).length)).toBe(0);
 });
 
 test("failing partway, it says so, and Undo takes back what it wrote, but a note changed since", async () => {
@@ -218,9 +218,9 @@ test("failing partway, it says so, and Undo takes back what it wrote, but a note
     window.testing.notes.setText(entry.note.id, `${entry.note.body}\nMy thoughts.\n`);
   });
   await group.getByRole("button", { name: "Undo Import" }).click();
-  await group.getByText("Import undone: the 249 notes it added are removed.").waitFor();
+  await group.getByText("Import undone: the 249 notes it added are in the Trash.").waitFor();
   await group.getByText("1 you’ve changed since is kept.").waitFor();
-  expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "article").map((entry) => entry.meta.title))).toEqual(["Article 1"]);
+  expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "article" && !entry.note.trashed).map((entry) => entry.meta.title))).toEqual(["Article 1"]);
   app.errors.splice(0, app.errors.length, ...app.errors.filter((error) => !error.includes("The disk is full")));
 });
 

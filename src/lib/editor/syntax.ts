@@ -1,4 +1,5 @@
-import type { BlockContext, InlineContext, Line, MarkdownConfig } from "@lezer/markdown";
+import { markdownLanguage } from "@codemirror/lang-markdown";
+import type { BlockContext, InlineContext, Line, MarkdownConfig, MarkdownParser } from "@lezer/markdown";
 import { tags as t } from "@lezer/highlight";
 import { TAG_CHAR } from "../notes/tags";
 
@@ -416,3 +417,6 @@ export const TexMath: MarkdownConfig = {
     },
   ],
 };
+
+/** Linedown as the editor reads it, but for what plugins add and underlined headings: GFM with lines' own syntax. */
+export const linedownParser = (markdownLanguage.parser as MarkdownParser).configure([Tag, Highlight, Underline, Card, TexMath, Mention]);

@@ -55,8 +55,8 @@ export type WindowMessage =
   /** How sync is doing in the main window, and the Settings window asking for it. */
   | { type: "sync-state"; state: import("./settings.svelte").SyncState }
   | { type: "sync-ask" }
-  /** How an import into the Library is doing in the main window (library/imports.svelte.ts). */
-  | { type: "import-state"; state: import("../library/imports.svelte").ImportState | null }
+  /** How an import is doing in the main window (imports/imports.svelte.ts). */
+  | { type: "import-state"; state: import("../imports/imports.svelte").ImportState | null }
   /** A spreadsheet's grid started or stopped writing a formula where a reference can go (plugins/spreadsheet/pointing.svelte.ts). */
   | { type: "sheet-writer"; writing: boolean; note: string }
   /** Cells pointed at in another window for it, in the sheet called `sheet`. */

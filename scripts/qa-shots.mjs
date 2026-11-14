@@ -191,6 +191,24 @@ async function readwise(page, { importing = false } = {}) {
 }
 
 /**
+ * Settings → Export and Import's Obsidian, with the tests' vault chosen (tests/unit/fixtures/obsidian/Vault);
+ * then, with `importing`, having imported it.
+ */
+async function obsidian(page, { importing = false } = {}) {
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByRole("dialog").getByRole("navigation").getByText("Export and Import", { exact: true }).first().click();
+  const group = page.getByRole("dialog").getByRole("region", { name: "From Obsidian" });
+  await group.locator("input[webkitdirectory]").setInputFiles(`${root}tests/unit/fixtures/obsidian/Vault`);
+  const start = group.getByRole("button", { name: /^Import \d+ Notes$/ });
+  await start.waitFor();
+  if (importing) {
+    await start.click();
+    await group.getByRole("button", { name: "Undo Import" }).waitFor();
+  }
+  await group.evaluate((element) => element.scrollIntoView({ block: "start" }));
+}
+
+/**
  * Add to Library, searching Books for "dune": Open Library's answer (trimmed) and its covers, drawn
  * here as the library's are, answered in place of the network.
  */
@@ -1398,6 +1416,51 @@ const SCENES = [
       schemes: style === "lines" ? ["light", "dark"] : ["light"],
     },
   ]),
+  ...["lines", "classic", "pixel", "neon"].flatMap((style) => [
+    {
+      id: `obsidian-found-${style}`,
+      title: `Settings → Export and Import → From Obsidian, a vault chosen, in ${style[0].toUpperCase()}${style.slice(1)}`,
+      look: "Its group after Import: what to choose and how to find it, Choose Vault Folder… with a folder's icon; then how many notes, attachments and folders in Vault, plain, and under it, quieter, a line for each kind of thing that won't come across as it was, each with its examples; Tag notes with their folders with its note and switch, as the rows above; Import 6 Notes, focused, and Cancel. Nothing cut off.",
+      prefs: style === "lines" ? {} : { style, theme: style },
+      act: (page) => obsidian(page),
+      shoot: "dialog",
+      schemes: style === "lines" ? ["light", "dark"] : ["light"],
+    },
+    {
+      id: `obsidian-done-${style}`,
+      title: `Settings → Export and Import → From Obsidian, imported, in ${style[0].toUpperCase()}${style.slice(1)}`,
+      look: "A check and “Imported 6 notes.”, Undo Import quiet at the row's end, as Readwise's is; what didn't come across said again under it, quieter.",
+      prefs: style === "lines" ? {} : { style, theme: style },
+      act: (page) => obsidian(page, { importing: true }),
+      shoot: "dialog",
+      schemes: style === "lines" ? ["light", "dark"] : ["light"],
+    },
+  ]),
+  {
+    id: "obsidian-again",
+    title: "Settings → Export and Import → From Obsidian, the vault chosen again",
+    look: "Everything in Vault is in lines already, then which are, a few by name, quieter; The same as “Vault”, imported before, on, with how many notes have the same paths; Cancel; under it, the last import's check and Undo Import, quiet at its end.",
+    act: async (page) => {
+      await obsidian(page, { importing: true });
+      const group = page.getByRole("dialog").getByRole("region", { name: "From Obsidian" });
+      await group.locator("input[webkitdirectory]").setInputFiles(`${root}tests/unit/fixtures/obsidian/Vault`);
+      await group.getByText(/^Everything in Vault/).waitFor();
+      await group.evaluate((element) => element.scrollIntoView({ block: "start" }));
+    },
+    shoot: "dialog",
+  },
+  {
+    id: "obsidian-note",
+    title: "A note brought from Obsidian",
+    look: "Welcome, scrolled to its middle: the picture at 300 px above, the PDF's card, Ideas as a mention, the missing note grey and dashed, the tip a blue callout with a lightbulb and its title in bold, a warning callout inside it; the highlight, and the comments faint and in italics.",
+    act: async (page) => {
+      await obsidian(page, { importing: true });
+      await page.keyboard.press("Escape");
+      await page.evaluate(() => window.testing.notes.select(window.testing.notes.entries.find((entry) => entry.meta.title === "Welcome").note.id));
+      await page.locator(".cm-content").getByText("Keep it").evaluate((line) => line.scrollIntoView({ block: "center" }));
+    },
+    shoot: ".editor-pane",
+  },
   {
     id: "readwise-note",
     title: "A book brought from Readwise",

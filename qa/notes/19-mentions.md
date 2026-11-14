@@ -61,4 +61,8 @@ Type @ and a letter on the line below: a menu of notes opens, with types on the 
 - [[No such note]] stays as written, grey with a dashed underline, and offers to create it on hover (don't)
 - ![[QA · Ada]] (an embed) and \[[QA · Ada]] (escaped) stay text
 
+| In a table | Its bar escaped |
+|---|---|
+| [[QA · Ada\|her]] | reads "her", with Ada's icon, the table's columns as they are |
+
 Type two opening square brackets on the line below: the menu of notes opens at once, and Enter writes the wiki link.

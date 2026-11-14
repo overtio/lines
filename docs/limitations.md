@@ -35,6 +35,18 @@ Where the web app keeps everything is in [storage.md](storage.md).
 - A note is stored a moment after the last key typed. Closing a tab or reloading before then keeps a copy in localStorage, stored at the next start. Not for locked notes, nor while the app lock is on, as localStorage can't be written encrypted that fast: those have only the write started as the page goes, which may not finish.
 - In the Mac app, Quit (⌘Q) waits for every window to store what's typed in it, three seconds at most, and closing the main window waits too. Quitting from the Dock, or logging out, still ends lines at once. Neither has been tried in the Mac app yet.
 
+## Importing from other apps
+
+How each import works is in [importing.md](importing.md).
+
+- lines has no folders: an app's folders become nested tags, and notes with the same name in different folders share a title, so a link to that name finds one of them.
+- A link to a block (`[[Plan#^37066d]]`) or a heading opens the note at its top, and a note shown inside another is a link to it: lines has neither.
+- In WebKit as Playwright drives it, a chosen folder's hidden files (an Obsidian vault's `.obsidian` settings and `.trash`) don't come through, so bookmarks aren't pinned and the vault's trash isn't imported. Not yet tried in Safari or the Mac app's own folder picker, which may do the same.
+- Only Obsidian so far. Bear, Logseq, Notion and Evernote are planned (the [roadmap](../README.md#roadmap)).
+- Not tried in the Mac, Windows or Linux apps, nor with Settings in a window of its own, where the attachments are copied in the Settings window and the notes made in the main one (sent to it 500 at a time). Closing that window while attachments are copied stops the import there, before any note is made.
+- Versions of lines from before importing came keep a synced note's `source:` line only until they change the note: writing it again, they leave it out, so importing again on a device with this version would bring that note in twice. This version, and later ones, keep any line of the header they don't know and write it back.
+- An Obsidian vault has no id of its own that lines can read, so a vault imported before is found by its name, or by notes with the same paths; whether it's the same is asked, not guessed.
+
 ## The website
 
 The home page and the docs at https://overtio.github.io/lines/ (`site/`):

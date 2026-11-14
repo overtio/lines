@@ -497,7 +497,7 @@ function build(view: EditorView): DecorationSet {
             mark(node.from, node.to, "cm-lp-mention-source");
             return false;
           }
-          const drawn = drawMention(doc.sliceString(node.from, node.to));
+          const drawn = drawMention(doc.sliceString(node.from, node.to), state);
           if ("widget" in drawn) decos.push(Decoration.replace({ widget: drawn.widget }).range(node.from, node.to));
           else mark(node.from, node.to, "cm-lp-mention-missing", drawn.missing ? { title: drawn.missing } : undefined);
           return false;
@@ -751,7 +751,7 @@ export const openAtCursor: Command = (view) => {
   for (const side of [-1, 1] as const) {
     for (let node: SyntaxNode | null = syntaxTree(state).resolveInner(head, side); node; node = node.parent) {
       if (node.name === "Mention") {
-        openMention(state.sliceDoc(node.from, node.to));
+        openMention(state.sliceDoc(node.from, node.to), state);
         return true;
       }
       if (node.name === "Tag") {

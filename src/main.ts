@@ -18,7 +18,7 @@ import LockScreen from "./lib/components/LockScreen.svelte";
 import { addBookFile, bookTypes, isBook } from "./lib/books/adding";
 import { reading } from "./lib/books/reading.svelte";
 import { feeds } from "./lib/feeds/feeds.svelte";
-import { imports } from "./lib/library/imports.svelte";
+import { imports } from "./lib/imports/imports.svelte";
 import { player } from "./lib/player/player.svelte";
 import { lock } from "./lib/lock/lock.svelte";
 import { arrived, removeUnusedAttachments } from "./lib/notes/attachments";

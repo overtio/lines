@@ -22,7 +22,7 @@ export default {
   "readwise.import": "Importer",
   "readwise.added": "{count, plural, =0 {Aucune note ajoutée.} one {# note ajoutée.} other {# notes ajoutées.}}",
   "readwise.updated": "{count, plural, one {Surlignages ajoutés à # note déjà présente.} other {Surlignages ajoutés à # notes déjà présentes.}}",
-  "readwise.undone": "{count, plural, =0 {Importation annulée.} one {Importation annulée : la note ajoutée est retirée.} other {Importation annulée : les # notes ajoutées sont retirées.}}",
+  "readwise.undone": "{count, plural, =0 {Importation annulée.} one {Importation annulée : la note ajoutée est dans la Corbeille.} other {Importation annulée : les # notes ajoutées sont dans la Corbeille.}}",
   "readwise.restored": "{count, plural, one {La note complétée est comme avant.} other {Les # notes complétées sont comme avant.}}",
   "readwise.badToken": "Readwise n’a pas accepté ce jeton. Copiez-le à nouveau depuis Readwise.",
   "readwise.answered": "Readwise a répondu {status}. Réessayez dans un moment.",

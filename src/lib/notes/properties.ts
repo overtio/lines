@@ -104,8 +104,8 @@ export const typeLabel = (type: string) => type.charAt(0).toUpperCase() + type.s
  * A mention: `@Name`, or `@[Any title]` for one with spaces or punctuation, and then optionally
  * a property, `.key`. Not after a letter, digit, `.`, `/` or `\`, so emails, `owner/repo@sha`
  * and `\@` stay text. Or a wiki link, as Obsidian writes them: `[[Any title]]`, with the text it
- * shows after a bar (`[[Ada Lovelace|Ada]]`); a heading after a `#` is read past, and an embed
- * (`![[…]]`) isn't one.
+ * shows after a bar (`[[Ada Lovelace|Ada]]`, or `\|` in a table); a heading after a `#` is read past,
+ * and an embed (`![[…]]`) isn't one.
  */
 export const MENTION =
   /(?<![\p{L}\p{M}\p{N}_./\\@`])@(?:\[([^\]\n]+)\]|([\p{L}\p{N}_][\p{L}\p{M}\p{N}_-]*))(?:\.([\p{L}_][\p{L}\p{M}\p{N}_-]*))?|(?<![!\\])\[\[([^[\]\n|#]*[^\s[\]|#][^[\]\n|#]*)(?:#[^[\]\n|]*)?(?:\|([^[\]\n]+))?\]\]/gu;
@@ -124,7 +124,8 @@ export function readMention(text: string): Mention | null {
   MENTION.lastIndex = 0;
   const match = MENTION.exec(text);
   if (!match || match.index !== 0) return null;
-  if (match[4] !== undefined) return { name: match[4].trim(), ...(match[5]?.trim() ? { shown: match[5].trim() } : {}) };
+  // In a table, the bar before the text shown is `\|`, as a table needs it.
+  if (match[4] !== undefined) return { name: match[4].trim().replace(/\\$/, ""), ...(match[5]?.trim() ? { shown: match[5].trim() } : {}) };
   return { name: unescapeMarkdown(match[1] ?? match[2]), ...(match[3] ? { key: match[3] } : {}) };
 }
 

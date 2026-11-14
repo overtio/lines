@@ -6,6 +6,7 @@ lines has no account and no server. Your notes live on your device, and only go 
 
 - **Save to a folder:** the button at the bottom of the sidebar writes every note to a folder as a Markdown file and keeps it up to date (in Chrome and Edge).
 - **Export:** Settings → Export and Import saves everything in a .zip, each note as a file in its own format (Markdown, LaTeX or CSV), pictures and files included.
+- **Moving from Obsidian:** Settings → Export and Import → **Choose Vault Folder…** brings a vault's notes over, with their folders as tags, their links, pictures and callouts, and says first what won't come across as it was.
 - **PDF and PNG:** ⌘P shows the note laid out on pages, ready to print or save as a PDF, or to save as PNG images: the whole note as one, or one per page. Try it on this note.
 - **Locked notes:** lock a note with a password from the lock button above it. Its text is encrypted, and only its title stays readable.
 

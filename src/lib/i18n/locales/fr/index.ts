@@ -6,6 +6,7 @@ import editor from "./editor";
 import feeds from "./feeds";
 import http from "./http";
 import hurl from "./hurl";
+import importing from "./import";
 import latex from "./latex";
 import library from "./library";
 import list from "./list";
@@ -31,6 +32,7 @@ export default {
   ...feeds,
   ...http,
   ...hurl,
+  ...importing,
   ...latex,
   ...library,
   ...list,

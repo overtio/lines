@@ -8,7 +8,7 @@
   import { locale, t } from "../../i18n/index.svelte";
   import { type BookmarksInput, libraryLinks } from "../../library/bookmarkImport";
   import { planImport, readBookmarks } from "../../library/bookmarks";
-  import { imports } from "../../library/imports.svelte";
+  import { imports } from "../../imports/imports.svelte";
   import type { ImportFile } from "../../plugins/types";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
@@ -93,12 +93,14 @@
       onimport={() => imports.start(ID, input())}
       oncancel={close}
       result={(done) => t("library.bookmarks.imported", { count: done.added, there: plan.there })}
-      undone={(undone) => t("library.bookmarks.undone", { count: undone.removed })}
+      undone={(undone) => t("library.bookmarks.undone", { count: undone.trashed })}
     >
       {#snippet options()}
-        <FieldRow label={t("library.bookmarks.folderTags")} note={t("library.bookmarks.folderTagsNote")}>
-          <Switch label={t("library.bookmarks.folderTags")} checked={folderTags} onchange={(on) => (folderTags = on)} />
-        </FieldRow>
+        {#if plan.add.length}
+          <FieldRow label={t("library.bookmarks.folderTags")} note={t("library.bookmarks.folderTagsNote")}>
+            <Switch label={t("library.bookmarks.folderTags")} checked={folderTags} onchange={(on) => (folderTags = on)} />
+          </FieldRow>
+        {/if}
       {/snippet}
     </ImportStep>
   {/key}

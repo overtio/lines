@@ -9,7 +9,7 @@
   import { isClosed, notes } from "../../notes/store.svelte";
   import { isApple, isDesktopApp, isSite, revealFile, saveFile } from "../../platform";
   import { plugins } from "../../plugins/registry.svelte";
-  import type { ImportFile, LibraryImport } from "../../plugins/types";
+  import type { Import, ImportFile } from "../../plugins/types";
   import { sync } from "../../sync/engine.svelte";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
@@ -17,6 +17,7 @@
   import FieldRow from "../ui/FieldRow.svelte";
   import Switch from "../ui/Switch.svelte";
   import CardBlock from "./CardBlock.svelte";
+  import ImportGroup from "./ImportGroup.svelte";
 
   let includeTrash = $state(false);
   let busy = $state(false);
@@ -36,10 +37,10 @@
   let importButton = $state<HTMLElement>();
 
   type Panel = Component<{ files?: ImportFile[]; onclose?: () => void }>;
-  /** Files a Library import reads (a browser's bookmarks), each import asking what to do with them below. */
+  /** Files a plugin's import reads (a browser's bookmarks), each import asking what to do with them below. */
   let steps = $state.raw<{ files: ImportFile[]; step: Panel }[]>([]);
-  /** The Library's imports of files of their own. */
-  const fileImports = $derived(plugins.libraryImports.filter((each): each is LibraryImport & Required<Pick<LibraryImport, "files">> => !!each.files));
+  /** Plugins' imports of files of their own. */
+  const fileImports = $derived(plugins.imports.filter((each): each is Import & Required<Pick<Import, "files">> => !!each.files));
 
   /** The extension a file's name ends in, in lowercase. */
   const extensionOf = (name: string) => name.slice(name.lastIndexOf(".") + 1).toLowerCase();
@@ -250,6 +251,10 @@
     />
   {/each}
 </FieldGroup>
+
+{#each plugins.imports.filter((source) => source.into === "notes") as source (source.id)}
+  <ImportGroup {source} />
+{/each}
 
 <FieldGroup title={t("settings.samples")} note={t("settings.samplesText")}>
   <CardBlock>
