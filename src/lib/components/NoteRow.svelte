@@ -11,8 +11,8 @@
   import { longPress } from "../longPress";
   import { coarsePointer, copyText, isApple, isMacApp, reducedMotion } from "../platform";
   import { lookUpDetails } from "../library/adding";
-  import { rateItems, ratings, sayRated } from "../library/ratings.svelte";
-  import { ratingOf, shelfRow } from "../library/rows";
+  import { rateItems, ratingOf, ratings, sayRated } from "../library/ratings.svelte";
+  import { shelfRow } from "../library/rows";
   import { scoreIn, scoreText } from "../editor/scores";
   import { propertyOf } from "../notes/properties";
   import { setProperties } from "../notes/properties";
