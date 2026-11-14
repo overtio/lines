@@ -31,7 +31,7 @@
     if (f.kind === "type") return typeLabel(f.type);
     if (f.kind === "library") return shelves.get(f.shelf)?.label ?? typeLabel(f.shelf);
     if (f.kind === "calendar") return t("sidebar.calendar");
-    if (f.kind === "feeds") return (f.feed && feeds.subscription(f.feed)?.title) || feedRowLabel(f.group);
+    if (f.kind === "feeds") return (f.feed && feeds.subscription(f.feed)?.title) || f.stream || feedRowLabel(f.group);
     return { inbox: t("sidebar.inbox"), all: t("sidebar.notes"), todo: t("sidebar.todo"), untagged: t("sidebar.untagged"), trash: t("sidebar.trash") }[f.kind];
   });
 
@@ -49,7 +49,7 @@
     return filter;
   }
   /** The feeds whose posts are listed. */
-  const listedFeeds = $derived(feedView ? (feedView.feed ? [feedView.feed] : feeds.feedsIn(feedView.group)) : []);
+  const listedFeeds = $derived(feedView ? feeds.feedsOf(feedView) : []);
   const posts = $derived(feeds.listed);
   /** Whether the feeds listed have posts but every one is dismissed. */
   const caughtUp = $derived(!!feedView && !feedView.dismissed && listedFeeds.some((url) => feeds.records.get(url)?.posts.length));

@@ -22,7 +22,7 @@
   });
 
   /** Focus goes back before the item runs, so a dialog it opens gives focus back there too as it closes. */
-  function choose(item: Exclude<MenuItem, "separator">) {
+  function choose(item: { run: () => void }) {
     ui.closeMenu();
     if (previous instanceof HTMLElement && previous.isConnected) previous.focus({ preventScroll: true });
     item.run();
@@ -42,6 +42,37 @@
   }
 </script>
 
+{#snippet items(menu: MenuItem[])}
+  {#each menu as item, i (i)}
+    {#if item === "separator"}
+      <DropdownMenu.Separator class={separator} />
+    {:else if "items" in item}
+      <!-- A menu beside this one, opened by → or pointing, as the system's submenus are. -->
+      <DropdownMenu.Sub>
+        <DropdownMenu.SubTrigger class={[option, "data-[state=open]:bg-active"]}>
+          {#if item.icon}<Icon name={item.icon} size={15} />{/if}
+          <span class="flex-1">{item.label}</span>
+          <Icon name="chevron-right" size={14} />
+        </DropdownMenu.SubTrigger>
+        <DropdownMenu.SubContent sideOffset={4} collisionPadding={8} class="{floating} min-w-44 p-[5px]">
+          {@render items(item.items)}
+        </DropdownMenu.SubContent>
+      </DropdownMenu.Sub>
+    {:else if item.checked !== undefined}
+      <!-- A choice, read as checked or not, its check where other items have their icon. -->
+      <DropdownMenu.CheckboxItem checked={item.checked} onSelect={() => choose(item)} class={option}>
+        {#if item.checked}<Icon name="check" size={15} class="text-accent!" />{:else}<span class="size-[15px] shrink-0"></span>{/if}
+        {item.label}
+      </DropdownMenu.CheckboxItem>
+    {:else}
+      <DropdownMenu.Item onSelect={() => choose(item)} class={[option, item.danger && "text-danger! [&_.icon]:text-danger!"]}>
+        {#if item.icon}<Icon name={item.icon} size={15} />{/if}
+        {item.label}
+      </DropdownMenu.Item>
+    {/if}
+  {/each}
+{/snippet}
+
 <!-- Bound both ways: a menu that closes itself (an item chosen) is closed in `ui` too, or the next one wouldn't open. -->
 <DropdownMenu.Root bind:open={() => !!ui.menu, (open) => !open && ui.closeMenu()}>
   <DropdownMenu.Portal>
@@ -57,22 +88,7 @@
       oncontextmenu={(event) => event.preventDefault()}
       class="{floating} min-w-48 p-[5px]"
     >
-      {#each ui.menu?.items ?? [] as item, i (i)}
-        {#if item === "separator"}
-          <DropdownMenu.Separator class={separator} />
-        {:else if item.checked !== undefined}
-          <!-- A choice, read as checked or not, its check where other items have their icon. -->
-          <DropdownMenu.CheckboxItem checked={item.checked} onSelect={() => choose(item)} class={option}>
-            {#if item.checked}<Icon name="check" size={15} class="text-accent!" />{:else}<span class="size-[15px] shrink-0"></span>{/if}
-            {item.label}
-          </DropdownMenu.CheckboxItem>
-        {:else}
-          <DropdownMenu.Item onSelect={() => choose(item)} class={[option, item.danger && "text-danger! [&_.icon]:text-danger!"]}>
-            {#if item.icon}<Icon name={item.icon} size={15} />{/if}
-            {item.label}
-          </DropdownMenu.Item>
-        {/if}
-      {/each}
+      {@render items(ui.menu?.items ?? [])}
     </DropdownMenu.Content>
   </DropdownMenu.Portal>
 </DropdownMenu.Root>

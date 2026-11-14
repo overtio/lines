@@ -5,6 +5,7 @@
   import { t } from "../i18n/index.svelte";
   import { feedRowLabel, feeds, type Subscription } from "../feeds/feeds.svelte";
   import { FEED_GROUPS, type FeedGroup } from "../feeds/groups";
+  import { streamKey } from "../feeds/streams";
   import { type Shelf, shelves } from "../library/shelves.svelte";
   import { lock } from "../lock/lock.svelte";
   import { notesOnDays } from "../notes/calendar";
@@ -57,19 +58,23 @@
   const ownTypes = $derived(notes.types.filter(({ type }) => !plugins.libraryKind(type)));
 
   /**
-   * The Library's rows: its feeds (a row for each kind with subscriptions, or one for them all, as
-   * Settings → Library says), then its shelves with something on them, in the order chosen; and
-   * those not hidden. A feeds' row is ordered, sized and hidden as `feeds:rss`, a shelf as its kind.
+   * The Library's rows: its feeds' streams, then its feeds (a row for each kind with subscriptions,
+   * or one for them all, as Settings → Library says), then its shelves with something on them, in
+   * the order chosen; and those not hidden. A stream's row is ordered, sized and hidden as
+   * `stream:work`, a feeds' row as `feeds:rss`, a shelf as its kind.
    */
   type LibraryRow =
-    | { kind: "feeds"; key: string; group: FeedGroup | null; subscriptions: Subscription[]; unread: number }
+    | { kind: "feeds"; key: string; group: FeedGroup | null; stream?: string; subscriptions: Subscription[]; unread: number }
     | { kind: "shelf"; key: string; shelf: Shelf; count: number };
   const libraryRows = $derived.by(() => {
     const feedRows: LibraryRow[] = !feeds.on
       ? []
-      : prefs.feedsInSidebar === "together"
-        ? [{ kind: "feeds", key: "feeds:all", group: null, subscriptions: feeds.subscriptions, unread: feeds.totalUnread }]
-        : feeds.groups.map(({ group, subscriptions, unread }) => ({ kind: "feeds", key: `feeds:${group}`, group, subscriptions, unread }));
+      : [
+          ...feeds.streams.map(({ name, subscriptions, unread }): LibraryRow => ({ kind: "feeds", key: `stream:${streamKey(name)}`, group: null, stream: name, subscriptions, unread })),
+          ...(prefs.feedsInSidebar === "together"
+            ? [{ kind: "feeds" as const, key: "feeds:all", group: null, subscriptions: feeds.subscriptions, unread: feeds.totalUnread }]
+            : feeds.groups.map(({ group, subscriptions, unread }) => ({ kind: "feeds" as const, key: `feeds:${group}`, group, subscriptions, unread }))),
+        ];
     const counts = new Map(notes.types.map(({ type, count }) => [type, count]));
     const stocked = shelves.all
       .map((shelf) => ({ kind: "shelf" as const, key: shelf.key, shelf, count: shelf.kinds.reduce((sum, kind) => sum + (counts.get(kind.type) ?? 0), 0) }))
@@ -82,7 +87,7 @@
   const rowKey = (row: LibraryRow) => (row.kind === "feeds" ? row.key : `shelf:${row.key}`);
   const shownLibrary = $derived(libraryRows.filter((row) => !sidebarLayout.isHidden(rowKey(row))));
   /** Every row of feeds there can be, to size along with the Library's other rows. */
-  const FEED_ROWS = ["feeds:all", ...FEED_GROUPS.map((group) => `feeds:${group}`)];
+  const feedRowKeys = $derived([...feeds.streams.map(({ name }) => `stream:${streamKey(name)}`), "feeds:all", ...FEED_GROUPS.map((group) => `feeds:${group}`)]);
 
   const placeKeys = PLACES.map((place) => place.key);
   const placeOf = new Map(PLACES.map((place) => [place.key, place]));
@@ -218,6 +223,10 @@
     if (kind === "type") return notes.types.some(({ type }) => type === name) ? { label: typeLabel(name), icon: typeLooks.icon(name) } : null;
     if (kind === "shelf") return shelves.get(name) ?? null;
     if (kind === "feeds") return feeds.on ? { label: feedRowLabel(name === "all" ? null : (name as FeedGroup)), icon: "rss" } : null;
+    if (kind === "stream") {
+      const stream = feeds.on ? feeds.streams.find((each) => streamKey(each.name) === name) : undefined;
+      return stream ? { label: stream.name, icon: "waves" } : null;
+    }
     if (kind === "tag") return tagPaths.has(name) ? { label: `#${name}`, icon: tagLooks.icon(name) } : null;
     return null;
   };
@@ -259,7 +268,7 @@
   function sectionMenu(section: Section, x: number, y: number) {
     const label = nameOf(section);
     if (section.kind === "library") {
-      const own = sizeItems("library", "", [...FEED_ROWS, ...shelves.all.map((shelf) => `shelf:${shelf.key}`)]);
+      const own = sizeItems("library", "", [...feedRowKeys, ...shelves.all.map((shelf) => `shelf:${shelf.key}`)]);
       return openRowMenu(`section:${section.key}`, label, own, hideItems("section", section.key), x, y);
     }
     if (section.kind !== "places") {
@@ -281,9 +290,10 @@
     openRowMenu(`shelf:${shelf.key}`, shelf.label, sizeItems("library", `shelf:${shelf.key}`), hideItems("shelf", shelf.key), x, y);
   }
 
-  /** A row of feeds' menu: its own items (FeedRows.svelte), then its size (never a tile: its feeds are under it), and hiding it. */
+  /** A row of feeds' or a stream's menu: its own items (FeedRows.svelte), then its size (never a tile: its feeds are under it), and hiding it. */
   function feedsMenu(key: string, label: string, own: MenuItem[], x: number, y: number) {
-    openRowMenu(key, label, [...own, "separator", ...sizeItems("library", key, undefined, false)], hideItems("feeds", key.slice("feeds:".length)), x, y);
+    const [kind, name] = [key.slice(0, key.indexOf(":")) as "feeds" | "stream", key.slice(key.indexOf(":") + 1)];
+    openRowMenu(key, label, [...own, "separator", ...sizeItems("library", key, undefined, false)], hideItems(kind, name), x, y);
   }
 
   /** Add to Library, open under the Library heading's button. */
@@ -573,6 +583,7 @@
                 {@const size = sidebarLayout.sizeOf(row.key, "library")}
                 <FeedRows
                   group={row.group}
+                  stream={row.stream}
                   subscriptions={row.subscriptions}
                   unread={row.unread}
                   size={size === "large" ? "standard" : size}

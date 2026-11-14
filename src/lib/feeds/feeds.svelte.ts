@@ -36,6 +36,7 @@ import {
   writeShard,
 } from "./marks";
 import { readOpml, writeOpml } from "./opml";
+import { cleanStream, streamKey, streamsOf, withoutStream, withStream, writeStreams } from "./streams";
 import { plainText } from "./markdown";
 import { feedItem } from "./item";
 import { isFeed, NotAFeed, readFeed, type Feed } from "./parse";
@@ -56,6 +57,15 @@ export interface Subscription {
   /** The note subscribing to it (the one edited last, if several do). */
   note: string;
   title: string;
+  /** The streams it's in (streams.ts), as its notes name them. */
+  streams: string[];
+}
+
+/** A stream (streams.ts): its name, its feeds, and how many of their posts are unread. */
+export interface Stream {
+  name: string;
+  subscriptions: Subscription[];
+  unread: number;
 }
 
 /** A post, with the feed it's from. */
@@ -100,7 +110,7 @@ const hostOf = (url: string) => {
 };
 
 /** A note's feed, if it's a subscription: its `feed:` property, a link to the web. */
-function feedOf(properties: Parameters<typeof propertyOf>[0]): string | null {
+export function feedOf(properties: Parameters<typeof propertyOf>[0]): string | null {
   const value = propertyOf(properties, "feed")?.value.trim();
   return value && /^https?:\/\/\S+$/i.test(value) ? value : null;
 }
@@ -108,16 +118,23 @@ function feedOf(properties: Parameters<typeof propertyOf>[0]): string | null {
 /** The note (not in the Trash) whose `key` property is `value`: a post saved to the Library, by its link or its sound. */
 export const savedWith = (key: string, value: string) => notes.entries.find(({ note, meta }) => !note.trashed && propertyOf(meta.properties, key)?.value.trim() === value);
 
-/** Every subscription as one line each, so typing that changes none leaves it the same and nothing below redraws. */
+/**
+ * Every subscription as one line each, so typing that changes none leaves it the same and nothing
+ * below redraws: its feed, its note, its title and its streams, those every note subscribing to it names.
+ */
 function signature() {
-  const found = new Map<string, { note: string; title: string; updated: number }>();
+  const found = new Map<string, { note: string; title: string; updated: number; streams: string[] }>();
   for (const { note, meta } of notes.entries) {
     if (note.trashed) continue;
     const url = feedOf(meta.properties);
-    const other = url ? found.get(url) : undefined;
-    if (url && (!other || note.updatedAt > other.updated)) found.set(url, { note: note.id, title: meta.title, updated: note.updatedAt });
+    if (!url) continue;
+    const other = found.get(url);
+    const streams = withStream(other?.streams ?? [], streamsOf(meta.properties));
+    if (!other || note.updatedAt > other.updated) found.set(url, { note: note.id, title: meta.title, updated: note.updatedAt, streams });
+    else other.streams = streams;
   }
-  return [...found].map(([url, { note, title }]) => `${url}\t${note}\t${title}`).join("\n");
+  // A stream's name has no comma (streams.ts).
+  return [...found].map(([url, { note, title, streams }]) => `${url}\t${note}\t${title}\t${streams.join(",")}`).join("\n");
 }
 
 class Feeds {
@@ -163,8 +180,8 @@ class Feeds {
       ? this.#signature
           .split("\n")
           .map((line) => {
-            const [url, note, title] = line.split("\t");
-            return { url, note, title };
+            const [url, note, title, streams] = line.split("\t");
+            return { url, note, title, streams: streams ? streams.split(",") : [] };
           })
           .sort((a, b) => a.title.localeCompare(b.title))
       : [],
@@ -197,6 +214,21 @@ class Feeds {
     }).filter(({ subscriptions }) => subscriptions.length),
   );
 
+  /** The streams there are (those their feeds name), by name, each with its feeds and how many of their posts are unread. */
+  streams = $derived.by((): Stream[] => {
+    const found = new Map<string, { name: string; subscriptions: Subscription[] }>();
+    for (const subscription of this.subscriptions) {
+      for (const name of subscription.streams) {
+        const stream = found.get(streamKey(name)) ?? { name, subscriptions: [] };
+        stream.subscriptions.push(subscription);
+        found.set(streamKey(name), stream);
+      }
+    }
+    return [...found.values()]
+      .map(({ name, subscriptions }) => ({ name, subscriptions, unread: subscriptions.reduce((sum, { url }) => sum + (this.unread.get(url) ?? 0), 0) }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  });
+
   /** The open post, with its feed. */
   openRow = $derived.by((): Row | null => {
     const open = this.open;
@@ -215,7 +247,9 @@ class Feeds {
     const out = !!filter.dismissed;
     const terms = notes.query.toLowerCase().split(/\s+/).filter(Boolean);
     const titles = new Map(this.subscriptions.map(({ url, title }) => [url, title.toLowerCase()]));
-    return this.posts(filter.feed, filter.group).filter(({ feed, post }) => {
+    const chosen = new Set(this.feedsOf(filter));
+    const rows = filter.feed ? this.posts(filter.feed) : filter.group || filter.stream ? this.#all.filter(({ feed }) => chosen.has(feed)) : this.#all;
+    return rows.filter(({ feed, post }) => {
       if (isOut(post) !== out) return false;
       if (!terms.length) return true;
       const text = `${post.title.toLowerCase()} ${post.excerpt.toLowerCase()} ${titles.get(feed) ?? ""}`;
@@ -238,14 +272,55 @@ class Feeds {
     return group ? this.#all.filter((row) => this.groupOf.get(row.feed) === group) : this.#all;
   }
 
-  /** The feeds subscribed to in a group, or all of them. */
-  feedsIn(group?: FeedGroup): string[] {
-    return this.subscriptions.filter(({ url }) => !group || this.groupOf.get(url) === group).map(({ url }) => url);
+  /** The feeds the sidebar's row `filter` chose: one, a kind's, a stream's, or every one subscribed to. */
+  feedsOf(filter: FeedsFilter): string[] {
+    if (filter.feed) return [filter.feed];
+    const stream = filter.stream && streamKey(filter.stream);
+    return this.subscriptions
+      .filter(({ url, streams }) => (!filter.group || this.groupOf.get(url) === filter.group) && (!stream || streams.some((name) => streamKey(name) === stream)))
+      .map(({ url }) => url);
   }
 
   /** Whether a feed's posts are among those the sidebar's row `filter` chose. */
   chose(filter: FeedsFilter, feed: string) {
-    return filter.feed ? filter.feed === feed : !filter.group || this.groupOf.get(feed) === filter.group;
+    return this.feedsOf(filter).includes(feed);
+  }
+
+  /** Puts a feed in a stream, made if it's new: each note subscribing to it names it. */
+  addToStream(url: string, name: string) {
+    this.#rewriteStreams((streams, feed) => (feed === url ? withStream(streams, [name]) : streams));
+  }
+
+  /** Takes a feed out of a stream. */
+  removeFromStream(url: string, name: string) {
+    this.#rewriteStreams((streams, feed) => (feed === url ? withoutStream(streams, name) : streams));
+  }
+
+  /** Renames a stream: each of its feeds' notes names it so (one in both is in it once), and its list stays shown. */
+  renameStream(from: string, to: string) {
+    if (!cleanStream(to) || cleanStream(to) === from) return;
+    this.#rewriteStreams((streams) => (streams.some((name) => streamKey(name) === streamKey(from)) ? withStream(withoutStream(streams, from), [to]) : streams));
+    const filter = notes.filter;
+    if (filter.kind === "feeds" && filter.stream && streamKey(filter.stream) === streamKey(from)) notes.setFilter({ ...filter, stream: cleanStream(to) });
+  }
+
+  /** Deletes a stream: its feeds' notes no longer name it, and stay subscribed. */
+  deleteStream(name: string) {
+    this.#rewriteStreams((streams) => withoutStream(streams, name));
+    const filter = notes.filter;
+    if (filter.kind === "feeds" && filter.stream && streamKey(filter.stream) === streamKey(name)) notes.setFilter({ kind: "feeds" });
+  }
+
+  /** Changes the streams of subscriptions' notes (`change` of each's streams and feed), keeping their dates, as renaming a type does. */
+  #rewriteStreams(change: (streams: string[], feed: string) => string[]) {
+    notes.rewrite((body, note) => {
+      const properties = notes.get(note.id)?.meta.properties ?? [];
+      const feed = !note.trashed && feedOf(properties);
+      if (!feed) return body;
+      const streams = streamsOf(properties);
+      const changed = change(streams, feed);
+      return changed.join("\n") === streams.join("\n") ? body : writeStreams(body, changed);
+    });
   }
 
   subscription(url: string) {

@@ -1,4 +1,6 @@
 import { speak } from "../a11y";
+import { feedOf, feeds } from "../feeds/feeds.svelte";
+import { streamKey, streamsOf } from "../feeds/streams";
 import { t } from "../i18n/index.svelte";
 import { setProperties, typeLabel } from "./properties";
 import { isClosed, notes } from "./store.svelte";
@@ -6,8 +8,9 @@ import { isClosed, notes } from "./store.svelte";
 /*
  * A note dragged from the list onto a row of the sidebar (panes.svelte.ts follows the drag): onto a
  * tag, it's tagged; onto a type, it's one of that type; onto the Inbox or the Trash, it goes there.
- * The rows say what they are as `data-note-drop`: `tag:work/meetings`, `type:person`, `place:inbox`,
- * `place:trash`.
+ * A feed's subscription (its row, dragged in the Library) onto a stream goes in that stream. The rows
+ * say what they are as `data-note-drop`: `tag:work/meetings`, `type:person`, `place:inbox`,
+ * `place:trash`, `stream:Must read`.
  */
 
 /** Whether the note can be dropped there: what it'd do it hasn't done already, and can do (a locked note's text, or properties outside Markdown, can't be changed). */
@@ -19,6 +22,7 @@ export function canDrop(target: string, id: string): boolean {
   if (kind === "place") return name === "inbox" ? !note.inbox && !note.trashed : !note.trashed;
   if (isClosed(note) || note.trashed) return false;
   if (kind === "tag") return !meta.tags.includes(name);
+  if (kind === "stream") return !!feedOf(meta.properties) && !streamsOf(meta.properties).some((each) => streamKey(each) === streamKey(name));
   return kind === "type" && !note.format && meta.type !== name;
 }
 
@@ -29,6 +33,9 @@ export function dropNote(target: string, id: string) {
   const name = target.slice(target.indexOf(":") + 1);
   if (target.startsWith("tag:")) {
     speak(t("list.tagged", { count: notes.addTag([id], name), tag: name }));
+  } else if (target.startsWith("stream:")) {
+    feeds.addToStream(feedOf(entry.meta.properties)!, name);
+    speak(t("feeds.streams.added", { title: entry.meta.title, name }));
   } else if (target.startsWith("type:")) {
     notes.edit(id, setProperties(entry.note.body, { type: name }), t("calendar.didUndo"));
     speak(t("list.didType", { type: typeLabel(name) }));

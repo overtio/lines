@@ -8,8 +8,11 @@ export const NOTE_MIN = 360;
 
 export type Layout = "wide" | "medium" | "narrow";
 
-/** A menu's item, or a line between groups of them. One with `checked` is a choice, marked while it's the one made. */
-export type MenuItem = { label: string; icon?: IconName; danger?: boolean; checked?: boolean; run: () => void } | "separator";
+/**
+ * A menu's item, or a line between groups of them. One with `checked` is a choice, marked while it's
+ * the one made; one with `items` opens a menu of them beside it.
+ */
+export type MenuItem = { label: string; icon?: IconName; danger?: boolean; checked?: boolean; run: () => void } | { label: string; icon?: IconName; items: MenuItem[] } | "separator";
 
 /** A menu in sections, a line between each; a section with nothing in it isn't one. */
 export const menuSections = (...sections: Exclude<MenuItem, "separator">[][]): MenuItem[] =>
@@ -93,6 +96,8 @@ class UIState {
   tagPrompt = $state.raw<TagPrompt | null>(null);
   /** Where the box to subscribe to a feed opens, while it's open. */
   subscribePrompt = $state.raw<Omit<TagPrompt, "ids"> | null>(null);
+  /** The box a stream's name is typed in, while it's open: a new one for `feed`, or `rename`'s new name. */
+  streamPrompt = $state.raw<(Omit<TagPrompt, "ids"> & { feed?: string; rename?: string }) | null>(null);
   /**
    * The note whose PDF is being previewed, and what it goes straight on to once it's ready:
    * printing, exporting the PDF (printed, or saved from a typesetter), or offering PNG images.
