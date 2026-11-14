@@ -60,12 +60,14 @@ function codeParser(info: string): Parser | null {
  * GFM plus our #tags, ==highlights==, <u>underlines</u>, cards, $math$, @mentions, highlighted code blocks and what
  * plugins add. Built directly rather than through `markdown()`, which would also bundle HTML, CSS
  * and JavaScript parsers up front. Sharing `markdownLanguage.data` keeps list continuation on
- * Enter working.
+ * Enter working. Not its `:emoji:` shortcodes, which lines doesn't draw: they only colored what's
+ * between two colons, the 47 of a duration's 4:47:43.
  */
 const linedown = (additions: MarkdownAddition[], underlined: boolean) =>
   new Language(
     markdownLanguage.data,
     (markdownLanguage.parser as MarkdownParser).configure([
+      { remove: ["Emoji"] },
       Tag,
       Highlight,
       Underline,

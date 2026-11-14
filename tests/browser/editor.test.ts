@@ -1016,3 +1016,13 @@ test("a score on a Key: Value line or in the properties is drawn as marks, as Li
   expect(await page.locator(".editor-pane .cm-content").innerText()).toContain("Score: 4/7");
   expect(await page.locator(".editor-pane .cm-lp-copy").count()).toBe(0);
 });
+
+test("times and words between colons are text, not emoji shortcodes: a duration's 4:47:43, :smile:", async () => {
+  app = await openApp();
+  await app.open("---\nduration: 4:47:43\n---\n# Talk\n\nAt 1:02:03 and :smile: here");
+  const lines = app.page.locator(".editor-pane .cm-line", { hasText: /4:47:43|1:02:03/ });
+  await lines.first().waitFor();
+  // Nothing between the colons is drawn apart from the rest of the text.
+  const apart = await lines.evaluateAll((all) => all.flatMap((line) => [...line.querySelectorAll("span")].map((span) => span.textContent)).filter((text) => /^:\w+:$/.test(text ?? "")));
+  expect(apart).toEqual([]);
+});
