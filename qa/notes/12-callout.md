@@ -385,61 +385,67 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::
 
-#### 39. Image in a callout
+#### 39. Time in an episode in a callout
+
+:::i
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+:::
+
+#### 40. Image in a callout
 
 :::i
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 40. Drawing in a callout
+#### 41. Drawing in a callout
 
 :::i
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 41. File in a callout
+#### 42. File in a callout
 
 :::i
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 42. Folder and file links in a callout
+#### 43. Folder and file links in a callout
 
 :::i
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 :::
 
-#### 43. Attached 3D model (STL) in a callout
+#### 44. Attached 3D model (STL) in a callout
 
 :::i
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 44. Terminal recording (.cast file) in a callout
+#### 45. Terminal recording (.cast file) in a callout
 
 :::i
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 45. Audio in a callout
+#### 46. Audio in a callout
 
 :::i
 [Chime.mp3](attachment:chime.mp3)
 :::
 
-#### 46. Video in a callout
+#### 47. Video in a callout
 
 :::i
 [Sky.mp4](attachment:sky.mp4)
 :::
 
-#### 47. Missing file in a callout
+#### 48. Missing file in a callout
 
 :::i
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 48. Card in a callout
+#### 49. Card in a callout
 
 :::i
 ::: card
@@ -447,7 +453,7 @@ Text in a card.
 :::
 :::
 
-#### 49. Callout (info) in a callout
+#### 50. Callout (info) in a callout
 
 :::i
 :::i
@@ -455,7 +461,7 @@ Text in an info callout.
 :::
 :::
 
-#### 50. Callout (warning, chosen icon) in a callout
+#### 51. Callout (warning, chosen icon) in a callout
 
 :::i
 :::! icon=flag
@@ -463,7 +469,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 51. Callout (decision, no icon) in a callout
+#### 52. Callout (decision, no icon) in a callout
 
 :::i
 :::^ icon=none

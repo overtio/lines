@@ -461,7 +461,15 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 | longer cell text | `code` | 22 |
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Table, then Image
+#### 39. Table, then Time in an episode
+
+| Left | Center | Right |
+| :--- | :----: | ----: |
+| a | **b** | 1 |
+| longer cell text | `code` | 22 |
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Table, then Image
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -469,7 +477,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 ![A sample picture](attachment:photo.png)
 
-#### 40. Table, then Drawing
+#### 41. Table, then Drawing
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -477,7 +485,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Table, then File
+#### 42. Table, then File
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -485,7 +493,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Table, then Folder and file links
+#### 43. Table, then Folder and file links
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -493,7 +501,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 | longer cell text | `code` | 22 |
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Table, then Attached 3D model (STL)
+#### 44. Table, then Attached 3D model (STL)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -501,7 +509,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 | longer cell text | `code` | 22 |
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Table, then Terminal recording (.cast file)
+#### 45. Table, then Terminal recording (.cast file)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -509,7 +517,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 | longer cell text | `code` | 22 |
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Table, then Audio
+#### 46. Table, then Audio
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -517,7 +525,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 | longer cell text | `code` | 22 |
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Table, then Video
+#### 47. Table, then Video
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -525,7 +533,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 | longer cell text | `code` | 22 |
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Table, then Missing file
+#### 48. Table, then Missing file
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -533,7 +541,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 | longer cell text | `code` | 22 |
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Table, then Card
+#### 49. Table, then Card
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -543,7 +551,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 Text in a card.
 :::
 
-#### 49. Table, then Callout (info)
+#### 50. Table, then Callout (info)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -553,7 +561,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 50. Table, then Callout (warning, chosen icon)
+#### 51. Table, then Callout (warning, chosen icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |
@@ -563,7 +571,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Table, then Callout (decision, no icon)
+#### 52. Table, then Callout (decision, no icon)
 
 | Left | Center | Right |
 | :--- | :----: | ----: |

@@ -59,7 +59,7 @@
   </header>
   {#if entry}
     <div class="min-h-0 flex-1" hidden={closed}>
-      <Editor noteId={id} trashed={entry.note.trashed || closed} />
+      <Editor noteId={id} trashed={entry.note.trashed || closed} pane={id} />
     </div>
     {#if closed}
       <LockedNoteView {entry} />

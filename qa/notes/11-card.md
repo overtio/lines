@@ -385,61 +385,67 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::
 
-#### 39. Image in a card
+#### 39. Time in an episode in a card
+
+::: card
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+:::
+
+#### 40. Image in a card
 
 ::: card
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 40. Drawing in a card
+#### 41. Drawing in a card
 
 ::: card
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 41. File in a card
+#### 42. File in a card
 
 ::: card
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 42. Folder and file links in a card
+#### 43. Folder and file links in a card
 
 ::: card
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 :::
 
-#### 43. Attached 3D model (STL) in a card
+#### 44. Attached 3D model (STL) in a card
 
 ::: card
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 44. Terminal recording (.cast file) in a card
+#### 45. Terminal recording (.cast file) in a card
 
 ::: card
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 45. Audio in a card
+#### 46. Audio in a card
 
 ::: card
 [Chime.mp3](attachment:chime.mp3)
 :::
 
-#### 46. Video in a card
+#### 47. Video in a card
 
 ::: card
 [Sky.mp4](attachment:sky.mp4)
 :::
 
-#### 47. Missing file in a card
+#### 48. Missing file in a card
 
 ::: card
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 48. Card in a card
+#### 49. Card in a card
 
 ::: card
 ::: card
@@ -447,7 +453,7 @@ Text in a card.
 :::
 :::
 
-#### 49. Callout (info) in a card
+#### 50. Callout (info) in a card
 
 ::: card
 :::i
@@ -455,7 +461,7 @@ Text in an info callout.
 :::
 :::
 
-#### 50. Callout (warning, chosen icon) in a card
+#### 51. Callout (warning, chosen icon) in a card
 
 ::: card
 :::! icon=flag
@@ -463,7 +469,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 51. Callout (decision, no icon) in a card
+#### 52. Callout (decision, no icon) in a card
 
 ::: card
 :::^ icon=none

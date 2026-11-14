@@ -169,6 +169,17 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.goToLine", keys: ["Mod-Alt-g"] },
     ],
   },
+  {
+    // The podcast player's (player/keys.ts), and times in notes (player/noteTimes.ts).
+    name: "shortcuts.group.listening",
+    shortcuts: [
+      { action: "shortcuts.playPause", keys: [{ mac: "Ctrl-Mod-p", other: "Ctrl-Alt-p" }] },
+      { action: "shortcuts.playerBack", keys: [{ mac: "Ctrl-Mod-ArrowLeft", other: "Ctrl-Alt-," }] },
+      { action: "shortcuts.playerForward", keys: [{ mac: "Ctrl-Mod-ArrowRight", other: "Ctrl-Alt-." }] },
+      { action: "shortcuts.writeTime", keys: [{ mac: "Ctrl-Mod-t", other: "Ctrl-Alt-s" }], note: "shortcuts.inNote" },
+      { action: "shortcuts.playTime", keys: ["Alt-Enter"], note: "shortcuts.inNote" },
+    ],
+  },
 ];
 
 /** The system lines runs on, for the keys it shows first. */

@@ -3,6 +3,7 @@
   import Editor from "../editor/Editor.svelte";
   import { t } from "../i18n/index.svelte";
   import { isClosed, notes } from "../notes/store.svelte";
+  import { MAIN } from "../panes";
   import LockedNoteView from "./LockedNoteView.svelte";
   import SaveError from "./SaveError.svelte";
   import { prefs } from "../prefs.svelte";
@@ -142,7 +143,8 @@
 
   {#if entry && !entry.note.trashed}
     <div class="min-h-0 flex-1" hidden={closed}>
-      <Editor noteId={id} trashed={closed} />
+      <!-- Its window's one pane. -->
+      <Editor noteId={id} trashed={closed} pane={MAIN} />
     </div>
     {#if closed}
       <LockedNoteView {entry} compact />

@@ -79,6 +79,9 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - Episodes play in the main window. A floating note's Play asks the main window to play it, and its button says Play even while it's playing there.
 - Locking lines, or quitting it, stops the episode playing: it's back in the player once lines is unlocked or open again, paused where it was.
 - The player hasn't been tried in the Mac app yet: playing through its web view, Now Playing and the media keys, a floating note's Play, and keeping the place on ⌘Q.
+- Writing the time (⌃⌘T, `/time`) and the player's keys work only in the main window: a floating note doesn't know where the main window's player is. A time written there plays, in the main window.
+- Transcripts are only those a feed names, with times (plain text ones aren't read), and only in Podcasting 2.0's current namespace (a few feeds still use its first, on GitHub); on the web, only where their site lets pages read them (most hosts do; Transistor doesn't). Who's speaking is read from a name before what's said where a file has no voices, if the same name is written so on more than one line, so a line starting "Warning: …" stays as it is; a speaker named only once in a whole transcript isn't told apart from what they say. Chapters inside the sound file (ID3) aren't read.
+- Times aren't drawn as chips, nor written with ⌃⌘T or `/time`, in LaTeX notes yet, and a quote from a transcript goes into the episode's note rather than a LaTeX one.
 - Not tried in the Mac app (WKWebView), nor Windows, Linux, iOS or Android: only in Chromium and WebKit with sound served by the tests. The Mac's Now Playing and media keys need trying there.
 
 ## Wallhaven

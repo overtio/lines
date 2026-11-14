@@ -1,0 +1,8 @@
+{
+  "version": "1.2.0",
+  "chapters": [
+    { "startTime": 0, "endTime": 0.075 },
+    { "startTime": 0.075, "endTime": 29.2, "title": "Opening", "img": "https://example.com/opening.jpg" },
+    { "startTime": 29.2, "endTime": 67.9, "title": "Welcome" }
+  ]
+}

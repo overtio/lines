@@ -76,6 +76,8 @@ export default {
   "feeds.refreshEveryNote": "Al abrir lines, y después con esta frecuencia mientras está abierto.",
   "feeds.every": "{minutes, plural, =60 {Cada hora} =240 {Cada 4 horas} other {Cada # minutos}}",
   "feeds.onlyWhenAsked": "Solo cuando lo pida",
+  "feeds.timeNotes": "Poner la hora a las notas al escuchar",
+  "feeds.timeNotesNote": "En la nota de un episodio, mientras suena o está en pausa después de sonar (no uno pausado antes de abrir lines), Intro tras un elemento de una lista de momentos empieza el siguiente con el momento en el que va el episodio.",
   "feeds.opml": "Suscripciones",
   "feeds.opmlNote": "Como archivo OPML, que otros lectores de feeds y apps de pódcasts importan y exportan.",
   "feeds.importOpml": "Importar OPML…",

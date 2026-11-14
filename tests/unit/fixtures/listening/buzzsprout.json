@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "segments": [
+    { "speaker": "Ada Moss", "startTime": 0.16, "endTime": 0.48, "body": "Coming" },
+    { "speaker": "Ada Moss", "startTime": 0.48, "endTime": 0.64, "body": "up," },
+    { "speaker": "Ada Moss", "startTime": 0.64, "endTime": 1.2, "body": "turtles" },
+    { "speaker": "Ada Moss", "startTime": 1.2, "endTime": 1.6, "body": "come" },
+    { "speaker": "Ada Moss", "startTime": 1.6, "endTime": 2.1, "body": "home." },
+    { "speaker": "Announcer", "startTime": 4.48, "endTime": 4.9, "body": "With" },
+    { "speaker": "Announcer", "startTime": 4.9, "endTime": 5.6, "body": "Ada" },
+    { "speaker": "Announcer", "startTime": 5.6, "endTime": 6.2, "body": "Moss." },
+    { "speaker": "Announcer", "startTime": 9.5, "endTime": 9.9, "body": "Later," },
+    { "speaker": "Announcer", "startTime": 10, "endTime": 10.4, "body": "the" },
+    { "speaker": "Announcer", "startTime": 10.4, "endTime": 10.9, "body": "news." }
+  ]
+}

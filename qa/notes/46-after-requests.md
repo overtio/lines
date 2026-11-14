@@ -689,7 +689,21 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. API requests (http block): a variable, a named request and one using its response, then Image
+#### 39. API requests (http block): a variable, a named request and one using its response, then Time in an episode
+
+```http
+@api = https://jsonplaceholder.typicode.com
+
+### A todo
+# @name todo
+GET {{api}}/todos/1
+
+### Its owner
+GET {{api}}/users/{{todo.response.body.$.userId}}
+```
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. API requests (http block): a variable, a named request and one using its response, then Image
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -703,7 +717,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 40. API requests (http block): a variable, a named request and one using its response, then Drawing
+#### 41. API requests (http block): a variable, a named request and one using its response, then Drawing
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -717,7 +731,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. API requests (http block): a variable, a named request and one using its response, then File
+#### 42. API requests (http block): a variable, a named request and one using its response, then File
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -731,7 +745,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 42. API requests (http block): a variable, a named request and one using its response, then Folder and file links
+#### 43. API requests (http block): a variable, a named request and one using its response, then Folder and file links
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -745,7 +759,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. API requests (http block): a variable, a named request and one using its response, then Attached 3D model (STL)
+#### 44. API requests (http block): a variable, a named request and one using its response, then Attached 3D model (STL)
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -759,7 +773,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. API requests (http block): a variable, a named request and one using its response, then Terminal recording (.cast file)
+#### 45. API requests (http block): a variable, a named request and one using its response, then Terminal recording (.cast file)
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -773,7 +787,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. API requests (http block): a variable, a named request and one using its response, then Audio
+#### 46. API requests (http block): a variable, a named request and one using its response, then Audio
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -787,7 +801,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. API requests (http block): a variable, a named request and one using its response, then Video
+#### 47. API requests (http block): a variable, a named request and one using its response, then Video
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -801,7 +815,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. API requests (http block): a variable, a named request and one using its response, then Missing file
+#### 48. API requests (http block): a variable, a named request and one using its response, then Missing file
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -815,7 +829,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. API requests (http block): a variable, a named request and one using its response, then Card
+#### 49. API requests (http block): a variable, a named request and one using its response, then Card
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -831,7 +845,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 Text in a card.
 :::
 
-#### 49. API requests (http block): a variable, a named request and one using its response, then Callout (info)
+#### 50. API requests (http block): a variable, a named request and one using its response, then Callout (info)
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -847,7 +861,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 Text in an info callout.
 :::
 
-#### 50. API requests (http block): a variable, a named request and one using its response, then Callout (warning, chosen icon)
+#### 51. API requests (http block): a variable, a named request and one using its response, then Callout (warning, chosen icon)
 
 ```http
 @api = https://jsonplaceholder.typicode.com
@@ -863,7 +877,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. API requests (http block): a variable, a named request and one using its response, then Callout (decision, no icon)
+#### 52. API requests (http block): a variable, a named request and one using its response, then Callout (decision, no icon)
 
 ```http
 @api = https://jsonplaceholder.typicode.com

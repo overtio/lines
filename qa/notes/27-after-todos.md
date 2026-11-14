@@ -423,70 +423,77 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
   - [ ] Nested open todo
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Todo list, then Image
+#### 39. Todo list, then Time in an episode
+
+- [x] Done todo
+- [ ] Open todo
+  - [ ] Nested open todo
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Todo list, then Image
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample picture](attachment:photo.png)
 
-#### 40. Todo list, then Drawing
+#### 41. Todo list, then Drawing
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Todo list, then File
+#### 42. Todo list, then File
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Todo list, then Folder and file links
+#### 43. Todo list, then Folder and file links
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Todo list, then Attached 3D model (STL)
+#### 44. Todo list, then Attached 3D model (STL)
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Todo list, then Terminal recording (.cast file)
+#### 45. Todo list, then Terminal recording (.cast file)
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Todo list, then Audio
+#### 46. Todo list, then Audio
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Todo list, then Video
+#### 47. Todo list, then Video
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Todo list, then Missing file
+#### 48. Todo list, then Missing file
 
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Todo list, then Card
+#### 49. Todo list, then Card
 
 - [x] Done todo
 - [ ] Open todo
@@ -495,7 +502,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 Text in a card.
 :::
 
-#### 49. Todo list, then Callout (info)
+#### 50. Todo list, then Callout (info)
 
 - [x] Done todo
 - [ ] Open todo
@@ -504,7 +511,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 50. Todo list, then Callout (warning, chosen icon)
+#### 51. Todo list, then Callout (warning, chosen icon)
 
 - [x] Done todo
 - [ ] Open todo
@@ -513,7 +520,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Todo list, then Callout (decision, no icon)
+#### 52. Todo list, then Callout (decision, no icon)
 
 - [x] Done todo
 - [ ] Open todo

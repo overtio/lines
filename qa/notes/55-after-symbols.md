@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Symbols, then Image
+#### 39. Symbols, then Time in an episode
+
+Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Symbols, then Image
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ![A sample picture](attachment:photo.png)
 
-#### 40. Symbols, then Drawing
+#### 41. Symbols, then Drawing
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Symbols, then File
+#### 42. Symbols, then File
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Symbols, then Folder and file links
+#### 43. Symbols, then Folder and file links
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Symbols, then Attached 3D model (STL)
+#### 44. Symbols, then Attached 3D model (STL)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Symbols, then Terminal recording (.cast file)
+#### 45. Symbols, then Terminal recording (.cast file)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Symbols, then Audio
+#### 46. Symbols, then Audio
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Symbols, then Video
+#### 47. Symbols, then Video
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Symbols, then Missing file
+#### 48. Symbols, then Missing file
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Symbols, then Card
+#### 49. Symbols, then Card
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 ::: card
 Text in a card.
 :::
 
-#### 49. Symbols, then Callout (info)
+#### 50. Symbols, then Callout (info)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::i
 Text in an info callout.
 :::
 
-#### 50. Symbols, then Callout (warning, chosen icon)
+#### 51. Symbols, then Callout (warning, chosen icon)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Symbols, then Callout (decision, no icon)
+#### 52. Symbols, then Callout (decision, no icon)
 
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 :::^ icon=none

@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Missing file, then Image
+#### 39. Missing file, then Time in an episode
+
+[Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Missing file, then Image
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ![A sample picture](attachment:photo.png)
 
-#### 40. Missing file, then Drawing
+#### 41. Missing file, then Drawing
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Missing file, then File
+#### 42. Missing file, then File
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Missing file, then Folder and file links
+#### 43. Missing file, then Folder and file links
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Missing file, then Attached 3D model (STL)
+#### 44. Missing file, then Attached 3D model (STL)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Missing file, then Terminal recording (.cast file)
+#### 45. Missing file, then Terminal recording (.cast file)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Missing file, then Audio
+#### 46. Missing file, then Audio
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Missing file, then Video
+#### 47. Missing file, then Video
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Missing file, then Missing file
+#### 48. Missing file, then Missing file
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Missing file, then Card
+#### 49. Missing file, then Card
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 ::: card
 Text in a card.
 :::
 
-#### 49. Missing file, then Callout (info)
+#### 50. Missing file, then Callout (info)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::i
 Text in an info callout.
 :::
 
-#### 50. Missing file, then Callout (warning, chosen icon)
+#### 51. Missing file, then Callout (warning, chosen icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Missing file, then Callout (decision, no icon)
+#### 52. Missing file, then Callout (decision, no icon)
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::^ icon=none

@@ -461,7 +461,15 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 3. Third
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Numbered list, then Image
+#### 39. Numbered list, then Time in an episode
+
+1. First
+2. Second
+   1. Nested
+3. Third
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Numbered list, then Image
 
 1. First
 2. Second
@@ -469,7 +477,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 ![A sample picture](attachment:photo.png)
 
-#### 40. Numbered list, then Drawing
+#### 41. Numbered list, then Drawing
 
 1. First
 2. Second
@@ -477,7 +485,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Numbered list, then File
+#### 42. Numbered list, then File
 
 1. First
 2. Second
@@ -485,7 +493,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Numbered list, then Folder and file links
+#### 43. Numbered list, then Folder and file links
 
 1. First
 2. Second
@@ -493,7 +501,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 3. Third
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Numbered list, then Attached 3D model (STL)
+#### 44. Numbered list, then Attached 3D model (STL)
 
 1. First
 2. Second
@@ -501,7 +509,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 3. Third
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Numbered list, then Terminal recording (.cast file)
+#### 45. Numbered list, then Terminal recording (.cast file)
 
 1. First
 2. Second
@@ -509,7 +517,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 3. Third
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Numbered list, then Audio
+#### 46. Numbered list, then Audio
 
 1. First
 2. Second
@@ -517,7 +525,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 3. Third
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Numbered list, then Video
+#### 47. Numbered list, then Video
 
 1. First
 2. Second
@@ -525,7 +533,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 3. Third
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Numbered list, then Missing file
+#### 48. Numbered list, then Missing file
 
 1. First
 2. Second
@@ -533,7 +541,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 3. Third
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Numbered list, then Card
+#### 49. Numbered list, then Card
 
 1. First
 2. Second
@@ -543,7 +551,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 Text in a card.
 :::
 
-#### 49. Numbered list, then Callout (info)
+#### 50. Numbered list, then Callout (info)
 
 1. First
 2. Second
@@ -553,7 +561,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 50. Numbered list, then Callout (warning, chosen icon)
+#### 51. Numbered list, then Callout (warning, chosen icon)
 
 1. First
 2. Second
@@ -563,7 +571,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Numbered list, then Callout (decision, no icon)
+#### 52. Numbered list, then Callout (decision, no icon)
 
 1. First
 2. Second

@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Wiki link, then Image
+#### 39. Wiki link, then Time in an episode
+
+Ask [[QA · Ada]], or [[QA · Ada|her]].
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Wiki link, then Image
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ![A sample picture](attachment:photo.png)
 
-#### 40. Wiki link, then Drawing
+#### 41. Wiki link, then Drawing
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Wiki link, then File
+#### 42. Wiki link, then File
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Wiki link, then Folder and file links
+#### 43. Wiki link, then Folder and file links
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Wiki link, then Attached 3D model (STL)
+#### 44. Wiki link, then Attached 3D model (STL)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Wiki link, then Terminal recording (.cast file)
+#### 45. Wiki link, then Terminal recording (.cast file)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Wiki link, then Audio
+#### 46. Wiki link, then Audio
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Wiki link, then Video
+#### 47. Wiki link, then Video
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Wiki link, then Missing file
+#### 48. Wiki link, then Missing file
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Wiki link, then Card
+#### 49. Wiki link, then Card
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 ::: card
 Text in a card.
 :::
 
-#### 49. Wiki link, then Callout (info)
+#### 50. Wiki link, then Callout (info)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::i
 Text in an info callout.
 :::
 
-#### 50. Wiki link, then Callout (warning, chosen icon)
+#### 51. Wiki link, then Callout (warning, chosen icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Wiki link, then Callout (decision, no icon)
+#### 52. Wiki link, then Callout (decision, no icon)
 
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 :::^ icon=none

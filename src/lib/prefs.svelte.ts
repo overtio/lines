@@ -210,6 +210,8 @@ export interface Stored {
   bookFlow: BookFlow;
   /** PDFs' pages drawn in the theme's colors, rather than as printed. */
   bookThemeColors: boolean;
+  /** In an episode's note while it's in the player, a new item of a list of times starts with the time it's at (noteTimes.ts). */
+  timeNotes: boolean;
   spacing: Spacing;
   /** How wide a note's text runs before wrapping, in px; or all the room there is, with the side margins kept. */
   noteWidth: number;
@@ -400,6 +402,7 @@ const DEFAULTS: Stored = {
   playbackRate: 1,
   bookFlow: "paginated",
   bookThemeColors: false,
+  timeNotes: true,
   spacing: DEFAULT_SPACING,
   noteWidth: 720,
   fullWidth: false,
@@ -563,6 +566,7 @@ function read(json?: string): Stored {
     playbackRate: oneOf(raw.playbackRate, PLAYBACK_RATES, DEFAULTS.playbackRate),
     bookFlow: oneOf(raw.bookFlow, BOOK_FLOWS, DEFAULTS.bookFlow),
     bookThemeColors: flag(raw.bookThemeColors, DEFAULTS.bookThemeColors),
+    timeNotes: flag(raw.timeNotes, DEFAULTS.timeNotes),
     spacing: Object.fromEntries(
       SPACING_FIELDS.map(({ key, min, max }) => [key, clamp(spacing[key], min, max, DEFAULT_SPACING[key])]),
     ) as unknown as Spacing,
@@ -678,6 +682,7 @@ class Prefs {
   playbackRate = $state<PlaybackRate>(this.#initial.playbackRate);
   bookFlow = $state<BookFlow>(this.#initial.bookFlow);
   bookThemeColors = $state(this.#initial.bookThemeColors);
+  timeNotes = $state(this.#initial.timeNotes);
   windowOpacity = $state(this.#initial.windowOpacity);
   windowBlur = $state(this.#initial.windowBlur);
   windowSeeThrough = $state(this.#initial.windowSeeThrough);
@@ -886,6 +891,7 @@ class Prefs {
       playbackRate: this.playbackRate,
       bookFlow: this.bookFlow,
       bookThemeColors: this.bookThemeColors,
+      timeNotes: this.timeNotes,
       spacing: $state.snapshot(this.spacing),
       noteWidth: this.noteWidth,
       fullWidth: this.fullWidth,
@@ -1003,6 +1009,7 @@ class Prefs {
     this.playbackRate = next.playbackRate;
     this.bookFlow = next.bookFlow;
     this.bookThemeColors = next.bookThemeColors;
+    this.timeNotes = next.timeNotes;
     if (!sameSpacing(this.spacing, next.spacing)) this.spacing = next.spacing;
     this.noteWidth = next.noteWidth;
     this.fullWidth = next.fullWidth;

@@ -1,148 +1,116 @@
-# QA · Right after: Card
+# QA · Right after: File
 
-Card followed straight away, with no blank line, by each element. Check: nothing overlaps, nothing is cut off, and the space between is even. Markdown joins some pairs without a blank line (text followed by --- is a heading, and a line of text can carry on into the next), so check that what's drawn matches the Markdown.
+File followed straight away, with no blank line, by each element. Check: nothing overlaps, nothing is cut off, and the space between is even. Markdown joins some pairs without a blank line (text followed by --- is a heading, and a line of text can carry on into the next), so check that what's drawn matches the Markdown.
 
 #qa/adjacent
 
-#### 1. Card, then Paragraph
+#### 1. File, then Paragraph
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 
-#### 2. Card, then Long paragraph
+#### 2. File, then Long paragraph
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 
-#### 3. Card, then Heading 1
+#### 3. File, then Heading 1
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 # Heading one
 
-#### 4. Card, then Heading 2
+#### 4. File, then Heading 2
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ## Heading two
 
-#### 5. Card, then Heading 3
+#### 5. File, then Heading 3
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ### Heading three
 
-#### 6. Card, then Bullet list
+#### 6. File, then Bullet list
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 - First item
 - Second item
   - Nested item
     - Third level
 - Last item
 
-#### 7. Card, then Numbered list
+#### 7. File, then Numbered list
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 1. First
 2. Second
    1. Nested
 3. Third
 
-#### 8. Card, then Todo list
+#### 8. File, then Todo list
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 - [x] Done todo
 - [ ] Open todo
   - [ ] Nested open todo
 
-#### 9. Card, then Quote
+#### 9. File, then Quote
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 > A quote that runs over
 > two lines.
 
-#### 10. Card, then Line marks
+#### 10. File, then Line marks
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 Marked as the accent. <!-- mark -->
 Two lines marked green, one bar. <!-- mark green: ready -->
 The second of them. <!-- mark green: ready -->
 Red, with a label to point at. <!-- mark red: to fix -->
 - A list item, marked purple. <!-- mark purple -->
 
-#### 11. Card, then Code block
+#### 11. File, then Code block
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```
 plain code
   indented line
 ```
 
-#### 12. Card, then Code block (TypeScript)
+#### 12. File, then Code block (TypeScript)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```ts
 const greeting: string = "hello";
 console.log(greeting);
 ```
 
-#### 13. Card, then JSON block (no language)
+#### 13. File, then JSON block (no language)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 
-#### 14. Card, then Diagram
+#### 14. File, then Diagram
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```mermaid
 flowchart LR
   A[Start] --> B{Choice}
   B --> C[Done]
 ```
 
-#### 15. Card, then Diagram (240 px wide)
+#### 15. File, then Diagram (240 px wide)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```mermaid |240
 flowchart LR
   A[Small] --> B[Diagram]
 ```
 
-#### 16. Card, then 3D model (openscad block), a colored part, an echo
+#### 16. File, then 3D model (openscad block), a colored part, an echo
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```openscad
 difference() {
   cube(20, center = true);
@@ -152,31 +120,25 @@ translate([25, 0, 0]) color("tomato") cylinder(h = 10, r = 5);
 echo("made");
 ```
 
-#### 17. Card, then Flat model (openscad block)
+#### 17. File, then Flat model (openscad block)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```openscad
 square(20);
 translate([30, 10]) circle(8);
 ```
 
-#### 18. Card, then Broken model (openscad block)
+#### 18. File, then Broken model (openscad block)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```openscad
 cube(10)
 sphere(3;
 ```
 
-#### 19. Card, then 3D model (stl block)
+#### 19. File, then 3D model (stl block)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```stl
 solid pyramid
 facet normal 0 0 -1
@@ -224,11 +186,9 @@ endfacet
 endsolid pyramid
 ```
 
-#### 20. Card, then Timing diagram (wavedrom block)
+#### 20. File, then Timing diagram (wavedrom block)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```wavedrom
 { signal: [
   { name: "clk", wave: "p.....|..." },
@@ -238,11 +198,9 @@ Text in a card.
 ], edge: ["a~>b t1"] }
 ```
 
-#### 21. Card, then Typing practice (typing block)
+#### 21. File, then Typing practice (typing block)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```typing
 It’s a “fine” day — type it.
 function go() {
@@ -250,30 +208,24 @@ function go() {
 }
 ```
 
-#### 22. Card, then Math block
+#### 22. File, then Math block
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 $$
 \int_0^1 x^2\,dx = \frac{1}{3}
 $$
 
-#### 23. Card, then Table
+#### 23. File, then Table
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 | Left | Center | Right |
 | :--- | :----: | ----: |
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 
-#### 24. Card, then Table with formulas
+#### 24. File, then Table with formulas
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 | Item | Cost |
 | --- | ---: |
 | Rent | 1200 |
@@ -281,11 +233,9 @@ Text in a card.
 | Total | =SUM(B2:B3) |
 | Broken | =B2/0 |
 
-#### 25. Card, then Hurl entries (hurl block): a capture used by the next entry, and asserts
+#### 25. File, then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```hurl
 # A todo
 GET https://jsonplaceholder.typicode.com/todos/1
@@ -302,18 +252,14 @@ HTTP 200
 jsonpath "$.name" isString
 ```
 
-#### 26. Card, then Secret ({{name}}, kept in a locked secrets note)
+#### 26. File, then Secret ({{name}}, kept in a locked secrets note)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
-#### 27. Card, then API requests (http block): a variable, a named request and one using its response
+#### 27. File, then API requests (http block): a variable, a named request and one using its response
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```http
 @api = https://jsonplaceholder.typicode.com
 
@@ -325,11 +271,9 @@ GET {{api}}/todos/1
 GET {{api}}/users/{{todo.response.body.$.userId}}
 ```
 
-#### 28. Card, then Spreadsheet (csv block)
+#### 28. File, then Spreadsheet (csv block)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```csv
 Item, Cost
 Rent, 1200
@@ -337,11 +281,9 @@ Food, 450.50
 Total, =SUM(B2:B3)
 ```
 
-#### 29. Card, then Named spreadsheet (csv name=), and a formula in another block using it
+#### 29. File, then Named spreadsheet (csv name=), and a formula in another block using it
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ```csv name=costs
 Item, Cost, Day
 Rent, $1200, 2026-01-05
@@ -351,18 +293,14 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 
-#### 30. Card, then Divider
+#### 30. File, then Divider
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ---
 
-#### 31. Card, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
+#### 31. File, then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 Before the break.
 
 <!-- pagebreak -->
@@ -372,152 +310,117 @@ After it, on a new page.
 
 And another.
 
-#### 32. Card, then Key: Value line
+#### 32. File, then Key: Value line
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 **Wi-Fi password:** correct-horse-battery
 
-#### 33. Card, then Score (Settings → Little Touches)
+#### 33. File, then Score (Settings → Little Touches)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 Rating: 4/5
 Score: 7 / 10
 Not a score: 12/20
 
-#### 34. Card, then Mention
+#### 34. File, then Mention
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 Ask @[QA · Ada] at @[QA · Ada].email.
 
-#### 35. Card, then Wiki link
+#### 35. File, then Wiki link
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 Ask [[QA · Ada]], or [[QA · Ada|her]].
 
-#### 36. Card, then Symbols
+#### 36. File, then Symbols
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
 
-#### 37. Card, then GitHub links
+#### 37. File, then GitHub links
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 
-#### 38. Card, then arXiv links
+#### 38. File, then arXiv links
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Card, then Image
+#### 39. File, then Time in an episode
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. File, then Image
+
+[Budget.csv](attachment:budget.csv)
 ![A sample picture](attachment:photo.png)
 
-#### 40. Card, then Drawing
+#### 41. File, then Drawing
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Card, then File
+#### 42. File, then File
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Card, then Folder and file links
+#### 43. File, then Folder and file links
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Card, then Attached 3D model (STL)
+#### 44. File, then Attached 3D model (STL)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Card, then Terminal recording (.cast file)
+#### 45. File, then Terminal recording (.cast file)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Card, then Audio
+#### 46. File, then Audio
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Card, then Video
+#### 47. File, then Video
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Card, then Missing file
+#### 48. File, then Missing file
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Card, then Card
+#### 49. File, then Card
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 ::: card
 Text in a card.
 :::
 
-#### 49. Card, then Callout (info)
+#### 50. File, then Callout (info)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 :::i
 Text in an info callout.
 :::
 
-#### 50. Card, then Callout (warning, chosen icon)
+#### 51. File, then Callout (warning, chosen icon)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Card, then Callout (decision, no icon)
+#### 52. File, then Callout (decision, no icon)
 
-::: card
-Text in a card.
-:::
+[Budget.csv](attachment:budget.csv)
 :::^ icon=none
 Text in a decision callout with no icon.
 :::

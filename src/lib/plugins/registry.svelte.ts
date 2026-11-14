@@ -104,6 +104,7 @@ class Plugins {
   readonly linkActions = $derived(this.#from("linkActions"));
   readonly libraryImports = $derived(this.#from("libraryImports"));
   readonly discussions = $derived(this.#from("discussions"));
+  readonly playerParts = $derived(this.#from("playerParts"));
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).

@@ -461,7 +461,15 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 39. Image in a callout in a card
+#### 39. Time in an episode in a callout in a card
+
+::: card
+:::!
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+:::
+:::
+
+#### 40. Image in a callout in a card
 
 ::: card
 :::!
@@ -469,7 +477,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 40. Drawing in a callout in a card
+#### 41. Drawing in a callout in a card
 
 ::: card
 :::!
@@ -477,7 +485,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 41. File in a callout in a card
+#### 42. File in a callout in a card
 
 ::: card
 :::!
@@ -485,7 +493,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 :::
 :::
 
-#### 42. Folder and file links in a callout in a card
+#### 43. Folder and file links in a callout in a card
 
 ::: card
 :::!
@@ -493,7 +501,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 43. Attached 3D model (STL) in a callout in a card
+#### 44. Attached 3D model (STL) in a callout in a card
 
 ::: card
 :::!
@@ -501,7 +509,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 44. Terminal recording (.cast file) in a callout in a card
+#### 45. Terminal recording (.cast file) in a callout in a card
 
 ::: card
 :::!
@@ -509,7 +517,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 45. Audio in a callout in a card
+#### 46. Audio in a callout in a card
 
 ::: card
 :::!
@@ -517,7 +525,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 46. Video in a callout in a card
+#### 47. Video in a callout in a card
 
 ::: card
 :::!
@@ -525,7 +533,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 47. Missing file in a callout in a card
+#### 48. Missing file in a callout in a card
 
 ::: card
 :::!
@@ -533,7 +541,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 :::
 :::
 
-#### 48. Card in a callout in a card
+#### 49. Card in a callout in a card
 
 ::: card
 :::!
@@ -543,7 +551,7 @@ Text in a card.
 :::
 :::
 
-#### 49. Callout (info) in a callout in a card
+#### 50. Callout (info) in a callout in a card
 
 ::: card
 :::!
@@ -553,7 +561,7 @@ Text in an info callout.
 :::
 :::
 
-#### 50. Callout (warning, chosen icon) in a callout in a card
+#### 51. Callout (warning, chosen icon) in a callout in a card
 
 ::: card
 :::!
@@ -563,7 +571,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 51. Callout (decision, no icon) in a callout in a card
+#### 52. Callout (decision, no icon) in a callout in a card
 
 ::: card
 :::!

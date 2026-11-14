@@ -100,6 +100,9 @@ export default {
   "feeds.refreshEveryNote": "When lines starts, and then this often while it’s open.",
   "feeds.every": "{minutes, plural, =60 {Every hour} =240 {Every 4 hours} other {Every # minutes}}",
   "feeds.onlyWhenAsked": "Only when I ask",
+  // In an episode's note as it plays, Enter after a time's item starts the next with the time it's at.
+  "feeds.timeNotes": "Time new notes while listening",
+  "feeds.timeNotesNote": "In an episode’s note, while it plays or is paused after playing (not one paused before lines opened), Enter after an item of a list of times starts the next with the time the episode is at.",
   "feeds.opml": "Subscriptions",
   "feeds.opmlNote": "As an OPML file, which other feed readers and podcast apps import and export.",
   "feeds.importOpml": "Import OPML…",

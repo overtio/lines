@@ -9,6 +9,7 @@ import type { SlashCommand } from "../editor/slashCommands";
 import type { IconName } from "../icons/icons";
 import type { NoteStats } from "../notes/stats";
 import type { NoteMeta } from "../notes/types";
+import type { Episode } from "../player/player.svelte";
 import type { Parts } from "../print/parts";
 import type { ImportWork } from "../library/imports.svelte";
 
@@ -101,6 +102,18 @@ export interface Contributions {
   libraryImports?: LibraryImport[];
   /** Sites whose discussion of a post lines shows under it, from the post's comments link: Hacker News'. */
   discussions?: DiscussionSource[];
+  /** What the podcast player has for the episode in it: buttons beside its own, and what shows above it (a transcript). */
+  playerParts?: PlayerPart[];
+}
+
+/**
+ * A plugin's part of the podcast player (MiniPlayer.svelte), for the episode in it: buttons at the
+ * left of its row of controls, and what shows above it, each a component given the episode.
+ */
+export interface PlayerPart {
+  id: string;
+  buttons?: Component<{ episode: Episode }>;
+  above?: Component<{ episode: Episode }>;
 }
 
 /** A file chosen to import, read. */

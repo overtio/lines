@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Paragraph, then Image
+#### 39. Paragraph, then Time in an episode
+
+A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Paragraph, then Image
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ![A sample picture](attachment:photo.png)
 
-#### 40. Paragraph, then Drawing
+#### 41. Paragraph, then Drawing
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Paragraph, then File
+#### 42. Paragraph, then File
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Paragraph, then Folder and file links
+#### 43. Paragraph, then Folder and file links
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Paragraph, then Attached 3D model (STL)
+#### 44. Paragraph, then Attached 3D model (STL)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Paragraph, then Terminal recording (.cast file)
+#### 45. Paragraph, then Terminal recording (.cast file)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Paragraph, then Audio
+#### 46. Paragraph, then Audio
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Paragraph, then Video
+#### 47. Paragraph, then Video
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Paragraph, then Missing file
+#### 48. Paragraph, then Missing file
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Paragraph, then Card
+#### 49. Paragraph, then Card
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 ::: card
 Text in a card.
 :::
 
-#### 49. Paragraph, then Callout (info)
+#### 50. Paragraph, then Callout (info)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::i
 Text in an info callout.
 :::
 
-#### 50. Paragraph, then Callout (warning, chosen icon)
+#### 51. Paragraph, then Callout (warning, chosen icon)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Paragraph, then Callout (decision, no icon)
+#### 52. Paragraph, then Callout (decision, no icon)
 
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
 :::^ icon=none

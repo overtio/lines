@@ -1,4 +1,5 @@
 import { SvelteMap } from "svelte/reactivity";
+import type { Named } from "../feeds/parse";
 import { feedStorage, type Position } from "../feeds/storage";
 import { t } from "../i18n/index.svelte";
 import { attachmentURL } from "../notes/attachments";
@@ -16,7 +17,7 @@ import { announce, windowLabel } from "../windows/channel";
  * Playing) drive it through the Media Session API.
  */
 
-/** Something to play: a feed's episode, or an `episode` note's audio. */
+/** Something to play: a feed's episode, an `episode` note's audio, or a sound a note links to a time in. */
 export interface Episode {
   /** What its place is kept under. */
   key: string;
@@ -29,8 +30,11 @@ export interface Episode {
   cover?: string;
   /** Its length in seconds, as its feed or note says, until the audio says itself. */
   duration?: number;
-  /** Where it opens from the player: its post in the Feeds, or its note. */
-  from: { feed: string; post: string } | { note: string };
+  /** Its transcript and chapters, where its feed names them (Podcasting 2.0's). */
+  transcript?: Named;
+  chapters?: Named;
+  /** Where it opens from the player: its post in the Feeds, or its `episode` note; a sound alone opens nowhere. */
+  from: { feed: string; post: string } | { note: string } | { sound: string };
 }
 
 /** How far back and forward the skip buttons go, in seconds. */
@@ -54,6 +58,11 @@ class Player {
   playing = $state(false);
   /** Waiting for the audio to come. */
   loading = $state(false);
+  /**
+   * The episode in it has played since it was put there: playing, or paused partway since. One put
+   * back after a restart or the app lock, paused, hasn't, until it plays again.
+   */
+  heard = $state(false);
   /** Where it's got to, and how long it is, in seconds. */
   time = $state(0);
   duration = $state(0);
@@ -102,18 +111,23 @@ class Player {
     audio.addEventListener("timeupdate", () => {
       // Until it knows the audio, it's at 0, which isn't where the episode was stopped.
       if (!this.#knows()) return;
+      // Moving on is playing, said or not: WebKitGTK (the Linux app's) says nothing more once it's
+      // played on from where it was sought to while paused, nor, it may be, once a wait is over.
+      const moved = !audio.paused && !audio.seeking && audio.currentTime > this.time;
       this.time = audio.currentTime;
+      if (moved && (!this.playing || this.loading)) this.#playing();
       if (Date.now() - this.#keptAt > KEEP_EVERY) void this.#keep(false);
       this.#position();
     });
     audio.addEventListener("durationchange", () => {
       if (Number.isFinite(audio.duration)) this.duration = audio.duration;
     });
-    audio.addEventListener("playing", () => {
-      this.playing = true;
-      this.loading = false;
+    audio.addEventListener("playing", () => this.#playing());
+    audio.addEventListener("waiting", () => {
+      this.loading = true;
+      // Where it stopped to wait, so only moving on from there (above) says it's playing again.
+      if (this.#knows()) this.time = audio.currentTime;
     });
-    audio.addEventListener("waiting", () => (this.loading = true));
     audio.addEventListener("pause", () => {
       this.playing = this.loading = false;
       // At its end, "ended" comes next, and says so.
@@ -146,25 +160,18 @@ class Player {
   }
 
   /**
-   * Plays an episode where it was stopped (from the start if it was played); the one in the player,
-   * on from where it is, or again, if it couldn't be. Called straight from a click, as WebKit plays
-   * only then. In another window, asks the main window to.
+   * Plays an episode where it was stopped (from the start if it was played), or from `at` seconds in;
+   * the one in the player, on from where it is, or again, if it couldn't be. Called straight from a
+   * click, as WebKit plays only then. In another window, asks the main window to.
    */
-  play(episode: Episode) {
+  play(episode: Episode, at?: number) {
     if (!here) {
-      void announce({ type: "play", episode });
+      void announce({ type: "play", episode, at });
       return;
     }
     const audio = this.#element;
-    if (this.episode?.key !== episode.key) {
-      void this.#keep(true);
-      this.episode = episode;
-      this.duration = episode.duration ?? 0;
-      const kept = this.positions.get(episode.key);
-      this.time = kept && !kept.played ? kept.at : 0;
-      void feedStorage.putInPlayer(episode).catch((error) => console.error("lines: couldn't keep the episode in the player", error));
-      void this.#metadata();
-    }
+    if (this.episode?.key !== episode.key) this.#take(episode);
+    if (at !== undefined) this.seek(at);
     if (this.#source !== episode.key || this.error) {
       this.#source = episode.key;
       this.error = null;
@@ -180,6 +187,35 @@ class Player {
       this.error = t("player.couldntPlay");
       console.warn("lines: couldn't play the episode", error);
     });
+  }
+
+  /**
+   * Puts an episode in the player, at where it was stopped. The same sound under another key (a post,
+   * and the note it was saved as) is the same episode: it goes on where it is, kept by that key now.
+   */
+  #playing() {
+    this.playing = this.heard = true;
+    this.loading = false;
+  }
+
+  #take(episode: Episode) {
+    const same = this.episode?.audio === episode.audio;
+    void this.#keep(true);
+    if (same && this.#source === this.episode?.key) this.#source = episode.key;
+    this.episode = episode;
+    if (!same) {
+      this.heard = false;
+      this.duration = episode.duration ?? 0;
+      const kept = this.positions.get(episode.key);
+      this.time = kept && !kept.played ? kept.at : 0;
+    }
+    void feedStorage.putInPlayer(episode).catch((error) => console.error("lines: couldn't keep the episode in the player", error));
+    void this.#metadata();
+  }
+
+  /** Has the episode in the player known by another key, if it's the same sound (its post saved as a note): playing or not, as it was. */
+  rename(episode: Episode) {
+    if (this.episode && this.episode.key !== episode.key && this.episode.audio === episode.audio) this.#take(episode);
   }
 
   pause() {
@@ -225,6 +261,7 @@ class Player {
     if (keepPlace) void this.#keep(true);
     this.#audio?.pause();
     this.episode = null;
+    this.heard = false;
     this.#source = null;
     this.loading = false;
     this.error = null;

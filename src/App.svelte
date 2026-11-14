@@ -39,6 +39,7 @@
   import { feeds, savePost } from "./lib/feeds/feeds.svelte";
   import { reading } from "./lib/books/reading.svelte";
   import { postEpisode } from "./lib/player/episodes";
+  import { playerKey } from "./lib/player/keys";
   import { player } from "./lib/player/player.svelte";
   import { canPrint, copyText, isApple, isNewNoteShortcut, newNoteKey, openExternal } from "./lib/platform";
   import { saveAndShow } from "./lib/save";
@@ -387,8 +388,8 @@
       return;
     }
     // ⌘P (Ctrl+P) previews the open note as a PDF, rather than printing the window. In the
-    // preview, it prints or saves (PdfPreview.svelte).
-    if ((event.metaKey || event.ctrlKey) && !event.shiftKey && !event.altKey && event.key.toLowerCase() === "p") {
+    // preview, it prints or saves (PdfPreview.svelte). Not ⌃⌘P, the player's (player/keys.ts).
+    if (event.metaKey !== event.ctrlKey && !event.shiftKey && !event.altKey && event.key.toLowerCase() === "p") {
       event.preventDefault();
       event.stopPropagation();
       if (selected && !closed) ui.pdf = { id: selected.note.id };
@@ -470,6 +471,10 @@
       return;
     }
     if (modalOpen()) return;
+    if (playerKey(event)) {
+      event.preventDefault();
+      return;
+    }
     if (event.key === "F6" && !event.metaKey && !event.ctrlKey && !event.altKey) {
       event.preventDefault();
       cyclePane(event.shiftKey);
@@ -719,7 +724,7 @@
       {#if selected}
         <!-- The editor stays, out of sight, so other notes keep their undo history and place. -->
         <div class="min-h-0 flex-1" hidden={closed || !!readingBook}>
-          <Editor noteId={selected.note.id} trashed={selected.note.trashed || closed} />
+          <Editor noteId={selected.note.id} trashed={selected.note.trashed || closed} pane={MAIN} />
         </div>
         {#if readingBook}
           {#key `${selected.note.id} ${readingBook.name}`}

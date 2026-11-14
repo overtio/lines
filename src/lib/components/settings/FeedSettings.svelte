@@ -11,6 +11,7 @@
   import FieldRow from "../ui/FieldRow.svelte";
   import Segmented from "../ui/Segmented.svelte";
   import Select from "../ui/Select.svelte";
+  import Switch from "../ui/Switch.svelte";
 
   // The feeds' part of Settings → Library: how they're listed in the sidebar, how often they're
   // fetched, and OPML in and out.
@@ -64,6 +65,9 @@
       options={intervals}
       onchange={(minutes) => (prefs.feedRefresh = Number(minutes) as FeedRefresh)}
     />
+  </FieldRow>
+  <FieldRow label={t("feeds.timeNotes")} note={t("feeds.timeNotesNote")}>
+    <Switch label={t("feeds.timeNotes")} checked={prefs.timeNotes} onchange={(on) => (prefs.timeNotes = on)} />
   </FieldRow>
   <FieldRow label={t("feeds.opml")} note={t("feeds.opmlNote")}>
     <Button icon="import" onclick={() => picker?.click()} disabled={importing}>{importing ? t("feeds.importing") : t("feeds.importOpml")}</Button>

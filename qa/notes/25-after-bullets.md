@@ -499,7 +499,16 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 - Last item
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Bullet list, then Image
+#### 39. Bullet list, then Time in an episode
+
+- First item
+- Second item
+  - Nested item
+    - Third level
+- Last item
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Bullet list, then Image
 
 - First item
 - Second item
@@ -508,7 +517,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 ![A sample picture](attachment:photo.png)
 
-#### 40. Bullet list, then Drawing
+#### 41. Bullet list, then Drawing
 
 - First item
 - Second item
@@ -517,7 +526,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Bullet list, then File
+#### 42. Bullet list, then File
 
 - First item
 - Second item
@@ -526,7 +535,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Bullet list, then Folder and file links
+#### 43. Bullet list, then Folder and file links
 
 - First item
 - Second item
@@ -535,7 +544,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 - Last item
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Bullet list, then Attached 3D model (STL)
+#### 44. Bullet list, then Attached 3D model (STL)
 
 - First item
 - Second item
@@ -544,7 +553,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 - Last item
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Bullet list, then Terminal recording (.cast file)
+#### 45. Bullet list, then Terminal recording (.cast file)
 
 - First item
 - Second item
@@ -553,7 +562,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 - Last item
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Bullet list, then Audio
+#### 46. Bullet list, then Audio
 
 - First item
 - Second item
@@ -562,7 +571,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 - Last item
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Bullet list, then Video
+#### 47. Bullet list, then Video
 
 - First item
 - Second item
@@ -571,7 +580,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 - Last item
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Bullet list, then Missing file
+#### 48. Bullet list, then Missing file
 
 - First item
 - Second item
@@ -580,7 +589,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 - Last item
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Bullet list, then Card
+#### 49. Bullet list, then Card
 
 - First item
 - Second item
@@ -591,7 +600,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 Text in a card.
 :::
 
-#### 49. Bullet list, then Callout (info)
+#### 50. Bullet list, then Callout (info)
 
 - First item
 - Second item
@@ -602,7 +611,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 50. Bullet list, then Callout (warning, chosen icon)
+#### 51. Bullet list, then Callout (warning, chosen icon)
 
 - First item
 - Second item
@@ -613,7 +622,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Bullet list, then Callout (decision, no icon)
+#### 52. Bullet list, then Callout (decision, no icon)
 
 - First item
 - Second item

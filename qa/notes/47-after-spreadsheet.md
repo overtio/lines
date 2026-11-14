@@ -537,7 +537,17 @@ Total, =SUM(B2:B3)
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Spreadsheet (csv block), then Image
+#### 39. Spreadsheet (csv block), then Time in an episode
+
+```csv
+Item, Cost
+Rent, 1200
+Food, 450.50
+Total, =SUM(B2:B3)
+```
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Spreadsheet (csv block), then Image
 
 ```csv
 Item, Cost
@@ -547,7 +557,7 @@ Total, =SUM(B2:B3)
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 40. Spreadsheet (csv block), then Drawing
+#### 41. Spreadsheet (csv block), then Drawing
 
 ```csv
 Item, Cost
@@ -557,7 +567,7 @@ Total, =SUM(B2:B3)
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Spreadsheet (csv block), then File
+#### 42. Spreadsheet (csv block), then File
 
 ```csv
 Item, Cost
@@ -567,7 +577,7 @@ Total, =SUM(B2:B3)
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Spreadsheet (csv block), then Folder and file links
+#### 43. Spreadsheet (csv block), then Folder and file links
 
 ```csv
 Item, Cost
@@ -577,7 +587,7 @@ Total, =SUM(B2:B3)
 ```
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Spreadsheet (csv block), then Attached 3D model (STL)
+#### 44. Spreadsheet (csv block), then Attached 3D model (STL)
 
 ```csv
 Item, Cost
@@ -587,7 +597,7 @@ Total, =SUM(B2:B3)
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Spreadsheet (csv block), then Terminal recording (.cast file)
+#### 45. Spreadsheet (csv block), then Terminal recording (.cast file)
 
 ```csv
 Item, Cost
@@ -597,7 +607,7 @@ Total, =SUM(B2:B3)
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Spreadsheet (csv block), then Audio
+#### 46. Spreadsheet (csv block), then Audio
 
 ```csv
 Item, Cost
@@ -607,7 +617,7 @@ Total, =SUM(B2:B3)
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Spreadsheet (csv block), then Video
+#### 47. Spreadsheet (csv block), then Video
 
 ```csv
 Item, Cost
@@ -617,7 +627,7 @@ Total, =SUM(B2:B3)
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Spreadsheet (csv block), then Missing file
+#### 48. Spreadsheet (csv block), then Missing file
 
 ```csv
 Item, Cost
@@ -627,7 +637,7 @@ Total, =SUM(B2:B3)
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Spreadsheet (csv block), then Card
+#### 49. Spreadsheet (csv block), then Card
 
 ```csv
 Item, Cost
@@ -639,7 +649,7 @@ Total, =SUM(B2:B3)
 Text in a card.
 :::
 
-#### 49. Spreadsheet (csv block), then Callout (info)
+#### 50. Spreadsheet (csv block), then Callout (info)
 
 ```csv
 Item, Cost
@@ -651,7 +661,7 @@ Total, =SUM(B2:B3)
 Text in an info callout.
 :::
 
-#### 50. Spreadsheet (csv block), then Callout (warning, chosen icon)
+#### 51. Spreadsheet (csv block), then Callout (warning, chosen icon)
 
 ```csv
 Item, Cost
@@ -663,7 +673,7 @@ Total, =SUM(B2:B3)
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Spreadsheet (csv block), then Callout (decision, no icon)
+#### 52. Spreadsheet (csv block), then Callout (decision, no icon)
 
 ```csv
 Item, Cost

@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "segments": [
+    {
+      "speaker": "Ben",
+      "startTime": "0.0",
+      "endTime": "8.559999",
+      "body": "Ada, I can't do a podcast with you. We're done. There are gulls in the background."
+    },
+    {
+      "speaker": "Ben",
+      "startTime": "8.559999",
+      "endTime": "10.16",
+      "body": "What is going on there?"
+    },
+    {
+      "speaker": "Ada",
+      "startTime": "10.16",
+      "endTime": "15.2",
+      "body": "Oh, it's the window. Sorry about the gulls."
+    }
+  ]
+}

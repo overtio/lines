@@ -34,6 +34,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Attachment | `![](../attachments/<hash>.png)`, `[Name.pdf](../attachments/<hash>.pdf)` | Yes (relative links) |
 | Folder or file on this computer | `[Projects](file:///Users/me/Projects/)`, `[Plan](file:///Users/me/plan.pdf)` | Yes (file URLs; Obsidian, VS Code and Typora open them too) |
 | Copyable value, score | `Key: Value` lines (`Rating: 4/5` as stars) | Yes (plain text, read specially) |
+| Time in an episode | `[12:34]` in an `episode` note; `[12:34](https://…/episode.mp3#t=754)` in any note | Yes (text; a link with a [Media Fragments](https://www.w3.org/TR/media-frags/) time, which browsers play from) |
 | GitHub link | `https://github.com/owner/repo/issues/12` | Yes (an ordinary link, drawn short) |
 | Terminal recording | `[![asciicast](https://asciinema.org/a/<id>.svg)](https://asciinema.org/a/<id>)`, `[demo.cast](../attachments/<hash>.cast)` | Yes (asciinema's embed code: a linked image; a link) |
 | Spotify or SoundCloud player | `[Never Gonna Give You Up](https://open.spotify.com/track/<id>)`, `[SoundCloud](https://soundcloud.com/<who>/<track>)` on a line of its own | Yes (an ordinary link) |

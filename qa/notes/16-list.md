@@ -385,61 +385,67 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
 
   Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Image in a list item (stays Markdown here)
+#### 39. Time in an episode in a list item
+
+- List item
+
+  At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Image in a list item (stays Markdown here)
 
 - List item
 
   ![A sample picture](attachment:photo.png)
 
-#### 40. Drawing in a list item (stays Markdown here)
+#### 41. Drawing in a list item (stays Markdown here)
 
 - List item
 
   ![A sample drawing](attachment:drawing.svg)
 
-#### 41. File in a list item (stays Markdown here)
+#### 42. File in a list item (stays Markdown here)
 
 - List item
 
   [Budget.csv](attachment:budget.csv)
 
-#### 42. Folder and file links in a list item
+#### 43. Folder and file links in a list item
 
 - List item
 
   See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Attached 3D model (STL) in a list item
+#### 44. Attached 3D model (STL) in a list item
 
 - List item
 
   [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Terminal recording (.cast file) in a list item
+#### 45. Terminal recording (.cast file) in a list item
 
 - List item
 
   [terminal.cast](attachment:terminal.cast)
 
-#### 45. Audio in a list item (stays Markdown here)
+#### 46. Audio in a list item (stays Markdown here)
 
 - List item
 
   [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Video in a list item (stays Markdown here)
+#### 47. Video in a list item (stays Markdown here)
 
 - List item
 
   [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Missing file in a list item (stays Markdown here)
+#### 48. Missing file in a list item (stays Markdown here)
 
 - List item
 
   [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Card in a list item
+#### 49. Card in a list item
 
 - List item
 
@@ -447,7 +453,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a card.
   :::
 
-#### 49. Callout (info) in a list item
+#### 50. Callout (info) in a list item
 
 - List item
 
@@ -455,7 +461,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in an info callout.
   :::
 
-#### 50. Callout (warning, chosen icon) in a list item
+#### 51. Callout (warning, chosen icon) in a list item
 
 - List item
 
@@ -463,7 +469,7 @@ Each element in a list item. Check: it draws as it does on its own, sits inside 
   Text in a warning callout with the flag icon.
   :::
 
-#### 51. Callout (decision, no icon) in a list item
+#### 52. Callout (decision, no icon) in a list item
 
 - List item
 

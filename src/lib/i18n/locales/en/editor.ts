@@ -108,6 +108,9 @@ export default {
   "editor.slash.date.keywords": "today time now",
   // Shown faintly beside it in the menu.
   "editor.slash.date.hint": "today",
+  // The time the podcast player is at, written as a chip that plays the episode from there.
+  "editor.slash.time": "Time in the Episode",
+  "editor.slash.time.keywords": "timestamp podcast episode playing listening moment",
 
   // Callouts: cards named for what they hold. Each is also a "/" command, found by these words too.
   "editor.callout.info": "Info",

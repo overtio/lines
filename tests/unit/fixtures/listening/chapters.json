@@ -1,0 +1,13 @@
+{
+  "version": "1.2.0",
+  "author": "Ada Moss & Ben Okafor",
+  "title": "Tide Tables 42: Why Turtles Come Home",
+  "podcastName": "Tide Tables",
+  "chapters": [
+    { "startTime": 0, "title": "Welcome" },
+    { "startTime": 9, "endTime": 19, "img": "https://example.com/tip.png", "title": "A tip from a listener", "toc": false },
+    { "startTime": 245.5, "title": "The beach they were born on", "url": "https://example.com/beach", "img": "https://example.com/beach.jpg" },
+    { "startTime": "1830", "title": "Magnets" },
+    { "startTime": 60, "title": "Out of order" }
+  ]
+}

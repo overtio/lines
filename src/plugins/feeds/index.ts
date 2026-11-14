@@ -5,7 +5,10 @@ import { findFeed, looksLikeFeed, NoFeed } from "../../lib/feeds/find";
 import { isFeed, readFeed } from "../../lib/feeds/parse";
 import { t } from "../../lib/i18n/index.svelte";
 import { episodePlay } from "../../lib/player/notePlay";
-import type { LibraryKind, LibrarySource, Plugin } from "../../lib/plugins/types";
+import { noteTimes, timeCommand } from "../../lib/player/noteTimes";
+import type { LibraryKind, LibrarySource, PlayerPart, Plugin } from "../../lib/plugins/types";
+import ListeningButtons from "./ListeningButtons.svelte";
+import Transcript from "./Transcript.svelte";
 
 /*
  * Feeds (docs/library.md#feeds): a site's or a podcast's feed subscribed to, as a note with a
@@ -61,6 +64,9 @@ const site: LibrarySource = {
   },
 };
 
+/** Notes while listening, in the podcast player: Take Notes, and the episode's transcript and chapters above it. */
+const listening: PlayerPart = { id: "listening", buttons: ListeningButtons, above: Transcript };
+
 export const feedsPlugin = (): Plugin => ({
   id: "feeds",
   name: t("feeds.title"),
@@ -68,5 +74,10 @@ export const feedsPlugin = (): Plugin => ({
   icon: "rss",
   enabledByDefault: true,
   requires: ["library"],
-  contributes: { libraryKinds: [FEED], librarySources: [source, site], markdown: [{ editor: episodePlay }] },
+  contributes: {
+    libraryKinds: [FEED],
+    librarySources: [source, site],
+    markdown: [{ editor: [episodePlay, noteTimes], commands: [timeCommand] }],
+    playerParts: [listening],
+  },
 });

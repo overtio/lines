@@ -1,0 +1,7 @@
+{
+  "version": "1.2.0",
+  "chapters": [
+    { "startTime": 0, "title": "Welcome to Syntax!" },
+    { "startTime": 9, "title": "The traffic changed shape" }
+  ]
+}

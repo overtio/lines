@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 # Heading one
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Heading 1, then Image
+#### 39. Heading 1, then Time in an episode
+
+# Heading one
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Heading 1, then Image
 
 # Heading one
 ![A sample picture](attachment:photo.png)
 
-#### 40. Heading 1, then Drawing
+#### 41. Heading 1, then Drawing
 
 # Heading one
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Heading 1, then File
+#### 42. Heading 1, then File
 
 # Heading one
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Heading 1, then Folder and file links
+#### 43. Heading 1, then Folder and file links
 
 # Heading one
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Heading 1, then Attached 3D model (STL)
+#### 44. Heading 1, then Attached 3D model (STL)
 
 # Heading one
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Heading 1, then Terminal recording (.cast file)
+#### 45. Heading 1, then Terminal recording (.cast file)
 
 # Heading one
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Heading 1, then Audio
+#### 46. Heading 1, then Audio
 
 # Heading one
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Heading 1, then Video
+#### 47. Heading 1, then Video
 
 # Heading one
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Heading 1, then Missing file
+#### 48. Heading 1, then Missing file
 
 # Heading one
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Heading 1, then Card
+#### 49. Heading 1, then Card
 
 # Heading one
 ::: card
 Text in a card.
 :::
 
-#### 49. Heading 1, then Callout (info)
+#### 50. Heading 1, then Callout (info)
 
 # Heading one
 :::i
 Text in an info callout.
 :::
 
-#### 50. Heading 1, then Callout (warning, chosen icon)
+#### 51. Heading 1, then Callout (warning, chosen icon)
 
 # Heading one
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Heading 1, then Callout (decision, no icon)
+#### 52. Heading 1, then Callout (decision, no icon)
 
 # Heading one
 :::^ icon=none

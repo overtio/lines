@@ -423,70 +423,77 @@ Score: 7 / 10
 Not a score: 12/20
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Score (Settings → Little Touches), then Image
+#### 39. Score (Settings → Little Touches), then Time in an episode
+
+Rating: 4/5
+Score: 7 / 10
+Not a score: 12/20
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Score (Settings → Little Touches), then Image
 
 Rating: 4/5
 Score: 7 / 10
 Not a score: 12/20
 ![A sample picture](attachment:photo.png)
 
-#### 40. Score (Settings → Little Touches), then Drawing
+#### 41. Score (Settings → Little Touches), then Drawing
 
 Rating: 4/5
 Score: 7 / 10
 Not a score: 12/20
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Score (Settings → Little Touches), then File
+#### 42. Score (Settings → Little Touches), then File
 
 Rating: 4/5
 Score: 7 / 10
 Not a score: 12/20
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Score (Settings → Little Touches), then Folder and file links
+#### 43. Score (Settings → Little Touches), then Folder and file links
 
 Rating: 4/5
 Score: 7 / 10
 Not a score: 12/20
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Score (Settings → Little Touches), then Attached 3D model (STL)
+#### 44. Score (Settings → Little Touches), then Attached 3D model (STL)
 
 Rating: 4/5
 Score: 7 / 10
 Not a score: 12/20
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Score (Settings → Little Touches), then Terminal recording (.cast file)
+#### 45. Score (Settings → Little Touches), then Terminal recording (.cast file)
 
 Rating: 4/5
 Score: 7 / 10
 Not a score: 12/20
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Score (Settings → Little Touches), then Audio
+#### 46. Score (Settings → Little Touches), then Audio
 
 Rating: 4/5
 Score: 7 / 10
 Not a score: 12/20
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Score (Settings → Little Touches), then Video
+#### 47. Score (Settings → Little Touches), then Video
 
 Rating: 4/5
 Score: 7 / 10
 Not a score: 12/20
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Score (Settings → Little Touches), then Missing file
+#### 48. Score (Settings → Little Touches), then Missing file
 
 Rating: 4/5
 Score: 7 / 10
 Not a score: 12/20
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Score (Settings → Little Touches), then Card
+#### 49. Score (Settings → Little Touches), then Card
 
 Rating: 4/5
 Score: 7 / 10
@@ -495,7 +502,7 @@ Not a score: 12/20
 Text in a card.
 :::
 
-#### 49. Score (Settings → Little Touches), then Callout (info)
+#### 50. Score (Settings → Little Touches), then Callout (info)
 
 Rating: 4/5
 Score: 7 / 10
@@ -504,7 +511,7 @@ Not a score: 12/20
 Text in an info callout.
 :::
 
-#### 50. Score (Settings → Little Touches), then Callout (warning, chosen icon)
+#### 51. Score (Settings → Little Touches), then Callout (warning, chosen icon)
 
 Rating: 4/5
 Score: 7 / 10
@@ -513,7 +520,7 @@ Not a score: 12/20
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Score (Settings → Little Touches), then Callout (decision, no icon)
+#### 52. Score (Settings → Little Touches), then Callout (decision, no icon)
 
 Rating: 4/5
 Score: 7 / 10
