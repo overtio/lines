@@ -124,6 +124,30 @@ test("a note at two times on one day shows at both", async () => {
   await page.getByRole("button", { name: /^Twice, 2:00/ }).waitFor();
 });
 
+test("dragging or stretching the second of a note's two times under one key changes it, and only it", async () => {
+  app = await openApp({ prefs: { calendarView: "day" } });
+  const day = await dayIn(app);
+  await app.open(`---\ndate: ${day} 10:00\nDate: ${day} 14:00\n---\n# Twice`);
+  const page = app.page;
+  const body = () => page.evaluate(() => window.testing.notes.entries.find((entry) => entry.meta.title === "Twice")!.note.body);
+  await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: "Calendar" }).click();
+  await page.getByRole("button", { name: /^Twice, 2:00/ }).waitFor();
+  await dragIn(app, day, 14 * 60 + 20, 16 * 60 + 20);
+  await page.getByRole("button", { name: /^Twice, 4:00/ }).waitFor();
+  expect(await body()).toBe(`---\ndate: ${day} 10:00\nDate: ${day} 16:00\n---\n# Twice`);
+  await page.getByRole("button", { name: /^Twice, 10:00/ }).waitFor();
+
+  // Its bottom edge, from 17:00 down to 18:00: a start and an end in place of its date, the other kept.
+  const block = (await page.getByRole("button", { name: /^Twice, 4:00/ }).boundingBox())!;
+  await page.mouse.move(block.x + block.width / 2, block.y + block.height - 2);
+  await page.mouse.down();
+  await page.mouse.move(block.x + block.width / 2, block.y + block.height + 48, { steps: 6 });
+  await page.mouse.up();
+  await page.getByRole("button", { name: /^Twice, 4:00 – 6:00/ }).waitFor();
+  expect(await body()).toBe(`---\ndate: ${day} 10:00\nstart: ${day} 16:00\nend: ${day} 18:00\n---\n# Twice`);
+  await page.getByRole("button", { name: /^Twice, 10:00/ }).waitFor();
+});
+
 test("on the days the clocks change, the hours and times are as the clock reads them", async () => {
   app = await openApp({ timezone: "America/New_York", prefs: { calendarView: "day" } });
   await app.open(`---\ndate: 2026-03-08 14:00\n---\n# Spring`);
