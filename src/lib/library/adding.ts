@@ -54,7 +54,7 @@ export function lookUpDetails(id: string) {
   notes.select(id);
   completeNote(id, entry.note.body, async (signal) => {
     const item = await lookUp(link, signal);
-    return item && { ...item, properties: [...item.properties, ...kept], tags: [...new Set([...(item.tags ?? []), ...entry.meta.tags])] };
+    return item && { ...item, properties: [...item.properties, ...kept.filter(([key]) => !item.properties.some(([found]) => found === key))], tags: [...new Set([...(item.tags ?? []), ...entry.meta.tags])] };
   });
 }
 

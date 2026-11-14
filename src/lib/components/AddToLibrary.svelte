@@ -3,10 +3,11 @@
   import WebSearchPicker from "../editor/WebSearchPicker.svelte";
   import { addBookFile } from "../books/adding";
   import { addBlank, addToLibrary } from "../library/adding";
-  import { lookUp } from "../library/lookup";
+  import { lookUpAny } from "../library/lookup";
   import { subtitleOf } from "../library/rows";
   import { shelves } from "../library/shelves.svelte";
   import { linkOnly } from "../library/text";
+  import { readsPages } from "../library/web";
   import { plugins } from "../plugins/registry.svelte";
   import type { LibraryItem, SearchPage } from "../plugins/types";
   import Button from "./ui/Button.svelte";
@@ -45,7 +46,7 @@
     if (!text || page > 1) return { items: [], more: false };
     const link = linkOnly(text);
     if (link) {
-      const item = await lookUp(link, signal);
+      const item = await lookUpAny(link, signal);
       return { items: item ? [{ id: link, item, whole: true }] : [], more: false };
     }
     const asked = current?.asked ?? [];
@@ -59,6 +60,8 @@
 
   /** Who made it and when, as its row on its shelf will say (`Frank Herbert · 1965`), or what the catalog says it is. */
   function about(item: LibraryItem) {
+    // On the web pages can't be read for what they are (Web Pages is the apps'): a page is kept as one.
+    if (item.type === "resource" && !readsPages()) return t("library.keptAsPage");
     const kind = plugins.libraryKind(item.type);
     const said = kind ? subtitleOf(kind, (key) => item.properties.find(([each]) => each === key)?.[1]) : "";
     return said || item.description || "";

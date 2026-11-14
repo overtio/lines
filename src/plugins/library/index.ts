@@ -133,13 +133,15 @@ const KINDS: LibraryKind[] = [
     statuses: READ,
   },
   {
-    // A bookmark, imported from a browser (docs/library.md), until it's looked up as what it is.
+    // A bookmark imported from a browser, or a page added that nothing could say more of (docs/library.md), until it's looked up as what it is.
     type: "resource",
     name: t("library.resource"),
     label: t("library.resources"),
     icon: "bookmark",
-    properties: ["folder", "added"],
-    subtitle: ["folder"],
+    properties: ["site", "folder", "added"],
+    subtitle: ["folder", "site"],
+    // Read later: a page added on purpose starts to be read; imported bookmarks start nowhere.
+    statuses: READ,
     lookUp: true,
   },
 ];

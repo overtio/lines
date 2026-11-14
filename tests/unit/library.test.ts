@@ -9,7 +9,15 @@ import { stubApp } from "./stubs";
  * and below). Nothing here reaches the network: every request is answered from `answers`.
  */
 
-/** What each address asked for answers: JSON, a page's HTML, or a status; the first whose start matches. */
+/** A page's HTML, read from `to`, where asking for another address ended (a redirect). */
+class Moved {
+  constructor(
+    readonly to: string,
+    readonly html: string,
+  ) {}
+}
+
+/** What each address asked for answers: JSON, a page's HTML (where it was sent to read it), or a status; the first whose start matches. */
 const answers = new Map<string, unknown>();
 const asked: string[] = [];
 const answer = (url: string, init?: RequestInit) => {
@@ -18,6 +26,7 @@ const answer = (url: string, init?: RequestInit) => {
   if (found === undefined) return new Response("", { status: 404 });
   if (typeof found === "number") return new Response("", { status: found });
   if (typeof found === "string") return new Response(found, { headers: { "content-type": "text/html; charset=utf-8" } });
+  if (found instanceof Moved) return Object.defineProperty(new Response(found.html, { headers: { "content-type": "text/html; charset=utf-8" } }), "url", { value: found.to });
   return Response.json(found);
 };
 stubApp({ isTauri: false, webFetch: async () => async (url: string, init?: RequestInit) => answer(url, init) });
@@ -28,7 +37,7 @@ const { frontMatter, mentionOf, nameOf, readMention } = await import("../../src/
 const { computeMeta, extractTags } = await import("../../src/lib/notes/parse");
 const { plainLine } = await import("../../src/lib/notes/stats");
 const { pacing, withTimeout } = await import("../../src/lib/pacing");
-const { isPublic, pageSummary } = await import("../../src/lib/library/web");
+const { getPage, isPublic, pageSummary } = await import("../../src/lib/library/web");
 const { libraryNote } = await import("../../src/lib/library/note");
 const { subtitleOf } = await import("../../src/lib/library/rows");
 const { readPage, decodeEntities } = await import("../../src/lib/library/page");
@@ -44,6 +53,7 @@ const { soundcloud, soundcloudIn } = await import("../../src/plugins/soundcloud"
 const { paperItem } = await import("../../src/plugins/arxiv");
 const bookmarks = await import("../../src/lib/library/bookmarks");
 const keys = await import("../../src/lib/library/keys");
+const { lookUpAny, pageResource } = await import("../../src/lib/library/lookup");
 const { dayOf } = await import("../../src/lib/notes/calendar");
 
 const fixture = (name: string) => readFileSync(new URL(`fixtures/library/${name}`, import.meta.url), "utf8");
@@ -915,5 +925,61 @@ describe("the same thing, however it's added", () => {
     const item = (await look(wikidata, "https://en.wikipedia.org/wiki/Emily_in_Paris"))!;
     expect(item.ids).toEqual(expect.arrayContaining(["wikidata:Q64584978", "imdb:tt8962124", "wikipedia:en:Emily_in_Paris"]));
     expect(item.cover).toBeUndefined();
+  });
+});
+
+describe("a page nothing can say more of", () => {
+  test("is a resource: its title, its site, the day it's added, its picture and what it says of itself", () => {
+    const home = readPage('<html><head><title>Intent — plan your day</title><meta property="og:title" content="Intent"><meta property="og:description" content="Plan your day."><meta property="og:image" content="/card.png"></head></html>', "https://www.intent.example/");
+    expect(pageResource(home, "https://www.intent.example/")).toEqual({
+      type: "resource",
+      title: "Intent",
+      link: "https://www.intent.example/",
+      properties: [
+        ["site", "intent.example"],
+        ["added", dayOf(Date.now())],
+      ],
+      ids: [],
+      cover: "https://www.intent.example/card.png",
+      description: "Plan your day.",
+    });
+    // Its <title> where it names nothing else, and its site's name for one with neither.
+    expect(pageResource(readPage('<title>A Tool</title><meta name="description" content="Does things.">', "https://tool.example/"), "https://tool.example/").title).toBe("A Tool");
+    expect(pageResource(readPage("<p>Hi</p>", "https://bare.example/x"), "https://bare.example/x").title).toBe("bare.example");
+  });
+
+  test("keeps the link added, whatever the page calls itself; another name of the same page only finds it", () => {
+    // A one-page app names its home page for each of its pages.
+    const docs = pageResource(readPage('<title>Install</title><link rel="canonical" href="https://app.example/">', "https://app.example/docs/install"), "https://app.example/docs/install");
+    expect([docs.link, docs.ids]).toEqual(["https://app.example/docs/install", []]);
+    const post = pageResource(readPage('<title>A Post</title><link rel="canonical" href="https://blog.example/p/a-post">', "https://blog.example/p/a-post?from=home"), "https://blog.example/p/a-post?from=home");
+    expect([post.link, post.ids]).toEqual(["https://blog.example/p/a-post?from=home", ["link:blog.example/p/a-post"]]);
+  });
+
+  test("one sent to sign in or to agree to cookies, or saying it isn't there, isn't kept: it couldn't be read", async () => {
+    const signal = new AbortController().signal;
+    answers.set("https://docs.example/private", new Moved("https://accounts.google.com/v3/signin/identifier?continue=x", "<title>Sign in – Google Accounts</title>"));
+    answers.set("https://news.example/story", new Moved("https://consent.news.example/v2/collectConsent?sessionId=1", "<title>Before you continue</title>"));
+    answers.set("https://team.example/browse/X-1", new Moved("https://team.example/login?next=/browse/X-1", "<title>Log in</title>"));
+    answers.set("https://site.example/gone", "<title>Page Not Found – Site</title>");
+    answers.set("https://site.example/404", "<title>404</title>");
+    for (const link of ["https://docs.example/private", "https://news.example/story", "https://team.example/browse/X-1", "https://site.example/gone", "https://site.example/404"]) {
+      await expect(lookUpAny(link, signal), link).rejects.toThrow();
+    }
+    // A page sent on to its own new address, or titled with words that are only part of it, is kept.
+    answers.set("https://site.example/old", new Moved("https://site.example/new", "<title>The New Page</title>"));
+    answers.set("https://site.example/lost", "<title>Not Found: a novel</title>");
+    expect((await lookUpAny("https://site.example/old", signal))?.link).toBe("https://site.example/old");
+    expect((await lookUpAny("https://site.example/lost", signal))?.title).toBe("Not Found: a novel");
+  });
+
+  test("read once as it's added: asked again for the same lookup, the same reading; for another, read afresh", async () => {
+    answers.set("https://once.example/", "<title>Once</title>");
+    const signal = new AbortController().signal;
+    expect((await getPage("https://once.example/", signal))?.title).toBe("Once");
+    expect((await getPage("https://once.example/", signal))?.title).toBe("Once");
+    expect(asked).toEqual(["https://once.example/"]);
+    answers.set("https://once.example/", "<title>Twice</title>");
+    expect((await getPage("https://once.example/", new AbortController().signal))?.title).toBe("Twice");
   });
 });

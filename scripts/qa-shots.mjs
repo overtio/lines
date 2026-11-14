@@ -1278,8 +1278,8 @@ const SCENES = [
   },
   {
     id: "library-resources",
-    title: "Resources: imported bookmarks on their shelf",
-    look: "Library → Resources: each bookmark its title and folder under it (Bookmarks bar / Dev / Rust), the bookmark icon in its box where a cover would be, the date it was bookmarked on the right, the latest first; the Rust book open: its folder, added and link, its title, and its tag.",
+    title: "Resources: imported bookmarks on their shelf, and a page added on purpose",
+    look: "Library → Resources: each bookmark its title and folder under it (Bookmarks bar / Dev / Rust), no status, the bookmark icon in its box where a cover would be, the date it was bookmarked on the right, the latest first; Intent, added today from Add to Library, at the top with its site (intent.example) under it and To Read as other kinds' statuses show; the Rust book open: its folder, added and link, its title, and its tag.",
     act: async (page) => {
       await page.getByRole("button", { name: "Settings", exact: true }).click();
       const dialog = page.getByRole("dialog");
@@ -1289,6 +1289,11 @@ const SCENES = [
       await dialog.getByRole("button", { name: "Import 6 Resources" }).click();
       await dialog.getByText("Imported 6 resources").waitFor();
       await page.keyboard.press("Escape");
+      await page.evaluate(() => {
+        const day = new Date().toISOString().slice(0, 10);
+        const body = `---\ntype: resource\nsite: intent.example\nadded: ${day}\nlink: https://intent.example/\nstatus: to read\n---\n# Intent\n\nPlan your day.\n`;
+        return window.testing.notes.insert({ id: crypto.randomUUID(), body, createdAt: Date.now(), updatedAt: Date.now(), pinned: false, trashed: false });
+      });
       await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Resources/ }).click();
       await page.locator(".note-list [data-id]").filter({ hasText: "The Rust Programming Language" }).click();
     },

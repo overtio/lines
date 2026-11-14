@@ -18,6 +18,8 @@ export interface PageLink {
 export interface Page {
   /** The page's own address, or its canonical one where it names it. */
   url: string;
+  /** Where it was read from, after any redirects: what `url` is, unless the page names another. */
+  address: string;
   title: string;
   /** Its JSON-LD's objects, each one found in lists and `@graph`s too, in order. */
   data: Record<string, unknown>[];
@@ -120,7 +122,7 @@ export function readPage(html: string, url: string): Page {
   }
   const canonical = links.find((link) => link.rel.split(/\s+/).includes("canonical"))?.href;
   const title = decodeEntities(/<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] ?? "").replace(/\s+/g, " ").trim();
-  return { url: canonical ?? url, title, data, meta, links };
+  return { url: canonical ?? url, address: url, title, data, meta, links };
 }
 
 /** A JSON-LD object's types, by their names (`Movie`, of `https://schema.org/Movie` too). */

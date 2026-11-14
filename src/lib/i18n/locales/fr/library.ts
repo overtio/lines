@@ -41,6 +41,7 @@ export default {
   "library.already": "Déjà dans votre bibliothèque",
   "library.openIt": "Ouvrir",
   "library.openItLabel": "L’ouvrir dans votre bibliothèque",
+  "library.keptAsPage": "Gardée comme page : l’app sait dire ce que c’est",
   "library.merge": "Fusionner",
   "library.mergeLabel": "Déplacer ce que vous avez écrit vers la note de votre bibliothèque",
   "library.merged": "Ce que vous avez écrit est maintenant dans {title}",
