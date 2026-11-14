@@ -120,7 +120,7 @@ export const savedWith = (key: string, value: string) => notes.entries.find(({ n
 
 /**
  * Every subscription as one line each, so typing that changes none leaves it the same and nothing
- * below redraws: its feed, its note, its title and its streams, those every note subscribing to it names.
+ * below redraws: its feed, its note, its title and its streams.
  */
 function signature() {
   const found = new Map<string, { note: string; title: string; updated: number; streams: string[] }>();
@@ -129,9 +129,8 @@ function signature() {
     const url = feedOf(meta.properties);
     if (!url) continue;
     const other = found.get(url);
-    const streams = withStream(other?.streams ?? [], streamsOf(meta.properties));
-    if (!other || note.updatedAt > other.updated) found.set(url, { note: note.id, title: meta.title, updated: note.updatedAt, streams });
-    else other.streams = streams;
+    // A feed's streams are its subscription's, the note edited last: a second note never puts it in two.
+    if (!other || note.updatedAt > other.updated) found.set(url, { note: note.id, title: meta.title, updated: note.updatedAt, streams: streamsOf(meta.properties) });
   }
   // A stream's name has no comma (streams.ts).
   return [...found].map(([url, { note, title, streams }]) => `${url}\t${note}\t${title}\t${streams.join(",")}`).join("\n");
@@ -311,16 +310,18 @@ class Feeds {
     if (filter.kind === "feeds" && filter.stream && streamKey(filter.stream) === streamKey(name)) notes.setFilter({ kind: "feeds" });
   }
 
-  /** Changes the streams of subscriptions' notes (`change` of each's streams and feed), keeping their dates, as renaming a type does. */
+  /**
+   * Changes the streams of subscriptions' notes (`change` of each's streams and feed), as edits are
+   * dated, so sync weighs them as it does any edit, against one made on another device meanwhile.
+   */
   #rewriteStreams(change: (streams: string[], feed: string) => string[]) {
-    notes.rewrite((body, note) => {
-      const properties = notes.get(note.id)?.meta.properties ?? [];
-      const feed = !note.trashed && feedOf(properties);
-      if (!feed) return body;
-      const streams = streamsOf(properties);
+    for (const { note, meta } of notes.entries) {
+      const feed = !note.trashed && !note.locked && feedOf(meta.properties);
+      if (!feed) continue;
+      const streams = streamsOf(meta.properties);
       const changed = change(streams, feed);
-      return changed.join("\n") === streams.join("\n") ? body : writeStreams(body, changed);
-    });
+      if (changed.join("\n") !== streams.join("\n")) notes.setText(note.id, (body) => writeStreams(body, changed));
+    }
   }
 
   subscription(url: string) {

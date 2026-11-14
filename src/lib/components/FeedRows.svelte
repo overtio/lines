@@ -3,6 +3,11 @@
 
   /** Which rows of feeds have their subscriptions folded away, as the sidebar was left. */
   const folded = new SvelteSet<string>();
+
+  /** A row renamed (a stream's, by its key) stays folded if it was. */
+  export function refold(from: string, to: string) {
+    if (folded.delete(from)) folded.add(to);
+  }
 </script>
 
 <script lang="ts">

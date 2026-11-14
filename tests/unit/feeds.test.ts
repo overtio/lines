@@ -141,6 +141,10 @@ describe("streams, named on subscriptions' notes", async () => {
     expect(writeStreams(body, ["Later", "Must read"])).toBe("---\ntype: feed\nfeed: https://a.example/feed\nstream: Later, Must read\n---\n# A");
     expect(writeStreams(body, [])).toBe("---\ntype: feed\nfeed: https://a.example/feed\n---\n# A");
     expect(writeStreams("---\nfeed: https://a.example/feed\n---\n# A", ["Work"])).toBe("---\nfeed: https://a.example/feed\nstream: Work\n---\n# A");
+    // A name like a tag or a mention is written as words, and read back as it was.
+    const tagged = writeStreams("---\nfeed: https://a.example/feed\n---\n# A", ["#later", "@home"]);
+    expect(tagged).toBe("---\nfeed: https://a.example/feed\nstream: \\#later, \\@home\n---\n# A");
+    expect(streams(tagged)).toEqual(["#later", "@home"]);
   });
 });
 

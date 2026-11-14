@@ -1,7 +1,9 @@
 <script lang="ts">
   import { speak } from "../a11y";
   import { feeds } from "../feeds/feeds.svelte";
-  import { cleanStream } from "../feeds/streams";
+  import { cleanStream, streamKey } from "../feeds/streams";
+  import { sidebarLayout } from "../sidebarLayout.svelte";
+  import { refold } from "./FeedRows.svelte";
   import { t } from "../i18n/index.svelte";
   import { ui } from "../ui.svelte";
   import Prompt from "./ui/Prompt.svelte";
@@ -22,6 +24,9 @@
     if (!prompt || !name) return;
     if (prompt.rename) {
       feeds.renameStream(prompt.rename, name);
+      // Its row keeps its place, size and folding.
+      sidebarLayout.rename("stream", streamKey(prompt.rename), streamKey(name));
+      refold(`stream:${streamKey(prompt.rename)}`, `stream:${streamKey(name)}`);
       speak(t("feeds.streams.renamed", { name }));
     } else if (prompt.feed) {
       feeds.addToStream(prompt.feed, name);

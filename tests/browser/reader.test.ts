@@ -1211,6 +1211,11 @@ describe("streams, feeds grouped by topic or priority", () => {
     await sidebar.getByRole("button", { name: "Later, 3 unread" }).waitFor();
     expect(await sidebar.getByRole("list", { name: "Work" }).getByRole("button").evaluateAll((all) => all.map((row) => row.getAttribute("aria-label")))).toEqual(["Alpha, 3 unread", "Beta, 2 unread"]);
 
+    // Made small and folded, it stays so renamed.
+    await sidebar.getByRole("button", { name: "Work, 5 unread" }).click({ button: "right" });
+    await page.getByRole("menuitemcheckbox", { name: "Small Row" }).click();
+    await sidebar.getByRole("button", { name: "Show the feeds in Work" }).click();
+    await sidebar.getByRole("list", { name: "Work" }).waitFor({ state: "detached" });
     await sidebar.getByRole("button", { name: "Work, 5 unread" }).click();
     await sidebar.getByRole("button", { name: "Work, 5 unread" }).click({ button: "right" });
     await page.getByRole("menuitem", { name: "Rename…" }).click();
@@ -1223,12 +1228,37 @@ describe("streams, feeds grouped by topic or priority", () => {
     expect(await bodyOf(app, "Beta")).toContain("\nstream: Projects\n");
     // Its list stays shown, under its new name.
     await expect(page.locator("#note-list-title").innerText()).resolves.toBe("Projects");
+    expect(await page.evaluate(() => window.testing.sidebarLayout.sizeOf("stream:projects", "library"))).toBe("small");
+    await expect(sidebar.getByRole("button", { name: "Show the feeds in Projects" }).getAttribute("aria-expanded")).resolves.toBe("false");
+    // Dated as any edit, so sync weighs it against one made elsewhere meanwhile.
+    expect(await page.evaluate(() => window.testing.notes.get("Beta")!.note.updatedAt)).toBeGreaterThan(0);
 
     await sidebar.getByRole("button", { name: "Later, 3 unread" }).click({ button: "right" });
     await page.getByRole("menuitem", { name: "Delete Stream" }).click();
     await sidebar.getByRole("button", { name: /^Later/ }).waitFor({ state: "detached" });
     expect(await bodyOf(app, "Alpha")).toContain("\nstream: Projects\n");
     await sidebar.getByRole("list", { name: "RSS Feeds" }).getByRole("button", { name: "Alpha, 3 unread" }).waitFor();
+  });
+
+  test("a feed's streams are its subscription's, the note edited last; a name like a tag is written as words", async () => {
+    app = await openApp();
+    await madeFeeds(app, [{ title: "Alpha", posts: 2, streams: "Work" }]);
+    const page = app.page;
+    // An older second note subscribing to the same feed doesn't put it in its stream too.
+    await page.evaluate(() => window.testing.notes.insert({ id: "copy", body: "---\ntype: feed\nfeed: https://alpha.example/feed.xml\nstream: Other\n---\n# Alpha", createdAt: 0, updatedAt: -1, pinned: false, trashed: false }));
+    const sidebar = page.getByRole("navigation", { name: "Library" });
+    await sidebar.getByRole("button", { name: "Work, 2 unread" }).waitFor();
+    expect(await sidebar.getByRole("button", { name: /^Other/ }).count()).toBe(0);
+
+    await sidebar.getByRole("list", { name: "RSS Feeds" }).getByRole("button", { name: /^Alpha/ }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Add to Stream" }).click();
+    await page.getByRole("menuitem", { name: "New Stream…" }).click();
+    const field = page.getByRole("textbox", { name: "Name of the stream" });
+    await field.fill("#later");
+    await field.press("Enter");
+    await sidebar.getByRole("button", { name: "#later, 2 unread" }).waitFor();
+    expect(await bodyOf(app, "Alpha")).toContain("\nstream: Work, \\#later\n");
+    expect(await page.evaluate(() => window.testing.notes.get("Alpha")!.meta.tags)).toEqual([]);
   });
 
   test("a feed's row dragged onto a stream's row goes in it", async () => {

@@ -6,6 +6,7 @@ import { attachmentNames, getAttachment, putAttachment, usedAttachments } from "
 import { LOOKS_FILE, readLooks, writeLooks } from "../notes/looks";
 import { looks } from "../notes/looks.svelte";
 import { noteKeys } from "../notes/noteKeys.svelte";
+import { frontMatter, propertyOf, setProperties } from "../notes/properties";
 import { TITLE_LINES } from "../notes/title";
 import { isBlank, notes, opened } from "../notes/store.svelte";
 import { syncRecords, type SyncRecord } from "../notes/storage";
@@ -139,7 +140,15 @@ function conflictCopy(note: Note): Note {
   if (note.locked && !note.locked.open) {
     return { ...copy, locked: { ...note.locked, title: t("sync.conflicted", { title: note.locked.title || t("sync.untitled") }) } };
   }
-  return { ...copy, body: markConflicted(note), ...(note.locked ? { locked: { ...note.locked, sealed: "" } } : {}) };
+  return { ...copy, body: unsubscribed(markConflicted(note)), ...(note.locked ? { locked: { ...note.locked, sealed: "" } } : {}) };
+}
+
+/**
+ * A copy of a feed's subscription (a note with `feed:`, feeds/feeds.svelte.ts) is a note of its own,
+ * not a second subscription: its `feed:` is taken off, the note it's a copy of keeping it.
+ */
+function unsubscribed(body: string) {
+  return propertyOf(frontMatter(body)?.properties ?? [], "feed") ? setProperties(body, { feed: null }) : body;
 }
 
 /**

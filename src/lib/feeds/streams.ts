@@ -1,3 +1,4 @@
+import { propertyValue } from "../notes/escape";
 import { type Property, propertyOf, setProperties } from "../notes/properties";
 
 /*
@@ -27,5 +28,5 @@ export function withStream(streams: string[], added: string[]): string[] {
 /** `streams` without `name`'s. */
 export const withoutStream = (streams: string[], name: string) => streams.filter((each) => streamKey(each) !== streamKey(name));
 
-/** A note's text with its streams as these; with none, its `stream:` taken off. */
-export const writeStreams = (body: string, streams: string[]) => setProperties(body, { stream: streams.length ? streams.join(", ") : null });
+/** A note's text with its streams as these, written as any outside text is (a `#later` isn't a tag); with none, its `stream:` taken off. */
+export const writeStreams = (body: string, streams: string[]) => setProperties(body, { stream: streams.length ? propertyValue(streams.join(", ")) : null });

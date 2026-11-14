@@ -315,15 +315,16 @@ class SidebarLayout {
     this.#save();
   }
 
-  /** A tag or type renamed: it keeps its place, and stays hidden if it was. */
-  rename(kind: "tag" | "type", from: string, to: string) {
-    const renamed = (name: string) => (kind === "type" ? (name === from ? to : name) : within(name, from) ? to + name.slice(from.length) : name);
+  /** A tag, type or stream (by its key) renamed: it keeps its place and size, and stays hidden if it was. */
+  rename(kind: "tag" | "type" | "stream", from: string, to: string) {
+    const renamed = (name: string) => (kind !== "tag" ? (name === from ? to : name) : within(name, from) ? to + name.slice(from.length) : name);
     const renamedKey = (key: string) => (key.startsWith(`${kind}:`) ? `${kind}:${renamed(key.slice(kind.length + 1))}` : key);
     this.#hidden = this.#hidden.map(renamedKey);
     this.#sizes = Object.fromEntries(Object.entries(this.#sizes).map(([key, size]) => [renamedKey(key), size]));
     this.#order = Object.fromEntries(
       Object.entries(this.#order).map(([list, keys]) => {
         if (kind === "type") return [list, list === "types" ? keys.map(renamed) : keys];
+        if (kind === "stream") return [list, list === "library" ? keys.map(renamedKey) : keys];
         if (!list.startsWith("tags:")) return [list, keys];
         const parent = list.slice("tags:".length);
         return [parent ? `tags:${renamed(parent)}` : list, keys.map(renamed)];

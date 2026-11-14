@@ -53,6 +53,10 @@ describe("sync", () => {
     expect(await conflictedCopy(body, "code-c")).toBe(`${body}\n\nthere`);
   });
 
+  test("a feed's subscription's is a note of its own, not a second subscription: its feed: is taken off", async () => {
+    expect(await conflictedCopy("---\ntype: feed\nfeed: https://blog.example/feed\nstream: Work\n---\n# Blog")).toBe("---\ntype: feed\nstream: Work\n---\n# Blog (conflicted copy)\n\nthere");
+  });
+
   test("a Markdown note's is marked on its title", async () => {
     expect(await conflictedCopy("# Plan\n\nA")).toBe("# Plan (conflicted copy)\n\nA\n\nthere");
   });
