@@ -17,6 +17,8 @@ export type Day = string;
 export interface Span {
   /** The property it's from: `start` for a span to its `end`. */
   key: "date" | "due" | "start" | "end";
+  /** The line that property is on, from 1, telling it from another with the same key. */
+  line: number;
   from: Day;
   to: Day;
   /** When it starts on its first day, in minutes after midnight. */
@@ -106,7 +108,7 @@ export function spansOf(properties: Property[]): Span[] {
     if (key !== "date" && key !== "due" && key !== "start" && key !== "end") continue;
     const day = dayIn(property.value);
     if (!day) continue;
-    const span: Span = { key, from: day, to: day, ...withTime("start", timeIn(property.value, key === "end")) };
+    const span: Span = { key, line: property.line, from: day, to: day, ...withTime("start", timeIn(property.value, key === "end")) };
     if (key === "start") start ??= span;
     else if (key === "end") end ??= span;
     else found.push(span);
@@ -498,10 +500,11 @@ export function allDayProperties(a: Day, b: Day): Record<string, string> {
 /**
  * The note's text with what `span` put on the Calendar moved to `to`: a start and end both moved,
  * a date or due moved; a date given a length other than the usual one becomes a start and an end.
+ * Of a key written twice, the one on the span's line.
  */
 export function retimed(body: string, span: Span, to: Slot): string {
   const at = (minutes: number) => `${to.day} ${timeText(minutes)}`;
-  if (span.key === "start") return setProperties(body, { start: at(to.start), end: at(to.end) });
-  if (span.key === "date" && to.end - to.start !== USUAL_LENGTH) return setProperties(body, { date: null, start: at(to.start), end: at(to.end) });
-  return setProperties(body, { [span.key]: at(to.start) });
+  if (span.key === "start") return setProperties(body, { start: at(to.start), end: at(to.end) }, span.line);
+  if (span.key === "date" && to.end - to.start !== USUAL_LENGTH) return setProperties(body, { date: null, start: at(to.start), end: at(to.end) }, span.line);
+  return setProperties(body, { [span.key]: at(to.start) }, span.line);
 }

@@ -38,16 +38,16 @@ test("a property's value is a day when it starts with a real ISO date, with or w
 
 test("a note is on the days of its date and due, and every day from its start to its end", () => {
   expect(spansOf(properties("Date: 2026-11-30\ndue: 2026-12-02\ntype: trip"))).toEqual([
-    { key: "date", from: "2026-11-30", to: "2026-11-30" },
-    { key: "due", from: "2026-12-02", to: "2026-12-02" },
+    { key: "date", line: 2, from: "2026-11-30", to: "2026-11-30" },
+    { key: "due", line: 3, from: "2026-12-02", to: "2026-12-02" },
   ]);
-  expect(spansOf(properties("start: 2026-11-28\nend: 2026-12-01"))).toEqual([{ key: "start", from: "2026-11-28", to: "2026-12-01" }]);
+  expect(spansOf(properties("start: 2026-11-28\nend: 2026-12-01"))).toEqual([{ key: "start", line: 2, from: "2026-11-28", to: "2026-12-01" }]);
   // An end before the start, or a start alone, is just those days.
   expect(spansOf(properties("start: 2026-12-01\nend: 2026-11-28"))).toEqual([
-    { key: "start", from: "2026-12-01", to: "2026-12-01" },
-    { key: "end", from: "2026-11-28", to: "2026-11-28" },
+    { key: "start", line: 2, from: "2026-12-01", to: "2026-12-01" },
+    { key: "end", line: 3, from: "2026-11-28", to: "2026-11-28" },
   ]);
-  expect(spansOf(properties("start: 2026-11-28"))).toEqual([{ key: "start", from: "2026-11-28", to: "2026-11-28" }]);
+  expect(spansOf(properties("start: 2026-11-28"))).toEqual([{ key: "start", line: 2, from: "2026-11-28", to: "2026-11-28" }]);
   expect(spansOf(properties("published: 2026-11-28"))).toEqual([]);
 });
 
@@ -99,13 +99,13 @@ test("a time after the date is read as the clock on the wall reads it", () => {
   expect(timeIn("2026-11-30T09:30:00Z")).toBe(9 * 60 + 30);
   expect(timeIn("2026-11-30")).toBeNull();
   expect(timeIn("2026-11-30 25:00")).toBeNull();
-  expect(spansOf(properties("start: 2026-11-30 14:00\nend: 2026-11-30 15:30"))).toEqual([{ key: "start", from: "2026-11-30", to: "2026-11-30", start: 840, end: 930 }]);
+  expect(spansOf(properties("start: 2026-11-30 14:00\nend: 2026-11-30 15:30"))).toEqual([{ key: "start", line: 2, from: "2026-11-30", to: "2026-11-30", start: 840, end: 930 }]);
   // An end before the start on the same day is the start alone.
-  expect(spansOf(properties("start: 2026-11-30 14:00\nend: 2026-11-30 13:00"))).toEqual([{ key: "start", from: "2026-11-30", to: "2026-11-30", start: 840 }]);
+  expect(spansOf(properties("start: 2026-11-30 14:00\nend: 2026-11-30 13:00"))).toEqual([{ key: "start", line: 2, from: "2026-11-30", to: "2026-11-30", start: 840 }]);
   // An end at 24:00 is the day's end, as an event dragged to midnight writes it; anything else isn't a time then.
   const late = eventProperties({ day: "2026-11-30", start: 22 * 60, end: 24 * 60 });
   expect(late.end).toBe("2026-11-30 24:00");
-  expect(spansOf(properties(`start: ${late.start}\nend: ${late.end}`))).toEqual([{ key: "start", from: "2026-11-30", to: "2026-11-30", start: 1320, end: 1440 }]);
+  expect(spansOf(properties(`start: ${late.start}\nend: ${late.end}`))).toEqual([{ key: "start", line: 2, from: "2026-11-30", to: "2026-11-30", start: 1320, end: 1440 }]);
   expect(timeIn("2026-11-30 24:00")).toBeNull();
   expect(itemsOn([entry("end: 2026-11-30 24:00")], ["2026-11-30"], false).get("2026-11-30")!.timed.map(({ start, end }) => [start, end])).toEqual([[1425, 1440]]);
 });
@@ -147,6 +147,13 @@ test("moving a note on the Calendar rewrites what put it there", () => {
   const event = "---\ntype: event\nstart: 2026-11-30 10:00\nend: 2026-11-30 11:00\n---\n# Lunch";
   const [span] = spansOf(frontMatter(event)!.properties);
   expect(retimed(event, span, { day: "2026-12-02", start: 720, end: 780 })).toBe("---\ntype: event\nstart: 2026-12-02 12:00\nend: 2026-12-02 13:00\n---\n# Lunch");
+  // The second of two times under one key: it, and not the first.
+  const twice = "---\ndate: 2026-11-30 10:00\nDate: 2026-11-30 14:00\n---\n# Twice";
+  const [, second] = spansOf(frontMatter(twice)!.properties);
+  expect(retimed(twice, second, { day: "2026-11-30", start: 960, end: 1020 })).toBe("---\ndate: 2026-11-30 10:00\nDate: 2026-11-30 16:00\n---\n# Twice");
+  expect(retimed(twice, second, { day: "2026-11-30", start: 960, end: 1080 })).toBe(
+    "---\ndate: 2026-11-30 10:00\nstart: 2026-11-30 16:00\nend: 2026-11-30 18:00\n---\n# Twice",
+  );
   expect(eventProperties({ day: "2026-11-30", start: 570, end: 630 })).toEqual({ type: "event", start: "2026-11-30 09:30", end: "2026-11-30 10:30" });
 });
 

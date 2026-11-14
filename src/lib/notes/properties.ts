@@ -168,15 +168,16 @@ export function typeRefOf(type: string, columns: string[] | null) {
 
 /**
  * The note with its properties changed: each key set to its value (as written, on the line it was
- * on, keeping how its key was written), or taken out where the value is null. New ones go at the
- * end of the properties, which are made if the note has none.
+ * on, keeping how its key was written), or taken out where the value is null. Of a key written more
+ * than once, the first is changed, or the one on `line`. New ones go at the end of the properties,
+ * which are made if the note has none.
  */
-export function setProperties(body: string, changes: Record<string, string | null>): string {
+export function setProperties(body: string, changes: Record<string, string | null>, line?: number): string {
   const front = frontMatter(body);
   const lines = body.split("\n");
   const added: string[] = [];
   const found = new Map<string, Property>();
-  for (const property of front?.properties ?? []) if (!found.has(keyOf(property.key))) found.set(keyOf(property.key), property);
+  for (const property of front?.properties ?? []) if (!found.has(keyOf(property.key)) || property.line === line) found.set(keyOf(property.key), property);
   const edits: { property: Property; value: string | null }[] = [];
   for (const [key, value] of Object.entries(changes)) {
     const property = found.get(keyOf(key));
