@@ -1,3 +1,4 @@
+import { closeCompletion } from "@codemirror/autocomplete";
 import { redo, undo } from "@codemirror/commands";
 import { getSearchQuery, searchPanelOpen } from "@codemirror/search";
 import {
@@ -68,7 +69,7 @@ function held(end: number, tr: Transaction) {
   if (end < 0) return -1;
   const { doc, selection } = tr.state;
   const to = tr.changes.mapPos(end, 1);
-  return selection.main.to <= to && /^---/.test(doc.line(1).text) && doc.sliceString(to, to + 1) === "\n" ? to : -1;
+  return selection.main.to <= to && doc.line(1).text.startsWith("---") && doc.sliceString(to, to + 1) === "\n" ? to : -1;
 }
 
 const apart = StateField.define<Apart>({
@@ -313,6 +314,8 @@ class PropertiesPane {
         userEvent: tr.isUserEvent("select.pointer") ? undefined : tr.annotation(Transaction.userEvent),
         filter: false,
       });
+      // Typed there, the menus (`/`, `@`) open in the properties' editor, and not in the note's as well.
+      closeCompletion(this.view);
     }
   }
 
