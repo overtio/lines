@@ -1,7 +1,8 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { latexContent, markTitle } from "../../src/plugins/latex/text";
 import { beforeWrite, devices, drive, editElsewhere, FOLDER, fileOf, languages, notes, serialize, sync } from "./sync";
-// After ./sync, which sets up the page it runs in.
+// After ./sync, which sets up the page they run in and the notes' storage in memory: imported first,
+// a module would read a page that isn't there, or bind the real storage (IndexedDB) before it's replaced.
+const { latexContent, markTitle } = await import("../../src/plugins/latex/text");
 const { looks, tagLooks, typeLooks } = await import("../../src/lib/notes/looks.svelte");
 
 // LaTeX, its title read as the plugin reads it: a document's \title, or its first line of text.
