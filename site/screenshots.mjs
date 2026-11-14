@@ -43,7 +43,7 @@ const server = Bun.serve({
   },
 });
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ args: ["--mute-audio"] });
 mkdirSync(OUT, { recursive: true });
 
 /** A PNG as WebP, which the browser encodes: a fraction of the size, and as sharp. */

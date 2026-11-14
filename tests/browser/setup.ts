@@ -24,7 +24,8 @@ beforeAll(async () => {
   // on the same port number could answer this one's browser.
   server = await preview({ root, mode: "test", logLevel: "error", build: { outDir }, preview: { host: "127.0.0.1", port: 0, open: false } });
   const engine = process.env.BROWSER === "webkit" ? "webkit" : "chromium";
-  const browser = await (engine === "webkit" ? webkit : chromium).launch();
+  // Unheard (the build mutes itself too: src/test/silence.ts); WebKit has no such switch.
+  const browser = engine === "webkit" ? await webkit.launch() : await chromium.launch({ args: ["--mute-audio"] });
   globalThis.lines = { browser, url: server.resolvedUrls!.local[0], engine };
 }, 180_000);
 
