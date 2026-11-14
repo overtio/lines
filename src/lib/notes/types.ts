@@ -80,7 +80,8 @@ export type Filter =
   /** The Calendar, on one day (`YYYY-MM-DD`, see calendar.ts): the notes on it. */
   | { kind: "calendar"; day: string }
   /**
-   * The posts of every feed subscribed to, of a group's (feeds/groups.ts), or of the one at `feed`
-   * (feeds/feeds.svelte.ts): no notes. Those still in the list, or with `dismissed`, those taken out.
+   * The posts of every feed subscribed to, of a group's (feeds/groups.ts), of a stream's
+   * (feeds/streams.ts), or of the one at `feed` (feeds/feeds.svelte.ts): no notes. Those still in the
+   * list, or with `dismissed`, those taken out.
    */
-  | { kind: "feeds"; feed?: string; group?: FeedGroup; dismissed?: true };
+  | { kind: "feeds"; feed?: string; group?: FeedGroup; stream?: string; dismissed?: true };

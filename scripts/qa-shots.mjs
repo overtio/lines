@@ -940,6 +940,28 @@ const SCENES = [
       await page.locator(".note-list [data-post]").nth(1).hover();
     },
   },
+  ...[false, true].map((menu) => ({
+    id: menu ? "feeds-stream-menu" : "feeds-streams",
+    title: menu ? "A feed's menu: Add to Stream" : "Streams at the top of the Library",
+    look: menu
+      ? "The Svelte blog's menu, Add to Stream open beside it: its waves icon and a chevron at its right; the menu beside lined up with its item, Must read and Later, a line, then New Stream…; Remove from Later in the feed's menu."
+      : "Must read and Later, each with the waves icon, at the Library's top before RSS Feeds, their feeds under them (Daring Fireball under both Must read and Atom Feeds) with their counts; Must read chosen, its feeds' posts together, newest first, titled Must read.",
+    act: async (page) => {
+      await subscribe(page, FEEDS);
+      await page.evaluate(() => {
+        const { feeds } = window.testing;
+        feeds.addToStream("https://daringfireball.net/feeds/main", "Must read");
+        feeds.addToStream("https://feeds.megaphone.fm/FSI1483080183", "Must read");
+        feeds.addToStream("https://svelte.dev/blog/rss.xml", "Later");
+      });
+      const sidebar = page.getByRole("navigation", { name: "Library" });
+      await sidebar.getByRole("button", { name: /^Must read/ }).click();
+      if (!menu) return;
+      await sidebar.getByRole("list", { name: "Later" }).getByRole("button", { name: /^Svelte blog/ }).click({ button: "right" });
+      await page.getByRole("menuitem", { name: "Add to Stream" }).click();
+      await page.getByRole("menuitem", { name: "New Stream…" }).waitFor();
+    },
+  })),
   ...[false, true].map((dismissed) => ({
     id: dismissed ? "feeds-dismissed" : "feeds-caught-up",
     title: dismissed ? "A feed's posts dismissed (Show Dismissed)" : "A feed at zero: all its posts dismissed",

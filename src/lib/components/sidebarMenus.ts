@@ -11,7 +11,7 @@ import { type MenuItem, ui } from "../ui.svelte";
  */
 
 /** What kind of row a list holds, as hidden rows are named (`tag:work`). */
-export type RowKind = "place" | "section" | "type" | "shelf" | "feeds" | "tag";
+export type RowKind = "place" | "section" | "type" | "shelf" | "feeds" | "stream" | "tag";
 
 /** How a hidden row is shown in Show Hidden's menu: its name and icon, or null if it's gone (a tag no note has now). */
 export type Describe = (hidden: string) => { label: string; icon: IconName } | null;

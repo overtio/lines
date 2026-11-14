@@ -3,6 +3,11 @@
 
   /** Which rows of feeds have their subscriptions folded away, as the sidebar was left. */
   const folded = new SvelteSet<string>();
+
+  /** A row renamed (a stream's, by its key) stays folded if it was. */
+  export function refold(from: string, to: string) {
+    if (folded.delete(from)) folded.add(to);
+  }
 </script>
 
 <script lang="ts">
@@ -10,12 +15,14 @@
   import { speak } from "../a11y";
   import { dismissAll, feedError, feedRowLabel, feeds, type FeedsFilter, type Subscription } from "../feeds/feeds.svelte";
   import type { FeedGroup } from "../feeds/groups";
+  import { streamKey } from "../feeds/streams";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
   import { longPress } from "../longPress";
   import { coverOf } from "../library/text";
   import { arrivedURL } from "../notes/attachments";
   import { notes } from "../notes/store.svelte";
+  import { panes } from "../panes.svelte";
   import { plugins } from "../plugins/registry.svelte";
   import type { Filter } from "../notes/types";
   import { copyText } from "../platform";
@@ -23,15 +30,18 @@
   import type { RowSize } from "../sidebarLayout.svelte";
   import { type MenuItem, menuSections, ui } from "../ui.svelte";
   import { fitPicture, TONE_BACKING } from "./fitPicture";
+  import { followPointer } from "./followPointer";
   import SidebarRow from "./SidebarRow.svelte";
 
-  // A row of the Library's feeds: a kind of feed's posts (RSS, Atom, podcasts'), or every feed's,
-  // and under it each feed subscribed to with its unread posts counted, as the tag tree nests tags.
-  // A feed that couldn't be fetched says why when pointed at. The row's own menu is the sidebar's
-  // (`onmenu`), which adds sizing and hiding it.
+  // A row of the Library's feeds: a stream's posts, a kind of feed's (RSS, Atom, podcasts'), or
+  // every feed's, and under it each of its feeds with its unread posts counted, as the tag tree nests
+  // tags. A feed that couldn't be fetched says why when pointed at. A feed dragged onto a stream's row
+  // goes in that stream (noteDrops.ts). The row's own menu is the sidebar's (`onmenu`), which adds
+  // sizing and hiding it.
 
   let {
     group,
+    stream,
     subscriptions,
     unread,
     size = "standard",
@@ -40,8 +50,10 @@
     onmenu,
     reorder,
   }: {
-    /** Its kind of feed, or null for every feed. */
+    /** Its kind of feed, or null for every feed (or a stream's). */
     group: FeedGroup | null;
+    /** Its stream's name, if it's a stream's (feeds/streams.ts). */
+    stream?: string;
     subscriptions: Subscription[];
     unread: number;
     size?: RowSize;
@@ -54,12 +66,15 @@
   /** The subscription whose menu is open, outlined like a right-clicked note. */
   let menuFor = $state<string | null>(null);
 
-  const key = $derived(group ?? "all");
-  const label = $derived(feedRowLabel(group));
+  const key = $derived(stream ? `stream:${streamKey(stream)}` : (group ?? "all"));
+  const label = $derived(stream ?? feedRowLabel(group));
   const filter = $derived(notes.filter.kind === "feeds" ? notes.filter : null);
   const shown = $derived(!folded.has(key) && subscriptions.length > 0);
   /** What the row lists. */
-  const own = $derived<FeedsFilter>(group ? { kind: "feeds", group } : { kind: "feeds" });
+  const own = $derived<FeedsFilter>(stream ? { kind: "feeds", stream } : group ? { kind: "feeds", group } : { kind: "feeds" });
+  const active = $derived(!!filter && !filter.feed && filter.group === own.group && streamKey(filter.stream ?? "") === streamKey(stream ?? ""));
+  /** What a feed dropped on a stream's row is put in (noteDrops.ts). */
+  const drop = $derived(stream && `stream:${stream}`);
   const urls = () => subscriptions.map(({ url }) => url);
 
   function readAll(urls: string[]) {
@@ -77,11 +92,80 @@
       // Its sites' feeds subscribed to without a picture (made before lines gave them their sites' icons) given theirs.
       ...(bare.length ? [{ label: t("feeds.getPictures"), icon: "image" as const, run: () => void getPictures(bare) }] : []),
       "separator",
-      { label: t("feeds.subscribe"), icon: "plus", run: () => (ui.subscribePrompt = { x, y }) },
+      ...(stream
+        ? [
+            { label: t("feeds.streams.renameItem"), icon: "pencil" as const, run: () => (ui.streamPrompt = { x, y, rename: stream }) },
+            { label: t("feeds.streams.delete"), icon: "trash" as const, danger: true, run: () => deleteStream(stream) },
+          ]
+        : [{ label: t("feeds.subscribe"), icon: "plus" as const, run: () => (ui.subscribePrompt = { x, y }) }]),
     ], x, y);
   }
 
-  function subscriptionMenu({ url, note, title }: Subscription, x: number, y: number) {
+  /** A stream deleted: its feeds stay subscribed. */
+  function deleteStream(name: string) {
+    feeds.deleteStream(name);
+    speak(t("feeds.streams.deleted", { name }));
+  }
+
+  /** The menu's items for a feed's streams: a menu of those it isn't in (and a new one), and taking it out of each it is. */
+  function streamItems({ url, title, streams }: Subscription, x: number, y: number): Exclude<MenuItem, "separator">[] {
+    const others = feeds.streams.filter(({ name }) => !streams.some((each) => streamKey(each) === streamKey(name)));
+    const add = (name: string) => {
+      feeds.addToStream(url, name);
+      speak(t("feeds.streams.added", { title, name }));
+    };
+    return [
+      {
+        label: t("feeds.streams.addTo"),
+        icon: "waves",
+        items: [
+          ...others.map(({ name }): MenuItem => ({ label: name, icon: "waves", run: () => add(name) })),
+          ...(others.length ? ["separator" as const] : []),
+          { label: t("feeds.streams.new"), icon: "plus", run: () => (ui.streamPrompt = { x, y, feed: url }) },
+        ],
+      },
+      ...streams.map((name) => ({
+        label: t("feeds.streams.removeFrom", { name }),
+        icon: "minus" as const,
+        run: () => {
+          feeds.removeFromStream(url, name);
+          speak(t("feeds.streams.removed", { title, name }));
+        },
+      })),
+    ];
+  }
+
+  /** Whether a feed's row was just dragged, so the click that ends it doesn't choose it. */
+  let dragged = false;
+
+  /**
+   * A feed's row dragged with a mouse or pen, as its note, followed here (panes.svelte.ts): onto a
+   * stream's row it goes in that stream, onto a tag's it's tagged, as a note dragged from the list is.
+   */
+  function dragFeed(event: PointerEvent, note: string) {
+    if (event.button !== 0 || event.pointerType === "touch") return;
+    const done = () => setTimeout(() => (dragged = false));
+    followPointer(event, {
+      move: ({ clientX: x, clientY: y }, first) => {
+        if (first) {
+          dragged = true;
+          panes.startDrag("note", note);
+        }
+        panes.follow(x, y);
+      },
+      drop: () => {
+        panes.drop();
+        done();
+      },
+      cancel: () => {
+        panes.endDrag();
+        done();
+      },
+    });
+  }
+
+  function subscriptionMenu(subscription: Subscription, x: number, y: number) {
+    const { url, note, title } = subscription;
     menuFor = url;
     ui.openMenu({
       x,
@@ -94,6 +178,7 @@
           { label: t("feeds.dismissAll"), icon: "archive", run: () => dismissAll([url]) },
           { label: t("feeds.showDismissed"), icon: "eye", run: () => onchoose({ kind: "feeds", feed: url, dismissed: true }) },
         ],
+        streamItems(subscription, x, y),
         [
           { label: t("feeds.openNote"), icon: "file-text", run: () => notes.show(note) },
           { label: t("feeds.copyFeedLink"), icon: "link", run: () => void copyText(url).then(() => speak(t("list.copied"))) },
@@ -136,11 +221,12 @@
     <SidebarRow
       {size}
       class={subscriptions.length ? "pr-[30px] coarse:pr-12" : undefined}
-      icon="rss"
+      icon={stream ? "waves" : "rss"}
       {label}
       count={unread}
-      active={!!filter && !filter.feed && filter.group === (group ?? undefined)}
-      {marked}
+      {active}
+      marked={marked || (!!drop && panes.rowAt === drop)}
+      data-note-drop={drop || undefined}
       aria-label={unread ? `${label}, ${t("feeds.unreadCount", { count: unread })}` : undefined}
       onclick={() => onchoose(own)}
       oncontextmenu={(event) => oncontextmenu(event, rowMenu, marked)}
@@ -154,17 +240,17 @@
           shown && "rotate-90",
         ]}
         onclick={() => (folded.has(key) ? folded.delete(key) : folded.add(key))}
-        aria-label={group ? t("feeds.showGroup", { group: label }) : t("feeds.showSubscriptions")}
-        title={group ? t("feeds.showGroup", { group: label }) : t("feeds.showSubscriptions")}
+        aria-label={group || stream ? t("feeds.showGroup", { group: label }) : t("feeds.showSubscriptions")}
+        title={group || stream ? t("feeds.showGroup", { group: label }) : t("feeds.showSubscriptions")}
         aria-expanded={shown}
-        aria-controls="feeds-in-{key}"
+        aria-controls="feeds-in-{encodeURIComponent(key)}"
       >
         <Icon name="chevron-right" size={14} />
       </button>
     {/if}
   </div>
   {#if shown}
-    <ul id="feeds-in-{key}" class="mt-0.5 grid grid-cols-1 gap-y-0.5" aria-label={label}>
+    <ul id="feeds-in-{encodeURIComponent(key)}" class="mt-0.5 grid grid-cols-1 gap-y-0.5" aria-label={label}>
       {#each subscriptions as subscription (subscription.url)}
         {@const { url, title, note } = subscription}
         {@const error = feeds.records.get(url)?.error}
@@ -192,7 +278,8 @@
             marked={menuFor === url}
             title={error ? feedError(error) : undefined}
             aria-label={[title || url, count ? t("feeds.unreadCount", { count }) : "", error ? feedError(error) : ""].filter(Boolean).join(", ")}
-            onclick={() => onchoose({ kind: "feeds", feed: url })}
+            onclick={() => dragged || onchoose({ kind: "feeds", feed: url })}
+            onpointerdown={(event) => dragFeed(event, note)}
             oncontextmenu={(event) => oncontextmenu(event, (x, y) => subscriptionMenu(subscription, x, y), menuFor === url)}
             {@attach longPress((x, y) => subscriptionMenu(subscription, x, y))}
           />

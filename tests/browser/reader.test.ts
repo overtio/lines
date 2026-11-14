@@ -1131,3 +1131,156 @@ describe("dismissing posts, to keep a feed at zero", () => {
     expect(await page.evaluate((url) => window.testing.feeds.posts(url).every(({ post }) => post.dismissed === "done"), url)).toBe(true);
   });
 });
+
+/** Subscriptions to feeds made up of a few posts each, by title, kept as if just fetched; their notes' ids are their titles, and `streams` their `stream:`. */
+async function madeFeeds(app: App, made: { title: string; posts: number; streams?: string }[]) {
+  for (const { title, posts, streams } of made) {
+    const url = `https://${title.toLowerCase()}.example/feed.xml`;
+    const feed = await madeFeed(app, url, posts);
+    await app.page.evaluate(
+      async ({ url, feed, title, streams }) => {
+        const { feeds, notes } = window.testing;
+        await feeds.take(url, feed, {});
+        const body = `---\ntype: feed\nfeed: ${url}\n${streams ? `stream: ${streams}\n` : ""}---\n# ${title}`;
+        await notes.insert({ id: title, body, createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+      },
+      { url, feed, title, streams },
+    );
+  }
+}
+
+/** A note's text. */
+const bodyOf = (app: App, id: string) => app.page.evaluate((id) => window.testing.notes.get(id)?.note.body, id);
+
+describe("streams, feeds grouped by topic or priority", () => {
+  test("a feed's menu puts it in a new stream, named in the page: a row at the Library's top of its posts, counted; the menu adds another, and takes one out", async () => {
+    app = await openApp();
+    await madeFeeds(app, [
+      { title: "Alpha", posts: 3 },
+      { title: "Beta", posts: 2 },
+    ]);
+    const page = app.page;
+    const sidebar = page.getByRole("navigation", { name: "Library" });
+    await sidebar.getByRole("button", { name: "Alpha, 3 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Add to Stream" }).click();
+    await page.getByRole("menuitem", { name: "New Stream…" }).click();
+    const field = page.getByRole("textbox", { name: "Name of the stream" });
+    await field.fill("Must read, now");
+    await field.press("Enter");
+    await field.waitFor({ state: "detached" });
+    expect(await bodyOf(app, "Alpha")).toContain("\nstream: Must read now\n");
+
+    // At the Library's top, before the kinds of feeds.
+    const rows = () => sidebar.locator("[data-reorder-key^='feeds:'], [data-reorder-key^='stream:']").evaluateAll((all) => all.map((row) => row.getAttribute("aria-label") ?? row.textContent?.trim()));
+    await sidebar.getByRole("button", { name: "Must read now, 3 unread" }).click();
+    expect(await rows()).toEqual(["Must read now, 3 unread", "RSS Feeds, 5 unread"]);
+    await expect(page.locator("#note-list-title").innerText()).resolves.toBe("Must read now");
+    expect(await page.locator(".note-list [data-post]").count()).toBe(3);
+
+    // Another, from its menu's list of the streams there are.
+    await sidebar.getByRole("list", { name: "RSS Feeds" }).getByRole("button", { name: "Beta, 2 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Add to Stream" }).click();
+    await page.getByRole("menuitem", { name: "Must read now" }).click();
+    await sidebar.getByRole("button", { name: "Must read now, 5 unread" }).waitFor();
+    await page.waitForFunction(() => document.querySelectorAll(".note-list [data-post]").length === 5);
+    // Dismissing works there as anywhere.
+    await page.locator(".note-list [data-post]").first().focus();
+    await page.keyboard.press("e");
+    await sidebar.getByRole("button", { name: "Must read now, 4 unread" }).waitFor();
+
+    // Out again, from the feed's menu under the stream.
+    await sidebar.getByRole("list", { name: "Must read now" }).getByRole("button", { name: /^Beta/ }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Remove from Must read now" }).click();
+    await sidebar.getByRole("list", { name: "Must read now" }).getByRole("button", { name: /^Beta/ }).waitFor({ state: "detached" });
+    const alpha = await sidebar.getByRole("list", { name: "Must read now" }).getByRole("button", { name: /^Alpha/ }).getAttribute("aria-label");
+    await sidebar.getByRole("button", { name: alpha!.replace("Alpha", "Must read now") }).waitFor();
+    expect(await bodyOf(app, "Beta")).not.toContain("stream:");
+  });
+
+  test("the property makes them, a list for several; a stream's menu renames it in each of its feeds' notes, and deletes it, its feeds still subscribed", async () => {
+    app = await openApp();
+    await madeFeeds(app, [
+      { title: "Alpha", posts: 3, streams: "Later, Work" },
+      { title: "Beta", posts: 2, streams: "work" },
+      { title: "Gamma", posts: 1 },
+    ]);
+    const page = app.page;
+    const sidebar = page.getByRole("navigation", { name: "Library" });
+    // One stream whatever its case: Work, of both.
+    await sidebar.getByRole("button", { name: "Work, 5 unread" }).waitFor();
+    await sidebar.getByRole("button", { name: "Later, 3 unread" }).waitFor();
+    expect(await sidebar.getByRole("list", { name: "Work" }).getByRole("button").evaluateAll((all) => all.map((row) => row.getAttribute("aria-label")))).toEqual(["Alpha, 3 unread", "Beta, 2 unread"]);
+
+    // Made small and folded, it stays so renamed.
+    await sidebar.getByRole("button", { name: "Work, 5 unread" }).click({ button: "right" });
+    await page.getByRole("menuitemcheckbox", { name: "Small Row" }).click();
+    await sidebar.getByRole("button", { name: "Show the feeds in Work" }).click();
+    await sidebar.getByRole("list", { name: "Work" }).waitFor({ state: "detached" });
+    await sidebar.getByRole("button", { name: "Work, 5 unread" }).click();
+    await sidebar.getByRole("button", { name: "Work, 5 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Rename…" }).click();
+    const field = page.getByRole("textbox", { name: "Name of the stream" });
+    expect(await field.inputValue()).toBe("Work");
+    await field.fill("Projects");
+    await field.press("Enter");
+    await sidebar.getByRole("button", { name: "Projects, 5 unread" }).waitFor();
+    expect(await bodyOf(app, "Alpha")).toContain("\nstream: Later, Projects\n");
+    expect(await bodyOf(app, "Beta")).toContain("\nstream: Projects\n");
+    // Its list stays shown, under its new name.
+    await expect(page.locator("#note-list-title").innerText()).resolves.toBe("Projects");
+    expect(await page.evaluate(() => window.testing.sidebarLayout.sizeOf("stream:projects", "library"))).toBe("small");
+    await expect(sidebar.getByRole("button", { name: "Show the feeds in Projects" }).getAttribute("aria-expanded")).resolves.toBe("false");
+    // Dated as any edit, so sync weighs it against one made elsewhere meanwhile.
+    expect(await page.evaluate(() => window.testing.notes.get("Beta")!.note.updatedAt)).toBeGreaterThan(0);
+
+    await sidebar.getByRole("button", { name: "Later, 3 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Delete Stream" }).click();
+    await sidebar.getByRole("button", { name: /^Later/ }).waitFor({ state: "detached" });
+    expect(await bodyOf(app, "Alpha")).toContain("\nstream: Projects\n");
+    await sidebar.getByRole("list", { name: "RSS Feeds" }).getByRole("button", { name: "Alpha, 3 unread" }).waitFor();
+  });
+
+  test("a feed's streams are its subscription's, the note edited last; a name like a tag is written as words", async () => {
+    app = await openApp();
+    await madeFeeds(app, [{ title: "Alpha", posts: 2, streams: "Work" }]);
+    const page = app.page;
+    // An older second note subscribing to the same feed doesn't put it in its stream too.
+    await page.evaluate(() => window.testing.notes.insert({ id: "copy", body: "---\ntype: feed\nfeed: https://alpha.example/feed.xml\nstream: Other\n---\n# Alpha", createdAt: 0, updatedAt: -1, pinned: false, trashed: false }));
+    const sidebar = page.getByRole("navigation", { name: "Library" });
+    await sidebar.getByRole("button", { name: "Work, 2 unread" }).waitFor();
+    expect(await sidebar.getByRole("button", { name: /^Other/ }).count()).toBe(0);
+
+    await sidebar.getByRole("list", { name: "RSS Feeds" }).getByRole("button", { name: /^Alpha/ }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Add to Stream" }).click();
+    await page.getByRole("menuitem", { name: "New Stream…" }).click();
+    const field = page.getByRole("textbox", { name: "Name of the stream" });
+    await field.fill("#later");
+    await field.press("Enter");
+    await sidebar.getByRole("button", { name: "#later, 2 unread" }).waitFor();
+    expect(await bodyOf(app, "Alpha")).toContain("\nstream: Work, \\#later\n");
+    expect(await page.evaluate(() => window.testing.notes.get("Alpha")!.meta.tags)).toEqual([]);
+  });
+
+  test("a feed's row dragged onto a stream's row goes in it", async () => {
+    app = await openApp();
+    await madeFeeds(app, [
+      { title: "Alpha", posts: 3, streams: "Work" },
+      { title: "Beta", posts: 2 },
+    ]);
+    const page = app.page;
+    const sidebar = page.getByRole("navigation", { name: "Library" });
+    const beta = sidebar.getByRole("list", { name: "RSS Feeds" }).getByRole("button", { name: "Beta, 2 unread" });
+    const work = sidebar.getByRole("button", { name: "Work, 3 unread" });
+    const from = (await beta.boundingBox())!;
+    const to = (await work.boundingBox())!;
+    await page.mouse.move(from.x + 20, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(from.x + 20, from.y + from.height / 2 - 10, { steps: 3 });
+    await page.mouse.move(to.x + 20, to.y + to.height / 2, { steps: 8 });
+    await page.mouse.up();
+    await sidebar.getByRole("button", { name: "Work, 5 unread" }).waitFor();
+    expect(await bodyOf(app, "Beta")).toContain("\nstream: Work\n");
+    // The click that ended it didn't choose the feed.
+    await expect(page.locator("#note-list-title").innerText()).resolves.not.toBe("Beta");
+  });
+});

@@ -118,6 +118,36 @@ describe("keeping posts", () => {
   });
 });
 
+describe("streams, named on subscriptions' notes", async () => {
+  const { frontMatter } = await import("../../src/lib/notes/properties");
+  const { cleanStream, streamKey, streamsOf, withoutStream, withStream, writeStreams } = await import("../../src/lib/feeds/streams");
+  const streams = (body: string) => streamsOf(frontMatter(body)?.properties ?? []);
+
+  test("a note's `stream:` is a list, written on one line or as YAML's, each name once whatever its case", () => {
+    expect(streams("---\nfeed: https://a.example/feed\nstream: Must read, Work,  work , \n---\n# A")).toEqual(["Must read", "Work"]);
+    expect(streams("---\nstream:\n  - Later\n  - Friends\n---\n# A")).toEqual(["Later", "Friends"]);
+    expect(streams("---\nfeed: https://a.example/feed\n---\n# A")).toEqual([]);
+    expect(streamKey("  Must   Read ")).toBe(streamKey("must read"));
+  });
+
+  test("a name typed is one line without commas; one added that's there already isn't again; one taken out goes whatever its case", () => {
+    expect(cleanStream(" Work, urgent\n")).toBe("Work urgent");
+    expect(withStream(["Work"], ["work", "Later", ""])).toEqual(["Work", "Later"]);
+    expect(withoutStream(["Work", "Later"], "WORK")).toEqual(["Later"]);
+  });
+
+  test("written back in the note's properties, as one line; none takes `stream:` off", () => {
+    const body = "---\ntype: feed\nfeed: https://a.example/feed\nstream:\n  - Later\n---\n# A";
+    expect(writeStreams(body, ["Later", "Must read"])).toBe("---\ntype: feed\nfeed: https://a.example/feed\nstream: Later, Must read\n---\n# A");
+    expect(writeStreams(body, [])).toBe("---\ntype: feed\nfeed: https://a.example/feed\n---\n# A");
+    expect(writeStreams("---\nfeed: https://a.example/feed\n---\n# A", ["Work"])).toBe("---\nfeed: https://a.example/feed\nstream: Work\n---\n# A");
+    // A name like a tag or a mention is written as words, and read back as it was.
+    const tagged = writeStreams("---\nfeed: https://a.example/feed\n---\n# A", ["#later", "@home"]);
+    expect(tagged).toBe("---\nfeed: https://a.example/feed\nstream: \\#later, \\@home\n---\n# A");
+    expect(streams(tagged)).toEqual(["#later", "@home"]);
+  });
+});
+
 describe("marks, what was done with posts, as devices sync them", () => {
   const kept = (id: string, read = false, date?: number): KeptPost => ({ id, key: `key-${id}`, title: id, base: "https://example.com/", excerpt: id, date, version: "v", read, seen: 0 });
   const FEED = "https://example.com/feed";

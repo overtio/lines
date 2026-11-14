@@ -9,6 +9,7 @@
   import IconPicker from "./lib/components/IconPicker.svelte";
   import TagPrompt from "./lib/components/TagPrompt.svelte";
   import SubscribePrompt from "./lib/components/SubscribePrompt.svelte";
+  import StreamPrompt from "./lib/components/StreamPrompt.svelte";
   import PostView from "./lib/components/PostView.svelte";
   import BookReader from "./lib/components/BookReader.svelte";
   import LockedNoteView from "./lib/components/LockedNoteView.svelte";
@@ -860,3 +861,4 @@
 <IconPicker />
 <TagPrompt />
 <SubscribePrompt />
+<StreamPrompt />

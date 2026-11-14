@@ -18,6 +18,7 @@ import { panes } from "../lib/panes.svelte";
 import { player } from "../lib/player/player.svelte";
 import { plugins } from "../lib/plugins/registry.svelte";
 import { prefs } from "../lib/prefs.svelte";
+import { sidebarLayout } from "../lib/sidebarLayout.svelte";
 import { customThemes } from "../lib/themes/custom.svelte";
 import { themeDrafts } from "../lib/themes/drafts.svelte";
 import { presets, writePresetFile } from "../lib/themes/presets.svelte";
@@ -56,6 +57,7 @@ const testing = {
   /** The app lock, to turn on as Settings does. */
   lock,
   panes,
+  sidebarLayout,
   plugins,
   prefs,
   customThemes,
