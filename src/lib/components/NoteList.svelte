@@ -124,9 +124,11 @@
   });
   const drawnRows = $derived(feedView ? postRows : rows);
 
+  // A post opened (from the mini player, or the next after a dismiss) is shown in the list too; one
+  // that only moves, as a row above it goes, isn't scrolled to.
   $effect(() => {
-    const index = openPost;
-    untrack(() => postRows.show(index));
+    void feeds.open;
+    untrack(() => postRows.show(openPost));
   });
 
   const picked = $derived(notes.pickedEntries);
@@ -211,7 +213,8 @@
         return;
       }
     }
-    const to = step(event.key, openPost, posts.length);
+    // From the row focused, which is the open one but after a dismiss or a click on another's button.
+    const to = step(event.key, posts.findIndex(({ post }) => post.key === row.post.key), posts.length);
     const next = to === null ? undefined : posts[to];
     if (!next) return;
     event.preventDefault();
@@ -221,11 +224,12 @@
   }
 
   /**
-   * Dismisses a post (`why`), or puts a dismissed one back (null), and then focuses the row that
-   * takes its place, if focus was in the list: the post opened in its place, or the one after it.
+   * Dismisses a post (`why`), or puts a dismissed one back (null). If focus was in the list, it goes
+   * to the row that takes its place (the post opened there, if it was the open one), the list staying
+   * where it was.
    */
   function dismissRow(row: Row, why: Dismissal | null) {
-    const index = posts.indexOf(row);
+    const index = posts.findIndex(({ post }) => post.key === row.post.key);
     const focused = list.contains(document.activeElement);
     if (why) dismissPosts([row], why);
     else {
@@ -234,10 +238,10 @@
     }
     flushSync();
     if (!focused) return;
-    const next = openPost >= 0 ? posts[openPost] : posts[Math.min(index, posts.length - 1)];
+    const next = posts[Math.min(index, posts.length - 1)];
     const target = next && list.querySelector<HTMLElement>(`[data-post="${next.post.key}"]`);
     // With none left, the button to see those dismissed, or the search field.
-    (target ?? empty?.querySelector("button") ?? searchInput)?.focus();
+    (target ?? empty?.querySelector("button") ?? searchInput)?.focus({ preventScroll: true });
   }
 
   /** The row ↑, ↓, Home or End go to from row `index` (-1 for none) of `count`; null for another key. */

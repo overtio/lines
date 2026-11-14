@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import type { Request, Route } from "playwright";
-import { markKey, readMarks, writeMarks } from "../../src/lib/feeds/marks";
+import { markKey, readShard, shardOf, writeShard } from "../../src/lib/feeds/marks";
 import { type App, choose, engine, mod, noErrors, openApp, toggle } from "./app";
 import { answerPictures, ico, png } from "./files";
 
@@ -924,6 +924,63 @@ describe("dismissing posts, to keep a feed at zero", () => {
     await sidebar.getByRole("button", { name: "Made, 1 unread" }).waitFor();
   });
 
+  test("a row dismissed with the mouse goes without moving the list, the open post staying open; focus goes to the row after it", async () => {
+    app = await openApp();
+    await madeSubscription(app, 40);
+    const page = app.page;
+    const rows = page.locator(".note-list [data-post]");
+    await rows.first().click();
+    await page.getByRole("textbox", { name: "Post: Post 0" }).waitFor();
+    const list = page.locator(".note-list .items");
+    await list.evaluate((element) => (element.scrollTop = element.scrollHeight));
+    const row = rows.filter({ hasText: "Post 37" });
+    await row.hover();
+    const scrolled = await list.evaluate((element) => element.scrollTop);
+    await row.locator("xpath=..").getByRole("button", { name: "Dismiss", exact: true }).click();
+    await rows.filter({ hasText: "Post 37" }).waitFor({ state: "detached" });
+    expect(Math.abs((await list.evaluate((element) => element.scrollTop)) - scrolled)).toBeLessThan(120);
+    await page.getByRole("textbox", { name: "Post: Post 0" }).waitFor();
+    // Where the browser focuses a button clicked (Chromium), focus goes on to the row after.
+    if (engine() === "chromium") await page.waitForFunction(() => document.activeElement?.closest("[data-post]")?.textContent?.includes("Post 38"));
+  });
+
+  test("a post clicked takes the list's keys, however the browser focuses; E and N over the open post too", async () => {
+    app = await openApp();
+    await madeSubscription(app, 4);
+    const page = app.page;
+    await page.locator(".note-list [data-post]").first().click();
+    await page.getByRole("textbox", { name: "Post: Post 0" }).waitFor();
+    await page.keyboard.press("e");
+    await page.getByRole("textbox", { name: "Post: Post 1" }).waitFor();
+    await page.keyboard.press("ArrowDown");
+    await page.getByRole("textbox", { name: "Post: Post 2" }).waitFor();
+    // Clicked in the open post's text, N dismisses it.
+    await page.locator(".editor-pane .cm-content").click();
+    await page.keyboard.press("n");
+    await page.getByRole("textbox", { name: "Post: Post 3" }).waitFor();
+    expect(await listed(app)).toEqual(["Post 1", "Post 3"]);
+  });
+
+  test("⌘Z in a note's editor undoes the note's typing, not posts dismissed a moment before", async () => {
+    app = await openApp();
+    const page = app.page;
+    await page.evaluate(() => window.testing.notes.insert({ id: "plan", body: "# Plan", createdAt: 0, updatedAt: 0, pinned: false, trashed: false }));
+    await madeSubscription(app, 3);
+    await page.locator(".note-list [data-post]").first().click();
+    await page.keyboard.press("e");
+    expect(await listed(app)).toEqual(["Post 1", "Post 2"]);
+    await page.evaluate(() => window.testing.notes.select("plan"));
+    await page.locator(".editor-pane .cm-content").click();
+    await page.keyboard.press(`${mod()}+z`);
+    await page.waitForTimeout(200);
+    expect(await page.evaluate(() => window.testing.feeds.posts("https://made.example/feed.xml").find(({ post }) => post.title === "Post 0")?.post.dismissed)).toBe("done");
+    // Back in the posts, ⌘Z brings it back.
+    await openFeeds(app, "https://made.example/feed.xml");
+    await page.locator(".note-list [data-post]").first().click();
+    await page.keyboard.press(`${mod()}+z`);
+    await page.waitForFunction(() => document.querySelectorAll(".note-list [data-post]").length === 3);
+  });
+
   test("over the open post, Not Interesting and Dismiss go on to the next; the last one gone, the list is all caught up", async () => {
     app = await openApp();
     await madeSubscription(app, 2);
@@ -1018,28 +1075,28 @@ describe("dismissing posts, to keep a feed at zero", () => {
     expect(await listed(app)).toEqual(["Post 1", "Post 2", "Post 3"]);
   });
 
-  test("what's done with posts goes to other devices and comes from them, mark by mark (feeds.json), and is kept", async () => {
+  test("what's done with posts goes to other devices and comes from them, mark by mark, a file for each feed (feeds/), and is kept", async () => {
     app = await openApp();
     const url = "https://made.example/feed.xml";
     await madeSubscription(app, 4, url);
     const page = app.page;
     const ids = await page.evaluate((url) => window.testing.feeds.posts(url).map(({ post }) => post.id), url);
     const key = (i: number) => markKey(ids[i]);
+    const file = async () => readShard((await page.evaluate((name) => window.testing.feeds.marksFolder.files().get(name), shardOf(url))) ?? "")[url];
     await page.locator(".note-list [data-post]").first().click();
     await page.locator(".editor-pane").getByRole("button", { name: "Not Interesting" }).click();
-    const here = readMarks(await page.evaluate(() => window.testing.feeds.marksFile.text()));
-    expect(Object.keys(here)).toEqual([url]);
-    expect(Object.keys(here[url]).sort()).toEqual([key(0), key(1)].sort());
-    expect(Object.keys(here[url][key(0)]).sort()).toEqual(["read", "uninteresting"]);
+    const here = await file();
+    expect(Object.keys(here.posts).sort()).toEqual([key(0), key(1)].sort());
+    expect(Object.keys(here.posts[key(0)]).sort()).toEqual(["listed", "read", "uninteresting"]);
 
     // Another device dismissed Post 2 since, put Post 0 back later still, and read a post this one hasn't fetched yet.
     const later = Date.now() + 60_000;
-    const there = { [url]: { [key(0)]: { restored: later }, [key(2)]: { done: later }, [markKey(`${url}#9`)]: { read: later } } };
-    await page.evaluate((text) => window.testing.feeds.marksFile.merge(text), writeMarks(there));
+    const there = { [url]: { posts: { [key(0)]: { restored: later }, [key(2)]: { done: later }, [markKey(`${url}#9`)]: { read: later } } } };
+    await page.evaluate(([name, text]) => window.testing.feeds.marksFolder.merge(name, text), [shardOf(url), writeShard(there)] as const);
     expect(await listed(app)).toEqual(["Post 0", "Post 1", "Post 3"]);
-    const merged = readMarks(await page.evaluate(() => window.testing.feeds.marksFile.text()));
-    expect(merged[url][key(0)]).toMatchObject({ uninteresting: here[url][key(0)].uninteresting, restored: later });
-    expect(merged[url][markKey(`${url}#9`)]).toEqual({ read: later });
+    const merged = await file();
+    expect(merged.posts[key(0)]).toMatchObject({ uninteresting: here.posts[key(0)].uninteresting, restored: later });
+    expect(merged.posts[markKey(`${url}#9`)]).toEqual({ read: later });
 
     // Fetched here later, that one is read, as the other device left it.
     const more = await madeFeed(app, url, 10);
@@ -1048,6 +1105,29 @@ describe("dismissing posts, to keep a feed at zero", () => {
     // Kept on the device, there after a restart.
     await page.reload();
     await page.waitForFunction(() => window.testing?.feeds.loaded);
-    expect(readMarks(await page.evaluate(() => window.testing.feeds.marksFile.text()))[url][key(2)]).toEqual({ done: later });
+    expect((await file()).posts[key(2)]).toMatchObject({ done: later });
+  });
+
+  test("Dismiss All is a watermark for what was published before it, so a device new to the feed has its old posts dismissed too", async () => {
+    app = await openApp();
+    const url = "https://made.example/feed.xml";
+    await madeSubscription(app, 4, url);
+    const page = app.page;
+    await page.evaluate((url) => window.testing.feeds.dismissAll([url]), url);
+    const marks = readShard((await page.evaluate((name) => window.testing.feeds.marksFolder.files().get(name), shardOf(url)))!)[url];
+    // The posts, all published days ago, aren't marked one by one.
+    expect(marks.posts).toEqual({});
+    expect(marks.cleared!.before).toBeLessThan(Date.now() - 2 * 86_400_000);
+    // As a device new to the feed would have them, fetched again from nothing.
+    const feed = await madeFeed(app, url, 4);
+    await page.evaluate(
+      async ({ url, feed }) => {
+        const { feeds } = window.testing;
+        feeds.records.get(url)!.posts.length = 0;
+        await feeds.take(url, feed, {});
+      },
+      { url, feed },
+    );
+    expect(await page.evaluate((url) => window.testing.feeds.posts(url).every(({ post }) => post.dismissed === "done"), url)).toBe(true);
   });
 });

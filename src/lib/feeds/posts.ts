@@ -20,6 +20,8 @@ export interface KeptPost extends Omit<Post, "html"> {
   dismissed?: Dismissal;
   /** When it was first seen here: its place among posts with no date. */
   seen: number;
+  /** When a fetch last had it in the feed (`FeedRecord.fetchedAt` while it's still there). */
+  listed?: number;
 }
 
 /** What's kept of a feed: what it said of itself last time, its posts, and how its fetching went. */
@@ -33,6 +35,8 @@ export interface FeedRecord extends Omit<Feed, "posts"> {
   lastModified?: string;
   /** When it was last fetched, or tried. */
   checked?: number;
+  /** When it was last fetched and read, its posts as they were then (`KeptPost.listed`). */
+  fetchedAt?: number;
   /** Why the last try failed, if it did. */
   error?: string;
   /** How many tries in a row have failed. */
@@ -70,7 +74,7 @@ export function merge(kept: readonly KeptPost[], fetched: readonly Post[], now: 
     const version = fingerprint(html);
     if (was?.version !== version) changed.push({ key, html });
     // Posts with no date keep the feed's order: its first is the newest.
-    return { ...post, key, version, read: was?.read ?? false, ...(was?.dismissed && { dismissed: was.dismissed }), seen: was?.seen ?? now - i };
+    return { ...post, key, version, read: was?.read ?? false, ...(was?.dismissed && { dismissed: was.dismissed }), seen: was?.seen ?? now - i, listed: now };
   });
   posts.push(...kept.filter((post) => !listed.has(post.id)));
   posts.sort(newestFirst);

@@ -343,7 +343,7 @@ src/
       shelves.svelte.ts      The Library's rows in the sidebar; rows.ts, what a note's row on its shelf shows
     feeds/
       feeds.svelte.ts        Feeds subscribed to (notes with `feed:`), fetching them in turn, their posts, read, unread and dismissed, saving one to the Library
-      marks.ts               What was done with posts, synced as `feeds.json` and merged mark by mark
+      marks.ts               What was done with posts, synced as a file for each feed and merged mark by mark
       parse.ts  markdown.ts  Reading RSS, Atom, RSS 1.0 (mended where they're broken) and JSON Feed; a post's HTML as Markdown, by walking it
       html.ts  text.ts       Reading HTML from the web where nothing in it runs; a comment's HTML as text lines draws itself
       thread.svelte.ts       A post's discussion as the reader shows it (components/Discussion.svelte): folding, and the keys from comment to comment

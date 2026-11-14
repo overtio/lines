@@ -18,6 +18,8 @@ export interface Remote {
   putFile(key: string, data: Blob): Promise<void>;
   /** Where a file is stored, for a remote that doesn't use the key as is (an encrypted one). */
   fileKey?(key: string): Promise<string>;
+  /** A drive's own copy of the file at `key`, stored as `stored`, for a remote that doesn't use keys as they are. */
+  getCopy?(stored: string, key: string): Promise<{ text: string; etag: string | null } | null>;
 }
 
 export interface RemoteObject {

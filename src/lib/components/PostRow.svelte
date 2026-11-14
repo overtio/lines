@@ -120,7 +120,11 @@
       tabindex={tabbable ? 0 : -1}
       aria-current={selected}
       aria-describedby={post.excerpt ? `excerpt-${post.key}` : undefined}
-      onclick={() => feeds.show(row.feed, post.id)}
+      onclick={(event) => {
+        // WebKit doesn't focus a button clicked, as Chromium does: the list's keys (E, ↓) then act on it.
+        event.currentTarget.focus({ preventScroll: true });
+        feeds.show(row.feed, post.id);
+      }}
       {onkeydown}
       {oncontextmenu}
       {@attach measure}

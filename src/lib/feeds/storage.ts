@@ -3,7 +3,7 @@ import { isSealed, openRecord, sealRecord, vault, type Sealed } from "../lock/va
 import { database, ObjectStore } from "../notes/storage";
 import type { Episode } from "../player/player.svelte";
 import type { BookPlace } from "../plugins/types";
-import type { Mark } from "./marks";
+import type { FeedMarks } from "./marks";
 import type { FeedRecord } from "./posts";
 
 /*
@@ -26,11 +26,11 @@ interface Content {
   html: string;
 }
 
-/** A feed's marks (marks.ts), by its posts' keys. */
+/** A feed's marks (marks.ts). */
 export interface MarksRecord {
   id: string;
   feed: string;
-  marks: Record<string, Mark>;
+  marks: FeedMarks;
 }
 
 /** Where an episode was stopped, by its key (its post's, or its note's id). */

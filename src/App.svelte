@@ -400,7 +400,8 @@
     const target = event.target as HTMLElement;
     if (!(event.metaKey || event.ctrlKey) || event.shiftKey || event.altKey || event.key.toLowerCase() !== "z") return;
     if (target.matches("input, textarea")) return;
-    const undone = undoDismissal() ?? (notes.undoTrash() ? t("list.didRestore") : notes.undoEdit());
+    // In a note's editor, its own undo; posts dismissed come back from where they were (or the notice's Undo).
+    const undone = (forPosts(target) ? undoDismissal() : null) ?? (notes.undoTrash() ? t("list.didRestore") : notes.undoEdit());
     if (!undone) return;
     speak(undone);
     event.preventDefault();
@@ -475,6 +476,24 @@
     target?.focus();
   }
 
+  /**
+   * Whether a key pressed on `target` is for the Feeds' posts: pressed in their list, in the open
+   * post, or with focus on nothing in particular while they're shown (where WebKit leaves it after a click).
+   */
+  const forPosts = (target: HTMLElement) =>
+    notes.filter.kind === "feeds" && !selected && (target === document.body || !!target.closest(".note-list") || (!!post && !!target.closest(".editor-pane")));
+
+  /** E or ⌫, and N, dismiss the open post as they do its row, pressed in it or with focus on nothing in particular. */
+  function dismissKey(event: KeyboardEvent) {
+    const target = event.target as HTMLElement;
+    if (!post || post.post.dismissed || event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return false;
+    if (target.closest(".note-list") || target.matches("input, textarea, select, [contenteditable=true]") || !forPosts(target)) return false;
+    const key = event.key.toLowerCase();
+    const why: Dismissal | null = key === "e" || key === "backspace" || key === "delete" ? "done" : key === "n" ? "uninteresting" : null;
+    if (why) dismissOpen(post, why);
+    return !!why;
+  }
+
   function onKeydown(event: KeyboardEvent) {
     // ⌃⌘L locks lines (Ctrl+Alt+L elsewhere), by key position so other keyboard layouts work too.
     if (event.code === "KeyL" && event.ctrlKey && (isApple ? event.metaKey : event.altKey) && lock.enabled) {
@@ -483,7 +502,7 @@
       return;
     }
     if (modalOpen()) return;
-    if (playerKey(event)) {
+    if (playerKey(event) || dismissKey(event)) {
       event.preventDefault();
       return;
     }

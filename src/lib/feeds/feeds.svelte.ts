@@ -12,12 +12,29 @@ import type { Filter } from "../notes/types";
 import { plugins } from "../plugins/registry.svelte";
 import type { LibraryItem } from "../plugins/types";
 import { prefs } from "../prefs.svelte";
-import type { SharedFile } from "../sync/engine.svelte";
+import type { SharedFolder } from "../sync/engine.svelte";
 import { ui } from "../ui.svelte";
 import { fetchFeed, FetchError, type Validators } from "./fetch";
 import { findFeed, linkOf, NoFeed } from "./find";
 import { FEED_GROUPS, type FeedGroup, groupOf } from "./groups";
-import { applyMarks, type Dismissal, type MarkField, marked, markKey, type Marks, MARKS_FILE, mergeMarks, pruneMarks, readMarks, withoutDismissal, writeMarks } from "./marks";
+import {
+  applyMarks,
+  CLEAR_MARGIN,
+  type Dismissal,
+  type FeedMarks,
+  latestOf,
+  type MarkField,
+  marked,
+  markKey,
+  type Marks,
+  MARKS_DIR,
+  mergeFeed,
+  readShard,
+  shardOf,
+  tidyFeed,
+  withoutDismissal,
+  writeShard,
+} from "./marks";
 import { readOpml, writeOpml } from "./opml";
 import { plainText } from "./markdown";
 import { feedItem } from "./item";
@@ -255,7 +272,7 @@ class Feeds {
     const stored = await feedStorage.marks();
     this.#markIds = new Map(stored.map(({ feed, id }) => [feed, id]));
     this.#marks = Object.fromEntries(stored.map(({ feed, marks }) => [feed, marks]));
-    this.#setMarks(pruneMarks(this.#marks));
+    this.#takeMarks(this.#marks);
     this.loaded = true;
     // Now there's something to sync.
     for (const listener of this.#markListeners) listener();
@@ -373,7 +390,8 @@ class Feeds {
   }
 
   async #take(url: string, feed: Feed, validators: Validators) {
-    const { posts, changed, dropped } = merge(this.records.get(url)?.posts ?? [], feed.posts, Date.now());
+    const fetchedAt = Date.now();
+    const { posts, changed, dropped } = merge(this.records.get(url)?.posts ?? [], feed.posts, fetchedAt);
     await feedStorage.putContents(changed.map(({ key, html }) => ({ id: key, html })));
     // As the posts are now: one opened (or marked) while their content was written stays as it was left.
     const now = this.records.get(url);
@@ -389,12 +407,15 @@ class Feeds {
       url,
       posts: applyMarks(posts.map(asLeft), this.#marks[url]),
       ...validators,
-      checked: Date.now(),
+      checked: fetchedAt,
+      fetchedAt,
       error: undefined,
       failures: 0,
       retryAt: undefined,
       gone: false,
     });
+    // Its marks as the feed is now: those still needed said so, those that aren't let go.
+    if (this.#marks[url]) this.#takeMarks({ [url]: this.#marks[url] });
     await feedStorage.deleteContents(dropped);
   }
 
@@ -411,25 +432,44 @@ class Feeds {
     this.#writes.set(url, write);
   }
 
-  /** `feeds.json`, which sync merges with other devices' (sync/engine.svelte.ts), once what's kept here is read. */
-  readonly marksFile: SharedFile = {
-    name: MARKS_FILE,
+  /**
+   * The feeds' marks, a file for each feed in `feeds/`, which sync merges with other devices' a file
+   * at a time (sync/engine.svelte.ts), once what's kept here is read.
+   */
+  readonly marksFolder: SharedFolder = {
+    dir: MARKS_DIR,
     ready: () => this.loaded,
-    merge: (text) => this.#setMarks(pruneMarks(mergeMarks(this.#marks, readMarks(text)))),
-    text: () => writeMarks(pruneMarks(this.#marks)),
+    names: () => {
+      const named = notes.entries.map(({ meta }) => feedOf(meta.properties)).filter((url): url is string => !!url);
+      return [...new Set([...named, ...this.records.keys(), ...Object.keys(this.#marks)].map(shardOf))];
+    },
+    files: () => {
+      const shards = new Map<string, Marks>();
+      for (const [feed, marks] of Object.entries(this.#marks)) shards.set(shardOf(feed), { ...shards.get(shardOf(feed)), [feed]: marks });
+      return new Map([...shards].map(([name, marks]) => [name, writeShard(marks)]));
+    },
+    merge: (_, text) => this.#takeMarks(readShard(text)),
     onChange: (listener) => void this.#markListeners.add(listener),
   };
 
-  /** Takes these marks in place of those here: each feed's that changed is kept, and applied to its posts. */
-  #setMarks(marks: Marks) {
-    const before = this.#marks;
-    this.#marks = marks;
-    for (const feed of new Set([...Object.keys(before), ...Object.keys(marks)])) {
-      if (before[feed] === marks[feed]) continue;
-      this.#keepMarks(feed);
+  /**
+   * Takes in these feeds' marks: merged with those here, tidied as each feed was last fetched here
+   * (marks.ts' tidyFeed), kept, and applied to its posts.
+   */
+  #takeMarks(there: Marks) {
+    for (const [feed, theirs] of Object.entries(there)) {
+      const mine = this.#marks[feed];
       const record = this.records.get(feed);
+      let marks = mergeFeed(mine, theirs);
+      if (record?.fetchedAt) {
+        const listing = new Set(record.posts.filter((post) => post.listed === record.fetchedAt).map((post) => markKey(post.id)));
+        marks = tidyFeed(marks, listing, record.fetchedAt);
+      }
+      if (marks === mine) continue;
+      this.#marks = { ...this.#marks, [feed]: marks };
+      this.#keepMarks(feed);
       if (!record) continue;
-      const posts = applyMarks(record.posts, marks[feed]);
+      const posts = applyMarks(record.posts, marks);
       if (posts !== record.posts) this.#set(feed, { ...record, posts });
     }
   }
@@ -452,15 +492,17 @@ class Feeds {
     this.#markWrites.set(feed, write);
   }
 
-  /** Changes these posts of a feed, and marks them so (`fields`) for other devices. */
-  #change(feed: string, ids: string[], change: (post: KeptPost) => KeptPost, fields: MarkField[]) {
+  /** Changes these posts of a feed, and marks them so (`fields`) for other devices, but those `unmarked` (a Dismiss All's watermark marks them). */
+  #change(feed: string, ids: string[], change: (post: KeptPost) => KeptPost, fields: MarkField[], unmarked?: Set<string>) {
     const record = this.records.get(feed);
     if (!record || !ids.length) return;
     const changing = new Set(ids);
     this.#set(feed, { ...record, posts: record.posts.map((post) => (changing.has(post.id) ? change(post) : post)) });
-    const own = { ...this.#marks[feed] };
-    for (const id of ids) own[markKey(id)] = marked(own[markKey(id)], fields);
-    this.#marks = { ...this.#marks, [feed]: own };
+    const own = this.#marks[feed] ?? { posts: {} };
+    const floor = latestOf(own);
+    const posts = { ...own.posts };
+    for (const id of ids) if (!unmarked?.has(id)) posts[markKey(id)] = marked(posts[markKey(id)], fields, floor);
+    this.#marks = { ...this.#marks, [feed]: { ...own, posts } };
     this.#keepMarks(feed);
     for (const listener of this.#markListeners) listener();
   }
@@ -485,13 +527,13 @@ class Feeds {
    * them back. Dismissing the open post opens the next one listed (or, at the end, the one before),
    * as a mail app goes on to the next message. How many were dismissed.
    */
-  dismiss(rows: Row[], why: Dismissal = "done"): number {
+  dismiss(rows: Row[], why: Dismissal = "done", unmarked?: Set<string>): number {
     const going = rows.filter(({ post }) => !post.dismissed);
     if (!going.length) return 0;
     const open = this.open;
     const opened = !!open && going.some(({ feed, post }) => feed === open.feed && post.id === open.id);
     const next = opened ? this.#nextBut(new Set(going.map(({ post }) => post.key))) : undefined;
-    this.#dismiss(going, why);
+    this.#dismiss(going, why, unmarked);
     if (next) this.show(next.feed, next.post.id);
     else if (opened) this.open = null;
     return going.length;
@@ -507,16 +549,27 @@ class Feeds {
     return listed.slice(at + 1).find(staying) ?? listed.slice(0, at).reverse().find(staying);
   }
 
-  #dismiss(rows: Row[], why: Dismissal) {
+  #dismiss(rows: Row[], why: Dismissal, unmarked?: Set<string>) {
     const open = this.open;
     this.#dismissals.push(rows.map(({ feed, post }) => ({ feed, id: post.id, read: post.read, open: open?.feed === feed && open.id === post.id })));
-    for (const [feed, ids] of byFeed(idsOf(rows))) this.#change(feed, ids, (post) => ({ ...post, read: true, dismissed: why }), [why]);
+    for (const [feed, ids] of byFeed(idsOf(rows))) this.#change(feed, ids, (post) => ({ ...post, read: true, dismissed: why }), [why], unmarked);
   }
 
-  /** Every post of these feeds still in their lists, dismissed: how many. */
+  /**
+   * Every post of these feeds still in their lists, dismissed: how many. Those published more than
+   * a little while before are dismissed by a watermark (marks.ts), rather than marked one by one,
+   * so clearing a backlog leaves little to sync.
+   */
   dismissAll(urls: Iterable<string>): number {
     const rows = [...urls].flatMap((feed) => (this.records.get(feed)?.posts ?? []).filter((post) => !isOut(post)).map((post) => ({ feed, post })));
-    return this.dismiss(rows);
+    if (!rows.length) return 0;
+    const now = Date.now();
+    const before = now - CLEAR_MARGIN;
+    for (const feed of new Set(rows.map(({ feed }) => feed))) {
+      const own: FeedMarks = this.#marks[feed] ?? { posts: {} };
+      this.#marks = { ...this.#marks, [feed]: { ...own, cleared: { before, at: Math.max(now, latestOf(own) + 1) } } };
+    }
+    return this.dismiss(rows, "done", new Set(rows.filter(({ post }) => post.date !== undefined && post.date < before).map(({ post }) => post.id)));
   }
 
   /** Puts dismissed posts back in their lists, unread, to be read: dismissing read them. */
