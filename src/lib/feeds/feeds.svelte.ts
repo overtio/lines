@@ -2,10 +2,9 @@ import { untrack } from "svelte";
 import { SvelteMap } from "svelte/reactivity";
 import { speak } from "../a11y";
 import { t } from "../i18n/index.svelte";
-import { type Cover, coverFor, libraryNote } from "../library/note";
+import { coverOfItem, libraryNote } from "../library/note";
 import { clock, coverOf, known, withCover } from "../library/text";
-import { isPublic } from "../library/web";
-import { attachmentNameOf, putAttachment } from "../notes/attachments";
+import { putAttachment } from "../notes/attachments";
 import { dayOf } from "../notes/calendar";
 import { propertyOf } from "../notes/properties";
 import { isClosed, notes } from "../notes/store.svelte";
@@ -15,7 +14,6 @@ import { prefs } from "../prefs.svelte";
 import { fetchFeed, FetchError, type Validators } from "./fetch";
 import { findFeed, linkOf, NoFeed } from "./find";
 import { FEED_GROUPS, type FeedGroup, groupOf } from "./groups";
-import { siteIcon } from "./icon";
 import { readOpml, writeOpml } from "./opml";
 import { plainText } from "./markdown";
 import { feedItem } from "./item";
@@ -49,8 +47,6 @@ export const FEED_SOURCE = "feeds";
 
 /** How many feeds are fetched at once (never two from one site). */
 const AT_ONCE = 3;
-/** How long before a feed whose notes have no picture, and that had none to give, is asked again. */
-const ART_AGAIN = 30 * DAY;
 /** A subscription made by hand is fetched once its `feed:` has been left alone this long. */
 const SETTLE = 2000;
 
@@ -264,13 +260,11 @@ class Feeds {
       const response = await fetchFeed(url, record ?? {});
       if (!response.changed) {
         this.#update(url, { checked: Date.now(), error: undefined, failures: 0, retryAt: undefined, gone: false });
-        void this.#art(url);
         return null;
       }
       if (!isFeed(response.text)) throw new NotAFeed(url);
       const feed = readFeed(response.text, response.url);
       await this.take(url, feed, response.validators);
-      void this.#art(url);
       return feed;
     } catch (error) {
       console.warn(`lines: couldn't fetch the feed ${url}`, error);
@@ -316,7 +310,6 @@ class Feeds {
       failures: 0,
       retryAt: undefined,
       gone: false,
-      artTried: now?.artTried,
     });
     await feedStorage.deleteContents(dropped);
   }
@@ -445,34 +438,32 @@ class Feeds {
     if (this.#subscribed.has(found.url)) return found.url;
     await this.take(found.url, found.feed, found.validators);
     await this.#write(feedItem(found.url, found.feed), signal);
-    void this.#art(found.url);
     return found.url;
   }
 
   /**
-   * Gives the notes subscribing to a feed a picture where they have none, as a podcast's has its
-   * artwork: the feed's own (one that couldn't be had when the note was made), else its site's icon
-   * (icon.ts), kept with them as their cover. Asked at a fetch, once: where none can be had, not
-   * again for a month.
+   * Gives the notes subscribing to a feed its picture where they have none, when asked (a feed's
+   * menu): its artwork, or a site's feed with none its site's icon, as a new subscription's note is
+   * made with. Never by itself, so a picture taken out of a note stays out. Whether there was one
+   * to give.
    */
-  async #art(url: string) {
+  async givePicture(url: string): Promise<boolean> {
     const record = this.records.get(url);
-    const bare = notes.entries.filter(({ note, meta }) => !note.trashed && !note.locked && feedOf(meta.properties) === url && !coverOf(note.body));
-    if (!record || !bare.length || (record.artTried && Date.now() - record.artTried < ART_AGAIN)) return;
-    this.#update(url, { artTried: Date.now() });
+    const cover = record && (await coverOfItem(feedItem(url, record)));
+    if (!cover) return false;
     try {
-      const signal = new AbortController().signal;
-      const icon = async (): Promise<Cover | undefined> => {
-        const found = await siteIcon(record.link && isPublic(record.link) ? record.link : new URL(url).origin, signal);
-        return found && { picture: found.picture, name: await attachmentNameOf(found.picture), width: found.side };
-      };
-      const cover = (record.image && (await coverFor(record.image, bare[0].meta.type ?? "feed", signal))) || (await icon());
-      if (!cover) return;
       await putAttachment(cover.name, cover.picture);
-      for (const { note, meta } of bare) notes.setText(note.id, (body) => (coverOf(body) ? body : withCover(body, meta.title, cover)), { keepDate: true });
     } catch (error) {
-      console.warn(`lines: couldn't keep a picture for the feed ${url}`, error);
+      console.warn("lines: couldn't keep a feed's picture", error);
+      return false;
     }
+    for (const id of this.notesOf(url)) {
+      // As the note is now: not one locked or trashed meanwhile (a closed locked note's text isn't there to add to), nor one given a picture.
+      const entry = notes.get(id);
+      if (!entry || entry.note.locked || entry.note.trashed) continue;
+      notes.setText(id, (body) => (coverOf(body) ? body : withCover(body, entry.meta.title, cover)), { keepDate: true });
+    }
+    return true;
   }
 
   /**

@@ -240,7 +240,8 @@ const FEEDS = { "https://svelte.dev/blog/rss.xml": "blog.rss", "https://daringfi
 
 /**
  * Sites' icons for feeds that give no picture of their own: Hacker News' Y (named by its page here,
- * as Playwright answers no request for a favicon.ico), and a blog's icon for phones.
+ * as Playwright answers no request for a favicon.ico), a blog's icon for phones, and a blog's black
+ * mark on nothing, which a dark theme puts on a tile.
  */
 const SITE_ICONS = {
   "https://news.ycombinator.com/": ['<html><head><link rel="icon" href="y18.ico"></head></html>', "text/html"],
@@ -250,8 +251,15 @@ const SITE_ICONS = {
   ],
   "https://daringfireball.net/": ['<html><head><link rel="apple-touch-icon" href="/touch-icon"></head></html>', "text/html"],
   "https://daringfireball.net/touch-icon": [png(180, 180, (x, y) => (Math.hypot(x - 90, y - 90) < 52 ? [236, 239, 244] : [74, 85, 104])), "image/png"],
+  "https://plain.example/": ['<html><head><link rel="icon" href="/mark.png" sizes="32x32"></head></html>', "text/html"],
+  "https://plain.example/mark.png": [png(32, 32, (x, y) => (Math.hypot(x - 15.5, y - 15.5) < 14 && Math.hypot(x - 15.5, y - 15.5) > 8 ? [24, 23, 23, 255] : [0, 0, 0, 0])), "image/png"],
 };
-const ICON_FEEDS = { "https://news.ycombinator.com/rss": "hn.rss", "https://daringfireball.net/feeds/main": "blog.atom", "https://feeds.megaphone.fm/FSI1483080183": "podcast.rss" };
+const ICON_FEEDS = {
+  "https://news.ycombinator.com/rss": "hn.rss",
+  "https://plain.example/feed.xml": "plain.rss",
+  "https://daringfireball.net/feeds/main": "blog.atom",
+  "https://feeds.megaphone.fm/FSI1483080183": "podcast.rss",
+};
 
 /** lines' own look, and three styles with their themes: a scene taken in each, `-neon` after its id. */
 const LOOKS = [
@@ -818,12 +826,12 @@ const SCENES = [
   ...LOOKS.filter(([suffix]) => suffix !== "-classic").map(([suffix, prefs]) => ({
     id: `feeds-icons${suffix}`,
     title: `Feeds' pictures: a site's icon, as a podcast's artwork${inLook(suffix)}`,
-    look: "Under RSS Feeds, Hacker News with its orange Y; under Atom Feeds, Daring Fireball with its site's icon; under Podcast Feeds, the podcast's artwork: each the same small rounded square beside its title, lined up with the rows' icons, crisp, the Y not blurred or stretched.",
+    look: "Under RSS Feeds, Hacker News with its orange Y and Plain Notes with its black ring (in a dark theme on a light rounded tile, so it doesn't vanish; in a light one as it is); under Atom Feeds, Daring Fireball with its site's icon; under Podcast Feeds, the podcast's artwork: each the same small rounded square beside its title, lined up with the rows' icons, crisp, the Y not blurred or stretched.",
     prefs,
     act: async (page) => {
       await subscribe(page, ICON_FEEDS, SITE_ICONS);
-      await page.waitForFunction(() => window.testing.notes.entries.filter((entry) => entry.note.body.includes("](../attachments/")).length === 3);
-      await page.getByRole("navigation", { name: "Library" }).locator("li li img").nth(2).waitFor();
+      await page.waitForFunction(() => window.testing.notes.entries.filter((entry) => entry.note.body.includes("](../attachments/")).length === 4);
+      await page.getByRole("navigation", { name: "Library" }).locator("li li img").nth(3).waitFor();
     },
   })),
   {

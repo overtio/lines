@@ -4,7 +4,7 @@ import { feeds } from "../lib/feeds/feeds.svelte";
 import { NoFeed } from "../lib/feeds/find";
 import { htmlToMarkdown, saysMore } from "../lib/feeds/markdown";
 import { readOpml } from "../lib/feeds/opml";
-import { siteIcon } from "../lib/feeds/icon";
+import { siteIcon } from "../lib/library/icon";
 import { iconPicture } from "../lib/pictures";
 import { isFeed, NotAFeed, readFeed } from "../lib/feeds/parse";
 import { htmlToText } from "../lib/feeds/text";

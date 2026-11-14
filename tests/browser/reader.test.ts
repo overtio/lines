@@ -296,7 +296,7 @@ test("Settings → Library → Feeds in the sidebar: Together is one Feeds row o
   await app.closeSettings();
 });
 
-test("a feed with no picture of its own gets its site's icon, the largest its page names, kept as its note's cover; one with none keeps the glyph; none is asked again", async () => {
+test("a feed with no picture of its own is made with its site's icon as its note's cover, each site asked once; a podcast's is its artwork or none; a cover taken out stays out", async () => {
   app = await openApp();
   const page = app.page;
   const asked: string[] = [];
@@ -306,16 +306,21 @@ test("a feed with no picture of its own gets its site's icon, the largest its pa
   };
   // Daring Fireball's page names a tab's icon and a phone's: the larger is kept. Hacker News' names its Y. A quiet blog's
   // names none, and its favicon.ico can't be had: Playwright doesn't let a test answer for one (it aborts every request for it).
+  // A podcast's artwork can't be had either (nothing answers for it but the tests' empty catch-all), nor is its site asked.
   await page.route("https://daringfireball.net/", answer('<html><head><link rel="icon" href="/favicon-16.png" sizes="16x16"><link rel="apple-touch-icon" href="/apple-touch-icon.png"></head></html>', "text/html"));
   await page.route("https://daringfireball.net/apple-touch-icon.png", answer(png(180, 180, () => [74, 85, 104]), "image/png"));
   await page.route("https://daringfireball.net/favicon-16.png", answer(png(16, 16, () => [74, 85, 104]), "image/png"));
   await page.route("https://news.ycombinator.com/", answer('<html><head><link rel="icon" href="y18.ico"></head></html>', "text/html"));
   await page.route("https://news.ycombinator.com/y18.ico", answer(ico(png(18, 18, (x, y) => (x > 4 && x < 13 && y > 4 && y < 13 ? [255, 255, 255] : [255, 102, 0])), 18), "image/x-icon"));
   await page.route("https://quiet.example/", answer("<html><head><title>Quiet</title></head></html>", "text/html"));
+  await page.route((url) => url.hostname === "syntax.fm", answer("", "text/html"));
+  const PODCAST = "https://feeds.megaphone.fm/FSI1483080183";
   const feeds: Record<string, string> = {
     "https://daringfireball.net/feeds/main": fixture("blog.atom"),
     "https://news.ycombinator.com/rss": fixture("hn.rss"),
+    "https://news.ycombinator.com/newest": fixture("hn.rss"),
     "https://quiet.example/feed.xml": '<rss version="2.0"><channel><title>Quiet</title><link>https://quiet.example/</link><item><title>Hello</title><guid>1</guid></item></channel></rss>',
+    [PODCAST]: fixture("podcast.rss"),
   };
   for (const [url, body] of Object.entries(feeds)) await page.route(url, (route) => route.fulfill({ body, contentType: "application/rss+xml", headers: { "access-control-allow-origin": "*" } }));
 
@@ -332,43 +337,114 @@ test("a feed with no picture of its own gets its site's icon, the largest its pa
 
   asked.length = 0;
   for (const url of Object.keys(feeds)) await page.evaluate((url) => window.testing.feeds.subscribe(url), url);
-  await page.waitForFunction(() => [...window.testing.feeds.records.values()].filter((record) => record.artTried).length === 3);
   const sidebar = page.getByRole("navigation", { name: "Library" });
+  // The width its cover is shown at in the note of the subscription to `feed`, which has it as it's made.
+  const cover = (feed: string) =>
+    page.evaluate((feed) => {
+      const { feeds, notes } = window.testing;
+      return notes.get(feeds.notesOf(feed)[0])?.note.body.match(/!\[[^\]]*\|(\d+)\]\(\.\.\/attachments\/[0-9a-f]{32}\.png\)/)?.[1];
+    }, feed);
   if (engine() === "chromium") {
-    // Kept with the subscription's note as its cover, at its own size there, and shown in the sidebar.
-    const cover = (title: string) =>
-      page.evaluate((title) => window.testing.notes.entries.find((entry) => entry.meta.title === title)?.note.body.match(/!\[[^\]]*\|(\d+)\]\(\.\.\/attachments\/[0-9a-f]{32}\.png\)/)?.[1], title);
-    await page.waitForFunction(() => window.testing.notes.entries.filter((entry) => entry.note.body.includes("](../attachments/")).length === 2);
-    expect([await cover("Daring Fireball"), await cover("Hacker News"), await cover("Quiet")]).toEqual(["128", "18", undefined]);
+    expect(await Promise.all(Object.keys(feeds).map(cover))).toEqual(["128", "18", "18", undefined, undefined]);
     await sidebar.getByRole("button", { name: /^Daring Fireball/ }).locator("img").waitFor();
-    await sidebar.getByRole("button", { name: /^Hacker News/ }).locator("img").waitFor();
+    await sidebar.getByRole("button", { name: /^Hacker News/ }).first().locator("img").waitFor();
   }
   expect(await sidebar.getByRole("button", { name: /^Quiet/ }).locator("img").count()).toBe(0);
-  // Its page, then its icon: two requests to a site at most.
+  expect(await sidebar.getByRole("button", { name: /^Syntax/ }).locator("img").count()).toBe(0);
+  // Its page, then its icon: two requests to a site at most, Hacker News' once for both its feeds, and none to the podcast's.
   const sites = (urls: string[]) => urls.filter((url) => !(url in feeds));
   expect(sites(asked).length).toBeLessThanOrEqual(5);
+  expect(asked.filter((url) => url.endsWith("/y18.ico"))).toHaveLength(1);
+  expect(asked.filter((url) => url.includes("syntax.fm"))).toEqual([]);
 
-  // Fetched again, none is asked for its icon again: those with one have it, the one without waits a month.
+  // Its picture taken out of a subscription's note isn't put back as the feeds are fetched again; nor is any site asked again.
+  const HN = "https://news.ycombinator.com/rss";
+  await page.evaluate((feed) => {
+    const { feeds, notes } = window.testing;
+    notes.setText(feeds.notesOf(feed)[0], (body) => body.replace(/!\[[^\]]*\]\(\.\.\/attachments\/[0-9a-f]{32}\.png\)\n*/, ""));
+  }, HN);
   asked.length = 0;
   await page.evaluate(() => window.testing.feeds.refresh());
   await page.waitForFunction(() => !window.testing.feeds.fetching.size);
   await page.waitForTimeout(300);
   expect(sites(asked)).toEqual([]);
+  expect(await cover(HN)).toBeUndefined();
 });
 
-test("a site's icon file (.ico) or drawing (.svg) is kept as a PNG at its own size, a drawing at 128 pixels", async () => {
+test("Get Its Picture, in a subscription's menu, gives one without a picture its site's icon; a note locked meanwhile is left as it was", async () => {
+  app = await openApp();
+  const page = app.page;
+  const FEED = "https://plain.example/feed.xml";
+  const cors = { "access-control-allow-origin": "*" };
+  // Its site names no icon as it's subscribed to (and its favicon.ico can't be had), then a black ring on nothing, whose answer waits.
+  let named = false;
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => (release = resolve));
+  const ring = png(32, 32, (x, y) => (Math.abs(Math.hypot(x - 15.5, y - 15.5) - 11) < 3 ? [24, 23, 23, 255] : [0, 0, 0, 0]));
+  await page.route("https://plain.example/", (route) =>
+    route.fulfill({ body: named ? '<html><head><link rel="icon" href="/mark.png"></head></html>' : "<html></html>", contentType: "text/html", headers: cors }),
+  );
+  await page.route("https://plain.example/mark.png", async (route) => {
+    await held;
+    await route.fulfill({ body: ring, contentType: "image/png", headers: cors });
+  });
+  await page.route(FEED, (route) => route.fulfill({ body: fixture("plain.rss"), contentType: "application/rss+xml", headers: cors }));
+  await page.evaluate((url) => window.testing.feeds.subscribe(url), FEED);
+  const id = await page.evaluate((url) => window.testing.feeds.notesOf(url)[0], FEED);
+  const body = () => page.evaluate((id) => window.testing.notes.get(id)?.note.body, id);
+  const before = await body();
+  expect(before).not.toContain("](../attachments/");
+
+  const row = page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Plain Notes/ });
+  const getPicture = page.getByRole("menuitem", { name: "Get Its Picture" });
+  named = true;
+  const asking = page.waitForRequest("https://plain.example/mark.png");
+  await row.click({ button: "right" });
+  await getPicture.click();
+  await asking;
+  await page.evaluate(async (id) => {
+    const { noteKeys, notes } = window.testing;
+    noteKeys.save({ key: (await noteKeys.create("a password")).key, touchId: false });
+    notes.lock(id);
+  }, id);
+  await page.waitForFunction((id) => window.testing.notes.get(id)?.note.locked, id);
+  release();
+  await page.waitForResponse("https://plain.example/mark.png");
+  await page.waitForTimeout(500);
+  expect(await body()).toBe(before);
+
+  // WebKit's test browser can't keep a picture (an attachment): what follows is Chromium's.
+  if (engine() !== "chromium") return;
+  await page.evaluate((id) => window.testing.notes.removeLock(id), id);
+  await row.click({ button: "right" });
+  await getPicture.click();
+  await page.waitForFunction((id) => window.testing.notes.get(id)?.note.body.includes("](../attachments/"), id);
+  // Its icon you can see through, black all over, is marked so: on a tile in a dark theme.
+  await expect(row.locator("img").getAttribute("data-tone")).resolves.toBe("dark");
+  await row.click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Open Its Note" }).waitFor();
+  expect(await getPicture.count()).toBe(0);
+  await page.keyboard.press("Escape");
+});
+
+test("a site's icon file (.ico) or drawing (.svg, whatever it's said to be) is kept as a PNG at its own size, a drawing at 128 pixels; one too big to draw isn't", async () => {
   app = await openApp();
   const drawn = await app.page.evaluate(
-    async ({ icon, svg }) => {
+    async (files) => {
       const { iconPicture } = window.testing.reading;
-      const fromIco = await iconPicture(new Blob([new Uint8Array(icon)], { type: "image/x-icon" }), 128);
-      const fromSvg = await iconPicture(new Blob([svg], { type: "image/svg+xml" }), 128);
-      const nothing = await iconPicture(new Blob(["not a picture"], { type: "image/png" }), 128);
-      return [fromIco && [fromIco.side, fromIco.picture.type], fromSvg && [fromSvg.side, fromSvg.picture.type], nothing ?? null];
+      const bytes = (file: number[] | string) => (typeof file === "string" ? new TextEncoder().encode(file) : new Uint8Array(file));
+      const found = await Promise.all(files.map((file) => iconPicture(bytes(file), 128)));
+      return found.map((icon) => (icon ? [icon.side, icon.picture.type] : null));
     },
-    { icon: [...ico(png(32, 32, () => [255, 102, 0]), 32)], svg: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="#f60"/></svg>' },
+    [
+      [...ico(png(32, 32, () => [255, 102, 0]), 32)],
+      '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="#f60"/></svg>',
+      '<?xml version="1.0" encoding="UTF-8"?>\n<!-- A mark -->\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#f60"/></svg>',
+      [...png(9000, 1, () => [0, 0, 0])],
+      "not a picture",
+    ],
   );
-  expect(drawn).toEqual([[32, "image/png"], [128, "image/png"], null]);
+  expect(drawn).toEqual([[32, "image/png"], [128, "image/png"], [128, "image/png"], null, null]);
 });
 
 test("Save to Library keeps a post as an article, made as the Library makes notes, and then opens it", async () => {

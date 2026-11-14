@@ -12,6 +12,10 @@ export default {
   "feeds.didReadAll": "Marked all as read",
   "feeds.openNote": "Open Its Note",
   "feeds.copyFeedLink": "Copy Feed Link",
+  // A feed's menu, for one whose note has no picture: its artwork, or its site's icon; and what's said after.
+  "feeds.getPicture": "Get Its Picture",
+  "feeds.gotPicture": "{title} has its picture.",
+  "feeds.noPicture": "There’s no picture for {title}.",
   "feeds.unsubscribe": "Unsubscribe",
   "feeds.unsubscribed": "Unsubscribed from {title}. Its note is in the Trash.",
   "feeds.refresh": "Refresh Feeds",

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Plain Notes</title>
+    <link>https://plain.example/</link>
+    <description>A blog with no picture of its own, whose site's icon is black on nothing.</description>
+    <item>
+      <title>Writing every day</title>
+      <link>https://plain.example/every-day</link>
+      <guid>https://plain.example/every-day</guid>
+      <pubDate>Tue, 10 Nov 2026 09:00:00 GMT</pubDate>
+      <description>A page a day, kept short.</description>
+    </item>
+    <item>
+      <title>On plain text</title>
+      <link>https://plain.example/plain-text</link>
+      <guid>https://plain.example/plain-text</guid>
+      <pubDate>Mon, 02 Nov 2026 09:00:00 GMT</pubDate>
+      <description>Why notes outlast the apps they're written in.</description>
+    </item>
+  </channel>
+</rss>
