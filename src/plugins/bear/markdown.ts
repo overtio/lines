@@ -93,7 +93,7 @@ function linked(links: Links, name: string, written: string, parts: { bang?: str
 export function translate(text: string, links: Links, name: string): string {
   const read = readMarkdown(text);
   const edits: Edit[] = [];
-  const taken: Span[] = [...read.kept];
+  const taken: Span[] = [...read.kept, ...read.urls];
   for (const link of read.links) {
     const shown = SHOWN.exec(text.slice(link.to));
     const span = { from: link.from, to: link.to + (shown?.[0].length ?? 0) };

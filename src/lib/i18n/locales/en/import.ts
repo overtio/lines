@@ -48,6 +48,18 @@ export default {
   "import.bear.note": "In Bear, choose File → Backup Notes…, then choose the .bear2bk file it saves here: it keeps which notes are pinned, archived or in the trash, and when each was made and changed. Or export notes with File → Export Notes… as Markdown or TextBundle, with Export attachments on, into a folder, and choose that folder. Tags, links, pictures and files come across either way.",
   "import.bear.chooseBackup": "Choose Backup…",
   "import.bear.chooseFolder": "Choose Export Folder…",
+  "import.report.blockProperties": "{count, plural, one {# property of a block, kept as text, as lines’ properties are a note’s: {examples}} other {# properties of blocks, kept as text, as lines’ properties are a note’s: {examples}}}",
+  "import.report.taskStates": "{count, plural, one {# task in a state lines has no box for, the state kept as a word: {examples}} other {# tasks in a state lines has no box for, the state kept as a word: {examples}}}",
+  "import.report.taskDates": "{count, plural, one {# scheduled or deadline date, kept as text: {examples}} other {# scheduled and deadline dates, kept as text: {examples}}}",
+  "import.report.priorities": "{count, plural, one {# task’s priority, kept as text: {examples}} other {# tasks’ priorities, kept as text: {examples}}}",
+  "import.report.refs": "{count, plural, one {# reference to a block, now the block’s text, as lines doesn’t link to a block: {examples}} other {# references to blocks, now the blocks’ text, as lines doesn’t link to a block: {examples}}}",
+  "import.report.macros": "{count, plural, one {# query or macro, kept as text: {examples}} other {# queries and macros, kept as text: {examples}}}",
+  "import.report.org": "{count, plural, one {# page written in Org mode, left out, as lines reads Markdown: {examples}} other {# pages written in Org mode, left out, as lines reads Markdown: {examples}}}",
+  "import.report.empty": "{count, plural, one {# empty page, left out: {examples}} other {# empty pages, left out (Logseq makes some itself): {examples}}}",
+  // Logseq's group of Settings → Export and Import.
+  "import.logseq.title": "From Logseq",
+  "import.logseq.note": "A graph is a folder of Markdown files, so there’s nothing to export: choose the graph’s folder (the one with pages, journals and assets in it). Logseq shows where it is in its left sidebar’s graph menu → All graphs. Pages, journals (on the Calendar), namespaces, properties, tasks, references and assets all come across.",
+  "import.logseq.choose": "Choose Graph Folder…",
   // Obsidian's group of Settings → Export and Import.
   "import.obsidian.title": "From Obsidian",
   "import.obsidian.note": "A vault is a folder of Markdown files, so there’s nothing to export: choose the vault’s folder. To find it, open Obsidian’s vault switcher (the vault’s name, at the bottom of the sidebar) → Manage Vaults, or right-click a note → Reveal in Finder. Notes, folders, links, pictures and files, callouts, bookmarks (pinned) and daily notes (on the Calendar) all come across.",

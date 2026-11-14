@@ -153,11 +153,11 @@ function comments(vault: Vault, name: string, text: string, kept: Span[], blocks
 
 /** The note's text but its properties, in Linedown. */
 function body(text: string, vault: Vault, name: string) {
-  const { kept, blocks, links, languages } = readMarkdown(text);
+  const { kept, urls, blocks, links, languages } = readMarkdown(text);
   for (const language of languages) if (/^dataview(?:js)?$/i.test(language)) vault.report.add("import.report.dataview", name);
   const notes = comments(vault, name, text, kept, blocks);
   // What's text: not code, math, HTML, a comment, or a Markdown link (each changed as a whole).
-  const prose = between([...kept, ...notes.spans, ...links], 0, text.length);
+  const prose = between([...kept, ...urls, ...notes.spans, ...links], 0, text.length);
   const edits = [...notes.edits, ...wikiEdits(vault, name, text, prose)];
   for (const link of links) {
     if (within(link, notes.spans) || isElsewhere(link.address)) continue;

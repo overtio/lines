@@ -151,6 +151,7 @@ export default {
     "Trae a la Biblioteca tus subrayados de Readwise y lo que guardaste en Reader, desde Ajustes → Biblioteca. Usa un token de acceso de Readwise, que solo se envía a Readwise y no se guarda.",
   "plugins.obsidian.description": "Para pasarte desde Obsidian: las notas de una bóveda, con sus carpetas, enlaces, imágenes y archivos, desde Ajustes → Exportar e importar.",
   "plugins.bear.description": "Para pasarte desde Bear: sus notas, con sus etiquetas, enlaces, imágenes y archivos, fijadas y fechas, desde su copia de seguridad o lo que exporta, en Ajustes → Exportar e importar.",
+  "plugins.logseq.description": "Para pasarte desde Logseq: las páginas y diarios de un grafo, con sus esquemas, propiedades, tareas, referencias y recursos, desde Ajustes → Exportar e importar.",
   "plugins.pdfReader": "Lector de PDF",
   "plugins.pdfReader.description": "Lee los PDF guardados con libros y artículos de la Biblioteca, en el lugar de la nota: páginas en los colores del tema, índice, búsqueda y citas guardadas en la nota. Usa pdf.js de Mozilla.",
   "plugins.epubReader": "Lector de EPUB",

@@ -4,7 +4,7 @@ Notes from another notes app come into lines from **Settings → Export and Impo
 
 ## How an import goes
 
-1. **Choose** what the app exported: a folder (an Obsidian vault, Bear's Markdown), or a file (Bear's backup, a ZIP). Nothing is written yet, and nothing in it is run: its notes are read as text.
+1. **Choose** what the app exported: a folder (an Obsidian vault, a Logseq graph, Bear's Markdown), or a file (Bear's backup, a ZIP). Nothing is written yet, and nothing in it is run: its notes are read as text.
 2. **What it would do** comes first: how many notes, attachments and folders, and on lines of their own, what won't come across as it was, each kind with how many and a few examples (`^37066d (Plan)`): what's kept as text because lines has nothing like it, and what's left out. Notes imported from it before are left out too, and said so, with which ([below](#importing-again)).
 3. **Import** (focused, so Enter imports) copies the pictures and files the notes show into lines' attachments, then makes the notes a few hundred at a time, with a bar showing how far it's got; Stop stops either, keeping what's made (stopped while copying, no note is made, and it says so). Ten thousand notes take a few seconds. Closing Settings doesn't stop it, and opening it again shows how it's going, or how it went.
 4. **What it did**, with what didn't come across said again, and **Undo Import**, which moves every note it made to the Trash (but one you've changed since, which is yours now). Nothing an import made is ever deleted outright: empty the Trash for that. Choosing something else to import keeps the last import's Undo, under what the next would do; an import with nothing to bring can't be started, so it never takes that Undo's place.
@@ -95,3 +95,37 @@ A mention finds a note by its title ([linedown.md](linedown.md#mentions)), and r
 **Kept as they are, and said so:** links Bear shows as previews (`<!-- {"preview":"true"} -->`) are links, and links to pictures or files that aren't in the backup are kept as written.
 
 Bear's older markup (Bear 1's "Polar Bear" `::highlight::`, `*bold*`, `/italic/`) isn't translated: Bear 2 writes Markdown. The code is in `src/plugins/bear/`: `backup.ts` reads the backup or export, `markdown.ts` its notes.
+
+## Logseq
+
+**What to choose:** a graph is a folder of Markdown files, so there's nothing to export: choose the graph's folder (the one with `pages`, `journals` and `assets` in it) with **Choose Graph Folder…**. Logseq shows where it is in its left sidebar's graph menu → **All graphs**.
+
+**What comes across:**
+
+| In Logseq | In lines |
+| --- | --- |
+| A page, `pages/Plan.md` | A note titled Plan (or as its `title::` says) |
+| A namespace's page, `Projects/Acme` (`Projects___Acme.md`, or `Projects%2FAcme.md` as older versions wrote it) | A note titled `Projects/Acme`, as links name it, tagged `#projects` |
+| A day's journal, `journals/2026_11_14.md` | A note titled as Logseq titles it ("Nov 14th, 2026", or as `:journal/page-title-format` says), with `date: 2026-11-14`, so it's on the Calendar, tagged `#journals` |
+| Page properties, `type:: book` | Properties, `type: book`; `tags::` become `#tags` in the text, `title::` is the title |
+| The outline | A list, nested as it was: an outline stays one. A page that's clearly prose (below) is paragraphs |
+| `- # Heading` blocks | Headings, what's under them after them |
+| `TODO`, `LATER`; `DONE` | `- [ ]`; `- [x]` |
+| `DOING`, `NOW`, `WAITING` | `- [ ] DOING …`: open, the state kept as a word (said so) |
+| `CANCELED` | `- [x] ~~…~~` (said so) |
+| `[[Page]]`, `[text]([[Page]])`, `#[[two words]]` | `[[Page]]`, `[[Page\|text]]`, `#two-words` (said so) |
+| `((block reference))`, `{{embed ((…))}}` | The block's text, and a link to its page if it's another's (said so): lines doesn't link to a block |
+| `{{embed [[Page]]}}` | `[[Page]]` (said so) |
+| `{{video …}}`, `{{youtube …}}`, `{{tweet …}}` | The link |
+| `^^highlight^^` | `==highlight==` |
+| `![photo](../assets/photo.png){:width 320}` | Kept in lines, at its width |
+| Favorites (`:favorites` in config.edn) | Pinned |
+
+**Prose or a list:** Logseq writes every line as a block, so a page of paragraphs reads as a list of them. A run of blocks at a page's top (between headings) becomes paragraphs only when it's clearly prose: each block a sentence or more (40 characters or longer, ending as a sentence does), with nothing under it, no task, no properties lines would keep; or a page of one such block alone. Anything else, a block with blocks under it, a short item, a task, stays the list it was, so nothing that was an outline is flattened.
+
+**Kept as text, and said so:** a block's own properties (`owner:: Ada`, as lines' properties are a note's; but its `id::`, which references used, and `collapsed::`, which is Logseq's), task priorities (`[#A]`), `SCHEDULED:` and `DEADLINE:` dates, and queries and other macros (`{{query …}}`).
+
+**Left out, and said so:** empty pages (Logseq makes some itself, as Contents, and a journal for each day opened), pages written in Org mode, and files no page shows (an unused asset, a drawing, a whiteboard). Logseq's own folder (`logseq/`: its settings, backups and versions) isn't read but for config.edn.
+
+The code is in `src/plugins/logseq/`: `graph.ts` reads the graph, `outline.ts` its pages' outlines, `dates.ts` its journals' names.
+

@@ -99,7 +99,7 @@ Put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block), or, with Sp
 - **Share** a note through the system share sheet, copy it as Markdown or plain text, or download it as a file.
 - **Export everything** as files in a .zip, each in its note's format (Markdown, LaTeX, CSV, .http or .hurl), with images and files (Settings → Export and Import).
 - **Import** Markdown, LaTeX, CSV, Excel, `.http` and `.hurl` files as notes (Settings → Export and Import).
-- **Move from Obsidian or Bear.** Choose your Obsidian vault's folder, or Bear's backup, in Settings → Export and Import, and its notes come over with their tags (and folders, as tags), links, pictures and files, pins and dates; Obsidian's callouts and daily notes (on the Calendar) too, and Bear's archive and trash. What won't come across as it was is said first, with examples; importing again adds only what's new, and Undo takes it all back to the Trash. See [docs/importing.md](docs/importing.md).
+- **Move from Obsidian, Bear or Logseq.** Choose your Obsidian vault's folder, Bear's backup or your Logseq graph in Settings → Export and Import, and its notes come over with their tags (and folders, as tags), links, pictures and files, pins and dates; Obsidian's callouts and daily notes and Logseq's journals (on the Calendar), Logseq's outlines as lists (and prose as paragraphs), and Bear's archive and trash. What won't come across as it was is said first, with examples; importing again adds only what's new, and Undo takes it all back to the Trash. See [docs/importing.md](docs/importing.md).
 - **Sample notes.** Add the feature tour, LaTeX examples or the QA notes from Settings → Export and Import.
 
 ### Sync and privacy
@@ -172,7 +172,7 @@ Also on the website: [overtio.github.io/lines/docs](https://overtio.github.io/li
 | [API requests](docs/requests.md) | Sending requests from notes, in the `.http` and Hurl formats |
 | [Secrets](docs/secrets.md) | API keys and passwords kept in a locked note, and used by name |
 | [Library](docs/library.md) | Books, movies, music and the rest as notes, filled in from a link, and where lines looks them up |
-| [Importing](docs/importing.md) | Bringing notes in from other apps (Obsidian, Bear): what to export, what comes across and what doesn't |
+| [Importing](docs/importing.md) | Bringing notes in from other apps (Obsidian, Bear, Logseq): what to export, what comes across and what doesn't |
 | [Plugins](docs/plugins.md) | How lines is made of plugins, turning them off, and writing one |
 | [Sync](docs/sync.md) | How sync and encryption work |
 | [Storage](docs/storage.md) | Where the web app keeps your notes, and for how long |
@@ -319,6 +319,7 @@ src/
     readwise/                Moving from Readwise: its API (api.ts), what it has as library notes (sources.ts), their highlights (write.ts), what importing writes (plan.ts)
     obsidian/                Moving from Obsidian: a vault read (vault.ts), its notes in Linedown (markdown.ts)
     bear/                    Moving from Bear: its backup or export read (backup.ts), its notes in Linedown (markdown.ts)
+    logseq/                  Moving from Logseq: a graph read (graph.ts), its pages' outlines as lists or prose (outline.ts), its journals' days (dates.ts)
     code/                    Code notes, a format for each language CodeMirror knows, shown as one (Code) with a choice of language
     changes/                 Marks the lines changed since a note was opened (a line diff, diff.ts)
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
@@ -540,7 +541,8 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] Renaming a note updates the mentions of it
 - [x] Import from Obsidian: notes, folders as tags, links, pictures and files, callouts, pins and daily notes
 - [x] Import from Bear: its backup or export, tags, links, pictures and files, pins, archive and trash
-- [ ] Import from Logseq, Notion and Evernote, as from Obsidian and Bear
+- [x] Import from Logseq: pages, journals, outlines, properties, tasks, references and assets
+- [ ] Import from Notion and Evernote, as from Obsidian, Bear and Logseq
 - [ ] Drawings in LaTeX notes (`\includegraphics` of a drawing, as a PDF for TeX)
 - [ ] Converting a note between Markdown and LaTeX
 - [ ] More of TeX Live for TeX's PDFs (packages beyond the basic ones, fetched as a note needs them)

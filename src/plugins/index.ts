@@ -17,6 +17,7 @@ import { ironcalc } from "./ironcalc";
 import { katex } from "./katex";
 import { latex } from "./latex";
 import { library } from "./library";
+import { logseq } from "./logseq";
 import { lucide } from "./lucide";
 import { markdown } from "./markdown";
 import { mermaid } from "./mermaid";
@@ -91,6 +92,7 @@ export const builtIn = (): Plugin[] => [
   // Bringing notes in from another app.
   obsidian(),
   bear(),
+  logseq(),
   // Books kept with library notes, read in the note's place.
   pdfReader(),
   epubReader(),
