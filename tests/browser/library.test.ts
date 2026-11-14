@@ -203,7 +203,7 @@ test("notes that are just a link aren't looked up as they open or as they're wri
   const settings = await app.settings("Library");
   // On the web, only the sources that work there are named, each once: not Web Pages, nor Feeds' own for a site's page, which reads it.
   await expect(settings.getByText("In the browser, only", { exact: false }).innerText()).resolves.toBe(
-    "In the browser, only YouTube, Open Library, Wikidata, MusicBrainz, SoundCloud, Apple Podcasts, and Feeds can be asked: other sites don’t let web pages read them. The lines app reads any page.",
+    "In the browser, only YouTube, Open Library, Wikidata, MusicBrainz, AniList, MyAnimeList, SoundCloud, Apple Podcasts, and Feeds can be asked: other sites don’t let web pages read them. The lines app reads any page.",
   );
   await toggle(settings, "Look up links", false);
   await app.closeSettings();
