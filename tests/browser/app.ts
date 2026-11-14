@@ -1,5 +1,8 @@
 import { expect } from "bun:test";
-import type { Locator, Page } from "playwright";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { type Locator, type Page, webkit } from "playwright";
 
 /*
  * The app in a page of its own, for a browser test: fresh storage, Settings as given, and what the
@@ -16,6 +19,11 @@ export interface Options {
   height?: number;
   /** The page's time zone (`America/New_York`), if not this machine's. */
   timezone?: string;
+  /**
+   * Its storage kept on disk, as a browser's own is: Playwright's WebKit keeps no files (Blobs) in
+   * IndexedDB otherwise, so the app can't keep an attachment there. Slower to start.
+   */
+  onDisk?: boolean;
 }
 
 export interface App {
@@ -49,8 +57,10 @@ export const clickMod = (page: App["page"]) => page.evaluate(() => (/Mac|iPhone|
 /** What a browser says in the console on its own, not about lines: WebKit on Linux doesn't know a viewport key the page sets. */
 const NOISE = [/^Viewport argument key ".+" not recognized and ignored\.$/];
 
-export async function openApp({ prefs = {}, tour = false, scheme = "light", width = 1280, height = 820, timezone }: Options = {}): Promise<App> {
-  const context = await globalThis.lines.browser.newContext({ viewport: { width, height }, colorScheme: scheme, deviceScaleFactor: 1, timezoneId: timezone });
+export async function openApp({ prefs = {}, tour = false, scheme = "light", width = 1280, height = 820, timezone, onDisk = false }: Options = {}): Promise<App> {
+  const settings = { viewport: { width, height }, colorScheme: scheme, deviceScaleFactor: 1, timezoneId: timezone };
+  const dir = onDisk && engine() === "webkit" ? mkdtempSync(join(tmpdir(), "lines-test-")) : null;
+  const context = dir ? await webkit.launchPersistentContext(dir, settings) : await globalThis.lines.browser.newContext(settings);
   if (engine() === "chromium") await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   // Once, so a reload keeps what the test changed.
   await context.addInitScript(
@@ -86,7 +96,10 @@ export async function openApp({ prefs = {}, tour = false, scheme = "light", widt
     text: () => page.evaluate(() => window.testing.text()),
     style: (selector, property) => page.locator(selector).first().evaluate((element, property) => getComputedStyle(element).getPropertyValue(property), property),
     root: (name) => page.evaluate((name) => document.documentElement.getAttribute(`data-${name}`), name),
-    close: () => context.close(),
+    async close() {
+      await context.close();
+      if (dir) rmSync(dir, { recursive: true, force: true });
+    },
   };
 }
 

@@ -34,6 +34,7 @@ const IMAGES: Record<string, string> = {
 const TYPES: Record<string, string> = {
   ...Object.fromEntries(Object.entries(IMAGES).map(([type, ext]) => [ext, type])),
   pdf: "application/pdf",
+  epub: "application/epub+zip",
   txt: "text/plain",
   md: "text/markdown",
   csv: "text/csv",
@@ -129,9 +130,9 @@ export async function saveAttachment(file: Blob): Promise<string> {
   return name;
 }
 
-/** The name a file is saved as (saveAttachment), from its content: to write a note's link to it before it's saved. */
-export async function attachmentNameOf(file: Blob): Promise<string> {
-  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", await file.arrayBuffer()));
+/** The name a file is saved as (saveAttachment), from its content (its `bytes`, if they're read already): to write a note's link to it before it's saved. */
+export async function attachmentNameOf(file: Blob, bytes?: Uint8Array<ArrayBuffer>): Promise<string> {
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes ?? (await file.arrayBuffer())));
   const hex = Array.from(digest.slice(0, 16), (byte) => byte.toString(16).padStart(2, "0")).join("");
   return `${hex}.${extension(file)}`;
 }

@@ -12,6 +12,7 @@ The next note, @[Frankenstein], is one, as a link to it becomes. It's in the sid
 - **A link in any note**: right-click it → **Add to Library**, and it becomes a mention of its own library note.
 - **Your highlights from Readwise**: Settings → Library → **Readwise** brings your books, articles and podcasts over, each with its highlights as quotes, and what you saved in Reader.
 - **Your bookmarks**, from any browser: Settings → Library → **Import Bookmarks…** makes each a resource, with its folders, the day you saved it and its tags. Right-click one → **Look Up Details** when you want it filled in.
+- **Books you keep.** A book's PDF or EPUB can be kept with its note and read in its place, as @[The Yellow Wallpaper] is: drop the file on lines, or **Add a Book from a File…** under the **+**.
 - **Where you've got to.** Every book starts *to read*. Right-click it on its shelf to mark it Reading or Read; movies are to watch, music to listen to.
 - **One undo puts the link back**, if it isn't what you wanted. Changed while it's looked up, the note is left as you wrote it.
 - **Mention it** anywhere: @[Frankenstein] was written by @[Frankenstein].author in @[Frankenstein].year. And `@type.book` on a line of its own is your reading list:

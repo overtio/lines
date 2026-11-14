@@ -64,6 +64,41 @@ function dayFromToday(days) {
  * songs and an album with square covers, and a video; and a person, under Types. The covers are drawn
  * here, a gradient and a title, and kept as attachments.
  */
+/**
+ * The tests' books (tests/browser/books/), Pride and Prejudice as a PDF and The Yellow Wallpaper as
+ * an EPUB, dropped on lines as files; then `title`'s opened, and read in its place. Only Chromium
+ * keeps them: Playwright's WebKit keeps no files in IndexedDB but on disk.
+ */
+const BOOKS = [
+  { name: "Pride and Prejudice.pdf", type: "application/pdf", data: readFileSync(`${root}tests/browser/books/pride-and-prejudice.pdf`).toString("base64") },
+  { name: "The Yellow Wallpaper.epub", type: "application/epub+zip", data: readFileSync(`${root}tests/browser/books/the-yellow-wallpaper.epub`).toString("base64") },
+];
+async function readBook(page, title) {
+  await page.evaluate((books) => {
+    const transfer = new DataTransfer();
+    for (const { name, type, data } of books) transfer.items.add(new File([Uint8Array.from(atob(data), (char) => char.charCodeAt(0))], name, { type }));
+    document.body.dispatchEvent(new DragEvent("drop", { dataTransfer: transfer, bubbles: true, cancelable: true }));
+  }, BOOKS);
+  await page.waitForFunction(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "book").length === 2);
+  await page.evaluate((title) => window.testing.notes.select(window.testing.notes.entries.find((entry) => entry.meta.title === title).note.id), title);
+  await page.getByRole("button", { name: "Read the Book" }).click();
+  if (title === "The Yellow Wallpaper") {
+    await page.getByRole("button", { name: "Contents" }).click();
+    await page.getByRole("menuitem", { name: "The Yellow Wallpaper" }).click();
+    await page.frameLocator("iframe.epub-reader").getByRole("heading", { level: 1 }).waitFor();
+  } else {
+    await page.locator(".pdf-page canvas").first().waitFor();
+  }
+}
+
+/** Chooses the first sentence of the book read, as one about to keep as a quote does. */
+const chooseSentence = (page) =>
+  page.evaluate(() => {
+    const doc = document.querySelector("iframe.epub-reader")?.contentDocument;
+    if (doc) return doc.getSelection().selectAllChildren([...doc.querySelectorAll("p")].find((p) => p.textContent.includes("ancestral halls")));
+    getSelection().selectAllChildren([...document.querySelectorAll(".pdf-page[data-page='1'] .textLayer span")].find((span) => span.textContent.includes("It is a truth")));
+  });
+
 const seedLibrary = (page) =>
   page.evaluate(async () => {
     const { notes, saveAttachment } = window.testing;
@@ -900,6 +935,95 @@ const SCENES = [
     act: searchLibrary,
     schemes: style === "lines" ? ["light", "dark"] : ["light"],
   })),
+  ...["lines", "classic", "pixel", "neon"].map((style) => ({
+    id: `book-epub-${style}`,
+    title: `An EPUB read in its note's place, in ${style[0].toUpperCase()}${style.slice(1)}`,
+    look: "The Yellow Wallpaper's story in a column as wide as a note's, in the theme's colors and the notes' font (the style's own in Pixel and Neon), its italics and centered title kept; a sentence chosen in the selection's color. Above it, lined up: Contents, the search field, Pages and Scroll, Keep Quote (on now). Under it the chapter's name, a thin line of how far through and its percent, between the turn buttons. Nothing cut off, no second page peeking in at the side.",
+    prefs: style === "lines" ? {} : { style, theme: style },
+    act: async (page) => {
+      await readBook(page, "The Yellow Wallpaper");
+      await chooseSentence(page);
+    },
+    schemes: style === "lines" ? ["light", "dark"] : ["light"],
+  })),
+  {
+    id: "book-pdf",
+    title: "A PDF read in its note's place, as printed",
+    look: "Pride and Prejudice's first page whole, as printed (black on white, in the dark theme too), centered with room around it and no next page showing under it; its first line chosen over the text. Page 1 of 6 under it.",
+    act: async (page) => {
+      await readBook(page, "Pride and Prejudice");
+      await chooseSentence(page);
+    },
+  },
+  {
+    id: "book-pdf-theme-colors",
+    title: "A PDF in the theme's colors",
+    look: "The paintbrush on: the page's paper the theme's background and its type the theme's text, the brush in the accent; the page's edge still a quiet line.",
+    prefs: { bookThemeColors: true },
+    act: (page) => readBook(page, "Pride and Prejudice"),
+    schemes: ["dark"],
+  },
+  {
+    id: "book-pdf-scrolled",
+    title: "A PDF scrolled",
+    look: "Scroll chosen: the pages one under another, as wide as the column allows (no wider than reads well), with room between them.",
+    prefs: { bookFlow: "scrolled" },
+    act: async (page) => {
+      await readBook(page, "Pride and Prejudice");
+      await page.locator(".pdf-reader").evaluate((reader) => reader.scrollBy(0, 500));
+    },
+  },
+  {
+    id: "book-contents",
+    title: "A book's contents",
+    look: "Under Contents, the book's table of contents in a menu no longer than the window, each entry on its own lines if it's long, entries within others indented.",
+    act: async (page) => {
+      await readBook(page, "The Yellow Wallpaper");
+      await page.getByRole("button", { name: "Contents" }).click();
+    },
+  },
+  {
+    id: "book-search",
+    title: "Searching a book",
+    look: "Under the search field, the matches under the chapter each is in (its name small and quiet), each match the words around it, wrapping to three lines at most; the list no longer than the window, scrolling inside.",
+    act: async (page) => {
+      await readBook(page, "The Yellow Wallpaper");
+      const field = page.getByRole("searchbox", { name: "Search the book" });
+      await field.fill("paper");
+      await field.press("Enter");
+      await page.getByRole("menu").waitFor();
+    },
+  },
+  {
+    id: "book-quote",
+    title: "A quote kept, and how far through on the shelf",
+    look: "Back in the note: `progress` and `status: reading` among its properties, the quote at its end with — Page 1 under it as a link. In the list, the book's row with Reading and a thin line of how far through in the accent, under its date.",
+    act: async (page) => {
+      await readBook(page, "Pride and Prejudice");
+      await chooseSentence(page);
+      await page.getByRole("button", { name: "Keep Quote" }).click();
+      await page.keyboard.press("ArrowRight");
+      await page.keyboard.press("ArrowRight");
+      await page.getByRole("button", { name: "Back to the Note" }).click();
+      await page.evaluate(() => window.testing.place());
+    },
+  },
+  {
+    id: "phone-book-epub",
+    title: "Phone: an EPUB",
+    look: "The toolbar on one row: Contents, the field (Search, not cut), Pages and Scroll as icons, the quote button as an icon; the text in a column the phone's width, with margins.",
+    act: (page) => readBook(page, "The Yellow Wallpaper"),
+    width: 390,
+    height: 780,
+  },
+  {
+    id: "phone-book-pdf",
+    title: "Phone: a PDF, a page at a time",
+    look: "One page fitting the phone's width, centered, and nothing of the next page under it; the toolbar on one row.",
+    act: (page) => readBook(page, "Pride and Prejudice"),
+    width: 390,
+    height: 780,
+  },
   {
     id: "library-link-menu",
     title: "A link's menu in a note",

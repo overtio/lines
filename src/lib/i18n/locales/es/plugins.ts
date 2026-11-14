@@ -149,6 +149,10 @@ export default {
   "plugins.hackerNews.description": "Muestra los comentarios de una historia de Hacker News bajo su publicación en los Feeds de la Biblioteca, en hilos, para leerlos. El id de la historia va a la API de Hacker News y a la copia de Algolia.",
   "plugins.readwise.description":
     "Trae a la Biblioteca tus subrayados de Readwise y lo que guardaste en Reader, desde Ajustes → Biblioteca. Usa un token de acceso de Readwise, que solo se envía a Readwise y no se guarda.",
+  "plugins.pdfReader": "Lector de PDF",
+  "plugins.pdfReader.description": "Lee los PDF guardados con libros y artículos de la Biblioteca, en el lugar de la nota: páginas en los colores del tema, índice, búsqueda y citas guardadas en la nota. Usa pdf.js de Mozilla.",
+  "plugins.epubReader": "Lector de EPUB",
+  "plugins.epubReader.description": "Lee los libros EPUB guardados con libros de la Biblioteca, en el lugar de la nota, en los colores del tema y tu fuente: páginas o desplazamiento, índice, búsqueda y citas guardadas en la nota. Los scripts de un libro nunca se ejecutan.",
   "plugins.code": "Código",
   "plugins.code.description": "Notas que son archivos de código, en cualquiera de unos 120 lenguajes de programación: números de línea, letra de ancho fijo y resaltado en los colores del tema, con sangría y corchetes como en un editor de código. Se descargan y exportan como archivos de su lenguaje (.py, .ts, .rs…).",
   "plugins.typing": "Mecanografía",

@@ -155,6 +155,13 @@ export const SHORTCUTS: ShortcutGroup[] = [
     ],
   },
   {
+    name: "shortcuts.group.books",
+    shortcuts: [
+      { action: "shortcuts.bookTurn", keys: ["ArrowRight", "ArrowLeft", "PageDown", "PageUp", "Space", "Shift-Space"], note: "shortcuts.inBook" },
+      { action: "shortcuts.bookQuote", keys: ["Mod-Shift-h"], note: "shortcuts.inBook" },
+    ],
+  },
+  {
     name: "shortcuts.group.find",
     shortcuts: [
       { action: "shortcuts.find", keys: ["Mod-f"], note: "shortcuts.inNote" },

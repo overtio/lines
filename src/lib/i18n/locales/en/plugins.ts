@@ -160,6 +160,10 @@ export default {
   "plugins.hackerNews.description": "Shows a Hacker News story’s comments under its post in the Library’s Feeds, threaded, to read. The story’s id goes to Hacker News’ API and to Algolia’s copy of it.",
   "plugins.readwise.description":
     "Brings your highlights from Readwise, and what you saved in Reader, into the Library, from Settings → Library. Uses an access token from Readwise, sent only to Readwise and not kept.",
+  "plugins.pdfReader": "PDF Reader",
+  "plugins.pdfReader.description": "Reads PDFs kept with books and papers in the Library, in the note’s place: pages in the theme’s colors, contents, search, and quotes kept in the note. Uses Mozilla’s pdf.js.",
+  "plugins.epubReader": "EPUB Reader",
+  "plugins.epubReader.description": "Reads EPUB books kept with books in the Library, in the note’s place, in the theme’s colors and your font: pages or scrolling, contents, search, and quotes kept in the note. A book’s scripts never run.",
   "plugins.code": "Code",
   "plugins.code.description": "Notes that are files of code, in any of about 120 programming languages: line numbers, a fixed-width font, and highlighting in the theme's colors, with indenting and brackets as in a code editor. They download and export as their language's files (.py, .ts, .rs…).",
   "plugins.typing": "Typing Practice",

@@ -1,5 +1,6 @@
 import { aesKey, isLockedKey, lockKey, randomBytes, unlockKey, type Bytes, type LockedKey } from "../crypto";
 import { feeds } from "../feeds/feeds.svelte";
+import { reading } from "../books/reading.svelte";
 import { player } from "../player/player.svelte";
 import { rewriteAttachments } from "../notes/attachments";
 import { notes, noteStorage } from "../notes/store.svelte";
@@ -154,10 +155,10 @@ class AppLock {
     this.#save({ ...this.settings, touchId: on });
   }
 
-  /** Locks every window: once what's typed is saved, and where the episode playing is, they start over, locked. */
+  /** Locks every window: once what's typed is saved, and where the episode playing and the book read are, they start over, locked. */
   async lockNow() {
     if (!this.settings) return;
-    await Promise.all([notes.flush(), player.keep()]);
+    await Promise.all([reading.leave(), notes.flush(), player.keep()]);
     if (isDesktopApp) await native("lock_forget");
     await announce({ type: "lock" });
     location.reload();

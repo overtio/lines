@@ -1,9 +1,12 @@
 import type { EditorView } from "@codemirror/view";
 import { speak } from "../a11y";
 import { t } from "../i18n/index.svelte";
+import { placeLink } from "../books/books";
+import { reading } from "../books/reading.svelte";
 import { attachmentName, openAttachment } from "../notes/attachments";
 import { isLocal } from "../notes/localLinks";
 import { coarsePointer, copyText, isApple, openExternal } from "../platform";
+import { plugins } from "../plugins/registry.svelte";
 import { type LinkAction, prefs } from "../prefs.svelte";
 import { tabs } from "../tabs.svelte";
 import { windowLabel } from "../windows/channel";
@@ -61,7 +64,11 @@ export function followClick(event: MouseEvent, view: EditorView): boolean {
 /** Opens a link's address: an attached file in its app, a folder or file on this computer in Finder or its app, anything else in the browser. */
 export function openHref(href: string, text: string, element?: HTMLElement) {
   if (isLocal(href)) return void openLocal(href, element);
-  const name = attachmentName(href);
+  // A place in a book kept with a note (a quote's), in its reader; with none to read it there (its
+  // reader off, its note gone or locked), the file in its app.
+  const place = placeLink(href);
+  if (place && plugins.bookReader(place.name) && reading.openAt(place.name, place.at)) return;
+  const name = place?.name ?? attachmentName(href);
   void (name ? openAttachment(name, text || name) : openExternal(href));
 }
 

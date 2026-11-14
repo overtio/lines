@@ -2,14 +2,15 @@ import { fromUtf8, utf8 } from "../crypto";
 import { isSealed, openRecord, sealRecord, vault, type Sealed } from "../lock/vault";
 import { database, ObjectStore } from "../notes/storage";
 import type { Episode } from "../player/player.svelte";
+import type { BookPlace } from "../plugins/types";
 import type { FeedRecord } from "./posts";
 
 /*
  * Feeds' posts on this device, in a database of their own (`lines-feeds`): a record for each feed
  * (what it said of itself, its posts but their content, which were read), each post's content
  * apart, read when it's opened, and where each episode was stopped, with the one in the player
- * (player/player.svelte.ts). Each
- * is stored under a random id, and with the app lock on, encrypted like notes (lock/vault.ts), so
+ * (player/player.svelte.ts), and where each book was left (books/reading.svelte.ts). Each is
+ * stored under a random id, and with the app lock on, encrypted like notes (lock/vault.ts), so
  * nothing kept says what's subscribed to, read or listened to.
  */
 
@@ -40,10 +41,22 @@ interface InPlayer {
   episode: Episode;
 }
 
+/** Where a book kept with a note was left (books/reading.svelte.ts), by the note's id, kept among the positions. */
+export interface BookPosition {
+  id: string;
+  /** The book's file, its attachment's name: a note with another file starts that one at its start. */
+  book: string;
+  place: BookPlace;
+  /** How far it's been read, 0 to 1: pages turned, not places gone to. */
+  furthest: number;
+}
+
+const isBook = (value: Position | InPlayer | BookPosition): value is BookPosition => "book" in value;
+
 const open = database(FEEDS_DB, 2, [FEEDS, POSTS, POSITIONS]);
 const feedStore = new ObjectStore<FeedRecord | Sealed>(FEEDS, open);
 const postStore = new ObjectStore<Content | Sealed>(POSTS, open);
-const positionStore = new ObjectStore<Position | InPlayer | Sealed>(POSITIONS, open);
+const positionStore = new ObjectStore<Position | InPlayer | BookPosition | Sealed>(POSITIONS, open);
 
 async function seal<T extends { id: string }>(store: string, value: T): Promise<T | Sealed> {
   return vault.sealing ? sealRecord(store, value.id, utf8(JSON.stringify(value))) : value;
@@ -84,13 +97,13 @@ export const feedStorage = {
   },
 
   /** Where each episode was stopped, and the one that was in the player, if one was. */
-  async positions(): Promise<{ positions: Position[]; inPlayer?: Episode }> {
-    const all = await Promise.all((await positionStore.all()).map((value) => unseal<Position | InPlayer>(POSITIONS, value)));
+  async positions(): Promise<{ positions: Position[]; inPlayer?: Episode; books: BookPosition[] }> {
+    const all = await Promise.all((await positionStore.all()).map((value) => unseal<Position | InPlayer | BookPosition>(POSITIONS, value)));
     const inPlayer = all.find((each): each is InPlayer => each.id === IN_PLAYER);
-    return { positions: all.filter((each): each is Position => each !== inPlayer), inPlayer: inPlayer?.episode };
+    return { positions: all.filter((each): each is Position => each !== inPlayer && !isBook(each)), inPlayer: inPlayer?.episode, books: all.filter(isBook) };
   },
 
-  async putPosition(position: Position) {
+  async putPosition(position: Position | BookPosition) {
     await positionStore.put(await seal(POSITIONS, position));
   },
 

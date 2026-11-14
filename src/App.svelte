@@ -10,6 +10,7 @@
   import TagPrompt from "./lib/components/TagPrompt.svelte";
   import SubscribePrompt from "./lib/components/SubscribePrompt.svelte";
   import PostView from "./lib/components/PostView.svelte";
+  import BookReader from "./lib/components/BookReader.svelte";
   import LockedNoteView from "./lib/components/LockedNoteView.svelte";
   import NotesPasswordDialog from "./lib/components/NotesPasswordDialog.svelte";
   import PdfPreview from "./lib/components/PdfPreview.svelte";
@@ -36,6 +37,7 @@
   import { isClosed, notes } from "./lib/notes/store.svelte";
   import { plugins } from "./lib/plugins/registry.svelte";
   import { feeds, savePost } from "./lib/feeds/feeds.svelte";
+  import { reading } from "./lib/books/reading.svelte";
   import { postEpisode } from "./lib/player/episodes";
   import { player } from "./lib/player/player.svelte";
   import { canPrint, copyText, isApple, isNewNoteShortcut, newNoteKey, openExternal } from "./lib/platform";
@@ -153,6 +155,9 @@
   const calendarDay = $derived(!selected && !notes.loadError && notes.ready && notes.filter.kind === "calendar" && !narrow ? notes.filter.day : null);
   /** A locked note that isn't open shows the password prompt instead of its text. */
   const closed = $derived(!!selected && isClosed(selected.note));
+  /** The book the open note keeps, to read in its place; and that book while it's read there. */
+  const book = $derived(selected && !closed && !selected.note.trashed ? reading.bookOf(selected) : null);
+  const readingBook = $derived(book && reading.isReading(selected!.note.id) ? book : null);
   /** The feed's post open in the note's place, in the Feeds, with no note open. */
   const post = $derived.by(() => {
     const f = notes.filter;
@@ -618,6 +623,15 @@
             <Button variant="quiet" icon="restore" onclick={() => restore(selected.note.id)}>{t("app.restore")}</Button>
             <Button variant="danger" onclick={() => deleteForever(selected.note.id)}>{t("app.deleteForever")}</Button>
           {:else}
+            {#if book}
+              <IconButton
+                icon="book-open"
+                iconSize={17}
+                on={!!readingBook}
+                label={readingBook ? t("books.backToNote") : t("books.read")}
+                onclick={() => reading.toggle(selected.note.id)}
+              />
+            {/if}
             {#if canFloat}
               {@const floating = floatingOpen.has(selected.note.id)}
               <IconButton
@@ -704,9 +718,14 @@
 
       {#if selected}
         <!-- The editor stays, out of sight, so other notes keep their undo history and place. -->
-        <div class="min-h-0 flex-1" hidden={closed}>
+        <div class="min-h-0 flex-1" hidden={closed || !!readingBook}>
           <Editor noteId={selected.note.id} trashed={selected.note.trashed || closed} />
         </div>
+        {#if readingBook}
+          {#key `${selected.note.id} ${readingBook.name}`}
+            <BookReader entry={selected} book={readingBook} />
+          {/key}
+        {/if}
         {#if closed}
           {#key selected.note.id}
             <LockedNoteView entry={selected} />

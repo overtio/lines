@@ -2,7 +2,11 @@ import { propertyOf, readMention } from "../notes/properties";
 import type { Note, NoteMeta } from "../notes/types";
 import { plugins } from "../plugins/registry.svelte";
 import type { LibraryKind } from "../plugins/types";
+import { progressOf } from "../books/books";
 import { coverOf } from "./text";
+
+/** Progress worth a line: begun, and not finished. */
+const unfinished = (progress: number | null) => (progress !== null && progress > 0 && progress < 1 ? progress : null);
 
 /** What a library note's row on its shelf shows: its cover, what it's by, and where it's got to. */
 export interface ShelfRow {
@@ -13,6 +17,8 @@ export interface ShelfRow {
   subtitle: string;
   /** Its `status`, shown as its kind names it, or as written if it's one of your own. */
   status?: { value: string; label: string };
+  /** How far through it is, 0 to 1, as its note says (`progress: 37%`), while it isn't finished. */
+  progress: number | null;
 }
 
 const rows = new WeakMap<Note, ShelfRow | null>();
@@ -43,6 +49,7 @@ export function shelfRow({ note, meta }: { note: Note; meta: NoteMeta }): ShelfR
           cover: coverOf(note.body),
           subtitle: subtitleOf(kind, value),
           status: written ? (kind.statuses?.find((status) => status.value === written.toLowerCase()) ?? { value: written, label: written }) : undefined,
+          progress: unfinished(progressOf(value("progress"))),
         }
       : null;
     rows.set(note, row);

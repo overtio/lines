@@ -79,6 +79,7 @@ class Plugins {
   readonly mathEngines = $derived(this.#from("math"));
   readonly renderers = $derived(this.#from("renderers"));
   readonly fileViews = $derived(this.#from("files"));
+  readonly bookReaders = $derived(this.#from("bookReaders"));
   readonly typesetters = $derived(this.#from("typesetters"));
   readonly formulaEngines = $derived(this.#from("formulas"));
   readonly markdown = $derived(this.#from("markdown"));
@@ -247,6 +248,11 @@ class Plugins {
   /** What shows an attached file of this name (`….stl`) in a note, if anything does. */
   fileView(name: string) {
     return this.fileViews.find((view) => view.extensions.includes(extension(name)));
+  }
+
+  /** What reads a book of this name (`….epub`) in a note's place, if anything does. */
+  bookReader(name: string) {
+    return this.bookReaders.find((reader) => reader.extensions.includes(extension(name)));
   }
 
   /** What makes a block from an attached file of this name (a `.csv` file's spreadsheet), if anything does. */

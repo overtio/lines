@@ -11,7 +11,7 @@ const COVER_SIDE = 1200;
 /** The most a cover may weigh as it's downloaded: anything heavier isn't one. */
 const COVER_BYTES = 20_000_000;
 /** How wide a note shows its cover, by its kind's shape: enough to know it by, leaving room for the rest. */
-const COVER_WIDTH = { tall: 240, square: 240, wide: 400 };
+export const COVER_WIDTH = { tall: 240, square: 240, wide: 400 };
 
 /** A library note to write: its text, and its cover to keep once it's written (the text links to it). */
 export interface LibraryNote {
