@@ -385,61 +385,67 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 :::
 
-#### 39. Image in a callout with no icon
+#### 39. Time in an episode in a callout with no icon
+
+:::^ icon=none
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+:::
+
+#### 40. Image in a callout with no icon
 
 :::^ icon=none
 ![A sample picture](attachment:photo.png)
 :::
 
-#### 40. Drawing in a callout with no icon
+#### 41. Drawing in a callout with no icon
 
 :::^ icon=none
 ![A sample drawing](attachment:drawing.svg)
 :::
 
-#### 41. File in a callout with no icon
+#### 42. File in a callout with no icon
 
 :::^ icon=none
 [Budget.csv](attachment:budget.csv)
 :::
 
-#### 42. Folder and file links in a callout with no icon
+#### 43. Folder and file links in a callout with no icon
 
 :::^ icon=none
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 :::
 
-#### 43. Attached 3D model (STL) in a callout with no icon
+#### 44. Attached 3D model (STL) in a callout with no icon
 
 :::^ icon=none
 [Bracket.stl](attachment:bracket.stl)
 :::
 
-#### 44. Terminal recording (.cast file) in a callout with no icon
+#### 45. Terminal recording (.cast file) in a callout with no icon
 
 :::^ icon=none
 [terminal.cast](attachment:terminal.cast)
 :::
 
-#### 45. Audio in a callout with no icon
+#### 46. Audio in a callout with no icon
 
 :::^ icon=none
 [Chime.mp3](attachment:chime.mp3)
 :::
 
-#### 46. Video in a callout with no icon
+#### 47. Video in a callout with no icon
 
 :::^ icon=none
 [Sky.mp4](attachment:sky.mp4)
 :::
 
-#### 47. Missing file in a callout with no icon
+#### 48. Missing file in a callout with no icon
 
 :::^ icon=none
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 :::
 
-#### 48. Card in a callout with no icon
+#### 49. Card in a callout with no icon
 
 :::^ icon=none
 ::: card
@@ -447,7 +453,7 @@ Text in a card.
 :::
 :::
 
-#### 49. Callout (info) in a callout with no icon
+#### 50. Callout (info) in a callout with no icon
 
 :::^ icon=none
 :::i
@@ -455,7 +461,7 @@ Text in an info callout.
 :::
 :::
 
-#### 50. Callout (warning, chosen icon) in a callout with no icon
+#### 51. Callout (warning, chosen icon) in a callout with no icon
 
 :::^ icon=none
 :::! icon=flag
@@ -463,7 +469,7 @@ Text in a warning callout with the flag icon.
 :::
 :::
 
-#### 51. Callout (decision, no icon) in a callout with no icon
+#### 52. Callout (decision, no icon) in a callout with no icon
 
 :::^ icon=none
 :::^ icon=none

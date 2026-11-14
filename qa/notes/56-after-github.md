@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. GitHub links, then Image
+#### 39. GitHub links, then Time in an episode
+
+Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. GitHub links, then Image
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ![A sample picture](attachment:photo.png)
 
-#### 40. GitHub links, then Drawing
+#### 41. GitHub links, then Drawing
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. GitHub links, then File
+#### 42. GitHub links, then File
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Budget.csv](attachment:budget.csv)
 
-#### 42. GitHub links, then Folder and file links
+#### 43. GitHub links, then Folder and file links
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. GitHub links, then Attached 3D model (STL)
+#### 44. GitHub links, then Attached 3D model (STL)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. GitHub links, then Terminal recording (.cast file)
+#### 45. GitHub links, then Terminal recording (.cast file)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. GitHub links, then Audio
+#### 46. GitHub links, then Audio
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. GitHub links, then Video
+#### 47. GitHub links, then Video
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. GitHub links, then Missing file
+#### 48. GitHub links, then Missing file
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. GitHub links, then Card
+#### 49. GitHub links, then Card
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 ::: card
 Text in a card.
 :::
 
-#### 49. GitHub links, then Callout (info)
+#### 50. GitHub links, then Callout (info)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::i
 Text in an info callout.
 :::
 
-#### 50. GitHub links, then Callout (warning, chosen icon)
+#### 51. GitHub links, then Callout (warning, chosen icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. GitHub links, then Callout (decision, no icon)
+#### 52. GitHub links, then Callout (decision, no icon)
 
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
 :::^ icon=none

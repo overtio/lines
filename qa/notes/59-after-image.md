@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 ![A sample picture](attachment:photo.png)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Image, then Image
+#### 39. Image, then Time in an episode
+
+![A sample picture](attachment:photo.png)
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Image, then Image
 
 ![A sample picture](attachment:photo.png)
 ![A sample picture](attachment:photo.png)
 
-#### 40. Image, then Drawing
+#### 41. Image, then Drawing
 
 ![A sample picture](attachment:photo.png)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Image, then File
+#### 42. Image, then File
 
 ![A sample picture](attachment:photo.png)
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Image, then Folder and file links
+#### 43. Image, then Folder and file links
 
 ![A sample picture](attachment:photo.png)
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Image, then Attached 3D model (STL)
+#### 44. Image, then Attached 3D model (STL)
 
 ![A sample picture](attachment:photo.png)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Image, then Terminal recording (.cast file)
+#### 45. Image, then Terminal recording (.cast file)
 
 ![A sample picture](attachment:photo.png)
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Image, then Audio
+#### 46. Image, then Audio
 
 ![A sample picture](attachment:photo.png)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Image, then Video
+#### 47. Image, then Video
 
 ![A sample picture](attachment:photo.png)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Image, then Missing file
+#### 48. Image, then Missing file
 
 ![A sample picture](attachment:photo.png)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Image, then Card
+#### 49. Image, then Card
 
 ![A sample picture](attachment:photo.png)
 ::: card
 Text in a card.
 :::
 
-#### 49. Image, then Callout (info)
+#### 50. Image, then Callout (info)
 
 ![A sample picture](attachment:photo.png)
 :::i
 Text in an info callout.
 :::
 
-#### 50. Image, then Callout (warning, chosen icon)
+#### 51. Image, then Callout (warning, chosen icon)
 
 ![A sample picture](attachment:photo.png)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Image, then Callout (decision, no icon)
+#### 52. Image, then Callout (decision, no icon)
 
 ![A sample picture](attachment:photo.png)
 :::^ icon=none

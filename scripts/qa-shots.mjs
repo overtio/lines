@@ -316,6 +316,21 @@ const BOOKMARKS = `<!DOCTYPE NETSCAPE-Bookmark-file-1>
 </DL><p>
 `;
 
+/** The podcast's latest episode, 16 seconds in, its transcript and chapters (the tests' copies) shown above the player. */
+async function openTranscript(page) {
+  const cors = { "access-control-allow-origin": "*" };
+  const served = { "/1055/transcript.vtt": "transcript.vtt", "/1055/chapters.json": "chapters.json" };
+  await page.route(
+    (url) => url.hostname === "syntax.fm" && url.pathname in served,
+    (route) => route.fulfill({ body: readFileSync(`${root}tests/browser/feeds/${served[new URL(route.request().url()).pathname]}`, "utf8"), headers: cors }),
+  );
+  await playEpisode(page);
+  await page.evaluate(() => window.testing.player.seek(16));
+  const mini = page.getByRole("region", { name: "Podcast player" });
+  await mini.getByRole("button", { name: "Transcript" }).click();
+  await mini.getByRole("list", { name: "Transcript" }).getByRole("button").nth(5).waitFor();
+}
+
 /** What takes each theme's own colors besides its accent: a highlight, callouts and line marks. */
 const THEME_COLORS = `# Colors
 
@@ -864,7 +879,7 @@ const SCENES = [
   ...LOOKS.map(([suffix, prefs]) => ({
     id: `player${suffix}`,
     title: `The podcast player${inLook(suffix)}`,
-    look: "At the bottom of the sidebar, over Set up sync: the episode's artwork, its title and show cut short, the close button lined up with them; the slider across with the time played and left under its ends; back 15, play and forward 30 centered, the speed at the end, all in line. The episode's row says how much is left, its play button clear of the text.",
+    look: "At the bottom of the sidebar, over Set up sync: the episode's artwork, its title and show cut short, the close button lined up with them; the slider across with the time played and left under its ends; Take Notes and the transcript's button at the left, then back 15, play and forward 30 with the same room either side, the speed at the end, all in line. The episode's row says how much is left, its play button clear of the text.",
     prefs,
     act: (page) => playEpisode(page),
   })),
@@ -890,6 +905,91 @@ const SCENES = [
       await page.evaluate(() => window.testing.player.seek(20));
     },
   })),
+  ...["", "pixel"].map((style) => ({
+    id: `listening${style && `-${style}`}`,
+    title: `Notes taken while listening${style && ` in ${style[0].toUpperCase()}${style.slice(1)}`}`,
+    look: "The note's list of times, each a chip in the accent with a small play icon before the time, its text's baseline the item's, the text after it a space away; the last item just started by Take Notes, the cursor after its chip. In the mini player, the pen (Take Notes) at the left, lined up with the speed at the right.",
+    prefs: style ? { style, theme: style } : {},
+    note: "---\ntype: episode\npodcast: @[Syntax]\npublished: 2026-11-11\nduration: 1:00\naudio: https://traffic.megaphone.fm/FSI3647670844.mp3\nstatus: listening\n---\n# 1055: What the hell is going on with GitHub?\n\nScott and Wes sit down with GitHub's Kyle Daigle to ask what the hell is going on with GitHub.\n\n- [0:12] Why it keeps going down: the move to Azure, and how big the monorepo got\n- [4:05] Copilot's agents are most of the traffic now\n- [0:31] ",
+    act: async (page) => {
+      const audio = wav(60_000);
+      await page.route((url) => url.hostname === "traffic.megaphone.fm", (route) => answerFile(route, audio, "audio/wav"));
+      await page.locator(".cm-content").getByRole("button", { name: "Play Episode" }).click();
+      await page.waitForFunction(() => window.testing.player.playing);
+      await page.evaluate(() => {
+        window.testing.player.pause();
+        window.testing.player.seek(31);
+        const view = window.testing.editor();
+        view.focus();
+        view.dispatch({ selection: { anchor: view.state.doc.length } });
+      });
+    },
+  })),
+  {
+    id: "listening-enter",
+    title: "Notes taken while listening, each Enter starting the next at the time it's at",
+    look: "The note's list of times, built with Take Notes and then Enter: each item's chip with the time it was written at (0:12, 0:41, 0:55), the last just started, the cursor after its chip; the chips lined up, the text after them a space away.",
+    note: "---\ntype: episode\npodcast: @[Syntax]\naudio: https://traffic.megaphone.fm/FSI3647670844.mp3\nstatus: listening\n---\n# 1055: What the hell is going on with GitHub?\n\nScott and Wes sit down with GitHub's Kyle Daigle.",
+    act: async (page) => {
+      const audio = wav(60_000);
+      await page.route((url) => url.hostname === "traffic.megaphone.fm", (route) => answerFile(route, audio, "audio/wav"));
+      await page.locator(".cm-content").getByRole("button", { name: "Play Episode" }).click();
+      await page.waitForFunction(() => window.testing.player.playing);
+      await page.evaluate(() => {
+        window.testing.player.pause();
+        window.testing.player.seek(12);
+      });
+      await page.getByRole("region", { name: "Podcast player" }).getByRole("button", { name: "Take Notes" }).click();
+      await page.waitForFunction(() => window.testing.text()?.endsWith("] "));
+      await page.keyboard.type("Why it keeps going down: the move to Azure");
+      await page.evaluate(() => window.testing.player.seek(41));
+      await page.keyboard.press("Enter");
+      await page.keyboard.type("Copilot's agents are most of the traffic now");
+      await page.evaluate(() => window.testing.player.seek(55));
+      await page.keyboard.press("Enter");
+    },
+  },
+  {
+    id: "listening-transcript",
+    title: "An episode's transcript, quoted into a note",
+    look: "Above the mini player, with room under it, the transcript: its chapter's title faint at the top with the quote button at its right; lines with their time and speaker small and faint over the text, chapters as small bold headings between them, the line playing on a soft background, those played muted; no taller than about a third of the window, the Library still in sight above it; nothing cut off at the sidebar's edges. In the player's row, Take Notes and the transcript's button (on) at the left, the controls centered. In the note, the quote with its time's chip.",
+    act: async (page) => {
+      await openTranscript(page);
+      await page.evaluate(() => window.testing.open("# Outages\n\nWhy GitHub keeps going down."));
+      await page.locator(".cm-content").click();
+      await page.keyboard.press("Meta+End");
+      await page.getByRole("region", { name: "Podcast player" }).getByRole("button", { name: "Quote in Note" }).click();
+      await page.waitForFunction(() => window.testing.text()?.includes("> ["));
+      await page.evaluate(() => window.testing.editor().contentDOM.blur());
+    },
+  },
+  {
+    id: "listening-transcript-phone",
+    title: "Phone: an episode's transcript",
+    look: "At the bottom of the list, the transcript above the player, as on a desktop, at most about a third of the screen, the list scrolling above; nothing cut off at the screen's edges.",
+    width: 390,
+    height: 780,
+    act: (page) => openTranscript(page),
+  },
+  {
+    id: "listening-phone",
+    title: "Phone: Take Notes",
+    look: "The episode's note open, its list's new item's chip with the cursor after it, ready to type; nothing cut off.",
+    width: 390,
+    height: 780,
+    act: async (page) => {
+      await playEpisode(page);
+      await page.getByRole("region", { name: "Podcast player" }).getByRole("button", { name: "Take Notes" }).click();
+      await page.waitForFunction(() => window.testing.text()?.endsWith("] "));
+    },
+  },
+  {
+    id: "listening-elsewhere",
+    title: "Times in another note",
+    look: "In a note that isn't the episode's, each time a link to its sound drawn as the same chip (no address in sight), in the middle of a sentence, its text's baseline the line's.",
+    note: "# Outages, and what to do about them\n\nKyle's point about status pages [4:05](https://traffic.megaphone.fm/FSI3647670844.mp3#t=245) is the one to take to the team, with the bit on the monorepo [0:12](https://traffic.megaphone.fm/FSI3647670844.mp3#t=12).",
+    act: (page) => page.evaluate(() => window.testing.editor().contentDOM.blur()),
+  },
   {
     id: "calendar-repeat",
     title: "A repeating event and its Repeat menu",

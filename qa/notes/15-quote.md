@@ -309,61 +309,65 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 
 > Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Image in a quote (stays Markdown here)
+#### 39. Time in an episode in a quote
+
+> At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Image in a quote (stays Markdown here)
 
 > ![A sample picture](attachment:photo.png)
 
-#### 40. Drawing in a quote (stays Markdown here)
+#### 41. Drawing in a quote (stays Markdown here)
 
 > ![A sample drawing](attachment:drawing.svg)
 
-#### 41. File in a quote (stays Markdown here)
+#### 42. File in a quote (stays Markdown here)
 
 > [Budget.csv](attachment:budget.csv)
 
-#### 42. Folder and file links in a quote
+#### 43. Folder and file links in a quote
 
 > See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Attached 3D model (STL) in a quote
+#### 44. Attached 3D model (STL) in a quote
 
 > [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Terminal recording (.cast file) in a quote
+#### 45. Terminal recording (.cast file) in a quote
 
 > [terminal.cast](attachment:terminal.cast)
 
-#### 45. Audio in a quote (stays Markdown here)
+#### 46. Audio in a quote (stays Markdown here)
 
 > [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Video in a quote (stays Markdown here)
+#### 47. Video in a quote (stays Markdown here)
 
 > [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Missing file in a quote (stays Markdown here)
+#### 48. Missing file in a quote (stays Markdown here)
 
 > [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Card in a quote
+#### 49. Card in a quote
 
 > ::: card
 > Text in a card.
 > :::
 
-#### 49. Callout (info) in a quote
+#### 50. Callout (info) in a quote
 
 > :::i
 > Text in an info callout.
 > :::
 
-#### 50. Callout (warning, chosen icon) in a quote
+#### 51. Callout (warning, chosen icon) in a quote
 
 > :::! icon=flag
 > Text in a warning callout with the flag icon.
 > :::
 
-#### 51. Callout (decision, no icon) in a quote
+#### 52. Callout (decision, no icon) in a quote
 
 > :::^ icon=none
 > Text in a decision callout with no icon.

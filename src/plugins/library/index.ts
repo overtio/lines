@@ -101,7 +101,7 @@ const KINDS: LibraryKind[] = [
     name: t("library.episode"),
     label: t("library.episodes"),
     icon: "headphones",
-    properties: ["podcast", "published", "duration", "audio"],
+    properties: ["podcast", "published", "duration", "audio", "transcript", "chapters"],
     subtitle: ["podcast", "duration"],
     mentions: ["podcast"],
     statuses: LISTENED,

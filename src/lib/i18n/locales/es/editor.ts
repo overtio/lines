@@ -91,6 +91,8 @@ export default {
   "editor.slash.date": "Fecha",
   "editor.slash.date.keywords": "hoy hora ahora día",
   "editor.slash.date.hint": "hoy",
+  "editor.slash.time": "Momento del episodio",
+  "editor.slash.time.keywords": "marca tiempo podcast episodio reproduciendo escuchando minuto",
 
   "editor.callout.info": "Información",
   "editor.callout.info.keywords": "destacado nota consejo pista aviso",

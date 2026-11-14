@@ -461,7 +461,15 @@ sphere(3;
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Broken model (openscad block), then Image
+#### 39. Broken model (openscad block), then Time in an episode
+
+```openscad
+cube(10)
+sphere(3;
+```
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Broken model (openscad block), then Image
 
 ```openscad
 cube(10)
@@ -469,7 +477,7 @@ sphere(3;
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 40. Broken model (openscad block), then Drawing
+#### 41. Broken model (openscad block), then Drawing
 
 ```openscad
 cube(10)
@@ -477,7 +485,7 @@ sphere(3;
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Broken model (openscad block), then File
+#### 42. Broken model (openscad block), then File
 
 ```openscad
 cube(10)
@@ -485,7 +493,7 @@ sphere(3;
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Broken model (openscad block), then Folder and file links
+#### 43. Broken model (openscad block), then Folder and file links
 
 ```openscad
 cube(10)
@@ -493,7 +501,7 @@ sphere(3;
 ```
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Broken model (openscad block), then Attached 3D model (STL)
+#### 44. Broken model (openscad block), then Attached 3D model (STL)
 
 ```openscad
 cube(10)
@@ -501,7 +509,7 @@ sphere(3;
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Broken model (openscad block), then Terminal recording (.cast file)
+#### 45. Broken model (openscad block), then Terminal recording (.cast file)
 
 ```openscad
 cube(10)
@@ -509,7 +517,7 @@ sphere(3;
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Broken model (openscad block), then Audio
+#### 46. Broken model (openscad block), then Audio
 
 ```openscad
 cube(10)
@@ -517,7 +525,7 @@ sphere(3;
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Broken model (openscad block), then Video
+#### 47. Broken model (openscad block), then Video
 
 ```openscad
 cube(10)
@@ -525,7 +533,7 @@ sphere(3;
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Broken model (openscad block), then Missing file
+#### 48. Broken model (openscad block), then Missing file
 
 ```openscad
 cube(10)
@@ -533,7 +541,7 @@ sphere(3;
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Broken model (openscad block), then Card
+#### 49. Broken model (openscad block), then Card
 
 ```openscad
 cube(10)
@@ -543,7 +551,7 @@ sphere(3;
 Text in a card.
 :::
 
-#### 49. Broken model (openscad block), then Callout (info)
+#### 50. Broken model (openscad block), then Callout (info)
 
 ```openscad
 cube(10)
@@ -553,7 +561,7 @@ sphere(3;
 Text in an info callout.
 :::
 
-#### 50. Broken model (openscad block), then Callout (warning, chosen icon)
+#### 51. Broken model (openscad block), then Callout (warning, chosen icon)
 
 ```openscad
 cube(10)
@@ -563,7 +571,7 @@ sphere(3;
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Broken model (openscad block), then Callout (decision, no icon)
+#### 52. Broken model (openscad block), then Callout (decision, no icon)
 
 ```openscad
 cube(10)

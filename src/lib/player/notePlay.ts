@@ -2,8 +2,10 @@ import { type EditorState, StateField } from "@codemirror/state";
 import { Decoration, type DecorationSet, EditorView, WidgetType } from "@codemirror/view";
 import { mount, unmount } from "svelte";
 import EpisodePlay from "../components/EpisodePlay.svelte";
+import { frontMatterField } from "../editor/objects";
 import { editedNote } from "../editor/util";
 import { frontMatter, propertyOf, typeOf } from "../notes/properties";
+import { isWeb } from "./episodes";
 
 /*
  * An `episode` note's Play button, before its `audio` property's link (EpisodePlay.svelte),
@@ -39,12 +41,21 @@ class PlayWidget extends WidgetType {
   }
 }
 
+/** An `episode` note's `audio` property, if it's a link to its sound: as the editor has the note. */
+export function episodeAudio(state: EditorState) {
+  // As the editor read the properties when the note last changed (objects.ts), rather than again: read
+  // here only where it doesn't (null there is a note without properties).
+  const field = state.field(frontMatterField, false);
+  const front = field === undefined ? frontMatter(state.doc.sliceString(0, Math.min(state.doc.length, 10_000))) : field;
+  if (!front || typeOf(front.properties) !== "episode") return null;
+  const audio = propertyOf(front.properties, "audio");
+  return audio && isWeb(audio.value.trim()) ? audio : null;
+}
+
 function decorations(state: EditorState): DecorationSet {
   const note = state.facet(editedNote);
-  const front = note ? frontMatter(state.doc.sliceString(0, Math.min(state.doc.length, 10_000))) : null;
-  if (!note || !front || typeOf(front.properties) !== "episode") return Decoration.none;
-  const audio = propertyOf(front.properties, "audio");
-  if (!audio || !/^https?:\/\//i.test(audio.value.trim())) return Decoration.none;
+  const audio = note && episodeAudio(state);
+  if (!note || !audio) return Decoration.none;
   // Before the link, clear of the copy button a value has at its end.
   const line = state.doc.line(audio.line);
   const value = line.from + /^[^:]*:[ \t]*/.exec(line.text)![0].length;

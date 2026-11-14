@@ -461,7 +461,15 @@ flowchart LR
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Diagram (240 px wide), then Image
+#### 39. Diagram (240 px wide), then Time in an episode
+
+```mermaid |240
+flowchart LR
+  A[Small] --> B[Diagram]
+```
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Diagram (240 px wide), then Image
 
 ```mermaid |240
 flowchart LR
@@ -469,7 +477,7 @@ flowchart LR
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 40. Diagram (240 px wide), then Drawing
+#### 41. Diagram (240 px wide), then Drawing
 
 ```mermaid |240
 flowchart LR
@@ -477,7 +485,7 @@ flowchart LR
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Diagram (240 px wide), then File
+#### 42. Diagram (240 px wide), then File
 
 ```mermaid |240
 flowchart LR
@@ -485,7 +493,7 @@ flowchart LR
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Diagram (240 px wide), then Folder and file links
+#### 43. Diagram (240 px wide), then Folder and file links
 
 ```mermaid |240
 flowchart LR
@@ -493,7 +501,7 @@ flowchart LR
 ```
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Diagram (240 px wide), then Attached 3D model (STL)
+#### 44. Diagram (240 px wide), then Attached 3D model (STL)
 
 ```mermaid |240
 flowchart LR
@@ -501,7 +509,7 @@ flowchart LR
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Diagram (240 px wide), then Terminal recording (.cast file)
+#### 45. Diagram (240 px wide), then Terminal recording (.cast file)
 
 ```mermaid |240
 flowchart LR
@@ -509,7 +517,7 @@ flowchart LR
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Diagram (240 px wide), then Audio
+#### 46. Diagram (240 px wide), then Audio
 
 ```mermaid |240
 flowchart LR
@@ -517,7 +525,7 @@ flowchart LR
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Diagram (240 px wide), then Video
+#### 47. Diagram (240 px wide), then Video
 
 ```mermaid |240
 flowchart LR
@@ -525,7 +533,7 @@ flowchart LR
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Diagram (240 px wide), then Missing file
+#### 48. Diagram (240 px wide), then Missing file
 
 ```mermaid |240
 flowchart LR
@@ -533,7 +541,7 @@ flowchart LR
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Diagram (240 px wide), then Card
+#### 49. Diagram (240 px wide), then Card
 
 ```mermaid |240
 flowchart LR
@@ -543,7 +551,7 @@ flowchart LR
 Text in a card.
 :::
 
-#### 49. Diagram (240 px wide), then Callout (info)
+#### 50. Diagram (240 px wide), then Callout (info)
 
 ```mermaid |240
 flowchart LR
@@ -553,7 +561,7 @@ flowchart LR
 Text in an info callout.
 :::
 
-#### 50. Diagram (240 px wide), then Callout (warning, chosen icon)
+#### 51. Diagram (240 px wide), then Callout (warning, chosen icon)
 
 ```mermaid |240
 flowchart LR
@@ -563,7 +571,7 @@ flowchart LR
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Diagram (240 px wide), then Callout (decision, no icon)
+#### 52. Diagram (240 px wide), then Callout (decision, no icon)
 
 ```mermaid |240
 flowchart LR

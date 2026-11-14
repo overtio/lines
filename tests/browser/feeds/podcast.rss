@@ -41,6 +41,9 @@ Show Notes
       <itunes:duration>1882</itunes:duration>
       <guid isPermaLink="false"><![CDATA[14678690-dd33-11f1-b943-2b9148b63cb2]]></guid>
       <enclosure url="https://traffic.megaphone.fm/FSI3647670844.mp3" length="0" type="audio/mpeg"/>
+      <podcast:transcript url="https://syntax.fm/1055/transcript.vtt" type="text/vtt"/>
+      <podcast:transcript url="https://syntax.fm/1055/transcript.txt" type="text/plain"/>
+      <podcast:chapters url="https://syntax.fm/1055/chapters.json" type="application/json+chapters"/>
     </item>
     <item>
       <title>1054: Is CSS a Programming Language?</title>

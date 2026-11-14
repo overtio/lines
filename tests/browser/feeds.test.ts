@@ -177,6 +177,43 @@ describe("reading feeds", () => {
     });
     expect(refused).toBe(true);
   });
+
+  test("a podcast's episode: its transcript, in the format lines reads best of those it names, and its chapters", async () => {
+    const [episode, other] = (await read(fixture("podcast.rss"), "https://feeds.megaphone.fm/FSI1483080183")).posts;
+    // Of WebVTT and plain text, WebVTT: it has times.
+    expect(episode.transcript).toEqual({ url: "https://syntax.fm/1055/transcript.vtt", type: "text/vtt" });
+    expect(episode.chapters).toEqual({ url: "https://syntax.fm/1055/chapters.json", type: "application/json+chapters" });
+    expect([other.transcript, other.chapters]).toEqual([undefined, undefined]);
+  });
+});
+
+describe("transcripts", () => {
+  /** What's said, as `0:04 Speaker: text`, read as lines does (plugins/feeds/transcripts.ts). */
+  const said = (text: string, type?: string) =>
+    app.page.evaluate(
+      ([text, type]) =>
+        window.testing.reading.sentences(window.testing.reading.readTranscript(text, type)).map(({ start, speaker, text }) => `${Math.floor(start)} ${speaker ?? "?"}: ${text}`),
+      [text, type] as const,
+    );
+
+  test("Podcasting 2.0's HTML, however a host writes it, as text only", async () => {
+    // Buzzsprout's: a chapter's heading, every word in a span, no colon after a name.
+    expect(await said(fixture("transcript-buzzsprout.html"), "text/html")).toEqual(["0 Ada Moss: Coming up, turtles' way home.", "4 Announcer: With Ada & Ben.", "3723 Announcer: Still Ada, a long way in."]);
+    // Captivate's: an empty paragraph after each; with no type, read as what it looks like.
+    expect(await said(fixture("transcript-captivate.html"))).toEqual([
+      "0 Ben: Ada, I can't do a podcast with you. We're done.",
+      "8 Ben: What is going on there?",
+      "10 Ada: Oh, it's the window. Sorry about the gulls.",
+    ]);
+    // Markup and references in what's said are read as the page's text, never run or shown.
+    expect(await said('<cite>Ada:</cite><time>0:01</time><p>a &lt; b, &#99999999; <img src=x onerror="window.ran=1"> &amp; c</p>')).toEqual(["1 Ada: a < b, � & c"]);
+    expect(await app.page.evaluate(() => "ran" in window)).toBe(false);
+  });
+
+  test("JSON's text, its markup and references read", async () => {
+    const json = JSON.stringify({ segments: [{ speaker: "Ada", startTime: "1.5", body: "<b>Tides</b> &amp; turtles &#99999999;" }] });
+    expect(await said(json)).toEqual(["1 Ada: Tides & turtles �"]);
+  });
 });
 
 describe("HTML as Markdown", () => {

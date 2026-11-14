@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 [terminal.cast](attachment:terminal.cast)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Terminal recording (.cast file), then Image
+#### 39. Terminal recording (.cast file), then Time in an episode
+
+[terminal.cast](attachment:terminal.cast)
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Terminal recording (.cast file), then Image
 
 [terminal.cast](attachment:terminal.cast)
 ![A sample picture](attachment:photo.png)
 
-#### 40. Terminal recording (.cast file), then Drawing
+#### 41. Terminal recording (.cast file), then Drawing
 
 [terminal.cast](attachment:terminal.cast)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Terminal recording (.cast file), then File
+#### 42. Terminal recording (.cast file), then File
 
 [terminal.cast](attachment:terminal.cast)
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Terminal recording (.cast file), then Folder and file links
+#### 43. Terminal recording (.cast file), then Folder and file links
 
 [terminal.cast](attachment:terminal.cast)
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Terminal recording (.cast file), then Attached 3D model (STL)
+#### 44. Terminal recording (.cast file), then Attached 3D model (STL)
 
 [terminal.cast](attachment:terminal.cast)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Terminal recording (.cast file), then Terminal recording (.cast file)
+#### 45. Terminal recording (.cast file), then Terminal recording (.cast file)
 
 [terminal.cast](attachment:terminal.cast)
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Terminal recording (.cast file), then Audio
+#### 46. Terminal recording (.cast file), then Audio
 
 [terminal.cast](attachment:terminal.cast)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Terminal recording (.cast file), then Video
+#### 47. Terminal recording (.cast file), then Video
 
 [terminal.cast](attachment:terminal.cast)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Terminal recording (.cast file), then Missing file
+#### 48. Terminal recording (.cast file), then Missing file
 
 [terminal.cast](attachment:terminal.cast)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Terminal recording (.cast file), then Card
+#### 49. Terminal recording (.cast file), then Card
 
 [terminal.cast](attachment:terminal.cast)
 ::: card
 Text in a card.
 :::
 
-#### 49. Terminal recording (.cast file), then Callout (info)
+#### 50. Terminal recording (.cast file), then Callout (info)
 
 [terminal.cast](attachment:terminal.cast)
 :::i
 Text in an info callout.
 :::
 
-#### 50. Terminal recording (.cast file), then Callout (warning, chosen icon)
+#### 51. Terminal recording (.cast file), then Callout (warning, chosen icon)
 
 [terminal.cast](attachment:terminal.cast)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Terminal recording (.cast file), then Callout (decision, no icon)
+#### 52. Terminal recording (.cast file), then Callout (decision, no icon)
 
 [terminal.cast](attachment:terminal.cast)
 :::^ icon=none

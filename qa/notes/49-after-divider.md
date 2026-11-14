@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 ---
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Divider, then Image
+#### 39. Divider, then Time in an episode
+
+---
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Divider, then Image
 
 ---
 ![A sample picture](attachment:photo.png)
 
-#### 40. Divider, then Drawing
+#### 41. Divider, then Drawing
 
 ---
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Divider, then File
+#### 42. Divider, then File
 
 ---
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Divider, then Folder and file links
+#### 43. Divider, then Folder and file links
 
 ---
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Divider, then Attached 3D model (STL)
+#### 44. Divider, then Attached 3D model (STL)
 
 ---
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Divider, then Terminal recording (.cast file)
+#### 45. Divider, then Terminal recording (.cast file)
 
 ---
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Divider, then Audio
+#### 46. Divider, then Audio
 
 ---
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Divider, then Video
+#### 47. Divider, then Video
 
 ---
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Divider, then Missing file
+#### 48. Divider, then Missing file
 
 ---
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Divider, then Card
+#### 49. Divider, then Card
 
 ---
 ::: card
 Text in a card.
 :::
 
-#### 49. Divider, then Callout (info)
+#### 50. Divider, then Callout (info)
 
 ---
 :::i
 Text in an info callout.
 :::
 
-#### 50. Divider, then Callout (warning, chosen icon)
+#### 51. Divider, then Callout (warning, chosen icon)
 
 ---
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Divider, then Callout (decision, no icon)
+#### 52. Divider, then Callout (decision, no icon)
 
 ---
 :::^ icon=none

@@ -309,61 +309,65 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Image at the top level
+#### 39. Time in an episode at the top level
+
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Image at the top level
 
 ![A sample picture](attachment:photo.png)
 
-#### 40. Drawing at the top level
+#### 41. Drawing at the top level
 
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. File at the top level
+#### 42. File at the top level
 
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Folder and file links at the top level
+#### 43. Folder and file links at the top level
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Attached 3D model (STL) at the top level
+#### 44. Attached 3D model (STL) at the top level
 
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Terminal recording (.cast file) at the top level
+#### 45. Terminal recording (.cast file) at the top level
 
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Audio at the top level
+#### 46. Audio at the top level
 
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Video at the top level
+#### 47. Video at the top level
 
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Missing file at the top level
+#### 48. Missing file at the top level
 
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Card at the top level
+#### 49. Card at the top level
 
 ::: card
 Text in a card.
 :::
 
-#### 49. Callout (info) at the top level
+#### 50. Callout (info) at the top level
 
 :::i
 Text in an info callout.
 :::
 
-#### 50. Callout (warning, chosen icon) at the top level
+#### 51. Callout (warning, chosen icon) at the top level
 
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Callout (decision, no icon) at the top level
+#### 52. Callout (decision, no icon) at the top level
 
 :::^ icon=none
 Text in a decision callout with no icon.

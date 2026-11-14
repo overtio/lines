@@ -54,6 +54,9 @@ export interface Post {
   duration?: number;
   season?: number;
   episode?: number;
+  /** Podcasting 2.0's transcript of an episode, in the format with most in it that lines reads, and its chapters. */
+  transcript?: Named;
+  chapters?: Named;
 }
 
 export class NotAFeed extends Error {}
@@ -249,6 +252,34 @@ function authorName(value: string | undefined): string | undefined {
 
 const number = (value: string | undefined) => (value && /^\d+$/.test(value) ? Number(value) : undefined);
 
+/** A file a feed names for an episode: its transcript (`podcast:transcript`), its chapters (`podcast:chapters`). */
+export interface Named {
+  url: string;
+  type?: string;
+}
+
+/** Transcripts' formats lines reads, the one with most in it first: times and who's speaking, then times alone. */
+const TRANSCRIPTS = ["json", "vtt", "srt", "subrip", "html"];
+
+/** Where a transcript's format is among TRANSCRIPTS, by its type or else its name; past them all, one lines doesn't read. */
+function rank({ url, type = "" }: Named) {
+  const at = TRANSCRIPTS.findIndex((format) => type.toLowerCase().includes(format) || new URL(url).pathname.toLowerCase().endsWith(`.${format}`));
+  return at === -1 ? TRANSCRIPTS.length : at;
+}
+
+/** Files named by Podcasting 2.0's tags (`<podcast:transcript url="…" type="text/vtt"/>`), those on the web. */
+function named(elements: Element[], base: string): Named[] {
+  return elements.flatMap((element) => {
+    const url = address(element.getAttribute("url"), base);
+    return url ? [{ url, type: element.getAttribute("type") ?? undefined }] : [];
+  });
+}
+
+/** The transcript lines reads best of those an episode names: one with times, in the format with most in it. */
+function bestTranscript(files: Named[]): Named | undefined {
+  return files.filter((file) => rank(file) < TRANSCRIPTS.length).sort((a, b) => rank(a) - rank(b))[0];
+}
+
 /** What a post or a channel says of itself in iTunes' and Podcasting 2.0's tags, and Media RSS's. */
 function podcastTags(element: Element, base: string) {
   const media = children(element, "content", NS.media);
@@ -263,6 +294,8 @@ function podcastTags(element: Element, base: string) {
     season: number(text(element, "season", NS.itunes) ?? text(element, "season", NS.podcast)),
     episode: number(text(element, "episode", NS.itunes) ?? text(element, "episode", NS.podcast)),
     playable: playable && { url: playable.getAttribute("url"), type: playable.getAttribute("type") },
+    transcript: bestTranscript(named(children(element, "transcript", NS.podcast), base)),
+    chapters: named(children(element, "chapters", NS.podcast), base)[0],
   };
 }
 
@@ -324,6 +357,8 @@ function readItem(item: Element, base: string, ns: string | null): Post {
     duration: tags.duration,
     season: tags.season,
     episode: tags.episode,
+    transcript: tags.transcript,
+    chapters: tags.chapters,
   };
 }
 
@@ -404,6 +439,8 @@ function readAtom(root: Element, url: string): Feed {
       duration: entryTags.duration,
       season: entryTags.season,
       episode: entryTags.episode,
+      transcript: entryTags.transcript,
+      chapters: entryTags.chapters,
     };
   });
   return {

@@ -16,8 +16,10 @@
   import { copyOnSelect } from "./copyOnSelect";
   import { symbolsChanged } from "./symbols";
   import { changesBetween, editedNote } from "./util";
+  import { paneEditor } from "./writeIn";
 
-  let { noteId, trashed }: { noteId: string; trashed: boolean } = $props();
+  // `pane`: which pane it's in (panes.ts), for what's written into its note from outside it (writeIn.ts).
+  let { noteId, trashed, pane }: { noteId: string; trashed: boolean; pane: string } = $props();
   // Read through these, the effects below run again only when the note or whether it's read-only
   // changes, not each time the note's entry does (a save, or sync).
   const id = $derived(noteId);
@@ -120,6 +122,7 @@
   $effect(() => {
     view = new EditorView({ parent: host });
     const unregister = notes.registerFlusher(sync);
+    const unwritable = paneEditor(untrack(() => pane), () => view);
     const leave = () => notes.leave();
     const onVisibility = () => document.visibilityState === "hidden" && leave();
     document.addEventListener("visibilitychange", onVisibility);
@@ -128,6 +131,7 @@
     window.addEventListener("beforeunload", leave);
     return () => {
       unregister();
+      unwritable();
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("pagehide", leave);
       window.removeEventListener("beforeunload", leave);

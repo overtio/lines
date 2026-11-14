@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Folder and file links, then Image
+#### 39. Folder and file links, then Time in an episode
+
+See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Folder and file links, then Image
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 ![A sample picture](attachment:photo.png)
 
-#### 40. Folder and file links, then Drawing
+#### 41. Folder and file links, then Drawing
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Folder and file links, then File
+#### 42. Folder and file links, then File
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Folder and file links, then Folder and file links
+#### 43. Folder and file links, then Folder and file links
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Folder and file links, then Attached 3D model (STL)
+#### 44. Folder and file links, then Attached 3D model (STL)
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Folder and file links, then Terminal recording (.cast file)
+#### 45. Folder and file links, then Terminal recording (.cast file)
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Folder and file links, then Audio
+#### 46. Folder and file links, then Audio
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Folder and file links, then Video
+#### 47. Folder and file links, then Video
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Folder and file links, then Missing file
+#### 48. Folder and file links, then Missing file
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Folder and file links, then Card
+#### 49. Folder and file links, then Card
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 ::: card
 Text in a card.
 :::
 
-#### 49. Folder and file links, then Callout (info)
+#### 50. Folder and file links, then Callout (info)
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 :::i
 Text in an info callout.
 :::
 
-#### 50. Folder and file links, then Callout (warning, chosen icon)
+#### 51. Folder and file links, then Callout (warning, chosen icon)
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Folder and file links, then Callout (decision, no icon)
+#### 52. Folder and file links, then Callout (decision, no icon)
 
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 :::^ icon=none

@@ -119,6 +119,11 @@ const ELEMENTS = [
     name: "arXiv links",
     md: "Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)",
   },
+  {
+    id: "time",
+    name: "Time in an episode",
+    md: "At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here",
+  },
   { id: "image", name: "Image", md: "![A sample picture](attachment:photo.png)" },
   { id: "drawing", name: "Drawing", md: "![A sample drawing](attachment:drawing.svg)" },
   { id: "file", name: "File", md: "[Budget.csv](attachment:budget.csv)" },

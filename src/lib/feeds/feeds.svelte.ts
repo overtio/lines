@@ -63,6 +63,9 @@ function feedOf(properties: Parameters<typeof propertyOf>[0]): string | null {
   return value && /^https?:\/\/\S+$/i.test(value) ? value : null;
 }
 
+/** The note (not in the Trash) whose `key` property is `value`: a post saved to the Library, by its link or its sound. */
+export const savedWith = (key: string, value: string) => notes.entries.find(({ note, meta }) => !note.trashed && propertyOf(meta.properties, key)?.value.trim() === value);
+
 /** Every subscription as one line each, so typing that changes none leaves it the same and nothing below redraws. */
 function signature() {
   const found = new Map<string, { note: string; title: string; updated: number }>();
@@ -354,8 +357,7 @@ class Feeds {
   /** The note a post was saved to the Library as, if it was: the one with its link (an episode's, its sound). */
   savedNote({ post }: Row) {
     const [key, value] = post.audio ? ["audio", post.audio.url] : ["link", post.link];
-    if (!value) return undefined;
-    return notes.entries.find(({ note, meta }) => !note.trashed && propertyOf(meta.properties, key)?.value.trim() === value);
+    return value ? savedWith(key, value) : undefined;
   }
 
   /**
@@ -391,6 +393,8 @@ class Feeds {
             ["published", published],
             ["duration", clock(post.duration)],
             ["audio", post.audio.url],
+            ["transcript", post.transcript?.url],
+            ["chapters", post.chapters?.url],
           ]),
           cover: post.image ?? record?.image,
           description: html ? plainText(html) : post.excerpt,

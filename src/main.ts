@@ -126,7 +126,7 @@ void onAnnounce(async (message) => {
     if (message.open) floatingOpen.add(message.id);
     else floatingOpen.delete(message.id);
   } else if (message.type === "play" && isMain) {
-    player.play(message.episode);
+    player.play(message.episode, message.at);
   } else if (message.type === "show" && isMain) {
     notes.show(message.id);
     if (isTauri) {

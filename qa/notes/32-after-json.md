@@ -423,70 +423,77 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 ```
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. JSON block (no language), then Image
+#### 39. JSON block (no language), then Time in an episode
+
+```
+{"name":"lines","tags":["a","b"],"id":12345678901234567890}
+```
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. JSON block (no language), then Image
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample picture](attachment:photo.png)
 
-#### 40. JSON block (no language), then Drawing
+#### 41. JSON block (no language), then Drawing
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. JSON block (no language), then File
+#### 42. JSON block (no language), then File
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Budget.csv](attachment:budget.csv)
 
-#### 42. JSON block (no language), then Folder and file links
+#### 43. JSON block (no language), then Folder and file links
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. JSON block (no language), then Attached 3D model (STL)
+#### 44. JSON block (no language), then Attached 3D model (STL)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. JSON block (no language), then Terminal recording (.cast file)
+#### 45. JSON block (no language), then Terminal recording (.cast file)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. JSON block (no language), then Audio
+#### 46. JSON block (no language), then Audio
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. JSON block (no language), then Video
+#### 47. JSON block (no language), then Video
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. JSON block (no language), then Missing file
+#### 48. JSON block (no language), then Missing file
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. JSON block (no language), then Card
+#### 49. JSON block (no language), then Card
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -495,7 +502,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 Text in a card.
 :::
 
-#### 49. JSON block (no language), then Callout (info)
+#### 50. JSON block (no language), then Callout (info)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -504,7 +511,7 @@ Text in a card.
 Text in an info callout.
 :::
 
-#### 50. JSON block (no language), then Callout (warning, chosen icon)
+#### 51. JSON block (no language), then Callout (warning, chosen icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
@@ -513,7 +520,7 @@ Text in an info callout.
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. JSON block (no language), then Callout (decision, no icon)
+#### 52. JSON block (no language), then Callout (decision, no icon)
 
 ```
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}

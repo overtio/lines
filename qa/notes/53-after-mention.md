@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 Ask @[QA · Ada] at @[QA · Ada].email.
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Mention, then Image
+#### 39. Mention, then Time in an episode
+
+Ask @[QA · Ada] at @[QA · Ada].email.
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Mention, then Image
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ![A sample picture](attachment:photo.png)
 
-#### 40. Mention, then Drawing
+#### 41. Mention, then Drawing
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Mention, then File
+#### 42. Mention, then File
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Mention, then Folder and file links
+#### 43. Mention, then Folder and file links
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Mention, then Attached 3D model (STL)
+#### 44. Mention, then Attached 3D model (STL)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Mention, then Terminal recording (.cast file)
+#### 45. Mention, then Terminal recording (.cast file)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Mention, then Audio
+#### 46. Mention, then Audio
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Mention, then Video
+#### 47. Mention, then Video
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Mention, then Missing file
+#### 48. Mention, then Missing file
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Mention, then Card
+#### 49. Mention, then Card
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 ::: card
 Text in a card.
 :::
 
-#### 49. Mention, then Callout (info)
+#### 50. Mention, then Callout (info)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::i
 Text in an info callout.
 :::
 
-#### 50. Mention, then Callout (warning, chosen icon)
+#### 51. Mention, then Callout (warning, chosen icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Mention, then Callout (decision, no icon)
+#### 52. Mention, then Callout (decision, no icon)
 
 Ask @[QA · Ada] at @[QA · Ada].email.
 :::^ icon=none

@@ -347,73 +347,78 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 [Chime.mp3](attachment:chime.mp3)
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 
-#### 39. Audio, then Image
+#### 39. Audio, then Time in an episode
+
+[Chime.mp3](attachment:chime.mp3)
+At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
+
+#### 40. Audio, then Image
 
 [Chime.mp3](attachment:chime.mp3)
 ![A sample picture](attachment:photo.png)
 
-#### 40. Audio, then Drawing
+#### 41. Audio, then Drawing
 
 [Chime.mp3](attachment:chime.mp3)
 ![A sample drawing](attachment:drawing.svg)
 
-#### 41. Audio, then File
+#### 42. Audio, then File
 
 [Chime.mp3](attachment:chime.mp3)
 [Budget.csv](attachment:budget.csv)
 
-#### 42. Audio, then Folder and file links
+#### 43. Audio, then Folder and file links
 
 [Chime.mp3](attachment:chime.mp3)
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
 
-#### 43. Audio, then Attached 3D model (STL)
+#### 44. Audio, then Attached 3D model (STL)
 
 [Chime.mp3](attachment:chime.mp3)
 [Bracket.stl](attachment:bracket.stl)
 
-#### 44. Audio, then Terminal recording (.cast file)
+#### 45. Audio, then Terminal recording (.cast file)
 
 [Chime.mp3](attachment:chime.mp3)
 [terminal.cast](attachment:terminal.cast)
 
-#### 45. Audio, then Audio
+#### 46. Audio, then Audio
 
 [Chime.mp3](attachment:chime.mp3)
 [Chime.mp3](attachment:chime.mp3)
 
-#### 46. Audio, then Video
+#### 47. Audio, then Video
 
 [Chime.mp3](attachment:chime.mp3)
 [Sky.mp4](attachment:sky.mp4)
 
-#### 47. Audio, then Missing file
+#### 48. Audio, then Missing file
 
 [Chime.mp3](attachment:chime.mp3)
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
 
-#### 48. Audio, then Card
+#### 49. Audio, then Card
 
 [Chime.mp3](attachment:chime.mp3)
 ::: card
 Text in a card.
 :::
 
-#### 49. Audio, then Callout (info)
+#### 50. Audio, then Callout (info)
 
 [Chime.mp3](attachment:chime.mp3)
 :::i
 Text in an info callout.
 :::
 
-#### 50. Audio, then Callout (warning, chosen icon)
+#### 51. Audio, then Callout (warning, chosen icon)
 
 [Chime.mp3](attachment:chime.mp3)
 :::! icon=flag
 Text in a warning callout with the flag icon.
 :::
 
-#### 51. Audio, then Callout (decision, no icon)
+#### 52. Audio, then Callout (decision, no icon)
 
 [Chime.mp3](attachment:chime.mp3)
 :::^ icon=none

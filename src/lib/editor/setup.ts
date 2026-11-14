@@ -1,5 +1,5 @@
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
-import { deleteMarkupBackward, insertNewlineContinueMarkupCommand, markdownLanguage, pasteURLAsLink } from "@codemirror/lang-markdown";
+import { markdownLanguage, pasteURLAsLink } from "@codemirror/lang-markdown";
 import { HighlightStyle, Language, ParseContext, syntaxHighlighting } from "@codemirror/language";
 import type { Parser } from "@lezer/common";
 import { type MarkdownParser, parseCode } from "@lezer/markdown";
@@ -19,6 +19,7 @@ import { find } from "./find.svelte";
 import { attachmentBlocks } from "./attachments";
 import { formatToolbar, toggleFormat } from "./formatting";
 import { listKeymap, listPaste } from "./lists";
+import { markdownKeymap } from "./markdownKeys";
 import { livePreview, openAtCursor } from "./livePreview";
 import { mathBlocks } from "./math";
 import { markdownPaperLink, paperCommands } from "./papers";
@@ -109,14 +110,6 @@ const toggleTodo: StateCommand = ({ state, dispatch }) => {
   return true;
 };
 
-/**
- * Markdown's Enter and Backspace, CodeMirror's: Enter continues a list or a quote, and on an empty
- * item ends the list, its second item too (rather than putting a blank line before it).
- */
-const markdownKeymap = keymap.of([
-  { key: "Enter", run: insertNewlineContinueMarkupCommand({ nonTightLists: false }) },
-  { key: "Backspace", run: deleteMarkupBackward },
-]);
 
 const formattingKeymap = keymap.of([
   { key: "Mod-b", run: toggleFormat("bold") },
