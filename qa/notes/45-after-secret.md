@@ -319,6 +319,7 @@ The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 

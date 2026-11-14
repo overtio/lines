@@ -337,6 +337,68 @@
   fill: currentColor;
 }
 
+/* Half a mark (`3.5/5`): a filled one over the faint one, cut at its middle (its end, right to left). */
+.cm-lp-score-mark.is-half {
+  position: relative;
+}
+
+.cm-lp-score-mark.is-half .icon + .icon {
+  position: absolute;
+  inset: 0;
+  color: var(--score);
+  fill: currentColor;
+  clip-path: inset(0 50% 0 0);
+}
+
+.cm-lp-score-mark.is-half .icon + .icon:dir(rtl) {
+  clip-path: inset(0 0 0 50%);
+}
+
+/* A click sets it (ratings.ts), where the note can be changed. */
+.cm-content[contenteditable="true"] .cm-lp-score-mark,
+.cm-content[contenteditable="true"] .cm-lp-score-label {
+  cursor: pointer;
+}
+
+.cm-lp-score-icons {
+  gap: 0.3em;
+}
+
+.cm-lp-score-icons .cm-lp-score-mark.is-filled {
+  color: var(--accent);
+}
+
+/* Points (`85/100`): the number, what it's out of, faint, and a short bar filled as far. */
+.cm-lp-score-points {
+  align-items: center;
+  gap: 0;
+  vertical-align: baseline;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.cm-lp-score-of {
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+.cm-lp-score-meter {
+  width: 2.5em;
+  height: 0.25em;
+  margin-left: 0.5em;
+  border-radius: 1em;
+  background: linear-gradient(var(--accent), var(--accent)) no-repeat 0 0 / var(--filled) 100%, color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+/* A word (`A`, `Masterpiece`), as a chip in the accent. */
+.cm-lp-score-label {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-radius: calc(6px * var(--radius-scale));
+  padding: 0.05em 0.45em;
+  font-weight: 600;
+}
+
 /* Centered on the name's capitals, in any font. */
 .cm-lp-tag-icon {
   display: inline-flex;

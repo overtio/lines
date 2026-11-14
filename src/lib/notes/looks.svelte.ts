@@ -1,6 +1,8 @@
 import type { IconName } from "../icons/icons";
 import type { PaletteColor } from "../palette";
+import type { RatingChoices } from "../library/ratings";
 import { plugins } from "../plugins/registry.svelte";
+import { announce, onAnnounce } from "../windows/channel";
 import type { Note, NoteMeta } from "./types";
 import { type Chosen, type Look, type LookKind, type Looks, mergeLooks, noLooks, readLooks, writeLooks } from "./looks";
 
@@ -23,10 +25,19 @@ function read(): Looks {
   }
 }
 
-/** Every tag's and type's look, kept on this device and synced (looks.ts). */
+/** Every tag's and type's look, and what the Library's kinds are rated on, kept on this device and synced (looks.ts). */
 class LibraryLooks {
   #looks = $state.raw<Looks>(read());
   #listeners = new Set<() => void>();
+
+  constructor() {
+    // Chosen in another window (Settings'): taken up here, and synced from the main window, as if chosen here.
+    void onAnnounce((message) => {
+      if (message.type !== "looks") return;
+      this.#looks = readLooks(message.looks);
+      for (const listener of this.#listeners) listener();
+    });
+  }
 
   get looks(): Looks {
     return this.#looks;
@@ -57,6 +68,11 @@ class LibraryLooks {
     this.#change({ ...this.#looks, [kind]: looks });
   }
 
+  /** Changes the ratings' choices (library/ratings.svelte.ts). */
+  setRatings(ratings: RatingChoices) {
+    this.#change({ ...this.#looks, ratings });
+  }
+
   /** Takes in another device's looks; whether any here changed. */
   merge(there: Looks): boolean {
     const merged = mergeLooks(this.#looks, there);
@@ -77,12 +93,15 @@ class LibraryLooks {
     for (const listener of this.#listeners) listener();
   }
 
+  /** Kept, and sent to the other windows, which take it up at once. */
   #save() {
+    const text = writeLooks(this.#looks);
     try {
-      localStorage.setItem(KEY, writeLooks(this.#looks));
+      localStorage.setItem(KEY, text);
     } catch {
       // Private mode or full storage: they last until lines is closed, and sync if it's on.
     }
+    void announce({ type: "looks", looks: text });
   }
 }
 

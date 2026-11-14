@@ -19,6 +19,7 @@ import { addBookFile, bookTypes, isBook } from "./lib/books/adding";
 import { reading } from "./lib/books/reading.svelte";
 import { feeds } from "./lib/feeds/feeds.svelte";
 import { imports } from "./lib/library/imports.svelte";
+import { ratings } from "./lib/library/ratings.svelte";
 import { player } from "./lib/player/player.svelte";
 import { lock } from "./lib/lock/lock.svelte";
 import { arrived, removeUnusedAttachments } from "./lib/notes/attachments";
@@ -159,7 +160,7 @@ async function start() {
     if (lock.enabled) watchActivity();
   } else if (isSettingsWindow) {
     ui.settings = initialSection();
-    const synced = forwardToMain({ sync, lock, lockedNotes, notes, feeds, imports }, sync, (state) => {
+    const synced = forwardToMain({ sync, lock, lockedNotes, notes, feeds, imports, ratings }, sync, (state) => {
       lock.settings = state.lock;
       noteKeys.settings = state.noteKeys;
     });
@@ -192,7 +193,7 @@ async function start() {
   // Settings, in its own window, asks this one to sync, lock and add notes.
   if (isTauri) {
     serveSettings(
-      { sync, lock, lockedNotes, notes, feeds, imports },
+      { sync, lock, lockedNotes, notes, feeds, imports, ratings },
       () => ({
         config: sync.config,
         status: sync.status,

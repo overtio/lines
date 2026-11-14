@@ -1,8 +1,10 @@
+import { type Scale, type Score, scoreIn } from "../editor/scores";
 import { propertyOf, readMention } from "../notes/properties";
 import type { Note, NoteMeta } from "../notes/types";
 import { plugins } from "../plugins/registry.svelte";
 import type { LibraryKind } from "../plugins/types";
 import { progressOf } from "../books/books";
+import { OVERALL, ratings } from "./ratings.svelte";
 import { coverOf } from "./text";
 
 /** Progress worth a line: begun, and not finished. */
@@ -55,4 +57,12 @@ export function shelfRow({ note, meta }: { note: Note; meta: NoteMeta }): ShelfR
     rows.set(note, row);
   }
   return row;
+}
+
+/** A library note's overall rating, on its kind's scale (as written, `score` null, where it doesn't fit), if it has one. Not kept with its row: the scale can change. */
+export function ratingOf({ meta }: { meta: NoteMeta }): { score: Score | null; scale: Scale; written: string } | null {
+  const written = propertyOf(meta.properties, OVERALL)?.value.trim();
+  if (!written || !ratings.rated(meta.type)) return null;
+  const scale = ratings.scaleOf(meta.type);
+  return { score: scoreIn(written, scale), scale, written };
 }

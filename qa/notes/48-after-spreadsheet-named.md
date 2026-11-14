@@ -550,6 +550,7 @@ Rent, $1200, 2026-01-05
 Total, =costs!B2*2
 ```
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 

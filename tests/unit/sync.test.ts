@@ -354,6 +354,28 @@ describe("sync, of tags' and types' icons and colors", () => {
   });
 });
 
+describe("sync, of what the Library's kinds are rated on", () => {
+  test("goes to the folder in library.json, and comes in from other devices choice by choice, the later winning", async () => {
+    const [here] = await devices(1);
+    looks.setRatings({ kinds: { show: { scale: { id: "10", at: Date.now() } } }, scales: {} });
+    await here.sync();
+    const file = `${FOLDER.path}/library.json`;
+    expect(JSON.parse(drive.get(file)!.text).ratings.kinds.show.scale.id).toBe("10");
+
+    // Another device named a show's ratings and made a scale since, and chose its scale before this one did.
+    const there = JSON.parse(drive.get(file)!.text);
+    there.ratings.kinds.show = { scale: { id: "5", at: 1 }, named: { names: ["Story", "Music"], at: Date.now() + 1000 } };
+    there.ratings.scales.vibes = { name: "Vibes", scale: { kind: "labels", labels: ["Great", "Meh"] }, at: Date.now() + 1000 };
+    drive.set(file, { text: JSON.stringify(there), etag: "elsewhere" });
+    await here.sync();
+    expect(looks.looks.ratings.kinds.show).toMatchObject({ scale: { id: "10" }, named: { names: ["Story", "Music"] } });
+    expect(looks.looks.ratings.scales.vibes).toMatchObject({ name: "Vibes" });
+    const merged = JSON.parse(drive.get(file)!.text).ratings;
+    expect(merged.kinds.show).toMatchObject({ scale: { id: "10" }, named: { names: ["Story", "Music"] } });
+    expect(merged.scales.vibes.scale).toEqual({ kind: "labels", labels: ["Great", "Meh"] });
+  });
+});
+
 describe("sync, once every synced note was deleted on another device", () => {
   /** A note synced to two devices and deleted for good on the other; one written here since. */
   async function deletedElsewhere() {

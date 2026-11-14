@@ -33,7 +33,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Math | `$x^2$`, `$$` … `$$`, ` ```math ` code block | GitHub, GitLab, Obsidian, Pandoc |
 | Attachment | `![](../attachments/<hash>.png)`, `[Name.pdf](../attachments/<hash>.pdf)` | Yes (relative links) |
 | Folder or file on this computer | `[Projects](file:///Users/me/Projects/)`, `[Plan](file:///Users/me/plan.pdf)` | Yes (file URLs; Obsidian, VS Code and Typora open them too) |
-| Copyable value, score | `Key: Value` lines (`Rating: 4/5` as stars) | Yes (plain text, read specially) |
+| Copyable value, score, rating | `Key: Value` lines (`Rating: 4/5` as stars), a library note's `rating: 85/100`, `rating: A` | Yes (plain text, read specially) |
 | Time in an episode | `[12:34]` in an `episode` note; `[12:34](https://…/episode.mp3#t=754)` in any note | Yes (text; a link with a [Media Fragments](https://www.w3.org/TR/media-frags/) time, which browsers play from) |
 | GitHub link | `https://github.com/owner/repo/issues/12` | Yes (an ordinary link, drawn short) |
 | Terminal recording | `[![asciicast](https://asciinema.org/a/<id>.svg)](https://asciinema.org/a/<id>)`, `[demo.cast](../attachments/<hash>.cast)` | Yes (asciinema's embed code: a linked image; a link) |
@@ -374,9 +374,35 @@ Plate: 3WBZ56
 - The key is up to 40 characters, starting with a letter or digit, optionally in bold, followed by `:` and a space or tab.
 - The space after the colon keeps out times (`10:30`) and URLs (`https://…`).
 - Only the value is copied, without its Markdown.
-- A value that's a score, a whole number out of 2 to 10 (`Rating: 4/5`, `Score: 5 / 7`), is drawn as that many marks, so many filled: stars, hearts or circles, or as written (Settings → Little Touches, where the copy buttons can be turned off too). With the cursor on its line it's as written, to change. Properties' values are drawn the same.
+- A value that's a score, a number out of 2 to 10, whole or with a half (`Rating: 4/5`, `Score: 5 / 7`, `3.5/5`), is drawn as that many marks, so many filled and a half one half filled: stars, hearts or circles, or as written (Settings → Little Touches, where the copy buttons can be turned off too). With the cursor on its line it's as written, to change; a click on a mark sets it there, and a click on the one that's the score makes it 0, each one change that ⌘Z takes back. Properties' values are drawn the same, and a library note's ratings on its kind's scale ([below](#ratings)).
 
 This changes nothing about the Markdown; it's only how lines draws the line.
+
+## Ratings
+
+A library note's ratings ([library.md](library.md#ratings)) are properties, written so that any app reads them: `rating` for the overall one, and any its kind names (`story`, `music`). Each is read on its kind's scale (Settings → Library → Ratings):
+
+```markdown
+---
+type: show
+rating: 8.5/10
+story: 9/10
+music: A
+---
+# Frieren
+```
+
+| Scale | Written | Drawn |
+|---|---|---|
+| Marks, out of 2 to 10 (Out of 5, lines' default, or one of yours in an icon of its own) | `4/5`, `3.5/5` (halves too) | That many marks, so many filled, as Little Touches draws scores |
+| Points, out of up to 1,000 (Out of 10, Out of 100, or yours) | `85/100`, `7.5/10` (to a tenth) | The number, what it's out of, and a short bar filled as far |
+| Words, the best first (Grades, S to F, or yours: `Masterpiece`, `Great`…) | `A`, `Masterpiece` (in any case) | The word, as a chip in the accent |
+| Thumbs | `thumbs up`, `thumbs down` | A thumb up and a thumb down, the one chosen filled |
+
+- A value that doesn't fit its kind's scale (`4/5` on a show rated out of 10) is drawn as written, nothing changed; changing a kind's scale rewrites nothing.
+- A click on a mark sets the rating there, and on the one set takes the rating out of the properties; a click on a word offers its scale's others. Each is one change, which ⌘Z takes back.
+- Typing a key in a library note's properties offers the kind's ratings it hasn't got, and after one, its scale's values, the best first.
+- Settings → Little Touches → Scores, As Written, draws ratings as written too.
 
 ## Properties
 

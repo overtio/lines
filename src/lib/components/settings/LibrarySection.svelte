@@ -1,8 +1,8 @@
 <script lang="ts">
   // Library: whether a note that's just a link is looked up and filled in, and on the web, which
-  // sources a web page can ask at all (docs/library.md); bringing things in from elsewhere, each
-  // import a plugin's group (a browser's bookmarks, Readwise); and feeds: how often they're
-  // fetched, and OPML.
+  // sources a web page can ask at all (docs/library.md); what things are rated on; bringing things
+  // in from elsewhere, each import a plugin's group (a browser's bookmarks, Readwise); and feeds:
+  // how often they're fetched, and OPML.
   import { feeds } from "../../feeds/feeds.svelte";
   import { locale, t } from "../../i18n/index.svelte";
   import { isTauri } from "../../platform";
@@ -15,6 +15,7 @@
   import Switch from "../ui/Switch.svelte";
   import CardBlock from "./CardBlock.svelte";
   import FeedSettings from "./FeedSettings.svelte";
+  import RatingSettings from "./RatingSettings.svelte";
 
   /** The sources a web page can ask: those on that let it (the rest are the apps' alone). */
   const names = $derived(new Intl.ListFormat(locale, { type: "conjunction" }).format(plugins.librarySources.map((source) => source.name)));
@@ -38,6 +39,8 @@
     <Switch label={t("library.settings.countAgain")} checked={prefs.countAddedAgain} onchange={(on) => (prefs.countAddedAgain = on)} />
   </FieldRow>
 </FieldGroup>
+
+<RatingSettings />
 
 {#each plugins.libraryImports as source (source.id)}
   {#await panelOf(source) then { default: Panel }}

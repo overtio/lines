@@ -116,9 +116,32 @@ link: https://doc.rust-lang.org/book/
 | `feed` | Feeds (by its posts) | author, feed | |
 | `resource` | Resources | folder, added | |
 
-Each has `link` (where it's from) and `status` after its own properties, and only the properties a source found. The keys and the `status` values are written in English, like `type`, so tables (`@type.book`), mentions (`@[Dune].author`) and the Library read them alike on every device; lines shows the status in its own language. A note's status is set from its row's menu on its shelf (or by writing it), and it keeps its date, so the list stays as it is. A status of your own (`status: abandoned`) is shown as written.
+Each has `link` (where it's from) and `status` after its own properties, and only the properties a source found; a `rating` once it's [rated](#ratings). The keys and the `status` values are written in English, like `type`, so tables (`@type.book`), mentions (`@[Dune].author`) and the Library read them alike on every device; lines shows the status in its own language. A note's status is set from its row's menu on its shelf (or by writing it), and it keeps its date, so the list stays as it is. A status of your own (`status: abandoned`) is shown as written.
 
 A new note made while a shelf is shown starts as its kind, at its first status, as Blank in Add to Library does.
+
+## Ratings
+
+Anything in the Library can be rated: its `rating`, a property like any other, which other apps read as it's written.
+
+```markdown
+---
+type: show
+creator: Kanehito Yamada
+rating: 9/10
+story: 8/10
+music: 10/10
+status: watched
+---
+# Frieren: Beyond Journey's End
+```
+
+- **Setting it.** On its shelf, its row's menu has **Rate ▸**, the scale's values the best first, the one set checked, and Remove Rating; with ratings of its own (below), a menu of each, Overall first. In the note, a click on a mark sets it, and a click on the one set takes it out; a click on a word (`A`) offers the scale's others; each is one change, which ⌘Z takes back, and the row's keeps the note's date, so the list doesn't move. Typing a key in its properties offers its kind's ratings it hasn't got (`rating`, `story`), and after one, its scale's values; or write it. Nothing writes an empty `rating:` into a note: a note has a rating once it's rated.
+- **Where it shows.** Drawn in the note's properties on its kind's scale ([linedown.md](linedown.md#ratings)), small on its row on its shelf beside its status, and as marks in a `@type.book` table, whose header sorts by it, the best first or last. A value that doesn't fit the kind's scale shows as written, everywhere.
+- **Scales.** Settings → Library → **Ratings** chooses each kind's: lines' own (Out of 5, in Little Touches' marks, which every kind starts on; Out of 10; Out of 100; Thumbs Up or Down; Grades, S to F), or one of yours. **New Scale** makes one: marks out of 2 to 10 in an icon (stars, hearts, circles, flames…), points out of up to 1,000, or words, the best first (`Masterpiece, Great, Fine, Meh`). Marks take halves, `3.5/5`, which are drawn half filled and typed; a click or a menu gives whole ones. Points take tenths, `7.5/10`; a menu offers out of more than 10 by tenths of the whole (100, 90…). A scale a kind is rated on can't be removed until the kind's on another.
+- **Changing a kind's scale rewrites nothing.** Ratings written on the old one show as written, and Settings says how many of its notes have a rating that doesn't fit. Change them by hand, or choose the scale again.
+- **Ratings of its own.** A kind can name more, beside the overall one: a show's Story, Animation and Music. Each is a property of its notes (`story: 8/10`, the name in lower case), on the kind's scale, offered in the row's Rate ▸ and as the note's properties are typed. In Settings, the pencil beside a kind adds, renames, moves and removes them. Renaming one renames it in the kind's notes too (not in locked notes), which keep their dates; removing one leaves the notes as they are. A name can't be a property lines writes in the kind's notes itself (`status`, `author`…).
+- **Synced.** Each kind's scale and named ratings, and your scales, are kept with tags' and types' looks in `library.json` and synced choice by choice, the later winning ([sync.md](sync.md)), so every device draws a note's ratings alike. An older lines keeps tags' and types' looks from the file but not these, and writes it back without them; a device with this lines puts them back at its next sync.
 
 ## In the sidebar
 

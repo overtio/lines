@@ -7,6 +7,7 @@ Score (Settings → Little Touches) followed straight away, with no blank line, 
 #### 1. Score (Settings → Little Touches), then Paragraph
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighted==, `code`, a [link](https://example.com) and a #qa/tag.
@@ -14,6 +15,7 @@ A paragraph with **bold**, *italic*, <u>underlined</u>, ~~struck~~, ==highlighte
 #### 2. Score (Settings → Little Touches), then Long paragraph
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
@@ -21,6 +23,7 @@ A long paragraph that wraps onto several lines at the usual width, so the space 
 #### 3. Score (Settings → Little Touches), then Heading 1
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 # Heading one
@@ -28,6 +31,7 @@ Not a score: 12/20
 #### 4. Score (Settings → Little Touches), then Heading 2
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ## Heading two
@@ -35,6 +39,7 @@ Not a score: 12/20
 #### 5. Score (Settings → Little Touches), then Heading 3
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ### Heading three
@@ -42,6 +47,7 @@ Not a score: 12/20
 #### 6. Score (Settings → Little Touches), then Bullet list
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 - First item
@@ -53,6 +59,7 @@ Not a score: 12/20
 #### 7. Score (Settings → Little Touches), then Numbered list
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 1. First
@@ -63,6 +70,7 @@ Not a score: 12/20
 #### 8. Score (Settings → Little Touches), then Todo list
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 - [x] Done todo
@@ -72,6 +80,7 @@ Not a score: 12/20
 #### 9. Score (Settings → Little Touches), then Quote
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 > A quote that runs over
@@ -80,6 +89,7 @@ Not a score: 12/20
 #### 10. Score (Settings → Little Touches), then Line marks
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 Marked as the accent. <!-- mark -->
@@ -91,6 +101,7 @@ Red, with a label to point at. <!-- mark red: to fix -->
 #### 11. Score (Settings → Little Touches), then Code block
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```
@@ -101,6 +112,7 @@ plain code
 #### 12. Score (Settings → Little Touches), then Code block (TypeScript)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```ts
@@ -111,6 +123,7 @@ console.log(greeting);
 #### 13. Score (Settings → Little Touches), then JSON block (no language)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```
@@ -120,6 +133,7 @@ Not a score: 12/20
 #### 14. Score (Settings → Little Touches), then Diagram
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```mermaid
@@ -131,6 +145,7 @@ flowchart LR
 #### 15. Score (Settings → Little Touches), then Diagram (240 px wide)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```mermaid |240
@@ -141,6 +156,7 @@ flowchart LR
 #### 16. Score (Settings → Little Touches), then 3D model (openscad block), a colored part, an echo
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```openscad
@@ -155,6 +171,7 @@ echo("made");
 #### 17. Score (Settings → Little Touches), then Flat model (openscad block)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```openscad
@@ -165,6 +182,7 @@ translate([30, 10]) circle(8);
 #### 18. Score (Settings → Little Touches), then Broken model (openscad block)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```openscad
@@ -175,6 +193,7 @@ sphere(3;
 #### 19. Score (Settings → Little Touches), then 3D model (stl block)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```stl
@@ -227,6 +246,7 @@ endsolid pyramid
 #### 20. Score (Settings → Little Touches), then Timing diagram (wavedrom block)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```wavedrom
@@ -241,6 +261,7 @@ Not a score: 12/20
 #### 21. Score (Settings → Little Touches), then Typing practice (typing block)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```typing
@@ -253,6 +274,7 @@ function go() {
 #### 22. Score (Settings → Little Touches), then Math block
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 $$
@@ -262,6 +284,7 @@ $$
 #### 23. Score (Settings → Little Touches), then Table
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 | Left | Center | Right |
@@ -272,6 +295,7 @@ Not a score: 12/20
 #### 24. Score (Settings → Little Touches), then Table with formulas
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 | Item | Cost |
@@ -284,6 +308,7 @@ Not a score: 12/20
 #### 25. Score (Settings → Little Touches), then Hurl entries (hurl block): a capture used by the next entry, and asserts
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```hurl
@@ -305,6 +330,7 @@ jsonpath "$.name" isString
 #### 26. Score (Settings → Little Touches), then Secret ({{name}}, kept in a locked secrets note)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 The token is {{qa-token}}, and {{no-such-secret}} isn't one.
@@ -312,6 +338,7 @@ The token is {{qa-token}}, and {{no-such-secret}} isn't one.
 #### 27. Score (Settings → Little Touches), then API requests (http block): a variable, a named request and one using its response
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```http
@@ -328,6 +355,7 @@ GET {{api}}/users/{{todo.response.body.$.userId}}
 #### 28. Score (Settings → Little Touches), then Spreadsheet (csv block)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```csv
@@ -340,6 +368,7 @@ Total, =SUM(B2:B3)
 #### 29. Score (Settings → Little Touches), then Named spreadsheet (csv name=), and a formula in another block using it
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ```csv name=costs
@@ -354,6 +383,7 @@ Total, =costs!B2*2
 #### 30. Score (Settings → Little Touches), then Divider
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ---
@@ -361,6 +391,7 @@ Not a score: 12/20
 #### 31. Score (Settings → Little Touches), then Page breaks (as lines writes them, and as Obsidian and Typora do; a new page in the PDF at each, a gap between pages over a backdrop)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 Before the break.
@@ -375,6 +406,7 @@ And another.
 #### 32. Score (Settings → Little Touches), then Key: Value line
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 **Wi-Fi password:** correct-horse-battery
@@ -382,15 +414,18 @@ Not a score: 12/20
 #### 33. Score (Settings → Little Touches), then Score (Settings → Little Touches)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 
 #### 34. Score (Settings → Little Touches), then Mention
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 Ask @[QA · Ada] at @[QA · Ada].email.
@@ -398,6 +433,7 @@ Ask @[QA · Ada] at @[QA · Ada].email.
 #### 35. Score (Settings → Little Touches), then Wiki link
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 Ask [[QA · Ada]], or [[QA · Ada|her]].
@@ -405,6 +441,7 @@ Ask [[QA · Ada]], or [[QA · Ada|her]].
 #### 36. Score (Settings → Little Touches), then Symbols
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !== \-> and `a -> b` in code.
@@ -412,6 +449,7 @@ Home -> cabin <- back, a <-> b, x => y, p <=> q, 1 <= 2 >= 0 != 3. Stays: --> !=
 #### 37. Score (Settings → Little Touches), then GitHub links
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 Issue https://github.com/overtio/lines/issues/1 and [a named link](https://github.com/overtio/lines)
@@ -419,6 +457,7 @@ Issue https://github.com/overtio/lines/issues/1 and [a named link](https://githu
 #### 38. Score (Settings → Little Touches), then arXiv links
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
@@ -426,6 +465,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 #### 39. Score (Settings → Little Touches), then Time in an episode
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
@@ -433,6 +473,7 @@ At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [
 #### 40. Score (Settings → Little Touches), then Image
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ![A sample picture](attachment:photo.png)
@@ -440,6 +481,7 @@ Not a score: 12/20
 #### 41. Score (Settings → Little Touches), then Drawing
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ![A sample drawing](attachment:drawing.svg)
@@ -447,6 +489,7 @@ Not a score: 12/20
 #### 42. Score (Settings → Little Touches), then File
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 [Budget.csv](attachment:budget.csv)
@@ -454,6 +497,7 @@ Not a score: 12/20
 #### 43. Score (Settings → Little Touches), then Folder and file links
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/plan.pdf) on this computer.
@@ -461,6 +505,7 @@ See [Projects](file:///Users/me/My%20Projects/) and [the plan](file:///Users/me/
 #### 44. Score (Settings → Little Touches), then Attached 3D model (STL)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 [Bracket.stl](attachment:bracket.stl)
@@ -468,6 +513,7 @@ Not a score: 12/20
 #### 45. Score (Settings → Little Touches), then Terminal recording (.cast file)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 [terminal.cast](attachment:terminal.cast)
@@ -475,6 +521,7 @@ Not a score: 12/20
 #### 46. Score (Settings → Little Touches), then Audio
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 [Chime.mp3](attachment:chime.mp3)
@@ -482,6 +529,7 @@ Not a score: 12/20
 #### 47. Score (Settings → Little Touches), then Video
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 [Sky.mp4](attachment:sky.mp4)
@@ -489,6 +537,7 @@ Not a score: 12/20
 #### 48. Score (Settings → Little Touches), then Missing file
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 [Not here yet.pdf](../attachments/00000000000000000000000000000000.pdf)
@@ -496,6 +545,7 @@ Not a score: 12/20
 #### 49. Score (Settings → Little Touches), then Card
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 ::: card
@@ -505,6 +555,7 @@ Text in a card.
 #### 50. Score (Settings → Little Touches), then Callout (info)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 :::i
@@ -514,6 +565,7 @@ Text in an info callout.
 #### 51. Score (Settings → Little Touches), then Callout (warning, chosen icon)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 :::! icon=flag
@@ -523,6 +575,7 @@ Text in a warning callout with the flag icon.
 #### 52. Score (Settings → Little Touches), then Callout (decision, no icon)
 
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 :::^ icon=none
