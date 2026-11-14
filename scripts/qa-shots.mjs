@@ -10,10 +10,12 @@
  *   bun run qa-shots --only paper,typing the scenes whose names have these words
  *   bun run qa-shots --no-build          the last build again
  */
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, webkit } from "playwright";
 import { build, preview } from "vite";
+import { zip } from "../src/lib/zip.ts";
 import { answerFile, ico, png, wav } from "../tests/browser/files.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -199,6 +201,24 @@ async function obsidian(page, { importing = false } = {}) {
   await page.getByRole("dialog").getByRole("navigation").getByText("Export and Import", { exact: true }).first().click();
   const group = page.getByRole("dialog").getByRole("region", { name: "From Obsidian" });
   await group.locator("input[webkitdirectory]").setInputFiles(`${root}tests/unit/fixtures/obsidian/Vault`);
+  const start = group.getByRole("button", { name: /^Import \d+ Notes$/ });
+  await start.waitFor();
+  if (importing) {
+    await start.click();
+    await group.getByRole("button", { name: "Undo Import" }).waitFor();
+  }
+  await group.evaluate((element) => element.scrollIntoView({ block: "start" }));
+}
+
+/** Settings → Export and Import's Bear, with a backup of the tests' notes chosen (tests/unit/fixtures/bear/Backup, zipped); then, with `importing`, imported. */
+async function bear(page, { importing = false } = {}) {
+  const folder = `${root}tests/unit/fixtures/bear/Backup`;
+  const walk = (dir) => readdirSync(dir).flatMap((entry) => (statSync(join(dir, entry)).isDirectory() ? walk(join(dir, entry)) : [join(dir, entry)]));
+  const backup = zip(walk(folder).map((path) => ({ name: relative(folder, path), data: new Uint8Array(readFileSync(path)), modified: new Date(2024, 10, 14) })));
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByRole("dialog").getByRole("navigation").getByText("Export and Import", { exact: true }).first().click();
+  const group = page.getByRole("dialog").getByRole("region", { name: "From Bear" });
+  await group.locator("input[accept*='.bear2bk']").setInputFiles({ name: "Bear Notes 2024-11-14.bear2bk", mimeType: "application/octet-stream", buffer: Buffer.from(backup) });
   const start = group.getByRole("button", { name: /^Import \d+ Notes$/ });
   await start.waitFor();
   if (importing) {
@@ -1458,6 +1478,25 @@ const SCENES = [
       await page.keyboard.press("Escape");
       await page.evaluate(() => window.testing.notes.select(window.testing.notes.entries.find((entry) => entry.meta.title === "Welcome").note.id));
       await page.locator(".cm-content").getByText("Keep it").evaluate((line) => line.scrollIntoView({ block: "center" }));
+    },
+    shoot: ".editor-pane",
+  },
+  {
+    id: "bear-found",
+    title: "Settings → Export and Import → From Bear, a backup chosen",
+    look: "Its group after Obsidian's: what to choose in Bear and how; Choose Backup… and Choose Export Folder… side by side, lined up; then how many notes and attachments, and quieter, what's left out (a locked note, an unused picture) and changed (a tag of several words, an archived note), each with its examples; no folder switch; Import 5 Notes, focused, and Cancel.",
+    act: (page) => bear(page),
+    shoot: "dialog",
+  },
+  {
+    id: "bear-note",
+    title: "A note brought from Bear",
+    look: "Welcome: its tags (#big-ideas with a dash), the highlight, the underline drawn underlined, struck text; Ideas, later ideas and the recipe as mentions; the picture at 320 px; the PDF's card; the link; the table with a line of text above it.",
+    act: async (page) => {
+      await bear(page, { importing: true });
+      await page.keyboard.press("Escape");
+      await page.evaluate(() => window.testing.notes.select(window.testing.notes.entries.find((entry) => entry.meta.title === "Welcome" && entry.note.source?.app === "bear").note.id));
+      await page.locator(".cm-content").getByText("Fruit counts").waitFor();
     },
     shoot: ".editor-pane",
   },

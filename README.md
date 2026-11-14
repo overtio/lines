@@ -99,7 +99,7 @@ Put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block), or, with Sp
 - **Share** a note through the system share sheet, copy it as Markdown or plain text, or download it as a file.
 - **Export everything** as files in a .zip, each in its note's format (Markdown, LaTeX, CSV, .http or .hurl), with images and files (Settings → Export and Import).
 - **Import** Markdown, LaTeX, CSV, Excel, `.http` and `.hurl` files as notes (Settings → Export and Import).
-- **Move from Obsidian.** Choose your vault's folder in Settings → Export and Import, and its notes come over with their folders (as tags), links, pictures and files, callouts, pins and daily notes (on the Calendar). What won't come across as it was is said first, with examples; importing again adds only what's new, and Undo takes it all back to the Trash. See [docs/importing.md](docs/importing.md).
+- **Move from Obsidian or Bear.** Choose your Obsidian vault's folder, or Bear's backup, in Settings → Export and Import, and its notes come over with their tags (and folders, as tags), links, pictures and files, pins and dates; Obsidian's callouts and daily notes (on the Calendar) too, and Bear's archive and trash. What won't come across as it was is said first, with examples; importing again adds only what's new, and Undo takes it all back to the Trash. See [docs/importing.md](docs/importing.md).
 - **Sample notes.** Add the feature tour, LaTeX examples or the QA notes from Settings → Export and Import.
 
 ### Sync and privacy
@@ -172,7 +172,7 @@ Also on the website: [overtio.github.io/lines/docs](https://overtio.github.io/li
 | [API requests](docs/requests.md) | Sending requests from notes, in the `.http` and Hurl formats |
 | [Secrets](docs/secrets.md) | API keys and passwords kept in a locked note, and used by name |
 | [Library](docs/library.md) | Books, movies, music and the rest as notes, filled in from a link, and where lines looks them up |
-| [Importing](docs/importing.md) | Bringing notes in from other apps (Obsidian): what to export, what comes across and what doesn't |
+| [Importing](docs/importing.md) | Bringing notes in from other apps (Obsidian, Bear): what to export, what comes across and what doesn't |
 | [Plugins](docs/plugins.md) | How lines is made of plugins, turning them off, and writing one |
 | [Sync](docs/sync.md) | How sync and encryption work |
 | [Storage](docs/storage.md) | Where the web app keeps your notes, and for how long |
@@ -318,6 +318,7 @@ src/
     hacker-news/             A Hacker News story's discussion under its post: Algolia's copy of the thread, ranked by the official API (thread.ts)
     readwise/                Moving from Readwise: its API (api.ts), what it has as library notes (sources.ts), their highlights (write.ts), what importing writes (plan.ts)
     obsidian/                Moving from Obsidian: a vault read (vault.ts), its notes in Linedown (markdown.ts)
+    bear/                    Moving from Bear: its backup or export read (backup.ts), its notes in Linedown (markdown.ts)
     code/                    Code notes, a format for each language CodeMirror knows, shown as one (Code) with a choice of language
     changes/                 Marks the lines changed since a note was opened (a line diff, diff.ts)
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
@@ -347,6 +348,7 @@ src/
       imports.svelte.ts      Any import (notes from another app, the Library's bookmarks, Readwise), written in the main window a batch at a time, and Undo into the Trash
       exported.ts            What another app exported, chosen to import: a folder's files or a ZIP's, read when asked
       notes.ts               Notes from another app: what importing them would do, their attachments kept, and the notes, each knowing where it came from
+      markdown.ts            Another app's Markdown changed only outside code; paths and links in it
     feeds/
       feeds.svelte.ts        Feeds subscribed to (notes with `feed:`), fetching them in turn, their posts, read and unread, saving one to the Library
       parse.ts  markdown.ts  Reading RSS, Atom, RSS 1.0 (mended where they're broken) and JSON Feed; a post's HTML as Markdown, by walking it
@@ -537,7 +539,8 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [ ] Backlinks: the notes that mention this one
 - [ ] Renaming a note updates the mentions of it
 - [x] Import from Obsidian: notes, folders as tags, links, pictures and files, callouts, pins and daily notes
-- [ ] Import from Bear, Logseq, Notion and Evernote, as from Obsidian
+- [x] Import from Bear: its backup or export, tags, links, pictures and files, pins, archive and trash
+- [ ] Import from Logseq, Notion and Evernote, as from Obsidian and Bear
 - [ ] Drawings in LaTeX notes (`\includegraphics` of a drawing, as a PDF for TeX)
 - [ ] Converting a note between Markdown and LaTeX
 - [ ] More of TeX Live for TeX's PDFs (packages beyond the basic ones, fetched as a note needs them)

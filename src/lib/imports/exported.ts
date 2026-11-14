@@ -33,7 +33,10 @@ export const textOf = (bytes: Uint8Array) => new TextDecoder().decode(bytes).rep
 
 const typed = (blob: Blob, path: string) => new File([blob], nameOf(path), { type: attachmentType(path) });
 
-/** The files of each ZIP chosen, by their paths in it. */
+/** ZIPs, by the names apps give theirs too: Bear's backups (.bear2bk), TextPacks. */
+const ZIP = /\.(?:zip|bear2bk|textpack)$/i;
+
+/** The files of a ZIP, by their paths in it. */
 async function unzipped(zip: File): Promise<ExportedFile[]> {
   const entries = zipEntries(new Uint8Array(await zip.arrayBuffer()));
   return [...entries]
@@ -47,25 +50,29 @@ async function unzipped(zip: File): Promise<ExportedFile[]> {
     }));
 }
 
+/** Files with the folder they all share, if they do, as their name and taken off their paths; or `name`. */
+function rooted(name: string, files: ExportedFile[]): Exported {
+  const top = files[0]?.path.split("/")[0];
+  const shared = !!top && files.every((file) => file.path.startsWith(`${top}/`));
+  return shared ? { name: top, files: files.map((file) => ({ ...file, path: file.path.slice(top.length + 1) })) } : { name, files };
+}
+
 /**
  * The export in the files chosen: a folder's (from a picker of folders, each file knowing its path
- * in it), or one or more ZIPs, unpacked. A top folder they all share is the export's name, and
- * taken off their paths.
+ * in it), or a ZIP, unpacked; a folder they all share is its name. Of several ZIPs, each is a folder
+ * of the export named after it.
  */
 export async function exportedFrom(chosen: File[]): Promise<Exported> {
-  const files: ExportedFile[] = [];
-  for (const file of chosen) {
-    if (/\.zip$/i.test(file.name)) files.push(...(await unzipped(file)));
-    else {
+  const zips = chosen.filter((file) => ZIP.test(file.name));
+  const loose = chosen.filter((file) => !ZIP.test(file.name));
+  const parts = await Promise.all(zips.map(async (zip) => rooted(zip.name.replace(ZIP, ""), await unzipped(zip))));
+  if (loose.length) {
+    const files = loose.map((file): ExportedFile => {
       const path = file.webkitRelativePath || file.name;
-      files.push({ path, size: file.size, modified: file.lastModified || undefined, text: async () => textOf(new Uint8Array(await file.arrayBuffer())), file: async () => typed(file, path) });
-    }
+      return { path, size: file.size, modified: file.lastModified || undefined, text: async () => textOf(new Uint8Array(await file.arrayBuffer())), file: async () => typed(file, path) };
+    });
+    parts.push(rooted(loose[0].name, files));
   }
-  const top = files[0]?.path.split("/")[0];
-  const shared = top && files.every((file) => file.path.startsWith(`${top}/`));
-  const zip = chosen.length === 1 && /\.zip$/i.test(chosen[0].name) ? chosen[0].name.replace(/\.zip$/i, "") : "";
-  return {
-    name: shared ? top : zip || (chosen[0]?.name ?? ""),
-    files: shared ? files.map((file) => ({ ...file, path: file.path.slice(top.length + 1) })) : files,
-  };
+  if (parts.length === 1) return parts[0];
+  return { name: parts[0]?.name ?? "", files: parts.flatMap((part) => part.files.map((file) => ({ ...file, path: `${part.name}/${file.path}` }))) };
 }

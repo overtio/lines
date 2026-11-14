@@ -9,4 +9,4 @@
   let { onclose }: { files?: ImportFile[]; onclose?: () => void } = $props();
 </script>
 
-<NotesImport id="obsidian" choose={t("import.obsidian.choose")} folder read={readVault} {onclose} />
+<NotesImport id="obsidian" choices={[{ label: t("import.obsidian.choose"), folder: true }]} read={readVault} {onclose} />
