@@ -35,6 +35,7 @@ const { readPage, decodeEntities } = await import("../../src/lib/library/page");
 const { itemOfPage } = await import("../../src/plugins/web-pages/read");
 const { webPages } = await import("../../src/plugins/web-pages");
 const { youtube, youtubeId } = await import("../../src/plugins/youtube");
+const { agoDate, channelAsFeed, channelPath, feedChannel, readChannelPage } = await import("../../src/plugins/youtube/channel");
 const { openLibrary, bookIn, isIsbn } = await import("../../src/plugins/open-library");
 const { wikidata, itemIn } = await import("../../src/plugins/wikidata");
 const { musicbrainz, musicIn } = await import("../../src/plugins/musicbrainz");
@@ -164,13 +165,19 @@ describe("a library note's text", () => {
     expect([propertyValue("Star Wars: Episode IV"), propertyValue("It's"), propertyValue("Plain Words")]).toEqual(["'Star Wars: Episode IV'", "It's", "Plain Words"]);
   });
 
-  test("an episode's podcast, a mention of it, where its kind says so; its row shows the podcast", () => {
-    const written = text.libraryNoteText({ type: "episode", title: "An Episode", properties: [["podcast", "The Daily"], ["author", "@nytimes"]] }, { mentions: ["podcast"] });
-    expect(written).toContain("podcast: @[The Daily]\nauthor: \\@nytimes\n");
-    const kind = { type: "episode", subtitle: ["podcast", "author"], mentions: ["podcast"] } as unknown as Parameters<typeof subtitleOf>[0];
-    const meta = computeMeta(written);
-    const value = (key: string) => meta.properties.find((property) => property.key === key)?.value;
-    expect(subtitleOf(kind, value)).toBe("The Daily · @nytimes");
+  test("an episode's podcast, a mention of its note, and a video's channel, a link to its page, as they're given; their rows show the names", () => {
+    const shown = (written: string, subtitle: string[], mentions: string[]) => {
+      const kind = { type: "", subtitle, mentions } as unknown as Parameters<typeof subtitleOf>[0];
+      const meta = computeMeta(written);
+      return subtitleOf(kind, (key: string) => meta.properties.find((property) => property.key === key)?.value);
+    };
+    const episode = text.libraryNoteText({ type: "episode", title: "An Episode", properties: [["podcast", "The Daily"], ["author", "@nytimes"]] }, { written: { podcast: "@[The Daily]" } });
+    expect(episode).toContain("podcast: @[The Daily]\nauthor: \\@nytimes\n");
+    expect(shown(episode, ["podcast", "author"], ["podcast"])).toBe("The Daily · @nytimes");
+    const link = "[Tide \\[Pool\\] Science](https://www.youtube.com/@tidepools)";
+    const video = text.libraryNoteText({ type: "video", title: "A Video", properties: [["channel", "Tide [Pool] Science"], ["duration", "12:04"]] }, { written: { channel: link } });
+    expect(video).toContain(`channel: ${link}\nduration: 12:04\n`);
+    expect(shown(video, ["channel", "duration"], ["channel"])).toBe("Tide [Pool] Science · 12:04");
   });
 
   test("a cover had later (a feed's site's icon) goes under the note's title, at the width it's given", () => {
@@ -306,6 +313,118 @@ describe("YouTube", () => {
     await expect(look(youtube, "https://youtu.be/dQw4w9WgXcQ")).rejects.toThrow();
     answers.set("https://www.youtube.com/oembed", 404);
     expect(await look(youtube, "https://youtu.be/dQw4w9WgXcQ")).toBeNull();
+  });
+
+  const CHANNEL = "UCtidepoolscience0000001";
+  const channelPage = () => readFileSync(new URL("../browser/feeds/youtube-channel.html", import.meta.url), "utf8");
+  const NOW = Date.UTC(2026, 10, 14, 12);
+
+  test("knows its channels' links, by handle, id, custom name or user, to any of their tabs, and their feeds", () => {
+    const paths = {
+      "https://www.youtube.com/@tidepools": "@tidepools",
+      "https://m.youtube.com/@tidepools/videos?view=0": "@tidepools",
+      "https://youtube.com/channel/UCtidepoolscience0000001/featured": `channel/${CHANNEL}`,
+      "https://www.youtube.com/c/TidePoolScience/": "c/TidePoolScience",
+      "https://www.youtube.com/user/tidepools/streams": "user/tidepools",
+    };
+    for (const [link, path] of Object.entries(paths)) expect(channelPath(new URL(link)), link).toBe(path);
+    for (const link of ["https://www.youtube.com/watch?v=tidepool003", "https://www.youtube.com/channel/UCshort", "https://www.youtube.com/feed/subscriptions", "https://music.youtube.com/@tidepools", "https://example.com/@tidepools"]) {
+      expect(channelPath(new URL(link)), link).toBeNull();
+    }
+    expect(feedChannel(new URL(`https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL}`))).toBe(CHANNEL);
+    expect(feedChannel(new URL("https://www.youtube.com/feeds/videos.xml?playlist_id=PLtidepools"))).toBeNull();
+  });
+
+  test("reads when \"3 days ago\" was, written short or long", () => {
+    const DAY = 86_400_000;
+    expect([agoDate("9d ago", NOW), agoDate("3w ago", NOW), agoDate("2 months ago", NOW), agoDate("Streamed 1 year ago", NOW), agoDate("5 minutes ago", NOW)]).toEqual([
+      NOW - 9 * DAY,
+      NOW - 21 * DAY,
+      NOW - 60 * DAY,
+      NOW - 365 * DAY,
+      NOW - 5 * 60_000,
+    ]);
+    expect([agoDate("Premieres tomorrow", NOW), agoDate("18K views", NOW)]).toEqual([undefined, undefined]);
+  });
+
+  test("a channel's page: what it says of itself, and its videos, a playlist among them not one; as a feed, its dates a guess", () => {
+    const channel = readChannelPage(channelPage(), "https://www.youtube.com/@tidepools/videos", NOW);
+    expect({ ...channel, videos: undefined }).toEqual({
+      id: CHANNEL,
+      title: "Tide Pool Science",
+      link: "https://www.youtube.com/@tidepools",
+      description: "Small worlds between the tides: crabs, anemones and the sea that comes back twice a day.",
+      picture: "https://yt3.googleusercontent.com/tidepools=s900-c-k-c0x00ffffff-no-rj",
+      videos: undefined,
+    });
+    const DAY = 86_400_000;
+    expect(channel.videos).toEqual([
+      { id: "tidepool003", title: "How hermit crabs trade shells", date: NOW - 2 * DAY, duration: 3956 },
+      { id: "tidepool002", title: "Anemones at low tide", date: NOW - 21 * DAY, duration: 724 },
+      { id: "tidepool001", title: "Why the sea comes back twice a day", date: NOW - 60 * DAY, duration: 510 },
+    ]);
+    const feed = channelAsFeed(channel);
+    expect(feed.posts[0]).toEqual({
+      id: "yt:video:tidepool003",
+      title: "How hermit crabs trade shells",
+      link: "https://www.youtube.com/watch?v=tidepool003",
+      author: "Tide Pool Science",
+      date: NOW - 2 * DAY,
+      approximate: true,
+      html: "",
+      base: "https://www.youtube.com/watch?v=tidepool003",
+      excerpt: "",
+      image: "https://i.ytimg.com/vi/tidepool003/hqdefault.jpg",
+      duration: 3956,
+    });
+  });
+
+  test("a channel's page as YouTube wrote its lists before (videoRenderer) is read too; one that's changed past reading, or isn't a channel's, is nothing to guess from", () => {
+    const old = channelPage().replace(
+      /var ytInitialData = .*;<\/script>/,
+      `var ytInitialData = ${JSON.stringify({
+        contents: { items: [{ videoRenderer: { videoId: "tidepool009", title: { runs: [{ text: "Kelp, " }, { text: "slowly" }] }, publishedTimeText: { simpleText: "4 days ago" }, lengthText: { simpleText: "3:15" } } }] },
+        metadata: { channelMetadataRenderer: { title: "Tide Pool Science", externalId: CHANNEL } },
+      })};</script>`,
+    );
+    const channel = readChannelPage(old, "https://www.youtube.com/channel/UCtidepoolscience0000001/videos", NOW);
+    expect(channel.videos).toEqual([{ id: "tidepool009", title: "Kelp, slowly", date: NOW - 4 * 86_400_000, duration: 195 }]);
+    // No handle in its data: its link by its id.
+    expect(channel.link).toBe(`https://www.youtube.com/channel/${CHANNEL}`);
+
+    const changed = channelPage().replace(/"lockupViewModel"/g, '"somethingNew"');
+    expect(readChannelPage(changed, "https://www.youtube.com/@tidepools/videos", NOW).videos).toEqual([]);
+    expect(() => channelAsFeed(readChannelPage(changed, "https://www.youtube.com/@tidepools/videos", NOW))).toThrow();
+    expect(() => readChannelPage("<html><head><title>Before you continue to YouTube</title></head></html>", "https://consent.youtube.com/m", NOW)).toThrow();
+  });
+
+  test("a channel's link is the channel, subscribing to its feed: its page asked for once, in English; a video's channel is linked to", async () => {
+    answers.set("https://www.youtube.com/@tidepools/videos", channelPage());
+    const item = await look(youtube, "https://www.youtube.com/@tidepools/featured");
+    expect(item).toEqual({
+      type: "channel",
+      title: "Tide Pool Science",
+      link: "https://www.youtube.com/@tidepools",
+      properties: [["feed", `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL}`]],
+      cover: "https://yt3.googleusercontent.com/tidepools=s900-c-k-c0x00ffffff-no-rj",
+      description: "Small worlds between the tides: crabs, anemones and the sea that comes back twice a day.",
+    });
+    expect(asked).toEqual(["https://www.youtube.com/@tidepools/videos"]);
+
+    // A video: its channel's page linked to (or its note mentioned: note.ts), by the link oEmbed gives.
+    answers.set("https://www.youtube.com/oembed", { title: "How hermit crabs trade shells", author_name: "Tide Pool Science", author_url: "https://www.youtube.com/@tidepools" });
+    answers.set("https://i.ytimg.com/vi/tidepool003/maxresdefault.jpg", {});
+    expect((await look(youtube, "https://youtu.be/tidepool003"))?.linked).toEqual({ channel: "https://www.youtube.com/@tidepools" });
+
+    // Subscribing to a video's link is subscribing to its channel; its feed missing, it's read from the channel's page.
+    asked.length = 0;
+    const source = sourceOf(youtube);
+    expect((await source.subscription!(new URL("https://www.youtube.com/watch?v=tidepool003"), new AbortController().signal))?.title).toBe("Tide Pool Science");
+    answers.set(`https://www.youtube.com/channel/${CHANNEL}/videos`, channelPage());
+    const feed = await source.feedInstead!(new URL(`https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL}`), new AbortController().signal);
+    expect(feed?.posts.map((post) => post.id)).toEqual(["yt:video:tidepool003", "yt:video:tidepool002", "yt:video:tidepool001"]);
+    expect(await source.feedInstead!(new URL("https://example.com/feed.xml"), new AbortController().signal)).toBeNull();
+    expect(asked.filter((url) => !url.startsWith("https://www.youtube.com/oembed"))).toEqual(["https://www.youtube.com/@tidepools/videos", `https://www.youtube.com/channel/${CHANNEL}/videos`]);
   });
 });
 
@@ -732,7 +851,7 @@ describe("asking the web", () => {
   });
 
   test("a cover that isn't on the web at large isn't asked for, and nothing's kept", async () => {
-    const note = await libraryNote({ type: "movie", title: "Dune", properties: [], cover: "https://192.168.1.1/poster.jpg" });
+    const note = await libraryNote({ type: "movie", title: "Dune", properties: [], cover: "https://192.168.1.1/poster.jpg" }, []);
     expect(asked).toEqual([]);
     expect(text.coverOf(note.text)).toBeNull();
     await note.keep();

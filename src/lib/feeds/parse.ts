@@ -41,6 +41,8 @@ export interface Post {
   author?: string;
   /** When it was published (or last updated, if that's all it says), in milliseconds. */
   date?: number;
+  /** Its date is a guess, from "3 days ago" (a YouTube channel's page): kept as it was once one's known. */
+  approximate?: boolean;
   /** Its content, as HTML. */
   html: string;
   /** Where its content's relative links and pictures are from. */
@@ -237,7 +239,7 @@ function asHtml(value: string): string {
   return paragraphs(value, (line) => line.replace(/&(?![#\w]+;)/g, "&amp;").replace(/</g, "&lt;"));
 }
 
-/** HTML for what's only ever text (JSON Feed's): nothing in it read as a tag or an entity. */
+/** HTML for what's only ever text (JSON Feed's, and Media RSS's descriptions, YouTube's): nothing in it read as a tag or an entity. */
 const textHtml = (value: string) => paragraphs(value, (line) => line.replace(/&/g, "&amp;").replace(/</g, "&lt;"));
 
 /**
@@ -292,14 +294,16 @@ function bestTranscript(files: Named[]): Named | undefined {
 
 /** What a post or a channel says of itself in iTunes' and Podcasting 2.0's tags, and Media RSS's. */
 function podcastTags(element: Element, base: string) {
-  const media = children(element, "content", NS.media);
-  const thumbnail = child(element, "thumbnail", NS.media) ?? media.flatMap((content) => children(content, "thumbnail", NS.media))[0];
+  // Media RSS's, as they come or in a group of them (YouTube's).
+  const holders = [element, ...children(element, "group", NS.media)];
+  const media = holders.flatMap((holder) => children(holder, "content", NS.media));
+  const thumbnail = holders.map((holder) => child(holder, "thumbnail", NS.media)).find(Boolean) ?? media.flatMap((content) => children(content, "thumbnail", NS.media))[0];
   const picture = media.find((content) => content.getAttribute("medium") === "image" || (content.getAttribute("type") ?? "").startsWith("image/"));
   const playable = media.find((content) => ["audio", "video"].includes(content.getAttribute("medium") ?? "") || PLAYABLE.test(content.getAttribute("type") ?? ""));
   return {
     image: address(child(element, "image", NS.itunes)?.getAttribute("href") ?? child(element, "image", NS.googleplay)?.getAttribute("href") ?? thumbnail?.getAttribute("url") ?? picture?.getAttribute("url"), base),
     author: text(element, "author", NS.itunes) ?? text(element, "creator", NS.dc),
-    summary: text(element, "summary", NS.itunes),
+    summary: text(element, "summary", NS.itunes) ?? holders.map((holder) => text(holder, "description", NS.media)).find(Boolean),
     duration: readDuration(text(element, "duration", NS.itunes)) ?? readDuration(playable?.getAttribute("duration")),
     season: number(text(element, "season", NS.itunes) ?? text(element, "season", NS.podcast)),
     episode: number(text(element, "episode", NS.itunes) ?? text(element, "episode", NS.podcast)),
@@ -430,7 +434,8 @@ function readAtom(root: Element, url: string): Feed {
     const date = readDate(text(entry, "published", ns) ?? text(entry, "issued", ns) ?? text(entry, "updated", ns) ?? text(entry, "modified", ns));
     const summary = atomHtml(child(entry, "summary", ns));
     const content = child(entry, "content", ns);
-    const html = atomHtml(content) || summary;
+    // Or, where it has neither, what its media say (YouTube's).
+    const html = atomHtml(content) || summary || textHtml(entryTags.summary ?? "");
     const enclosures = children(entry, "link", ns)
       .filter((each) => each.getAttribute("rel") === "enclosure")
       .map((each) => ({ url: each.getAttribute("href"), type: each.getAttribute("type") }));

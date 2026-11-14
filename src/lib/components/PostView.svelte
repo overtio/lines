@@ -64,12 +64,15 @@
     const by = [
       source && escapeMarkdown(source),
       elsewhere,
-      post.author && escapeMarkdown(post.author),
+      // By whom, but not again where it's the feed's own name (a channel's videos are by the channel).
+      post.author && post.author !== source && escapeMarkdown(post.author),
       post.date && escapeMarkdown(formatDay(post.date)),
       post.comments && markdownLink(t("feeds.comments"), post.comments),
     ].filter(Boolean);
     const title = post.link ? markdownLink(post.title, post.link) : escapeMarkdown(post.title);
-    const body = bodyOf(post, html, summary);
+    // One a site's player plays (a YouTube video), that player first: its link on a line of its own.
+    const played = post.link && plugins.embed({ href: post.link, image: null, label: post.title }) ? markdownLink(post.title, post.link) : "";
+    const body = [played, bodyOf(post, html, summary)].filter(Boolean).join("\n\n");
     // No empty lines for a body it hasn't, between its byline and its comments.
     return `# ${title}\n${by.join(" · ")}${body && `\n\n${body}\n`}`;
   }

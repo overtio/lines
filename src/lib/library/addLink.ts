@@ -78,7 +78,7 @@ export async function addLink(view: EditorView, link: WebLink) {
     if (!addings.has(adding)) return;
     if (!item) return say(adding, "nothing", t("library.nothing"));
     const existing = libraryNoteOf(item.link, link.href);
-    const made = existing ? null : await libraryNote(item, signal);
+    const made = existing ? null : await libraryNote(item, notes.entries, signal);
     if (!addings.has(adding)) return;
     end(adding);
     // Where the link is now: in the editor following it, or else in the note as stored.

@@ -131,7 +131,12 @@ export default {
   "plugins.webPages.description":
     "Looks up a link to any page for what it says it is (a book, a movie, an article…), as most sites say for search engines: IMDb, Letterboxd, Goodreads, Spotify, Bandcamp, Substack, blogs and news. The link goes to its site.",
   "plugins.webPages.apps": "Needs the lines app: sites don’t let web pages read them.",
-  "plugins.youtube.description": "Looks up links to YouTube’s videos: their title, channel and picture, and in the apps when they came out and how long they are. The link goes to YouTube.",
+  "plugins.youtube.description": "Looks up links to YouTube’s videos (their title, channel and picture, and in the apps when they came out and how long they are) and its channels, which are subscribed to for their videos; plays a video linked to on a line of its own. Only the links go to YouTube, and its player loads only once it’s played.",
+  // A YouTube channel as a kind of thing in the Library: one, and its row.
+  "plugins.youtube.channel": "Channel",
+  "plugins.youtube.channels": "Channels",
+  // What a link to a YouTube video is, on its card until it plays.
+  "plugins.youtube.video": "Video",
   "plugins.openLibrary.description": "Looks up books by a link to Open Library, or an ISBN in a link (a bookshop’s, or Amazon’s): author, year, pages and cover. The book’s ISBN or id goes to Open Library.",
   "plugins.wikidata.description":
     "Looks up movies, shows and books by a link to IMDb, The Movie Database, Letterboxd, Wikipedia or Wikidata: director, year, runtime, genre, and what they’re about from Wikipedia. The id in the link goes to Wikidata and Wikipedia.",

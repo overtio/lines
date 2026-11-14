@@ -1713,6 +1713,54 @@
   max-width: none;
 }
 
+/* A video's, as wide as the note lets it be: its picture until it's played, Play in its middle. */
+.cm-lp-site-player.is-video {
+  width: min(100%, 40em);
+}
+
+.cm-lp-site-poster {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--card-bg);
+  box-shadow: 0 0 0 1px var(--card-border);
+}
+
+.cm-lp-site-poster img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cm-lp-site-poster .cm-lp-site-play {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.5em;
+  height: 3.5em;
+  border-radius: 50%;
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: 0 0 0 1px var(--card-border);
+}
+
+.cm-lp-site-poster .cm-lp-site-play:hover {
+  background: var(--card-bg);
+  color: var(--accent);
+}
+
+.cm-focused .cm-lp-embed-block.is-selected .cm-lp-site-player:has(> .cm-lp-site-poster) {
+  box-shadow: none;
+}
+
+.cm-focused .cm-lp-embed-block.is-selected .cm-lp-site-poster {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
 .cm-lp-site-player:hover .cm-lp-actions,
 .cm-lp-embed-block:is(.is-preview, .is-selected) .cm-lp-site-player .cm-lp-actions {
   opacity: 1;

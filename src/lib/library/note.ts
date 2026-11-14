@@ -1,5 +1,8 @@
 import { readAtMost } from "../feeds/fetch";
+import { markdownLink } from "../feeds/markdown";
 import { attachmentNameOf, putAttachment } from "../notes/attachments";
+import { mentionOf, propertyOf } from "../notes/properties";
+import type { Entry } from "../notes/store.svelte";
 import { drawable, smaller } from "../pictures";
 import { plugins } from "../plugins/registry.svelte";
 import type { LibraryItem } from "../plugins/types";
@@ -53,17 +56,37 @@ async function coverAt(url: string, signal?: AbortSignal): Promise<Blob | undefi
 /**
  * A library note for what a source found, written the same way however it's added (a link, Add to
  * Library, a saved post): starting where its kind starts (`to read`), its cover downloaded but kept
- * only with `keep()`, once the note is written, so nothing's left over when it isn't. Something
- * brought from another app can say where it's got to instead (`status`, or null for nowhere).
+ * only with `keep()`, once the note is written, so nothing's left over when it isn't, and what it
+ * names that the library has (`notes`, the notes there are) mentioned. Something brought from
+ * another app can say where it's got to instead (`status`, or null for nowhere).
  */
-export async function libraryNote(item: LibraryItem, signal?: AbortSignal, { status = firstStatus(item.type) }: { status?: string | null } = {}): Promise<LibraryNote> {
+export async function libraryNote(item: LibraryItem, notes: readonly Entry[], signal?: AbortSignal, { status = firstStatus(item.type) }: { status?: string | null } = {}): Promise<LibraryNote> {
   const cover = await coverOfItem(item, signal);
   return {
-    text: libraryNoteText(item, { status: status ?? undefined, cover, mentions: plugins.libraryKind(item.type)?.mentions }),
+    text: libraryNoteText(item, { status: status ?? undefined, cover, written: namedValues(item, notes) }),
     keep: async () => {
       if (cover) await putAttachment(cover.name, cover.picture);
     },
   };
+}
+
+/**
+ * How `item`'s properties naming something with a note of its own are written (its kind's
+ * `mentions`: an episode's podcast, a video's channel): a mention of that note while the Library has
+ * it (among `notes`), found by its page (`LibraryItem.linked`) or else by its title; else a link to
+ * its page, or just its name. Never a mention of a note that isn't there.
+ */
+export function namedValues(item: LibraryItem, notes: readonly Entry[]): Record<string, string> {
+  const library = notes.filter(({ note, meta }) => !note.trashed && plugins.libraryKind(meta.type));
+  return Object.fromEntries(
+    (plugins.libraryKind(item.type)?.mentions ?? []).flatMap((key) => {
+      const name = item.properties.find(([each]) => each === key)?.[1].trim();
+      if (!name) return [];
+      const page = item.linked?.[key];
+      const named = library.find(({ meta }) => (page ? propertyOf(meta.properties, "link")?.value.trim() === page : meta.title === name));
+      return named ? [[key, mentionOf(named.meta.title)]] : page ? [[key, markdownLink(name, page)]] : [];
+    }),
+  );
 }
 
 /** The cover of a note for `item`: its picture, else its site's icon (a feed's that has none); nothing where neither can be had. */

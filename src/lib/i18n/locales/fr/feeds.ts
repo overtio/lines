@@ -73,6 +73,7 @@ export default {
   "feeds.group.atom": "Flux Atom",
   "feeds.group.json": "Flux JSON",
   "feeds.group.podcast": "Flux de podcasts",
+  "feeds.group.video": "Flux de vidéos",
   "feeds.showGroup": "Afficher les flux de {group}",
   "feeds.inSidebar": "Flux dans la barre latérale",
   "feeds.inSidebarNote": "Par type : une ligne dans la Bibliothèque pour les flux RSS, une pour les flux Atom et une pour ceux des podcasts (celui d’un podcast, quel que soit son format). Ensemble : une seule ligne, Flux.",

@@ -1,7 +1,6 @@
 import { ATTACHMENT_PATH } from "../notes/attachments";
 import { escapeMarkdown, propertyValue } from "../notes/escape";
 import { cleanTagInput, normalizeTag } from "../notes/parse";
-import { mentionOf } from "../notes/properties";
 import type { LibraryItem } from "../plugins/types";
 
 /*
@@ -72,8 +71,8 @@ export interface NoteOptions {
   status?: string;
   /** Its cover, an attachment's name, and how wide the note shows it. */
   cover?: { name: string; width: number };
-  /** The keys whose values are another note's title (an episode's podcast), written as a mention of it. */
-  mentions?: string[];
+  /** Properties written as they're given, already Markdown, by key: a mention of another note, a link (note.ts' `namedValues`). */
+  written?: Record<string, string>;
 }
 
 /**
@@ -81,13 +80,13 @@ export interface NoteOptions {
  * got to, `status`), its title as its heading, its cover, its summary and its tags. What came from
  * elsewhere reads as just that text (escape.ts): no tag, mention, link or picture is made of it.
  */
-export function libraryNoteText(item: LibraryItem, { status, cover, mentions = [] }: NoteOptions = {}): string {
+export function libraryNoteText(item: LibraryItem, { status, cover, written = {} }: NoteOptions = {}): string {
   const properties: [string, string][] = [["type", item.type], ...item.properties];
   if (item.link) properties.push(["link", item.link]);
   if (status) properties.push(["status", status]);
   const front = properties.flatMap(([key, value]) => {
     const text = oneLine(value);
-    return text ? [`${key}: ${mentions.includes(key) ? mentionOf(text) : propertyValue(text)}`] : [];
+    return text ? [`${key}: ${written[key] ?? propertyValue(text)}`] : [];
   });
   const title = oneLine(item.title);
   const parts = [`---\n${front.join("\n")}\n---\n# ${escapeMarkdown(title)}`];

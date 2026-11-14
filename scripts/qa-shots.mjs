@@ -280,6 +280,15 @@ const ICON_FEEDS = {
   "https://feeds.megaphone.fm/FSI1483080183": "podcast.rss",
 };
 
+/** A YouTube channel, as the apps read it: its page, its feed, its picture, and its newest video's (sea over sand). */
+const CHANNEL = "https://www.youtube.com/@tidepools";
+const YOUTUBE = {
+  [`${CHANNEL}/videos`]: [readFileSync(`${root}tests/browser/feeds/youtube-channel.html`, "utf8"), "text/html"],
+  "https://www.youtube.com/feeds/videos.xml?channel_id=UCtidepoolscience0000001": [readFileSync(`${root}tests/browser/feeds/youtube.atom`, "utf8"), "application/atom+xml"],
+  "https://yt3.googleusercontent.com/tidepools=s900-c-k-c0x00ffffff-no-rj": [png(96, 96, (x, y) => (Math.hypot(x - 48, y - 48) < 30 ? [236, 180, 120] : [40, 120, 140])), "image/png"],
+  "https://i.ytimg.com/vi/tidepool003/hqdefault.jpg": [png(480, 270, (x, y) => (y > 170 + 12 * Math.sin(x / 40) ? [214, 196, 160] : [46, 128, 150 + Math.round(y / 6)])), "image/png"],
+};
+
 /** lines' own look, and three styles with their themes: a scene taken in each, `-neon` after its id. */
 const LOOKS = [
   ["", {}],
@@ -918,6 +927,18 @@ const SCENES = [
       await page.getByRole("navigation", { name: "Library" }).locator("li li img").nth(3).waitFor();
     },
   })),
+  {
+    id: "feeds-video",
+    title: "A YouTube channel's video, in Video Feeds",
+    look: "In the Library: Video Feeds after Podcast Feeds, Tide Pool Science under it with its round picture and unread count, and a Channels shelf. Its posts in the list, a Short among them. The open video: its title and byline, then its picture as wide as the note at 16:9, its corners the theme's, a round Play button in its middle (the theme's card color, not YouTube's red), Open on YouTube beside it; then what the video says, its link a link.",
+    act: async (page) => {
+      await subscribe(page, {}, YOUTUBE);
+      await page.evaluate((channel) => window.testing.feeds.subscribe(channel), CHANNEL);
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Tide Pool Science/ }).click();
+      await page.locator(".note-list").getByRole("button", { name: /^How hermit crabs/ }).click();
+      await page.getByRole("group", { name: "How hermit crabs trade shells" }).locator("img").waitFor();
+    },
+  },
   {
     id: "feeds-together",
     title: "The Feeds together (Settings → Library → Feeds in the sidebar)",

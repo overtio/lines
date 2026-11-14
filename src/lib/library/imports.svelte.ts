@@ -116,7 +116,7 @@ class Imports {
 
   /** The note for `made`, its cover downloaded (kept with `keep()` once it's written). */
   async #make({ item, status, more, created, updated }: NewNote, undated: number, signal: AbortSignal) {
-    const written = await libraryNote(item, signal, { status });
+    const written = await libraryNote(item, notes.entries, signal, { status });
     const time = created ?? undated;
     const note: Note = {
       id: crypto.randomUUID(),
