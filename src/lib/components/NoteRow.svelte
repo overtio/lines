@@ -11,7 +11,10 @@
   import { longPress } from "../longPress";
   import { coarsePointer, copyText, isApple, isMacApp, reducedMotion } from "../platform";
   import { lookUpDetails } from "../library/adding";
-  import { shelfRow } from "../library/rows";
+  import { rateItems, ratings, sayRated } from "../library/ratings.svelte";
+  import { ratingOf, shelfRow } from "../library/rows";
+  import { scoreIn, scoreText } from "../editor/scores";
+  import { propertyOf } from "../notes/properties";
   import { setProperties } from "../notes/properties";
   import { dragNoteOut, handNoteOut } from "../notes/dragOut";
   import { deletePicked, inboxPicked, pinPicked, restorePicked, tagPicked, trashPicked } from "../notes/picked";
@@ -27,6 +30,7 @@
   import { canFloat, floatingOpen, toggleFloating } from "../windows/floating";
   import { followPointer } from "./followPointer";
   import LibraryCover from "./LibraryCover.svelte";
+  import RatingMarks from "./RatingMarks.svelte";
 
   let {
     entry,
@@ -93,6 +97,7 @@
   const icon = $derived(iconOf(entry));
   /** On a shelf of the Library, the row shows the item: its cover, what it's by, and where it's got to. */
   const shelf = $derived(notes.filter.kind === "library" ? shelfRow(entry) : null);
+  const rating = $derived(shelf && ratingOf(entry));
 
   // Swipe right for the leading action and left for the trailing one, like Mail.
   const leading = $derived<Action>(
@@ -502,6 +507,28 @@
     speak(t("library.status", { status: status.label }));
   }
 
+  /** Rates it (`rating: 4/5`, `story: A`) on its kind's scale, or takes the rating out: taken back with ⌘Z, and it keeps its date. */
+  function rate(key: string, score: number | null) {
+    const body = notes.get(id)?.note.body;
+    if (body === undefined) return;
+    const scale = ratings.scaleOf(entry.meta.type);
+    notes.edit(id, setProperties(body, { [key]: score === null ? null : scoreText(score, scale) }), t("library.rating.didUndo"), { keepDate: true });
+    sayRated(score, scale);
+  }
+
+  /** Rate ▸: its kind's scale, or with named ratings, a menu of each, the overall one first. */
+  function rateItem() {
+    const type = entry.meta.type;
+    const scale = ratings.scaleOf(type);
+    const each = ratings.of(type).map((rating) => {
+      const written = propertyOf(entry.meta.properties, rating.key)?.value;
+      return { rating, items: rateItems(scale, written ? scoreIn(written, scale) : null, (score) => rate(rating.key, score)) };
+    });
+    if (!each.length) return [];
+    const items = each.length === 1 ? each[0].items : each.map(({ rating, items }) => ({ label: rating.name, items }));
+    return [{ label: t("library.rating.rate"), icon: "star" as const, items }];
+  }
+
   /** Puts it in the Inbox, or takes it out (filed). */
   function fileOne(inbox: boolean) {
     notes.setInbox([id], inbox);
@@ -553,6 +580,7 @@
         shelf && !entry.note.trashed && !isClosed(entry.note)
           ? [
               ...(shelf.kind.statuses ?? []).map((status) => ({ label: status.label, checked: status.value === shelf.status?.value, run: () => setStatus(status) })),
+              ...rateItem(),
               ...(shelf.kind.lookUp ? [{ label: t("library.lookUpDetails"), icon: "search" as const, run: () => lookUpDetails(id) }] : []),
             ]
           : [],
@@ -619,6 +647,7 @@
     {#if shelf?.status}
       <span class="rounded-[calc(9px*var(--radius-scale))] px-1.5 leading-[17px] inset-ring-1 inset-ring-line">{shelf.status.label}</span>
     {/if}
+    {#if rating}<RatingMarks {...rating} />{/if}
     <time datetime={new Date(entry.note.updatedAt).toISOString()}>{formatDate(entry.note.updatedAt, now)}</time>
   </span>
 {/snippet}

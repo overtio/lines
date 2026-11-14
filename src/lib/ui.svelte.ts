@@ -8,8 +8,14 @@ export const NOTE_MIN = 360;
 
 export type Layout = "wide" | "medium" | "narrow";
 
-/** A menu's item, or a line between groups of them. One with `checked` is a choice, marked while it's the one made. */
-export type MenuItem = { label: string; icon?: IconName; danger?: boolean; checked?: boolean; run: () => void } | "separator";
+/**
+ * A menu's item, or a line between groups of them. One with `checked` is a choice, marked while it's
+ * the one made; one with `items`, a menu of its own beside it (Rate ▸).
+ */
+export type MenuItem =
+  | { label: string; icon?: IconName; danger?: boolean; checked?: boolean; run: () => void }
+  | { label: string; icon?: IconName; items: MenuItem[] }
+  | "separator";
 
 /** A menu in sections, a line between each; a section with nothing in it isn't one. */
 export const menuSections = (...sections: Exclude<MenuItem, "separator">[][]): MenuItem[] =>

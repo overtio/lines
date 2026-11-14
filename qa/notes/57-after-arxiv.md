@@ -319,6 +319,7 @@ Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/
 
 Paper https://arxiv.org/abs/1706.03762 and [a named link](https://arxiv.org/abs/2006.11239)
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 

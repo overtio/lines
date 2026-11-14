@@ -418,6 +418,7 @@ And another.
 | a | **b** | 1 |
 | longer cell text | `code` | 22 |
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 

@@ -286,6 +286,7 @@ Each element in a quote. Check: it draws as it does on its own, sits inside the 
 #### 33. Score (Settings → Little Touches) in a quote
 
 > Rating: 4/5
+> Half: 3.5/5
 > Score: 7 / 10
 > Not a score: 12/20
 

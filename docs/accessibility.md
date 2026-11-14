@@ -75,7 +75,9 @@ A spreadsheet's grid (`src/plugins/spreadsheet/Grid.svelte`, [spreadsheets.md](s
 
 ## Scores
 
-- A score drawn as marks (Settings → Little Touches) is an image named as it's said, "4 out of 5", its marks hidden from screen readers; with the cursor on its line it's the text as written. Filled and empty marks differ in shape (filled or an outline) as well as in color.
+- A score drawn as marks (Settings → Little Touches) is an image named as it's said, "4 out of 5", "3.5 out of 5", its marks hidden from screen readers; with the cursor on its line it's the text as written. Filled and empty marks differ in shape (filled or an outline) as well as in color, and half of one is filled to its middle. A library note's rating is named the same, on its kind's scale: points ("85 out of 100"), a word ("A", "Thumbs Up").
+- Rating needs no pointer. A shelf's row's menu (⇧F10 or the menu key) has Rate, a menu of its own that → or ↵ opens and ← closes, the scale's values as checked choices, the one set checked; with named ratings, a menu of each. In a note, typing a key in the properties offers the kind's ratings and then their values, as the "@" menu offers notes (↑ ↓, ↵ or Tab); or the value is typed. Whichever way, setting or taking one out says it ("Rated 4 out of 5", "Rating removed"), and ⌘Z takes it back. A click on a mark is the pointer's way to the same.
+- Settings → Library → Ratings: each kind's scale is a select named for it ("Show scale"), and the pencil beside it, a button named "Show ratings" that says whether it's open, shows its named ratings as fields named by place ("Rating 1"), each renamed as it's left or with ↵, with buttons named for what they do ("Move Story up", "Remove Story"); focus stays on the rating moved. What's added, renamed, moved or removed is said. A mistake (a name taken) is an alert. A scale of your own is made in a form named "New Scale": its name, what it's in (a radio group), how many it's out of, its icon (a radio group of icons named by what they are, "Hearts"), or its words.
 
 ## The Calendar
 

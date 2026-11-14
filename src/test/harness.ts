@@ -12,6 +12,8 @@ import { readBookmarks } from "../lib/library/bookmarks";
 import { readTranscript, sentences } from "../plugins/feeds/transcripts";
 import { lock } from "../lib/lock/lock.svelte";
 import { attachmentNames, saveAttachment } from "../lib/notes/attachments";
+import { readLooks } from "../lib/notes/looks";
+import { looks } from "../lib/notes/looks.svelte";
 import { noteKeys } from "../lib/notes/noteKeys.svelte";
 import { notes } from "../lib/notes/store.svelte";
 import { panes } from "../lib/panes.svelte";
@@ -55,6 +57,9 @@ const testing = {
   discussions: { htmlToText, readThread },
   /** The app lock, to turn on as Settings does. */
   lock,
+  /** Tags' and types' looks and what the Library's kinds are rated on, and reading another device's `library.json`, as sync does. */
+  looks,
+  readLooks,
   panes,
   plugins,
   prefs,

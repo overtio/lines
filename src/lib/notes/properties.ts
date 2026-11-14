@@ -166,6 +166,17 @@ export function typeRefOf(type: string, columns: string[] | null) {
   return `@type.${type.replace(/\s+/g, "_")}${columns ? `(${columns.join(", ")})` : ""}`;
 }
 
+/** The note with its property `from` called `to`, where it is and as it's set; as it was if it hasn't one, or has a `to` already. */
+export function renameKey(body: string, from: string, to: string): string {
+  const front = frontMatter(body);
+  const property = front && propertyOf(front.properties, from);
+  if (!property || propertyOf(front.properties, to)) return body;
+  const lines = body.split("\n");
+  const line = lines[property.line - 1];
+  lines[property.line - 1] = to + line.slice(line.indexOf(":"));
+  return lines.join("\n");
+}
+
 /**
  * The note with its properties changed: each key set to its value (as written, on the line it was
  * on, keeping how its key was written), or taken out where the value is null. Of a key written more

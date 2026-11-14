@@ -101,7 +101,7 @@ const ELEMENTS = [
     md: 'Before the break.\n\n<!-- pagebreak -->\nAfter it, on a new page.\n\n<div style="page-break-after: always"></div>\n\nAnd another.',
   },
   { id: "key-value", name: "Key: Value line", md: "**Wi-Fi password:** correct-horse-battery" },
-  { id: "score", name: "Score (Settings → Little Touches)", md: "Rating: 4/5\nScore: 7 / 10\nNot a score: 12/20" },
+  { id: "score", name: "Score (Settings → Little Touches)", md: "Rating: 4/5\nHalf: 3.5/5\nScore: 7 / 10\nNot a score: 12/20" },
   { id: "mention", name: "Mention", md: "Ask @[QA · Ada] at @[QA · Ada].email." },
   { id: "wiki-link", name: "Wiki link", md: "Ask [[QA · Ada]], or [[QA · Ada|her]]." },
   {
@@ -408,6 +408,10 @@ notes.push(
   {
     file: "18b-dated.md",
     text: "---\ndue: 2026-12-01\nstart: 2026-12-24 18:00\nend: 2026-12-26\n---\n# QA · Dated\n\nA note with dates in its properties (notes/calendar.ts). Check: in the Calendar, December 2026 has a dot on the 1st (its due date) and on the 24th, 25th and 26th (from its start to its end, the time read past); choosing any of those days lists this note, and choosing the 2nd doesn't. Then right-click it in the list → Icon and Color → Purple: its dots and its event in the week turn purple, whatever color qa/objects is given; No Color takes them back to qa/objects' color, or the accent.\n\n#qa/objects\n",
+  },
+  {
+    file: "18b-rated.md",
+    text: "---\ntype: book\nauthor: Mary Shelley\nrating: 3.5/5\nstatus: read\n---\n# QA · Rated\n\nA rated library note (library/ratings.svelte.ts, editor/ratings.ts). Check: its rating is three and a half stars, the half star filled to its middle; a click on the fifth makes it `rating: 5/5`, a click on that one again takes the line out, and ⌘Z puts each back; a screen reader hears \"Rated 5 out of 5\". Under Library → Books its row shows the stars small, and its menu's Rate ▸ sets it. Settings → Library → Ratings → Book: Out of 10, and `3.5/5` is drawn as written, the row saying one note doesn't fit; Grades, and `rating: A` is a chip a click on which offers the others.\n\n#qa/objects\n",
   },
   {
     file: "18c-repeating.md",

@@ -319,6 +319,7 @@ And another.
 
 ![A sample drawing](attachment:drawing.svg)
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 

@@ -319,6 +319,7 @@ A long paragraph that wraps onto several lines at the usual width, so the space 
 
 A long paragraph that wraps onto several lines at the usual width, so the space between its lines, its indent on every line, and where it meets the edges of anything around it can be checked. It goes on a little longer to be sure it wraps on a phone too.
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 

@@ -385,6 +385,7 @@ And another.
 {"name":"lines","tags":["a","b"],"id":12345678901234567890}
 ```
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 

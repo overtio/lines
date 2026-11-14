@@ -319,6 +319,7 @@ At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [
 
 At [12:34](https://traffic.megaphone.fm/FSI3647670844.mp3#t=754) they said it; [3:16] stays text here
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 

@@ -29,7 +29,8 @@ import { drawnAsBlock, imageElement } from "./attachments";
 import { linkAttributes, localIcon } from "./localLinks";
 import { shortLink, ShortLinkWidget, type ShortLink } from "./shortLinks";
 import { CopyWidget, keyValue } from "./keyValue";
-import { ScoreWidget, scoreIn } from "./scores";
+import { clickScore } from "./ratings";
+import { MARKS, type Scale, ScoreWidget, scoreIn } from "./scores";
 import { prefs } from "../prefs.svelte";
 import { InlineMathWidget } from "./math";
 import { fenceCode } from "./rendered";
@@ -37,7 +38,8 @@ import { followClick, openHref } from "./links";
 import { drawMention, frontMatterField, heldProperties, objectsChanged, openMention, openTag, valueText } from "./objects";
 import { normalizeTag } from "../notes/parse";
 import { cheer, viewSelectionInUse } from "./util";
-import { keyOf } from "../notes/properties";
+import { keyOf, typeOf } from "../notes/properties";
+import { ratings } from "../library/ratings.svelte";
 import { markupMode } from "./markupMode";
 import { plainLine } from "../notes/stats";
 import { t } from "../i18n/index.svelte";
@@ -311,12 +313,15 @@ function build(view: EditorView): DecorationSet {
   /**
    * A value (of a "Key: Value" line, or a property): a score drawn as marks, but on the line being
    * edited (scores.ts), and a button that copies it as it reads, without its Markdown, mentions as
-   * they show (Settings → Little Touches, both).
+   * they show (Settings → Little Touches, both). A library note's rating is read on its kind's
+   * `scale` alone, and shown as written where it doesn't fit it.
    */
-  const drawValue = (from: number, to: number, written: string) => {
-    const score = prefs.scores !== "off" && !lineActive(from) ? scoreIn(written) : null;
-    if (score) decos.push(Decoration.replace({ widget: new ScoreWidget(score.score, score.of, prefs.scores as Exclude<typeof prefs.scores, "off">) }).range(from, to));
-    else mark(from, to, "cm-lp-kv-value");
+  const drawValue = (from: number, to: number, written: string, scale?: Scale | null) => {
+    const score = prefs.scores !== "off" && !lineActive(from) ? (scale ? scoreIn(written, scale) : scoreIn(written)) : null;
+    if (score) {
+      const mark = MARKS[prefs.scores as Exclude<typeof prefs.scores, "off">];
+      decos.push(Decoration.replace({ widget: new ScoreWidget(score, scale ?? { kind: "marks", of: score.of }, mark) }).range(from, to));
+    } else mark(from, to, "cm-lp-kv-value");
     const plain = valueText(written);
     if (prefs.copyValues && plain) decos.push(Decoration.widget({ widget: new CopyWidget(plain, t("editor.copyValue", { value: plain })), side: 1 }).range(to));
   };
@@ -663,6 +668,7 @@ function build(view: EditorView): DecorationSet {
     // The properties: a key column and values, with the `---` lines shrunk away until the cursor is in them (never, Hidden).
     const active = mode !== "hidden" && touches(0, frontEnd);
     const keyLines = new Set(front.properties.map((property) => property.line));
+    const type = typeOf(front.properties);
     for (let n = 1; n <= front.lines; n++) {
       const line = doc.line(n);
       const fence = n === 1 ? "cm-lp-props-fence cm-lp-props-open" : n === front.lines ? "cm-lp-props-fence cm-lp-props-close" : "";
@@ -694,7 +700,7 @@ function build(view: EditorView): DecorationSet {
         continue;
       }
       // As a "Key: Value" line's: a score's marks, and a button that copies it on hovering.
-      drawValue(valueFrom, valueTo, property.value);
+      drawValue(valueFrom, valueTo, property.value, ratings.scaleFor(type, property.key));
     }
   }
 
@@ -811,7 +817,7 @@ export const livePreview = ViewPlugin.fromClass(
           event.preventDefault();
           return true;
         }
-        return followClick(event, view);
+        return clickScore(event, view) || followClick(event, view);
       },
     },
   },

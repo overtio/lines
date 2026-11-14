@@ -220,7 +220,7 @@ export function markdownDocument(body: string, parts: Parts): HTMLElement {
   function typeTable(ref: NonNullable<ReturnType<typeof readTypeRef>>) {
     const data = tableData(ref);
     const head = el("tr", "", el("th", "", typeLabel(data.type)), ...data.columns.map((column) => el("th", "", column.label)));
-    const rows = data.rows.map((row) => el("tr", "", el("td", "", row.title), ...row.cells.map((cell) => el("td", "", cell))));
+    const rows = data.rows.map((row) => el("tr", "", el("td", "", row.title), ...row.cells.map((cell) => el("td", "", cell.text))));
     return el("div", "doc-table", el("table", "", el("thead", "", head), el("tbody", "", ...rows)));
   }
 
