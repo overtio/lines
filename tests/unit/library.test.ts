@@ -44,6 +44,7 @@ const { soundcloud, soundcloudIn } = await import("../../src/plugins/soundcloud"
 const { paperItem } = await import("../../src/plugins/arxiv");
 const bookmarks = await import("../../src/lib/library/bookmarks");
 const keys = await import("../../src/lib/library/keys");
+const { pageResource } = await import("../../src/lib/library/lookup");
 const { dayOf } = await import("../../src/lib/notes/calendar");
 
 const fixture = (name: string) => readFileSync(new URL(`fixtures/library/${name}`, import.meta.url), "utf8");
@@ -915,5 +916,25 @@ describe("the same thing, however it's added", () => {
     const item = (await look(wikidata, "https://en.wikipedia.org/wiki/Emily_in_Paris"))!;
     expect(item.ids).toEqual(expect.arrayContaining(["wikidata:Q64584978", "imdb:tt8962124", "wikipedia:en:Emily_in_Paris"]));
     expect(item.cover).toBeUndefined();
+  });
+});
+
+describe("a page nothing can say more of", () => {
+  test("is a resource: its title, its site, the day it's added, its picture and what it says of itself", () => {
+    const home = readPage('<html><head><title>Intent — plan your day</title><meta property="og:title" content="Intent"><meta property="og:description" content="Plan your day."><meta property="og:image" content="/card.png"></head></html>', "https://www.intent.example/");
+    expect(pageResource(home)).toEqual({
+      type: "resource",
+      title: "Intent",
+      link: "https://www.intent.example/",
+      properties: [
+        ["site", "intent.example"],
+        ["added", dayOf(Date.now())],
+      ],
+      cover: "https://www.intent.example/card.png",
+      description: "Plan your day.",
+    });
+    // Its <title> where it names nothing else, and its site's name for one with neither.
+    expect(pageResource(readPage('<title>A Tool</title><meta name="description" content="Does things.">', "https://tool.example/")).title).toBe("A Tool");
+    expect(pageResource(readPage("<p>Hi</p>", "https://bare.example/x")).title).toBe("bare.example");
   });
 });

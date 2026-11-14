@@ -20,5 +20,5 @@ export interface BookmarksInput {
 export function bookmarkWork(input: unknown): ImportWork {
   const { bookmarks, folderTags } = input as BookmarksInput;
   const { add } = planImport(bookmarks, (link) => inLibrary({ link }));
-  return { add: add.map((bookmark) => ({ item: bookmarkItem(bookmark, { folderTags }), created: bookmark.added })), append: [] };
+  return { add: add.map((bookmark) => ({ item: bookmarkItem(bookmark, { folderTags }), created: bookmark.added, status: null })), append: [] };
 }

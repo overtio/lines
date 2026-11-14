@@ -3,7 +3,7 @@
   import WebSearchPicker from "../editor/WebSearchPicker.svelte";
   import { addBookFile } from "../books/adding";
   import { addBlank, addToLibrary } from "../library/adding";
-  import { lookUp } from "../library/lookup";
+  import { lookUpAny } from "../library/lookup";
   import { subtitleOf } from "../library/rows";
   import { shelves } from "../library/shelves.svelte";
   import { linkOnly } from "../library/text";
@@ -45,7 +45,7 @@
     if (!text || page > 1) return { items: [], more: false };
     const link = linkOnly(text);
     if (link) {
-      const item = await lookUp(link, signal);
+      const item = await lookUpAny(link, signal);
       return { items: item ? [{ id: link, item, whole: true }] : [], more: false };
     }
     const asked = current?.asked ?? [];

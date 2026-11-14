@@ -10,7 +10,7 @@ import { withTimeout } from "../pacing";
 import type { WebLink } from "../plugins/types";
 import { keepCover } from "./covers";
 import { type LookupState, LookupWidget } from "./linkNotes";
-import { lookUp } from "./lookup";
+import { lookUpAny } from "./lookup";
 import { libraryNote } from "./note";
 import { addedAgain, libraryNoteOf } from "./same";
 
@@ -75,7 +75,7 @@ export async function addLink(view: EditorView, link: WebLink) {
   speak(t("library.lookingUp"));
   const signal = withTimeout(adding.abort.signal, LOOKUP_TIME);
   try {
-    const item = await lookUp(link.href, signal);
+    const item = await lookUpAny(link.href, signal);
     if (!addings.has(adding)) return;
     if (!item) return say(adding, "nothing", t("library.nothing"));
     const existing = libraryNoteOf(item) ?? libraryNoteOf({ link: link.href });

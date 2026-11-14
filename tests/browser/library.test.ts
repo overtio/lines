@@ -761,3 +761,86 @@ test("a feed's episodes sharing their show's link are each saved by their sound,
   expect(await saved("https://cdn.example/2.mp3")).toBeNull();
   expect(podcast).not.toBe(first);
 });
+
+/** A product's home page, saying only its title and what it is: what the Library knows nothing more of. Served as a site that lets pages read it. */
+const HOME = "https://intent.example/";
+const homePage = (page: App["page"]) =>
+  page.route(
+    (url) => url.hostname.endsWith("intent.example"),
+    (route: Route) =>
+      route.fulfill({
+        headers: { ...CORS, "content-type": "text/html; charset=utf-8" },
+        body: '<!doctype html><html><head><title>Intent — plan your day</title><meta property="og:title" content="Intent"><meta property="og:description" content="Plan your day with #intent."><link rel="icon" href="/icon.png"></head><body><h1>Intent</h1></body></html>',
+      }),
+  );
+const today = (page: App["page"]) =>
+  page.evaluate(() => {
+    const date = new Date();
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  });
+const resourceText = (day: string, more = "") =>
+  `---\ntype: resource\nsite: intent.example\nadded: ${day}\nlink: ${HOME}\nstatus: to read\n${more}---\n# Intent\n\nPlan your day with \\#intent.\n`;
+
+test("a page nothing can say more of, added on purpose, is kept as a resource to read; again, it's opened", async () => {
+  app = await openApp();
+  const { page } = app;
+  await homePage(page);
+  const picker = await addToLibrary(page);
+  await picker.getByRole("searchbox").fill(HOME);
+  await picker.getByRole("option", { name: /^Intent/ }).click();
+  const day = await today(page);
+  await page.waitForFunction((text) => window.testing.text() === text, resourceText(day));
+  expect(await page.locator("#note-list-title").innerText()).toBe("Resources");
+  expect(await page.locator(".note-list [data-id]").first().innerText()).toMatch(/^Intent\s+intent\.example\s+To Read/);
+
+  // Added again, from the same dialog: that note, counted.
+  const again = await addToLibrary(page);
+  await again.getByRole("searchbox").fill("https://www.intent.example/?utm_source=newsletter");
+  await again.getByRole("option", { name: /^Intent/ }).click();
+  await page.waitForFunction((text) => window.testing.text() === text, resourceText(day, "times added: 2\n"));
+  expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "resource").length)).toBe(1);
+});
+
+test("a link in a note to a page nothing can say more of, added from its menu, is a resource mentioned in its place", async () => {
+  app = await openApp();
+  const { page } = app;
+  await homePage(page);
+  await app.open(`# Tools\n\nTry ${HOME} for planning`);
+  await page.locator(".cm-content .cm-lp-link").click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Add to Library" }).click();
+  await page.waitForFunction(() => window.testing.text() === "# Tools\n\nTry @Intent for planning");
+  const made = await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "resource").map((entry) => entry.note.body));
+  expect(made).toEqual([resourceText(await today(page))]);
+});
+
+test("a note that's only a link to such a page stays as it is: nothing is guessed", async () => {
+  app = await openApp();
+  const { page } = app;
+  await homePage(page);
+  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await page.waitForFunction(() => window.testing.text() === "# ");
+  await paste(page, HOME);
+  await page.waitForTimeout(1500);
+  expect(await app.text()).toBe(`# ${HOME}`);
+  expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "resource").length)).toBe(0);
+});
+
+test("a page that can't be reached, added on purpose, says so, and nothing is made", async () => {
+  app = await openApp();
+  const { page } = app;
+  await page.route((url) => url.hostname === "down.example", (route: Route) => route.abort("failed"));
+  const link = "https://down.example/";
+  await app.open(`# Tools\n\nTry ${link} for planning`);
+  await page.locator(".cm-content .cm-lp-link").click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Add to Library" }).click();
+  await page.waitForFunction(() => document.querySelector(".cm-library-lookup")?.textContent === "Couldn’t look this link up");
+  expect(await app.text()).toBe(`# Tools\n\nTry ${link} for planning`);
+
+  const picker = await addToLibrary(page);
+  await picker.getByRole("searchbox").fill(link);
+  await picker.getByRole("button", { name: "Try Again" }).waitFor();
+  expect(await picker.getByRole("option").count()).toBe(0);
+  expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "resource").length)).toBe(0);
+  // The search's failure, logged as it is offline.
+  app.errors.length = 0;
+});

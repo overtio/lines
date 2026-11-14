@@ -48,6 +48,10 @@ Imports (bookmarks, Readwise) leave out what's there, and say how many.
 - **Counted.** Each time something's added again its note counts it, `times added: 2` the first time (none while it's been added once), dated as any change is, so it syncs as one rather than losing to a change made elsewhere. Settings → Library → **Count adding again** turns that off: adding again then only opens it.
 - Added again, a cover lines kept that can't be shown (a logo kept before, or a file that isn't a picture) is mended from what's found again. One that hasn't arrived on this device yet is left to sync, and a cover is never taken out because what's found has none or can't be downloaded.
 
+## A page nothing can say more of
+
+Added on purpose (a link pasted into Add to Library, or a link's menu → Add to Library), a page none of the sources can say more of (a product's home page, a tool, a post on a site that doesn't describe itself) isn't left out: it's kept as a **resource**, to read, on the Resources shelf, as bookmarks are. Its title is the page's own (`og:title`, else its `<title>`, else its site's name), with its `site`, the day it was `added`, its picture where it names one (`og:image`), and what it says of itself as its text, all as text, as anything from elsewhere is. Right-click it on its shelf → Look Up Details looks it up again later. A note that's just such a link stays as it is: only adding it on purpose keeps the page, nothing is guessed from a link typed into a note. A page that can't be read at all (offline, gone, or on the web a site that doesn't let pages read it) says so, and nothing is made.
+
 ## Add to Library
 
 The + on the Library's heading in the sidebar opens Add to Library (with feeds on, it's in the +'s menu, beside Subscribe to a Feed): choose what to search for (Books, Movies, Shows, Music, Podcasts, Papers, as the sources on can search), and type a title, or a name with it. The catalogs answer as you type, each result with its cover, who made it and when; ↓ moves into them, and ↵ or a click adds the one chosen. Paste a link there instead to look it up as a note that's just a link is. Something the Library has a note of already, by its link, opens that note rather than making another. **Blank** starts one of the kind chosen to fill in by hand. What's added is filed on its shelf, not in the Inbox.
@@ -114,7 +118,7 @@ link: https://doc.rust-lang.org/book/
 | `article` | Articles | author, site, published | to read, reading, read |
 | `paper` | Papers | authors, year, arxiv | to read, reading, read |
 | `feed` | Feeds (by its posts) | author, feed | |
-| `resource` | Resources | folder, added | |
+| `resource` | Resources | site, folder, added | to read, reading, read (imported bookmarks start with none) |
 
 Each has `link` (where it's from) and `status` after its own properties, and only the properties a source found. The keys and the `status` values are written in English, like `type`, so tables (`@type.book`), mentions (`@[Dune].author`) and the Library read them alike on every device; lines shows the status in its own language. A note's status is set from its row's menu on its shelf (or by writing it), and it keeps its date, so the list stays as it is. A status of your own (`status: abandoned`) is shown as written.
 
