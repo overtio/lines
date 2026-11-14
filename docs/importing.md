@@ -4,7 +4,7 @@ Notes from another notes app come into lines from **Settings → Export and Impo
 
 ## How an import goes
 
-1. **Choose** what the app exported: a folder (an Obsidian vault). Nothing is written yet, and nothing in it is run: its notes are read as text.
+1. **Choose** what the app exported: a folder (an Obsidian vault, Bear's Markdown), or a file (Bear's backup, a ZIP). Nothing is written yet, and nothing in it is run: its notes are read as text.
 2. **What it would do** comes first: how many notes, attachments and folders, and on lines of their own, what won't come across as it was, each kind with how many and a few examples (`^37066d (Plan)`): what's kept as text because lines has nothing like it, and what's left out. Notes imported from it before are left out too, and said so, with which ([below](#importing-again)).
 3. **Import** (focused, so Enter imports) copies the pictures and files the notes show into lines' attachments, then makes the notes a few hundred at a time, with a bar showing how far it's got; Stop stops either, keeping what's made (stopped while copying, no note is made, and it says so). Ten thousand notes take a few seconds. Closing Settings doesn't stop it, and opening it again shows how it's going, or how it went.
 4. **What it did**, with what didn't come across said again, and **Undo Import**, which moves every note it made to the Trash (but one you've changed since, which is yours now). Nothing an import made is ever deleted outright: empty the Trash for that. Choosing something else to import keeps the last import's Undo, under what the next would do; an import with nothing to bring can't be started, so it never takes that Undo's place.
@@ -67,3 +67,31 @@ A mention finds a note by its title ([linedown.md](linedown.md#mentions)), and r
 **Notes with the same name** in different folders are both imported, and said so: Obsidian tells them apart by their paths, but lines finds a note by its title, so a link to that name finds the one with a type, then the one edited last ([linedown.md](linedown.md#mentions)).
 
 **Where it's read:** in a browser (and the apps), with the folder's files read only as text, never run, and nothing sent anywhere. The code is in `src/plugins/obsidian/`: `vault.ts` reads the vault, `markdown.ts` its notes.
+
+## Bear
+
+**What to choose:** in Bear (on the Mac), **File → Backup Notes…** saves a `.bear2bk` file: choose it with **Choose Backup…**. A backup has everything, and keeps which notes are pinned, archived or in Bear's trash, and when each was made and changed. Or export notes with **File → Export Notes…** as **Markdown** or **TextBundle**, with **Export attachments** on, into a folder, and choose that folder with **Choose Export Folder…**: notes exported that way are dated by their files, and have no pins. TextPacks (`.textpack`) and ZIPs of either can be chosen as a backup.
+
+**What comes across:**
+
+| In Bear | In lines |
+| --- | --- |
+| A note, its first line its title | A note, titled the same |
+| `#tag`, `#nested/tag` | The same |
+| `#tag of several words#`, `#work/next steps#` | `#tag-of-several-words`, `#work/next-steps`: lines' tags have no spaces (said so) |
+| `#tag#` | `#tag` |
+| `==highlight==`, `~~strikethrough~~`, tasks, tables, code, `$math$` | The same; a table right under a line of text gets a blank line before it, which Markdown needs |
+| `~underline~` | `<u>underline</u>` |
+| `[[Note]]`, `[[Note/Heading]]`, `[[Note\|text]]` | `[[Note]]`, `[[Note#Heading]]`, `[[Note\|text]]` |
+| A link to a note, `bear://x-callback-url/open-note?id=…` | `[[Note\|text]]`, by Bear's id of the note |
+| Pictures and files (`assets/`, or a folder beside an exported note), with a size: `![](photo.png)<!-- {"width":320} -->` | Kept in lines, `![\|320](../attachments/….png)`, the size its width |
+| Pinned | Pinned |
+| Archived | Tagged `#archived`, as lines has no archive (said so) |
+| In Bear's trash | In the Trash |
+| When it was made and changed | The same |
+
+**Left out, and said so:** locked notes, which can't be read without Bear (unlock them there, and back up again), and files no note shows.
+
+**Kept as they are, and said so:** links Bear shows as previews (`<!-- {"preview":"true"} -->`) are links, and links to pictures or files that aren't in the backup are kept as written.
+
+Bear's older markup (Bear 1's "Polar Bear" `::highlight::`, `*bold*`, `/italic/`) isn't translated: Bear 2 writes Markdown. The code is in `src/plugins/bear/`: `backup.ts` reads the backup or export, `markdown.ts` its notes.

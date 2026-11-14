@@ -18,16 +18,19 @@ import { stubApp } from "./stubs";
 stubApp();
 
 const { readVault } = await import("../../src/plugins/obsidian/vault");
+const { readBear } = await import("../../src/plugins/bear/backup");
+const { translate: translateBear } = await import("../../src/plugins/bear/markdown");
 const { translate } = await import("../../src/plugins/obsidian/markdown");
 const { attachmentPath, notesInput, notesWork, planNotes, Tally: Tallies, withTitle } = await import("../../src/lib/imports/notes");
 const { exportedFrom } = await import("../../src/lib/imports/exported");
 const { zip } = await import("../../src/lib/zip");
 const { computeMeta } = await import("../../src/lib/notes/parse");
 
+const walk = (dir: string): string[] => readdirSync(dir).flatMap((entry) => (statSync(join(dir, entry)).isDirectory() ? walk(join(dir, entry)) : [join(dir, entry)]));
+
 /** A folder of fixtures/ as a picker of folders gives it, each file dated alike. */
 function folder(name: string): Exported {
   const root = new URL(`fixtures/${name}`, import.meta.url).pathname;
-  const walk = (dir: string): string[] => readdirSync(dir).flatMap((entry) => (statSync(join(dir, entry)).isDirectory() ? walk(join(dir, entry)) : [join(dir, entry)]));
   return {
     name: root.split("/").at(-1)!,
     files: walk(root).map((path) => ({
@@ -235,6 +238,84 @@ describe("Obsidian's Markdown", () => {
     expect(translated("---\nauthor:\n  name: Ada\n---\nText").front).toBe("---\nauthor:\n  name: Ada\n---\n");
     const unread = translated('---\n"Born on": 1815\n---\nText');
     expect([unread.front, unread.body, unread.report]).toEqual(["", '```yaml\n"Born on": 1815\n```\n\nText', { properties: [1, "Note"] }]);
+  });
+});
+
+/** A folder of fixtures/ as a ZIP of what's in it, named `name`. */
+function zipped(folder: string, name: string) {
+  const root = new URL(`fixtures/${folder}`, import.meta.url).pathname;
+  return new File([zip(walk(root).map((path) => ({ name: relative(root, path), data: new Uint8Array(readFileSync(path)), modified: new Date(DAY) })))], name);
+}
+
+describe("Bear", () => {
+  test("its backup: a note of each TextBundle, titled by its first line, with Bear's id, dates, pin, archive and trash", async () => {
+    const bear = await readBear(await exportedFrom([zipped("bear/Backup", "Bear Notes 2024-11-14.bear2bk")]));
+    expect(bear.name).toBe("Bear Notes 2024-11-14");
+    const byName = Object.fromEntries(bear.notes.map((each) => [each.name, each]));
+    expect(Object.keys(byName).sort()).toEqual(["Gone", "Ideas", "Old plans", "Pancakes", "Welcome"]);
+    expect(byName.Welcome).toMatchObject({ id: "3A0F6C1E-5B7D-4E2A-9C11-0D2B6F8E4A01", created: Date.UTC(2024, 1, 1, 9, 30), updated: Date.UTC(2024, 10, 2, 18, 4, 11), folders: [], tags: [] });
+    expect([byName.Ideas.pinned, byName.Gone.trashed, byName["Old plans"].tags]).toEqual([true, true, ["archived"]]);
+    expect(bear.attachments.map((file) => file.path)).toEqual(["Welcome.textbundle/assets/photo.png", "Welcome.textbundle/assets/Report 2026.pdf"]);
+    const pictures = (body: string) => body.replace(/\.\.\/attachments\/\uE000(\d+)\uE000/g, (_, index) => `<${bear.attachments[Number(index)].path}>`);
+    expect(pictures(byName.Welcome.body)).toBe(
+      [
+        "# Welcome",
+        "",
+        "A note with #inbox, #work/projects and #big-ideas in it, a ==highlight==, <u>underlined</u> and ~~struck~~ text.",
+        "",
+        "See [[Ideas]], [[Ideas#Later|later ideas]] and [[Pancakes|the recipe]].",
+        "",
+        "![|320](<Welcome.textbundle/assets/photo.png>)",
+        "",
+        "[Report 2026.pdf](<Welcome.textbundle/assets/Report 2026.pdf>)",
+        "",
+        "[A site](https://example.com)",
+        "",
+        "Fruit counts:",
+        "",
+        "| Fruit | Count |",
+        "|---|---|",
+        "| Apple | 3 |",
+        "",
+        "`#not-a-tag and ~not underline~` stays code. A picture that isn't there: ![](assets/gone.png)",
+        "",
+        "- [ ] Open",
+        "- [x] Done",
+        "",
+      ].join("\n"),
+    );
+    expect(byName.Pancakes.body).toBe("# Pancakes\n\nFlour and milk. #recipes/breakfast\n");
+    expect(said(bear.report)).toEqual({
+      locked: [1, "Secret"],
+      archived: [1, "Old plans"],
+      spacedTags: [1, "#big ideas# → #big-ideas (Welcome)"],
+      previews: [1, "A site (Welcome)"],
+      missing: [1, "![](assets/gone.png) (Welcome)"],
+      unused: [1, "Welcome.textbundle/assets/unused.png"],
+    });
+  });
+
+  test("its Markdown export: a file for each note, its pictures in a folder beside it", async () => {
+    const bear = await readBear(folder("bear/Export"));
+    expect(bear.notes.map(({ id, name, folders }) => [id, name, folders])).toEqual([["Trip.md", "Trip", []]]);
+    expect(bear.local).toBe(true);
+    expect(bear.attachments.map((file) => file.path)).toEqual(["Trip/map.png"]);
+    expect(bear.notes[0].body).toBe("# Trip\n\n![|200](../attachments/\uE0000\uE000)\n\nWith #travel and a link to [[Pancakes]].\n");
+  });
+
+  test("Bear's marks: tags closed by a #, underlines, sizes, links to headings, outside code", () => {
+    const report = new Tallies();
+    const links = { report, note: (by: { title: string } | { id: string }) => ("id" in by ? (by.id === "A1" ? "Plan" : null) : by.title === "Plan" ? "Plan" : null), file: () => null };
+    const translated = (text: string) => translateBear(text, links, "Note");
+    expect(translated("#one# #2024# #work/next steps# a#b c# #a b #")).toBe("#one #2024# #work/next-steps a#b c# #a b #");
+    expect(translated("~one~ ~~two~~ ~ three ~ ~/path and ~4")).toBe("<u>one</u> ~~two~~ ~ three ~ ~/path and ~4");
+    expect(translated("[[Plan/Goals]] [[Plan/Goals|the goals]] [x](bear://x-callback-url/open-note?id=A1&header=Goals) [[Missing]]")).toBe(
+      "[[Plan#Goals]] [[Plan#Goals|the goals]] [[Plan#Goals|x]] [[Missing]]",
+    );
+    expect(translated("```\n#one# ~two~\n```")).toBe("```\n#one# ~two~\n```");
+    // Code as lines' Markdown reads it: indented, in a list, a URL too.
+    expect(translated("Text\n\n    ~one~ #a b#\n\n- Item\n\n      ~two~\n\nhttps://example.com/~a~")).toBe("Text\n\n    ~one~ #a b#\n\n- Item\n\n      ~two~\n\nhttps://example.com/~a~");
+    expect(translated("A\n| a |\n|---|\n\n| b |\n|---|")).toBe("A\n\n| a |\n|---|\n\n| b |\n|---|");
   });
 });
 

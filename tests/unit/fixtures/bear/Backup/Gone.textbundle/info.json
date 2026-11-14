@@ -1,0 +1,16 @@
+{
+  "creatorIdentifier": "net.shinyfrog.bear",
+  "net.shinyfrog.bear": {
+    "archived": 0,
+    "creationDate": "2021-01-01T12:00:00Z",
+    "lastEditingDevice": "MacBook",
+    "modificationDate": "2021-02-01T12:00:00Z",
+    "pinned": 0,
+    "trashed": 1,
+    "trashedDate": "2021-02-01T12:00:00Z",
+    "uniqueIdentifier": "AB12CD34-2222-4333-8444-555566667777"
+  },
+  "transient": true,
+  "type": "net.daringfireball.markdown",
+  "version": 2
+}

@@ -39,6 +39,15 @@ export default {
   "import.report.comments": "{count, plural, one {# comment kept as written, as it holds what would end an HTML comment: {examples}} other {# comments kept as written, as they hold what would end an HTML comment: {examples}}}",
   "import.report.sameName": "{count, plural, one {# note has another’s name, and links to it may find that one: {examples}} other {# notes have another’s name, and links to that name find the one edited last: {examples}}}",
   "import.report.unused": "{count, plural, one {# file no note shows, left out: {examples}} other {# files no note shows, left out: {examples}}}",
+  "import.report.locked": "{count, plural, one {# locked note, which can’t be read (unlock it in Bear to bring it), left out: {examples}} other {# locked notes, which can’t be read (unlock them in Bear to bring them), left out: {examples}}}",
+  "import.report.archived": "{count, plural, one {# archived note, with the tag “archived”, as lines has no archive: {examples}} other {# archived notes, with the tag “archived”, as lines has no archive: {examples}}}",
+  "import.report.previews": "{count, plural, one {# link Bear shows as a preview, a link here: {examples}} other {# links Bear shows as previews, links here: {examples}}}",
+  "import.report.spacedTags": "{count, plural, one {# tag of several words, written with dashes, as lines’ tags have no spaces: {examples}} other {# tags of several words, written with dashes, as lines’ tags have no spaces: {examples}}}",
+  // Bear's group of Settings → Export and Import.
+  "import.bear.title": "From Bear",
+  "import.bear.note": "In Bear, choose File → Backup Notes…, then choose the .bear2bk file it saves here: it keeps which notes are pinned, archived or in the trash, and when each was made and changed. Or export notes with File → Export Notes… as Markdown or TextBundle, with Export attachments on, into a folder, and choose that folder. Tags, links, pictures and files come across either way.",
+  "import.bear.chooseBackup": "Choose Backup…",
+  "import.bear.chooseFolder": "Choose Export Folder…",
   // Obsidian's group of Settings → Export and Import.
   "import.obsidian.title": "From Obsidian",
   "import.obsidian.note": "A vault is a folder of Markdown files, so there’s nothing to export: choose the vault’s folder. To find it, open Obsidian’s vault switcher (the vault’s name, at the bottom of the sidebar) → Manage Vaults, or right-click a note → Reveal in Finder. Notes, folders, links, pictures and files, callouts, bookmarks (pinned) and daily notes (on the Calendar) all come across.",

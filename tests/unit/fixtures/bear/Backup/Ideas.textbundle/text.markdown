@@ -1,0 +1,5 @@
+# Ideas
+
+## Later
+
+- A garden

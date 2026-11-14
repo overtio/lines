@@ -1,15 +1,17 @@
 import { afterEach, expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { zip } from "../../src/lib/zip";
 import { type App, engine, noErrors, openApp } from "./app";
 
 /*
  * Notes from another app, imported from Settings → Export and Import: an Obsidian vault (the unit
  * tests' fixture, tests/unit/fixtures/obsidian/Vault) chosen as a folder, what importing it would do
  * said first, then done with its pictures and files, undone into the Trash, and imported again
- * adding only what isn't there; and ten thousand notes at once, stopped partway.
+ * adding only what isn't there; ten thousand notes at once, stopped partway; and Bear's backup
+ * (tests/unit/fixtures/bear/Backup, zipped as Bear zips it).
  */
 
 let app: App;
@@ -33,6 +35,14 @@ const imported = () =>
   app.page.evaluate(() =>
     Object.fromEntries(window.testing.notes.entries.filter(({ note }) => note.source?.app === "obsidian").map(({ note }) => [note.source!.id, note])),
   );
+
+/** Bear's backup of the unit tests' notes, as a .bear2bk file is: a ZIP of a TextBundle for each. */
+function bearBackup() {
+  const root = fileURLToPath(new URL("../unit/fixtures/bear/Backup", import.meta.url));
+  const walk = (dir: string): string[] => readdirSync(dir).flatMap((entry) => (statSync(join(dir, entry)).isDirectory() ? walk(join(dir, entry)) : [join(dir, entry)]));
+  const data = zip(walk(root).map((path) => ({ name: relative(root, path), data: new Uint8Array(readFileSync(path)), modified: new Date(2024, 10, 14) })));
+  return { name: "Bear Notes 2024-11-14.bear2bk", mimeType: "application/octet-stream", buffer: Buffer.from(data) };
+}
 
 test("an Obsidian vault: what importing it would do, said first; then its notes, pictures and files; undone into the Trash, and imported again only once", async () => {
   // On disk, so WebKit keeps the attachments.
@@ -137,3 +147,31 @@ test("ten thousand notes: the import says how it's going, with Settings closed a
     rmSync(folder, { recursive: true, force: true });
   }
 }, 240_000);
+
+test("Bear's backup: its notes with their tags, pictures, pins, archive and trash; then nothing new to import", async () => {
+  app = await openApp({ onDisk: true });
+  const { page } = app;
+  const settings = await app.settings("Export and Import");
+  const group = settings.getByRole("region", { name: "From Bear" });
+  await group.locator("input[accept*='.bear2bk']").setInputFiles(bearBackup());
+  await group.getByText("5 notes and 2 attachments in Bear Notes 2024-11-14.").waitFor();
+  await group.getByText("1 locked note, which can’t be read (unlock it in Bear to bring it), left out: Secret").waitFor();
+  await group.getByText("1 tag of several words, written with dashes, as lines’ tags have no spaces: #big ideas# → #big-ideas (Welcome)").waitFor();
+  // No folders in Bear: nothing to tag them with.
+  expect(await group.getByRole("switch").count()).toBe(0);
+  await group.getByRole("button", { name: "Import 5 Notes" }).click();
+  await group.getByText("Imported 5 notes.").waitFor();
+
+  const notes = await page.evaluate(() =>
+    Object.fromEntries(window.testing.notes.entries.filter(({ note }) => note.source?.app === "bear").map(({ note, meta }) => [meta.title, note])),
+  );
+  expect(Object.keys(notes).sort()).toEqual(["Gone", "Ideas", "Old plans", "Pancakes", "Welcome"]);
+  expect(notes.Welcome.body).toMatch(/\n!\[\|320\]\(\.\.\/attachments\/[0-9a-f]{32}\.png\)\n/);
+  expect(notes.Welcome.body).toContain("See [[Ideas]], [[Ideas#Later|later ideas]] and [[Pancakes|the recipe]].");
+  expect([notes.Ideas.pinned, notes.Gone.trashed, notes["Old plans"].body]).toEqual([true, true, "# Old plans\n\nDone with these.\n\n#archived\n"]);
+  expect(notes.Welcome.createdAt).toBe(Date.UTC(2024, 1, 1, 9, 30));
+  await page.locator('.sidebar [data-tag="big-ideas"]').waitFor();
+
+  await group.locator("input[accept*='.bear2bk']").setInputFiles(bearBackup());
+  await group.getByText("Everything in Bear Notes 2024-11-14 is in lines already.").waitFor();
+});

@@ -21,24 +21,22 @@
   type Props = {
     /** The import's id, as its plugin gives it. */
     id: string;
-    /** The button that chooses what to import: "Choose Vault Folder…". */
-    choose: string;
-    /** Whether that's a folder (a vault), rather than files of `accept`'s kinds (a ZIP). */
-    folder?: boolean;
-    accept?: string;
+    /** The buttons that choose what to import, as the app exports it: a folder ("Choose Vault Folder…"), or a file of `accept`'s kinds. */
+    choices: { label: string; folder?: boolean; accept?: string }[];
     /** What the export chosen holds, as its import reads it. */
     read: (exported: Exported) => Promise<Source>;
     onclose?: () => void;
   };
-  let { id, choose, folder = false, accept, read, onclose }: Props = $props();
+  let { id, choices, read, onclose }: Props = $props();
 
   const list = (parts: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(parts);
   /** A few of `count` things by name, and how many more there are. */
   const some = (names: string[], count: number) => list([...names, ...(count > names.length ? [t("import.more", { count: count - names.length })] : [])]);
 
-  let picker = $state<HTMLInputElement>();
+  const pickers = $state<HTMLInputElement[]>([]);
   let chooseButton = $state<HTMLElement>();
-  let reading = $state(false);
+  /** Which choice is being read. */
+  let reading = $state<number | null>(null);
   let error = $state<string | null>(null);
   /** What the export holds (large: not made deeply reactive), and the id a new collection of it would have. */
   let found = $state.raw<{ source: Source; fresh: string } | null>(null);
@@ -75,11 +73,11 @@
   /** Asked about, or imported from here before (Settings closed and opened again meanwhile). */
   const shown = $derived(!!found || imports.state?.id === id);
 
-  async function chosen() {
-    const files = [...(picker?.files ?? [])];
-    if (picker) picker.value = "";
+  async function chosen(choice: number, picker: HTMLInputElement) {
+    const files = [...(picker.files ?? [])];
+    picker.value = "";
     if (!files.length) return;
-    reading = true;
+    reading = choice;
     error = null;
     found = plan = null;
     try {
@@ -91,7 +89,7 @@
       console.warn(`lines: couldn't read what was chosen to import from ${id}`, problem);
       error = t("import.unreadable");
     } finally {
-      reading = false;
+      reading = null;
     }
   }
 
@@ -112,14 +110,24 @@
 </script>
 
 <CardBlock class="items-start">
-  <Button icon={folder ? "folder" : "import"} busy={reading} disabled={reading || imports.busy} onclick={() => picker?.click()} {@attach (button: HTMLElement) => void (chooseButton = button)}>
-    {reading ? t("import.reading") : choose}
-  </Button>
-  {#if folder}
-    <input bind:this={picker} type="file" webkitdirectory class="hidden" onchange={chosen} />
-  {:else}
-    <input bind:this={picker} type="file" {accept} class="hidden" onchange={chosen} />
-  {/if}
+  <div class="flex flex-wrap items-center gap-1.5">
+    {#each choices as { label, folder, accept }, i (label)}
+      <Button
+        icon={folder ? "folder" : "import"}
+        busy={reading === i}
+        disabled={reading !== null || imports.busy}
+        onclick={() => pickers[i]?.click()}
+        {@attach (button: HTMLElement) => void (i === 0 && (chooseButton = button))}
+      >
+        {reading === i ? t("import.reading") : label}
+      </Button>
+      {#if folder}
+        <input bind:this={pickers[i]} type="file" webkitdirectory class="hidden" onchange={(event) => chosen(i, event.currentTarget)} />
+      {:else}
+        <input bind:this={pickers[i]} type="file" {accept} class="hidden" onchange={(event) => chosen(i, event.currentTarget)} />
+      {/if}
+    {/each}
+  </div>
   {#if error}
     <Callout tone="danger" class="w-full">{error}</Callout>
   {/if}

@@ -3,6 +3,7 @@ import type { Plugin } from "../lib/plugins/types";
 import { applePodcasts } from "./apple-podcasts";
 import { arxiv } from "./arxiv";
 import { asciinema } from "./asciinema";
+import { bear } from "./bear";
 import { changesPlugin } from "./changes";
 import { code } from "./code";
 import { feedsPlugin } from "./feeds";
@@ -89,6 +90,7 @@ export const builtIn = (): Plugin[] => [
   readwise(),
   // Bringing notes in from another app.
   obsidian(),
+  bear(),
   // Books kept with library notes, read in the note's place.
   pdfReader(),
   epubReader(),
