@@ -81,6 +81,8 @@ export default {
   "shortcuts.skipRecording": "Retroceder o avanzar",
   "shortcuts.leaveRecording": "Volver al texto de la nota",
   "shortcuts.inPlayer": "En una grabación o un audio",
+  "shortcuts.playSite": "Reproducir un enlace de Spotify o SoundCloud",
+  "shortcuts.inSitePlayer": "En el reproductor de Spotify o SoundCloud",
   "shortcuts.bold": "Negrita",
   "shortcuts.italic": "Cursiva",
   "shortcuts.underline": "Subrayado",

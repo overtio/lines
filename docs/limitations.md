@@ -99,6 +99,18 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 - A GIF is kept as its address on GIPHY, like an Unsplash photo: it needs the internet to show, and isn't in exports or sync as a picture. With reduced motion, GIFs from GIPHY show still, but other animated images in notes still play.
 - They're in Markdown notes only. A LaTeX note can't compile a picture from the web anyway.
 
+## Spotify and SoundCloud
+
+- The players are the sites' own, in a frame. Spotify's plays 30 seconds of a song, an episode or a show to anyone not logged in to Spotify in that browser, and in the apps to everyone (the frame can't see a login made elsewhere, and WebKit has none of the protection, Widevine, Spotify's whole songs need in other browsers; not tried in the apps). Nothing of Spotify's plays through lines' own player, nor does SoundCloud's but for someone's podcast feed.
+- Scrolled far from it in a long note, a player playing stops, as the note draws only what's near the view, and it's loaded again (paused) when scrolled back to.
+- In Safari, playing a card loads the player without starting it: the site's play button starts it. The Mac app's web view lets pages start sound, so it may start there; not tried.
+- In the apps, the links in a player (the Spotify logo, Share) go nowhere, as the app doesn't open windows a page asks for: Open on Spotify, beside it, opens the link.
+- Keys pressed in a player never reach lines, so Esc doesn't leave it; Tab and ⇧Tab do.
+- SoundCloud's player is light in every theme: SoundCloud has no dark one. Its colors are the theme's accent as it was when the player loaded.
+- Only a Markdown link on a line of its own is a player; a bare address is a link. Spotify's short links (`spotify.link/…`) and SoundCloud's (`on.soundcloud.com/…`) aren't known. LaTeX notes don't draw players: their links are links.
+- Spotify's links aren't looked up for the library by a source of Spotify's own (its developer terms don't let what it says be kept): MusicBrainz looks up those it knows, and in the apps Web Pages reads their pages. A SoundCloud set isn't looked up: SoundCloud says whether it's an album or a playlist only on its page.
+- Nothing of either needs an account, and nothing from one is read: your saved songs, playlists or what's playing aren't in lines.
+
 ## Terminal recordings (asciinema)
 
 - A recording on asciinema.org is kept as its embed code, not as a file: it needs the internet to play, and isn't in exports or sync as a recording. A `.cast` file dropped into a note is an attachment like any other, and plays offline.

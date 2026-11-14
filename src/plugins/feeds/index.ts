@@ -1,4 +1,5 @@
-import { FEED_SOURCE, feedItem, feeds, namedFeed } from "../../lib/feeds/feeds.svelte";
+import { FEED_SOURCE, feeds, namedFeed } from "../../lib/feeds/feeds.svelte";
+import { feedItem } from "../../lib/feeds/item";
 import { fetchFeed } from "../../lib/feeds/fetch";
 import { findFeed, looksLikeFeed, NoFeed } from "../../lib/feeds/find";
 import { isFeed, readFeed } from "../../lib/feeds/parse";

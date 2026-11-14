@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
+      <channel>
+        <atom:link href="https://feeds.soundcloud.com/users/soundcloud:users:20789805/sounds.rss" rel="self" type="application/rss+xml"/>
+        <title>Melodic Techno Mix</title>
+        <link>https://soundcloud.com/bader_b</link>
+        <pubDate>Fri, 20 Jun 2025 16:46:11 +0000</pubDate>
+        <language>en</language>
+        <copyright>All rights reserved</copyright>
+        <webMaster>feeds@soundcloud.com (SoundCloud Feeds)</webMaster>
+        <description>Podcast by BaderB</description>
+        <itunes:author>BaderB</itunes:author>
+        <itunes:image href="https://i1.sndcdn.com/avatars-CRqQ2ScJQ4l9Fywz-iYisOQ-original.jpg"/>
+        <item>
+          <guid isPermaLink="false">tag:soundcloud,2010:tracks/2116405905</guid>
+          <title>Jamboree Paris 2025 — Bader B [20.06.25]</title>
+          <pubDate>Fri, 20 Jun 2025 16:46:11 +0000</pubDate>
+          <link>https://soundcloud.com/bader_b/jamboree25</link>
+          <itunes:duration>01:44:50</itunes:duration>
+          <itunes:author>BaderB</itunes:author>
+          <enclosure type="audio/mpeg" url="https://feeds.soundcloud.com/stream/2116405905-bader_b-jamboree25.mp3" length="50327414"/>
+          <description>Live at Jamboree Paris, June 2025.</description>
+        </item>
+      </channel>
+    </rss>

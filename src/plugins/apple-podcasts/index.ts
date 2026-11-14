@@ -128,6 +128,7 @@ const source: LibrarySource = {
   lookup,
   searches: ["podcast"],
   search,
+  feed: async (url, signal) => (await lookup(url, signal))?.properties.find(([key]) => key === "feed")?.[1] ?? null,
 };
 
 export const applePodcasts = (): Plugin => ({

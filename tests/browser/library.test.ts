@@ -1,4 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import type { Route } from "playwright";
 import { type App, engine, mod, noErrors, openApp, toggle } from "./app";
 
@@ -103,6 +104,23 @@ test("a link pasted into a note started on a shelf, its type and status, is fill
   expect(await app.text()).toContain(`\n---\n# ${TITLE}\n`);
 });
 
+test("a link to someone on SoundCloud whose sounds are a podcast is that podcast, subscribed to, by SoundCloud's feed of them", async () => {
+  app = await openApp();
+  const { page } = app;
+  const FEED = "https://feeds.soundcloud.com/users/soundcloud:users:20789805/sounds.rss";
+  // Trimmed from what SoundCloud answered (November 2026).
+  const html = '<iframe width="100%" height="450" src="https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Fusers%2F20789805&show_artwork=true"></iframe>';
+  await page.route("https://soundcloud.com/oembed**", (route: Route) => route.fulfill({ headers: CORS, json: { title: "BaderB", author_name: "BaderB", html } }));
+  await page.route(FEED, (route: Route) => route.fulfill({ headers: CORS, contentType: "application/rss+xml", body: readFileSync(new URL("./feeds/soundcloud.rss", import.meta.url), "utf8") }));
+  await page.route("https://i1.sndcdn.com/**", (route: Route) => route.fulfill({ headers: { ...CORS, "content-type": "image/png" }, body: PNG }));
+  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await page.waitForFunction(() => window.testing.text() === "# ");
+  await paste(page, "https://soundcloud.com/bader_b");
+  await page.waitForFunction(() => window.testing.text()?.includes("\nfeed: "));
+  expect(await app.text()).toStartWith(`---\ntype: podcast\nauthor: BaderB\nfeed: ${FEED}\nlink: https://soundcloud.com/bader_b\n---\n# Melodic Techno Mix\n`);
+  await page.waitForFunction((feed) => !!window.testing.feeds.subscription(feed), FEED);
+});
+
 test("a link typed is looked up once it's stayed a moment, and not filled in if it changes meanwhile", async () => {
   app = await openApp();
   const { page } = app;
@@ -185,7 +203,7 @@ test("notes that are just a link aren't looked up as they open or as they're wri
   const settings = await app.settings("Library");
   // On the web, only the sources that work there are named, each once: not Web Pages, nor Feeds' own for a site's page, which reads it.
   await expect(settings.getByText("In the browser, only", { exact: false }).innerText()).resolves.toBe(
-    "In the browser, only YouTube, Open Library, Wikidata, MusicBrainz, Apple Podcasts, and Feeds can be asked: other sites don’t let web pages read them. The lines app reads any page.",
+    "In the browser, only YouTube, Open Library, Wikidata, MusicBrainz, SoundCloud, Apple Podcasts, and Feeds can be asked: other sites don’t let web pages read them. The lines app reads any page.",
   );
   await toggle(settings, "Look up links", false);
   await app.closeSettings();

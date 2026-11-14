@@ -15,7 +15,8 @@ import { findFeed, linkOf, NoFeed } from "./find";
 import { FEED_GROUPS, type FeedGroup, groupOf } from "./groups";
 import { readOpml, writeOpml } from "./opml";
 import { plainText } from "./markdown";
-import { isFeed, isPodcast, NotAFeed, readFeed, type Feed } from "./parse";
+import { feedItem } from "./item";
+import { isFeed, NotAFeed, readFeed, type Feed } from "./parse";
 import { backoff, DAY, merge, newestFirst, type FeedRecord, type KeptPost } from "./posts";
 import { feedStorage } from "./storage";
 
@@ -502,33 +503,17 @@ export async function savePost(row: Row) {
   }
 }
 
-/** A feed at `url` as the library keeps it: a podcast's (its posts have sound) or a site's, its artwork its cover. */
-export function feedItem(url: string, feed: Feed): LibraryItem {
-  return {
-    type: isPodcast(feed) ? "podcast" : "feed",
-    title: feed.title,
-    link: feed.link,
-    properties: known([
-      ["author", feed.author],
-      ["feed", url],
-    ]),
-    cover: feed.image,
-    description: feed.description,
-  };
-}
-
 /**
- * The feed a podcasts' library source says a link has, if one does: a podcast's page on Apple
- * Podcasts names its podcast's. (Not the feeds' own sources, which read the link itself.) Only
- * podcasts' sources are asked, as a page's every link may be.
+ * The feed a library source says a link names, if one does (`LibrarySource.feed`): a podcast's page
+ * on Apple Podcasts, someone's sounds on SoundCloud. Only those sources are asked, as a page's
+ * every link may be.
  */
 export async function namedFeed(link: string, signal = new AbortController().signal): Promise<string | null> {
   const url = new URL(link);
   for (const source of plugins.librarySources) {
-    if (source.general || !source.searches?.includes("podcast") || !source.recognizes(url)) continue;
-    const item = await source.lookup(url, signal).catch(() => null);
+    if (!source.feed || !source.recognizes(url)) continue;
+    const feed = await source.feed(url, signal).catch(() => null);
     signal.throwIfAborted();
-    const feed = item?.properties.find(([key]) => key === "feed")?.[1];
     if (feed) return feed;
   }
   return null;

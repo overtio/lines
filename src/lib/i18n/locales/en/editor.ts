@@ -179,6 +179,16 @@ export default {
   // A terminal recording (asciinema) played in a note, named for screen readers, and what shows when it can't load.
   "editor.recording": "Terminal recording",
   "editor.recording.failed": "This recording couldn’t be loaded",
+  // A player from another site (Spotify, SoundCloud) in a note: a card until it's played, as nothing is
+  // asked of the site before. {site} is its name; {kind} what the plugin calls the thing ("Track"); {title} what it plays.
+  "editor.sitePlayer.play": "Play with {site}",
+  "editor.sitePlayer.name": "{kind} on {site}",
+  "editor.sitePlayer.loads": "Loads {site}’s player when you play it",
+  "editor.sitePlayer.frame": "{site} player: {title}",
+  "editor.sitePlayer.open": "Open on {site}",
+  "editor.sitePlayer.failed": "{site}’s player couldn’t be loaded.",
+  // A way out of the player, which Tab reaches from it: focus goes back to the note's text.
+  "editor.sitePlayer.back": "Back to the note’s text",
   "editor.size.bytes": "{count, plural, one {# byte} other {# bytes}}",
   "editor.size.kb": "{size} KB",
   "editor.size.mb": "{size} MB",

@@ -67,6 +67,18 @@ export async function pageSummary(url: string, signal: AbortSignal): Promise<{ d
 export const readsPages = () => plugins.librarySources.some((source) => source.id === "web-pages");
 
 /**
+ * What a page says about itself, for what only its page adds to what a source found: in the apps
+ * (web pages can't read other sites'), and nothing if it can't be read. Rejects only once `signal` aborts.
+ */
+export async function pageInApps(url: string, signal: AbortSignal): Promise<Page | null> {
+  if (!isTauri) return null;
+  return getPage(url, signal).catch(() => {
+    signal.throwIfAborted();
+    return null;
+  });
+}
+
+/**
  * Whether an address a page gave (its picture, its oEmbed) is one to ask: on the web at large over
  * https, not this computer or the network it's on, which a page could otherwise have the apps ask.
  */

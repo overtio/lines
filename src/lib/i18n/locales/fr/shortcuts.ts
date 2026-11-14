@@ -81,6 +81,8 @@ export default {
   "shortcuts.skipRecording": "Reculer ou avancer",
   "shortcuts.leaveRecording": "Revenir au texte de la note",
   "shortcuts.inPlayer": "Dans un enregistrement ou un son",
+  "shortcuts.playSite": "Lire un lien Spotify ou SoundCloud",
+  "shortcuts.inSitePlayer": "Dans le lecteur de Spotify ou de SoundCloud",
   "shortcuts.bold": "Gras",
   "shortcuts.italic": "Italique",
   "shortcuts.underline": "Souligné",

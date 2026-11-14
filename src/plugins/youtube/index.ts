@@ -1,7 +1,6 @@
 import { t } from "../../lib/i18n/index.svelte";
 import { clock, dayOf, isoSeconds, known } from "../../lib/library/text";
-import { getJson, getPage, request } from "../../lib/library/web";
-import { isTauri } from "../../lib/platform";
+import { getJson, pageInApps, request } from "../../lib/library/web";
 import type { LibrarySource, Plugin } from "../../lib/plugins/types";
 
 /*
@@ -42,12 +41,7 @@ const source: LibrarySource = {
     const link = `https://www.youtube.com/watch?v=${id}`;
     const embed = await getJson<OEmbed>(`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(link)}`, signal);
     if (!embed?.title) return null;
-    const page = isTauri
-      ? await getPage(link, signal).catch(() => {
-          signal.throwIfAborted();
-          return null;
-        })
-      : null;
+    const page = await pageInApps(link, signal);
     const meta = page?.meta;
     return {
       type: "video",

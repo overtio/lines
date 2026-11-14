@@ -36,6 +36,7 @@ The editor's parser is in `src/lib/editor/syntax.ts` (tags, highlights, underlin
 | Copyable value, score | `Key: Value` lines (`Rating: 4/5` as stars) | Yes (plain text, read specially) |
 | GitHub link | `https://github.com/owner/repo/issues/12` | Yes (an ordinary link, drawn short) |
 | Terminal recording | `[![asciicast](https://asciinema.org/a/<id>.svg)](https://asciinema.org/a/<id>)`, `[demo.cast](../attachments/<hash>.cast)` | Yes (asciinema's embed code: a linked image; a link) |
+| Spotify or SoundCloud player | `[Never Gonna Give You Up](https://open.spotify.com/track/<id>)`, `[SoundCloud](https://soundcloud.com/<who>/<track>)` on a line of its own | Yes (an ordinary link) |
 | arXiv link | `https://arxiv.org/abs/1706.03762` | Yes (an ordinary link, drawn short) |
 | Properties | `key: value` lines between `---` lines at the top | YAML front matter (Obsidian, Jekyll, Pandoc) |
 | Mention | `@Oleks`, `@[Two Words]`, `@Oleks.fullname`, `[[Two Words]]` | Wiki links: Obsidian, Logseq, Foam |
@@ -291,6 +292,24 @@ A recording of a terminal from [asciinema](https://asciinema.org) plays in the n
 - Clicking it plays it, and it's selected, moved and deleted as an image is: ↑ and ↓ stop on it, and Backspace after it selects it. With it selected, Enter plays it. In the player Space pauses, ← and → skip 5 seconds, a number jumps to that tenth of it, F is full screen, and Esc goes back to the note's text with it selected.
 - Like images, recordings are drawn at the top level and in cards. Within a line of text, in a list or in a quote, they're the picture or link they're written as. A link to an asciinema.org page is a link: only the embed code plays.
 - Printed, a recording from asciinema.org is its preview, linked to it; a `.cast` file is its name.
+
+## Spotify and SoundCloud
+
+A link to a song, album, playlist, artist, podcast or episode on [Spotify](https://open.spotify.com), or a track, set or someone's sounds on [SoundCloud](https://soundcloud.com), on a line of its own plays in the note with the site's own player, by the Spotify and SoundCloud [plugins](plugins.md). Within a line of text it's a link, as is a bare address on a line of its own; with a plugin off, its links are links.
+
+```markdown
+[Never Gonna Give You Up](https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC)
+
+[SoundCloud](https://soundcloud.com/forss/flickermood)
+```
+
+- **Until it's played** it's a card like an audio file's, named by the link's text (or "Track on Spotify", where the text is only the site's name), saying the site's player loads when it's played; Spotify's says too that it plays 30-second previews without a Spotify login. Nothing is asked of the site until then: its player loads from the site, which can then tell someone's listening.
+- **Played** (its button, or Enter with it selected), the card becomes the site's player, as wide as the card was, and plays where the browser lets a page start it (Chrome); elsewhere (Safari) the player's own play button starts it. SoundCloud's is in the theme's accent. Starting it pauses whatever else plays in lines (the podcast player, a sound in a note, another site's player), and the other way round. Enter on a player that's loaded plays it again.
+- **Spotify** plays 30 seconds of each song, episode or show to someone not logged in to Spotify in that browser; the apps can't see a login. **SoundCloud** plays whole tracks, as its site does.
+- **Open on Spotify** (or SoundCloud), beside it, opens the link in the browser: in the apps, the links in the players themselves go nowhere.
+- A player that hasn't loaded within ten seconds (offline, or what it plays is gone or private) says it couldn't be, with Open on its site.
+- Pasting a link to either on an empty line writes it as a link the player draws, without what the site added to say who shared it (`[Spotify](https://open.spotify.com/track/…)`, no `?si=…`); undo turns it back into the address as pasted.
+- Like images, the players are drawn at the top level and in cards. Printed, they're their links. In LaTeX notes they're links.
 
 ## Folders and files on your computer
 
