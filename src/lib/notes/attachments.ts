@@ -195,6 +195,8 @@ export const attachmentNames = () => attachmentStore.ids();
 /* Showing them. */
 
 const urls = new Map<string, Promise<string | null>>();
+/** Whether each attachment was on this device when last looked for (attachmentURL), or has arrived since. */
+const here = new Map<string, boolean>();
 const waiting = new Map<string, Set<() => void>>();
 
 /** A URL for showing an attachment, or null while it isn't on this device. */
@@ -202,13 +204,21 @@ export function attachmentURL(name: string): Promise<string | null> {
   let url = urls.get(name);
   if (!url) {
     url = getAttachment(name).then((data) => {
-      if (!data) urls.delete(name);
-      return data && URL.createObjectURL(data);
+      here.set(name, !!data);
+      if (data) return URL.createObjectURL(data);
+      urls.delete(name);
+      return null;
     });
     urls.set(name, url);
   }
   return url;
 }
+
+/**
+ * Whether an attachment was on this device when last looked for, undefined if it hasn't been: what
+ * shows it can be drawn so from the start, taking that room, while it's looked for again.
+ */
+export const attachmentHere = (name: string): boolean | undefined => here.get(name);
 
 /** Calls `callback` when an attachment that wasn't here arrives (from sync, or another window). */
 export function whenArrived(name: string, callback: () => void) {
@@ -220,6 +230,7 @@ export function whenArrived(name: string, callback: () => void) {
 
 /** An attachment was stored, here or in another window. */
 export function arrived(name: string) {
+  here.set(name, true);
   const callbacks = waiting.get(name);
   waiting.delete(name);
   for (const callback of callbacks ?? []) callback();

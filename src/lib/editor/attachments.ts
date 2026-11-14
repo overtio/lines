@@ -9,6 +9,7 @@ import type { IconName } from "../icons/icons";
 import {
   ATTACHMENT_PATH,
   attachmentFileName,
+  attachmentHere,
   attachmentName,
   attachmentURL,
   extensionOf,
@@ -51,10 +52,17 @@ import { ancestors, blockPos, drawnBlock, drawnBlocks, focused, INTERACTIVE, isE
  */
 
 /**
- * Heights images were drawn at (by address and label, which holds the width), so a block that
- * scrolls back into view takes its place at once.
+ * Heights blocks were drawn at (by what they draw), so one that scrolls back into view, or is in a
+ * note opened again, takes its place at once.
  */
 const heights = new Map<string, number>();
+
+/**
+ * Images' sizes as they loaded this session, by address, or that they didn't. Drawn again (its note
+ * opened again) one takes that room from the start, rather than growing into it once it's been
+ * looked up or has loaded, moving the text under it.
+ */
+const seen = new Map<string, { width: number; height: number } | "failed">();
 
 /**
  * An `<img>` for a note's image, at the width its label gives (`|400`), or a quiet placeholder
@@ -72,34 +80,57 @@ export function imageElement(src: string, label: string, onChange: () => void): 
   img.alt = alt || t("editor.image");
   img.draggable = false;
   if (width) setWidth(img, width);
+  const name = attachmentName(src);
+  const last = seen.get(src);
+  const sized = typeof last === "object";
+  if (sized) {
+    img.classList.add("is-sized");
+    img.style.setProperty("--image-width", `${last.width}px`);
+    img.style.setProperty("--image-ratio", `${last.width / last.height}`);
+  }
+  const message = (key: MessageKey) => dom.replaceChildren(placeholder(t(key)));
+  // Until it's known what shows: the image, if its size is known or it's here (a web image is, likely);
+  // what showed in its place last time; or, for an attachment not looked for yet, the room its
+  // placeholder takes, as it may well not be on this device.
+  const here = name ? attachmentHere(name) : true;
+  if (here === false) message("editor.imageNotHere");
+  else if (last === "failed") message("editor.imageFailed");
+  else if (here === undefined && !sized) dom.append(placeholder(""));
+  else dom.append(img);
+  /** Shows the image at `url`, in place of what's there at once if its size is known (or it's at hand, loaded before), else once it has loaded. */
+  const show = (url: string) => {
+    img.src = url;
+    if (img.parentNode !== dom && (sized || (img.complete && img.naturalWidth))) dom.replaceChildren(img);
+  };
   img.onload = () => {
-    heights.set(`${src}\n${label}`, img.offsetHeight);
+    if (img.naturalWidth && img.naturalHeight) seen.set(src, { width: img.naturalWidth, height: img.naturalHeight });
+    else seen.delete(src);
+    img.classList.remove("is-sized");
+    if (img.parentNode !== dom) dom.replaceChildren(img);
     onChange();
   };
   img.onerror = () => {
-    dom.replaceChildren(placeholder(t("editor.imageFailed")));
+    seen.set(src, "failed");
+    message("editor.imageFailed");
     onChange();
   };
   let cancel = () => {};
   let gone = false;
-  const name = attachmentName(src);
   if (!name) {
-    img.src = unsplashImage(src) ?? giphyStill(src) ?? src;
-    dom.append(img);
+    show(unsplashImage(src) ?? giphyStill(src) ?? src);
   } else {
-    const show = () =>
+    const look = () =>
       void attachmentURL(name).then((url) => {
         if (gone) return;
         if (url) {
-          img.src = url;
-          dom.replaceChildren(img);
+          show(url);
         } else {
-          dom.replaceChildren(placeholder(t("editor.imageNotHere")));
-          cancel = whenArrived(name, show);
+          message("editor.imageNotHere");
+          cancel = whenArrived(name, look);
         }
         onChange();
       });
-    show();
+    look();
   }
   return {
     dom,
@@ -110,9 +141,10 @@ export function imageElement(src: string, label: string, onChange: () => void): 
   };
 }
 
+/** What shows in an image's place while it can't be, or, with no `text`, the room that takes. */
 function placeholder(text: string) {
   const el = document.createElement("span");
-  el.className = "cm-lp-image-missing";
+  el.className = text ? "cm-lp-image-missing" : "cm-lp-image-missing is-waiting";
   el.textContent = text;
   return el;
 }
@@ -256,11 +288,18 @@ class BlockWidget extends WidgetType {
     dom.dataset.key = blockKey(this.block);
     this.#classes(dom);
     dom.addEventListener("keydown", (event) => backToNote(view, dom, event), true);
+    // Its height kept, as what it draws comes in, for when it's drawn again.
+    const onChange = () =>
+      view.requestMeasure({
+        key: dom,
+        read: () => {
+          if (dom.isConnected) heights.set(dom.dataset.key!, dom.offsetHeight);
+        },
+      });
     if (kind === "embed") {
-      drawEmbed(view, dom, this.block);
+      drawEmbed(dom, this.block, onChange);
       return dom;
     }
-    const onChange = () => view.requestMeasure();
     const name = attachmentName(src);
     const viewer = kind === "file" ? plugins.fileView(src) : undefined;
     const viewed = viewer && viewedFile(viewer, name!, label, onChange);
@@ -349,10 +388,11 @@ class BlockWidget extends WidgetType {
     removeActions(dom);
   }
   get estimatedHeight() {
-    const { kind, src, label } = this.block;
+    const { kind, src } = this.block;
+    const known = heights.get(blockKey(this.block));
+    if (known !== undefined) return known;
     if (kind === "file") return plugins.fileView(src) ? 420 : 60;
-    if (kind === "audio") return 60;
-    return heights.get(`${src}\n${label}`) ?? (kind === "image" ? 200 : kind === "video" ? 300 : 420);
+    return kind === "audio" ? 60 : kind === "image" ? 200 : kind === "video" ? 300 : 420;
   }
   /** What takes its own clicks and keys (a recording's player) has them; the rest selects the block. */
   ignoreEvent(event: Event) {
@@ -383,15 +423,12 @@ export function leaveBlock(element: HTMLElement) {
 }
 
 /** What a plugin draws for a link (embeds). */
-function drawEmbed(view: EditorView, dom: HTMLElement, block: Drawable) {
+function drawEmbed(dom: HTMLElement, block: Drawable, onChange: () => void) {
   const { link, by } = block.embed!;
   const frame = document.createElement("div");
   frame.className = "cm-lp-embed";
   dom.append(frame);
-  const drawn = by.draw(frame, link, () => {
-    heights.set(`${block.src}\n${block.label}`, frame.offsetHeight);
-    view.requestMeasure();
-  });
+  const drawn = by.draw(frame, link, onChange);
   shownBy.set(dom, () => drawn);
   cleanups.set(dom, () => drawn.destroy());
 }

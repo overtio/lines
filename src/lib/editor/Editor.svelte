@@ -12,7 +12,7 @@
   import { objectsChanged } from "./objects";
   import { outline, outlineCompartment } from "./outline.svelte";
   import { reopened } from "./markers";
-  import { copyOnSelectCompartment, createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment, spelling, spellingCompartment } from "./setup";
+  import { copyOnSelectCompartment, createExtensions, formatCompartment, formatEditing, readOnly, readOnlyCompartment, spelling, spellingCompartment, steadyScroller } from "./setup";
   import { copyOnSelect } from "./copyOnSelect";
   import { symbolsChanged } from "./symbols";
   import { changesBetween, editedNote } from "./util";
@@ -45,7 +45,7 @@
 
   /** A note's editor state, in its language from the start rather than read as Markdown first. */
   const stateOf = (note: Note | undefined) =>
-    EditorState.create({ doc: note?.body ?? "", extensions: [createExtensions(changed, note?.format), note ? editedNote.of(note.id) : []] });
+    EditorState.create({ doc: note?.body ?? "", extensions: [createExtensions(changed, note?.format), steadyScroller, note ? editedNote.of(note.id) : []] });
 
   /**
    * The editor owns the text while you type; the store gets a copy shortly

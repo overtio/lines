@@ -65,6 +65,15 @@
 }
 
 /*
+ * Room for the scroll bar where it takes room (shown always, or with a mouse on a Mac), so a note's
+ * text doesn't move sideways as it comes and goes: as another note opens, or a picture in it loads
+ * (setup.ts, steadyScroller). Not in Settings' previews, which don't scroll.
+ */
+.cm-editor.cm-steady > .cm-scroller {
+  scrollbar-gutter: stable;
+}
+
+/*
  * A post with its discussion under it (Discussion.svelte): as tall as it is, scrolled with it, Page
  * Down from the post too (no scroller of its own in the way), and the room under its last line the
  * discussion's.
@@ -1297,11 +1306,21 @@
 }
 
 .cm-lp-image {
+  --image-max-height: 480px;
   display: inline-block;
   max-width: 100%;
-  max-height: 480px;
+  max-height: var(--image-max-height);
   border-radius: calc(8px * var(--radius-scale));
   vertical-align: bottom;
+}
+
+/*
+ * An image that has shown before (attachments.ts), at that size while it loads again, so the text
+ * under it stays put: its own width, or the width that keeps it within its height.
+ */
+.cm-lp-image.is-sized {
+  aspect-ratio: var(--image-ratio);
+  width: min(var(--image-width), var(--image-max-height) * var(--image-ratio));
 }
 
 /* An image or file on a line of its own (attachments.ts): never wider than the note, however far in it is. */
@@ -1512,7 +1531,9 @@
   white-space: nowrap;
 }
 
+/* Its line kept while it's looked up, so the card doesn't grow as it's filled in. */
 .cm-lp-file-meta {
+  min-height: 1lh;
   color: var(--text-faint);
   font-size: 0.74em;
 }
@@ -1775,6 +1796,15 @@
   font-family: var(--font-ui);
   font-size: 0.8em;
   line-height: 1.3;
+}
+
+/* While an image is looked up, the room its placeholder takes, so the text under it stays put if that's what shows; within text, none. */
+.cm-lp-image-missing.is-waiting {
+  visibility: hidden;
+}
+
+.cm-line .cm-lp-image-missing.is-waiting {
+  display: none;
 }
 
 /*
@@ -2608,6 +2638,25 @@
 }
 
 :root[data-paper][data-scheme="dark"] .cm-editor.cm-page:not(.cm-sheet-note) > .cm-scroller {
+  background-image: var(--paper-dark);
+}
+
+/*
+ * The note's paper stops at the room kept for a scroll bar (it's painted under what scrolls), so
+ * under that room the same paper, still, lined up with the note's at its top.
+ */
+:root[data-paper]:not([data-backdrop]) .cm-editor.cm-steady:not(.cm-sheet-note)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--paper-light);
+  background-size: var(--paper-size);
+  background-position: var(--paper-position);
+  clip-path: inset(0 0 0 calc(100% - var(--scroll-gutter, 0px)));
+  pointer-events: none;
+}
+
+:root[data-paper][data-scheme="dark"]:not([data-backdrop]) .cm-editor.cm-steady:not(.cm-sheet-note)::before {
   background-image: var(--paper-dark);
 }
 
