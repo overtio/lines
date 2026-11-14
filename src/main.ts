@@ -186,7 +186,8 @@ async function start() {
   );
   await sync.load();
   sync.start();
-  // Only the main window fetches feeds, as it syncs, and plays episodes.
+  // Only the main window fetches feeds, as it syncs (what was done with their posts too), and plays episodes.
+  sync.share(feeds.marksFile);
   void feeds.start().catch((error) => console.error("lines: couldn't read the feeds kept", error));
   void player.load();
   // Settings, in its own window, asks this one to sync, lock and add notes.

@@ -26,6 +26,7 @@
   import TabBar from "./lib/components/TabBar.svelte";
   import Button from "./lib/components/ui/Button.svelte";
   import IconButton from "./lib/components/ui/IconButton.svelte";
+  import Notice from "./lib/components/ui/Notice.svelte";
   import Editor from "./lib/editor/Editor.svelte";
   import { flushSync, untrack } from "svelte";
   import { speak } from "./lib/a11y";
@@ -36,8 +37,9 @@
   import { lockedNotes } from "./lib/notes/locked.svelte";
   import { isClosed, notes } from "./lib/notes/store.svelte";
   import { plugins } from "./lib/plugins/registry.svelte";
-  import { feeds, savePost } from "./lib/feeds/feeds.svelte";
+  import { dismissPosts, feeds, type Row, savePost, undoDismissal } from "./lib/feeds/feeds.svelte";
   import { reading } from "./lib/books/reading.svelte";
+  import type { Dismissal } from "./lib/feeds/marks";
   import { postEpisode } from "./lib/player/episodes";
   import { playerKey } from "./lib/player/keys";
   import { player } from "./lib/player/player.svelte";
@@ -163,7 +165,7 @@
   const post = $derived.by(() => {
     const f = notes.filter;
     const row = feeds.openRow;
-    return !selected && f.kind === "feeds" && row && (f.feed ? f.feed === row.feed : !f.group || feeds.groupOf.get(row.feed) === f.group) ? row : null;
+    return !selected && f.kind === "feeds" && row && feeds.chose(f, row.feed) ? row : null;
   });
 
   /** On a phone, the note list and the note side by side, slid along to the one showing. */
@@ -398,7 +400,7 @@
     const target = event.target as HTMLElement;
     if (!(event.metaKey || event.ctrlKey) || event.shiftKey || event.altKey || event.key.toLowerCase() !== "z") return;
     if (target.matches("input, textarea")) return;
-    const undone = notes.undoTrash() ? t("list.didRestore") : notes.undoEdit();
+    const undone = undoDismissal() ?? (notes.undoTrash() ? t("list.didRestore") : notes.undoEdit());
     if (!undone) return;
     speak(undone);
     event.preventDefault();
@@ -428,15 +430,25 @@
     focusList();
   }
 
+  /** Dismisses the open post (`why`), or puts it back in the list (null); with none opened in its place, focus goes to the list. */
+  function dismissOpen(row: Row, why: Dismissal | null) {
+    if (why) dismissPosts([row], why);
+    else {
+      feeds.restore([row]);
+      speak(t("feeds.didRestore", { count: 1 }));
+    }
+    if (!feeds.openRow) focusList();
+  }
+
   function togglePin(id: string, pinned: boolean) {
     notes.togglePin(id);
     speak(pinned ? t("list.didUnpin") : t("list.pinned"));
   }
 
-  /** Once the list has redrawn: its row that takes focus, or else its search field. */
+  /** Once the list has redrawn: its row that takes focus, or else what an empty list offers to do, or else its search field. */
   function focusList() {
     requestAnimationFrame(() => {
-      const row = document.querySelector<HTMLElement>('.note-list .item[tabindex="0"]');
+      const row = document.querySelector<HTMLElement>('.note-list .item[tabindex="0"], .note-list [data-list-empty] button');
       (row ?? searchInput)?.focus({ preventScroll: !row });
     });
   }
@@ -714,6 +726,23 @@
             {@const link = shown.link}
             <IconButton icon="external-link" iconSize={17} label={t("feeds.openInBrowser")} onclick={() => void openExternal(link)} />
           {/if}
+          {#if !shown.dismissed}
+            <IconButton
+              icon="thumbs-down"
+              iconSize={17}
+              label={t("feeds.uninteresting")}
+              tooltip={t("feeds.uninterestingWithKey", { key: "N" })}
+              onclick={() => dismissOpen(post, "uninteresting")}
+            />
+          {/if}
+          <!-- One button either way, so focus stays on it. -->
+          <IconButton
+            icon={shown.dismissed ? "restore" : "archive"}
+            iconSize={17}
+            label={shown.dismissed ? t("feeds.restore") : t("feeds.dismiss")}
+            tooltip={shown.dismissed ? undefined : t("feeds.dismissWithKey", { key: "E" })}
+            onclick={() => dismissOpen(post, shown.dismissed ? null : "done")}
+          />
         {/if}
         {#if ui.sidebarToggle === "editor" && prefs.sidebarSide === "right"}
           <SidebarToggle />
@@ -786,6 +815,29 @@
 {/if}
 <ContextMenu />
 <ColorPicking />
+<!-- Something just done, and Undo; it stays while it's pointed at or focused. -->
+{#if ui.notice}
+  {@const notice = ui.notice}
+  <Notice
+    onpointerenter={() => ui.holdNotice(true)}
+    onpointerleave={() => ui.holdNotice(false)}
+    onfocusin={() => ui.holdNotice(true)}
+    onfocusout={() => ui.holdNotice(false)}
+  >
+    {notice.message}
+    {#snippet actions()}
+      <Button
+        variant="quiet"
+        onclick={() => {
+          notice.action.run();
+          focusList();
+        }}
+      >
+        {notice.action.label}
+      </Button>
+    {/snippet}
+  </Notice>
+{/if}
 <IconPicker />
 <TagPrompt />
 <SubscribePrompt />

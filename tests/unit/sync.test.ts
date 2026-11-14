@@ -3,6 +3,8 @@ import { latexContent, markTitle } from "../../src/plugins/latex/text";
 import { beforeWrite, devices, drive, editElsewhere, FOLDER, fileOf, languages, notes, serialize, sync } from "./sync";
 // After ./sync, which sets up the page it runs in.
 const { looks, tagLooks, typeLooks } = await import("../../src/lib/notes/looks.svelte");
+const { MARKS_FILE, mergeMarks, readMarks, writeMarks } = await import("../../src/lib/feeds/marks");
+type Marks = import("../../src/lib/feeds/marks").Marks;
 
 // LaTeX, its title read as the plugin reads it: a document's \title, or its first line of text.
 const latexTitle = (body: string) => {
@@ -351,6 +353,30 @@ describe("sync, of tags' and types' icons and colors", () => {
     expect(merged.tags.work).toMatchObject({ color: "blue" });
     expect(merged.types.book).toMatchObject({ icon: "book-open" });
     expect(looks.looks.types.book.icon).toBe("book-open");
+  });
+});
+
+describe("sync, of other files beside the notes: what was done with feeds' posts", () => {
+  test("each is merged by what keeps it, written back when the merge is new to the folder, and left alone until it's read here", async () => {
+    const FEED = "https://example.com/feed";
+    let here: Marks = { [FEED]: { a: { read: 10 } } };
+    let ready = true;
+    sync.share({ name: MARKS_FILE, ready: () => ready, merge: (text) => (here = mergeMarks(here, readMarks(text))), text: () => writeMarks(here), onChange: () => {} });
+    const [device] = await devices(1);
+    await device.sync();
+    const file = `${FOLDER.path}/feeds.json`;
+    expect(readMarks(drive.get(file)!.text)).toEqual(here);
+
+    // Another device dismissed one since, and the other as not interesting.
+    drive.set(file, { text: writeMarks({ [FEED]: { a: { done: 20 }, b: { uninteresting: 5 } } }), etag: "elsewhere" });
+    await device.sync();
+    expect(here).toEqual({ [FEED]: { a: { read: 10, done: 20 }, b: { uninteresting: 5 } } });
+    expect(readMarks(drive.get(file)!.text)).toEqual(here);
+
+    ready = false;
+    drive.delete(file);
+    await device.sync();
+    expect(drive.has(file)).toBe(false);
   });
 });
 

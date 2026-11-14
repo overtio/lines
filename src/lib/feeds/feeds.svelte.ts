@@ -8,12 +8,16 @@ import { putAttachment } from "../notes/attachments";
 import { dayOf } from "../notes/calendar";
 import { propertyOf } from "../notes/properties";
 import { isClosed, notes } from "../notes/store.svelte";
+import type { Filter } from "../notes/types";
 import { plugins } from "../plugins/registry.svelte";
 import type { LibraryItem } from "../plugins/types";
 import { prefs } from "../prefs.svelte";
+import type { SharedFile } from "../sync/engine.svelte";
+import { ui } from "../ui.svelte";
 import { fetchFeed, FetchError, type Validators } from "./fetch";
 import { findFeed, linkOf, NoFeed } from "./find";
 import { FEED_GROUPS, type FeedGroup, groupOf } from "./groups";
+import { applyMarks, type Dismissal, type MarkField, marked, markKey, type Marks, MARKS_FILE, mergeMarks, pruneMarks, readMarks, withoutDismissal, writeMarks } from "./marks";
 import { readOpml, writeOpml } from "./opml";
 import { plainText } from "./markdown";
 import { feedItem } from "./item";
@@ -24,7 +28,8 @@ import { feedStorage } from "./storage";
 /*
  * Feeds subscribed to, and their posts. A subscription is a note with a `feed:` property, so it
  * syncs as notes do; its posts are fetched in the main window (at start, then as often as
- * Settings → Library says, or when asked) and kept on this device (storage.ts), with which were read.
+ * Settings → Library says, or when asked) and kept on this device (storage.ts), with which were
+ * read and dismissed. What's done with them is marked for other devices too (marks.ts).
  */
 
 /** A feed subscribed to. */
@@ -41,6 +46,25 @@ export interface Row {
   feed: string;
   post: KeptPost;
 }
+
+/** What the list shows in the Feeds: posts. */
+export type FeedsFilter = Extract<Filter, { kind: "feeds" }>;
+
+/** Whether a post is out of the lists: dismissed. Filters that hide posts would take them out here too. */
+export const isOut = (post: KeptPost) => !!post.dismissed;
+
+/** These posts' ids, by their feeds' addresses. */
+function byFeed(posts: { feed: string; id: string }[]): Map<string, string[]> {
+  const feeds = new Map<string, string[]>();
+  for (const { feed, id } of posts) {
+    const ids = feeds.get(feed);
+    if (ids) ids.push(id);
+    else feeds.set(feed, [id]);
+  }
+  return feeds;
+}
+
+const idsOf = (rows: Row[]) => rows.map(({ feed, post }) => ({ feed, id: post.id }));
 
 /** The library source of feeds' own links (src/plugins/feeds). */
 export const FEED_SOURCE = "feeds";
@@ -87,10 +111,32 @@ class Feeds {
   loaded = $state(false);
   /** The feeds being fetched now. */
   fetching = $state.raw(new Set<string>());
-  /** The post open in the note's place. */
-  open = $state<{ feed: string; id: string } | null>(null);
+  #open = $state<{ feed: string; id: string } | null>(null);
   /** The posts being saved to the Library, by key: each saved once, however often it's asked meanwhile. */
   saving = new SvelteMap<string, Promise<string>>();
+
+  /** What was done with each feed's posts, by its address (marks.ts), as every device has it. */
+  #marks: Marks = {};
+  /** What each feed's marks are stored under. */
+  #markIds = new Map<string, string>();
+  /** Each feed's marks being written, so they land in order. */
+  #markWrites = new Map<string, Promise<void>>();
+  #markListeners = new Set<() => void>();
+  /** Posts dismissed together, most recent last, each as it was, for undo; until a note is changed. */
+  #dismissals: { feed: string; id: string; read: boolean; open: boolean }[][] = [];
+
+  /** The post open in the note's place. One left while Settings → Library → Dismiss posts once read is on is dismissed, if it's still read. */
+  get open() {
+    return this.#open;
+  }
+
+  set open(next) {
+    const left = this.#open;
+    this.#open = next;
+    if (!left || !prefs.dismissOnRead || (left.feed === next?.feed && left.id === next.id)) return;
+    const post = this.records.get(left.feed)?.posts.find((each) => each.id === left.id);
+    if (post?.read && !post.dismissed) this.#dismiss([{ feed: left.feed, post }], "done");
+  }
 
   #signature = $derived(signature());
 
@@ -116,8 +162,10 @@ class Feeds {
     return rows.sort((a, b) => newestFirst(a.post, b.post));
   });
 
-  /** How many posts each feed has unread, by its address. */
-  unread = $derived(new Map([...this.#subscribed].map((url) => [url, this.records.get(url)?.posts.filter((post) => !post.read).length ?? 0])));
+  /** How many posts each feed has unread in its list (not dismissed), by its address. */
+  unread = $derived(
+    new Map([...this.#subscribed].map((url) => [url, this.records.get(url)?.posts.reduce((count, post) => (post.read || isOut(post) ? count : count + 1), 0) ?? 0])),
+  );
 
   totalUnread = $derived([...this.unread.values()].reduce((sum, count) => sum + count, 0));
 
@@ -139,6 +187,25 @@ class Feeds {
     return post ? { feed: open.feed, post } : null;
   });
 
+  /**
+   * The posts the list shows (NoteList.svelte), newest first: those of the feeds the sidebar's row
+   * chose, in their list or, in its Dismissed, taken out of it, that have every word searched for
+   * in their title, excerpt or feed's name.
+   */
+  listed = $derived.by((): Row[] => {
+    const filter = notes.filter;
+    if (filter.kind !== "feeds") return [];
+    const out = !!filter.dismissed;
+    const terms = notes.query.toLowerCase().split(/\s+/).filter(Boolean);
+    const titles = new Map(this.subscriptions.map(({ url, title }) => [url, title.toLowerCase()]));
+    return this.posts(filter.feed, filter.group).filter(({ feed, post }) => {
+      if (isOut(post) !== out) return false;
+      if (!terms.length) return true;
+      const text = `${post.title.toLowerCase()} ${post.excerpt.toLowerCase()} ${titles.get(feed) ?? ""}`;
+      return terms.every((term) => text.includes(term));
+    });
+  });
+
   /** Fetches waiting their turn, in order: by feed, whether it was asked for (⟳), which goes even when it was to wait. */
   #queue = new Map<string, boolean>();
   /** What's waiting for each feed queued or being fetched: what it read of it, or null. */
@@ -157,6 +224,11 @@ class Feeds {
   /** The feeds subscribed to in a group, or all of them. */
   feedsIn(group?: FeedGroup): string[] {
     return this.subscriptions.filter(({ url }) => !group || this.groupOf.get(url) === group).map(({ url }) => url);
+  }
+
+  /** Whether a feed's posts are among those the sidebar's row `filter` chose. */
+  chose(filter: FeedsFilter, feed: string) {
+    return filter.feed ? filter.feed === feed : !filter.group || this.groupOf.get(feed) === filter.group;
   }
 
   subscription(url: string) {
@@ -180,7 +252,13 @@ class Feeds {
       kept = kept.filter((record) => noted.has(record.url));
     }
     this.records = new Map(kept.map((record) => [record.url, record]));
+    const stored = await feedStorage.marks();
+    this.#markIds = new Map(stored.map(({ feed, id }) => [feed, id]));
+    this.#marks = Object.fromEntries(stored.map(({ feed, marks }) => [feed, marks]));
+    this.#setMarks(pruneMarks(this.#marks));
     this.loaded = true;
+    // Now there's something to sync.
+    for (const listener of this.#markListeners) listener();
   }
 
   /**
@@ -189,6 +267,8 @@ class Feeds {
    */
   async start() {
     await this.load();
+    // A note changed makes its undo the one ⌘Z reaches, as typing does.
+    notes.onLocalChange(() => (this.#dismissals = []));
     $effect.root(() => {
       $effect(() => {
         const minutes = prefs.feedRefresh;
@@ -279,7 +359,7 @@ class Feeds {
     }
   }
 
-  /** Keeps a feed as it was just fetched: its posts merged with those kept, which were read staying read. */
+  /** Keeps a feed as it was just fetched: its posts merged with those kept, which were read or dismissed staying so, and as other devices marked them. */
   take(url: string, feed: Feed, validators: Validators): Promise<void> {
     // After the feed's last, so each merges with what the one before kept.
     const taking = (this.#taking.get(url) ?? Promise.resolve()).catch(() => {}).then(() => this.#take(url, feed, validators));
@@ -297,13 +377,17 @@ class Feeds {
     await feedStorage.putContents(changed.map(({ key, html }) => ({ id: key, html })));
     // As the posts are now: one opened (or marked) while their content was written stays as it was left.
     const now = this.records.get(url);
-    const read = new Map(now?.posts.map((post) => [post.id, post.read]));
+    const was = new Map(now?.posts.map((post) => [post.id, post]));
+    const asLeft = (post: KeptPost): KeptPost => {
+      const left = was.get(post.id);
+      return left ? { ...withoutDismissal(post), read: left.read, ...(left.dismissed && { dismissed: left.dismissed }) } : post;
+    };
     const { posts: _, ...rest } = feed;
     this.#set(url, {
       ...rest,
       id: now?.id ?? crypto.randomUUID(),
       url,
-      posts: posts.map((post) => (read.has(post.id) ? { ...post, read: read.get(post.id)! } : post)),
+      posts: applyMarks(posts.map(asLeft), this.#marks[url]),
       ...validators,
       checked: Date.now(),
       error: undefined,
@@ -327,12 +411,65 @@ class Feeds {
     this.#writes.set(url, write);
   }
 
+  /** `feeds.json`, which sync merges with other devices' (sync/engine.svelte.ts), once what's kept here is read. */
+  readonly marksFile: SharedFile = {
+    name: MARKS_FILE,
+    ready: () => this.loaded,
+    merge: (text) => this.#setMarks(pruneMarks(mergeMarks(this.#marks, readMarks(text)))),
+    text: () => writeMarks(pruneMarks(this.#marks)),
+    onChange: (listener) => void this.#markListeners.add(listener),
+  };
+
+  /** Takes these marks in place of those here: each feed's that changed is kept, and applied to its posts. */
+  #setMarks(marks: Marks) {
+    const before = this.#marks;
+    this.#marks = marks;
+    for (const feed of new Set([...Object.keys(before), ...Object.keys(marks)])) {
+      if (before[feed] === marks[feed]) continue;
+      this.#keepMarks(feed);
+      const record = this.records.get(feed);
+      if (!record) continue;
+      const posts = applyMarks(record.posts, marks[feed]);
+      if (posts !== record.posts) this.#set(feed, { ...record, posts });
+    }
+  }
+
+  /** Writes a feed's marks as they are by then (none: deleted), after its writes under way. */
+  #keepMarks(feed: string) {
+    const write = (this.#markWrites.get(feed) ?? Promise.resolve())
+      .then(async () => {
+        const marks = this.#marks[feed];
+        let id = this.#markIds.get(feed);
+        if (marks) {
+          if (!id) this.#markIds.set(feed, (id = crypto.randomUUID()));
+          await feedStorage.putMarks({ id, feed, marks });
+        } else if (id) {
+          this.#markIds.delete(feed);
+          await feedStorage.deleteMarks(id);
+        }
+      })
+      .catch((error) => console.error(`lines: couldn't keep what was done with the posts of ${feed}`, error));
+    this.#markWrites.set(feed, write);
+  }
+
+  /** Changes these posts of a feed, and marks them so (`fields`) for other devices. */
+  #change(feed: string, ids: string[], change: (post: KeptPost) => KeptPost, fields: MarkField[]) {
+    const record = this.records.get(feed);
+    if (!record || !ids.length) return;
+    const changing = new Set(ids);
+    this.#set(feed, { ...record, posts: record.posts.map((post) => (changing.has(post.id) ? change(post) : post)) });
+    const own = { ...this.#marks[feed] };
+    for (const id of ids) own[markKey(id)] = marked(own[markKey(id)], fields);
+    this.#marks = { ...this.#marks, [feed]: own };
+    this.#keepMarks(feed);
+    for (const listener of this.#markListeners) listener();
+  }
+
   /** Marks these posts of a feed read, or unread. */
   setRead(feed: string, ids: string[], read = true) {
-    const record = this.records.get(feed);
     const marking = new Set(ids);
-    if (!record?.posts.some((post) => marking.has(post.id) && post.read !== read)) return;
-    this.#set(feed, { ...record, posts: record.posts.map((post) => (marking.has(post.id) ? { ...post, read } : post)) });
+    const changing = (this.records.get(feed)?.posts ?? []).filter((post) => marking.has(post.id) && post.read !== read).map((post) => post.id);
+    this.#change(feed, changing, (post) => ({ ...post, read }), [read ? "read" : "unread"]);
   }
 
   /** Marks every post of these feeds (or of all of them) read. */
@@ -341,6 +478,74 @@ class Feeds {
       const posts = this.records.get(url)?.posts ?? [];
       this.setRead(url, posts.filter((post) => !post.read).map((post) => post.id));
     }
+  }
+
+  /**
+   * Takes these posts out of the lists, done with or not interesting, marking them read; ⌘Z puts
+   * them back. Dismissing the open post opens the next one listed (or, at the end, the one before),
+   * as a mail app goes on to the next message. How many were dismissed.
+   */
+  dismiss(rows: Row[], why: Dismissal = "done"): number {
+    const going = rows.filter(({ post }) => !post.dismissed);
+    if (!going.length) return 0;
+    const open = this.open;
+    const opened = !!open && going.some(({ feed, post }) => feed === open.feed && post.id === open.id);
+    const next = opened ? this.#nextBut(new Set(going.map(({ post }) => post.key))) : undefined;
+    this.#dismiss(going, why);
+    if (next) this.show(next.feed, next.post.id);
+    else if (opened) this.open = null;
+    return going.length;
+  }
+
+  /** The post listed after the open one that isn't among `going` (by their keys), or else the one before. */
+  #nextBut(going: Set<string>): Row | undefined {
+    const open = this.open;
+    const listed = this.listed;
+    const at = listed.findIndex(({ feed, post }) => feed === open?.feed && post.id === open.id);
+    if (at < 0) return undefined;
+    const staying = ({ post }: Row) => !going.has(post.key);
+    return listed.slice(at + 1).find(staying) ?? listed.slice(0, at).reverse().find(staying);
+  }
+
+  #dismiss(rows: Row[], why: Dismissal) {
+    const open = this.open;
+    this.#dismissals.push(rows.map(({ feed, post }) => ({ feed, id: post.id, read: post.read, open: open?.feed === feed && open.id === post.id })));
+    for (const [feed, ids] of byFeed(idsOf(rows))) this.#change(feed, ids, (post) => ({ ...post, read: true, dismissed: why }), [why]);
+  }
+
+  /** Every post of these feeds still in their lists, dismissed: how many. */
+  dismissAll(urls: Iterable<string>): number {
+    const rows = [...urls].flatMap((feed) => (this.records.get(feed)?.posts ?? []).filter((post) => !isOut(post)).map((post) => ({ feed, post })));
+    return this.dismiss(rows);
+  }
+
+  /** Puts dismissed posts back in their lists, unread, to be read: dismissing read them. */
+  restore(rows: Row[]) {
+    for (const [feed, ids] of byFeed(idsOf(rows.filter(({ post }) => post.dismissed)))) {
+      this.#change(feed, ids, (post) => ({ ...withoutDismissal(post), read: false }), ["restored", "unread"]);
+    }
+  }
+
+  /**
+   * Puts back the posts dismissed last, together, read or unread as they were, and opens again the
+   * one that was open among them while the posts are what's shown; how many, or 0 if none were
+   * dismissed since a note was changed.
+   */
+  undoDismiss(): number {
+    const batch = this.#dismissals.pop();
+    if (!batch) return 0;
+    for (const read of [true, false]) {
+      for (const [feed, ids] of byFeed(batch.filter((each) => each.read === read))) {
+        this.#change(feed, ids, (post) => ({ ...withoutDismissal(post), read }), read ? ["restored"] : ["restored", "unread"]);
+      }
+    }
+    const open = batch.find((each) => each.open);
+    if (open && !notes.selectedId) {
+      // Leaving the one opened in its place as it is, even with Dismiss posts once read on: it was only opened for it.
+      this.#open = { feed: open.feed, id: open.id };
+      this.show(open.feed, open.id);
+    }
+    return batch.length;
   }
 
   /** Opens a post in the note's place, and marks it read. */
@@ -515,7 +720,7 @@ class Feeds {
   /** Writes what's kept again, encrypted or not as the app lock now says, once the feeds being kept are. */
   async rewrite() {
     while (this.#taking.size) await Promise.allSettled(this.#taking.values());
-    await Promise.all(this.#writes.values());
+    await Promise.all([...this.#writes.values(), ...this.#markWrites.values()]);
     await feedStorage.rewrite();
   }
 }
@@ -540,6 +745,43 @@ export function feedError(reason: string): string {
     default:
       return t("feeds.errorOther", { error: reason });
   }
+}
+
+/** Dismisses these posts (`Feeds.dismiss`), and says so, with Undo, in a notice. How many were. */
+export function dismissPosts(rows: Row[], why: Dismissal = "done"): number {
+  const first = rows.find(({ post }) => !post.dismissed);
+  const count = feeds.dismiss(rows, why);
+  if (count > 1) sayDismissed(t("feeds.didDismissMany", { count }));
+  else if (first) sayDismissed(t(why === "uninteresting" ? "feeds.didDismissUninteresting" : "feeds.didDismiss", { title: first.post.title }));
+  return count;
+}
+
+/** Dismisses every post of these feeds still in their lists, and says so, with Undo. */
+export function dismissAll(urls: string[]) {
+  const count = feeds.dismissAll(urls);
+  if (count) sayDismissed(t("feeds.didDismissMany", { count }));
+}
+
+function sayDismissed(message: string) {
+  speak(message);
+  ui.notify({
+    message,
+    action: {
+      label: t("feeds.undo"),
+      run: () => {
+        const undone = undoDismissal();
+        if (undone) speak(undone);
+      },
+    },
+  });
+}
+
+/** Puts back the posts dismissed last (⌘Z, or the notice's Undo); what's said of it, or null if there were none. */
+export function undoDismissal(): string | null {
+  const count = feeds.undoDismiss();
+  if (!count) return null;
+  ui.notify(null);
+  return t("feeds.didRestore", { count });
 }
 
 /** Saves a post to the Library, and says so, or that it couldn't be; once, if it's being saved already. */

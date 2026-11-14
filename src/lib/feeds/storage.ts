@@ -3,25 +3,34 @@ import { isSealed, openRecord, sealRecord, vault, type Sealed } from "../lock/va
 import { database, ObjectStore } from "../notes/storage";
 import type { Episode } from "../player/player.svelte";
 import type { BookPlace } from "../plugins/types";
+import type { Mark } from "./marks";
 import type { FeedRecord } from "./posts";
 
 /*
  * Feeds' posts on this device, in a database of their own (`lines-feeds`): a record for each feed
- * (what it said of itself, its posts but their content, which were read), each post's content
- * apart, read when it's opened, and where each episode was stopped, with the one in the player
- * (player/player.svelte.ts), and where each book was left (books/reading.svelte.ts). Each is
- * stored under a random id, and with the app lock on, encrypted like notes (lock/vault.ts), so
- * nothing kept says what's subscribed to, read or listened to.
+ * (what it said of itself, its posts but their content, which were read and dismissed), each post's
+ * content apart, read when it's opened, each feed's marks as they sync (marks.ts), where each
+ * episode was stopped, with the one in the player (player/player.svelte.ts), and where each book was
+ * left (books/reading.svelte.ts). Each is stored under a random id, and with the app lock on,
+ * encrypted like notes (lock/vault.ts), so nothing kept says what's subscribed to, read or listened to.
  */
 
 export const FEEDS_DB = "lines-feeds";
 const FEEDS = "feeds";
 const POSTS = "posts";
 const POSITIONS = "positions";
+const MARKS = "marks";
 
 interface Content {
   id: string;
   html: string;
+}
+
+/** A feed's marks (marks.ts), by its posts' keys. */
+export interface MarksRecord {
+  id: string;
+  feed: string;
+  marks: Record<string, Mark>;
 }
 
 /** Where an episode was stopped, by its key (its post's, or its note's id). */
@@ -53,10 +62,11 @@ export interface BookPosition {
 
 const isBook = (value: Position | InPlayer | BookPosition): value is BookPosition => "book" in value;
 
-const open = database(FEEDS_DB, 2, [FEEDS, POSTS, POSITIONS]);
+const open = database(FEEDS_DB, 3, [FEEDS, POSTS, POSITIONS, MARKS]);
 const feedStore = new ObjectStore<FeedRecord | Sealed>(FEEDS, open);
 const postStore = new ObjectStore<Content | Sealed>(POSTS, open);
 const positionStore = new ObjectStore<Position | InPlayer | BookPosition | Sealed>(POSITIONS, open);
+const markStore = new ObjectStore<MarksRecord | Sealed>(MARKS, open);
 
 async function seal<T extends { id: string }>(store: string, value: T): Promise<T | Sealed> {
   return vault.sealing ? sealRecord(store, value.id, utf8(JSON.stringify(value))) : value;
@@ -96,6 +106,19 @@ export const feedStorage = {
     await feedStore.delete(record.id);
   },
 
+  /** Every feed's marks. */
+  async marks(): Promise<MarksRecord[]> {
+    return Promise.all((await markStore.all()).map((value) => unseal<MarksRecord>(MARKS, value)));
+  },
+
+  async putMarks(record: MarksRecord) {
+    await markStore.put(await seal(MARKS, record));
+  },
+
+  deleteMarks(id: string) {
+    return markStore.delete(id);
+  },
+
   /** Where each episode was stopped, and the one that was in the player, if one was. */
   async positions(): Promise<{ positions: Position[]; inPlayer?: Episode; books: BookPosition[] }> {
     const all = await Promise.all((await positionStore.all()).map((value) => unseal<Position | InPlayer | BookPosition>(POSITIONS, value)));
@@ -119,6 +142,7 @@ export const feedStorage = {
       [FEEDS, feedStore],
       [POSTS, postStore],
       [POSITIONS, positionStore],
+      [MARKS, markStore],
     ] as [string, ObjectStore<{ id: string } | Sealed>][];
     for (const [name, store] of stores) {
       for (const id of await store.ids()) {

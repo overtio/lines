@@ -8,7 +8,7 @@
 <script lang="ts">
   import type { Attachment } from "svelte/attachments";
   import { speak } from "../a11y";
-  import { feedError, feedRowLabel, feeds, type Subscription } from "../feeds/feeds.svelte";
+  import { dismissAll, feedError, feedRowLabel, feeds, type FeedsFilter, type Subscription } from "../feeds/feeds.svelte";
   import type { FeedGroup } from "../feeds/groups";
   import { t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
@@ -59,7 +59,7 @@
   const filter = $derived(notes.filter.kind === "feeds" ? notes.filter : null);
   const shown = $derived(!folded.has(key) && subscriptions.length > 0);
   /** What the row lists. */
-  const own = $derived<Filter>(group ? { kind: "feeds", group } : { kind: "feeds" });
+  const own = $derived<FeedsFilter>(group ? { kind: "feeds", group } : { kind: "feeds" });
   const urls = () => subscriptions.map(({ url }) => url);
 
   function readAll(urls: string[]) {
@@ -72,6 +72,8 @@
     onmenu(label, [
       { label: t("feeds.refresh"), icon: "refresh", run: () => feeds.refresh(urls()) },
       { label: t("feeds.readAll"), icon: "check-check", run: () => readAll(urls()) },
+      { label: t("feeds.dismissAll"), icon: "archive", run: () => dismissAll(urls()) },
+      { label: t("feeds.showDismissed"), icon: "eye", run: () => onchoose({ ...own, dismissed: true }) },
       // Its sites' feeds subscribed to without a picture (made before lines gave them their sites' icons) given theirs.
       ...(bare.length ? [{ label: t("feeds.getPictures"), icon: "image" as const, run: () => void getPictures(bare) }] : []),
       "separator",
@@ -89,6 +91,8 @@
         [
           { label: t("feeds.refreshOne"), icon: "refresh", run: () => feeds.refresh([url]) },
           { label: t("feeds.readAll"), icon: "check-check", run: () => readAll([url]) },
+          { label: t("feeds.dismissAll"), icon: "archive", run: () => dismissAll([url]) },
+          { label: t("feeds.showDismissed"), icon: "eye", run: () => onchoose({ kind: "feeds", feed: url, dismissed: true }) },
         ],
         [
           { label: t("feeds.openNote"), icon: "file-text", run: () => notes.show(note) },

@@ -1,7 +1,8 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import type { Request, Route } from "playwright";
-import { type App, choose, engine, mod, noErrors, openApp } from "./app";
+import { markKey, readMarks, writeMarks } from "../../src/lib/feeds/marks";
+import { type App, choose, engine, mod, noErrors, openApp, toggle } from "./app";
 import { answerPictures, ico, png } from "./files";
 
 /*
@@ -583,23 +584,24 @@ test("a feed the site won't let the web app read says why, quietly", async () =>
   app.errors.length = 0;
 });
 
-/** What's kept of feeds on this device, as stored: each feed's record and each post's content. */
+/** What's kept of feeds on this device, as stored: each feed's record, each post's content, and each feed's marks. */
 const stored = (app: App) =>
   app.page.evaluate(
     () =>
-      new Promise<{ feeds: unknown[]; posts: unknown[] }>((resolve, reject) => {
+      new Promise<{ feeds: unknown[]; posts: unknown[]; marks: unknown[] }>((resolve, reject) => {
         const request = indexedDB.open("lines-feeds");
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
           const db = request.result;
-          const names = ["feeds", "posts"].filter((name) => db.objectStoreNames.contains(name));
-          if (names.length < 2) return resolve({ feeds: [], posts: [] });
+          const names = ["feeds", "posts", "marks"].filter((name) => db.objectStoreNames.contains(name));
+          if (names.length < 3) return resolve({ feeds: [], posts: [], marks: [] });
           const transaction = db.transaction(names);
           const feeds = transaction.objectStore("feeds").getAll();
           const posts = transaction.objectStore("posts").getAll();
+          const marks = transaction.objectStore("marks").getAll();
           transaction.oncomplete = () => {
             db.close();
-            resolve({ feeds: feeds.result, posts: posts.result });
+            resolve({ feeds: feeds.result, posts: posts.result, marks: marks.result });
           };
         };
       }),
@@ -719,6 +721,8 @@ test("with the app lock on, what's kept of feeds is encrypted; Erase This Device
   await openFeeds(app);
   await subscribe(app, BLOG);
   const page = app.page;
+  // What was done with its posts too.
+  await page.evaluate((url) => window.testing.feeds.dismiss(window.testing.feeds.posts(url).slice(0, 1)), BLOG);
   // A feed being kept as the lock goes on is encrypted too.
   const big = "https://big.example/feed.xml";
   const feed = await madeFeed(app, big, 100, 20_000, "plain words");
@@ -729,7 +733,7 @@ test("with the app lock on, what's kept of feeds is encrypted; Erase This Device
     await taking;
   }, { big, feed });
   const kept = await stored(app);
-  expect([kept.feeds.length, kept.posts.length]).toEqual([2, 102]);
+  expect([kept.feeds.length, kept.posts.length, kept.marks.length]).toEqual([2, 102, 1]);
   const text = JSON.stringify(kept);
   for (const plain of ["Svelte", "site.example", "svelte.dev", "announcement", "big.example", "plain words"]) expect(text).not.toContain(plain);
 
@@ -738,7 +742,7 @@ test("with the app lock on, what's kept of feeds is encrypted; Erase This Device
   await page.getByRole("button", { name: "Erase this device…" }).click();
   await Promise.all([page.waitForEvent("load"), page.getByRole("button", { name: "Erase", exact: true }).click()]);
   await page.waitForFunction(() => window.testing?.notes.ready);
-  expect(await stored(app)).toEqual({ feeds: [], posts: [] });
+  expect(await stored(app)).toEqual({ feeds: [], posts: [], marks: [] });
 });
 
 test("at start, what's kept of a feed no note subscribes to goes", async () => {
@@ -847,4 +851,203 @@ test("OPML in fetches its feeds in turn, as refreshing does, keeping why one cou
   for (const { retryAt } of records) expect(retryAt - before).toBeGreaterThanOrEqual(3_600_000);
   expect(await page.evaluate(() => window.testing.feeds.subscriptions.map(({ title }) => title))).toEqual(["Feed 0", "Feed 1", "Feed 2"]);
   app.errors.length = 0;
+});
+
+/** A subscription to a feed of `count` posts, "Post 0" the newest, kept as if just fetched, with its posts listed. */
+async function madeSubscription(app: App, count: number, url = "https://made.example/feed.xml") {
+  const feed = await madeFeed(app, url, count);
+  await app.page.evaluate(
+    async ({ url, feed }) => {
+      const { feeds, notes } = window.testing;
+      await feeds.take(url, feed, {});
+      await notes.insert({ id: "made", body: `---\ntype: feed\nfeed: ${url}\n---\n# Made`, createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+    },
+    { url, feed },
+  );
+  await openFeeds(app, url);
+  await app.page.locator(".note-list [data-post]").first().waitFor();
+}
+
+/** The titles of the posts listed. */
+const listed = (app: App) => app.page.locator(".note-list [data-post] .block.truncate").allInnerTexts();
+
+describe("dismissing posts, to keep a feed at zero", () => {
+  test("a row's button, E and ⌫, N, or its menu take a post out of the list, read; the open one's place goes to the next; ⌘Z puts them back", async () => {
+    app = await openApp();
+    await madeSubscription(app, 6);
+    const page = app.page;
+    const sidebar = page.getByRole("navigation", { name: "Library" });
+    const rows = page.locator(".note-list [data-post]");
+    await sidebar.getByRole("button", { name: "Made, 6 unread" }).waitFor();
+
+    // The button over a row pointed at, and a notice that says so, with Undo.
+    await rows.first().hover();
+    await page.locator(".note-list li").first().getByRole("button", { name: "Dismiss", exact: true }).click();
+    await page.getByText("Dismissed “Post 0”").waitFor();
+    await page.getByRole("button", { name: "Undo" }).waitFor();
+    expect(await listed(app)).toEqual(["Post 1", "Post 2", "Post 3", "Post 4", "Post 5"]);
+    await sidebar.getByRole("button", { name: "Made, 5 unread" }).waitFor();
+
+    // E on the open post: the next opens, and has focus.
+    await rows.first().click();
+    await page.getByRole("textbox", { name: "Post: Post 1" }).waitFor();
+    await rows.first().focus();
+    await page.keyboard.press("e");
+    await page.getByRole("textbox", { name: "Post: Post 2" }).waitFor();
+    await page.waitForFunction(() => document.activeElement?.closest("[data-post]")?.textContent?.includes("Post 2"));
+    // ⌫ too, and N as not interesting.
+    await page.keyboard.press("Backspace");
+    await page.getByRole("textbox", { name: "Post: Post 3" }).waitFor();
+    await page.keyboard.press("n");
+    await page.getByRole("textbox", { name: "Post: Post 4" }).waitFor();
+    await page.getByText("Dismissed “Post 3” as not interesting").waitFor();
+    expect(await listed(app)).toEqual(["Post 4", "Post 5"]);
+
+    // Its menu, on a post that isn't open: the open one stays.
+    await rows.nth(1).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Not Interesting" }).waitFor();
+    await page.getByRole("menuitem", { name: "Dismiss", exact: true }).click();
+    expect(await listed(app)).toEqual(["Post 4"]);
+    await page.getByRole("textbox", { name: "Post: Post 4" }).waitFor();
+    // Those read or dismissed aren't counted.
+    await sidebar.getByRole("button", { name: "Made", exact: true }).waitFor();
+
+    // ⌘Z brings back the last dismissed, as it was (unread); again, the one before, open again as it was.
+    await rows.first().focus();
+    await page.keyboard.press(`${mod()}+z`);
+    await sidebar.getByRole("button", { name: "Made, 1 unread" }).waitFor();
+    expect(await listed(app)).toEqual(["Post 4", "Post 5"]);
+    await page.keyboard.press(`${mod()}+z`);
+    await page.getByRole("textbox", { name: "Post: Post 3" }).waitFor();
+    expect(await listed(app)).toEqual(["Post 3", "Post 4", "Post 5"]);
+    // Read when it was dismissed, so read now.
+    await sidebar.getByRole("button", { name: "Made, 1 unread" }).waitFor();
+  });
+
+  test("over the open post, Not Interesting and Dismiss go on to the next; the last one gone, the list is all caught up", async () => {
+    app = await openApp();
+    await madeSubscription(app, 2);
+    const page = app.page;
+    await page.locator(".note-list [data-post]").first().click();
+    await page.getByRole("textbox", { name: "Post: Post 0" }).waitFor();
+    await page.locator(".editor-pane").getByRole("button", { name: "Not Interesting" }).click();
+    await page.getByRole("textbox", { name: "Post: Post 1" }).waitFor();
+    await page.locator(".editor-pane").getByRole("button", { name: "Dismiss", exact: true }).click();
+    await page.getByText("All caught up.").waitFor();
+    await page.getByText("Choose a post to read it.").waitFor();
+    // Focus goes to the list, which has only the way to the posts dismissed.
+    await page.waitForFunction(() => document.activeElement?.textContent?.trim() === "Show Dismissed");
+  });
+
+  test("Dismiss All empties the list; the notice's Undo puts them back; Show Dismissed lists them, saying which weren't interesting, and Restore", async () => {
+    app = await openApp();
+    await madeSubscription(app, 4);
+    const page = app.page;
+    const sidebar = page.getByRole("navigation", { name: "Library" });
+    const rows = page.locator(".note-list [data-post]");
+    await rows.first().click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Not Interesting" }).click();
+
+    await sidebar.getByRole("button", { name: "Made, 3 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Dismiss All" }).click();
+    await page.getByText("All caught up.").waitFor();
+    await page.getByText("Dismissed 3 posts").waitFor();
+    await sidebar.getByRole("button", { name: "Made", exact: true }).waitFor();
+    await page.getByRole("button", { name: "Undo" }).click();
+    await page.getByText("Dismissed 3 posts").waitFor({ state: "detached" });
+    expect(await listed(app)).toEqual(["Post 1", "Post 2", "Post 3"]);
+    await sidebar.getByRole("button", { name: "Made, 3 unread" }).waitFor();
+
+    // The feeds' row's menu has it too, for all their posts.
+    await sidebar.getByRole("button", { name: "RSS Feeds, 3 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Dismiss All" }).click();
+    await page.getByText("All caught up.").waitFor();
+
+    // Found again, newest first, under the list's bar.
+    await page.getByRole("button", { name: "Show Dismissed" }).click();
+    await page.getByText("Dismissed posts can be restored.").waitFor();
+    expect(await listed(app)).toEqual(["Post 0", "Post 1", "Post 2", "Post 3"]);
+    await expect(rows.first().innerText()).resolves.toContain("Not interesting");
+    await rows.nth(2).hover();
+    await page.locator(".note-list li").nth(2).getByRole("button", { name: "Restore" }).click();
+    expect(await listed(app)).toEqual(["Post 0", "Post 1", "Post 3"]);
+    await page.getByRole("button", { name: "Hide Dismissed" }).click();
+    expect(await listed(app)).toEqual(["Post 2"]);
+    // Restored, it's unread, to be read.
+    await sidebar.getByRole("button", { name: "Made, 1 unread" }).waitFor();
+
+    // From the feed's own menu.
+    await sidebar.getByRole("button", { name: "Made, 1 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Show Dismissed" }).click();
+    expect(await listed(app)).toEqual(["Post 0", "Post 1", "Post 3"]);
+    // Opened, a dismissed post's Restore is over it.
+    await rows.first().click();
+    await page.locator(".editor-pane").getByRole("button", { name: "Restore" }).focus();
+    await page.keyboard.press("Enter");
+    expect(await listed(app)).toEqual(["Post 1", "Post 3"]);
+    // The same button, now Dismiss, keeps focus.
+    await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Dismiss");
+  });
+
+  test("Settings → Library → Dismiss posts once read: an open post leaves the list once another is opened, unless it was marked unread", async () => {
+    app = await openApp();
+    await madeSubscription(app, 4);
+    const page = app.page;
+    const rows = page.locator(".note-list [data-post]");
+    const dialog = await app.settings("Library");
+    await toggle(dialog, "Dismiss posts once read", true);
+    await app.closeSettings();
+    expect(await page.evaluate(() => window.testing.prefs.dismissOnRead)).toBe(true);
+
+    await rows.first().click();
+    await page.getByRole("textbox", { name: "Post: Post 0" }).waitFor();
+    await rows.first().focus();
+    await page.keyboard.press("ArrowDown");
+    await page.getByRole("textbox", { name: "Post: Post 1" }).waitFor();
+    expect(await listed(app)).toEqual(["Post 1", "Post 2", "Post 3"]);
+    // Marked unread, it stays.
+    await page.locator(".editor-pane").getByRole("button", { name: "Mark as Unread" }).click();
+    await rows.nth(1).click();
+    await page.getByRole("textbox", { name: "Post: Post 2" }).waitFor();
+    expect(await listed(app)).toEqual(["Post 1", "Post 2", "Post 3"]);
+    // ⌘Z brings back the one dismissed as it was left.
+    await rows.first().click();
+    expect(await listed(app)).toEqual(["Post 1", "Post 3"]);
+    await rows.first().focus();
+    await page.keyboard.press(`${mod()}+z`);
+    expect(await listed(app)).toEqual(["Post 1", "Post 2", "Post 3"]);
+  });
+
+  test("what's done with posts goes to other devices and comes from them, mark by mark (feeds.json), and is kept", async () => {
+    app = await openApp();
+    const url = "https://made.example/feed.xml";
+    await madeSubscription(app, 4, url);
+    const page = app.page;
+    const ids = await page.evaluate((url) => window.testing.feeds.posts(url).map(({ post }) => post.id), url);
+    const key = (i: number) => markKey(ids[i]);
+    await page.locator(".note-list [data-post]").first().click();
+    await page.locator(".editor-pane").getByRole("button", { name: "Not Interesting" }).click();
+    const here = readMarks(await page.evaluate(() => window.testing.feeds.marksFile.text()));
+    expect(Object.keys(here)).toEqual([url]);
+    expect(Object.keys(here[url]).sort()).toEqual([key(0), key(1)].sort());
+    expect(Object.keys(here[url][key(0)]).sort()).toEqual(["read", "uninteresting"]);
+
+    // Another device dismissed Post 2 since, put Post 0 back later still, and read a post this one hasn't fetched yet.
+    const later = Date.now() + 60_000;
+    const there = { [url]: { [key(0)]: { restored: later }, [key(2)]: { done: later }, [markKey(`${url}#9`)]: { read: later } } };
+    await page.evaluate((text) => window.testing.feeds.marksFile.merge(text), writeMarks(there));
+    expect(await listed(app)).toEqual(["Post 0", "Post 1", "Post 3"]);
+    const merged = readMarks(await page.evaluate(() => window.testing.feeds.marksFile.text()));
+    expect(merged[url][key(0)]).toMatchObject({ uninteresting: here[url][key(0)].uninteresting, restored: later });
+    expect(merged[url][markKey(`${url}#9`)]).toEqual({ read: later });
+
+    // Fetched here later, that one is read, as the other device left it.
+    const more = await madeFeed(app, url, 10);
+    await page.evaluate(({ url, feed }) => window.testing.feeds.take(url, feed, {}), { url, feed: more });
+    expect(await page.evaluate((url) => window.testing.feeds.posts(url).find(({ post }) => post.title === "Post 9")?.post.read, url)).toBe(true);
+    // Kept on the device, there after a restart.
+    await page.reload();
+    await page.waitForFunction(() => window.testing?.feeds.loaded);
+    expect(readMarks(await page.evaluate(() => window.testing.feeds.marksFile.text()))[url][key(2)]).toEqual({ done: later });
+  });
 });

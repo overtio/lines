@@ -2,6 +2,7 @@ import { describe, expect, mock, test } from "bun:test";
 import { readDate, readDuration } from "../../src/lib/feeds/dates";
 import { isFeed, mend, type Post } from "../../src/lib/feeds/parse";
 import { backoff, DAY, KEEP, merge, type KeptPost } from "../../src/lib/feeds/posts";
+import { applyMarks, marked, markKey, MARK_LIFE, type Marks, mergeMarks, pruneMarks, readMarks, stateOf, writeMarks } from "../../src/lib/feeds/marks";
 import { writeOpml } from "../../src/lib/feeds/opml";
 import { Thread } from "../../src/lib/feeds/thread.svelte";
 import type { DiscussionComment } from "../../src/lib/plugins/types";
@@ -99,6 +100,14 @@ describe("keeping posts", () => {
     expect(second.posts.map((each) => each.id)).toEqual(["z", "x", "y"]);
   });
 
+  test("a dismissed post stays dismissed, and why", () => {
+    const { posts } = merge([{ ...kept("a", 1, true), dismissed: "uninteresting" }], [post("b", 2), post("a", 1)], 100);
+    expect(posts.map(({ id, dismissed }) => [id, dismissed])).toEqual([
+      ["b", undefined],
+      ["a", "uninteresting"],
+    ]);
+  });
+
   test("only the newest are kept, and the rest's content goes", () => {
     const many = Array.from({ length: KEEP + 5 }, (_, i) => post(`p${i}`, i));
     const { posts, dropped, changed } = merge([], many, 0, counting());
@@ -106,6 +115,88 @@ describe("keeping posts", () => {
     expect(posts[0].id).toBe(`p${KEEP + 4}`);
     expect(dropped).toEqual(["new-4", "new-3", "new-2", "new-1", "new-0"]);
     expect(changed).toHaveLength(KEEP);
+  });
+});
+
+describe("marks, what was done with posts, as devices sync them", () => {
+  const kept = (id: string, read = false): KeptPost => ({ id, key: `key-${id}`, title: id, base: "https://example.com/", excerpt: id, version: "v", read, seen: 0 });
+  const FEED = "https://example.com/feed";
+
+  test("a post's key is the same for the same post on every device, and says nothing of it", () => {
+    expect(markKey("https://example.com/post/1")).toBe(markKey("https://example.com/post/1"));
+    expect(markKey("https://example.com/post/1")).not.toBe(markKey("https://example.com/post/2"));
+    expect(markKey("https://example.com/post/1")).toMatch(/^[0-9a-z]{4,12}$/);
+  });
+
+  test("the latest mark says what a post is: dismissing reads it, restoring keeps it read, and unread after that is unread", () => {
+    expect(stateOf({ read: 1 })).toEqual({ read: true });
+    expect(stateOf({ read: 1, unread: 2 })).toEqual({ read: false });
+    expect(stateOf({ unread: 1, done: 2 })).toEqual({ read: true, dismissed: "done" });
+    expect(stateOf({ done: 1, uninteresting: 2 })).toEqual({ read: true, dismissed: "uninteresting" });
+    expect(stateOf({ uninteresting: 1, restored: 2 })).toEqual({ read: true, dismissed: null });
+    expect(stateOf({ uninteresting: 1, restored: 2, unread: 2 })).toEqual({ read: false, dismissed: null });
+    expect(stateOf({})).toEqual({});
+  });
+
+  test("a mark made here is later than any the post has, whatever another device's clock said", () => {
+    expect(marked(undefined, ["read"], 100)).toEqual({ read: 100 });
+    // Another device, its clock ahead, dismissed it at 500; restoring it here at 200 still wins.
+    const mark = marked({ read: 100, done: 500 }, ["restored", "unread"], 200);
+    expect(mark).toEqual({ read: 100, done: 500, restored: 501, unread: 501 });
+    expect(stateOf(mark)).toEqual({ read: false, dismissed: null });
+  });
+
+  test("two devices' marks merge field by field, the later winning, alike either way round", () => {
+    // Read on the phone, offline; dismissed later on the Mac; marked unread on the phone after that.
+    const phone: Marks = { [FEED]: { a: { read: 10, unread: 30 }, b: { read: 5 } } };
+    const mac: Marks = { [FEED]: { a: { done: 20 } }, "https://other.example/feed": { c: { uninteresting: 7 } } };
+    const merged = mergeMarks(phone, mac);
+    expect(merged).toEqual({ [FEED]: { a: { read: 10, unread: 30, done: 20 }, b: { read: 5 } }, "https://other.example/feed": { c: { uninteresting: 7 } } });
+    expect(mergeMarks(mac, phone)).toEqual(merged);
+    // Dismissed, and unread since.
+    expect(stateOf(merged[FEED].a)).toEqual({ read: false, dismissed: "done" });
+    // Nothing new: the same marks, so nothing is written or applied again.
+    expect(mergeMarks(merged, mac)[FEED]).toBe(merged[FEED]);
+    expect(mergeMarks(merged, { [FEED]: { a: { done: 1 } } })[FEED]).toBe(merged[FEED]);
+  });
+
+  test("marks a month old are let go, and a feed with none left has none", () => {
+    const now = 100 * DAY;
+    const marks: Marks = {
+      [FEED]: { old: { read: now - MARK_LIFE - 1 }, kept: { read: now - MARK_LIFE - 1, done: now - DAY } },
+      "https://gone.example/feed": { old: { done: now - 40 * DAY } },
+      "https://fresh.example/feed": { a: { read: now } },
+    };
+    const pruned = pruneMarks(marks, now);
+    expect(Object.keys(pruned)).toEqual([FEED, "https://fresh.example/feed"]);
+    expect(Object.keys(pruned[FEED])).toEqual(["kept"]);
+    // A feed none of whose marks went is the same.
+    expect(pruned["https://fresh.example/feed"]).toBe(marks["https://fresh.example/feed"]);
+  });
+
+  test("applied to the posts kept: each as its marks say, and those without as they were", () => {
+    const posts = [kept("a"), kept("b", true), kept("c")];
+    const applied = applyMarks(posts, { [markKey("a")]: { uninteresting: 5 }, [markKey("b")]: { unread: 5 }, [markKey("z")]: { read: 5 } });
+    expect(applied.map(({ id, read, dismissed }) => [id, read, dismissed])).toEqual([
+      ["a", true, "uninteresting"],
+      ["b", false, undefined],
+      ["c", false, undefined],
+    ]);
+    expect(applied[2]).toBe(posts[2]);
+    // Restored, and nothing else to change: the same posts.
+    const restored = applyMarks(applied, { [markKey("a")]: { uninteresting: 5, restored: 6 } });
+    expect(restored[0]).toEqual({ ...kept("a"), read: true });
+    expect(applyMarks(restored, { [markKey("a")]: { uninteresting: 5, restored: 6 } })).toBe(restored);
+  });
+
+  test("read back as written, feeds and posts in order; what isn't a mark is left out", () => {
+    const marks: Marks = { "https://b.example/feed": { y: { read: 2 }, x: { done: 1, restored: 3 } }, [FEED]: { a: { uninteresting: 4 } } };
+    const text = writeMarks(marks);
+    expect(readMarks(text)).toEqual(marks);
+    expect(Object.keys(JSON.parse(text).feeds)).toEqual(["https://b.example/feed", FEED]);
+    expect(Object.keys(JSON.parse(text).feeds["https://b.example/feed"])).toEqual(["x", "y"]);
+    expect(readMarks(JSON.stringify({ feeds: { [FEED]: { a: { read: "soon", liked: 3, done: 2 }, b: { read: null }, c: 4 }, other: [] } }))).toEqual({ [FEED]: { a: { done: 2 } } });
+    expect(readMarks("not json")).toEqual({});
   });
 });
 

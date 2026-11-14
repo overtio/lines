@@ -62,6 +62,15 @@ export interface TagPrompt {
   align?: "start" | "center" | "end";
 }
 
+/** A short notice at the bottom of the window, of something just done, with a way to undo it. */
+export interface Notice {
+  message: string;
+  action: { label: string; run: () => void };
+}
+
+/** How long a notice shows, unless it's pointed at or focused. */
+const NOTICE_TIME = 6000;
+
 function layoutFor(width: number): Layout {
   return width >= 1000 ? "wide" : width >= 700 ? "medium" : "narrow";
 }
@@ -89,6 +98,9 @@ class UIState {
    * printing, exporting the PDF (printed, or saved from a typesetter), or offering PNG images.
    */
   pdf = $state.raw<{ id: string; action?: "print" | "export" | "png" } | null>(null);
+  /** The notice showing (`notify`), if one is. */
+  notice = $state.raw<Notice | null>(null);
+  #noticeTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor() {
     window.addEventListener("resize", () => {
@@ -133,6 +145,18 @@ class UIState {
     const menu = this.menu;
     this.menu = null;
     menu?.onclose?.();
+  }
+
+  /** Shows a notice in place of any showing, for a few seconds; null takes it away. */
+  notify(notice: Notice | null) {
+    this.notice = notice;
+    this.holdNotice(false);
+  }
+
+  /** Keeps the notice while it's pointed at or focused; let go, it goes a few seconds later. */
+  holdNotice(held: boolean) {
+    clearTimeout(this.#noticeTimer);
+    if (!held && this.notice) this.#noticeTimer = setTimeout(() => (this.notice = null), NOTICE_TIME);
   }
 
   /** Close the drawer after navigating, unless it's a permanent column. */

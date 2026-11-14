@@ -1,8 +1,10 @@
+import type { Dismissal } from "./marks";
 import type { Feed, Post } from "./parse";
 
 /*
- * What's kept of a feed's posts on this device: the newest KEEP, each with whether it was read.
- * Their content is kept apart (storage.ts), each under a random key of its post's own.
+ * What's kept of a feed's posts on this device: the newest KEEP, each with whether it was read and
+ * whether it was dismissed, and why (marks.ts). Their content is kept apart (storage.ts), each under
+ * a random key of its post's own.
  */
 
 /** How many of a feed's posts are kept, the newest. */
@@ -14,6 +16,8 @@ export interface KeptPost extends Omit<Post, "html"> {
   /** Its content's fingerprint, to tell when it changed. */
   version: string;
   read: boolean;
+  /** Taken out of the lists, and why: done with, or not interesting. */
+  dismissed?: Dismissal;
   /** When it was first seen here: its place among posts with no date. */
   seen: number;
 }
@@ -51,8 +55,8 @@ export const newestFirst = (a: KeptPost, b: KeptPost) => (b.date ?? b.seen) - (a
 
 /**
  * A feed's posts once it's been fetched again: those it lists now, as they are now, and those it
- * no longer lists, newest first, KEEP of them. Each keeps its key and whether it was read; a new one
- * is unread, under a new key (`newKey`). Also the content to store (new or changed, by key), and the
+ * no longer lists, newest first, KEEP of them. Each keeps its key, whether it was read and whether
+ * it was dismissed; a new one is unread, under a new key (`newKey`). Also the content to store (new or changed, by key), and the
  * keys of posts that went, to delete.
  */
 export function merge(kept: readonly KeptPost[], fetched: readonly Post[], now: number, newKey: () => string = () => crypto.randomUUID()) {
@@ -66,7 +70,7 @@ export function merge(kept: readonly KeptPost[], fetched: readonly Post[], now: 
     const version = fingerprint(html);
     if (was?.version !== version) changed.push({ key, html });
     // Posts with no date keep the feed's order: its first is the newest.
-    return { ...post, key, version, read: was?.read ?? false, seen: was?.seen ?? now - i };
+    return { ...post, key, version, read: was?.read ?? false, ...(was?.dismissed && { dismissed: was.dismissed }), seen: was?.seen ?? now - i };
   });
   posts.push(...kept.filter((post) => !listed.has(post.id)));
   posts.sort(newestFirst);

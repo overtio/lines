@@ -928,6 +928,35 @@ const SCENES = [
       await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Feeds/ }).click();
     },
   },
+  {
+    id: "feeds-dismiss",
+    title: "Dismissing a post: the row's button, the notice, and the buttons over the open post",
+    look: "A post just dismissed from over it: the next one open, Not Interesting (a thumbs-down) and Dismiss last in the toolbar, lined up with the others; at the bottom, centered, the notice \"Dismissed “…”\" with Undo, as the bar for picking colors looks. The row pointed at in the list: lit, its Dismiss button at its top right, quiet, centered on the title's line, the title's end clear of it; the RSS Feeds count one less.",
+    act: async (page) => {
+      await subscribe(page, { ...FEEDS, "https://rss.slashdot.org/Slashdot/slashdotMain": "slashdot.rdf" });
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^RSS Feeds/ }).click();
+      await page.locator(".note-list [data-post]").first().click();
+      await page.locator(".editor-pane").getByRole("button", { name: "Dismiss", exact: true }).click();
+      await page.locator(".note-list [data-post]").nth(1).hover();
+    },
+  },
+  ...[false, true].map((dismissed) => ({
+    id: dismissed ? "feeds-dismissed" : "feeds-caught-up",
+    title: dismissed ? "A feed's posts dismissed (Show Dismissed)" : "A feed at zero: all its posts dismissed",
+    look: dismissed
+      ? "Under the search, a bar like the Trash's: \"Dismissed posts can be restored.\" with Hide Dismissed in the accent; the posts dismissed, newest first, one saying after its date a thumbs-down and Not interesting."
+      : "After Dismiss All: \"All caught up.\" with a quiet Show Dismissed under it, as an empty list says it; the count gone; the notice saying so, with Undo, at the bottom.",
+    act: async (page) => {
+      await subscribe(page, FEEDS);
+      const sidebar = page.getByRole("navigation", { name: "Library" });
+      await sidebar.getByRole("button", { name: /^Atom Feeds/ }).click();
+      await page.locator(".note-list [data-post]").first().click({ button: "right" });
+      await page.getByRole("menuitem", { name: "Not Interesting" }).click();
+      await sidebar.getByRole("button", { name: /^Atom Feeds/ }).click({ button: "right" });
+      await page.getByRole("menuitem", { name: "Dismiss All" }).click();
+      if (dismissed) await page.locator(".note-list").getByRole("button", { name: "Show Dismissed" }).click();
+    },
+  })),
   ...["neon", "classic", "pixel"].map((style) => ({
     id: `feeds-${style}`,
     title: `The Feeds in ${style[0].toUpperCase()}${style.slice(1)}`,

@@ -54,7 +54,9 @@ async function connect(config: SyncConfig) {
  * Attachments (images and files) are named after their content, so they never change: each pass uploads the ones the
  * notes here show that the remote lacks, and downloads the ones they show that this device lacks.
  *
- * Tags' and types' icons and colors are one file, `library.json`, merged choice by choice (looks.ts).
+ * Some small files beside the notes are each merged by what keeps them (`SharedFile`): tags' and
+ * types' icons and colors, `library.json`, choice by choice (looks.ts), and what was done with
+ * feeds' posts, `feeds.json`, mark by mark (feeds/marks.ts).
  *
  * With end-to-end encryption on (see sealed.ts), the same happens through a SealedRemote. Turning
  * it on or off rewrites the whole remote, so it's never half one and half the other for long:
@@ -197,6 +199,28 @@ async function merge(here: Note, there: Note, base: SyncRecord | undefined): Pro
   };
 }
 
+/** A small file beside the notes, merged with another device's by what keeps it, rather than as a note is. */
+export interface SharedFile {
+  name: string;
+  /** Whether what it is on this device has been read yet: until then it's left alone. */
+  ready(): boolean;
+  /** Takes in another device's. */
+  merge(text: string): void;
+  /** As it is here now, to write. */
+  text(): string;
+  /** Called on each change made here, to sync it. */
+  onChange(listener: () => void): void;
+}
+
+/** Tags' and types' looks (library.json). */
+const looksFile: SharedFile = {
+  name: LOOKS_FILE,
+  ready: () => true,
+  merge: (text) => looks.merge(readLooks(text)),
+  text: () => writeLooks(looks.looks),
+  onChange: (listener) => looks.onChange(listener),
+};
+
 /** What the person calls where notes sync to: the drive or folder, or the bucket. */
 const placeName = (config: SyncConfig) => (isFolder(config) ? config.name : config.bucket);
 
@@ -222,6 +246,7 @@ class SyncEngine {
   #settingUp = false;
   /** The connection as last saved or read here, to tell when another tab changed it. */
   #saved: string | null = null;
+  #shared: SharedFile[] = [looksFile];
 
   /** Reads the saved connection. Once lines is unlocked, if the app lock is on. */
   async load() {
@@ -247,9 +272,15 @@ class SyncEngine {
     return true;
   }
 
+  /** Syncs another file beside the notes, from the next pass on. */
+  share(file: SharedFile) {
+    this.#shared.push(file);
+    file.onChange(() => this.schedule());
+  }
+
   start() {
     notes.onLocalChange(() => this.schedule());
-    looks.onChange(() => this.schedule());
+    looksFile.onChange(() => this.schedule());
     window.addEventListener("online", () => void this.syncNow());
     window.addEventListener("offline", () => this.config && (this.status = "offline"));
     window.addEventListener("focus", () => {
@@ -316,7 +347,7 @@ class SyncEngine {
       await writeKeyFile(store, root, file);
       // Every note goes up again, encrypted; the plain copies are removed after.
       await this.#switch({ ...config, encryption: { id, key: toBase64(raw) } });
-      await store.delete(root + LOOKS_FILE);
+      for (const file of this.#shared) await store.delete(root + file.name);
     });
   }
 
@@ -342,7 +373,7 @@ class SyncEngine {
         // Everything comes here first, since the encrypted copies are about to go.
         await this.#pass(config);
         const { remote } = await connect(config);
-        await store.delete(await remote.fileKey!(root + LOOKS_FILE));
+        for (const file of this.#shared) await store.delete(await remote.fileKey!(root + file.name));
         // Without the key file, other devices stop before they'd see notes go missing.
         await store.delete(root + KEY_FILE);
         localStorage.setItem(LEFTOVERS_KEY, "1");
@@ -640,16 +671,16 @@ class SyncEngine {
       // device still has its notes, and uploads them encrypted once it has the passphrase.
       await pool(listed.filter((object) => object.key.endsWith(".md")), (object) => store.delete(object.key));
     }
-    await this.#syncLooks(remote, root);
+    for (const file of this.#shared) if (file.ready()) await this.#syncShared(remote, root, file);
     await this.#syncAttachments(remote, store, attachmentDir, !!config.encryption);
   }
 
-  /** Brings in other devices' icons and colors, and writes back the merge if it's new to them. */
-  async #syncLooks(remote: Remote, root: string) {
-    const key = root + LOOKS_FILE;
+  /** Brings in other devices' version of a file beside the notes, and writes back the merge if it's new to them. */
+  async #syncShared(remote: Remote, root: string, file: SharedFile) {
+    const key = root + file.name;
     const there = await remote.get(key);
-    if (there) looks.merge(readLooks(there.text));
-    const text = writeLooks(looks.looks);
+    if (there) file.merge(there.text);
+    const text = file.text();
     if (text === there?.text) return;
     // Not over a version written since (false): the next pass merges that in.
     if ((await remote.put(key, text, there ? (there.etag ?? undefined) : null)) === false) this.schedule();

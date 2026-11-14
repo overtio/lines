@@ -3,7 +3,8 @@
   import { speak } from "../a11y";
   import { locale, t } from "../i18n/index.svelte";
   import Icon from "../icons/Icon.svelte";
-  import { feedError, feedRowLabel, feeds } from "../feeds/feeds.svelte";
+  import { dismissPosts, feedError, feedRowLabel, feeds, type FeedsFilter, type Row } from "../feeds/feeds.svelte";
+  import type { Dismissal } from "../feeds/marks";
   import { shelves } from "../library/shelves.svelte";
   import { dateOf } from "../notes/calendar";
   import { typeLabel } from "../notes/properties";
@@ -42,18 +43,16 @@
 
   /** The Feeds (Library), where the list is of posts: every feed's, a kind's, or one's. */
   const feedView = $derived(notes.filter.kind === "feeds" ? notes.filter : null);
+  /** The same feeds' posts still in the list. */
+  function withoutDismissed(view: FeedsFilter): FeedsFilter {
+    const { dismissed: _, ...filter } = view;
+    return filter;
+  }
   /** The feeds whose posts are listed. */
   const listedFeeds = $derived(feedView ? (feedView.feed ? [feedView.feed] : feeds.feedsIn(feedView.group)) : []);
-  const posts = $derived.by(() => {
-    if (!feedView) return [];
-    const terms = notes.query.toLowerCase().split(/\s+/).filter(Boolean);
-    const all = feeds.posts(feedView.feed, feedView.group);
-    if (!terms.length) return all;
-    return all.filter(({ feed, post }) => {
-      const text = `${post.title} ${post.excerpt} ${feeds.subscription(feed)?.title ?? ""}`.toLowerCase();
-      return terms.every((term) => text.includes(term));
-    });
-  });
+  const posts = $derived(feeds.listed);
+  /** Whether the feeds listed have posts but every one is dismissed. */
+  const caughtUp = $derived(!!feedView && !feedView.dismissed && listedFeeds.some((url) => feeds.records.get(url)?.posts.length));
   /** Where the open post is in the list, if it is. */
   const openPost = $derived.by(() => {
     const open = feeds.open;
@@ -90,6 +89,8 @@
   const ROW_GAP = 6;
 
   let list: HTMLUListElement;
+  /** What the list says when it has no posts to show. */
+  let empty = $state<HTMLElement>();
   /** The row that's swiped open, if any. */
   let swipedId = $state<string | null>(null);
 
@@ -196,8 +197,20 @@
     list.querySelector<HTMLElement>(`[data-id="${next}"]`)?.focus();
   }
 
-  /** ↑ and ↓ open the post above or below, Home and End the first and last. */
-  function onPostKeydown(event: KeyboardEvent) {
+  /**
+   * ↑ and ↓ open the post above or below, Home and End the first and last. E and ⌫ dismiss the
+   * post focused, N as not interesting.
+   */
+  function onPostKeydown(event: KeyboardEvent, row: Row) {
+    if (!event.metaKey && !event.ctrlKey && !event.altKey && !feedView?.dismissed) {
+      const key = event.key.toLowerCase();
+      const why: Dismissal | null = key === "e" || key === "backspace" || key === "delete" ? "done" : key === "n" ? "uninteresting" : null;
+      if (why) {
+        event.preventDefault();
+        dismissRow(row, why);
+        return;
+      }
+    }
     const to = step(event.key, openPost, posts.length);
     const next = to === null ? undefined : posts[to];
     if (!next) return;
@@ -205,6 +218,26 @@
     feeds.show(next.feed, next.post.id);
     flushSync();
     list.querySelector<HTMLElement>(`[data-post="${next.post.key}"]`)?.focus();
+  }
+
+  /**
+   * Dismisses a post (`why`), or puts a dismissed one back (null), and then focuses the row that
+   * takes its place, if focus was in the list: the post opened in its place, or the one after it.
+   */
+  function dismissRow(row: Row, why: Dismissal | null) {
+    const index = posts.indexOf(row);
+    const focused = list.contains(document.activeElement);
+    if (why) dismissPosts([row], why);
+    else {
+      feeds.restore([row]);
+      speak(t("feeds.didRestore", { count: 1 }));
+    }
+    flushSync();
+    if (!focused) return;
+    const next = openPost >= 0 ? posts[openPost] : posts[Math.min(index, posts.length - 1)];
+    const target = next && list.querySelector<HTMLElement>(`[data-post="${next.post.key}"]`);
+    // With none left, the button to see those dismissed, or the search field.
+    (target ?? empty?.querySelector("button") ?? searchInput)?.focus();
   }
 
   /** The row ↑, ↓, Home or End go to from row `index` (-1 for none) of `count`; null for another key. */
@@ -325,13 +358,27 @@
     {:else if !isTauri && !feedView.feed && listedFeeds.some((url) => feeds.records.get(url)?.error === "blocked")}
       <p class="mx-3 mb-2 rounded-lg bg-input px-2.5 py-2 text-xs leading-normal text-muted">{t("feeds.webHint")}</p>
     {/if}
+    <!-- The posts dismissed, as the Trash's notes are shown: what they are, and the way back to the list. -->
+    {#if feedView.dismissed}
+      <div class="mx-3 mb-2 flex items-center justify-between gap-2 rounded-lg bg-input px-2.5 py-2 text-xs text-muted">
+        <span>{t("feeds.dismissedHint")}</span>
+        <button class="-my-1 min-h-6 font-semibold whitespace-nowrap text-accent coarse:-my-3 coarse:min-h-11" onclick={() => notes.setFilter(withoutDismissed(feedView))}>
+          {t("feeds.hideDismissed")}
+        </button>
+      </div>
+    {/if}
     {#if !posts.length}
-      <div class="mx-6 my-8 flex flex-col items-center gap-3 text-center text-base text-faint">
+      <div class="mx-6 my-8 flex flex-col items-center gap-3 text-center text-base text-faint" data-list-empty bind:this={empty}>
         {#if notes.query}
           <p class="m-0">{t("feeds.noMatches", { query: notes.query })}</p>
         {:else if !feeds.subscriptions.length}
           <p class="m-0">{t("feeds.none")}</p>
           <Button variant="quiet" icon="plus" onclick={(event) => openSubscribe(event, "center")}>{t("feeds.subscribe")}</Button>
+        {:else if feedView.dismissed}
+          <p class="m-0">{t("feeds.noDismissed")}</p>
+        {:else if caughtUp}
+          <p class="m-0">{t("feeds.allCaughtUp")}</p>
+          <Button variant="quiet" icon="archive" onclick={() => notes.setFilter({ ...feedView, dismissed: true })}>{t("feeds.showDismissed")}</Button>
         {:else}
           <p class="m-0">{listedFeeds.some((url) => feeds.fetching.has(url)) ? t("feeds.fetching") : t("feeds.noPosts")}</p>
         {/if}
@@ -372,7 +419,8 @@
           measure={postRows.measure(row.post.key)}
           selected={index === openPost}
           tabbable={index === postStop}
-          onkeydown={onPostKeydown}
+          onkeydown={(event) => onPostKeydown(event, row)}
+          ondismiss={(why) => dismissRow(row, why)}
         />
       {/each}
     {:else}
@@ -444,8 +492,8 @@
   }
 
   @media (hover: hover) {
-    .items > :global(li:has(.item:hover)::before),
-    .items > :global(li:has(.item:hover) + li::before) {
+    .items > :global(li:has(.item:hover, .item ~ :hover)::before),
+    .items > :global(li:has(.item:hover, .item ~ :hover) + li::before) {
       opacity: 0;
     }
   }
