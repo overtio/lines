@@ -143,6 +143,8 @@
   }
 
   function clicked(event: MouseEvent) {
+    // The click that ends selecting some text is for the text, not a link or a fold it ends on.
+    if (!window.getSelection()?.isCollapsed) return;
     const target = event.target as Element;
     const href = target.closest<HTMLElement>("[data-href]")?.dataset.href;
     if (href) return void openExternal(href);
@@ -257,7 +259,8 @@
       {#if entry.folded && entry.size}<span class="shrink-0">· {t("feeds.discussion.replies", { count: entry.size })}</span>{/if}
     </button>
     {#if !entry.folded}
-      <div class="pl-5">{@render text(blocks, entry.current)}</div>
+      <!-- Selectable, to copy from, as a note's text is (the app's other text isn't). -->
+      <div class="pl-5 select-text">{@render text(blocks, entry.current)}</div>
       {#if entry.replies.length}
         <ul class={indent(entry.depth + 1)}>
           {#each entry.replies as reply (reply.comment.id)}
