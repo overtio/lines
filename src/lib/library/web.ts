@@ -1,5 +1,6 @@
 import { withTimeout } from "../pacing";
-import { isTauri, webFetch } from "../platform";
+import { isLocal, outsideFetch } from "../outside";
+import { isTauri } from "../platform";
 import { plugins } from "../plugins/registry.svelte";
 import { REPO, VERSION } from "../release";
 import { absolute, type Page, readPage } from "./page";
@@ -28,9 +29,8 @@ export class LookupError extends Error {}
  * the answer's body read or not.
  */
 export async function request(url: string, signal: AbortSignal, init: RequestInit = {}, timeout = TIMEOUT): Promise<Response> {
-  const fetch = await webFetch();
   const headers = { ...(init.headers as Record<string, string>), ...(isTauri && { "user-agent": CLIENT }) };
-  return fetch(url, { ...init, headers, signal: withTimeout(signal, timeout) });
+  return outsideFetch(url, { ...init, headers, signal: withTimeout(signal, timeout) });
 }
 
 /** What a service answers in JSON; null if it has nothing there (404). Rejects offline, or on any other error. */
@@ -83,20 +83,14 @@ export async function pageInApps(url: string, signal: AbortSignal): Promise<Page
 
 /**
  * Whether an address a page gave (its picture, its oEmbed) is one to ask: on the web at large over
- * https, not this computer or the network it's on, which a page could otherwise have the apps ask.
+ * https, not this computer or the network it's on by its name (outside.ts), which a page could
+ * otherwise have the apps ask. Where it leads, and what its name stands for, are asked as it is.
  */
 export function isPublic(address: string): boolean {
-  let url: URL;
   try {
-    url = new URL(address);
+    const url = new URL(address);
+    return url.protocol === "https:" && !isLocal(url.hostname);
   } catch {
     return false;
   }
-  const host = url.hostname.toLowerCase();
-  // A name with a dot in it (not `localhost`, nor an IPv6 address, `[::1]`) that isn't a local network's.
-  if (url.protocol !== "https:" || !/^[^[\]]+\.[^.]+$/.test(host) || /\.(?:local|localhost|internal|home|lan)$/.test(host)) return false;
-  const ipv4 = /^(\d+)\.(\d+)\.\d+\.\d+$/.exec(host);
-  if (!ipv4) return true;
-  const [a, b] = [Number(ipv4[1]), Number(ipv4[2])];
-  return !(a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127));
 }

@@ -88,6 +88,13 @@ export async function saveFile(filename: string, data: Uint8Array<ArrayBuffer>, 
   return invoke<string>("save_export", data, { headers: { "x-file-name": encodeURIComponent(filename) } });
 }
 
+/** Whether every address a site's name stands for is on the web at large, as the system looks it up (the apps); true elsewhere, where the browser keeps pages off this computer's network. */
+export async function hostIsPublic(host: string): Promise<boolean> {
+  if (!isTauri) return true;
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<boolean>("host_is_public", { host });
+}
+
 /** The paths of what was last dragged from Finder, which a page isn't told (the Mac app); none elsewhere. */
 export async function droppedPaths(): Promise<string[]> {
   if (!isMacApp) return [];

@@ -33,6 +33,7 @@ export default {
   "feeds.fetching": "Téléchargement…",
   "feeds.noMatches": "Aucun article ne correspond à « {query} ».",
   "feeds.errorBlocked": "Le site de ce flux ne laisse pas les pages Web le lire. Les apps de bureau le peuvent.",
+  "feeds.errorLocal": "Il mène à une adresse de cet ordinateur ou de son réseau, où lines ne suit pas ce qui vient du web.",
   "feeds.errorTimeout": "Le flux a mis trop de temps à répondre.",
   "feeds.errorTooBig": "Le flux est trop volumineux pour être lu.",
   "feeds.errorNotFeed": "Il n’y a plus de flux à cette adresse.",

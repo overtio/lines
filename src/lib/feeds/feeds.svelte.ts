@@ -531,6 +531,8 @@ export function feedError(reason: string): string {
   switch (reason) {
     case "blocked":
       return t("feeds.errorBlocked");
+    case "local":
+      return t("feeds.errorLocal");
     case "timeout":
       return t("feeds.errorTimeout");
     case "too big":

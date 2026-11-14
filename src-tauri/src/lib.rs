@@ -1,5 +1,6 @@
 use tauri::Manager;
 
+mod addresses;
 mod attachments;
 mod bucket_sync;
 mod devtools;
@@ -32,6 +33,7 @@ pub fn run() {
   let builder = builder.manage(quit::Quitting::default());
   builder
     .invoke_handler(tauri::generate_handler![
+      addresses::host_is_public,
       attachments::open_attachment,
       bucket_sync::sync_bucket_transfer,
       devtools::toggle_devtools,

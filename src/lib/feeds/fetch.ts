@@ -1,4 +1,5 @@
-import { isTauri, webFetch } from "../platform";
+import { LocalAddress, outsideFetch } from "../outside";
+import { isTauri } from "../platform";
 import { REPO, VERSION } from "../release";
 
 /*
@@ -84,7 +85,6 @@ export async function readAtMost(body: ReadableStream<Uint8Array> | null, limit:
  * by themselves, from what they've kept). Throws FetchError if it can't be, or answers with an error.
  */
 export async function fetchFeed(url: string, validators: Validators = {}, signal?: AbortSignal): Promise<Response> {
-  const fetch = await webFetch();
   const timeout = new AbortController();
   const timer = setTimeout(() => timeout.abort(new FetchError("timeout")), TIMEOUT);
   const abort = () => timeout.abort(signal?.reason);
@@ -101,9 +101,10 @@ export async function fetchFeed(url: string, validators: Validators = {}, signal
       : {};
     let response: globalThis.Response;
     try {
-      response = await fetch(url, { headers, signal: timeout.signal, ...(!isTauri && { cache: "no-cache" as const }) });
+      response = await outsideFetch(url, { headers, signal: timeout.signal, ...(!isTauri && { cache: "no-cache" as const }) });
     } catch (error) {
       if (timeout.signal.aborted) throw timeout.signal.reason;
+      if (error instanceof LocalAddress) throw new FetchError("local");
       // In a browser, a site that doesn't let web pages read it fails just as one that isn't there.
       throw new FetchError(isTauri ? String(error) : "blocked");
     }

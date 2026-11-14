@@ -42,6 +42,7 @@ export default {
   "feeds.noMatches": "No posts match “{query}”.",
   // Why a feed couldn't be fetched, over its posts and in its row's tooltip.
   "feeds.errorBlocked": "This feed’s site doesn’t let web pages read it. The desktop apps can.",
+  "feeds.errorLocal": "It leads to an address on this computer or its network, which lines doesn’t follow from the web.",
   "feeds.errorTimeout": "The feed took too long to answer.",
   "feeds.errorTooBig": "The feed is too big to read.",
   "feeds.errorNotFeed": "There’s no feed at this address any more.",
