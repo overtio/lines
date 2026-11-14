@@ -368,10 +368,10 @@
   color: var(--accent);
 }
 
-/* Points (`85/100`): the number, what it's out of, faint, and a short bar filled as far. */
+/* Points (`85/100`): a short bar filled as far, the number, and what it's out of, faint. */
+/* Inline, as text is: on the line's baseline, and no taller than the line. */
 .cm-lp-score-points {
-  align-items: center;
-  gap: 0;
+  display: inline;
   vertical-align: baseline;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
@@ -383,15 +383,19 @@
 }
 
 .cm-lp-score-meter {
+  display: inline-block;
+  vertical-align: 0.3em;
   width: 2.5em;
   height: 0.25em;
-  margin-left: 0.5em;
+  margin-right: 0.5em;
   border-radius: 1em;
   background: linear-gradient(var(--accent), var(--accent)) no-repeat 0 0 / var(--filled) 100%, color-mix(in srgb, var(--ink) 12%, transparent);
 }
 
-/* A word (`A`, `Masterpiece`), as a chip in the accent. */
+/* A word (`A`, `Masterpiece`), as a chip in the accent, inline as a mention is. */
 .cm-lp-score-label {
+  display: inline;
+  vertical-align: baseline;
   color: var(--accent);
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   border-radius: calc(6px * var(--radius-scale));

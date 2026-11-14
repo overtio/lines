@@ -1155,16 +1155,16 @@ const SCENES = [
     look: "In the properties, rating's three and a half stars in the theme's yellow, the fourth filled to its middle, the fifth a faint outline, the size of the text and on its baseline like the values above; in the text, Score's six of seven and Half's two and a half, the same. Nothing jumps from the text around them.",
     note: "---\ntype: book\nauthor: Mary Shelley\nyear: 1818\nstatus: read\nrating: 3.5/5\n---\n# Frankenstein\n\nScore: 6/7\nHalf: 2.5/5\n\nThe last line, for the cursor.",
     act: (page) => page.evaluate(() => window.testing.place()),
-    shoot: ".cm-lp-editable",
+    shoot: ".editor-pane",
   },
   {
     id: "ratings-points",
     title: "A show rated out of 10, with ratings of its own",
-    look: "Shows on Out of 10, with Story and Music: rating 9, story 8.5 and music 10, each bold, its /10 faint, and a short bar in the accent filled as far, the bars lined up under each other; the keys in their column like any property's.",
+    look: "Shows on Out of 10, with Story and Music: rating 9, story 8.5 and music 10, each a short bar in the accent filled as far, the bars lined up under each other, then the number bold and its /10 faint; the keys in their column like any property's.",
     storage: { "lines.looks": { ratings: { kinds: { show: { scale: { id: "10", at: 1 }, named: { names: ["Story", "Music"], at: 1 } } } } } },
     note: "---\ntype: show\ncreator: Kanehito Yamada\nrating: 9/10\nstory: 8.5/10\nmusic: 10/10\nstatus: watched\n---\n# Frieren: Beyond Journey's End\n\nThe last line, for the cursor.",
     act: (page) => page.evaluate(() => window.testing.place()),
-    shoot: ".cm-lp-editable",
+    shoot: ".editor-pane",
   },
   {
     id: "ratings-words",
@@ -1173,7 +1173,7 @@ const SCENES = [
     storage: { "lines.looks": { ratings: { kinds: { movie: { scale: { id: "grades", at: 1 }, named: { names: ["Story"], at: 1 } } } } } },
     note: "---\ntype: movie\ndirector: Denis Villeneuve\nrating: A\nstory: S\nstatus: watched\n---\n# Arrival\n\nNot a grade: Q\n\nThe last line, for the cursor.",
     act: (page) => page.evaluate(() => window.testing.place()),
-    shoot: ".cm-lp-editable",
+    shoot: ".editor-pane",
   },
   {
     id: "ratings-rate-menu",
