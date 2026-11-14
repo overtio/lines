@@ -163,6 +163,7 @@ export default {
   "plugins.obsidian.description": "Moving from Obsidian: a vault’s notes, with their folders, links, pictures and files, from Settings → Export and Import.",
   "plugins.bear.description": "Moving from Bear: its notes, with their tags, links, pictures and files, pins and dates, from its backup or what it exported, in Settings → Export and Import.",
   "plugins.logseq.description": "Moving from Logseq: a graph’s pages and journals, with their outlines, properties, tasks, references and assets, from Settings → Export and Import.",
+  "plugins.notion.description": "Moving from Notion: its Markdown & CSV export’s pages, databases, links, pictures and files, from Settings → Export and Import.",
   "plugins.pdfReader": "PDF Reader",
   "plugins.pdfReader.description": "Reads PDFs kept with books and papers in the Library, in the note’s place: pages in the theme’s colors, contents, search, and quotes kept in the note. Uses Mozilla’s pdf.js.",
   "plugins.epubReader": "EPUB Reader",

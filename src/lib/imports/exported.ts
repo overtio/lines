@@ -36,18 +36,22 @@ const typed = (blob: Blob, path: string) => new File([blob], nameOf(path), { typ
 /** ZIPs, by the names apps give theirs too: Bear's backups (.bear2bk), TextPacks. */
 const ZIP = /\.(?:zip|bear2bk|textpack)$/i;
 
-/** The files of a ZIP, by their paths in it. */
-async function unzipped(zip: File): Promise<ExportedFile[]> {
-  const entries = zipEntries(new Uint8Array(await zip.arrayBuffer()));
-  return [...entries]
-    .filter(([path]) => !path.startsWith("__MACOSX/"))
-    .map(([path, entry]) => ({
-      path,
-      size: entry.size,
-      modified: entry.modified,
-      text: async () => textOf(await entry.read()),
-      file: async () => typed(new Blob([await entry.read()]), path),
-    }));
+/**
+ * The files of a ZIP, by their paths in it. A ZIP of nothing but ZIPs (Notion splits a large export
+ * so) is the files of those, unpacked in turn.
+ */
+async function unzipped(data: Uint8Array<ArrayBuffer>): Promise<ExportedFile[]> {
+  const entries = [...zipEntries(data)].filter(([path]) => !path.startsWith("__MACOSX/"));
+  if (entries.length && entries.every(([path]) => /\.zip$/i.test(path))) {
+    return (await Promise.all(entries.map(async ([, entry]) => unzipped(await entry.read())))).flat();
+  }
+  return entries.map(([path, entry]) => ({
+    path,
+    size: entry.size,
+    modified: entry.modified,
+    text: async () => textOf(await entry.read()),
+    file: async () => typed(new Blob([await entry.read()]), path),
+  }));
 }
 
 /** Files with the folder they all share, if they do, as their name and taken off their paths; or `name`. */
@@ -65,7 +69,7 @@ function rooted(name: string, files: ExportedFile[]): Exported {
 export async function exportedFrom(chosen: File[]): Promise<Exported> {
   const zips = chosen.filter((file) => ZIP.test(file.name));
   const loose = chosen.filter((file) => !ZIP.test(file.name));
-  const parts = await Promise.all(zips.map(async (zip) => rooted(zip.name.replace(ZIP, ""), await unzipped(zip))));
+  const parts = await Promise.all(zips.map(async (zip) => rooted(zip.name.replace(ZIP, ""), await unzipped(new Uint8Array(await zip.arrayBuffer())))));
   if (loose.length) {
     const files = loose.map((file): ExportedFile => {
       const path = file.webkitRelativePath || file.name;

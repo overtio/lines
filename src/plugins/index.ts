@@ -23,6 +23,7 @@ import { markdown } from "./markdown";
 import { mermaid } from "./mermaid";
 import { models } from "./models";
 import { musicbrainz } from "./musicbrainz";
+import { notion } from "./notion";
 import { obsidian } from "./obsidian";
 import { openLibrary } from "./open-library";
 import { paper } from "./paper";
@@ -93,6 +94,7 @@ export const builtIn = (): Plugin[] => [
   obsidian(),
   bear(),
   logseq(),
+  notion(),
   // Books kept with library notes, read in the note's place.
   pdfReader(),
   epubReader(),

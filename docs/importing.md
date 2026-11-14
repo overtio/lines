@@ -4,7 +4,7 @@ Notes from another notes app come into lines from **Settings → Export and Impo
 
 ## How an import goes
 
-1. **Choose** what the app exported: a folder (an Obsidian vault, a Logseq graph, Bear's Markdown), or a file (Bear's backup, a ZIP). Nothing is written yet, and nothing in it is run: its notes are read as text.
+1. **Choose** what the app exported: a folder (an Obsidian vault, a Logseq graph, Bear's Markdown), or a file (Bear's backup, Notion's export, a ZIP; a ZIP of nothing but ZIPs, as Notion splits a large export, is unpacked in turn). Nothing is written yet, and nothing in it is run: its notes are read as text.
 2. **What it would do** comes first: how many notes, attachments and folders, and on lines of their own, what won't come across as it was, each kind with how many and a few examples (`^37066d (Plan)`): what's kept as text because lines has nothing like it, and what's left out. Notes imported from it before are left out too, and said so, with which ([below](#importing-again)).
 3. **Import** (focused, so Enter imports) copies the pictures and files the notes show into lines' attachments, then makes the notes a few hundred at a time, with a bar showing how far it's got; Stop stops either, keeping what's made (stopped while copying, no note is made, and it says so). Ten thousand notes take a few seconds. Closing Settings doesn't stop it, and opening it again shows how it's going, or how it went.
 4. **What it did**, with what didn't come across said again, and **Undo Import**, which moves every note it made to the Trash (but one you've changed since, which is yours now). Nothing an import made is ever deleted outright: empty the Trash for that. Choosing something else to import keeps the last import's Undo, under what the next would do; an import with nothing to bring can't be started, so it never takes that Undo's place.
@@ -128,4 +128,26 @@ Bear's older markup (Bear 1's "Polar Bear" `::highlight::`, `*bold*`, `/italic/`
 **Left out, and said so:** empty pages (Logseq makes some itself, as Contents, and a journal for each day opened), pages written in Org mode, and files no page shows (an unused asset, a drawing, a whiteboard). Logseq's own folder (`logseq/`: its settings, backups and versions) isn't read but for config.edn.
 
 The code is in `src/plugins/logseq/`: `graph.ts` reads the graph, `outline.ts` its pages' outlines, `dates.ts` its journals' names.
+
+## Notion
+
+**What to choose:** in Notion, **Settings → Export all workspace content** (or a page's **•••** menu → **Export**), with **Markdown & CSV** as its format, **Include subpages** and **Create folders for subpages** on. Choose the ZIP it downloads with **Choose Export ZIP…**, as it is: a large export is a ZIP of other ZIPs, which lines unpacks too. Or unpack it and choose the folder with **Choose Unpacked Folder…**.
+
+**What comes across:**
+
+| In Notion | In lines |
+| --- | --- |
+| A page, `Plan 1a2b….md` | A note titled Plan, without the id Notion adds to names |
+| A sub-page, in its page's folder | A note of its own, linked from its page as in Notion, tagged with the pages it's in (`#home`), as sub-pages are folders here |
+| A link to a page, `[Plan](Plan%201a2b….md)` | `[[Plan]]`, to the note, whatever the page is renamed to (Notion's ids are its own everywhere, so importing again knows each page) |
+| A database, `Reading List 3c4d….csv` and its folder of rows | A note titled Reading List, with a table of its rows (`@type.reading_list(Author, Status, …)`, [linedown.md](linedown.md#type-tables)) |
+| A database's row | A note of the type named after the database (`type: Reading List`), its columns its properties: relations as links to their pages, dates as lines writes them (`November 14, 2024 9:30 PM` → `2024-11-14 21:30`), the rest as written; its Created and Last edited columns its dates |
+| Pictures and files, in a page's folder | Kept in lines |
+| Callouts (`<aside>` 💡 …) | lines' callouts, info, or warning, error and question by their icon (⚠️, ❗, ❓), the icon kept as text |
+| Toggles (`<details>`) | Their title in bold, what's in them under it, open (said so) |
+| To-dos, headings, lists, tables, code, equations | The same |
+
+**Said so:** links to pages that aren't in the export (kept as written), toggles, files no page shows (left out), and pages with the same name (lines finds notes by title, so a link to that name finds one of them).
+
+Notion's Markdown export doesn't say when a page was made, so pages are dated when they were exported, but rows, by their Created and Last edited columns where the database has them. The code is in `src/plugins/notion/`: `export.ts` reads the export and its databases, `markdown.ts` its pages.
 

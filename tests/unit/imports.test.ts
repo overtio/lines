@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import type { Exported } from "../../src/lib/imports/exported";
+import { baseOf } from "../../src/lib/imports/markdown";
 import type { NewNote } from "../../src/lib/imports/imports.svelte";
 import type { Tally } from "../../src/lib/imports/notes";
 import type { Entry } from "../../src/lib/notes/store.svelte";
@@ -22,6 +23,7 @@ const { readBear } = await import("../../src/plugins/bear/backup");
 const { readGraph } = await import("../../src/plugins/logseq/graph");
 const { readPage, writePage } = await import("../../src/plugins/logseq/outline");
 const { formatDay, readDay } = await import("../../src/plugins/logseq/dates");
+const { readNotion } = await import("../../src/plugins/notion/export");
 const { translate: translateBear } = await import("../../src/plugins/bear/markdown");
 const { translate } = await import("../../src/plugins/obsidian/markdown");
 const { attachmentPath, notesInput, notesWork, planNotes, Tally: Tallies, withTitle } = await import("../../src/lib/imports/notes");
@@ -405,6 +407,77 @@ describe("Logseq", () => {
     const day = { year: 2026, month: 11, day: 1 };
     expect(["MMM do, yyyy", "EEE, dd.MM.yyyy", "yyyy-MM-dd", "MMMM d'st'"].map((format) => formatDay(day, format))).toEqual(["Nov 1st, 2026", "Sun, 01.11.2026", "2026-11-01", "November 1st"]);
     expect([readDay("2026_11_01", "yyyy_MM_dd"), readDay("Nov 1st, 2026", "MMM do, yyyy"), readDay("2026_13_01", "yyyy_MM_dd")]).toEqual([day, null, null]);
+  });
+});
+
+/** Notion's export of the fixture, as a large one comes: a ZIP holding a ZIP of the pages. */
+const notion = await readNotion(
+  await exportedFrom([new File([zip([{ name: "Export-0a1b-Part-1.zip", data: new Uint8Array(await zipped("notion/Export", "part.zip").arrayBuffer()), modified: new Date(DAY) }])], "Export-0a1b.zip")]),
+);
+
+describe("Notion", () => {
+  const page = (name: string) => notion.notes.find((each) => each.name === name)!;
+  const paths = (body: string) => body.replace(/\.\.\/attachments\/\uE000(\d+)\uE000/g, (_, index) => `<${baseOf(notion.attachments[Number(index)].path)}>`);
+
+  test("a note of each page and database, titled without Notion's ids, sub-pages under their pages, from a ZIP of ZIPs", () => {
+    expect(notion.name).toBe("Export-0a1b");
+    expect(notion.notes.map(({ id, name, folders }) => [id, name, folders.join("/")]).sort()).toEqual([
+      ["1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d", "Home", ""],
+      ["2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e", "Plans", "Home"],
+      ["3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f", "Reading List", "Home"],
+      ["4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a", "Dune", "Home"],
+      ["5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b", "Walden", "Home"],
+    ]);
+    expect(notion.local).toBeFalsy();
+    expect(page("Plans").body).toBe("# Plans\n\nBack to [[Home]], and a link to [nowhere](Gone%200000.md).\n");
+  });
+
+  test("a database a table of its rows; each row a note of its type, its columns properties, relations links, dates as lines writes them", () => {
+    expect(page("Reading List").body).toBe("# Reading List\n\n@type.reading_list(Author, Status, Date read, Related)\n");
+    expect(page("Dune").body).toBe("---\ntype: Reading List\nAuthor: Frank Herbert\nStatus: Read\nDate read: 2024-11-14 21:30\nRelated: '[[Walden]]'\n---\n# Dune\n\nA desert planet.\n");
+    expect(page("Walden").body).toBe("---\ntype: Reading List\nAuthor: Henry David Thoreau\nStatus: Reading\n---\n# Walden\n");
+  });
+
+  test("its Markdown in Linedown: links to pages and databases, pictures and files, callouts, toggles; code and math as they are", () => {
+    expect(paths(page("Home").body)).toBe(
+      [
+        "# Home",
+        "",
+        "Welcome to the workspace. See [[Plans]] and the [[Reading List]].",
+        "",
+        "![photo](<photo.png>)",
+        "",
+        "[Report 2026.pdf](<Report 2026.pdf>)",
+        "",
+        ":::info",
+        "💡 Remember to **water** the plants.",
+        ":::",
+        "",
+        ":::warning",
+        "⚠️ Careful with the oven.",
+        ":::",
+        "",
+        "**More**",
+        "Hidden by default.",
+        "",
+        "- [ ] Open task",
+        "- [x] Done task",
+        "",
+        "```js",
+        'const link = "[x](Home%201a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d.md)";',
+        "```",
+        "",
+        "$$",
+        "E = mc^2",
+        "$$",
+        "",
+      ].join("\n"),
+    );
+    expect(said(notion.report)).toEqual({
+      missing: [1, "[nowhere](Gone%200000.md) (Plans)"],
+      toggles: [1, "More (Home)"],
+      unused: [1, "Home 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d/unused.png"],
+    });
   });
 });
 

@@ -60,6 +60,12 @@ export default {
   "import.logseq.title": "From Logseq",
   "import.logseq.note": "A graph is a folder of Markdown files, so there’s nothing to export: choose the graph’s folder (the one with pages, journals and assets in it). Logseq shows where it is in its left sidebar’s graph menu → All graphs. Pages, journals (on the Calendar), namespaces, properties, tasks, references and assets all come across.",
   "import.logseq.choose": "Choose Graph Folder…",
+  "import.report.toggles": "{count, plural, one {# toggle, open here, as lines doesn’t fold: {examples}} other {# toggles, open here, as lines doesn’t fold: {examples}}}",
+  // Notion's group of Settings → Export and Import.
+  "import.notion.title": "From Notion",
+  "import.notion.note": "In Notion, open Settings → Export all workspace content (or a page’s ••• menu → Export), choose Markdown & CSV, with Include subpages and Create folders for subpages on, and choose the ZIP it downloads here, as it is: a large one holds other ZIPs, which lines unpacks too. Pages, sub-pages (as tags), links, pictures and files, callouts and databases (each row a note of a type, the database a table of them) come across.",
+  "import.notion.chooseZip": "Choose Export ZIP…",
+  "import.notion.chooseFolder": "Choose Unpacked Folder…",
   // Obsidian's group of Settings → Export and Import.
   "import.obsidian.title": "From Obsidian",
   "import.obsidian.note": "A vault is a folder of Markdown files, so there’s nothing to export: choose the vault’s folder. To find it, open Obsidian’s vault switcher (the vault’s name, at the bottom of the sidebar) → Manage Vaults, or right-click a note → Reveal in Finder. Notes, folders, links, pictures and files, callouts, bookmarks (pinned) and daily notes (on the Calendar) all come across.",
