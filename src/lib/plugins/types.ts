@@ -470,8 +470,10 @@ export interface NoteLanguage {
   addTag(body: string, tag: string): string;
   /**
    * The note with its title changed by `mark`, given the title as written, where this language
-   * keeps one apart from the text (a LaTeX document's `\title{…}`); null for a note without one.
-   * For a conflicted copy's title: without it, the line the title is read from is marked.
+   * keeps one apart from the text (a LaTeX document's `\title{…}`), or where changing the line it's
+   * read from would change what the note does (a code note's, which may be a line of code); null
+   * for a note without one. For a conflicted copy's title: without it, the line the title is read
+   * from is marked.
    */
   markTitle?(body: string, mark: (title: string) => string): string | null;
   /** A new note's text, made in the sidebar's tag or type, or on a day of the Calendar, if it was. */

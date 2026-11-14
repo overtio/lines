@@ -10,6 +10,8 @@ const latexTitle = (body: string) => {
   return title ?? text.split("\n").find((line) => line.trim()) ?? "";
 };
 languages.push({ id: "latex", meta: (body) => ({ ...languages[0].meta!(""), title: latexTitle(body) }), markTitle });
+const { code } = await import("../../src/plugins/code");
+languages.push(...(code().contributes.languages ?? []));
 
 /** Edits a note here and, later, on another device, and syncs them: the copy that makes, as it's written. */
 async function conflictedCopy(body: string, format?: string) {
@@ -36,6 +38,19 @@ describe("sync", () => {
   test("a note in another language whose title line can't be marked is left as it is", async () => {
     const body = "\\documentclass{article}\n\\begin{document}\n\\end{document}";
     expect(await conflictedCopy(body, "latex")).toBe(`${body}\n\nthere`);
+  });
+
+  test("a code note's is marked in the comment its title comes from, or in one of its own above a line of code", async () => {
+    expect(await conflictedCopy("/* Theme */\nbody {}", "code-css")).toBe("/* Theme (conflicted copy) */\nbody {}\n\nthere");
+    expect(await conflictedCopy("'use strict';\n\nconst a = 1;", "code-javascript")).toBe(
+      "// 'use strict'; (conflicted copy)\n'use strict';\n\nconst a = 1;\n\nthere",
+    );
+    expect(await conflictedCopy("#!/bin/sh\necho hi", "code-shell")).toBe("#!/bin/sh\n# echo hi (conflicted copy)\necho hi\n\nthere");
+  });
+
+  test("a code note's line of code is never marked, nor given a tag it didn't have (#include)", async () => {
+    const body = "#include <stdio.h>\n\nint main(void) {}";
+    expect(await conflictedCopy(body, "code-c")).toBe(`${body}\n\nthere`);
   });
 
   test("a Markdown note's is marked on its title", async () => {

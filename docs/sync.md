@@ -73,7 +73,7 @@ On each sync, lines compares every note with what it last exchanged with the buc
 | --- | --- |
 | Changed on this device | Uploaded |
 | Changed on another device | Downloaded, including into an open editor. Into a floating note being typed in, it's an edit on both devices (below) |
-| Edited on both | The newer edit wins, and the other is saved as a separate note titled “… (conflicted copy)”, its properties and type kept (a spreadsheet's mark goes on its title line, not in its cells, and a LaTeX document's in its `\title`; a note in another format whose title can't be marked that way keeps its text as it is). Nothing is lost. |
+| Edited on both | The newer edit wins, and the other is saved as a separate note titled “… (conflicted copy)”, its properties and type kept (a spreadsheet's mark goes on its title line, not in its cells, a LaTeX document's in its `\title`, and a code note's in the comment its title comes from, or in a comment of its own above the line of code it's read from, never in its code; a note in another format whose title can't be marked that way, or a code note whose comment would read as a tag, as a C note's `#include` would, keeps its text as it is). Nothing is lost. |
 | Edited on one, pinned, moved to the trash, filed or put in the Inbox, given an icon or locked on the other | Both kept, in one note: pinning and the rest don't count as edits. A note locked on either device stays locked, the edit inside it (or, on a device that doesn't have the password, the edit as a conflicted copy) |
 | Deleted on one device | Deleted on the others, unless another device edited it in the meantime, in which case the edit wins |
 
