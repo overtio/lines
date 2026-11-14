@@ -187,7 +187,7 @@ describe("mending a feed that isn't quite XML", () => {
 
 describe("a site's icon", () => {
   type Link = { rel?: string; href: string; type?: string; sizes?: string };
-  const page = (...links: Link[]) => ({ url: "https://example.com/", title: "", data: [], meta: new Map(), links: links.map((link) => ({ rel: "icon", type: "", title: "", sizes: "", ...link })) });
+  const page = (...links: Link[]) => ({ url: "https://example.com/", title: "", data: [], meta: new Map(), labels: [], links: links.map((link) => ({ rel: "icon", type: "", title: "", sizes: "", ...link })) });
 
   test("the largest picture its page names (a phone's, which says no size, is 180 pixels), a drawing last, none not on the web at large", () => {
     const named = page(

@@ -141,10 +141,12 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 ## Library
 
 - Only Markdown notes are looked up: a LaTeX, code or spreadsheet note that's just a link stays one, and so does a locked note, whose link isn't sent anywhere.
-- On the web, only YouTube, Open Library, Wikidata, MusicBrainz and Apple Podcasts can be asked; other sites don't let web pages read them (CORS), so links to them stay links there. The apps read any page ([library.md](library.md#where-lines-looks)).
+- On the web, only YouTube, Open Library, Wikidata, AniList, MusicBrainz and Apple Podcasts can be asked; other sites don't let web pages read them (CORS), so links to them stay links there. The apps read any page ([library.md](library.md#where-lines-looks)).
 - A page that only says what it is once its scripts have run (YouTube Music, some shops) isn't read for it: lines reads the page as it arrives, and never runs it. IMDb doesn't answer apps at all; its links are looked up through Wikidata, which has most films and series but not every one, nor the newest the day they're announced.
 - What Wikidata finds is what it's about from Wikipedia, in lines' language where Wikipedia has the page, else in English, and the poster at the top of that page.
 - Episodes from Apple Podcasts are found among a podcast's latest 200; a link to an older one stays a link.
+- Comics are searched on AniList, which has manga, manhwa and manhua but few Western comics: add one of those by its Wikipedia page, or its publisher's. AniList is asked at most every two seconds (it asks for no more than 30 requests a minute), so a search after another waits a moment. Its `format` is told by the country a series is from, so a Korean webtoon is a `manhwa` there. MangaDex's links are looked up only in the apps, and only where MangaDex knows the series' AniList or MyAnimeList id; its pages ask a browser to prove itself first, so Web Pages can't read them. Open Library's graphic novels and manga are books.
+- A page tells a comic from a book only as it says it is ([library.md](library.md#where-lines-looks)): a series on a scanlation site that neither labels its type nor files it under `/comic/`, `/manga/` and the like is a book; change its `type` to `comic` by hand.
 - MusicBrainz knows Spotify, Apple Music, Bandcamp, Deezer and Tidal links only where someone has added them: most albums, few songs. In the apps, Web Pages reads the rest.
 - A YouTube video looked up on the web has its title, channel and picture, but not when it came out, how long it is or what it's about: those are on its page, which only the apps can read.
 - The keys and `status` values are English in every language, so a note reads the same everywhere; lines shows the status in its own language.

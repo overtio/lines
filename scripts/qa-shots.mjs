@@ -80,7 +80,8 @@ function dayFromToday(days) {
 
 /**
  * Things in the library, as a link looked up makes them: movies with posters (one without), a book,
- * songs and an album with square covers, and a video; and a person, under Types. The covers are drawn
+ * comics (one without a cover), songs and an album with square covers, and a video; and a person,
+ * under Types. The covers are drawn
  * here, a gradient and a title, and kept as attachments.
  */
 /**
@@ -142,6 +143,9 @@ const seedLibrary = (page) =>
       ["movie", "Arrival", { director: "Denis Villeneuve", year: "2016", runtime: "116 min" }, "watched", tall("#9fb3c4", "#1b2733"), "A linguist works with the military to talk with the visitors after twelve spacecraft appear around the world."],
       ["movie", "Paris, Texas", { director: "Wim Wenders", year: "1984", runtime: "147 min" }, "watching", null, "A man wanders out of the desert, and sets out to put his family back together."],
       ["book", "Dune", { author: "Frank Herbert", year: "1965", pages: "896" }, "reading", tall("#c86c2b", "#391507"), "Set on the desert planet Arrakis, Dune is the story of the boy Paul Atreides."],
+      ["comic", "Tower of God", { author: "SIU", format: "webtoon", year: "2010", chapters: "652" }, "reading", tall("#5b7fd1", "#141f3d"), "A boy climbs a tower whose every floor holds a test, to find the girl who left him for it."],
+      ["comic", "Solo Leveling", { author: "Chu-Gong", artist: "Seong-Rak Jang", format: "manhwa", year: "2018", chapters: "201" }, "to read", tall("#3a6f9e", "#0b1626"), "The weakest hunter of all is the one a mysterious system chooses to grow stronger."],
+      ["comic", "Persepolis", { author: "Marjane Satrapi", format: "graphic novel", year: "2000" }, "read", null, "A girlhood in Tehran during the Islamic Revolution, drawn in black and white."],
       ["album", "Kid A", { artist: "Radiohead", year: "2000", tracks: "10" }, "listened", square("#d2dde4", "#56677a"), ""],
       ["song", "Never Gonna Give You Up", { artist: "Rick Astley", album: "Whenever You Need Somebody", year: "1987", duration: "3:33" }, "to listen", square("#7aa7d8", "#1f3554"), ""],
       ["video", "How Dune Was Made", { channel: "Behind the Scenes", duration: "14:02" }, "to watch", [640, 360, "#b98a50", "#2f1a0b"], ""],
@@ -192,9 +196,10 @@ async function readwise(page, { importing = false } = {}) {
 
 /**
  * Add to Library, searching Books for "dune": Open Library's answer (trimmed) and its covers, drawn
- * here as the library's are, answered in place of the network.
+ * here as the library's are, answered in place of the network. `names`: the sidebar's and the
+ * dialog's, in the language lines is in.
  */
-async function searchLibrary(page) {
+async function searchLibrary(page, { library = "Library", add = "Add to Library" } = {}) {
   const books = [
     ["OL893414W", "Dune", "Frank Herbert", 1965, "#c86c2b", "#391507"],
     ["OL893461W", "Dune Messiah", "Frank Herbert", 1969, "#4f7fa8", "#16263a"],
@@ -228,10 +233,10 @@ async function searchLibrary(page) {
     const i = Number(/\/id\/(\d+)-/.exec(route.request().url())[1]) - 1;
     return route.fulfill({ headers: { ...cors, "content-type": "image/jpeg" }, body: Buffer.from(covers[i], "base64") });
   });
-  await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: "Add to Library" }).click();
-  await page.getByRole("menuitem", { name: "Add to Library" }).click();
+  await page.getByRole("navigation", { name: library }).getByRole("button", { name: add }).click();
+  await page.getByRole("menuitem", { name: add }).click();
   await page.keyboard.type("dune");
-  await page.getByRole("dialog", { name: "Add to Library" }).getByRole("option").nth(3).waitFor();
+  await page.getByRole("dialog", { name: add }).getByRole("option").nth(3).waitFor();
 }
 
 /**
@@ -1149,6 +1154,24 @@ const SCENES = [
     },
     schemes: style === "lines" ? ["light", "dark"] : ["light"],
   })),
+  {
+    id: "library-add-fr",
+    title: "Add to Library, in French",
+    look: "The kinds in one row, each whole and readable: Livres, Bandes dessinées, Films, Séries, Musique, Podcasts; none cut off or run into the next.",
+    language: "fr",
+    act: (page) => searchLibrary(page, { library: "Bibliothèque", add: "Ajouter à la bibliothèque" }),
+    schemes: ["light"],
+  },
+  {
+    id: "library-comics",
+    title: "Comics on their shelf",
+    look: "In the sidebar's Library, Comics after Books, its icon a book with a picture; the shelf listed: each comic's cover tall beside its title, its author and format under it (SIU · webtoon, Chu-Gong · manhwa, Marjane Satrapi · graphic novel), its status quiet before the date; Persepolis without a cover shows the comic icon in a box of the same size. Solo Leveling open: author, artist, format, year, chapters, link and status, its title, cover and what it's about.",
+    act: async (page) => {
+      await seedLibrary(page);
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Comics/ }).click();
+      await page.locator(".note-list [data-id]").filter({ hasText: "Solo Leveling" }).click();
+    },
+  },
   ...["lines", "classic", "pixel", "neon"].map((style) => ({
     id: `library-add-${style}`,
     title: `Add to Library, searching Books, in ${style[0].toUpperCase()}${style.slice(1)}`,

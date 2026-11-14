@@ -1,8 +1,8 @@
 /*
  * What a web page says about itself, read from its HTML as text: its JSON-LD (schema.org's
  * descriptions, `<script type="application/ld+json">`), its `<meta>` tags (Open Graph's `og:…`,
- * Twitter's, microdata's `itemprop`) and the links in it (canonical, oEmbed, feeds). Nothing of
- * the page is run or shown, so it's as safe to read as any text.
+ * Twitter's, microdata's `itemprop`), the links in it (canonical, oEmbed, feeds) and its labels.
+ * Nothing of the page is run or shown, so it's as safe to read as any text.
  */
 
 export interface PageLink {
@@ -24,7 +24,16 @@ export interface Page {
   /** Its `<meta>` tags' content, by property, name or itemprop in lowercase: the first of each. */
   meta: Map<string, string>;
   links: PageLink[];
+  /**
+   * Its short texts that stand alone, each the whole of an element (a row's "Type" and its "Manhwa",
+   * a chip's "MANHWA"), in lowercase and in order: what the page calls things, as it shows them.
+   */
+  labels: string[];
 }
+
+/** The longest text that's a label, and the most labels read of a page. */
+const LABEL_LENGTH = 40;
+const LABELS = 5000;
 
 /** The characters named in HTML that pages' descriptions use most. */
 const NAMED: Record<string, string> = {
@@ -118,9 +127,15 @@ export function readPage(html: string, url: string): Page {
   for (const [, source, script] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
     if (/application\/ld\+json/i.test(attributes(source).get("type") ?? "")) flatten(json(script), data);
   }
+  const labels: string[] = [];
+  for (const [, text] of html.matchAll(new RegExp(`>([^<>]{1,${LABEL_LENGTH}})<`, "g"))) {
+    const label = decodeEntities(text).replace(/\s+/g, " ").trim().toLowerCase();
+    if (label) labels.push(label);
+    if (labels.length === LABELS) break;
+  }
   const canonical = links.find((link) => link.rel.split(/\s+/).includes("canonical"))?.href;
   const title = decodeEntities(/<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] ?? "").replace(/\s+/g, " ").trim();
-  return { url: canonical ?? url, title, data, meta, links };
+  return { url: canonical ?? url, title, data, meta, links, labels };
 }
 
 /** A JSON-LD object's types, by their names (`Movie`, of `https://schema.org/Movie` too). */

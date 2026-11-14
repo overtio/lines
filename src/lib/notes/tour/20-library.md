@@ -1,6 +1,6 @@
 # Books, movies and music
 
-Paste a link to a book, a movie, a video, a song, a podcast or an article into a new note, and it fills itself in: its title, its cover, who made it, when, and a few sentences of what it's about. Try it with a YouTube video, or a book on Open Library:
+Paste a link to a book, a comic, a movie, a video, a song, a podcast or an article into a new note, and it fills itself in: its title, its cover, who made it, when, and a few sentences of what it's about. Try it with a YouTube video, or a book on Open Library:
 
 ```
 https://openlibrary.org/works/OL450063W

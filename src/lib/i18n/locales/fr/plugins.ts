@@ -118,12 +118,14 @@ export default {
     "Affiche les liens vers les articles d’arXiv comme arXiv les cite : arXiv:1706.03762. Dans les apps, ajoute /article, pour chercher sur arXiv et mettre un lien vers un article, et complète une note qui n’est qu’un lien vers l’un d’eux comme article scientifique de la bibliothèque. Ce que vous cherchez est envoyé à arXiv.",
   "plugins.library.name": "Bibliothèque",
   "plugins.library.description":
-    "Livres, films, séries, vidéos, musique, podcasts, articles et articles scientifiques, chacun une note, dans la Bibliothèque de la barre latérale avec sa couverture et où vous en êtes. Une nouvelle note qui n’est qu’un lien est complétée avec ce qu’il désigne.",
+    "Livres, bandes dessinées, films, séries, vidéos, musique, podcasts, articles et articles scientifiques, chacun une note, dans la Bibliothèque de la barre latérale avec sa couverture et où vous en êtes. Une nouvelle note qui n’est qu’un lien est complétée avec ce qu’il désigne.",
   "plugins.webPages.name": "Pages web",
   "plugins.webPages.description":
     "Recherche un lien vers n’importe quelle page d’après ce qu’elle dit être (un livre, un film, un article…), comme la plupart des sites le disent aux moteurs de recherche : IMDb, Letterboxd, Goodreads, Spotify, Bandcamp, Substack, blogs et actualités. Le lien est envoyé à son site.",
   "plugins.webPages.apps": "Nécessite l’app lines : les sites ne se laissent pas lire par les pages web.",
   "plugins.youtube.description": "Recherche les liens vers les vidéos YouTube : leur titre, leur chaîne et leur image, et dans les apps leur date de publication et leur durée. Le lien est envoyé à YouTube.",
+  "plugins.anilist.description":
+    "Recherche les mangas, manhwas et manhuas par un lien vers AniList, MyAnimeList ou, dans les apps, MangaDex, et les trouve depuis Bandes dessinées dans Ajouter à la bibliothèque : auteur, dessinateur, année, chapitres et couverture. L’identifiant du lien, ou les mots recherchés, sont envoyés à AniList.",
   "plugins.openLibrary.description": "Recherche les livres par un lien vers Open Library ou un ISBN dans un lien (celui d’une librairie, ou d’Amazon) : auteur, année, pages et couverture. L’ISBN ou l’identifiant du livre est envoyé à Open Library.",
   "plugins.wikidata.description":
     "Recherche les films, séries et livres par un lien vers IMDb, The Movie Database, Letterboxd, Wikipédia ou Wikidata : réalisation, année, durée, genre et sujet, d’après Wikipédia. L’identifiant du lien est envoyé à Wikidata et Wikipédia.",

@@ -4,6 +4,8 @@ import type en from "../en/library";
 export default {
   "library.book": "Livre",
   "library.books": "Livres",
+  "library.comic": "Bande dessinée",
+  "library.comics": "Bandes dessinées",
   "library.movie": "Film",
   "library.movies": "Films",
   "library.show": "Série",
