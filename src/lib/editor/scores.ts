@@ -106,11 +106,13 @@ function iconOf(name: IconName, set: string): Node {
 const GAP = 0.125;
 
 /**
- * An icon as masks for marks drawn in one piece (`compact`): its outline, and filled, each with the
- * gap after it, to repeat along a line; none where its set doesn't draw it as an SVG (SF Symbols').
+ * An icon as a mask for marks drawn in one piece (`compact`): filled, with the gap after it, to
+ * repeat along a line, as a class of a stylesheet of its own, written once; none where its set
+ * doesn't draw it as an SVG (SF Symbols').
  */
-const masks = new Map<string, { outline: string; filled: string } | null>();
-function masksOf(name: IconName, set: string) {
+const masks = new Map<string, string | null>();
+let maskSheet: HTMLStyleElement | undefined;
+function maskOf(name: IconName, set: string) {
   const key = `${set}:${name}`;
   if (!masks.has(key)) {
     iconOf(name, set);
@@ -122,10 +124,11 @@ function masksOf(name: IconName, set: string) {
       svg.setAttribute("viewBox", `${x} ${y} ${width * (1 + GAP)} ${height}`);
       svg.removeAttribute("class");
       svg.setAttribute("stroke", "black");
-      const url = () => `url("data:image/svg+xml,${encodeURIComponent(new XMLSerializer().serializeToString(svg))}")`;
-      const outline = url();
       svg.setAttribute("fill", "black");
-      found = { outline, filled: url() };
+      const url = () => `url("data:image/svg+xml,${encodeURIComponent(new XMLSerializer().serializeToString(svg))}")`;
+      found = `cm-lp-score-mask-${masks.size}`;
+      maskSheet ??= document.head.appendChild(document.createElement("style"));
+      maskSheet.append(`.${found} { mask-image: ${url()}; }\n`);
     }
     masks.set(key, found);
   }
@@ -142,12 +145,11 @@ export function drawScore(score: Score, scale: Scale, mark: IconName, set: strin
   el.setAttribute("role", "img");
   el.setAttribute("aria-label", spokenScore(score, scale));
   const icon = scale.kind === "marks" ? (scale.icon ?? mark) : null;
-  const masked = compact && icon && masksOf(icon, set);
+  const masked = compact && icon && maskOf(icon, set);
   if (masked) {
-    el.className = `cm-lp-score cm-lp-score-${TONES[icon] ?? "accent"} cm-lp-score-compact`;
+    el.className = `cm-lp-score cm-lp-score-${TONES[icon] ?? "accent"} cm-lp-score-compact ${masked}`;
     const whole = Math.floor(score.score);
-    el.style.cssText = `--marks: ${score.of}; --outline: ${masked.outline}; --filled: ${masked.filled}; --fill: calc(${whole} * ${1 + GAP}em + ${score.score - whole}em)`;
-    el.append(document.createElement("span"), document.createElement("span"));
+    el.style.cssText = `--marks: ${score.of}; --fill: calc(${whole} * ${1 + GAP}em + ${score.score - whole}em)`;
     return el;
   }
   /** One of its marks: `fill` of it filled, 0, ½ or 1; a click on it sets `value` (ratings.ts). */

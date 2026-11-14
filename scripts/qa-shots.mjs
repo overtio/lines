@@ -1152,9 +1152,12 @@ const SCENES = [
   {
     id: "ratings-marks",
     title: "A rating in stars, and scores on lines of their own",
-    look: "In the properties, rating's three and a half stars in the theme's yellow, the fourth filled to its middle, the fifth a faint outline, the size of the text and on its baseline like the values above; in the text, Score's six of seven and Half's two and a half, the same. Nothing jumps from the text around them.",
-    note: "---\ntype: book\nauthor: Mary Shelley\nyear: 1818\nstatus: read\nrating: 3.5/5\n---\n# Frankenstein\n\nScore: 6/7\nHalf: 2.5/5\n\nThe last line, for the cursor.",
-    act: (page) => page.evaluate(() => window.testing.place()),
+    look: "In the properties, rating's three and a half stars in the theme's yellow, the fourth filled to its middle, the fifth a faint outline, the size of the text and on its baseline like the values above; in the text, Score's six of seven and Half's two and a half, the same. Nothing jumps from the text around them. In the books' table, each rating as stars in one piece, filled in yellow as far as it goes (a half star half) and faint after, lined up with the cells' text.",
+    note: "---\ntype: book\nauthor: Mary Shelley\nyear: 1818\nstatus: read\nrating: 3.5/5\n---\n# Frankenstein\n\nScore: 6/7\nHalf: 2.5/5\n\n@type.book(author, rating)\n\nThe last line, for the cursor.",
+    act: async (page) => {
+      await page.evaluate(() => window.testing.notes.add("---\ntype: book\nauthor: Charlotte Perkins Gilman\nrating: 5/5\n---\n# The Yellow Wallpaper\n"));
+      await page.evaluate(() => window.testing.place());
+    },
     shoot: ".editor-pane",
   },
   {
