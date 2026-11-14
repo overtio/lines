@@ -40,10 +40,10 @@ export function linkOf(input: string): string | null {
   }
 }
 
-/** Links that look like a feed's own: `….xml`, `/feed`, `/feed.json`, `/rss`, `feeds.…`, `?format=rss`. */
+/** Links that look like a feed's own: `….xml`, `/feed`, `/feed.json`, `/feeds/json`, `/rss`, `feeds.…`, `?format=rss`. */
 export function looksLikeFeed(url: URL) {
   return (
-    /(?:\.(?:rss|atom|rdf|xml)|\/(?:feeds?|rss2?|atom)(?:\.\w+)?|\/feed\/json)\/?$/i.test(url.pathname) ||
+    /(?:\.(?:rss|atom|rdf|xml)|\/(?:feeds?|rss2?|atom)(?:\.\w+)?|\/feeds?\/json)\/?$/i.test(url.pathname) ||
     /^(?:feeds?|rss)\./i.test(url.hostname) ||
     /(?:^|&)(?:feed|format)=(?:rss|atom|feed)\b/i.test(url.search.slice(1))
   );
@@ -64,7 +64,7 @@ export function readSite(html: string, base: string): { named: string[]; links: 
   };
   const named = [...page.querySelectorAll("link[rel~='alternate'][href][type]")]
     .map((link) => ({ type: link.getAttribute("type")!.toLowerCase().split(";")[0].trim(), href: link.getAttribute("href")! }))
-    .filter(({ type, href }) => FEED_TYPES.includes(type) && (type !== "application/json" || /feed/i.test(href)))
+    .filter(({ type, href }) => FEED_TYPES.includes(type) && (type !== "application/json" || /feed/i.test(href.replace(/^[a-z][\w+.-]*:\/\/[^/]*/i, ""))))
     .sort((a, b) => FEED_TYPES.indexOf(a.type) - FEED_TYPES.indexOf(b.type))
     .flatMap(({ href }) => whole(href).map(String));
   const links = [...page.querySelectorAll("a[href]")].flatMap((link) => whole(link.getAttribute("href")!));

@@ -510,7 +510,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 
 **Library**
 - [x] Add to the Library by searching the catalogs (Open Library, Wikidata, MusicBrainz, Apple Podcasts, arXiv), without a link; and a link in a note, as a mention of its own note
-- [x] Subscribe to podcasts and RSS and Atom feeds, and read their posts in lines
+- [x] Subscribe to podcasts and RSS, Atom and JSON feeds, and read their posts in lines
 - [x] Play podcast episodes in lines
 - [x] A Hacker News post's discussion under it, to read
 - [ ] Other sites' discussions (Lobsters, Reddit), and the replies Algolia leaves out under deleted comments
@@ -520,7 +520,7 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [x] Keep a book's PDF or EPUB with its note and read it there, with quotes kept in the note
 - [ ] Highlights drawn back in a book from its quotes, and where you are in it synced, not only how far
 - [ ] More kinds of books: Kindle's MOBI and AZW3, FictionBook, CBZ comics; and a PDF read a part at a time from storage
-- [ ] JSON Feed, and feeds that need signing in
+- [ ] Feeds that need signing in
 - [ ] Sync what's been read and played between devices
 - [ ] Shelves as a grid of covers
 - [ ] Episodes downloaded to listen to offline

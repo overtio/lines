@@ -13,7 +13,7 @@ import { stubApp } from "./stubs";
 stubApp();
 mock.module("../../src/lib/release", () => ({ VERSION: "0.0.0", REPO: "https://github.com/overtio/lines" }));
 const { encodingOf, readAtMost } = await import("../../src/lib/feeds/fetch");
-const { linkOf, usualFeeds } = await import("../../src/lib/feeds/find");
+const { linkOf, looksLikeFeed, usualFeeds } = await import("../../src/lib/feeds/find");
 const { formatAgo } = await import("../../src/lib/format");
 const { iconsOf, iconToAsk } = await import("../../src/lib/library/icon");
 
@@ -268,6 +268,8 @@ describe("links", () => {
     expect(root.length).toBe(blog.length / 2);
     // A JSON Feed's usual place, last.
     expect(root.at(-1)).toBe("https://example.com/feed.json");
+    // And links that look like a JSON Feed's own (Daring Fireball's is /feeds/json).
+    expect(["https://example.com/feed.json", "https://daringfireball.net/feeds/json", "https://example.com/feed/json", "https://example.com/api/data.json"].map((link) => looksLikeFeed(new URL(link)))).toEqual([true, true, true, false]);
   });
 
   test("decodes a feed as it says it's encoded", () => {

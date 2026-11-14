@@ -38,6 +38,7 @@
       ]
     },
     { "id": "ep-7", "title": "The same id again: kept once" },
+    { "id": "link-post", "title": "Why </script> breaks inline <b>JSON</b> & AT&amp;T", "external_url": "https://other.example/story", "content_html": "<p>See <a href=\"/about\">about</a>.</p>" },
     "not an item",
     { "id": { "nested": true }, "title": 7, "external_url": "javascript:alert(1)", "content_html": "<p>Fields of the wrong kind</p>" }
   ]

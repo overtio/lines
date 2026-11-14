@@ -130,8 +130,8 @@ describe("reading feeds", () => {
       "https://linked.example/icon-512.png",
     ]);
     // The same id twice is one post, and what isn't an item isn't one.
-    expect(feed.posts).toHaveLength(4);
-    const [first, untitled, episode, odd] = feed.posts;
+    expect(feed.posts).toHaveLength(5);
+    const [first, untitled, episode, linked, odd] = feed.posts;
     expect([first.id, first.title, first.link, first.author, iso(first.date), first.image, first.excerpt]).toEqual([
       "https://linked.example/2026/11/engines",
       "On engines",
@@ -150,6 +150,9 @@ describe("reading feeds", () => {
     expect(text).not.toContain("**");
     expect(episode).toMatchObject({ id: "ep-7", title: "Episode 7", audio: { url: "https://cdn.linked.example/7.mp3", type: "audio/mpeg" }, duration: 1835 });
     expect([odd.title, odd.link]).toEqual(["Fields of the wrong kind", undefined]);
+    // A title is plain text; a link post links elsewhere, but its own links are its site's.
+    expect([linked.title, linked.link]).toEqual(["Why </script> breaks inline <b>JSON</b> & AT&amp;T", "https://other.example/story"]);
+    expect(await markdown(linked.html, linked.base)).toBe("See [about](https://linked.example/about).");
   });
 
   test("a broken feed is mended: whitespace first, bare &s, HTML's entities, a prefix never declared", async () => {

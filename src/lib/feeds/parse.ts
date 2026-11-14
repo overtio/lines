@@ -475,6 +475,8 @@ const isFields = (value: unknown): value is Fields => !!value && typeof value ==
 /** A field's text, if it's text with something in it: a feed may give anything anywhere. */
 const textOf = (value: unknown) => (typeof value === "string" && value.trim() ? value.trim() : undefined);
 const listOf = (value: unknown) => (Array.isArray(value) ? value.filter(isFields) : []);
+/** A title, which JSON Feed writes as plain text: what looks like a tag or an entity in it is what it says. */
+const plainTitle = (value: unknown) => textOf(value)?.replace(/\s+/g, " ") ?? "";
 
 /** The feed the text is, if it's JSON Feed's object. */
 function jsonFeed(text: string): Fields | null {
@@ -496,9 +498,11 @@ function readJson(feed: Fields, url: string): Feed {
   const home = address(textOf(feed.home_page_url), url);
   const feedAuthor = jsonAuthors(feed);
   const posts = listOf(feed.items).map((item): Post => {
-    const link = address(textOf(item.url), url) ?? address(textOf(item.external_url), url);
-    const base = link ?? home ?? url;
-    const title = titleText(textOf(item.title));
+    const own = address(textOf(item.url), url);
+    // A link post's `external_url` is a page elsewhere: its own relative links are still from its site.
+    const link = own ?? address(textOf(item.external_url), url);
+    const base = own ?? home ?? url;
+    const title = plainTitle(item.title);
     const date = readDate(textOf(item.date_published) ?? textOf(item.date_modified));
     const summary = textOf(item.summary);
     const html = textOf(item.content_html) ?? textHtml(textOf(item.content_text) ?? summary ?? "");
@@ -521,7 +525,7 @@ function readJson(feed: Fields, url: string): Feed {
     };
   });
   return {
-    title: titleText(textOf(feed.title)) || new URL(url).hostname,
+    title: plainTitle(feed.title) || new URL(url).hostname,
     link: home,
     description: textOf(feed.description)?.replace(/\s+/g, " "),
     author: feedAuthor,
