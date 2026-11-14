@@ -362,3 +362,97 @@ test("reads the feeds an OPML file lists, in folders or not", async () => {
     { url: "https://feeds.megaphone.fm/FSI1483080183", title: "Syntax" },
   ]);
 });
+
+describe("discussions", () => {
+  const text = (html: string, base?: string) => app.page.evaluate(([html, base]) => window.testing.discussions.htmlToText(html, base), [html, base] as const);
+
+  test("a comment's HTML as paragraphs, quotes, lists and code, its entities read and its links only to the web", async () => {
+    // As Hacker News writes them: the first paragraph bare, the others after a <p>, code in <pre><code>.
+    expect(
+      await text(
+        'I use icewm <i>today</i> &amp; it&#x27;s fine.<p>See <a href="https:&#x2F;&#x2F;example.com&#x2F;a" rel="nofollow">https:&#x2F;&#x2F;example.com&#x2F;a</a> or <a href="item?id=1">this</a>.<p><pre><code>  let x = 1;\n  x += 1;\n</code></pre>',
+        "https://news.ycombinator.com/",
+      ),
+    ).toEqual([
+      { kind: "paragraph", spans: [{ text: "I use icewm " }, { text: "today", emphasis: true }, { text: " & it's fine." }] },
+      { kind: "paragraph", spans: [{ text: "See " }, { text: "https://example.com/a", href: "https://example.com/a" }, { text: " or " }, { text: "this", href: "https://news.ycombinator.com/item?id=1" }, { text: "." }] },
+      { kind: "code", spans: [{ text: "  let x = 1;\n  x += 1;" }] },
+    ]);
+    // Nothing runs or loads, and a link elsewhere than the web is only its words.
+    expect(await text('Hi <img src="x" onerror="alert(1)"> <script>alert(1)</script><a href="javascript:alert(1)">click</a> <a href="data:text/html,x">me</a>')).toEqual([
+      { kind: "paragraph", spans: [{ text: "Hi click me" }] },
+    ]);
+    // Other sites' quotes, lists (from where they start), bold and line breaks.
+    expect(await text('<blockquote><p>quoted <b>bold <i>both</i></b></p></blockquote><ol start="3"><li>three</li><li>four<br>lines<ul><li>in it</li></ul></li></ol>')).toEqual([
+      { kind: "quote", spans: [{ text: "quoted " }, { text: "bold ", strong: true }, { text: "both", strong: true, emphasis: true }] },
+      { kind: "paragraph", spans: [{ text: "3. three" }] },
+      { kind: "paragraph", spans: [{ text: "4. four\nlines" }] },
+      { kind: "paragraph", spans: [{ text: "• in it" }] },
+    ]);
+  });
+
+  test("a long list is read in a moment, each item counted once", async () => {
+    const html = `<ol>${"<li>an item</li>".repeat(20_000)}</ol>`;
+    const read = await app.page.evaluate((html) => {
+      const start = performance.now();
+      const blocks = window.testing.discussions.htmlToText(html);
+      return { ms: performance.now() - start, count: blocks.length, last: blocks.at(-1)!.spans[0].text };
+    }, html);
+    expect([read.count, read.last]).toEqual([20_000, "20000. an item"]);
+    expect(read.ms).toBeLessThan(2000);
+  });
+
+  const story = () => JSON.parse(fixture("hn-story.json"));
+  const read = (item: unknown, official?: unknown) => app.page.evaluate(([item, official]) => window.testing.discussions.readThread(item, official), [item, official] as const);
+
+  test("Hacker News: a story's thread from Algolia, its first comments in the order Hacker News ranks them, with its count", async () => {
+    const thread = await read(story(), JSON.parse(fixture("hn-official.json")));
+    expect([thread.author, thread.count]).toEqual(["inatreecrown2", 17]);
+    // Algolia's are oldest first; Hacker News ranks the oldest last.
+    expect(thread.comments.map((comment) => comment.author)).toEqual(["yjftsjthsd-h", "inatreecrown2", "sscarduzio", "microtonal"]);
+    const [first] = thread.comments;
+    expect([first.id, new Date(first.time!).toISOString(), first.replies.map((reply) => reply.author)]).toEqual(["50479019", "2026-11-13T06:07:47.000Z", ["inatreecrown2", "dead_hn_theory"]]);
+    // A paragraph starting with ">" is a quote, as Hacker News means it.
+    expect(first.replies[1].text).toEqual([
+      { kind: "quote", spans: [{ text: "treating this as a blast from the past." }] },
+      { kind: "paragraph", spans: [{ text: "Well, for most of us it is." }] },
+    ]);
+    // Without the official API's answer, or with one that isn't a story's, Algolia's order, and no count.
+    for (const official of [null, { kids: "no", descendants: "17" }]) {
+      const unranked = await read(story(), official);
+      expect([unranked.count, unranked.comments[0].author]).toEqual([undefined, "microtonal"]);
+    }
+  });
+
+  test("Hacker News: what isn't a comment is left out, what a comment lacks is left unsaid, and only a story's thread is read", async () => {
+    const odd = {
+      id: 1,
+      type: "story",
+      author: "op",
+      children: [
+        { id: 2, type: "comment", author: "no-time", text: "Fine.", children: [null, "text", { id: 3, type: "pollopt", text: "Option" }] },
+        { id: 4, type: "comment", author: null, created_at_i: "soon", text: null },
+        { type: "comment", author: "no-id", created_at_i: 1, text: "Lost." },
+        42,
+      ],
+    };
+    expect(await read(odd)).toEqual({
+      author: "op",
+      comments: [
+        { id: "2", author: "no-time", text: [{ kind: "paragraph", spans: [{ text: "Fine." }] }], replies: [] },
+        { id: "4", author: "", text: [], replies: [] },
+      ],
+    });
+    // A comment's link (its author isn't who posted the story), or anything else, isn't read as a story's.
+    const error = (item: unknown) => app.page.evaluate((item) => {
+      try {
+        window.testing.discussions.readThread(item);
+        return null;
+      } catch (error) {
+        return (error as Error).message;
+      }
+    }, item);
+    expect(await error({ id: 2, type: "comment", author: "someone", children: [] })).toBe("Not a story's comments");
+    expect(await error("<html>")).toBe("Not a story's comments");
+  });
+});

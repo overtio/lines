@@ -3,18 +3,23 @@ import { readDate, readDuration } from "../../src/lib/feeds/dates";
 import { isFeed, mend, type Post } from "../../src/lib/feeds/parse";
 import { backoff, DAY, KEEP, merge, type KeptPost } from "../../src/lib/feeds/posts";
 import { writeOpml } from "../../src/lib/feeds/opml";
+import { Thread } from "../../src/lib/feeds/thread.svelte";
+import type { DiscussionComment } from "../../src/lib/plugins/types";
+import { storyId, storyPage } from "../../src/plugins/hacker-news/links";
 import { stubApp } from "./stubs";
 
 stubApp();
 mock.module("../../src/lib/release", () => ({ VERSION: "0.0.0", REPO: "https://github.com/overtio/lines" }));
 const { encodingOf, readAtMost } = await import("../../src/lib/feeds/fetch");
 const { linkOf, usualFeeds } = await import("../../src/lib/feeds/find");
+const { formatAgo } = await import("../../src/lib/format");
 
 /*
  * Feeds' logic that needs no page: dates and durations as feeds write them, keeping posts across
  * fetches, waiting after failures and reading no more than a feed's limit, links as pasted, OPML
- * written out. Reading feeds and their HTML needs the browser's
- * parser, so tests/browser/feeds.test.ts covers that.
+ * written out, and a post's discussion: which links are Hacker News' stories, how long ago a
+ * comment was written, and moving through a thread. Reading feeds and their HTML needs the
+ * browser's parser, so tests/browser/feeds.test.ts covers that.
  */
 
 describe("dates", () => {
@@ -217,4 +222,54 @@ test("writes OPML that other readers take, with titles and links escaped", () =>
   expect(opml).toContain('<outline type="rss" text="&lt;Podcast&gt;" title="&lt;Podcast&gt;" xmlUrl="https://podcast.example/rss"/>');
   expect(opml).toContain("<dateCreated>Thu, 12 Nov 2026 00:00:00 GMT</dateCreated>");
   expect(opml.startsWith('<?xml version="1.0" encoding="UTF-8"?>\n<opml version="2.0">')).toBe(true);
+});
+
+describe("discussions", () => {
+  test("Hacker News: only a story's comments page, over https, is read, by its id; its page is made from that alone", () => {
+    const id = (link: string) => storyId(new URL(link));
+    expect(id("https://news.ycombinator.com/item?id=50487185")).toBe("50487185");
+    expect(id("https://news.ycombinator.com/item?id=50487185&p=2#50487190")).toBe("50487185");
+    for (const link of [
+      "http://news.ycombinator.com/item?id=1",
+      "javascript://news.ycombinator.com/item?id=1",
+      "https://news.ycombinator.com.evil.example/item?id=1",
+      "https://news.ycombinator.com/item?id=abc",
+      "https://news.ycombinator.com/item?id=1%0a",
+      "https://news.ycombinator.com/user?id=pg",
+      "https://lobste.rs/item?id=1",
+    ])
+      expect(id(link)).toBeNull();
+    expect(storyPage("50487185")).toBe("https://news.ycombinator.com/item?id=50487185");
+  });
+
+  test("how long ago, in its largest whole unit, as a number", () => {
+    const now = Date.UTC(2026, 10, 13, 12);
+    const before = (seconds: number) => formatAgo(now - seconds * 1000, now);
+    expect(before(12)).toBe("12 seconds ago");
+    expect(before(3 * 3600 + 59 * 60)).toBe("3 hours ago");
+    expect(before(86_400)).toBe("1 day ago");
+    expect(before(13 * 86_400)).toBe("13 days ago");
+    expect(before(45 * 86_400)).toBe("1 month ago");
+    expect(before(800 * 86_400)).toBe("2 years ago");
+    // A clock a little ahead of the site's isn't "in 3 seconds".
+    expect(formatAgo(now + 3000, now)).toBe("0 seconds ago");
+  });
+
+  test("moving through a thread: each comment shown in turn, past those folded away, to what one answers and the last shown", () => {
+    const comment = (id: string, ...replies: DiscussionComment[]): DiscussionComment => ({ id, author: id, text: [], replies });
+    const thread = new Thread({ comments: [comment("a", comment("a1", comment("a1x")), comment("a2")), comment("b")] });
+    const [a, a1, a1x, a2, b] = thread.all;
+    const ids = (entry: { comment: DiscussionComment } | undefined) => entry?.comment.id;
+    expect([a.size, a1.size, b.size, a1x.depth]).toEqual([3, 1, 0, 2]);
+    expect([thread.next(a), thread.next(a1x), thread.next(a2), thread.next(b)].map(ids)).toEqual(["a1", "a2", "b", undefined]);
+    expect([thread.previous(b), thread.previous(a2), thread.previous(a)].map(ids)).toEqual(["a2", "a1x", undefined]);
+    a1.folded = true;
+    expect([thread.next(a1), thread.previous(a2), ids(thread.shown(a1x))]).toEqual([a2, a1, "a1"]);
+    a.folded = true;
+    expect([thread.next(a), thread.previous(b), thread.shown(a1x)]).toEqual([b, a, a]);
+    b.folded = true;
+    expect(ids(thread.last())).toBe("b");
+    a.folded = false;
+    expect(ids(new Thread({ comments: [comment("a", comment("a1"))] }).last())).toBe("a1");
+  });
 });

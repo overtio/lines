@@ -52,6 +52,25 @@ export default {
   // A link to where a post is talked about (its comments' page), under its title.
   "feeds.comments": "Comments",
   "feeds.openInBrowser": "Open in Browser",
+  // A post's discussion, read under it where a plugin reads its comments link (Hacker News'): its heading, how many comments, where they're from.
+  "feeds.discussion.count": "{count, plural, one {# comment} other {# comments}}",
+  "feeds.discussion.openOn": "Open on {site}",
+  "feeds.discussion.loading": "Loading comments…",
+  "feeds.discussion.failed": "The comments couldn’t be loaded.",
+  "feeds.discussion.retry": "Try Again",
+  "feeds.discussion.none": "No comments yet.",
+  // The site counts comments, but has none to give yet (Hacker News' copy of a story posted a moment ago).
+  "feeds.discussion.notYet": "The comments aren’t here yet. They’re on {site}.",
+  // Comments the site counts that it didn't give (taken down with what they answer, or too new), linking to them there.
+  "feeds.discussion.missing": "{count, plural, one {# more comment} other {# more comments}} on {site}",
+  // A comment folded away: how many replies are folded with it.
+  "feeds.discussion.replies": "{count, plural, one {# reply} other {# replies}}",
+  // In a reply too deep to be drawn in from the comment it answers: whose that is.
+  "feeds.discussion.replyTo": "reply to {name}",
+  // After the name of whoever posted what's commented on, for screen readers.
+  "feeds.discussion.poster": "who posted it",
+  // Said by screen readers with the first comment, where Tab comes into the discussion.
+  "feeds.discussion.keys": "Up and down arrows go from comment to comment; left and right fold and unfold them, or go to what one answers and to its replies.",
   // Keeping a post as a note in the Library (an article, or an episode), and opening that note once it is.
   "feeds.save": "Save to Library",
   "feeds.openSaved": "Open in Library",

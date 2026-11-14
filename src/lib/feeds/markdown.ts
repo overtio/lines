@@ -1,32 +1,23 @@
 import { fenceFor } from "../editor/codeFence";
 import { escapeMarkdown } from "../notes/escape";
+import { address, BLOCK_ELEMENTS, BLOCKS, parseHtml, SKIPPED } from "./html";
 
 /*
- * A feed's HTML as Markdown, for reading a post as a note is drawn: the page is read into a document
- * of its own (DOMParser's, where nothing runs or loads) and walked, keeping paragraphs, headings,
- * links, emphasis, lists, quotes, code, pictures and simple tables, and dropping everything else.
+ * A feed's HTML as Markdown, for reading a post as a note is drawn: the page is read where nothing
+ * in it runs or loads (html.ts) and walked, keeping paragraphs, headings, links, emphasis, lists,
+ * quotes, code, pictures and simple tables, and dropping everything else.
  * No HTML is ever put into the page as it came, and nothing in a post is ever more than text there:
  * its words are escaped (notes/escape.ts), its code has no language (so nothing draws or runs it),
  * and its links go only to the web or to mail.
  */
 
-/** Links and pictures only to the web (and mail, for links): no `file:`, `javascript:` or `data:`. */
+/** Links to the web or to mail; pictures only from the web (html.ts' `WEB`). */
 const SAFE_LINK = /^(?:https?:|mailto:)/i;
-const SAFE_IMAGE = /^https?:/i;
-
-/** What's left out, with everything in it. */
-const SKIPPED = new Set(["script", "style", "noscript", "template", "head", "title", "meta", "link", "svg", "math", "form", "button", "input", "select", "textarea", "object", "embed", "canvas", "map"]);
-/** Blocks whose inline content is a paragraph of its own. */
-const BLOCKS = new Set(["p", "div", "section", "article", "header", "footer", "main", "aside", "nav", "figure", "address", "details", "summary", "center", "hgroup", "body"]);
-/** Every element that makes a block, those above and those with Markdown of their own. */
-const BLOCK_ELEMENTS = new Set([...BLOCKS, "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li", "blockquote", "pre", "hr", "table", "figcaption", "dl", "iframe", "video", "audio"]);
-
-const parse = (html: string) => new DOMParser().parseFromString(html, "text/html").body;
 
 /** The plain text of some HTML, its spaces collapsed: for excerpts and titles. */
 export function plainText(html: string): string {
   if (!/[<&]/.test(html)) return html.replace(/\s+/g, " ").trim();
-  const body = parse(html);
+  const body = parseHtml(html);
   for (const skipped of body.querySelectorAll([...SKIPPED].join(","))) skipped.remove();
   // Blocks and line breaks part words, as they do on the page.
   for (const element of body.querySelectorAll("br, p, div, li, h1, h2, h3, h4, h5, h6, blockquote, tr, td, th")) element.append(" ");
@@ -38,7 +29,7 @@ export function plainText(html: string): string {
  * News' posts say only "Comments", a link to theirs.
  */
 export function saysMore(html: string, base: string, own: (string | undefined)[]): boolean {
-  const body = parse(html);
+  const body = parseHtml(html);
   for (const link of body.querySelectorAll("a[href]")) {
     try {
       if (own.includes(new URL(link.getAttribute("href")!, base).href)) link.remove();
@@ -51,7 +42,7 @@ export function saysMore(html: string, base: string, own: (string | undefined)[]
 
 /** HTML as Markdown, its relative links and pictures read from `base`. */
 export function htmlToMarkdown(html: string, base?: string): string {
-  return new Writer(base).blocks(parse(html)).join("\n\n").trim();
+  return new Writer(base).blocks(parseHtml(html)).join("\n\n").trim();
 }
 
 /** A text node's words, escaped as a line of text is (notes/escape.ts), with a space kept at either end that had one: it parts them from what's beside them. */
@@ -69,17 +60,6 @@ const collapse = (text: string) => text.replace(/\s+/g, " ");
 
 class Writer {
   constructor(private base?: string) {}
-
-  /** A URL as the page wrote it, made whole, if it's one that's kept. */
-  #url(value: string | null | undefined, safe: RegExp): string | null {
-    if (!value?.trim()) return null;
-    try {
-      const url = new URL(value.trim(), this.base).href;
-      return safe.test(url) ? url : null;
-    } catch {
-      return null;
-    }
-  }
 
   /**
    * The Markdown of a node within a line: its text escaped, or an element's inline Markdown. A block
@@ -159,7 +139,7 @@ class Writer {
       case "video":
       case "audio": {
         // An embedded player is a link to what it plays.
-        const src = this.#url(element.getAttribute("src") ?? element.querySelector("source")?.getAttribute("src"), SAFE_IMAGE);
+        const src = address(element.getAttribute("src") ?? element.querySelector("source")?.getAttribute("src"), this.base);
         if (!src) return [];
         const label = element.getAttribute("title")?.trim() || new URL(src).hostname;
         return [`[${escapeText(label)}](${destination(src)})`];
@@ -197,7 +177,7 @@ class Writer {
       case "tt":
         return inlineCode(collapse(element.textContent ?? ""));
       case "img": {
-        const src = this.#url(element.getAttribute("src"), SAFE_IMAGE);
+        const src = address(element.getAttribute("src"), this.base);
         // Tracking pixels aren't pictures.
         if (!src || element.getAttribute("width") === "1" || element.getAttribute("height") === "1") return "";
         const alt = collapse(element.getAttribute("alt") ?? "").replace(/[[\]\\]/g, "\\$&").trim();
@@ -205,7 +185,7 @@ class Writer {
       }
       case "a": {
         const text = content().trim();
-        const href = this.#url(element.getAttribute("href"), SAFE_LINK);
+        const href = address(element.getAttribute("href"), this.base, SAFE_LINK);
         return href && text ? `[${text}](${destination(href)})` : text;
       }
       default:

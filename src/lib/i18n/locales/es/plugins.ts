@@ -132,6 +132,7 @@ export default {
   "plugins.applePodcasts.description": "Busca pódcasts y sus episodios por un enlace a Apple Podcasts, con el feed del pódcast. Los identificadores del enlace se envían a Apple.",
   "plugins.feeds.description":
     "Suscríbete a los feeds de sitios y pódcasts, y lee sus publicaciones en los Feeds de la Biblioteca. Una nota nueva que es solo el enlace de un feed te suscribe a él. Las notas de episodios tienen un botón para reproducirlos. Los feeds se descargan de sus sitios, en las apps cada 30 minutos.",
+  "plugins.hackerNews.description": "Muestra los comentarios de una historia de Hacker News bajo su publicación en los Feeds de la Biblioteca, en hilos, para leerlos. El id de la historia va a la API de Hacker News y a la copia de Algolia.",
   "plugins.code": "Código",
   "plugins.code.description": "Notas que son archivos de código, en cualquiera de unos 120 lenguajes de programación: números de línea, letra de ancho fijo y resaltado en los colores del tema, con sangría y corchetes como en un editor de código. Se descargan y exportan como archivos de su lenguaje (.py, .ts, .rs…).",
   "plugins.typing": "Mecanografía",

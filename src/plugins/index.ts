@@ -10,6 +10,7 @@ import { fonts } from "./fonts";
 import { giphy } from "./giphy";
 import { wallhaven } from "./wallhaven";
 import { github } from "./github";
+import { hackerNews } from "./hacker-news";
 import { requests } from "./http";
 import { ironcalc } from "./ironcalc";
 import { katex } from "./katex";
@@ -75,6 +76,7 @@ export const builtIn = (): Plugin[] => [
   applePodcasts(),
   webPages(),
   feedsPlugin(),
+  hackerNews(),
   changesPlugin(),
   themes(),
   styles(),

@@ -64,6 +64,23 @@
   color: inherit;
 }
 
+/*
+ * A post with its discussion under it (Discussion.svelte): as tall as it is, scrolled with it, Page
+ * Down from the post too (no scroller of its own in the way), and the room under its last line the
+ * discussion's.
+ */
+.post-with-discussion {
+  --editor-pad-bottom: 0px;
+}
+
+.post-with-discussion .cm-editor {
+  height: auto;
+}
+
+.post-with-discussion .cm-editor .cm-scroller {
+  overflow: visible;
+}
+
 /* An episode note's Play button, before its `audio` link (player/notePlay.ts): a small round button in the accent. */
 .cm-episode-play {
   display: inline-grid;
@@ -2625,6 +2642,56 @@
 :root[data-backdrop][data-paper][data-scheme="dark"] .editor-pane .cm-editor.cm-page:not(.cm-sheet-note, .cm-paged) > .cm-scroller > .cm-content::before,
 :root[data-backdrop][data-paper][data-scheme="dark"] .editor-pane .cm-page-card {
   background-image: var(--paper-dark);
+}
+
+/*
+ * A post and its discussion (PostView.svelte) are one page: the paper behind both rather than the
+ * post alone, ruled paper ruling the comments' text at its own lines too, and over a backdrop one
+ * card for both.
+ */
+:root[data-paper] .post-page {
+  background-image: var(--paper-light);
+  background-size: var(--paper-size);
+  background-position: var(--paper-position);
+}
+
+:root[data-paper][data-scheme="dark"] .post-page {
+  background-image: var(--paper-dark);
+}
+
+:root[data-paper] .post-page .cm-editor.cm-page:not(.cm-sheet-note) > .cm-scroller {
+  background-image: none;
+}
+
+:root[data-paper-lines] .post-page [data-comment] p {
+  background-image: var(--paper-lines);
+  background-size: var(--paper-lines-size);
+  background-position: var(--paper-lines-position);
+}
+
+:root[data-backdrop] .editor-pane .post-page {
+  position: relative;
+  isolation: isolate;
+  width: calc(100% - 2 * var(--page-gap));
+  max-width: var(--editor-width);
+  min-height: calc(100% - 2 * var(--page-gap));
+  margin: var(--page-gap) auto;
+  border-radius: var(--radius-xl);
+  background-color: var(--page-bg);
+  box-shadow:
+    var(--card-shadow),
+    0 18px 60px rgb(0 0 0 / 0.16);
+  backdrop-filter: var(--page-blur);
+}
+
+:root[data-backdrop] .editor-pane .post-page .cm-editor.cm-page > .cm-scroller > .cm-content {
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+}
+
+:root[data-backdrop] .editor-pane .post-page .cm-editor.cm-page > .cm-scroller > .cm-content::before {
+  content: none;
 }
 
 /* A grid's columns on each page, rather than down the column through the gaps between them. */

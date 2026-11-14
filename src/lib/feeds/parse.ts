@@ -1,4 +1,5 @@
 import { readDate, readDuration } from "./dates";
+import { address } from "./html";
 import { plainText, saysMore } from "./markdown";
 import { fingerprint } from "./posts";
 
@@ -211,17 +212,6 @@ function text(parent: Element, name: string, ns: string | null): string | undefi
   return child(parent, name, ns)?.textContent?.trim() || undefined;
 }
 
-/** A URL as the feed wrote it, made whole against `base`; undefined if it isn't one to the web. */
-function web(value: string | null | undefined, base: string): string | undefined {
-  if (!value?.trim()) return undefined;
-  try {
-    const url = new URL(value.trim(), base);
-    return url.protocol === "https:" || url.protocol === "http:" ? url.href : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
 /** A title as plain text: some feeds write theirs as HTML, or with its entities written twice. */
 const titleText = (value: string | undefined) => (!value ? "" : /&[#\w]+;|<\/[a-z]/i.test(value) ? plainText(value) : value.replace(/\s+/g, " ").trim());
 
@@ -266,7 +256,7 @@ function podcastTags(element: Element, base: string) {
   const picture = media.find((content) => content.getAttribute("medium") === "image" || (content.getAttribute("type") ?? "").startsWith("image/"));
   const playable = media.find((content) => ["audio", "video"].includes(content.getAttribute("medium") ?? "") || PLAYABLE.test(content.getAttribute("type") ?? ""));
   return {
-    image: web(child(element, "image", NS.itunes)?.getAttribute("href") ?? child(element, "image", NS.googleplay)?.getAttribute("href") ?? thumbnail?.getAttribute("url") ?? picture?.getAttribute("url"), base),
+    image: address(child(element, "image", NS.itunes)?.getAttribute("href") ?? child(element, "image", NS.googleplay)?.getAttribute("href") ?? thumbnail?.getAttribute("url") ?? picture?.getAttribute("url"), base),
     author: text(element, "author", NS.itunes) ?? text(element, "creator", NS.dc),
     summary: text(element, "summary", NS.itunes),
     duration: readDuration(text(element, "duration", NS.itunes)) ?? readDuration(playable?.getAttribute("duration")),
@@ -279,7 +269,7 @@ function podcastTags(element: Element, base: string) {
 /** A post's sound (or video): an enclosure that plays, else a Media RSS one. */
 function audioOf(enclosures: { url: string | null; type: string | null }[], base: string) {
   for (const { url, type } of enclosures) {
-    const href = web(url, base);
+    const href = address(url, base);
     if (href && (PLAYABLE.test(type ?? "") || (!type && PLAYABLE_FILE.test(href)))) return { url: href, ...(type ? { type } : {}) };
   }
   return undefined;
@@ -294,7 +284,7 @@ function distinct(posts: Post[]): Post[] {
 /* RSS 2.0 (and 0.9x). */
 
 function readRss(channel: Element, url: string, ns: string | null): Feed {
-  const link = web(text(channel, "link", ns), url);
+  const link = address(text(channel, "link", ns), url);
   const tags = podcastTags(channel, url);
   const posts = children(channel, "item", ns).map((item) => readItem(item, link ?? url, ns));
   return {
@@ -302,7 +292,7 @@ function readRss(channel: Element, url: string, ns: string | null): Feed {
     link,
     description: plainText(text(channel, "description", ns) ?? tags.summary ?? "") || undefined,
     author: authorName(tags.author ?? text(channel, "managingEditor", ns)),
-    image: tags.image ?? web(child(channel, "image", ns) && text(child(channel, "image", ns)!, "url", ns), url),
+    image: tags.image ?? address(child(channel, "image", ns) && text(child(channel, "image", ns)!, "url", ns), url),
     posts: distinct(posts),
   };
 }
@@ -311,13 +301,13 @@ function readItem(item: Element, base: string, ns: string | null): Post {
   const tags = podcastTags(item, base);
   const guid = child(item, "guid", ns);
   const guidText = guid?.textContent?.trim();
-  const link = web(text(item, "link", ns), base) ?? (guid?.getAttribute("isPermaLink") !== "false" ? web(guidText, base) : undefined);
+  const link = address(text(item, "link", ns), base) ?? (guid?.getAttribute("isPermaLink") !== "false" ? address(guidText, base) : undefined);
   const title = titleText(text(item, "title", ns) ?? text(item, "title", NS.dc));
   const date = readDate(text(item, "pubDate", ns) ?? text(item, "date", NS.dc));
   const description = text(item, "description", ns);
   const html = asHtml(text(item, "encoded", NS.content) ?? description ?? tags.summary ?? "");
   const enclosures = children(item, "enclosure", ns).map((enclosure) => ({ url: enclosure.getAttribute("url"), type: enclosure.getAttribute("type") }));
-  const comments = web(text(item, "comments", ns), base);
+  const comments = address(text(item, "comments", ns), base);
   return {
     id: guidText || link || `${title}\n${date ?? ""}\n${fingerprint(html)}`,
     title: title || excerptOf(html).slice(0, 80),
@@ -329,7 +319,7 @@ function readItem(item: Element, base: string, ns: string | null): Post {
     // A post's relative links are from its own page, if it has one.
     base: link ?? base,
     excerpt: excerptOf(description ? asHtml(description) : html, link ?? base, [link, comments]),
-    image: tags.image ?? web(enclosures.find(({ type }) => type?.startsWith("image/"))?.url, base),
+    image: tags.image ?? address(enclosures.find(({ type }) => type?.startsWith("image/"))?.url, base),
     audio: audioOf(tags.playable ? [...enclosures, tags.playable] : enclosures, base),
     duration: tags.duration,
     season: tags.season,
@@ -349,7 +339,7 @@ function readRdf(root: Element, url: string): Feed {
     const about = item.getAttributeNS(NS.rdf, "about");
     return about && !child(item, "guid", ns) ? { ...post, id: about } : post;
   });
-  return { ...feed, image: feed.image ?? web(child(root, "image", ns) && text(child(root, "image", ns)!, "url", ns), url), posts: distinct(posts) };
+  return { ...feed, image: feed.image ?? address(child(root, "image", ns) && text(child(root, "image", ns)!, "url", ns), url), posts: distinct(posts) };
 }
 
 /* Atom 1.0 (and 0.3, in its own namespace). */
@@ -371,11 +361,11 @@ function atomLink(parent: Element, ns: string | null, rel: string, base: string)
   // A page, not a feed: an entry's replies may be a feed of its comments as well as their page.
   const page = rel === "alternate" || rel === "replies";
   const link = children(parent, "link", ns).find((each) => (each.getAttribute("rel") ?? "alternate") === rel && !(page && /xml/.test(each.getAttribute("type") ?? "")));
-  return web(link?.getAttribute("href"), base);
+  return address(link?.getAttribute("href"), base);
 }
 
 /** Where an Atom element's relative URLs are from: its `xml:base`, else its parent's. */
-const baseOf = (element: Element, base: string) => web(element.getAttributeNS("http://www.w3.org/XML/1998/namespace", "base"), base) ?? base;
+const baseOf = (element: Element, base: string) => address(element.getAttributeNS("http://www.w3.org/XML/1998/namespace", "base"), base) ?? base;
 
 function readAtom(root: Element, url: string): Feed {
   const ns = root.namespaceURI;
@@ -421,7 +411,7 @@ function readAtom(root: Element, url: string): Feed {
     link: atomLink(root, ns, "alternate", base),
     description: plainText(atomHtml(child(root, "subtitle", ns) ?? child(root, "tagline", ns))) || tags.summary,
     author: feedAuthor ?? tags.author,
-    image: tags.image ?? web(text(root, "logo", ns) ?? text(root, "icon", ns), base),
+    image: tags.image ?? address(text(root, "logo", ns) ?? text(root, "icon", ns), base),
     posts: distinct(posts),
   };
 }
