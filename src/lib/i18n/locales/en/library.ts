@@ -20,6 +20,9 @@ export default {
   "library.articles": "Articles",
   "library.paper": "Paper",
   "library.papers": "Papers",
+  // Japanese animation: one of it, and its row in the Library.
+  "library.anime": "Anime",
+  "library.animeShelf": "Anime",
   // Where something is got to, shown in its row and chosen from its menu. The note keeps them in English.
   "library.status.toRead": "To Read",
   "library.status.reading": "Reading",
@@ -30,6 +33,8 @@ export default {
   "library.status.toListen": "To Listen",
   "library.status.listening": "Listening",
   "library.status.listened": "Listened",
+  "library.status.onHold": "On Hold",
+  "library.status.dropped": "Dropped",
   // Said to screen readers as one is chosen from an item's menu, and when ⌘Z puts back the one before.
   "library.status": "Status: {status}",
   "library.didUndoStatus": "Status put back",

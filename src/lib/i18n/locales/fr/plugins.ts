@@ -127,6 +127,8 @@ export default {
   "plugins.openLibrary.description": "Recherche les livres par un lien vers Open Library ou un ISBN dans un lien (celui d’une librairie, ou d’Amazon) : auteur, année, pages et couverture. L’ISBN ou l’identifiant du livre est envoyé à Open Library.",
   "plugins.wikidata.description":
     "Recherche les films, séries et livres par un lien vers IMDb, The Movie Database, Letterboxd, Wikipédia ou Wikidata : réalisation, année, durée, genre et sujet, d’après Wikipédia. L’identifiant du lien est envoyé à Wikidata et Wikipédia.",
+  "plugins.anilist.description": "Recherche les anime par un lien vers AniList, et les trouve dans Ajouter à la bibliothèque : format, studio, année, saison, épisodes et affiche, avec leurs identifiants sur AniList et MyAnimeList. L’identifiant de l’anime, ou ce qui est cherché, est envoyé à AniList.",
+  "plugins.myanimelist.description": "Recherche les anime par un lien vers MyAnimeList, par Jikan, une API ouverte qui lit MyAnimeList : format, studio, année, saison, épisodes et affiche. L’identifiant de l’anime est envoyé à Jikan.",
   "plugins.musicbrainz.description":
     "Recherche les morceaux et albums par un lien vers MusicBrainz, ou vers Spotify, Apple Music, Bandcamp, Deezer ou Tidal qu’il connaît : artiste, album, année et pochette. Le lien est envoyé à MusicBrainz.",
   "plugins.applePodcasts.description": "Recherche les podcasts et leurs épisodes par un lien vers Apple Podcasts, avec le flux du podcast. Les identifiants du lien sont envoyés à Apple.",

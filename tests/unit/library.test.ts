@@ -13,7 +13,7 @@ import { stubApp } from "./stubs";
 const answers = new Map<string, unknown>();
 const asked: string[] = [];
 const answer = (url: string, init?: RequestInit) => {
-  asked.push(init?.method === "HEAD" ? `HEAD ${url}` : url);
+  asked.push(init?.method === "HEAD" ? `HEAD ${url}` : init?.method === "POST" ? `POST ${url} ${init.body}` : url);
   const found = [...answers].find(([start]) => url.startsWith(start))?.[1];
   if (found === undefined) return new Response("", { status: 404 });
   if (typeof found === "number") return new Response("", { status: found });
@@ -42,6 +42,8 @@ const { applePodcasts, podcastIn } = await import("../../src/plugins/apple-podca
 const { spotify, spotifyIn, spotifyLink } = await import("../../src/plugins/spotify");
 const { soundcloud, soundcloudIn } = await import("../../src/plugins/soundcloud");
 const { paperItem } = await import("../../src/plugins/arxiv");
+const anilist = await import("../../src/plugins/anilist");
+const myanimelist = await import("../../src/plugins/myanimelist");
 const bookmarks = await import("../../src/lib/library/bookmarks");
 const { dayOf } = await import("../../src/lib/notes/calendar");
 
@@ -593,6 +595,102 @@ describe("Apple Podcasts", () => {
       ["audio", "https://example.com/episode.mp3"],
     ]);
     expect(episode?.link).toBe("https://podcasts.apple.com/us/podcast/an-episode/id1200361736?i=1000801496509");
+  });
+});
+
+describe("AniList and MyAnimeList", () => {
+  // Trimmed from graphql.anilist.co's and api.jikan.moe's answers for Frieren (November 2026).
+  const frieren = {
+    id: 154587,
+    idMal: 52991,
+    format: "TV",
+    episodes: 28,
+    season: "FALL",
+    seasonYear: 2023,
+    startDate: { year: 2023 },
+    title: { romaji: "Sousou no Frieren", english: "Frieren: Beyond Journey’s End", native: "葬送のフリーレン" },
+    coverImage: { extraLarge: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-qQTzQnEJJ3oB.jpg", large: "https://s4.anilist.co/large.jpg", medium: "https://s4.anilist.co/medium.jpg" },
+    siteUrl: "https://anilist.co/anime/154587",
+    studios: { nodes: [{ name: "MADHOUSE" }] },
+    description: "The adventure is over but life goes on for an elf mage just beginning to learn what living is all about.<br><br>(Source: Crunchyroll)",
+  };
+
+  test("know anime by their links on each site, and nothing else there", () => {
+    expect(anilist.animeIn(new URL("https://anilist.co/anime/154587/Sousou-no-Frieren/"))).toBe(154587);
+    expect(anilist.animeIn(new URL("https://anilist.co/manga/118586"))).toBeNull();
+    expect(anilist.animeIn(new URL("https://anilist.co/user/someone"))).toBeNull();
+    expect(myanimelist.animeIn(new URL("https://myanimelist.net/anime/52991/Sousou_no_Frieren"))).toBe(52991);
+    expect(myanimelist.animeIn(new URL("https://myanimelist.net/manga/126287"))).toBeNull();
+    expect(text.seasonOf("FALL", 2023)).toBe("Fall 2023");
+    expect(text.seasonOf("fall", undefined)).toBeUndefined();
+  });
+
+  test("AniList: an anime by its id, sent alone, with its ids on both sites", async () => {
+    answers.set("https://graphql.anilist.co", { data: { Media: frieren } });
+    expect(await look(anilist.anilist, "https://anilist.co/anime/154587/Sousou-no-Frieren/")).toEqual({
+      type: "anime",
+      title: "Frieren: Beyond Journey’s End",
+      link: "https://anilist.co/anime/154587",
+      properties: [
+        ["format", "TV"],
+        ["studio", "MADHOUSE"],
+        ["year", "2023"],
+        ["season", "Fall 2023"],
+        ["episodes", "28"],
+        ["anilist", "154587"],
+        ["mal", "52991"],
+      ],
+      cover: frieren.coverImage.extraLarge,
+      description: frieren.description,
+    });
+    expect(JSON.parse(asked[0].replace("POST https://graphql.anilist.co ", "")).variables).toEqual({ id: 154587 });
+    answers.set("https://graphql.anilist.co", { data: { Media: null }, errors: [{ message: "Not Found.", status: 404 }] });
+    await expect(look(anilist.anilist, "https://anilist.co/anime/1")).rejects.toThrow("AniList answered");
+  });
+
+  test("AniList: anime searched for, the words sent alone, their covers small", async () => {
+    answers.set("https://graphql.anilist.co", { data: { Page: { media: [{ ...frieren, title: { romaji: "Sousou no Frieren" } }, { id: 1, title: {} }] } } });
+    const found = await sourceOf(anilist.anilist).search!("anime", "frieren", new AbortController().signal);
+    expect(found.map((item) => [item.title, item.cover, item.link])).toEqual([["Sousou no Frieren", "https://s4.anilist.co/medium.jpg", "https://anilist.co/anime/154587"]]);
+    expect(JSON.parse(asked[0].replace("POST https://graphql.anilist.co ", "")).variables).toEqual({ search: "frieren" });
+  });
+
+  test("MyAnimeList, through Jikan: an anime by its id, without the credit its synopsis ends with", async () => {
+    answers.set("https://api.jikan.moe/v4/anime/52991/full", {
+      data: {
+        mal_id: 52991,
+        url: "https://myanimelist.net/anime/52991/Sousou_no_Frieren",
+        titles: [
+          { type: "Default", title: "Sousou no Frieren" },
+          { type: "English", title: "Frieren: Beyond Journey's End" },
+        ],
+        type: "TV",
+        episodes: 28,
+        season: "fall",
+        year: 2023,
+        studios: [{ name: "Madhouse" }],
+        synopsis: "During their decade-long quest to defeat the Demon King, the members of the hero's party grow close.\n\n[Written by MAL Rewrite]",
+        images: { jpg: { large_image_url: "https://cdn.myanimelist.net/images/anime/1015/138006l.jpg" } },
+      },
+    });
+    expect(await look(myanimelist.myanimelist, "https://myanimelist.net/anime/52991/Sousou_no_Frieren")).toEqual({
+      type: "anime",
+      title: "Frieren: Beyond Journey's End",
+      link: "https://myanimelist.net/anime/52991/Sousou_no_Frieren",
+      properties: [
+        ["format", "TV"],
+        ["studio", "Madhouse"],
+        ["year", "2023"],
+        ["season", "Fall 2023"],
+        ["episodes", "28"],
+        ["mal", "52991"],
+      ],
+      cover: "https://cdn.myanimelist.net/images/anime/1015/138006l.jpg",
+      description: "During their decade-long quest to defeat the Demon King, the members of the hero's party grow close.",
+    });
+    expect(asked).toEqual(["https://api.jikan.moe/v4/anime/52991/full"]);
+    answers.set("https://api.jikan.moe/v4/anime/1/full", 404);
+    expect(await look(myanimelist.myanimelist, "https://myanimelist.net/anime/1")).toBeNull();
   });
 });
 
