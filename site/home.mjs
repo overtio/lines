@@ -51,6 +51,7 @@ const MORE = [
   ["pen-tool", "Drawings"],
   ["send", "API requests"],
   ["play", "Audio and video"],
+  ["headphones", "Spotify and SoundCloud"],
   ["square-terminal", "Terminal recordings"],
   ["printer", "PDF and print"],
   ["lock", "Locked notes"],

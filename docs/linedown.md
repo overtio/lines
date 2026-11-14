@@ -295,7 +295,7 @@ A recording of a terminal from [asciinema](https://asciinema.org) plays in the n
 
 ## Spotify and SoundCloud
 
-A link to a song, album, playlist, artist, podcast or episode on [Spotify](https://open.spotify.com), or a track, set or someone's sounds on [SoundCloud](https://soundcloud.com), on a line of its own plays in the note with the site's own player, by the Spotify and SoundCloud [plugins](plugins.md). With a plugin off, its links are links.
+A link to a song, album, playlist, artist, podcast or episode on [Spotify](https://open.spotify.com), or a track, set or someone's sounds on [SoundCloud](https://soundcloud.com), on a line of its own plays in the note with the site's own player, by the Spotify and SoundCloud [plugins](plugins.md). Within a line of text it's a link, as is a bare address on a line of its own; with a plugin off, its links are links.
 
 ```markdown
 [Never Gonna Give You Up](https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC)
@@ -303,11 +303,13 @@ A link to a song, album, playlist, artist, podcast or episode on [Spotify](https
 [SoundCloud](https://soundcloud.com/forss/flickermood)
 ```
 
-- **Until it's played** it's a card like an audio file's, named by the link's text (or "Track on Spotify", where the text is only the site's name), saying the site's player loads when it's played. Nothing is asked of the site until then: its player loads from the site, which can then tell someone's listening.
-- **Played** (its button, or Enter with it selected), the card becomes the site's player, as wide as the note up to a column's width, which starts playing where the browser lets it (Chrome; in Safari a second press, in the player). SoundCloud's is in the theme's accent. Starting it pauses whatever else plays in lines (the podcast player, a sound in a note, another site's player), and the other way round.
-- **Spotify** plays 30 seconds of each song to someone not logged in to Spotify in that browser, and, it's likely, in Safari and the apps to everyone: WebKit has none of the protection (Widevine) Spotify's whole songs need in other browsers. **SoundCloud** plays whole tracks, as its site does.
-- Pasting a link to either on an empty line writes it as a link the player draws (`[Spotify](…)`); undo turns it back into the address. A bare address on a line of its own stays a link.
-- Like images, the players are drawn at the top level and in cards; within a line of text, in a list or in a quote, they're links. Printed, they're their links.
+- **Until it's played** it's a card like an audio file's, named by the link's text (or "Track on Spotify", where the text is only the site's name), saying the site's player loads when it's played; Spotify's says too that it plays 30-second previews without a Spotify login. Nothing is asked of the site until then: its player loads from the site, which can then tell someone's listening.
+- **Played** (its button, or Enter with it selected), the card becomes the site's player, as wide as the card was, and plays where the browser lets a page start it (Chrome); elsewhere (Safari) the player's own play button starts it. SoundCloud's is in the theme's accent. Starting it pauses whatever else plays in lines (the podcast player, a sound in a note, another site's player), and the other way round. Enter on a player that's loaded plays it again.
+- **Spotify** plays 30 seconds of each song, episode or show to someone not logged in to Spotify in that browser; the apps can't see a login. **SoundCloud** plays whole tracks, as its site does.
+- **Open on Spotify** (or SoundCloud), beside it, opens the link in the browser: in the apps, the links in the players themselves go nowhere.
+- A player that hasn't loaded within ten seconds (offline, or what it plays is gone or private) says it couldn't be, with Open on its site.
+- Pasting a link to either on an empty line writes it as a link the player draws, without what the site added to say who shared it (`[Spotify](https://open.spotify.com/track/…)`, no `?si=…`); undo turns it back into the address as pasted.
+- Like images, the players are drawn at the top level and in cards. Printed, they're their links. In LaTeX notes they're links.
 
 ## Folders and files on your computer
 

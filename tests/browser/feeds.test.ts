@@ -312,6 +312,30 @@ describe("subscribing", () => {
     app.errors.length = 0;
   });
 
+  test("to someone on SoundCloud whose sounds are a podcast: SoundCloud's feed of them; someone's whose feed has nothing in it, nothing", async () => {
+    const FEED = "https://feeds.soundcloud.com/users/soundcloud:users:20789805/sounds.rss";
+    const cors = { "access-control-allow-origin": "*" };
+    // Anything else of SoundCloud's isn't there.
+    await app.page.route((url) => url.hostname.endsWith("soundcloud.com"), (route) => route.fulfill({ status: 404, body: "", headers: cors }));
+    await app.page.route(
+      (url) => url.href.startsWith("https://soundcloud.com/oembed"),
+      (route) => {
+        const [name, id] = new URL(route.request().url()).searchParams.get("url")!.endsWith("/bader_b") ? ["BaderB", "20789805"] : ["Forss", "183"];
+        const html = `<iframe src="https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Fusers%2F${id}&show_artwork=true"></iframe>`;
+        return route.fulfill({ json: { title: name, author_name: name, html }, headers: cors });
+      },
+    );
+    // Someone's page names no feed.
+    await answer("https://soundcloud.com/forss", "<!doctype html><title>Forss</title>", "text/html");
+    await answer(FEED, fixture("soundcloud.rss"), "application/rss+xml");
+    await answer("https://feeds.soundcloud.com/users/soundcloud:users:183/sounds.rss", fixture("soundcloud.rss").replace(/<item>[\s\S]*<\/item>/, ""), "application/rss+xml");
+    const podcast = await subscribe("https://soundcloud.com/bader_b");
+    expect([podcast.url, podcast.title]).toEqual([FEED, "Melodic Techno Mix"]);
+    expect(podcast.note).toContain(`type: podcast\nauthor: BaderB\nfeed: ${FEED}`);
+    expect(await subscribe("https://soundcloud.com/forss")).toEqual({ error: "no feed" });
+    app.errors.length = 0;
+  });
+
   test("a podcast's site, whose own feed is for its posts: the podcast it links to, by its feed or its page on Apple Podcasts, but not one it only mentions", async () => {
     for (const host of ["www.syntax.fm", "syntax.fm", "mentions.example", "feeds.host.example"])
       await app.page.route((url) => url.hostname === host, (route) => route.fulfill({ status: 404, body: "", headers: { "access-control-allow-origin": "*" } }));

@@ -28,6 +28,10 @@ A terminal recording you made with `asciinema rec` plays above its card, in your
 
 [terminal.cast](attachment:terminal.cast)
 
+A Spotify or SoundCloud link on a line of its own is a card like this one. Press play and the site's own player loads in its place; nothing reaches the site before. Without a Spotify login, Spotify plays 30 seconds of each song.
+
+[Flickermood](https://soundcloud.com/forss/flickermood)
+
 Audio and video play right in the note, and audio keeps playing while you scroll and write. A video resizes by its corner, as a picture does.
 
 [Chime.mp3](attachment:chime.mp3)

@@ -935,7 +935,7 @@ const SCENES = [
   ...["lines", "classic", "pixel", "neon"].map((style) => ({
     id: `site-players-${style}`,
     title: `Spotify and SoundCloud links before they're played, in ${style[0].toUpperCase()}${style.slice(1)}`,
-    look: "Three cards like an audio file's, the same width: a round play button in the accent's soft box, then Never Gonna Give You Up, Flickermood and Album on Spotify, each with “Loads … player when you play it” faint under it; lined up with the text above, with room between them.",
+    look: "Three cards like an audio file's, the same width: a round play button in the accent's soft box, then Never Gonna Give You Up, Flickermood and Album on Spotify, faint under each “Loads … player when you play it” (Spotify's: with “30-second previews without a Spotify login”, wrapped if it must be); lined up with the text above, with room between them.",
     prefs: style === "lines" ? {} : { style, theme: style },
     note: "# Listening\n\nA few things to listen to this week.\n\n[Never Gonna Give You Up](https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC)\n\n[Flickermood](https://soundcloud.com/forss/flickermood)\n\n[Spotify](https://open.spotify.com/album/6N9PS4QXF1D0OWPk0Sxtb4)\n",
     shoot: ".editor-pane",
@@ -943,14 +943,19 @@ const SCENES = [
   })),
   {
     id: "site-players-playing",
-    title: "Spotify's and SoundCloud's players, played (needs a connection)",
-    look: "Spotify's player (Preview, the song's art and its own colors) and SoundCloud's below it with its buttons in the accent, each as wide as the note up to a column, the corners round; the album still a card. Nothing cut off, no frame refused.",
+    title: "Spotify's and SoundCloud's players, played (stand-ins for the sites')",
+    look: "Where each card was, its player (a stand-in box the height the site's is, a track's 152 and 166 pixels tall), as wide as its card was, the corners round, an Open button beside each; the album still a card, the same width. Nothing cut off, nothing refused, no message that it couldn't load.",
     note: "# Listening\n\n[Never Gonna Give You Up](https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC)\n\n[Flickermood](https://soundcloud.com/forss/flickermood)\n\n[Spotify](https://open.spotify.com/album/6N9PS4QXF1D0OWPk0Sxtb4)\n",
     act: async (page) => {
+      // Stand-ins, which say they're ready as the sites' players do, and play nothing.
+      const standIn = (site, ready) =>
+        `<!doctype html><meta charset="utf-8"><body style="margin:0;height:100vh;display:grid;place-items:center;background:#3b4b55;color:#fff;font:600 15px system-ui">${site}’s player<script>parent.postMessage(${ready}, "*")</script>`;
+      await page.route("https://open.spotify.com/embed/**", (route) => route.fulfill({ contentType: "text/html", body: standIn("Spotify", '{ type: "ready" }') }));
+      await page.route("https://w.soundcloud.com/player/**", (route) => route.fulfill({ contentType: "text/html", body: standIn("SoundCloud", 'JSON.stringify({ method: "ready", value: null })') }));
       await page.getByRole("button", { name: "Play with Spotify" }).first().click();
       await page.getByRole("button", { name: "Play with SoundCloud" }).click();
+      await page.locator(".cm-lp-site-player").first().hover();
     },
-    wait: 5000,
     shoot: ".editor-pane",
   },
   ...["block", "underline", "thick"].map((shape) => ({

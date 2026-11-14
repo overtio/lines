@@ -75,7 +75,6 @@ export const builtIn = (): Plugin[] => [
   openLibrary(),
   wikidata(),
   musicbrainz(),
-  // After MusicBrainz, which knows more of a song or album where it knows its link.
   spotify(),
   soundcloud(),
   applePodcasts(),

@@ -1591,6 +1591,8 @@
   position: relative;
   width: min(100%, 30em);
   border-radius: calc(12px * var(--radius-scale));
+  /* The note's pre-wrap would keep the spaces between its parts. */
+  white-space: normal;
 }
 
 .cm-lp-site-card {

@@ -129,8 +129,9 @@ A spreadsheet's grid (`src/plugins/spreadsheet/Grid.svelte`, [spreadsheets.md](s
 
 ## Spotify and SoundCloud
 
-- A link to either on a line of its own is a group named by the link's text (or "Track on Spotify"), with a button, "Play with Spotify". ↑ and ↓ stop on it; with it selected, Enter loads the site's player and puts focus in it, where Tab reaches its buttons.
-- The player is the site's own, in a frame titled "Spotify player: …": its buttons are named by the site, in the site's language. Esc can't leave it, as keys pressed in another site's frame don't reach lines; Tab and ⇧Tab do.
+- A link to either on a line of its own is a group named by the link's text (or "Track on Spotify"), with a button, "Play with Spotify". ↑ and ↓ stop on it; with it selected, Enter loads the site's player and puts focus in it, and Enter on a loaded one plays it again.
+- The player is the site's own, in a frame titled "Spotify player: …": its buttons are named by the site, in the site's language. Keys pressed in it never reach lines, so Esc can't leave it: Tab past its last button (and Open on Spotify, beside it) or ⇧Tab before its first goes back to the note's text with it selected. These are in Settings → Shortcuts.
+- One that couldn't be loaded says so in words, in its place, with Open on its site.
 
 ## Terminal recordings
 
