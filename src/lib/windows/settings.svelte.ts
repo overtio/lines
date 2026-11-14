@@ -2,7 +2,7 @@ import { tick } from "svelte";
 import { t } from "../i18n/index.svelte";
 import type { LockSettings } from "../lock/lock.svelte";
 import type { NotesPassword } from "../notes/noteKeys.svelte";
-import { imports } from "../library/imports.svelte";
+import { imports } from "../imports/imports.svelte";
 import { isDesktopApp } from "../platform";
 import { prefs, type SettingsOpens } from "../prefs.svelte";
 import { sectionOf, type SettingsSection } from "../components/settings/sections";
@@ -96,7 +96,7 @@ const FORWARDED: Record<string, string[]> = {
   lockedNotes: ["unlock", "changePassword", "reset", "setTouchId"],
   notes: ["addSamples", "reset", "setFilter"],
   feeds: ["importOpml"],
-  imports: ["start", "stop", "undo", "clear"],
+  imports: ["receive", "start", "stop", "undo", "clear"],
 };
 
 /**

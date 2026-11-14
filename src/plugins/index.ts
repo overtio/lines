@@ -21,6 +21,7 @@ import { markdown } from "./markdown";
 import { mermaid } from "./mermaid";
 import { models } from "./models";
 import { musicbrainz } from "./musicbrainz";
+import { obsidian } from "./obsidian";
 import { openLibrary } from "./open-library";
 import { paper } from "./paper";
 import { pdfReader } from "./pdf-reader";
@@ -86,6 +87,8 @@ export const builtIn = (): Plugin[] => [
   hackerNews(),
   // Bringing a library in from another app.
   readwise(),
+  // Bringing notes in from another app.
+  obsidian(),
   // Books kept with library notes, read in the note's place.
   pdfReader(),
   epubReader(),

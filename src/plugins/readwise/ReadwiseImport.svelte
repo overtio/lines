@@ -1,7 +1,7 @@
 <script lang="ts">
   // Readwise's group of Settings → Library: an access token, to ask Readwise what it has (api.ts),
   // kept only in the field, which empties once Readwise has answered; then what importing it would
-  // do, the import, and Undo (ImportStep.svelte, lib/library/imports.svelte.ts).
+  // do, the import, and Undo (ImportStep.svelte, lib/imports/imports.svelte.ts).
   import { onDestroy, tick } from "svelte";
   import { speak } from "../../lib/a11y";
   import ImportStep from "../../lib/components/settings/ImportStep.svelte";
@@ -10,7 +10,7 @@
   import FieldRow from "../../lib/components/ui/FieldRow.svelte";
   import TextField from "../../lib/components/ui/TextField.svelte";
   import { locale, t } from "../../lib/i18n/index.svelte";
-  import { imports } from "../../lib/library/imports.svelte";
+  import { imports } from "../../lib/imports/imports.svelte";
   import { notes } from "../../lib/notes/store.svelte";
   import { openExternal } from "../../lib/platform";
   import type { ImportFile } from "../../lib/plugins/types";
@@ -153,7 +153,7 @@
       onimport={() => found && imports.start(ID, found.input)}
       oncancel={close}
       result={(done) => [t("readwise.added", { count: done.added }), ...(done.appended ? [t("readwise.updated", { count: done.appended })] : [])].join(" ")}
-      undone={(undone) => [t("readwise.undone", { count: undone.removed }), ...(undone.restored ? [t("readwise.restored", { count: undone.restored })] : [])].join(" ")}
+      undone={(undone) => [t("readwise.undone", { count: undone.trashed }), ...(undone.restored ? [t("readwise.restored", { count: undone.restored })] : [])].join(" ")}
     />
   {/key}
 {/if}

@@ -148,9 +148,10 @@ export const library = (): Plugin => ({
     libraryKinds: KINDS,
     markdown: [{ editor: [linkLookups, linkAdds] }],
     linkActions: [{ label: t("library.add.title"), icon: "library", edits: true, run: (view, link) => void addLink(view, link) }],
-    libraryImports: [
+    imports: [
       {
         id: "bookmarks",
+        into: "library",
         name: t("library.bookmarks.title"),
         note: t("library.bookmarks.note"),
         panel: () => import("../../lib/components/settings/BookmarkImport.svelte"),

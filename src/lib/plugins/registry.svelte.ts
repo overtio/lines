@@ -102,7 +102,7 @@ class Plugins {
       .sort((a, b) => Number(!!a.general) - Number(!!b.general));
   });
   readonly linkActions = $derived(this.#from("linkActions"));
-  readonly libraryImports = $derived(this.#from("libraryImports"));
+  readonly imports = $derived(this.#from("imports"));
   readonly discussions = $derived(this.#from("discussions"));
   readonly playerParts = $derived(this.#from("playerParts"));
 

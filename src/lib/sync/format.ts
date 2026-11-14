@@ -2,7 +2,7 @@ import { ICONS, type IconName } from "../icons/icons";
 import { isPaletteColor } from "../palette";
 import { isWrappedKey } from "../notes/noteKeys.svelte";
 import { DEFAULT_LANGUAGE } from "../plugins/registry.svelte";
-import type { Note, NoteLock } from "../notes/types";
+import type { Note, NoteLock, NoteSource } from "../notes/types";
 
 /*
  * Notes are stored remotely as ordinary Markdown files with a small front
@@ -17,11 +17,13 @@ import type { Note, NoteLock } from "../notes/types";
  *   icon: rocket
  *   color: green
  *   format: latex
+ *   source: {"app":"obsidian","collection":{"id":"9c2e…","name":"Vault"},"id":"Projects/Plan.md","name":"Plan"}
  *   ---
  *   # My note
  *
  * `inbox: true` is only there for a note in the Inbox, `icon` and `color` for a note that has one, and `format` for a note not written in Markdown
- * (the id of its language, which a plugin adds), so other notes stay byte for byte as they were.
+ * (the id of its language, which a plugin adds), and `source` for one imported from another app (as JSON), so other notes stay byte for byte as they were.
+ * A line this version doesn't know, a newer one's, is kept and written back as it was.
  * A language this device doesn't have is kept as it is.
  *
  * A locked note's Markdown is encrypted (see notes/noteKeys.svelte.ts). What it keeps readable,
@@ -46,6 +48,8 @@ export function serialize(note: Note): string {
     ...(note.icon ? [`icon: ${note.icon}`] : []),
     ...(note.color ? [`color: ${note.color}`] : []),
     ...(note.format ? [`format: ${note.format}`] : []),
+    ...(note.source ? [`source: ${JSON.stringify(note.source)}`] : []),
+    ...Object.entries(note.header ?? {}).map(([key, value]) => `${key}: ${value}`),
     ...(lock ? [`locked: ${JSON.stringify(lock)}`] : []),
     "---",
     note.locked ? note.locked.sealed : note.body,
@@ -75,6 +79,8 @@ export function deserialize(text: string, fallbackId: string): Note {
   const format = fields.get("format");
   const body = match ? text.slice(match[0].length) : text;
   const locked = readLock(fields.get("locked"), body);
+  const source = readSource(fields.get("source"));
+  const header = Object.fromEntries([...fields].filter(([key]) => !KNOWN.has(key)));
   return {
     id: fields.get("id") || fallbackId,
     body: locked ? "" : body,
@@ -87,8 +93,13 @@ export function deserialize(text: string, fallbackId: string): Note {
     ...(isPaletteColor(color) ? { color } : {}),
     ...(isLanguage(format) ? { format } : {}),
     ...(locked ? { locked } : {}),
+    ...(source ? { source } : {}),
+    ...(Object.keys(header).length ? { header } : {}),
   };
 }
+
+/** The header's lines this version reads; others are a newer version's, kept as they are (`Note.header`). */
+const KNOWN = new Set(["id", "created", "updated", "pinned", "trashed", "inbox", "icon", "color", "format", "locked", "source"]);
 
 /** A language's id, other than Markdown's, which is what a note without one is in. */
 const isLanguage = (id: string | undefined): id is string => !!id && id !== DEFAULT_LANGUAGE && /^[a-z0-9][a-z0-9-]*$/.test(id);
@@ -99,6 +110,18 @@ function readLock(field: string | undefined, body: string): NoteLock | undefined
     const { title, files, key } = JSON.parse(field);
     if (typeof title !== "string" || !Array.isArray(files) || !isWrappedKey(key)) return;
     return { key, title, files: files.filter((file): file is string => typeof file === "string"), sealed: body.trim() };
+  } catch {
+    return;
+  }
+}
+
+function readSource(field: string | undefined): NoteSource | undefined {
+  if (!field) return;
+  try {
+    const { app, collection, id, name } = JSON.parse(field);
+    if (![app, id, name].every((value) => typeof value === "string")) return;
+    const known = typeof collection?.id === "string" && typeof collection.name === "string";
+    return { app, ...(known && { collection: { id: collection.id, name: collection.name } }), id, name };
   } catch {
     return;
   }

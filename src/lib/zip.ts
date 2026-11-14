@@ -94,6 +94,8 @@ export function zip(entries: ZipEntry[]): Uint8Array<ArrayBuffer> {
 export interface ZippedFile {
   /** Its size unpacked, as the ZIP says. */
   size: number;
+  /** When it was last changed, as the ZIP says (ms; to two seconds, in local time, as ZIP keeps it). */
+  modified: number;
   /** Its bytes; rejects for one bigger than the ZIP says it is, or than the limit. */
   read(): Promise<Uint8Array<ArrayBuffer>>;
 }
@@ -142,6 +144,8 @@ export function zipEntries(data: Uint8Array<ArrayBuffer>, limit = LIMIT): Map<st
   for (let count = view.getUint16(end + 10, true); count > 0; count--) {
     if (view.getUint32(at, true) !== 0x02014b50) throw new Error("A damaged ZIP file");
     const method = view.getUint16(at + 10, true);
+    const time = view.getUint16(at + 12, true);
+    const day = view.getUint16(at + 14, true);
     const packed = view.getUint32(at + 20, true);
     const size = view.getUint32(at + 24, true);
     const nameLength = view.getUint16(at + 28, true);
@@ -153,6 +157,7 @@ export function zipEntries(data: Uint8Array<ArrayBuffer>, limit = LIMIT): Map<st
     const stored = data.subarray(start, start + packed);
     files.set(name, {
       size,
+      modified: new Date((day >> 9) + 1980, ((day >> 5) & 15) - 1, day & 31, time >> 11, (time >> 5) & 63, (time & 31) * 2).getTime(),
       async read() {
         if (size > limit || (method === 0 && packed !== size)) throw tooBig();
         return method === 0 ? stored : inflate(stored, size);

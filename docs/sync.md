@@ -49,7 +49,7 @@ trashed: false
 Plain Markdown, readable by any editor.
 ```
 
-A note in the Inbox has an `inbox: true` line, and loses it once filed. A note with an icon has an `icon` line, and one with a color a `color` line. A note in another format has a `format` line, followed by its text: `format: latex` and its LaTeX ([latex.md](latex.md)), or `format: spreadsheet` and its title and CSV ([spreadsheets.md](spreadsheets.md#its-text)).
+A note in the Inbox has an `inbox: true` line, and loses it once filed. A note with an icon has an `icon` line, and one with a color a `color` line. A note in another format has a `format` line, followed by its text: `format: latex` and its LaTeX ([latex.md](latex.md)), or `format: spreadsheet` and its title and CSV ([spreadsheets.md](spreadsheets.md#its-text)). A note imported from another app has a `source` line saying where it came from, as JSON ([importing.md](importing.md#importing-again)). A line lines doesn't know, a newer version's, is kept as it is and written back when the note changes.
 
 Importing such a file (Settings → Export and Import → Import Files…) brings the note back as it was, with its id, unless a note on the device has that id; then it comes in as a note of its own, so an import never replaces one.
 

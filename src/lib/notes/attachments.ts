@@ -33,6 +33,7 @@ const IMAGES: Record<string, string> = {
 /** The type stored with an attachment, by extension; anything else is plain bytes. */
 const TYPES: Record<string, string> = {
   ...Object.fromEntries(Object.entries(IMAGES).map(([type, ext]) => [ext, type])),
+  jpeg: "image/jpeg",
   pdf: "application/pdf",
   epub: "application/epub+zip",
   txt: "text/plain",
@@ -140,13 +141,14 @@ export async function attachmentNameOf(file: Blob, bytes?: Uint8Array<ArrayBuffe
 /** An attachment's extension: `csv` for `3b8a….csv`. */
 export const extensionOf = (name: string) => name.slice(name.lastIndexOf(".") + 1);
 
-const typeOf = (name: string) => TYPES[extensionOf(name)] ?? "application/octet-stream";
+/** What kind of file an attachment, or a file to keep as one, is, by its name's extension. */
+export const attachmentType = (name: string) => TYPES[extensionOf(name).toLowerCase()] ?? "application/octet-stream";
 
 export type MediaKind = "audio" | "video";
 
 /** Whether an attachment is audio or video, which notes play; null for any other file. */
 export function mediaKind(name: string): MediaKind | null {
-  const kind = typeOf(name).split("/")[0];
+  const kind = attachmentType(name).split("/")[0];
   return kind === "audio" || kind === "video" ? kind : null;
 }
 
@@ -165,7 +167,7 @@ export async function putAttachment(name: string, data: Blob) {
 
 /** Encrypted while the app lock is on. */
 async function store(name: string, data: Blob) {
-  const type = typeOf(name);
+  const type = attachmentType(name);
   await attachmentStore.put(
     vault.sealing
       ? await sealRecord("attachments", name, new Uint8Array(await data.arrayBuffer()))
@@ -176,7 +178,7 @@ async function store(name: string, data: Blob) {
 export async function getAttachment(name: string): Promise<Blob | null> {
   const value = await attachmentStore.get(name);
   if (!value) return null;
-  const type = typeOf(name);
+  const type = attachmentType(name);
   if (isSealed(value)) return new Blob([await openRecord("attachments", value)], { type });
   // One stored before its kind was known here (a FLAC file, say) gets its type now, which WebKit needs to play it.
   return value.data.type === type ? value.data : new Blob([value.data], { type });

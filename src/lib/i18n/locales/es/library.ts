@@ -45,13 +45,6 @@ export default {
   "library.resource": "Recurso",
   "library.resources": "Recursos",
   "library.lookUpDetails": "Buscar los detalles",
-  "library.import.progress": "Importando… {done} de {count}",
-  "library.import.stop": "Detener",
-  "library.import.stopped": "Detenida: lo importado hasta entonces se queda, y Deshacer la importación lo quita.",
-  "library.import.failed": "Algo falló a mitad y se detuvo. Lo importado hasta entonces se queda, y Deshacer la importación lo quita.",
-  "library.import.undo": "Deshacer la importación",
-  "library.import.kept": "{count, plural, one {Se queda # que has cambiado desde entonces.} other {Se quedan # que has cambiado desde entonces.}}",
-  "library.import.unavailable": "No se pudo cargar. Inténtalo de nuevo después de reiniciar lines.",
   "library.bookmarks.title": "Marcadores",
   "library.bookmarks.note":
     "Los marcadores exportados de un navegador (Chrome, Edge, Firefox, Safari, Brave, Arc…) o de Pocket, Pinboard o Raindrop pasan a ser recursos de la biblioteca, una nota cada uno. No se busca nada al importarlos; cada uno puede buscarse después, desde su menú.",
@@ -68,7 +61,7 @@ export default {
   "library.bookmarks.start": "{count, plural, one {Importar # recurso} other {Importar # recursos}}",
   "library.bookmarks.imported":
     "{count, plural, =0 {Nada nuevo que importar} one {Se ha importado # recurso} other {Se han importado # recursos}}{there, plural, =0 {} one {; # ya estaba} other {; # ya estaban}}",
-  "library.bookmarks.undone": "{count, plural, one {Importación deshecha: se ha quitado # recurso} other {Importación deshecha: se han quitado # recursos}}",
+  "library.bookmarks.undone": "{count, plural, one {Importación deshecha: # recurso movido a la Papelera} other {Importación deshecha: # recursos movidos a la Papelera}}",
   "library.bookmarks.unreadable": "{name} no es un archivo de marcadores que lines pueda leer.",
   "library.settings.links": "Enlaces",
   "library.settings.lookUp": "Buscar enlaces",

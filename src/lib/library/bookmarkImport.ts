@@ -1,7 +1,7 @@
 import { notes } from "../notes/store.svelte";
 import { libraryLinkOf } from "./adding";
 import { type Bookmark, bookmarkItem, planImport } from "./bookmarks";
-import type { ImportWork } from "./imports.svelte";
+import type { ImportWork } from "../imports/imports.svelte";
 
 /*
  * Bookmarks made into the Library's resources (Settings → Library → Bookmarks): what an import of

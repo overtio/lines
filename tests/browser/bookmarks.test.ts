@@ -91,7 +91,8 @@ async function chooseBookmarks(files: { name: string; text: string }[]) {
   return settings;
 }
 
-const resources = () => app.page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "resource").map((entry) => entry.note));
+/** The resources there are, but those in the Trash. */
+const resources = () => app.page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "resource" && !entry.note.trashed).map((entry) => entry.note));
 
 test("imported from Settings → Library: what it will do, said first, then done, filed on their shelf, and undone", async () => {
   app = await openApp();
@@ -138,10 +139,11 @@ test("imported from Settings → Library: what it will do, said first, then done
   expect([rust.createdAt, rust.updatedAt]).toEqual([1700000400000, 1700000400000]);
   expect(made.some((note) => note.inbox)).toBe(false);
 
-  // Undone while it says what it did: they're gone, and nothing else.
+  // Undone while it says what it did: they're in the Trash, and nothing else.
   await settings.getByRole("button", { name: "Undo Import" }).click();
-  await settings.getByText("Import undone: 3 resources removed").waitFor();
+  await settings.getByText("Import undone: 3 resources moved to the Trash").waitFor();
   expect(await resources()).toEqual([]);
+  expect(await page.evaluate(() => window.testing.notes.counts.trash)).toBe(3);
   expect(await page.evaluate((id) => !!window.testing.notes.get(id), kept)).toBe(true);
 
   // Imported again, they're on their shelf, the latest bookmarked first.

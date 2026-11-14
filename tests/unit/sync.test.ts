@@ -195,6 +195,41 @@ describe("sync, of a note changed on two devices", () => {
     expect(notes.get(id)!.note.inbox).toBeFalsy();
   });
 
+  test("a note imported from another app says where it came from on every device, edited or not; its conflicted copy doesn't", async () => {
+    const [here, there] = await devices(2);
+    const source = { app: "obsidian", collection: { id: "c1", name: "Vault" }, id: "Projects/Plan.md", name: "Plan" };
+    await notes.insert({ id: "imported", body: "# Plan\n\none", createdAt: 1, updatedAt: 1, pinned: false, trashed: false, source });
+    await here.sync();
+    expect(drive.get(fileOf("imported"))!.text).toContain(`\nsource: ${JSON.stringify(source)}\n`);
+    await there.sync();
+    notes.update("imported", "# Plan\n\none\ntwo");
+    await there.sync();
+    await here.sync();
+    expect(notes.get("imported")!.note).toMatchObject({ body: "# Plan\n\none\ntwo", source });
+    // Edited on both: the copy isn't where the note came from, so links and importing again find the note.
+    await there.open();
+    notes.update("imported", "# Plan\n\nthere");
+    await there.sync();
+    await here.open();
+    notes.update("imported", "# Plan\n\nhere");
+    await here.sync();
+    const copy = notes.entries.find(({ note }) => note.id !== "imported")!.note;
+    expect([copy.body.startsWith("# Plan (conflicted copy"), copy.source]).toEqual([true, undefined]);
+  });
+
+  test("what a newer version writes in a note's header is kept here, and written back when it's edited", async () => {
+    const [here] = await devices(1);
+    const id = notes.add("# Plan\n\none");
+    await here.sync();
+    const { text } = drive.get(fileOf(id))!;
+    drive.set(fileOf(id), { text: text.replace("\ntrashed: false\n", "\ntrashed: false\nfuture: {\"kept\":true}\n").replace("one", "one\ntwo"), etag: "newer" });
+    await here.sync();
+    expect(notes.get(id)!.note.header).toEqual({ future: '{"kept":true}' });
+    notes.update(id, "# Plan\n\none\ntwo\nthree");
+    await here.sync();
+    expect(drive.get(fileOf(id))!.text).toContain('\nfuture: {"kept":true}\n---\n# Plan\n\none\ntwo\nthree');
+  });
+
   test("a note moved to the trash while it's edited elsewhere goes there with the edit", async () => {
     const [here, there] = await devices(2);
     const id = notes.add("# Draft\n\none");
@@ -398,5 +433,29 @@ describe("sync, once every synced note was deleted on another device", () => {
     expect(sync.status).toBe("idle");
     expect(bodies()).toEqual(["# Only note", "# Written here since"]);
     expect(noteFiles()).toHaveLength(2);
+  });
+});
+
+describe("mentions of notes imported from another app", () => {
+  const collection = { id: "c1", name: "Vault" };
+  const imported = (id: string, body: string, name: string, { updatedAt = 1, from = collection } = {}) =>
+    notes.insert({ id, body, createdAt: 1, updatedAt, pinned: false, trashed: false, source: { app: "obsidian", collection: from, id: `${name}.md`, name } });
+
+  test("find a note renamed here by the name it had there, from a note imported with it, the one edited last of two", async () => {
+    await devices(1);
+    await imported("plan", "# Q3 plan", "Plan");
+    await imported("links", "# Links\n\n[[Plan]]", "Links");
+    await imported("other-vault", "# Elsewhere", "Elsewhere", { from: { id: "c2", name: "Vault" } });
+    await notes.insert({ id: "mine", body: "# Mine\n\n[[Plan]]", createdAt: 1, updatedAt: 1, pinned: false, trashed: false });
+    const from = (id: string) => notes.get(id)!.note;
+    expect(notes.find("Plan", from("links"))?.note.id).toBe("plan");
+    // Not from a note of lines' own, which offers to create Plan, nor from another vault's.
+    expect(notes.find("Plan", from("mine"))).toBeUndefined();
+    expect(notes.find("Plan", from("other-vault"))).toBeUndefined();
+    // A title here wins; and of two once called Plan, the one edited last.
+    await imported("plan-2", "# Plan B", "Plan", { updatedAt: 5 });
+    expect(notes.find("Plan", from("links"))?.note.id).toBe("plan-2");
+    await notes.insert({ id: "titled", body: "# Plan", createdAt: 1, updatedAt: 1, pinned: false, trashed: false });
+    expect(notes.find("Plan", from("links"))?.note.id).toBe("titled");
   });
 });

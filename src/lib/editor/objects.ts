@@ -32,7 +32,7 @@ import { type Entry, notes } from "../notes/store.svelte";
 import { typeLooks } from "../notes/looks.svelte";
 import { speak } from "../a11y";
 import { announce, windowLabel } from "../windows/channel";
-import { ancestors } from "./util";
+import { ancestors, editedNote } from "./util";
 
 /*
  * Objects in the editor (see notes/properties.ts): the note's front matter, read from its first
@@ -135,11 +135,14 @@ export class MentionWidget extends WidgetType {
   }
 }
 
+/** The note an editor shows, which a mention in it finds notes from (`notes.find`). */
+const shownNote = (state: EditorState) => notes.get(state.facet(editedNote) ?? "")?.note;
+
 /**
- * How the mention written as `text` is drawn: a widget, or why it can't be (shown as written). A
- * mention of a note there isn't gets a card on hover instead (`missingNotes`), which says so.
+ * How the mention written as `text` in `state` is drawn: a widget, or why it can't be (shown as
+ * written). A mention of a note there isn't gets a card on hover instead (`missingNotes`), which says so.
  */
-export function drawMention(text: string): { widget: MentionWidget } | { missing: string | null } {
+export function drawMention(text: string, state: EditorState): { widget: MentionWidget } | { missing: string | null } {
   const ref = readTypeRef(text);
   if (ref) {
     const count = notes.ofType(ref.type).length;
@@ -149,7 +152,7 @@ export function drawMention(text: string): { widget: MentionWidget } | { missing
     return { widget: new MentionWidget("", label, typeLooks.icon(notes.ofType(ref.type)[0].meta.type), tip, ref.type) };
   }
   const mention = readMention(text);
-  const entry = mention && notes.find(mention.name);
+  const entry = mention && notes.find(mention.name, shownNote(state));
   if (!mention || !entry) return { missing: null };
   const { note, meta } = entry;
   const title = meta.title || t("editor.untitled");
@@ -325,12 +328,12 @@ function createMentioned(written: string) {
  * Opens what the mention written as `written` is of, as ⌘-click on it does: the note (a property's
  * too), or a type's notes in the list. A note that isn't there yet is made (`createMentioned`).
  */
-export function openMention(written: string) {
+export function openMention(written: string, state: EditorState) {
   const ref = readTypeRef(written);
   if (ref) return openType(ref.type);
   const mention = readMention(written);
   if (!mention) return;
-  const entry = notes.find(mention.name);
+  const entry = notes.find(mention.name, shownNote(state));
   if (entry) openNote(entry.note.id);
   else createMentioned(written);
 }
@@ -347,7 +350,7 @@ export const missingNotes = hoverTooltip(
     const { from, to } = node;
     const written = view.state.sliceDoc(from, to);
     const mention = readMention(written);
-    if (!mention || readTypeRef(written) || notes.find(mention.name)) return null;
+    if (!mention || readTypeRef(written) || notes.find(mention.name, shownNote(view.state))) return null;
     const title = titleFrom(written, mention.name);
     return {
       pos: from,

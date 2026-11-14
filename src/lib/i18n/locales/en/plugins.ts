@@ -160,6 +160,7 @@ export default {
   "plugins.hackerNews.description": "Shows a Hacker News story’s comments under its post in the Library’s Feeds, threaded, to read. The story’s id goes to Hacker News’ API and to Algolia’s copy of it.",
   "plugins.readwise.description":
     "Brings your highlights from Readwise, and what you saved in Reader, into the Library, from Settings → Library. Uses an access token from Readwise, sent only to Readwise and not kept.",
+  "plugins.obsidian.description": "Moving from Obsidian: a vault’s notes, with their folders, links, pictures and files, from Settings → Export and Import.",
   "plugins.pdfReader": "PDF Reader",
   "plugins.pdfReader.description": "Reads PDFs kept with books and papers in the Library, in the note’s place: pages in the theme’s colors, contents, search, and quotes kept in the note. Uses Mozilla’s pdf.js.",
   "plugins.epubReader": "EPUB Reader",

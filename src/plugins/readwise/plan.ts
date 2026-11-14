@@ -1,5 +1,5 @@
 import { linkKey } from "../../lib/library/bookmarks";
-import type { ImportWork, NewNote } from "../../lib/library/imports.svelte";
+import type { ImportWork, NewLibraryNote } from "../../lib/imports/imports.svelte";
 import { nameOf, propertyOf } from "../../lib/notes/properties";
 import type { Entry } from "../../lib/notes/store.svelte";
 import { isClosed } from "../../lib/notes/types";
@@ -32,7 +32,7 @@ interface Target {
 }
 
 export interface Plan {
-  work: ImportWork;
+  work: ImportWork<NewLibraryNote>;
   /** New notes, by kind (`book`). */
   kinds: Map<string, number>;
   /** Highlights in new notes. */
@@ -130,7 +130,7 @@ class Notes {
 }
 
 /** The new note for a source: the library's note of it, with Readwise's and Reader's ids, where it's got to, and its highlights after. */
-function newNote(source: Source, highlights: Highlight[]): NewNote {
+function newNote(source: Source, highlights: Highlight[]): NewLibraryNote {
   const ids = (
     [
       ["readwise", source.readwise?.toString()],

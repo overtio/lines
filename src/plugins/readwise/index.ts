@@ -19,9 +19,10 @@ export const readwise = (): Plugin => ({
   enabledByDefault: true,
   requires: ["library"],
   contributes: {
-    libraryImports: [
+    imports: [
       {
         id: "readwise",
+        into: "library",
         name: "Readwise",
         note: t("readwise.note"),
         panel: () => import("./ReadwiseImport.svelte"),

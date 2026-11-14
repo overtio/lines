@@ -149,6 +149,7 @@ export default {
   "plugins.hackerNews.description": "Affiche les commentaires d’un article de Hacker News sous sa publication dans les Flux de la Bibliothèque, en fils de discussion, à lire. Son identifiant est envoyé à l’API de Hacker News et à la copie d’Algolia.",
   "plugins.readwise.description":
     "Importe dans la Bibliothèque vos surlignages de Readwise et ce que vous avez enregistré dans Reader, depuis Réglages → Bibliothèque. Utilise un jeton d’accès de Readwise, envoyé uniquement à Readwise et non conservé.",
+  "plugins.obsidian.description": "Pour passer d’Obsidian : les notes d’un coffre, avec leurs dossiers, liens, images et fichiers, depuis Réglages → Exporter et importer.",
   "plugins.pdfReader": "Lecteur PDF",
   "plugins.pdfReader.description": "Lit les PDF gardés avec les livres et les articles de la Bibliothèque, à la place de la note : pages aux couleurs du thème, table des matières, recherche, et citations gardées dans la note. Utilise pdf.js de Mozilla.",
   "plugins.epubReader": "Lecteur EPUB",

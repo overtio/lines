@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "type": "file", "ctime": 1731571200000, "path": "Projects/Plan.md" },
+    { "type": "group", "ctime": 1731571200000, "title": "Later", "items": [{ "type": "file", "ctime": 1731571200000, "path": "Ideas.md" }] },
+    { "type": "search", "ctime": 1731571200000, "query": "tag:#inbox" }
+  ]
+}

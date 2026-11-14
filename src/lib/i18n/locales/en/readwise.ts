@@ -22,7 +22,7 @@ export default {
   "readwise.import": "Import",
   "readwise.added": "{count, plural, =0 {No notes added.} one {Added # note.} other {Added # notes.}}",
   "readwise.updated": "{count, plural, one {Added highlights to # note there already.} other {Added highlights to # notes there already.}}",
-  "readwise.undone": "{count, plural, =0 {Import undone.} one {Import undone: the note it added is removed.} other {Import undone: the # notes it added are removed.}}",
+  "readwise.undone": "{count, plural, =0 {Import undone.} one {Import undone: the note it added is in the Trash.} other {Import undone: the # notes it added are in the Trash.}}",
   "readwise.restored": "{count, plural, one {The note it added to is as it was.} other {The # notes it added to are as they were.}}",
   "readwise.badToken": "Readwise didn’t accept this token. Copy it again from Readwise.",
   "readwise.answered": "Readwise answered {status}. Try again in a while.",

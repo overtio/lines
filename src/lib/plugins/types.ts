@@ -11,7 +11,7 @@ import type { NoteStats } from "../notes/stats";
 import type { NoteMeta } from "../notes/types";
 import type { Episode } from "../player/player.svelte";
 import type { Parts } from "../print/parts";
-import type { ImportWork } from "../library/imports.svelte";
+import type { ImportWork } from "../imports/imports.svelte";
 
 /*
  * What a plugin is, and what it can add to lines (docs/plugins.md). lines' own languages, themes,
@@ -98,8 +98,11 @@ export interface Contributions {
   librarySources?: LibrarySource[];
   /** What a web link in a note can be used for, in its menu (right-click it) after Open and Copy: added to the Library, say. */
   linkActions?: LinkAction[];
-  /** Ways to bring things into the Library from elsewhere (a browser's bookmarks, Readwise), each a group of Settings → Library. */
-  libraryImports?: LibraryImport[];
+  /**
+   * Ways to bring things in from elsewhere, each a group of Settings: notes from another app
+   * (Obsidian), in Export and Import; things for the Library (a browser's bookmarks, Readwise), in Library.
+   */
+  imports?: Import[];
   /** Sites whose discussion of a post lines shows under it, from the post's comments link: Hacker News'. */
   discussions?: DiscussionSource[];
   /** What the podcast player has for the episode in it: buttons beside its own, and what shows above it (a transcript). */
@@ -123,12 +126,14 @@ export interface ImportFile {
 }
 
 /**
- * A way to bring things into the Library from another app or its files: its group of Settings →
- * Library, which says what importing would do before anything's written (ImportStep.svelte), then
- * has the import done in the main window (lib/library/imports.svelte.ts), which can take it back.
+ * A way to bring things into lines from another app or its files: its group of Settings, which says
+ * what importing would do before anything's written (ImportStep.svelte), then has the import done in
+ * the main window (lib/imports/imports.svelte.ts), which can take it back.
  */
-export interface LibraryImport {
+export interface Import {
   id: string;
+  /** What it brings in, which says where in Settings it's offered: notes (Export and Import), or things for the Library. */
+  into: "notes" | "library";
   /** Its group's heading and what it says under it: "Bookmarks". */
   name: string;
   note: string;
