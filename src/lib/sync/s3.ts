@@ -23,6 +23,33 @@ function encodeKey(key: string) {
 /** Buckets found this session not to do conditional writes, though they don't ignore them: written to as before. */
 const unconditional = new Set<string>();
 
+/** Why the app's native side couldn't transfer a file: the bucket's answer, or none (status null). */
+interface Failure {
+  status: number | null;
+  text: string;
+}
+
+/**
+ * Sends a request whose body or response is a file from the app's native side, with the file as
+ * bytes both ways (src-tauri/src/bucket_sync.rs). The HTTP plugin (`webFetch`) would send the body
+ * as JSON, a number for each byte: a 50 MB file was 180 MB of text, seconds to write and nearly
+ * 2 GB of memory to read. The response has the bucket's status and body, not its headers.
+ */
+async function transfer(request: Request): Promise<Response> {
+  const { invoke } = await import("@tauri-apps/api/core");
+  const signed = { method: request.method, url: request.url, headers: [...request.headers] };
+  try {
+    const body = await invoke<ArrayBuffer>("sync_bucket_transfer", new Uint8Array(await request.arrayBuffer()), {
+      headers: { "x-request": encodeURIComponent(JSON.stringify(signed)) },
+    });
+    return new Response(body);
+  } catch (error) {
+    const { status, text } = error as Failure;
+    if (typeof status === "number") return new Response(text, { status });
+    throw new Error(text ?? String(error), { cause: error });
+  }
+}
+
 export class S3Remote implements Remote {
   #client: AwsClient;
   #base: string;
@@ -38,14 +65,16 @@ export class S3Remote implements Remote {
     this.#base = `${config.endpoint.replace(/\/+$/, "")}/${encodeURIComponent(config.bucket)}`;
   }
 
-  /** A failure is thrown as an error, but for the statuses in `answers` (404: there's nothing there). */
-  async #request(path: string, init: RequestInit = {}, answers = [404]) {
-    // In the browser the bucket must allow this app's origin (CORS).
-    const doFetch = await webFetch();
+  /**
+   * A failure is thrown as an error, but for the statuses in `answers` (404: there's nothing there).
+   * `file`: its body or response is a file (an attachment).
+   */
+  async #request(path: string, init: RequestInit = {}, answers = [404], file = false) {
     const signed = await this.#client.sign(this.#base + path, init);
     let response: Response;
     try {
-      response = await doFetch(signed);
+      // In the browser the bucket must allow this app's origin (CORS).
+      response = await (file && isTauri ? transfer(signed) : (await webFetch())(signed));
     } catch (error) {
       console.error("lines: storage request failed", error);
       throw new SyncError(
@@ -109,7 +138,7 @@ export class S3Remote implements Remote {
   }
 
   async getFile(key: string) {
-    const response = await this.#request(`/${encodeKey(key)}`);
+    const response = await this.#request(`/${encodeKey(key)}`, {}, [404], true);
     return response.status === 404 ? null : response.blob();
   }
 
@@ -125,6 +154,7 @@ export class S3Remote implements Remote {
       `/${encodeKey(key)}`,
       { method: "PUT", body, headers: { "content-type": contentType, ...condition } },
       expected === undefined ? [404] : [404, 409, 412, 501],
+      body instanceof Blob,
     );
     // Another device wrote it since (409: just as this was written). Unless it's still as expected,
     // and the service can't do conditional writes after all: it would never be written then.

@@ -1,6 +1,7 @@
 use tauri::Manager;
 
 mod attachments;
+mod bucket_sync;
 mod devtools;
 mod drag_out;
 mod export;
@@ -32,6 +33,7 @@ pub fn run() {
   builder
     .invoke_handler(tauri::generate_handler![
       attachments::open_attachment,
+      bucket_sync::sync_bucket_transfer,
       devtools::toggle_devtools,
       drag_out::drag_note_out,
       export::save_export,
