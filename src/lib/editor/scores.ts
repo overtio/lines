@@ -1,5 +1,5 @@
 import { WidgetType } from "@codemirror/view";
-import { mount, unmount } from "svelte";
+import { mount } from "svelte";
 import { t } from "../i18n/index.svelte";
 import Icon from "../icons/Icon.svelte";
 import type { IconName } from "../icons/icons";
@@ -85,24 +85,78 @@ export const MARKS: Record<Exclude<ScoreStyle, "off">, IconName> = { stars: "sta
 /** The color marks of these icons are filled in: stars yellow and hearts red, as the theme has them, and others its accent. */
 const TONES: Partial<Record<IconName, string>> = { star: "stars", heart: "hearts" };
 
-const mounted = new WeakMap<HTMLElement, Record<string, unknown>[]>();
+/**
+ * Each icon drawn once in each icon set (`set`, the one chosen, which Icon draws in), and copied into
+ * every mark that shows it: a table of 250 ratings is 1,250 marks.
+ */
+const drawn = new Map<string, Element>();
+function iconOf(name: IconName, set: string): Node {
+  const key = `${set}:${name}`;
+  let icon = drawn.get(key);
+  if (!icon) {
+    const target = document.createElement("span");
+    mount(Icon, { target, props: { name, size: 16, strokeWidth: 2 } });
+    icon = target.firstElementChild!;
+    drawn.set(key, icon);
+  }
+  return icon.cloneNode(true);
+}
+
+/** How far apart marks are, as a share of one: the gap after each (editor.css's, `.cm-lp-score-compact`'s too). */
+const GAP = 0.125;
+
+/**
+ * An icon as masks for marks drawn in one piece (`compact`): its outline, and filled, each with the
+ * gap after it, to repeat along a line; none where its set doesn't draw it as an SVG (SF Symbols').
+ */
+const masks = new Map<string, { outline: string; filled: string } | null>();
+function masksOf(name: IconName, set: string) {
+  const key = `${set}:${name}`;
+  if (!masks.has(key)) {
+    iconOf(name, set);
+    const icon = drawn.get(key);
+    let found = null;
+    if (icon instanceof SVGSVGElement) {
+      const svg = icon.cloneNode(true) as SVGSVGElement;
+      const [x, y, width, height] = (svg.getAttribute("viewBox") ?? "0 0 24 24").split(/\s+/).map(Number);
+      svg.setAttribute("viewBox", `${x} ${y} ${width * (1 + GAP)} ${height}`);
+      svg.removeAttribute("class");
+      svg.setAttribute("stroke", "black");
+      const url = () => `url("data:image/svg+xml,${encodeURIComponent(new XMLSerializer().serializeToString(svg))}")`;
+      const outline = url();
+      svg.setAttribute("fill", "black");
+      found = { outline, filled: url() };
+    }
+    masks.set(key, found);
+  }
+  return masks.get(key);
+}
 
 /**
  * A score drawn: its marks, its points or its word, said as "4 out of 5". `mark` is the icon of
- * marks whose scale has none of its own. Its icons are to be unmounted with it (`unmountScore`).
+ * marks whose scale has none of its own; `set`, the icon set chosen. `compact`, its marks are one
+ * piece, masked by their icon, where they needn't each be clicked (a table's 250 ratings).
  */
-export function drawScore(score: Score, scale: Scale, mark: IconName): HTMLElement {
+export function drawScore(score: Score, scale: Scale, mark: IconName, set: string, compact = false): HTMLElement {
   const el = document.createElement("span");
   el.setAttribute("role", "img");
   el.setAttribute("aria-label", spokenScore(score, scale));
-  const icons: Record<string, unknown>[] = [];
+  const icon = scale.kind === "marks" ? (scale.icon ?? mark) : null;
+  const masked = compact && icon && masksOf(icon, set);
+  if (masked) {
+    el.className = `cm-lp-score cm-lp-score-${TONES[icon] ?? "accent"} cm-lp-score-compact`;
+    const whole = Math.floor(score.score);
+    el.style.cssText = `--marks: ${score.of}; --outline: ${masked.outline}; --filled: ${masked.filled}; --fill: calc(${whole} * ${1 + GAP}em + ${score.score - whole}em)`;
+    el.append(document.createElement("span"), document.createElement("span"));
+    return el;
+  }
   /** One of its marks: `fill` of it filled, 0, ½ or 1; a click on it sets `value` (ratings.ts). */
   const markOf = (icon: IconName, fill: number, value: number) => {
     const target = document.createElement("span");
     target.className = `cm-lp-score-mark${fill === 1 ? " is-filled" : fill ? " is-half" : ""}`;
     target.dataset.score = String(value);
     target.setAttribute("aria-hidden", "true");
-    for (let layer = 0; layer < (fill === 0.5 ? 2 : 1); layer++) icons.push(mount(Icon, { target, props: { name: icon, size: 16, strokeWidth: 2 } }));
+    for (let layer = 0; layer < (fill === 0.5 ? 2 : 1); layer++) target.append(iconOf(icon, set));
     el.append(target);
   };
   if (scale.kind === "points") {
@@ -127,12 +181,7 @@ export function drawScore(score: Score, scale: Scale, mark: IconName): HTMLEleme
     el.className = `cm-lp-score cm-lp-score-${TONES[icon] ?? "accent"}`;
     for (let i = 0; i < scale.of; i++) markOf(icon, Math.min(1, Math.max(0, score.score - i)), i + 1);
   }
-  mounted.set(el, icons);
   return el;
-}
-
-export function unmountScore(el: HTMLElement) {
-  for (const icon of mounted.get(el) ?? []) void unmount(icon);
 }
 
 export class ScoreWidget extends WidgetType {
@@ -141,17 +190,16 @@ export class ScoreWidget extends WidgetType {
     readonly scale: Scale,
     /** The icon of marks whose scale has none of its own. */
     readonly mark: IconName,
+    /** The icon set it's drawn in, so it's drawn again in another. */
+    readonly set: string,
   ) {
     super();
   }
   eq(other: ScoreWidget) {
-    return JSON.stringify([other.score, other.scale, other.mark]) === JSON.stringify([this.score, this.scale, this.mark]);
+    return JSON.stringify([other.score, other.scale, other.mark, other.set]) === JSON.stringify([this.score, this.scale, this.mark, this.set]);
   }
   toDOM() {
-    return drawScore(this.score, this.scale, this.mark);
-  }
-  destroy(dom: HTMLElement) {
-    unmountScore(dom);
+    return drawScore(this.score, this.scale, this.mark, this.set);
   }
   // A click on a mark sets it (ratings.ts); elsewhere, it puts the cursor on its line, which shows it as written.
   ignoreEvent() {

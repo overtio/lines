@@ -92,6 +92,14 @@ async function cursorAfterTitle(page) {
   await evaluate(page, () => window.bench.keys());
 }
 
+/** Puts the cursor on a new line at the open note's end. */
+async function cursorAtEnd(page) {
+  await page.locator(".editor-pane .cm-content").first().click({ position: { x: 40, y: 10 } });
+  await page.keyboard.press("ControlOrMeta+End");
+  await page.keyboard.press("Enter");
+  await evaluate(page, () => window.bench.keys());
+}
+
 /** Types `text` a key at a time, as quickly as a fast typist; how long each key took to show. */
 async function typeAndTime(page, text, delay = 60) {
   for (const key of text) {
@@ -130,14 +138,16 @@ async function start(page) {
 }
 
 async function open(page) {
-  const times = { typical: [], long: [], huge: [] };
+  const times = { typical: [], rated: [], long: [], huge: [] };
   for (let i = 0; i < 4; i++) {
     times.typical.push(await openNote(page, "Typical note"));
+    times.rated.push(await openNote(page, "Rated note"));
     times.long.push(await openNote(page, "Long note 3000"));
     times.huge.push(await openNote(page, "Long note 12000"));
   }
   return [
     measure("Typical note", times.typical, 100, "median"),
+    measure("A rated book with a table of 250", times.rated, 100, "median"),
     measure("3,000-line note", times.long, 200, "median"),
     measure("12,000-line note", times.huge, 400, "median"),
   ];
@@ -153,11 +163,13 @@ async function typing(page) {
   const results = [];
   for (const [title, label, budget] of [
     ["Typical note", "Typical note", 33],
+    ["Rated note", "A rated book with a table of 250", 33],
     ["Long note 3000", "3,000-line note", 33],
     ["Long note 12000", "12,000-line note", 50],
   ]) {
     await openNote(page, title);
-    await cursorAfterTitle(page);
+    // The rated book's first lines are its properties: typed into at its end, under its table, instead.
+    await (title === "Rated note" ? cursorAtEnd(page) : cursorAfterTitle(page));
     results.push(measure(label, await typeAndTime(page, KEYS), budget));
     await undo(page);
   }
@@ -329,7 +341,8 @@ if (!args.includes("--no-build") || !existsSync(`${root}${out}`)) {
   console.log("Building the app with its benchmark helpers…");
   await build({ root, mode: "bench", logLevel: "error", build: { outDir: out, emptyOutDir: true } });
 }
-const server = await preview({ root, mode: "bench", logLevel: "warn", build: { outDir: out }, preview: { port: 4317, strictPort: false, open: false } });
+// A port of its own on 127.0.0.1, as the browser tests' (tests/browser/setup.ts): "localhost" can be IPv6, where another worktree's bench may be.
+const server = await preview({ root, mode: "bench", logLevel: "warn", build: { outDir: out }, preview: { host: "127.0.0.1", port: 0, open: false } });
 const url = server.resolvedUrls.local[0];
 
 const all = {};

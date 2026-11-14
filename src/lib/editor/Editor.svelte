@@ -246,6 +246,7 @@
     void looks.looks;
     void ratings.choices;
     void prefs.scores;
+    void prefs.icons;
     void prefs.copyValues;
     untrack(() => view?.dispatch({ effects: objectsChanged.of(null) }));
   });

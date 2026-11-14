@@ -320,7 +320,7 @@ function build(view: EditorView): DecorationSet {
     const score = prefs.scores !== "off" && !lineActive(from) ? (scale ? scoreIn(written, scale) : scoreIn(written)) : null;
     if (score) {
       const mark = MARKS[prefs.scores as Exclude<typeof prefs.scores, "off">];
-      decos.push(Decoration.replace({ widget: new ScoreWidget(score, scale ?? { kind: "marks", of: score.of }, mark) }).range(from, to));
+      decos.push(Decoration.replace({ widget: new ScoreWidget(score, scale ?? { kind: "marks", of: score.of }, mark, prefs.icons) }).range(from, to));
     } else mark(from, to, "cm-lp-kv-value");
     const plain = valueText(written);
     if (prefs.copyValues && plain) decos.push(Decoration.widget({ widget: new CopyWidget(plain, t("editor.copyValue", { value: plain })), side: 1 }).range(to));

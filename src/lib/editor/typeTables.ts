@@ -14,7 +14,7 @@ import { ui } from "../ui.svelte";
 import { windowLabel } from "../windows/channel";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { iconOf, objectsChanged, openNote, valueText } from "./objects";
-import { drawScore, fractionOf, MARKS, type Scale, type Score, scoreIn, unmountScore } from "./scores";
+import { drawScore, fractionOf, MARKS, type Scale, type Score, scoreIn } from "./scores";
 import { arrowsInto, drawnBlock, drawnBlocks, focused, isEditing } from "./util";
 
 /*
@@ -106,12 +106,10 @@ export function tableData(ref: TypeRef): TableData {
 /** Each table's sort, kept while it redraws: which column (-1 for the title) and which way. */
 const sorts = new WeakMap<HTMLElement, { column: number; descending: boolean }>();
 const icons = new WeakMap<HTMLElement, Record<string, unknown>[]>();
-const scores = new WeakMap<HTMLElement, HTMLElement[]>();
 
-/** Unmounts what a table drew: its icons and its scores' marks. */
+/** Unmounts the icons a table drew. */
 function unmountTable(dom: HTMLElement) {
   for (const mounted of icons.get(dom) ?? []) void unmount(mounted);
-  for (const score of scores.get(dom) ?? []) unmountScore(score);
 }
 
 function icon(name: IconName, size = 14) {
@@ -157,7 +155,6 @@ function render(dom: HTMLElement, data: TableData, view: EditorView) {
   const focusKey = active instanceof HTMLElement && dom.contains(active) ? active.dataset.focus : undefined;
   unmountTable(dom);
   const mounted: Record<string, unknown>[] = [];
-  const drawn: HTMLElement[] = [];
   const editable = !view.state.readOnly;
   const sort = sorts.get(dom);
   const table = document.createElement("table");
@@ -284,11 +281,8 @@ function render(dom: HTMLElement, data: TableData, view: EditorView) {
     tr.append(name);
     for (const cell of row.cells) {
       const td = document.createElement("td");
-      if (cell.score) {
-        const score = drawScore(cell.score.score, cell.score.scale, MARKS[prefs.scores as Exclude<typeof prefs.scores, "off">]);
-        drawn.push(score);
-        td.append(score);
-      } else td.textContent = cell.text;
+      if (cell.score) td.append(drawScore(cell.score.score, cell.score.scale, MARKS[prefs.scores as Exclude<typeof prefs.scores, "off">], prefs.icons, true));
+      else td.textContent = cell.text;
       // Short values ("25 min") stay on one line; long ones wrap.
       if (cell.text.length <= 24) td.classList.add("is-short");
       tr.append(td);
@@ -315,7 +309,6 @@ function render(dom: HTMLElement, data: TableData, view: EditorView) {
     footer.append(add);
   }
   icons.set(dom, mounted);
-  scores.set(dom, drawn);
   dom.replaceChildren(table, footer);
   if (focusKey) dom.querySelector<HTMLElement>(`[data-focus="${CSS.escape(focusKey)}"]`)?.focus();
 }
@@ -329,7 +322,8 @@ class TypeTableWidget extends WidgetType {
     readonly preview: boolean,
   ) {
     super();
-    this.key = JSON.stringify(data);
+    // Drawn again in another icon set, as its scores' marks are copies of the set's icons.
+    this.key = JSON.stringify(data) + prefs.icons;
   }
   eq(other: TypeTableWidget) {
     return other.key === this.key && sameInset(other.inset, this.inset) && other.preview === this.preview;

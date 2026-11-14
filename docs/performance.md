@@ -17,16 +17,16 @@ The helpers (`src/bench/harness.ts`) are only in that build: `src/main.ts` loads
 
 ## What's measured
 
-The library is 5,000 everyday notes (a title, paragraphs, lists, todos, now and then a table or code; one in a hundred LaTeX, one in a hundred a small spreadsheet; one in twenty with properties), and five big ones, pinned: a typical note with a formula table, Markdown notes of 3,000 and 12,000 lines with every kind of block, a 3,000-line LaTeX note, and a 3,000-row spreadsheet. It's made by `src/bench/library.ts` from a seeded random, so every run has the same notes.
+The library is 5,000 everyday notes (a title, paragraphs, lists, todos, now and then a table or code; one in a hundred LaTeX, one in a hundred a small spreadsheet; one in twenty with properties, and one in twenty a book or film in the Library, rated), and six big ones, pinned: a typical note with a formula table, a rated book with scores in its text and a table of every book (`@type.book`, 250 rows of ratings drawn as marks), Markdown notes of 3,000 and 12,000 lines with every kind of block, a 3,000-line LaTeX note, and a 3,000-row spreadsheet. It's made by `src/bench/library.ts` from a seeded random, so every run has the same notes.
 
 Everything is driven with real input (keys, clicks and the mouse wheel, as Playwright sends them to the browser), and timed inside the page from when the browser stamped the input to when the frame showing its result has been drawn. That includes waiting for the screen's next frame, as the person waits too: up to 16.7 ms, 8 on average. Keys are typed 60 ms apart (a fast typist), and arrow keys pressed 35 ms apart (a held key repeating).
 
 | Scenario | What | Budget |
 |---|---|---|
 | Start | Reloading with the library: notes read from the database, and the list's first row shown | median ≤ 1 s |
-| Open a note | Clicking a note in the list until its text is in the editor and drawn: a typical note, 3,000 lines, 12,000 lines | median ≤ 100, 200, 400 ms |
+| Open a note | Clicking a note in the list until its text is in the editor and drawn: a typical note, the rated book, 3,000 lines, 12,000 lines | median ≤ 100, 100, 200, 400 ms |
 | Switch between notes | Clicking 20 everyday notes in turn | ≤ 100 ms |
-| Typing | Each key in the typical, 3,000-line and 12,000-line notes, after their title, and at the end of the 12,000-line one | ≤ 33, 33, 50, 50 ms |
+| Typing | Each key in the typical, 3,000-line and 12,000-line notes, after their title, at the end of the rated book (under its table), and at the end of the 12,000-line one | ≤ 33, 33, 33, 50, 50 ms |
 | Moving the cursor | ↓ and ↑ through the 3,000-line note | ≤ 33 ms |
 | Scrolling | Scrolling the 3,000-line note with the mouse wheel: how long each frame took, and how many took over 50 ms | ≤ 20 ms; none |
 | Searching | Each key typed in the list's search, over every note | ≤ 33 ms |

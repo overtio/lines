@@ -337,6 +337,35 @@
   fill: currentColor;
 }
 
+/*
+ * Marks in one piece, in a table (scores.ts's `compact`): the icons' outlines, faint, along the line,
+ * and filled over them as far as the score goes, each icon a mask with the gap after it.
+ */
+.cm-lp-score-compact {
+  position: relative;
+  display: inline-block;
+  width: calc(var(--marks) * 1.125em);
+  height: 1em;
+}
+
+.cm-lp-score-compact > span {
+  position: absolute;
+  inset: 0;
+  background: var(--text-faint);
+  mask: var(--outline) repeat-x left top / 1.125em 1em;
+}
+
+.cm-lp-score-compact > span + span {
+  inset-inline-end: auto;
+  width: var(--fill);
+  background: var(--score);
+  mask-image: var(--filled);
+}
+
+.cm-lp-score-compact:dir(rtl) > span {
+  mask-position: right top;
+}
+
 /* Half a mark (`3.5/5`): a filled one over the faint one, cut at its middle (its end, right to left). */
 .cm-lp-score-mark.is-half {
   position: relative;
