@@ -180,6 +180,7 @@
         ],
         streamItems(subscription, x, y),
         [
+          { label: t("feeds.filters.item"), icon: "funnel", run: () => (ui.feedFilters = url) },
           { label: t("feeds.openNote"), icon: "file-text", run: () => notes.show(note) },
           { label: t("feeds.copyFeedLink"), icon: "link", run: () => void copyText(url).then(() => speak(t("list.copied"))) },
           // Asked for, as a subscription's picture is only had when it's made: one taken out of its note stays out.

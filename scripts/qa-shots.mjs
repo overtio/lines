@@ -962,11 +962,26 @@ const SCENES = [
       await page.getByRole("menuitem", { name: "New Stream…" }).waitFor();
     },
   })),
+  ...[false, true].map((open) => ({
+    id: open ? "feeds-filters" : "feeds-filtered",
+    title: open ? "A feed's Filters…" : "Posts a filter kept out, with those dismissed",
+    look: open
+      ? "The dialog over a scrim, a funnel at its top in the accent, titled for Daring Fireball: what filters read, then Only show posts with (empty, its example faint) and Hide posts with (apple), labelled above them, the hint quieter, Cancel and Save at its foot."
+      : "Show Dismissed in Daring Fireball after hiding posts with “apple”: the bar “Posts dismissed or filtered out.”, and the post kept out saying after its date, with a funnel, Filtered: “apple”.",
+    act: async (page) => {
+      await subscribe(page, FEEDS);
+      await page.evaluate(() => window.testing.feeds.setFilters("https://daringfireball.net/feeds/main", [], ["apple"]));
+      const sidebar = page.getByRole("navigation", { name: "Library" });
+      await sidebar.getByRole("list", { name: "Atom Feeds" }).getByRole("button", { name: /^Daring Fireball/ }).click({ button: "right" });
+      await page.getByRole("menuitem", { name: open ? "Filters…" : "Show Dismissed" }).click();
+      if (open) await page.getByRole("dialog").waitFor();
+    },
+  })),
   ...[false, true].map((dismissed) => ({
     id: dismissed ? "feeds-dismissed" : "feeds-caught-up",
     title: dismissed ? "A feed's posts dismissed (Show Dismissed)" : "A feed at zero: all its posts dismissed",
     look: dismissed
-      ? "Under the search, a bar like the Trash's: \"Dismissed posts can be restored.\" with Hide Dismissed in the accent; the posts dismissed, newest first, one saying after its date a thumbs-down and Not interesting."
+      ? "Under the search, a bar like the Trash's: \"Posts dismissed or filtered out.\" with Hide Dismissed in the accent; the posts dismissed, newest first, one saying after its date a thumbs-down and Not interesting."
       : "After Dismiss All: \"All caught up.\" with a quiet Show Dismissed under it, as an empty list says it; the count gone; the notice saying so, with Undo, at the bottom.",
     act: async (page) => {
       await subscribe(page, FEEDS);

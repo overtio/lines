@@ -148,6 +148,76 @@ describe("streams, named on subscriptions' notes", async () => {
   });
 });
 
+describe("filters, keeping or hiding posts by their words", async () => {
+  const { filterKey, fold, matcher, postFilter, readMuted, termsOf, termsValue, wordsOf, writeMuted } = await import("../../src/lib/feeds/filters");
+  const post = { title: "Café culture in Rust", author: "Zoë", categories: ["Programming", "Web3"], excerpt: "A look at trust." };
+
+  test("a filter's words and phrases are between commas, their quotes taken off, each once whatever its case", () => {
+    expect(termsOf(` crypto, "web3  summit", “AI”, Crypto,, `)).toEqual(["crypto", "web3 summit", "AI"]);
+    expect(termsOf("")).toEqual([]);
+  });
+
+  test("whole words, whatever their case and accents, in the title, author, categories and text", () => {
+    const words = wordsOf(post, "Full text: a web summit, then C++ and more.");
+    expect(words).toBe(fold("Café culture in Rust\nZoë\nProgramming\nWeb3\nFull text: a web summit, then C++ and more."));
+    const has = (term: string) => matcher([term])(words);
+    expect([has("cafe"), has("CAFÉ"), has("zoe"), has("web3"), has("programming"), has("c++")]).toEqual(["cafe", "CAFÉ", "zoe", "web3", "programming", "c++"]);
+    // Not part of a word: "rust" isn't in "trust", nor "web" in "web3" alone.
+    expect(matcher(["rus"])(words)).toBeUndefined();
+    expect(matcher(["trust"])(words)).toBeUndefined();
+    expect(matcher(["web"])(wordsOf(post))).toBeUndefined();
+    expect(matcher(["web summit"])(words)).toBe("web summit");
+    expect(matcher(["summit web"])(words)).toBeUndefined();
+    // Without its text, its excerpt is read.
+    expect(matcher(["trust"])(wordsOf(post))).toBe("trust");
+  });
+
+  test("hiding wins over keeping; with words to keep, a post with none of them is kept out; with none at all, nothing is", () => {
+    const words = wordsOf(post);
+    expect(postFilter([], [])).toBeNull();
+    expect(postFilter(["rust"], [])!(words)).toBeNull();
+    expect(postFilter(["go"], [])!(words)).toEqual({});
+    expect(postFilter(["rust"], ["web3"])!(words)).toEqual({ term: "web3" });
+    expect(postFilter([], ["python"])!(words)).toBeNull();
+  });
+
+  test("in scripts written without spaces between words, a word is found within the text", () => {
+    const has = (term: string, text: string) => matcher([term])(fold(text));
+    expect(has("広告", "新製品の広告です")).toBe("広告");
+    expect(has("广告", "这是一个广告。")).toBe("广告");
+    expect(has("東京", "東京都に行った")).toBe("東京");
+    expect(has("โฆษณา", "นี่คือโฆษณาสินค้า")).toBe("โฆษณา");
+    // Korean spaces its words, but runs particles into them.
+    expect(has("광고", "광고를 봤다")).toBe("광고");
+    expect(has("広告", "新製品です")).toBeUndefined();
+  });
+
+  test("only Latin and Greek letters lose their accents: other scripts' marks make other letters", () => {
+    const has = (term: string, text: string) => matcher([term])(fold(text));
+    expect([has("cafe", "Café"), has("ελλαδα", "Ελλάδα"), has("naive", "naïve")]).toEqual(["cafe", "ελλαδα", "naive"]);
+    expect(has("कम", "काम करो")).toBeUndefined();
+    expect(has("कमी", "काम करो")).toBeUndefined();
+    expect(has("काम", "काम करो")).toBe("काम");
+    expect(has("か", "がっこう")).toBeUndefined();
+    expect(has("иод", "йод")).toBeUndefined();
+    expect(has("елка", "ёлка")).toBeUndefined();
+    expect(has("йод", "Йод")).toBe("йод");
+  });
+
+  test("written as a note's property, a word like a tag isn't one; what filters are is one key, whatever their case", () => {
+    expect(termsValue(["#ad", "web3 summit"])).toBe("\\#ad, web3 summit");
+    expect(filterKey(["Rust"], ["Café"])).toBe(filterKey(["rust"], ["cafe"]));
+    expect(filterKey(["rust"], [])).not.toBe(filterKey([], ["rust"]));
+  });
+
+  test("the words hidden in every feed, as synced: read back as written, and nothing from what isn't theirs", () => {
+    expect(readMuted(writeMuted({ words: ["crypto", "web3 summit"], at: 5 }))).toEqual({ words: ["crypto", "web3 summit"], at: 5 });
+    expect(readMuted("{\"words\": [\"a\", 1], \"at\": 2}")).toEqual({ words: ["a"], at: 2 });
+    expect(readMuted("not json")).toBeNull();
+    expect(readMuted("{\"words\": \"a\"}")).toBeNull();
+  });
+});
+
 describe("marks, what was done with posts, as devices sync them", () => {
   const kept = (id: string, read = false, date?: number): KeptPost => ({ id, key: `key-${id}`, title: id, base: "https://example.com/", excerpt: id, date, version: "v", read, seen: 0 });
   const FEED = "https://example.com/feed";

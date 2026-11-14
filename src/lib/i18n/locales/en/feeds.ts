@@ -99,15 +99,33 @@ export default {
   "feeds.didRestore": "{count, plural, one {Restored # post} other {Restored # posts}}",
   // A feed's menu (and its row's): every post in its list taken out at once.
   "feeds.dismissAll": "Dismiss All",
-  // The posts taken out of a feed's list, from its menu, and the bar over them.
+  // The posts taken out of a feed's list (dismissed, or kept out by a filter), from its menu, and the bar over them.
   "feeds.showDismissed": "Show Dismissed",
   "feeds.hideDismissed": "Hide Dismissed",
-  "feeds.dismissedHint": "Dismissed posts can be restored.",
+  "feeds.outHint": "Posts dismissed or filtered out.",
   // A dismissed post, as not interesting, in the list of them.
   "feeds.wasUninteresting": "Not interesting",
   // The list, with every post dismissed, and with none dismissed.
   "feeds.allCaughtUp": "All caught up.",
-  "feeds.noDismissed": "No dismissed posts.",
+  "feeds.noneOut": "No posts dismissed or filtered out.",
+  // Filters that keep or hide posts by their words: a feed's own (its menu's Filters…, a dialog), and those for every feed (Settings → Library).
+  "feeds.filters.item": "Filters…",
+  "feeds.filters.title": "Filters for {title}",
+  "feeds.filters.intro": "Words and phrases, between commas, that a post’s title, text, author or categories have, whatever their case and accents.",
+  "feeds.filters.include": "Only show posts with",
+  "feeds.filters.includeExample": "svelte, web components",
+  "feeds.filters.exclude": "Hide posts with",
+  "feeds.filters.excludeExample": "sponsored, crypto",
+  "feeds.filters.hint": "Hiding wins over showing. Posts hidden are under Show Dismissed, in its menu.",
+  "feeds.filters.cancel": "Cancel",
+  "feeds.filters.save": "Save",
+  "feeds.filters.saved": "Filters saved for {title}",
+  // A post a filter keeps out, among those dismissed: which of the words hides it, or that it has none of those its feed shows.
+  "feeds.filters.hiddenFor": "Filtered: “{term}”",
+  "feeds.filters.notKept": "Filtered: none of its feed’s words",
+  "feeds.filters.group": "Feed filters",
+  "feeds.filters.everywhere": "Hide posts with",
+  "feeds.filters.everywhereNote": "In every feed, on every device: words and phrases, between commas. A feed’s own are in its menu, Filters….",
   // In the note's place, in the Feeds with no post open.
   "feeds.choosePost": "Choose a post to read it.",
   // The open post, as screen readers name it.

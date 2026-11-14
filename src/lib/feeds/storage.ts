@@ -9,7 +9,8 @@ import type { FeedRecord } from "./posts";
 /*
  * Feeds' posts on this device, in a database of their own (`lines-feeds`): a record for each feed
  * (what it said of itself, its posts but their content, which were read and dismissed), each post's
- * content apart, read when it's opened, each feed's marks as they sync (marks.ts), where each
+ * content apart, read when it's opened, what filters read of each feed's posts (filters.ts), read
+ * only when they change, each feed's marks as they sync (marks.ts), where each
  * episode was stopped, with the one in the player (player/player.svelte.ts), and where each book was
  * left (books/reading.svelte.ts). Each is stored under a random id, and with the app lock on,
  * encrypted like notes (lock/vault.ts), so nothing kept says what's subscribed to, read or listened to.
@@ -20,6 +21,7 @@ const FEEDS = "feeds";
 const POSTS = "posts";
 const POSITIONS = "positions";
 const MARKS = "marks";
+const WORDS = "words";
 
 interface Content {
   id: string;
@@ -31,6 +33,12 @@ export interface MarksRecord {
   id: string;
   feed: string;
   marks: FeedMarks;
+}
+
+/** What filters read of a feed's posts (filters.ts), by their ids, and what it was read of; stored under the feed's record's id. */
+export interface WordsRecord {
+  id: string;
+  words: Record<string, { of: string; words: string }>;
 }
 
 /** Where an episode was stopped, by its key (its post's, or its note's id). */
@@ -62,11 +70,12 @@ export interface BookPosition {
 
 const isBook = (value: Position | InPlayer | BookPosition): value is BookPosition => "book" in value;
 
-const open = database(FEEDS_DB, 3, [FEEDS, POSTS, POSITIONS, MARKS]);
+const open = database(FEEDS_DB, 4, [FEEDS, POSTS, POSITIONS, MARKS, WORDS]);
 const feedStore = new ObjectStore<FeedRecord | Sealed>(FEEDS, open);
 const postStore = new ObjectStore<Content | Sealed>(POSTS, open);
 const positionStore = new ObjectStore<Position | InPlayer | BookPosition | Sealed>(POSITIONS, open);
 const markStore = new ObjectStore<MarksRecord | Sealed>(MARKS, open);
+const wordStore = new ObjectStore<WordsRecord | Sealed>(WORDS, open);
 
 async function seal<T extends { id: string }>(store: string, value: T): Promise<T | Sealed> {
   return vault.sealing ? sealRecord(store, value.id, utf8(JSON.stringify(value))) : value;
@@ -103,7 +112,18 @@ export const feedStorage = {
   /** A feed and its posts, gone. */
   async delete(record: FeedRecord) {
     await this.deleteContents(record.posts.map((post) => post.key));
+    await wordStore.delete(record.id);
     await feedStore.delete(record.id);
+  },
+
+  /** What filters read of a feed's posts, by their ids, if it was kept. */
+  async words(id: string): Promise<WordsRecord["words"] | undefined> {
+    const value = await wordStore.get(id);
+    return value && (await unseal<WordsRecord>(WORDS, value)).words;
+  },
+
+  async putWords(record: WordsRecord) {
+    await wordStore.put(await seal(WORDS, record));
   },
 
   /** Every feed's marks. */
@@ -143,6 +163,7 @@ export const feedStorage = {
       [POSTS, postStore],
       [POSITIONS, positionStore],
       [MARKS, markStore],
+      [WORDS, wordStore],
     ] as [string, ObjectStore<{ id: string } | Sealed>][];
     for (const [name, store] of stores) {
       for (const id of await store.ids()) {

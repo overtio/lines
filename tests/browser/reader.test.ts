@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import type { Request, Route } from "playwright";
+import { MUTED_FILE, readMuted, writeMuted } from "../../src/lib/feeds/filters";
 import { markKey, readShard, shardOf, writeShard } from "../../src/lib/feeds/marks";
 import { type App, choose, engine, mod, noErrors, openApp, toggle } from "./app";
 import { answerPictures, ico, png } from "./files";
@@ -1022,7 +1023,7 @@ describe("dismissing posts, to keep a feed at zero", () => {
 
     // Found again, newest first, under the list's bar.
     await page.getByRole("button", { name: "Show Dismissed" }).click();
-    await page.getByText("Dismissed posts can be restored.").waitFor();
+    await page.getByText("Posts dismissed or filtered out.").waitFor();
     expect(await listed(app)).toEqual(["Post 0", "Post 1", "Post 2", "Post 3"]);
     await expect(rows.first().innerText()).resolves.toContain("Not interesting");
     await rows.nth(2).hover();
@@ -1283,4 +1284,144 @@ describe("streams, feeds grouped by topic or priority", () => {
     // The click that ended it didn't choose the feed.
     await expect(page.locator("#note-list-title").innerText()).resolves.not.toBe("Beta");
   });
+});
+
+/** That the list comes to show these posts, in order: a filter changes it a moment after it's set. */
+async function expectListed(app: App, titles: string[]) {
+  const shown = (titles: string[]) => JSON.stringify([...document.querySelectorAll<HTMLElement>(".note-list [data-post] .block.truncate")].map((each) => each.innerText)) === JSON.stringify(titles);
+  await app.page.waitForFunction(shown, titles, { timeout: 5000 }).catch(() => {});
+  expect(await listed(app)).toEqual(titles);
+}
+
+/** A subscription, "Wordy", to a feed of posts with words to filter by, kept as if just fetched, its posts listed. */
+async function wordyFeed(app: App) {
+  const url = "https://wordy.example/feed.xml";
+  const items = [
+    `<item><title>Svelte 6 is out</title><guid>1</guid><category>Frameworks</category><pubDate>Fri, 13 Nov 2026 10:00:00 GMT</pubDate><description>Runes, everywhere.</description></item>`,
+    `<item><title>Sponsored: a Crypto exchange</title><guid>2</guid><pubDate>Fri, 13 Nov 2026 09:00:00 GMT</pubDate><description>Buy now.</description></item>`,
+    `<item><title>Café notes</title><guid>3</guid><pubDate>Fri, 13 Nov 2026 08:00:00 GMT</pubDate><description>&lt;p&gt;On Web Components, and cafés.&lt;/p&gt;</description></item>`,
+    `<item><title>In practice</title><guid>4</guid><author>zoe@example.com (Zoë Rust)</author><pubDate>Fri, 13 Nov 2026 07:00:00 GMT</pubDate><description>Trust the compiler.</description></item>`,
+  ];
+  await app.page.evaluate(
+    async ({ url, rss }) => {
+      const { feeds, notes, reading } = window.testing;
+      await feeds.take(url, reading.readFeed(rss, url), {});
+      await notes.insert({ id: "wordy", body: `---\ntype: feed\nfeed: ${url}\n---\n# Wordy`, createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+    },
+    { url, rss: `<rss version="2.0"><channel><title>Wordy</title>${items.join("")}</channel></rss>` },
+  );
+  await openFeeds(app, url);
+  await app.page.locator(".note-list [data-post]").first().waitFor();
+}
+
+describe("filters, keeping or hiding posts by their words", () => {
+  test("a feed's Filters…: Only show posts with keeps those with its words, Hide posts with takes out those with one, winning; on its note, and those kept out are found with the dismissed, saying why", async () => {
+    app = await openApp();
+    await wordyFeed(app);
+    const page = app.page;
+    const sidebar = page.getByRole("navigation", { name: "Library" });
+    await sidebar.getByRole("button", { name: "Wordy, 4 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Filters…" }).click();
+    const dialog = page.getByRole("dialog", { name: "Filters for Wordy" });
+    await dialog.getByRole("textbox", { name: "Only show posts with" }).fill("svelte, web components");
+    await dialog.getByRole("button", { name: "Save" }).click();
+    await dialog.waitFor({ state: "detached" });
+    // A category, and a phrase in its text whatever its case.
+    await expectListed(app, ["Svelte 6 is out", "Café notes"]);
+    await sidebar.getByRole("button", { name: "Wordy, 2 unread" }).waitFor();
+    expect(await page.evaluate(() => window.testing.notes.get("wordy")?.note.body)).toContain("\ninclude: svelte, web components\n");
+
+    // Hiding wins, whatever the accents.
+    await sidebar.getByRole("button", { name: "Wordy, 2 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Filters…" }).click();
+    await expect(dialog.getByRole("textbox", { name: "Only show posts with" }).inputValue()).resolves.toBe("svelte, web components");
+    await dialog.getByRole("textbox", { name: "Hide posts with" }).fill("cafe");
+    await dialog.getByRole("textbox", { name: "Hide posts with" }).press("Enter");
+    await dialog.waitFor({ state: "detached" });
+    await expectListed(app, ["Svelte 6 is out"]);
+
+    // Not deleted: with those dismissed, each saying why.
+    await sidebar.getByRole("button", { name: "Wordy, 1 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Show Dismissed" }).click();
+    await page.getByText("Posts dismissed or filtered out.").waitFor();
+    const rows = page.locator(".note-list [data-post]");
+    await expectListed(app, ["Sponsored: a Crypto exchange", "Café notes", "In practice"]);
+    await expect(rows.nth(1).innerText()).resolves.toContain("Filtered: “cafe”");
+    await expect(rows.nth(0).innerText()).resolves.toContain("Filtered: none of its feed’s words");
+
+    // Written by hand, at once: the author's name is read too, as whole words ("Rust", not "Trust").
+    await page.evaluate(() => {
+      const { notes } = window.testing;
+      notes.update("wordy", notes.get("wordy")!.note.body.replace(/include: .*\nexclude: .*\n/, "exclude: rust\n"));
+    });
+    await page.getByRole("button", { name: "Hide Dismissed" }).click();
+    await page.waitForFunction(() => document.querySelectorAll(".note-list [data-post]").length === 3);
+    await expectListed(app, ["Svelte 6 is out", "Sponsored: a Crypto exchange", "Café notes"]);
+
+    // A word like a tag is written as words, so the note isn't tagged, and read back as it was.
+    await sidebar.getByRole("button", { name: "Wordy, 3 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Filters…" }).click();
+    await dialog.getByRole("textbox", { name: "Hide posts with" }).fill("rust, #runes");
+    await dialog.getByRole("button", { name: "Save" }).click();
+    await dialog.waitFor({ state: "detached" });
+    expect(await page.evaluate(() => window.testing.notes.get("wordy")?.note.body)).toContain("\nexclude: rust, \\#runes\n");
+    expect(await page.evaluate(() => window.testing.notes.get("wordy")?.meta.tags)).toEqual([]);
+    await sidebar.getByRole("button", { name: "Wordy, 3 unread" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Filters…" }).click();
+    await expect(dialog.getByRole("textbox", { name: "Hide posts with" }).inputValue()).resolves.toBe("rust, #runes");
+    await page.keyboard.press("Escape");
+  });
+
+  test("Settings → Library → Feed filters hides posts with its words in every feed at once, and goes to other devices in feeds/muted.json, the later winning", async () => {
+    app = await openApp();
+    await wordyFeed(app);
+    const page = app.page;
+    const dialog = await app.settings("Library");
+    const field = dialog.getByRole("textbox", { name: "Hide posts with" });
+    await field.fill("crypto");
+    await field.press("Enter");
+    await app.closeSettings();
+    await expectListed(app, ["Svelte 6 is out", "Café notes", "In practice"]);
+    const file = await page.evaluate((name) => window.testing.feeds.marksFolder.files().get(name), MUTED_FILE);
+    expect(readMuted(file ?? "")?.words).toEqual(["crypto"]);
+    expect(await page.evaluate((name) => window.testing.feeds.marksFolder.names().includes(name), MUTED_FILE)).toBe(true);
+
+    // Set earlier on another device: still these.
+    await page.evaluate(([name, text]) => window.testing.feeds.marksFolder.merge(name, text), [MUTED_FILE, writeMuted({ words: ["svelte"], at: 1 })] as const);
+    await expectListed(app, ["Svelte 6 is out", "Café notes", "In practice"]);
+
+    // Set later on another device: theirs.
+    await page.evaluate(([name, text]) => window.testing.feeds.marksFolder.merge(name, text), [MUTED_FILE, writeMuted({ words: ["svelte"], at: Date.now() + 60_000 })] as const);
+    await page.waitForFunction(() => document.querySelector(".note-list [data-post]")?.textContent?.includes("Sponsored"));
+    await expectListed(app, ["Sponsored: a Crypto exchange", "Café notes", "In practice"]);
+  });
+});
+
+test("a JSON Feed's posts are filtered by their tags, listed in its stream and under JSON Feeds, and dismissed, as any feed's", async () => {
+  app = await openApp();
+  const page = app.page;
+  const url = "https://jason.example/feed.json";
+  const items = [
+    { id: "1", title: "Rust 2.0", content_text: "News.", tags: ["rust"], date_published: "2026-11-13T10:00:00Z" },
+    { id: "2", title: "A word from our sponsor", content_text: "Buy.", tags: ["ad"], date_published: "2026-11-13T09:00:00Z" },
+    { id: "3", title: "Go 2.0", content_text: "News.", tags: ["go"], date_published: "2026-11-13T08:00:00Z" },
+  ];
+  await page.evaluate(
+    async ({ url, json }) => {
+      const { feeds, notes, reading } = window.testing;
+      await feeds.take(url, reading.readFeed(json, url), {});
+      await notes.insert({ id: "jason", body: `---\ntype: feed\nfeed: ${url}\nstream: Reading\nexclude: ad\n---\n# Jason`, createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+    },
+    { url, json: JSON.stringify({ version: "https://jsonfeed.org/version/1.1", title: "Jason", items }) },
+  );
+  const sidebar = page.getByRole("navigation", { name: "Library" });
+  await sidebar.getByRole("button", { name: "Reading, 2 unread" }).click();
+  await expectListed(app, ["Rust 2.0", "Go 2.0"]);
+  await sidebar.getByRole("button", { name: "JSON Feeds, 2 unread" }).waitFor();
+
+  await page.locator(".note-list [data-post]").first().hover();
+  await page.locator(".note-list li").first().getByRole("button", { name: "Dismiss", exact: true }).click();
+  await expectListed(app, ["Go 2.0"]);
+  await sidebar.getByRole("button", { name: "JSON Feeds, 1 unread" }).waitFor();
+  await sidebar.getByRole("button", { name: "Reading, 1 unread" }).waitFor();
 });
