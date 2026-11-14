@@ -140,9 +140,21 @@ export default {
   "plugins.applePodcasts.description": "Looks up podcasts and their episodes by a link to Apple Podcasts, with the podcast’s feed. The ids in the link go to Apple.",
   // Spotify and SoundCloud are names, not translated.
   "plugins.spotify.description":
-    "Plays Spotify links in notes with Spotify’s own player, once you play them (without an account, 30 seconds of each song), and looks up Spotify’s songs, albums and episodes for the Library. The link goes to Spotify.",
+    "Plays links to Spotify on a line of their own with Spotify’s own player, once you play them: 30-second previews without a Spotify login. Nothing goes to Spotify until then.",
+  "plugins.spotify.previews": "Loads Spotify’s player when you play it: 30-second previews without a Spotify login",
+  // What a Spotify link is, in its card's name: "Track on Spotify".
+  "plugins.spotify.track": "Track",
+  "plugins.spotify.album": "Album",
+  "plugins.spotify.playlist": "Playlist",
+  "plugins.spotify.artist": "Artist",
+  "plugins.spotify.podcast": "Podcast",
+  "plugins.spotify.episode": "Episode",
   "plugins.soundcloud.description":
-    "Plays SoundCloud links in notes with SoundCloud’s own player, once you play them, and looks up its tracks for the Library; in the apps, a link to someone who publishes a podcast there subscribes to it. The link goes to SoundCloud.",
+    "Plays links to SoundCloud on a line of their own with SoundCloud’s own player, once you play them, and looks up its tracks for the Library. In the apps, a link to someone who publishes a podcast there subscribes to it. The link goes to SoundCloud.",
+  // What a SoundCloud link is, in its card's name: "Track on SoundCloud".
+  "plugins.soundcloud.track": "Track",
+  "plugins.soundcloud.set": "Playlist",
+  "plugins.soundcloud.user": "Artist",
   "plugins.feeds.description":
     "Subscribe to sites’ and podcasts’ feeds, and read their posts in the Library’s Feeds. A new note that’s just a feed’s link subscribes to it. Episode notes get a Play button. Feeds are fetched from their sites, in the apps every 30 minutes.",
   "plugins.hackerNews.description": "Shows a Hacker News story’s comments under its post in the Library’s Feeds, threaded, to read. The story’s id goes to Hacker News’ API and to Algolia’s copy of it.",

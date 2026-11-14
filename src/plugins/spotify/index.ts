@@ -1,19 +1,12 @@
 import { drawSitePlayer, type SitePlayer, webLink } from "../../lib/editor/sitePlayer";
 import { t } from "../../lib/i18n/index.svelte";
-import type { Page } from "../../lib/library/page";
-import { clock, known } from "../../lib/library/text";
-import { getJson, getPage } from "../../lib/library/web";
-import { isTauri } from "../../lib/platform";
-import type { Embed, LibraryItem, LibrarySource, Plugin } from "../../lib/plugins/types";
-import { itemOfPage } from "../web-pages/read";
+import type { Embed, Plugin } from "../../lib/plugins/types";
 
 /*
- * Spotify: a link to a song, album, playlist, artist, podcast or episode there, on a line of its
- * own in a note, plays in Spotify's own player once it's played (sitePlayer.ts): without a Spotify
- * account, or where Spotify's protected audio can't play (Safari, and the apps' web views), 30
- * seconds of each song. Songs, albums, podcasts and episodes are looked up for the library: in the
- * apps from their page, which says nearly all there is; on the web from Spotify's oEmbed, which says
- * only a title and a cover. Only the link is sent, without what Spotify adds to say who shared it.
+ * Spotify: a link to a song, album, playlist, artist, podcast or episode there, on a line of its own
+ * in a note, plays in Spotify's own player once it's played (sitePlayer.ts): 30 seconds of each
+ * without a Spotify login. Its links aren't looked up for the library here, as Spotify's terms
+ * don't let what it says be kept: MusicBrainz and Web Pages do that.
  */
 
 type Kind = "track" | "album" | "playlist" | "artist" | "show" | "episode";
@@ -25,22 +18,33 @@ export function spotifyIn(url: URL | null): { kind: Kind; id: string } | null {
   return match ? { kind: match[1] as Kind, id: match[2] } : null;
 }
 
-/** Each kind's player, the height Spotify's own embed code gives it. */
-const PLAYERS: Record<Kind, Pick<SitePlayer, "kind" | "height">> = {
-  track: { kind: "track", height: 152 },
-  album: { kind: "album", height: 352 },
-  playlist: { kind: "playlist", height: 352 },
-  artist: { kind: "artist", height: 352 },
-  show: { kind: "podcast", height: 232 },
-  episode: { kind: "episode", height: 232 },
+/** A link to Spotify as it plays, without what Spotify adds to say who shared it (`?si=`). */
+export function spotifyLink(href: string): string | null {
+  const found = spotifyIn(webLink(href));
+  return found && `https://open.spotify.com/${found.kind}/${found.id}`;
+}
+
+/** Each kind's height, as Spotify's own embed code gives it, and its name. */
+const KINDS: Record<Kind, { height: number; name: () => string }> = {
+  track: { height: 152, name: () => t("plugins.spotify.track") },
+  album: { height: 352, name: () => t("plugins.spotify.album") },
+  playlist: { height: 352, name: () => t("plugins.spotify.playlist") },
+  artist: { height: 352, name: () => t("plugins.spotify.artist") },
+  show: { height: 232, name: () => t("plugins.spotify.podcast") },
+  episode: { height: 232, name: () => t("plugins.spotify.episode") },
 };
 
-/** What Spotify's player says: `{ type: "ready" }`, then `{ type: "playback_update", payload: { isPaused } }` as it plays. */
+/**
+ * What Spotify's player says: `{ type: "ready" }`, then `{ type: "playback_update", payload }` about
+ * every second as it plays. It says it isn't paused while it waits for the sound too, even when the
+ * browser then won't let it play, so that isn't playing yet.
+ */
 function read(message: unknown): ReturnType<SitePlayer["read"]> {
-  const { type, payload } = (message ?? {}) as { type?: string; payload?: { isPaused?: boolean } };
+  const { type, payload } = (message ?? {}) as { type?: string; payload?: { isPaused?: boolean; isBuffering?: boolean } };
   if (type === "ready") return "ready";
-  if (type === "playback_update") return payload?.isPaused ? "paused" : "playing";
-  return null;
+  if (type !== "playback_update") return null;
+  if (payload?.isPaused) return "paused";
+  return payload?.isBuffering ? null : "playing";
 }
 
 const player: Embed = {
@@ -48,69 +52,29 @@ const player: Embed = {
   draws: ({ href, image }) => !image && !!spotifyIn(webLink(href)),
   draw(dom, { href, label }, changed) {
     const { kind, id } = spotifyIn(webLink(href))!;
-    const site = { site: "Spotify", title: label, ...PLAYERS[kind], src: `https://open.spotify.com/embed/${kind}/${id}`, origin: "https://open.spotify.com" };
-    return drawSitePlayer(dom, { ...site, read, play: { command: "play" }, pause: { command: "pause" } }, changed);
+    const { height, name } = KINDS[kind];
+    return drawSitePlayer(
+      dom,
+      {
+        site: "Spotify",
+        link: `https://open.spotify.com/${kind}/${id}`,
+        title: label,
+        kind: name(),
+        note: t("plugins.spotify.previews"),
+        src: `https://open.spotify.com/embed/${kind}/${id}`,
+        height,
+        origin: "https://open.spotify.com",
+        read,
+        play: { command: "play" },
+        pause: { command: "pause" },
+      },
+      changed,
+    );
   },
-  paste: (href) => (spotifyIn(webLink(href)) ? `[Spotify](${href})` : null),
-};
-
-/** The library's kinds, by what Spotify calls them; playlists and artists aren't kept. */
-const TYPES: Partial<Record<Kind, string>> = { track: "song", album: "album", show: "podcast", episode: "episode" };
-
-/** Spotify's words before what a podcast or episode is about: "Listen to this episode from The Daily on Spotify." */
-const LISTEN = /^Listen to (?:this episode from )?.+? on Spotify\.\s*/;
-
-/**
- * What a Spotify page says it is (as Web Pages reads it), with what that misses: an episode's
- * podcast and length, and what a podcast or episode is about without Spotify's words before it. A
- * song's or album's description is only Spotify's own (`Listen to … on Spotify. Song · …`).
- */
-export function spotifyItem(page: Page, type: string): LibraryItem | null {
-  const item = itemOfPage(page);
-  if (item?.type !== type) return null;
-  const description = type === "podcast" || type === "episode" ? item.description?.replace(LISTEN, "") : undefined;
-  if (type !== "episode") return { ...item, description };
-  const found = new Map(item.properties);
-  return {
-    ...item,
-    properties: known([
-      // Its page names its podcast only as `The Daily · Episode`.
-      ["podcast", found.get("podcast") ?? page.meta.get("og:description")?.split(" · ")[0]],
-      ["published", found.get("published")],
-      ["duration", found.get("duration") ?? clock(Number(page.meta.get("music:duration")))],
-    ]),
-    description,
-  };
-}
-
-interface OEmbed {
-  title?: string;
-  thumbnail_url?: string;
-}
-
-async function lookup(url: URL, signal: AbortSignal): Promise<LibraryItem | null> {
-  const found = spotifyIn(url);
-  const type = found && TYPES[found.kind];
-  if (!type) return null;
-  const link = `https://open.spotify.com/${found.kind}/${found.id}`;
-  if (isTauri) {
-    const page = await getPage(link, signal);
-    return page && spotifyItem(page, type);
-  }
-  // On the web only oEmbed answers, which names a podcast after its latest episode.
-  if (type === "podcast") return null;
-  const embed = await getJson<OEmbed>(`https://open.spotify.com/oembed?url=${encodeURIComponent(link)}`, signal);
-  return embed?.title ? { type, title: embed.title, link, properties: [], cover: embed.thumbnail_url } : null;
-}
-
-const source: LibrarySource = {
-  id: "spotify",
-  name: "Spotify",
-  recognizes: (url) => {
-    const found = spotifyIn(url);
-    return !!found && found.kind in TYPES;
+  paste: (href) => {
+    const link = spotifyLink(href);
+    return link && `[Spotify](${link})`;
   },
-  lookup,
 };
 
 export const spotify = (): Plugin => ({
@@ -119,8 +83,5 @@ export const spotify = (): Plugin => ({
   description: t("plugins.spotify.description"),
   icon: "headphones",
   enabledByDefault: true,
-  contributes: {
-    librarySources: [source],
-    markdown: [{ embeds: [player] }],
-  },
+  contributes: { markdown: [{ embeds: [player] }] },
 });

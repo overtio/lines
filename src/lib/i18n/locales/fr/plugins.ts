@@ -131,9 +131,19 @@ export default {
     "Recherche les morceaux et albums par un lien vers MusicBrainz, ou vers Spotify, Apple Music, Bandcamp, Deezer ou Tidal qu’il connaît : artiste, album, année et pochette. Le lien est envoyé à MusicBrainz.",
   "plugins.applePodcasts.description": "Recherche les podcasts et leurs épisodes par un lien vers Apple Podcasts, avec le flux du podcast. Les identifiants du lien sont envoyés à Apple.",
   "plugins.spotify.description":
-    "Lit les liens Spotify dans les notes avec le lecteur de Spotify, quand vous les lancez (sans compte, 30 secondes de chaque titre), et recherche les titres, albums et épisodes de Spotify pour la Bibliothèque. Le lien est envoyé à Spotify.",
+    "Lit les liens vers Spotify seuls sur leur ligne avec le lecteur de Spotify, quand vous les lancez : des extraits de 30 secondes sans connexion à Spotify. Rien n’est envoyé à Spotify avant.",
+  "plugins.spotify.previews": "Charge le lecteur de Spotify quand vous le lancez : des extraits de 30 secondes sans connexion à Spotify",
+  "plugins.spotify.track": "Titre",
+  "plugins.spotify.album": "Album",
+  "plugins.spotify.playlist": "Playlist",
+  "plugins.spotify.artist": "Artiste",
+  "plugins.spotify.podcast": "Podcast",
+  "plugins.spotify.episode": "Épisode",
   "plugins.soundcloud.description":
-    "Lit les liens SoundCloud dans les notes avec le lecteur de SoundCloud, quand vous les lancez, et recherche ses titres pour la Bibliothèque ; dans les apps, un lien vers quelqu’un qui y publie un podcast vous y abonne. Le lien est envoyé à SoundCloud.",
+    "Lit les liens vers SoundCloud seuls sur leur ligne avec le lecteur de SoundCloud, quand vous les lancez, et recherche ses titres pour la Bibliothèque. Dans les apps, un lien vers quelqu’un qui y publie un podcast vous y abonne. Le lien est envoyé à SoundCloud.",
+  "plugins.soundcloud.track": "Titre",
+  "plugins.soundcloud.set": "Playlist",
+  "plugins.soundcloud.user": "Artiste",
   "plugins.feeds.description":
     "Abonnez-vous aux flux des sites et des podcasts, et lisez leurs articles dans les Flux de la Bibliothèque. Une nouvelle note qui n’est que le lien d’un flux vous y abonne. Les notes d’épisodes ont un bouton pour les lire. Les flux sont téléchargés depuis leurs sites, dans les apps toutes les 30 minutes.",
   "plugins.hackerNews.description": "Affiche les commentaires d’un article de Hacker News sous sa publication dans les Flux de la Bibliothèque, en fils de discussion, à lire. Son identifiant est envoyé à l’API de Hacker News et à la copie d’Algolia.",

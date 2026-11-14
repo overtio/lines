@@ -99,6 +99,8 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.pauseRecording", keys: ["Space"], note: "shortcuts.inPlayer" },
       { action: "shortcuts.skipRecording", keys: ["ArrowLeft", "ArrowRight"], note: "shortcuts.inPlayer" },
       { action: "shortcuts.leaveRecording", keys: ["Escape"], note: "shortcuts.inPlayer" },
+      { action: "shortcuts.playSite", keys: ["Enter"], note: "shortcuts.mediaSelected" },
+      { action: "shortcuts.leaveRecording", keys: ["Tab", "Shift-Tab"], note: "shortcuts.inSitePlayer" },
     ],
   },
   {

@@ -365,9 +365,21 @@ function backToNote(view: EditorView, dom: HTMLElement, event: KeyboardEvent) {
   if (event.key !== "Escape" || !(event.target instanceof Element) || !event.target.closest(OWN_INPUT)) return;
   event.preventDefault();
   event.stopPropagation();
+  selectDrawn(view, dom);
+}
+
+/** Puts the keyboard back in the note, with the block `dom` draws selected. */
+function selectDrawn(view: EditorView, dom: HTMLElement) {
   const own = blockOnLine(view.state, view.state.doc.lineAt(blockPos(view, dom)).number);
   view.focus();
   if (own) selectBlock(view, own, true);
+}
+
+/** From within what a block draws (Tab out of a site's player, whose keys lines never hears): back to the note, with the block selected. */
+export function leaveBlock(element: HTMLElement) {
+  const dom = element.closest<HTMLElement>(".cm-lp-block");
+  const view = dom && EditorView.findFromDOM(dom);
+  if (dom && view) selectDrawn(view, dom);
 }
 
 /** What a plugin draws for a link (embeds). */

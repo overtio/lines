@@ -1583,16 +1583,24 @@
 
 /*
  * A site's own player (Spotify's, SoundCloud's; sitePlayer.ts): an audio file's card until it's
- * played, then the site's player, as wide as the note up to a column's width, at the height the
- * site gives it, its corners the theme's. The card's selected as a file's is.
+ * played, then the site's player at the height the site gives it, both as wide, its corners the
+ * theme's. Its Open button sits beside it, as other blocks' buttons do. The card's selected as a
+ * file's is.
  */
 .cm-lp-site-player {
-  max-width: 40em;
+  position: relative;
+  width: min(100%, 30em);
   border-radius: calc(12px * var(--radius-scale));
 }
 
 .cm-lp-site-card {
-  width: min(100%, 26em);
+  width: 100%;
+  max-width: none;
+}
+
+.cm-lp-site-player:hover .cm-lp-actions,
+.cm-lp-embed-block:is(.is-preview, .is-selected) .cm-lp-site-player .cm-lp-actions {
+  opacity: 1;
 }
 
 /* Until it's played, the card is what's selected. */
@@ -1611,6 +1619,18 @@
   border: 0;
   border-radius: inherit;
   background: var(--card-bg);
+}
+
+/* Open, in a message that it couldn't be loaded, as a link reads. */
+.cm-lp-site-open {
+  margin-left: 0.4em;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-link);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 /*

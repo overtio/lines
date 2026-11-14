@@ -272,6 +272,11 @@ export interface LibrarySource {
    * says of each (a small `cover`, its `link`), the rest looked up by its link once one is chosen.
    */
   search?(type: string, text: string, signal: AbortSignal): Promise<LibraryItem[]>;
+  /**
+   * The podcast feed a link it knows names, if it names one (a podcast's page on Apple Podcasts):
+   * Subscribe asks, and so does looking for a site's feed among the links on its page.
+   */
+  feed?(url: URL, signal: AbortSignal): Promise<string | null>;
 }
 
 /** A font to write notes in, which the plugin brings with it (`@font-face`) so it's there on every computer. */
