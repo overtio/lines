@@ -2,6 +2,7 @@ import { tick } from "svelte";
 import { t } from "../i18n/index.svelte";
 import type { LockSettings } from "../lock/lock.svelte";
 import type { NotesPassword } from "../notes/noteKeys.svelte";
+import { imports } from "../library/imports.svelte";
 import { isDesktopApp } from "../platform";
 import { prefs, type SettingsOpens } from "../prefs.svelte";
 import { sectionOf, type SettingsSection } from "../components/settings/sections";
@@ -95,6 +96,7 @@ const FORWARDED: Record<string, string[]> = {
   lockedNotes: ["unlock", "changePassword", "reset", "setTouchId"],
   notes: ["addSamples", "reset", "setFilter"],
   feeds: ["importOpml"],
+  imports: ["start", "stop", "undo", "clear"],
 };
 
 /**
@@ -144,6 +146,8 @@ export async function forwardToMain(targets: Record<string, Target>, sync: SyncS
       after(message.state);
       if (message.error === undefined) call.resolve(message.result);
       else call.reject(new Error(message.error));
+    } else if (message.type === "import-state") {
+      imports.state = message.state;
     } else if (message.type === "sync-state") {
       Object.assign(sync, message.state);
       heard();
@@ -155,14 +159,19 @@ export async function forwardToMain(targets: Record<string, Target>, sync: SyncS
   return synced;
 }
 
-/** In the main window: does what the Settings window asks, and tells it how sync is doing. */
+/** In the main window: does what the Settings window asks, and tells it how sync and an import are doing. */
 export function serveSettings(targets: Record<string, Target>, syncState: () => SyncState, lockState: () => LockState) {
   const tell = () => void announce({ type: "sync-state", state: syncState() });
+  const tellImport = () => void announce({ type: "import-state", state: $state.snapshot(imports.state) });
   $effect.root(() => {
     $effect(tell);
+    $effect(tellImport);
   });
   void onAnnounce(async (message) => {
-    if (message.type === "sync-ask") tell();
+    if (message.type === "sync-ask") {
+      tell();
+      tellImport();
+    }
     if (message.type === "open-settings") ui.settings = sectionOf(message.section);
     if (message.type !== "call" || !FORWARDED[message.target]?.includes(message.method)) return;
     try {

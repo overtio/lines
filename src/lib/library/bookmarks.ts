@@ -1,7 +1,6 @@
 import { dayOf } from "../notes/calendar";
-import { cleanTagInput, normalizeTag } from "../notes/parse";
 import type { LibraryItem } from "../plugins/types";
-import { known } from "./text";
+import { known, libraryTag } from "./text";
 
 /*
  * A browser's bookmarks, as the Library's resources (docs/library.md): read from the page of links
@@ -215,15 +214,9 @@ export function planImport(bookmarks: Bookmark[], kept: Iterable<string>): Bookm
   return plan;
 }
 
-/** A tag of a bookmark's, or of its folders (`Dev / Rust` as `dev/rust`), as lines writes it; null where nothing of it can be one. */
-function tagOf(names: string[]): string | null {
-  const parts = names.map((name) => cleanTagInput(name.replace(/[/#]/g, " ")).replace(/-{2,}/g, "-").replace(/^-|-$/g, "")).filter(Boolean);
-  return parts.length ? normalizeTag(parts.join("/")) : null;
-}
-
 /** A bookmark as a resource: its title, its folder and the day it was bookmarked, what it says of itself, and its tags, and its folders' if asked. */
 export function bookmarkItem(bookmark: Bookmark, { folderTags = false } = {}): LibraryItem {
-  const tags = [...bookmark.tags.map((tag) => tagOf([tag])), folderTags ? tagOf(bookmark.folders) : null].filter((tag) => tag !== null);
+  const tags = [...bookmark.tags.map((tag) => libraryTag([tag])), folderTags ? libraryTag(bookmark.folders) : null].filter((tag) => tag !== null);
   return {
     type: "resource",
     title: bookmark.title || bookmark.url.replace(/^https?:\/\/(?:www\.)?/i, "").replace(/\/$/, ""),

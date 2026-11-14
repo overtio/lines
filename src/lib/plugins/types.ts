@@ -10,6 +10,7 @@ import type { IconName } from "../icons/icons";
 import type { NoteStats } from "../notes/stats";
 import type { NoteMeta } from "../notes/types";
 import type { Parts } from "../print/parts";
+import type { ImportWork } from "../library/imports.svelte";
 
 /*
  * What a plugin is, and what it can add to lines (docs/plugins.md). lines' own languages, themes,
@@ -94,27 +95,41 @@ export interface Contributions {
   librarySources?: LibrarySource[];
   /** What a web link in a note can be used for, in its menu (right-click it) after Open and Copy: added to the Library, say. */
   linkActions?: LinkAction[];
-  /** Files lines imports as something other than a note in a language: a browser's bookmarks, as the Library's resources. */
-  fileImports?: FileImport[];
+  /** Ways to bring things into the Library from elsewhere (a browser's bookmarks, Readwise), each a group of Settings → Library. */
+  libraryImports?: LibraryImport[];
   /** Sites whose discussion of a post lines shows under it, from the post's comments link: Hacker News'. */
   discussions?: DiscussionSource[];
 }
 
+/** A file chosen to import, read. */
+export interface ImportFile {
+  name: string;
+  text: string;
+}
+
 /**
- * Files of a kind lines imports its own way (Settings → Export and Import → Import Files…), which
- * asks what to do with them before doing it: a browser's exported bookmarks.
+ * A way to bring things into the Library from another app or its files: its group of Settings →
+ * Library, which says what importing would do before anything's written (ImportStep.svelte), then
+ * has the import done in the main window (lib/library/imports.svelte.ts), which can take it back.
  */
-export interface FileImport {
+export interface LibraryImport {
   id: string;
-  /** The extensions of its files, for the file picker. */
-  extensions: string[];
-  /** Whether a file's text is one it reads (its start is enough), quickly. */
-  recognizes(text: string): boolean;
+  /** Its group's heading and what it says under it: "Bookmarks". */
+  name: string;
+  note: string;
   /**
-   * What says what importing the files would do, does it, and says what it did: rows of a card in
-   * Settings, given the files' names and text, and what to call when it's done with (Cancel).
+   * Its group's rows, loaded the first time they're shown: where to import from, and what importing
+   * would do. Given `files` chosen elsewhere (Export and Import's Import Files…), it asks about those,
+   * and `onclose` when it's done with them.
    */
-  step: () => Promise<{ default: Component<{ files: { name: string; text: string }[]; onclose: () => void }> }>;
+  panel: () => Promise<{ default: Component<{ files?: ImportFile[]; onclose?: () => void }> }>;
+  /** Files of its own that Export and Import's Import Files… hands it: their extensions, and whether a file's text is one (its start is enough), quickly. */
+  files?: { extensions: string[]; recognizes(text: string): boolean };
+  /**
+   * What importing `input` (what its panel gave `imports.start`, as it was sent between windows)
+   * writes, worked out against the notes as they are when it starts.
+   */
+  work(input: unknown): ImportWork;
 }
 
 /**

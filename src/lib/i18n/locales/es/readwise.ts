@@ -1,0 +1,33 @@
+import type { Translation } from "../../format";
+import type en from "../en/readwise";
+
+export default {
+  "readwise.note": "Tus libros, artículos, pódcasts y tuits de Readwise y Reader, con sus subrayados, como notas en la Biblioteca. Los feeds de Reader llegan como OPML, en Feeds.",
+  "readwise.token": "Token de acceso",
+  "readwise.tokenNote": "Readwise te da uno para copiar. Solo se envía a Readwise, para esta importación, y no se guarda.",
+  "readwise.getToken": "Obtener tu token",
+  "readwise.find": "Buscar",
+  "readwise.asking": "Consultando Readwise… {pages, plural, one {# página} other {# páginas}} hasta ahora",
+  "readwise.waiting": "Readwise pidió esperar; se volverá a consultar en {seconds} segundos…",
+  "readwise.found": "Se encontraron {things}, con {highlights, plural, one {# subrayado} other {# subrayados}}.",
+  "readwise.nothingNew": "Todo lo que hay en Readwise ya está en lines.",
+  "readwise.count.book": "{count, plural, one {# libro} other {# libros}}",
+  "readwise.count.article": "{count, plural, one {# artículo} other {# artículos}}",
+  "readwise.count.episode": "{count, plural, one {# episodio} other {# episodios}}",
+  "readwise.count.video": "{count, plural, one {# vídeo} other {# vídeos}}",
+  "readwise.count.paper": "{count, plural, one {# artículo científico} other {# artículos científicos}}",
+  "readwise.adding": "{count, plural, one {Añade # subrayado a notas que ya están en lines: {notes}.} other {Añade # subrayados a notas que ya están en lines: {notes}.}}",
+  "readwise.more": "{count, plural, one {# más} other {# más}}",
+  "readwise.leftOut": "{count, plural, one {Se deja fuera # libro complementario, sugerencia de Readwise.} other {Se dejan fuera # libros complementarios, sugerencias de Readwise.}}",
+  "readwise.import": "Importar",
+  "readwise.added": "{count, plural, =0 {No se añadió ninguna nota.} one {Se añadió # nota.} other {Se añadieron # notas.}}",
+  "readwise.updated": "{count, plural, one {Se añadieron subrayados a # nota que ya estaba.} other {Se añadieron subrayados a # notas que ya estaban.}}",
+  "readwise.undone": "{count, plural, =0 {Importación deshecha.} one {Importación deshecha: se quitó la nota que añadió.} other {Importación deshecha: se quitaron las # notas que añadió.}}",
+  "readwise.restored": "{count, plural, one {La nota a la que añadió está como estaba.} other {Las # notas a las que añadió están como estaban.}}",
+  "readwise.badToken": "Readwise no aceptó este token. Vuelve a copiarlo de Readwise.",
+  "readwise.answered": "Readwise respondió {status}. Inténtalo de nuevo más tarde.",
+  "readwise.unreadable": "No se pudo leer la respuesta de Readwise, así que no se importó nada.",
+  "readwise.unreachable": "No se pudo conectar con Readwise. Comprueba que tienes conexión e inténtalo de nuevo.",
+  "readwise.page": "Página {page}",
+  "readwise.location": "Posición {location}",
+} satisfies Translation<typeof en>;

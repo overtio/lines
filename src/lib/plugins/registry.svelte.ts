@@ -101,7 +101,7 @@ class Plugins {
       .sort((a, b) => Number(!!a.general) - Number(!!b.general));
   });
   readonly linkActions = $derived(this.#from("linkActions"));
-  readonly fileImports = $derived(this.#from("fileImports"));
+  readonly libraryImports = $derived(this.#from("libraryImports"));
   readonly discussions = $derived(this.#from("discussions"));
 
   constructor() {

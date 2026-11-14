@@ -51,6 +51,9 @@ export interface NoteLock {
   open?: boolean;
 }
 
+/** A locked note that isn't open: all there is of it is its title. */
+export const isClosed = (note: Note) => !!note.locked && !note.locked.open;
+
 /** Derived, cached data computed from a note's body. */
 export interface NoteMeta {
   title: string;

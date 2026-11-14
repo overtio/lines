@@ -9,6 +9,7 @@
   import { isClosed, notes } from "../../notes/store.svelte";
   import { isApple, isDesktopApp, isSite, revealFile, saveFile } from "../../platform";
   import { plugins } from "../../plugins/registry.svelte";
+  import type { ImportFile, LibraryImport } from "../../plugins/types";
   import { sync } from "../../sync/engine.svelte";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
@@ -34,21 +35,23 @@
   let picker = $state<HTMLInputElement>();
   let importButton = $state<HTMLElement>();
 
-  type Step = Component<{ files: { name: string; text: string }[]; onclose: () => void }>;
-  /** Files a plugin imports its own way (a browser's bookmarks), each kind asking what to do with them below. */
-  let steps = $state.raw<{ files: { name: string; text: string }[]; step: Step }[]>([]);
+  type Panel = Component<{ files?: ImportFile[]; onclose?: () => void }>;
+  /** Files a Library import reads (a browser's bookmarks), each import asking what to do with them below. */
+  let steps = $state.raw<{ files: ImportFile[]; step: Panel }[]>([]);
+  /** The Library's imports of files of their own. */
+  const fileImports = $derived(plugins.libraryImports.filter((each): each is LibraryImport & Required<Pick<LibraryImport, "files">> => !!each.files));
 
   /** The extension a file's name ends in, in lowercase. */
   const extensionOf = (name: string) => name.slice(name.lastIndexOf(".") + 1).toLowerCase();
 
   /** The chosen files a plugin imports its own way, by the plugin's import (read to tell), and the rest. */
   async function sortChosen(files: File[]) {
-    const theirs = new Map<string, { name: string; text: string }[]>();
+    const theirs = new Map<string, ImportFile[]>();
     const rest: File[] = [];
     for (const file of files) {
-      const own = plugins.fileImports.filter((each) => each.extensions.includes(extensionOf(file.name)));
+      const own = fileImports.filter((each) => each.files.extensions.includes(extensionOf(file.name)));
       const text = own.length ? await file.text() : "";
-      const by = own.find((each) => each.recognizes(text));
+      const by = own.find((each) => each.files.recognizes(text));
       if (by) theirs.set(by.id, [...(theirs.get(by.id) ?? []), { name: file.name, text }]);
       else rest.push(file);
     }
@@ -65,7 +68,7 @@
     try {
       const { theirs, rest } = await sortChosen(files);
       steps = await Promise.all(
-        [...theirs].map(async ([id, files]) => ({ files, step: (await plugins.fileImports.find((each) => each.id === id)!.step()).default })),
+        [...theirs].map(async ([id, files]) => ({ files, step: (await fileImports.find((each) => each.id === id)!.panel()).default })),
       );
       if (rest.length || !theirs.size) {
         imported = await notes.importFiles(rest);
@@ -223,7 +226,7 @@
       bind:this={picker}
       type="file"
       multiple
-      accept={[...importable(), ...plugins.fileImports.flatMap((each) => each.extensions)].map((extension) => `.${extension}`).join(",")}
+      accept={[...importable(), ...fileImports.flatMap((each) => each.files.extensions)].map((extension) => `.${extension}`).join(",")}
       class="hidden"
       onchange={importChosen}
     />

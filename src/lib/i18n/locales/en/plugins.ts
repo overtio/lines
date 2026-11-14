@@ -158,6 +158,8 @@ export default {
   "plugins.feeds.description":
     "Subscribe to sites’ and podcasts’ feeds, and read their posts in the Library’s Feeds. A new note that’s just a feed’s link subscribes to it. Episode notes get a Play button. Feeds are fetched from their sites, in the apps every 30 minutes.",
   "plugins.hackerNews.description": "Shows a Hacker News story’s comments under its post in the Library’s Feeds, threaded, to read. The story’s id goes to Hacker News’ API and to Algolia’s copy of it.",
+  "plugins.readwise.description":
+    "Brings your highlights from Readwise, and what you saved in Reader, into the Library, from Settings → Library. Uses an access token from Readwise, sent only to Readwise and not kept.",
   "plugins.code": "Code",
   "plugins.code.description": "Notes that are files of code, in any of about 120 programming languages: line numbers, a fixed-width font, and highlighting in the theme's colors, with indenting and brackets as in a code editor. They download and export as their language's files (.py, .ts, .rs…).",
   "plugins.typing": "Typing Practice",

@@ -105,6 +105,38 @@ const seedLibrary = (page) =>
   });
 
 /**
+ * Settings → Library's Readwise, having asked Readwise (answered here from the tests' fixtures, shaped
+ * as its API documents its answers) what it has; then, with `importing`, having imported it.
+ */
+async function readwise(page, { importing = false } = {}) {
+  const fixture = (name) => readFileSync(`${root}tests/unit/fixtures/readwise/${name}`, "utf8");
+  const reader = JSON.parse(fixture("reader.json"));
+  const cors = { "access-control-allow-origin": "*" };
+  await page.route("https://readwise.io/api/v2/auth/", (route) => route.fulfill({ headers: cors, status: 204 }));
+  await page.route("https://readwise.io/api/v2/export/**", (route) => route.fulfill({ headers: { ...cors, "content-type": "application/json" }, body: fixture("export.json") }));
+  await page.route("https://readwise.io/api/v3/list/**", (route) => {
+    const url = new URL(route.request().url());
+    const cursor = url.searchParams.get("pageCursor");
+    return route.fulfill({ headers: cors, json: reader[`${url.searchParams.get("location")}${cursor ? `:${cursor}` : ""}`] });
+  });
+  for (const pictures of ["https://m.media-amazon.com/**", "https://example.com/images/**", "https://i.ytimg.com/**"]) {
+    await page.route(pictures, (route) => route.fulfill({ body: png(200, 300, (x, y) => [40 + y / 3, 70 + x / 4, 110]), contentType: "image/png", headers: cors }));
+  }
+  await page.evaluate(() => window.testing.open("---\ntype: book\nauthor: Henry David Thoreau\nstatus: read\n---\n# Walden\n"));
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByRole("dialog").getByRole("navigation").getByText("Library", { exact: true }).first().click();
+  const group = page.getByRole("dialog").getByRole("region", { name: "Readwise" });
+  await group.getByLabel("Access token").fill("a-token-from-readwise");
+  await group.getByRole("button", { name: "Find", exact: true }).click();
+  await group.getByRole("button", { name: "Import", exact: true }).waitFor();
+  if (importing) {
+    await group.getByRole("button", { name: "Import", exact: true }).click();
+    await group.getByRole("button", { name: "Undo Import" }).waitFor();
+  }
+  await group.scrollIntoViewIfNeeded();
+}
+
+/**
  * Add to Library, searching Books for "dune": Open Library's answer (trimmed) and its covers, drawn
  * here as the library's are, answered in place of the network.
  */
@@ -999,6 +1031,38 @@ const SCENES = [
       await page.keyboard.type("Sphinx of blsck quartz.", { delay: 60 });
     },
     shoot: ".cm-lp-editable",
+  },
+  ...["lines", "classic", "pixel", "neon"].flatMap((style) => [
+    {
+      id: `readwise-found-${style}`,
+      title: `Settings → Library → Readwise, having found what's there, in ${style[0].toUpperCase()}${style.slice(1)}`,
+      look: "Readwise's group after Bookmarks, its rows as Bookmarks' are: the token's row with its note, the field (empty again) and Find lined up at its end; what was found, the first line plain and the rest quieter (adding to Walden, a supplemental book left out); then Import, focused, and Cancel.",
+      prefs: style === "lines" ? {} : { style, theme: style },
+      act: (page) => readwise(page),
+      shoot: "dialog",
+      schemes: style === "lines" ? ["light", "dark"] : ["light"],
+    },
+    {
+      id: `readwise-done-${style}`,
+      title: `Settings → Library → Readwise, imported, in ${style[0].toUpperCase()}${style.slice(1)}`,
+      look: "A check and what was added, Undo Import quiet at the row's end, as Bookmarks' is; the field empty.",
+      prefs: style === "lines" ? {} : { style, theme: style },
+      act: (page) => readwise(page, { importing: true }),
+      shoot: "dialog",
+      schemes: style === "lines" ? ["light", "dark"] : ["light"],
+    },
+  ]),
+  {
+    id: "readwise-note",
+    title: "A book brought from Readwise",
+    look: "Its properties (author, readwise), title and cover; its tag, then the person's note; Highlights, each a quote with where it is and when in it, the person's note on it under it as text.",
+    act: async (page) => {
+      await readwise(page, { importing: true });
+      await page.keyboard.press("Escape");
+      await page.evaluate(() => window.testing.notes.select(window.testing.notes.entries.find((entry) => entry.meta.title === "Moby-Dick").note.id));
+      await page.locator(".cm-content").getByText("Call me Ishmael.").waitFor();
+    },
+    height: 1400,
   },
   ...["Theme", "Paper", "Typography", "Cursor", "Mascots", "Editor", "Library", "All Plugins"].map((section) => ({
     id: `settings-${section.toLowerCase().replaceAll(" ", "-")}`,

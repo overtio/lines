@@ -24,6 +24,7 @@ import { musicbrainz } from "./musicbrainz";
 import { openLibrary } from "./open-library";
 import { paper } from "./paper";
 import { pele } from "./pele";
+import { readwise } from "./readwise";
 import { secrets } from "./secrets";
 import { sfSymbols } from "./sf-symbols";
 import { soundcloud } from "./soundcloud";
@@ -81,6 +82,8 @@ export const builtIn = (): Plugin[] => [
   webPages(),
   feedsPlugin(),
   hackerNews(),
+  // Bringing a library in from another app.
+  readwise(),
   changesPlugin(),
   themes(),
   styles(),

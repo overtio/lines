@@ -1,0 +1,33 @@
+import type { Translation } from "../../format";
+import type en from "../en/readwise";
+
+export default {
+  "readwise.note": "Vos livres, articles, podcasts et tweets de Readwise et Reader, avec leurs surlignages, en notes dans la Bibliothèque. Les flux de Reader arrivent en OPML, dans Flux.",
+  "readwise.token": "Jeton d’accès",
+  "readwise.tokenNote": "Readwise vous en donne un à copier. Il n’est envoyé qu’à Readwise, pour cette importation, et n’est pas conservé.",
+  "readwise.getToken": "Obtenir votre jeton",
+  "readwise.find": "Rechercher",
+  "readwise.asking": "Interrogation de Readwise… {pages, plural, one {# page} other {# pages}} pour l’instant",
+  "readwise.waiting": "Readwise a demandé d’attendre ; nouvel essai dans {seconds} secondes…",
+  "readwise.found": "Dans Readwise : {things}, avec {highlights, plural, one {# surlignage} other {# surlignages}}.",
+  "readwise.nothingNew": "Tout ce qui est dans Readwise est déjà dans lines.",
+  "readwise.count.book": "{count, plural, one {# livre} other {# livres}}",
+  "readwise.count.article": "{count, plural, one {# article} other {# articles}}",
+  "readwise.count.episode": "{count, plural, one {# épisode} other {# épisodes}}",
+  "readwise.count.video": "{count, plural, one {# vidéo} other {# vidéos}}",
+  "readwise.count.paper": "{count, plural, one {# article scientifique} other {# articles scientifiques}}",
+  "readwise.adding": "{count, plural, one {Ajoute # surlignage à des notes déjà dans lines : {notes}.} other {Ajoute # surlignages à des notes déjà dans lines : {notes}.}}",
+  "readwise.more": "{count, plural, one {# autre} other {# autres}}",
+  "readwise.leftOut": "{count, plural, one {# livre complémentaire, suggestion de Readwise, est laissé de côté.} other {# livres complémentaires, suggestions de Readwise, sont laissés de côté.}}",
+  "readwise.import": "Importer",
+  "readwise.added": "{count, plural, =0 {Aucune note ajoutée.} one {# note ajoutée.} other {# notes ajoutées.}}",
+  "readwise.updated": "{count, plural, one {Surlignages ajoutés à # note déjà présente.} other {Surlignages ajoutés à # notes déjà présentes.}}",
+  "readwise.undone": "{count, plural, =0 {Importation annulée.} one {Importation annulée : la note ajoutée est retirée.} other {Importation annulée : les # notes ajoutées sont retirées.}}",
+  "readwise.restored": "{count, plural, one {La note complétée est comme avant.} other {Les # notes complétées sont comme avant.}}",
+  "readwise.badToken": "Readwise n’a pas accepté ce jeton. Copiez-le à nouveau depuis Readwise.",
+  "readwise.answered": "Readwise a répondu {status}. Réessayez dans un moment.",
+  "readwise.unreadable": "La réponse de Readwise n’a pas pu être lue : rien n’a été importé.",
+  "readwise.unreachable": "Impossible de joindre Readwise. Vérifiez que vous êtes en ligne, puis réessayez.",
+  "readwise.page": "Page {page}",
+  "readwise.location": "Emplacement {location}",
+} satisfies Translation<typeof en>;
