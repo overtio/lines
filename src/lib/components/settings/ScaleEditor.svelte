@@ -58,8 +58,8 @@
 
 <form class="flex flex-col gap-3 border-b border-line px-4 py-3 last:border-0" aria-label={start ? t("library.rating.editScale", { name: start.name }) : t("library.rating.newScale")} onsubmit={save}>
   <div class="flex flex-wrap items-center gap-2">
-    <!-- svelte-ignore a11y_autofocus -->
-    <TextField class="min-w-40 flex-1" bind:value={name} aria-label={t("library.rating.scaleName")} placeholder={t("library.rating.scaleNamePlaceholder")} autofocus />
+    <!-- The keyboard's here as it opens. -->
+    <TextField class="min-w-40 flex-1" bind:value={name} aria-label={t("library.rating.scaleName")} placeholder={t("library.rating.scaleNamePlaceholder")} {@attach (field) => field.focus()} />
     <Segmented label={t("library.rating.scaleKind")} options={kinds} value={kind} onselect={(chosen) => (kind = chosen)} />
   </div>
   {#if kind === "labels"}

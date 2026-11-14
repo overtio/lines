@@ -3,6 +3,8 @@ import { fromBase64, lockKey, randomBytes, toBase64, unlockKey } from "../crypto
 import { t } from "../i18n/index.svelte";
 import { readSecret, writeSecret } from "../lock/vault";
 import { attachmentNames, getAttachment, putAttachment, usedAttachments } from "../notes/attachments";
+import { RATINGS_FILE, readRatings, writeRatings } from "../library/ratings";
+import { ratings } from "../library/ratings.svelte";
 import { LOOKS_FILE, readLooks, writeLooks } from "../notes/looks";
 import { looks } from "../notes/looks.svelte";
 import { noteKeys } from "../notes/noteKeys.svelte";
@@ -54,7 +56,8 @@ async function connect(config: SyncConfig) {
  * Attachments (images and files) are named after their content, so they never change: each pass uploads the ones the
  * notes here show that the remote lacks, and downloads the ones they show that this device lacks.
  *
- * Tags' and types' icons and colors are one file, `library.json`, merged choice by choice (looks.ts).
+ * Tags' and types' icons and colors are one file, `library.json`, merged choice by choice (looks.ts);
+ * what the Library's kinds are rated on another, `ratings.json`, merged the same way (library/ratings.ts).
  *
  * With end-to-end encryption on (see sealed.ts), the same happens through a SealedRemote. Turning
  * it on or off rewrites the whole remote, so it's never half one and half the other for long:
@@ -250,6 +253,7 @@ class SyncEngine {
   start() {
     notes.onLocalChange(() => this.schedule());
     looks.onChange(() => this.schedule());
+    ratings.onChange(() => this.schedule());
     window.addEventListener("online", () => void this.syncNow());
     window.addEventListener("offline", () => this.config && (this.status = "offline"));
     window.addEventListener("focus", () => {
@@ -317,6 +321,7 @@ class SyncEngine {
       // Every note goes up again, encrypted; the plain copies are removed after.
       await this.#switch({ ...config, encryption: { id, key: toBase64(raw) } });
       await store.delete(root + LOOKS_FILE);
+      await store.delete(root + RATINGS_FILE);
     });
   }
 
@@ -343,6 +348,7 @@ class SyncEngine {
         await this.#pass(config);
         const { remote } = await connect(config);
         await store.delete(await remote.fileKey!(root + LOOKS_FILE));
+        await store.delete(await remote.fileKey!(root + RATINGS_FILE));
         // Without the key file, other devices stop before they'd see notes go missing.
         await store.delete(root + KEY_FILE);
         localStorage.setItem(LEFTOVERS_KEY, "1");
@@ -641,6 +647,7 @@ class SyncEngine {
       await pool(listed.filter((object) => object.key.endsWith(".md")), (object) => store.delete(object.key));
     }
     await this.#syncLooks(remote, root);
+    await this.#syncRatings(remote, root);
     await this.#syncAttachments(remote, store, attachmentDir, !!config.encryption);
   }
 
@@ -652,6 +659,16 @@ class SyncEngine {
     const text = writeLooks(looks.looks);
     if (text === there?.text) return;
     // Not over a version written since (false): the next pass merges that in.
+    if ((await remote.put(key, text, there ? (there.etag ?? undefined) : null)) === false) this.schedule();
+  }
+
+  /** Brings in other devices' rating choices, and writes back the merge if it's new to them, as looks are. */
+  async #syncRatings(remote: Remote, root: string) {
+    const key = root + RATINGS_FILE;
+    const there = await remote.get(key);
+    if (there) ratings.merge(readRatings(there.text));
+    const text = writeRatings(ratings.choices);
+    if (text === there?.text) return;
     if ((await remote.put(key, text, there ? (there.etag ?? undefined) : null)) === false) this.schedule();
   }
 

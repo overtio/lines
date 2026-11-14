@@ -1161,7 +1161,7 @@ const SCENES = [
     id: "ratings-points",
     title: "A show rated out of 10, with ratings of its own",
     look: "Shows on Out of 10, with Story and Music: rating 9, story 8.5 and music 10, each a short bar in the accent filled as far, the bars lined up under each other, then the number bold and its /10 faint; the keys in their column like any property's.",
-    storage: { "lines.looks": { ratings: { kinds: { show: { scale: { id: "10", at: 1 }, named: { names: ["Story", "Music"], at: 1 } } } } } },
+    storage: { "lines.ratings": { kinds: { show: { scale: { id: "10", at: 1 }, named: { names: ["Story", "Music"], at: 1 } } } } },
     note: "---\ntype: show\ncreator: Kanehito Yamada\nrating: 9/10\nstory: 8.5/10\nmusic: 10/10\nstatus: watched\n---\n# Frieren: Beyond Journey's End\n\nThe last line, for the cursor.",
     act: (page) => page.evaluate(() => window.testing.place()),
     shoot: ".editor-pane",
@@ -1170,7 +1170,7 @@ const SCENES = [
     id: "ratings-words",
     title: "Ratings in words, on Grades",
     look: "Movies on Grades: rating A, a chip in the accent, its corners as round as a mention's; story on the same. Under them a Key: Value line as written. Nothing taller than the line.",
-    storage: { "lines.looks": { ratings: { kinds: { movie: { scale: { id: "grades", at: 1 }, named: { names: ["Story"], at: 1 } } } } } },
+    storage: { "lines.ratings": { kinds: { movie: { scale: { id: "grades", at: 1 }, named: { names: ["Story"], at: 1 } } } } },
     note: "---\ntype: movie\ndirector: Denis Villeneuve\nrating: A\nstory: S\nstatus: watched\n---\n# Arrival\n\nNot a grade: Q\n\nThe last line, for the cursor.",
     act: (page) => page.evaluate(() => window.testing.place()),
     shoot: ".editor-pane",
@@ -1192,11 +1192,9 @@ const SCENES = [
     title: "Settings → Library → Ratings",
     look: "Ratings after Links: a row for each kind, its name, its note (Show's: \u201cAlso rated for Story and Music.\u201d) and a select of its scale with the pencil after it, lined up down the card. Show's pencil open: Story and Music in fields, each with up, down and remove, the up of the first and the down of the last dimmed; the field to add another and Add; the note under them. Scales after it: Vibes (\u201cWords: …\u201d) and Hearts with a heart, each with a pencil and a trash, the one in use dimmed; New Scale quiet at the heading's end.",
     storage: {
-      "lines.looks": {
-        ratings: {
-          kinds: { show: { scale: { id: "10", at: 1 }, named: { names: ["Story", "Music"], at: 1 } }, movie: { scale: { id: "vibes", at: 1 } } },
-          scales: { vibes: { name: "Vibes", scale: { kind: "labels", labels: ["Masterpiece", "Great", "Fine", "Meh"] }, at: 1 }, hearts: { name: "Hearts", scale: { kind: "marks", of: 7, icon: "heart" }, at: 1 } },
-        },
+      "lines.ratings": {
+        kinds: { show: { scale: { id: "10", at: 1 }, named: { names: ["Story", "Music"], at: 1 } }, movie: { scale: { id: "vibes", at: 1 } } },
+        scales: { vibes: { name: "Vibes", scale: { kind: "labels", labels: ["Masterpiece", "Great", "Fine", "Meh"] }, at: 1 }, hearts: { name: "Hearts", scale: { kind: "marks", of: 7, icon: "heart" }, at: 1 } },
       },
     },
     act: async (page) => {

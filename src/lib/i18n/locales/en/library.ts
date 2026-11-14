@@ -70,6 +70,8 @@ export default {
   "library.rating.nameTaken": "“{name}” is a property these notes have already.",
   "library.rating.added": "Added {name}",
   "library.rating.renamed": "Renamed {from} to {to}",
+  "library.rating.renameNotes": "{count, plural, one {Renames {from} to {to} in # note too, which keeps its date.} other {Renames {from} to {to} in # notes too, which keep their dates.}}",
+  "library.rating.rename": "Rename",
   "library.rating.moved": "{name}, {place} of {count}",
   "library.rating.removed": "Removed {name}",
   // Your own scales: marks in an icon, points, or words, the best first.

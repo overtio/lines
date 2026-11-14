@@ -90,7 +90,7 @@ A note shows an image as `![](../attachments/<hash>.png)` and links a file as `[
 
 The icons and colors chosen for tags and types are one small file beside the notes, `<bucket>/<folder>/library.json` (encrypted like a note when encryption is on). Each choice keeps when it was made, so devices merge them one by one, the later winning: an icon chosen for a tag on the phone and a color for a type on the Mac both stay. A choice undone is kept as undone, so that syncs too. Icons chosen before they synced are the device's until another device chooses for the same tag or type.
 
-The same file keeps what the Library's kinds are rated on ([library.md](library.md#ratings)): each kind's scale and its named ratings, two choices of their own, and each scale of yours, merged the same way. A scale removed is kept as removed, so that syncs too. The ratings themselves are properties of the notes, and sync with them. An older lines leaves these out when it writes the file back; the next sync from a device with this lines puts them back.
+What the Library's kinds are rated on ([library.md](library.md#ratings)) is a file of its own beside it, `<bucket>/<folder>/ratings.json` (encrypted likewise): each kind's scale and its named ratings, two choices of their own, and each scale of yours, merged the same way. A scale removed is kept as removed, so that syncs too, unless a kind is still rated on it on either device, which keeps it. A file of its own, so that a lines from before ratings, which writes `library.json` back as it knows it, leaves them alone. The ratings themselves are properties of the notes, and sync with them.
 
 Only one sync pass runs at a time, even with lines open in several browser tabs, so a conflict makes one copy, not one per tab.
 

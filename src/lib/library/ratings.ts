@@ -1,13 +1,17 @@
 import type { Scale } from "../editor/scores";
 import { ICONS, type IconName } from "../icons/icons";
+import { keyOf } from "../notes/properties";
 
 /*
  * What things in the Library are rated on, as every device has it: each kind's scale and its named
- * ratings (a show's Story, Music…), and scales of your own. Kept in `library.json` with tags' and
- * types' looks (notes/looks.ts), each choice with when it was made, so devices merge them one by
- * one, the later winning, as looks do. A note's ratings are its properties: `rating: 4/5`,
- * `story: A` (ratings.svelte.ts).
+ * ratings (a show's Story, Music…), and scales of your own. Synced as a file of their own,
+ * `ratings.json`, beside `library.json` (tags' and types' looks, which a lines from before ratings
+ * writes back whole), each choice with when it was made, so devices merge them one by one, the
+ * later winning. A note's ratings are its properties: `rating: 4/5`, `story: A`
+ * (ratings.svelte.ts).
  */
+
+export const RATINGS_FILE = "ratings.json";
 
 /** lines' own scales, by id: out of 5 in Little Touches' marks (the default), out of 10 and 100, thumbs, and grades. */
 export const SCALES = {
@@ -43,7 +47,7 @@ export interface RatingChoices {
 
 export const noRatings = (): RatingChoices => ({ kinds: {}, scales: {} });
 
-/** The property a named rating is written as: `Voice acting` is `voice acting: 8/10`. */
+/** The property a named rating is written as: `Voice acting` is `voice acting: 8/10`. Two names are the same rating where their keys are one (keyOf: `Voice-acting` too). */
 export const ratingKey = (name: string) => name.trim().replace(/\s+/g, " ").toLowerCase();
 
 const time = (at: unknown) => (typeof at === "number" && Number.isFinite(at) ? at : 0);
@@ -60,7 +64,7 @@ export function wordsIn(value: unknown, most: number, keys = false): string[] | 
   if (!Array.isArray(value) || value.length > most) return null;
   const words = value.map((word) => (typeof word === "string" ? word.trim().replace(/\s+/g, " ") : ""));
   const fits = (word: string) => word && word.length <= LONGEST && (keys ? KEY.test(word) : !word.includes(","));
-  return words.every(fits) && new Set(words.map(ratingKey)).size === words.length ? words : null;
+  return words.every(fits) && new Set(words.map(keys ? keyOf : ratingKey)).size === words.length ? words : null;
 }
 
 /** A scale of your own as kept, if it's one this lines can draw. */
@@ -73,9 +77,15 @@ export function readScale(value: unknown): Scale | null {
   return words && words.length >= 2 ? { kind: "labels", labels: words } : null;
 }
 
-/** The choices as written (by `writeRatings`), leaving out what this lines can't read. */
-export function readRatings(raw: unknown): RatingChoices {
+/** The choices as written (by `writeRatings`), leaving out what this lines can't read; none if the file can't be read. */
+export function readRatings(text: string): RatingChoices {
   const ratings = noRatings();
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    return ratings;
+  }
   const { kinds, scales } = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
   for (const [type, value] of Object.entries(kinds && typeof kinds === "object" ? kinds : {})) {
     const { scale, named } = (value ?? {}) as Record<string, Record<string, unknown> | undefined>;
@@ -96,13 +106,18 @@ export function readRatings(raw: unknown): RatingChoices {
 
 const sorted = <T>(record: Record<string, T>) => Object.fromEntries(Object.keys(record).sort().map((key) => [key, record[key]]));
 
-/** As kept in the file, kinds and scales in order, so the same choices always read the same. */
-export const writeRatings = (ratings: RatingChoices) => ({ kinds: sorted(ratings.kinds), scales: sorted(ratings.scales) });
+/** As a file, kinds and scales in order, so the same choices always read the same. */
+export const writeRatings = (ratings: RatingChoices) =>
+  JSON.stringify({ format: "lines-ratings", version: 1, kinds: sorted(ratings.kinds), scales: sorted(ratings.scales) }, null, 2) + "\n";
 
 /** The later of two choices; at the same time, `there`'s, so both devices end up alike. */
 const later = <T extends { at: number }>(here: T | undefined, there: T | undefined) => (here && (!there || here.at > there.at) ? here : there);
 
-/** Two devices' choices as one: for each kind's scale, its named ratings, and each scale of your own, the later. */
+/**
+ * Two devices' choices as one: for each kind's scale, its named ratings, and each scale of your own,
+ * the later. But a scale a kind is rated on stays, as its latest version that isn't removed, though
+ * another device removed it since: removing one wins only once nothing's rated on it.
+ */
 export function mergeRatings(here: RatingChoices, there: RatingChoices): RatingChoices {
   const kinds: Record<string, KindRatings> = {};
   for (const type of new Set([...Object.keys(here.kinds), ...Object.keys(there.kinds)])) {
@@ -113,5 +128,10 @@ export function mergeRatings(here: RatingChoices, there: RatingChoices): RatingC
   }
   const scales: Record<string, OwnScale> = {};
   for (const id of new Set([...Object.keys(here.scales), ...Object.keys(there.scales)])) scales[id] = later(here.scales[id], there.scales[id])!;
+  for (const { scale } of Object.values(kinds)) {
+    if (!scale || !scales[scale.id] || !("removed" in scales[scale.id])) continue;
+    const kept = [here.scales[scale.id], there.scales[scale.id]].filter((each) => each && !("removed" in each)).sort((a, b) => b!.at - a!.at)[0];
+    if (kept) scales[scale.id] = kept;
+  }
   return { kinds, scales };
 }

@@ -374,7 +374,7 @@ Plate: 3WBZ56
 - The key is up to 40 characters, starting with a letter or digit, optionally in bold, followed by `:` and a space or tab.
 - The space after the colon keeps out times (`10:30`) and URLs (`https://…`).
 - Only the value is copied, without its Markdown.
-- A value that's a score, a number out of 2 to 10, whole or with a half (`Rating: 4/5`, `Score: 5 / 7`, `3.5/5`), is drawn as that many marks, so many filled and a half one half filled: stars, hearts or circles, or as written (Settings → Little Touches, where the copy buttons can be turned off too). With the cursor on its line it's as written, to change; a click on a mark sets it there, and a click on the one that's the score makes it 0, each one change that ⌘Z takes back. Properties' values are drawn the same, and a library note's ratings on its kind's scale ([below](#ratings)).
+- A value that's a score, a number out of 2 to 10, whole or with a half (`Rating: 4/5`, `Score: 5 / 7`, `3.5/5`, `1.5/2` too), is drawn as that many marks, so many filled and a half one half filled: stars, hearts or circles, or as written (Settings → Little Touches, where the copy buttons can be turned off too). In a list or a task too (`- Score: 2/5`). With the cursor on its line it's as written, to change; a click on a mark sets it there, and a click on the one that's the score makes it 0, each one change that ⌘Z takes back. Properties' values are drawn the same, and a library note's ratings on its kind's scale ([below](#ratings)).
 
 This changes nothing about the Markdown; it's only how lines draws the line.
 
@@ -400,8 +400,8 @@ music: A
 | Thumbs | `thumbs up`, `thumbs down` | A thumb up and a thumb down, the one chosen filled |
 
 - A value that doesn't fit its kind's scale (`4/5` on a show rated out of 10) is drawn as written, nothing changed; changing a kind's scale rewrites nothing.
-- A click on a mark sets the rating there, and on the one set takes the rating out of the properties; a click on a word offers its scale's others. Each is one change, which ⌘Z takes back.
-- Typing a key in a library note's properties offers the kind's ratings it hasn't got, and after one, its scale's values, the best first.
+- A click on a mark sets the rating there, and on the one set takes the rating out of the properties (another property's score, in a note that isn't the library's, goes to 0, as on a line of text); a click on a word offers its scale's others. Each is one change, which ⌘Z takes back.
+- Typing a key in a library note's properties offers the kind's ratings it hasn't got, and after one, its scale's values, the best first; choosing one writes over the value typed so far, and what follows it on the line stays.
 - Settings → Little Touches → Scores, As Written, draws ratings as written too.
 
 ## Properties

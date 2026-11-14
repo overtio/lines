@@ -1,15 +1,14 @@
 <script lang="ts">
   // Settings → Library → Ratings: what each kind is rated on (lines' own scales, or yours) and the
   // ratings it names besides the overall one, added, renamed, moved and removed; and your own scales.
-  // Synced, with tags' and types' looks, in library.json (library/ratings.ts). Notes are never
-  // rewritten for a scale: what doesn't fit it shows as written, and this says how many don't.
+  // Synced in ratings.json (library/ratings.ts). Notes are never rewritten for a scale: what doesn't
+  // fit it shows as written, and this says how many don't; renaming a rating in them is said first.
   import { tick } from "svelte";
   import { speak } from "../../a11y";
   import { scoreIn } from "../../editor/scores";
   import { locale, t } from "../../i18n/index.svelte";
   import Icon from "../../icons/Icon.svelte";
-  import { ratingKey, wordsIn } from "../../library/ratings";
-  import { OVERALL, ratings, type ScaleChoice } from "../../library/ratings.svelte";
+  import { ratings, type ScaleChoice } from "../../library/ratings.svelte";
   import { propertyOf } from "../../notes/properties";
   import { notes } from "../../notes/store.svelte";
   import { plugins } from "../../plugins/registry.svelte";
@@ -49,38 +48,58 @@
     ).length;
   }
 
-  /** Why `name` can't be one of `kind`'s named ratings (`except` the one it's renaming), if it can't. */
-  function wrong(kind: LibraryKind, name: string, except?: string): string | null {
-    const others = ratings.named(kind.type).filter((each) => ratingKey(each) !== ratingKey(except ?? ""));
-    // Keys lines writes in the kind's notes itself.
-    const written = new Set(["type", "link", "status", "progress", OVERALL, ...kind.properties]);
-    if (!wordsIn([name], 1, true)) return t("library.rating.nameInvalid");
-    if (written.has(ratingKey(name)) || others.some((each) => ratingKey(each) === ratingKey(name))) return t("library.rating.nameTaken", { name: name.trim() });
-    return null;
+  /** Why `name` can't be one of a kind's named ratings (`except`, the one it's renaming), said as Settings says it. */
+  function wrong(type: string, name: string, except?: string): string | null {
+    const why = ratings.wrong(type, name, except);
+    return why === "invalid" ? t("library.rating.nameInvalid") : why === "taken" ? t("library.rating.nameTaken", { name: name.trim() }) : null;
   }
 
   function add(event: SubmitEvent, kind: LibraryKind) {
     event.preventDefault();
     const name = adding.trim();
-    error = wrong(kind, name);
+    error = wrong(kind.type, name);
     if (error) return;
     ratings.setNamed(kind.type, [...ratings.named(kind.type), name]);
     adding = "";
     speak(t("library.rating.added", { name }));
   }
 
-  /** Renames one as its field's left (or ↵ pressed in it): in the kind's notes too (ratings.svelte.ts). */
-  function rename(event: Event, kind: LibraryKind, from: string) {
+  /** A rename that changes notes too, said first, in the page, until it's done or not. */
+  let renaming = $state<{ type: string; from: string; to: string; count: number; field: HTMLInputElement } | null>(null);
+
+  /**
+   * Renames one as its field's left (or ↵ pressed in it). Where that renames it in the kind's notes
+   * too (ratings.svelte.ts), it says how many first, and waits to be asked again.
+   */
+  async function rename(event: Event, kind: LibraryKind, from: string) {
     const field = event.currentTarget as HTMLInputElement;
     const to = field.value.trim();
     if (to === from) return;
-    error = wrong(kind, to, from);
+    error = wrong(kind.type, to, from);
     if (error) {
       field.value = from;
       return;
     }
-    void ratings.rename(kind.type, from, to);
+    const count = ratings.renames(kind.type, from, to);
+    if (!count) return renamed(kind.type, from, to);
+    renaming = { type: kind.type, from, to, count, field };
+    await tick();
+    document.getElementById(`${id}-rename`)?.focus();
+  }
+
+  function renamed(type: string, from: string, to: string) {
+    void ratings.rename(type, from, to);
     speak(t("library.rating.renamed", { from, to }));
+  }
+
+  /** Does the rename said, or doesn't, the keyboard back in its field either way. */
+  function settle(confirmed: boolean) {
+    if (!renaming) return;
+    const { type, from, to, field } = renaming;
+    renaming = null;
+    if (confirmed) renamed(type, from, to);
+    else field.value = from;
+    field.focus();
   }
 
   async function move(kind: LibraryKind, at: number, by: -1 | 1) {
@@ -104,9 +123,22 @@
     document.getElementById(`${id}-${kind.type}-add`)?.focus();
   }
 
-  function removeScale(scale: ScaleChoice) {
+  /** Removes a scale of yours, the keyboard going on to the next (or the one before, or New Scale). */
+  async function removeScale(scale: ScaleChoice) {
+    const at = own.findIndex((each) => each.id === scale.id);
     ratings.removeScale(scale.id);
     speak(t("library.rating.scaleRemoved", { name: scale.name }));
+    await tick();
+    const next = own[at] ?? own[at - 1];
+    document.getElementById(next ? `${id}-edit-${next.id}` : `${id}-new-scale`)?.focus();
+  }
+
+  /** Done changing a scale, or making one: the keyboard back on the button that opened it. */
+  async function closeEditor() {
+    const was = editing;
+    editing = null;
+    await tick();
+    document.getElementById(was === "new" || !own.some((each) => each.id === was) ? `${id}-new-scale` : `${id}-edit-${was}`)?.focus();
   }
 
   /** What a scale of yours is, under its name. */
@@ -145,14 +177,20 @@
       {#snippet below()}
         {#if open === kind.type}
           <div id="{id}-{kind.type}" class="mt-3 flex flex-col gap-1.5" role="group" aria-label={t("library.rating.namedOf", { kind: kind.name })}>
-            {#each names as name, at (name)}
+            <!-- By place, so a rating renamed keeps its row, and Tab its place. -->
+            {#each names as name, at (at)}
               <div class="flex items-center gap-1">
                 <TextField
                   class="flex-1"
                   value={name}
                   aria-label={t("library.rating.nameOf", { place: at + 1 })}
                   onchange={(event) => rename(event, kind, name)}
-                  onkeydown={(event) => event.key === "Enter" && event.currentTarget.blur()}
+                  onkeydown={(event) => {
+                    if (event.key !== "Enter") return;
+                    // Not let on to what takes the keyboard next (a rename's Rename).
+                    event.preventDefault();
+                    event.currentTarget.blur();
+                  }}
                 />
                 <IconButton id="{id}-{kind.type}-{at}-up" icon="arrow-up" label={t("library.rating.moveUp", { name })} disabled={at === 0} onclick={() => move(kind, at, -1)} />
                 <IconButton
@@ -170,6 +208,15 @@
               <Button type="submit" icon="plus" disabled={!adding.trim()}>{t("library.rating.add")}</Button>
             </form>
             {#if error}<Callout tone="danger">{error}</Callout>{/if}
+            {#if renaming?.type === kind.type}
+              <Callout class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <span class="flex-1 basis-60">{t("library.rating.renameNotes", { from: renaming.from, to: renaming.to, count: renaming.count })}</span>
+                <span class="flex gap-1.5">
+                  <Button id="{id}-rename" variant="primary" onclick={() => settle(true)}>{t("library.rating.rename")}</Button>
+                  <Button variant="quiet" onclick={() => settle(false)}>{t("settings.cancel")}</Button>
+                </span>
+              </Callout>
+            {/if}
             <p class="m-0 text-xs leading-normal text-muted">{t("library.rating.namedNote")}</p>
           </div>
         {/if}
@@ -179,19 +226,19 @@
 </FieldGroup>
 
 {#snippet newScale()}
-  <Button variant="quiet" icon="plus" onclick={() => (editing = "new")} disabled={editing === "new"}>{t("library.rating.newScale")}</Button>
+  <Button id="{id}-new-scale" variant="quiet" icon="plus" onclick={() => (editing = "new")}>{t("library.rating.newScale")}</Button>
 {/snippet}
 
 <FieldGroup title={t("library.rating.scales")} note={t("library.rating.scalesNote")} action={newScale}>
-  {#if editing === "new"}<ScaleEditor onclose={() => (editing = null)} />{/if}
+  {#if editing === "new"}<ScaleEditor onclose={closeEditor} />{/if}
   {#each own as scale (scale.id)}
     {#if editing === scale.id}
-      <ScaleEditor {scale} onclose={() => (editing = null)} />
+      <ScaleEditor {scale} onclose={closeEditor} />
     {:else}
       {@const users = ratings.usedBy(scale.id)}
       <FieldRow label={scale.name} note={describe(scale)}>
         {#if scale.scale.kind === "marks" && scale.scale.icon}<Icon name={scale.scale.icon} size={16} class="text-accent" />{/if}
-        <IconButton icon="square-pen" label={t("library.rating.editScale", { name: scale.name })} onclick={() => (editing = scale.id)} />
+        <IconButton id="{id}-edit-{scale.id}" icon="square-pen" label={t("library.rating.editScale", { name: scale.name })} onclick={() => (editing = scale.id)} />
         <IconButton
           icon="trash"
           label={t("library.rating.removeScale", { name: scale.name })}

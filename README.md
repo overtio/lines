@@ -341,7 +341,7 @@ src/
       imports.svelte.ts      Any import into the Library (bookmarks, Readwise), written in the main window a batch at a time, and Undo
       page.ts  web.ts        What a page says about itself, read as text; asking the web as lines
       shelves.svelte.ts      The Library's rows in the sidebar; rows.ts, what a note's row on its shelf shows
-      ratings.svelte.ts      What each kind is rated on (Settings → Library → Ratings); ratings.ts, those choices as library.json keeps and merges them
+      ratings.svelte.ts      What each kind is rated on (Settings → Library → Ratings); ratings.ts, those choices as ratings.json keeps and merges them
     feeds/
       feeds.svelte.ts        Feeds subscribed to (notes with `feed:`), fetching them in turn, their posts, read and unread, saving one to the Library
       parse.ts  markdown.ts  Reading RSS, Atom, RSS 1.0 (mended where they're broken) and JSON Feed; a post's HTML as Markdown, by walking it

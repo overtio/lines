@@ -64,6 +64,8 @@ export default {
   "library.rating.nameTaken": "Ces notes ont déjà une propriété « {name} ».",
   "library.rating.added": "{name} ajoutée",
   "library.rating.renamed": "{from} renommée en {to}",
+  "library.rating.renameNotes": "{count, plural, one {Renomme aussi {from} en {to} dans # note, qui garde sa date.} other {Renomme aussi {from} en {to} dans # notes, qui gardent leur date.}}",
+  "library.rating.rename": "Renommer",
   "library.rating.moved": "{name}, {place} sur {count}",
   "library.rating.removed": "{name} retirée",
   "library.rating.scales": "Échelles",

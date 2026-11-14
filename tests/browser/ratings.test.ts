@@ -115,6 +115,8 @@ test("Settings → Library → Ratings: a kind's scale and its named ratings, re
   const story = settings.getByRole("textbox", { name: "Rating 1" });
   await story.fill("Plot");
   await story.press("Enter");
+  // In a note too: said first.
+  await settings.getByRole("button", { name: "Rename", exact: true }).click();
   await page.waitForFunction(() => window.testing.notes.entries.some((entry) => entry.note.body.includes("\nplot: 7/10\n")));
   // Not a property the kind's notes have already.
   await settings.getByRole("textbox", { name: "New rating" }).fill("Status");
@@ -147,7 +149,10 @@ test("Settings → Library → Ratings: a kind's scale and its named ratings, re
 test("in a library note's properties, a key typed offers the kind's ratings, and then its scale's values", async () => {
   app = await openApp();
   const { page } = app;
-  await page.evaluate(() => window.testing.looks.setRatings({ kinds: { show: { scale: { id: "10", at: 1 }, named: { names: ["Story"], at: 1 } } }, scales: {} }));
+  await page.evaluate(() => {
+    window.testing.ratings.setScale("show", "10");
+    window.testing.ratings.setNamed("show", ["Story"]);
+  });
   await app.open("---\ntype: show\n---\n# Frieren");
   await page.evaluate(() => window.testing.place("---\ntype: show".length));
   await page.keyboard.press("Enter");
@@ -163,7 +168,7 @@ test("in a library note's properties, a key typed offers the kind's ratings, and
   await has(page, "\nstory: 8/10\n");
 });
 
-test("what kinds are rated on comes in from other devices' library.json, and from Settings in another window, and notes are drawn again", async () => {
+test("what kinds are rated on comes in from other devices' ratings.json, and from Settings in another window, and notes are drawn again", async () => {
   app = await openApp();
   const { page } = app;
   await app.open("---\ntype: book\nrating: A\n---\n# Dune\n\nEnd");
@@ -173,17 +178,125 @@ test("what kinds are rated on comes in from other devices' library.json, and fro
   await other.waitForFunction(() => window.testing?.notes.ready);
 
   // Another device chose grades for books since.
-  await page.evaluate(() => window.testing.looks.merge(window.testing.readLooks(JSON.stringify({ ratings: { kinds: { book: { scale: { id: "grades", at: Date.now() } } } } }))));
+  await page.evaluate(() => window.testing.ratings.merge(window.testing.readRatings(JSON.stringify({ kinds: { book: { scale: { id: "grades", at: Date.now() } } } }))));
   await page.locator(".editor-pane .cm-lp-score-label", { hasText: "A" }).waitFor();
   // The other window has it at once.
-  await other.waitForFunction(() => window.testing.looks.looks.ratings.kinds.book?.scale?.id === "grades");
+  await other.waitForFunction(() => window.testing.ratings.choices.kinds.book?.scale?.id === "grades");
 
   // Chosen in the other window: thumbs, which A isn't on, so it's as written.
-  await other.evaluate(() => window.testing.looks.setRatings({ ...window.testing.looks.looks.ratings, kinds: { book: { scale: { id: "thumbs", at: Date.now() } } } }));
+  await other.evaluate(() => window.testing.ratings.setScale("book", "thumbs"));
   await page.locator(".editor-pane .cm-lp-score-label").waitFor({ state: "detached" });
   expect(await page.locator(".editor-pane .cm-content").innerText()).toContain("A");
   await app.open("---\ntype: book\nrating: thumbs up\n---\n# Dune Messiah\n\nEnd");
   await page.evaluate(() => window.testing.place());
   await page.locator(".editor-pane .cm-lp-score-icons[aria-label='Thumbs Up']").waitFor();
   await other.close();
+});
+
+test("a click on a score's mark in a list or a task sets it; another note's property set to 0, not taken out; a click beside it is the editor's", async () => {
+  app = await openApp();
+  const { page } = app;
+  await app.open("---\ndifficulty: 3/5\n---\n# Plain\n\n- Score: 2/5\n- [ ] Task: 1/5\n\nEnd");
+  await page.evaluate(() => window.testing.place());
+  await page.locator(".editor-pane .cm-lp-score[aria-label='2 out of 5'] .cm-lp-score-mark").nth(3).click();
+  await has(page, "- Score: 4/5\n");
+  await page.locator(".editor-pane .cm-lp-score[aria-label='1 out of 5'] .cm-lp-score-mark").nth(1).click();
+  await has(page, "- [ ] Task: 2/5\n");
+  // Not a library note's rating: its line stays, at 0.
+  await page.locator(".editor-pane .cm-lp-score[aria-label='3 out of 5'] .cm-lp-score-mark").nth(2).click();
+  await has(page, "---\ndifficulty: 0/5\n---\n");
+  // Its key's words are text, which a click puts the cursor in, as before.
+  await page.locator(".editor-pane .cm-line", { hasText: "Score:" }).getByText("Score:").click();
+  const line = await page.evaluate(() => {
+    const view = window.testing.editor()!;
+    return view.state.doc.lineAt(view.state.selection.main.head).text;
+  });
+  expect(line).toBe("- Score: 4/5");
+});
+
+test("a value chosen from the properties' menu writes over the value typed, and what follows it on the line stays", async () => {
+  app = await openApp();
+  const { page } = app;
+  await app.open("---\ntype: show\nrating: 3 (rewatch)\n---\n# Frieren");
+  await page.evaluate(() => window.testing.place("---\ntype: show\nrating: 3".length));
+  await page.keyboard.type("/");
+  await page.waitForFunction(() => document.querySelectorAll("[role=option]").length === 1);
+  await page.keyboard.press("Enter");
+  await has(page, "\nrating: 3/5 (rewatch)\n");
+});
+
+test("a named rating can't be one of the kind's own properties, nor another as keys are matched; renaming one in notes is said first, and renames only ratings", async () => {
+  app = await openApp();
+  const { page } = app;
+  await page.evaluate(() => window.testing.ratings.setNamed("show", ["Story"]));
+  const rated = await app.open("---\ntype: show\nstory: 4/5\n---\n# Frieren");
+  const said = await app.open("---\ntype: show\nstory: a slow start\n---\n# Mushishi");
+  const settings = await app.settings("Library");
+  const field = settings.getByRole("textbox", { name: "New rating" });
+  const add = settings.getByRole("button", { name: "Add", exact: true });
+
+  await settings.getByRole("button", { name: "Movie ratings" }).click();
+  await field.fill("Run time");
+  await add.click();
+  await settings.getByText("“Run time” is a property these notes have already.").waitFor();
+  await settings.getByRole("button", { name: "Movie ratings" }).click();
+
+  await settings.getByRole("button", { name: "Show ratings" }).click();
+  await field.fill("Voice acting");
+  await add.click();
+  await field.fill("Voice-acting");
+  await add.click();
+  await settings.getByText("“Voice-acting” is a property these notes have already.").waitFor();
+  expect(await page.evaluate(() => window.testing.ratings.named("show"))).toEqual(["Story", "Voice acting"]);
+
+  // Renamed: said first, with Rename focused, and only the note whose story is a rating changes.
+  const story = settings.getByRole("textbox", { name: "Rating 1" });
+  await story.fill("Plot");
+  await story.press("Enter");
+  await settings.getByText("Renames Story to Plot in 1 note too, which keeps its date.").waitFor();
+  await page.waitForFunction(() => document.activeElement?.textContent?.trim() === "Rename");
+  await page.keyboard.press("Enter");
+  await page.waitForFunction((id) => window.testing.notes.get(id)?.note.body.includes("\nplot: 4/5\n"), rated);
+  expect(await page.evaluate((id) => window.testing.notes.get(id)?.note.body, said)).toContain("\nstory: a slow start\n");
+  // The keyboard's back in its field, the same one.
+  expect(await page.evaluate(() => (document.activeElement as HTMLInputElement).value)).toBe("Plot");
+
+  // Cancelled: the field and the notes as they were.
+  await story.fill("Arc");
+  await story.press("Enter");
+  await settings.getByRole("button", { name: "Cancel" }).click();
+  expect(await story.inputValue()).toBe("Plot");
+  expect(await page.evaluate((id) => window.testing.notes.get(id)?.note.body, rated)).toContain("\nplot: 4/5\n");
+  expect(await page.evaluate(() => window.testing.ratings.named("show"))).toEqual(["Plot", "Voice acting"]);
+});
+
+test("Settings' scales keep the keyboard: in a new scale's name, back on what opened it, and on to the next once one's removed", async () => {
+  app = await openApp();
+  const { page } = app;
+  const settings = await app.settings("Library");
+  const focusedName = () => page.evaluate(() => document.activeElement?.getAttribute("aria-label") ?? document.activeElement?.textContent?.trim());
+
+  const make = async (name: string) => {
+    await settings.getByRole("button", { name: "New Scale" }).click();
+    await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Scale’s name");
+    await page.keyboard.type(name);
+    await settings.getByRole("button", { name: "Save", exact: true }).click();
+    await page.waitForFunction(() => document.activeElement?.textContent?.trim() === "New Scale");
+  };
+  await make("Ones");
+  await make("Twos");
+
+  await settings.getByRole("button", { name: "New Scale" }).click();
+  await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Scale’s name");
+  await settings.getByRole("button", { name: "Cancel" }).click();
+  expect(await focusedName()).toBe("New Scale");
+
+  await settings.getByRole("button", { name: "Change Ones" }).click();
+  await settings.getByRole("button", { name: "Cancel" }).click();
+  expect(await focusedName()).toBe("Change Ones");
+
+  await settings.getByRole("button", { name: "Remove Ones" }).click();
+  await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Change Twos");
+  await settings.getByRole("button", { name: "Remove Twos" }).click();
+  await page.waitForFunction(() => document.activeElement?.textContent?.trim() === "New Scale");
 });
