@@ -200,3 +200,32 @@ test("a Logseq graph: its pages and journals, outlines as lists and prose as par
   await group.locator("input[webkitdirectory]").setInputFiles(graph);
   await group.getByText("Everything in Graph is in lines already.").waitFor();
 });
+
+test("Notion's export, a ZIP of ZIPs: its pages, a database as a table of its rows, each a note of its type; then nothing new", async () => {
+  app = await openApp({ onDisk: true });
+  const { page } = app;
+  const root = fileURLToPath(new URL("../unit/fixtures/notion/Export", import.meta.url));
+  const walk = (dir: string): string[] => readdirSync(dir).flatMap((entry) => (statSync(join(dir, entry)).isDirectory() ? walk(join(dir, entry)) : [join(dir, entry)]));
+  const part = zip(walk(root).map((path) => ({ name: relative(root, path), data: new Uint8Array(readFileSync(path)), modified: new Date(2024, 10, 14) })));
+  const exported = { name: "Export-0a1b.zip", mimeType: "application/zip", buffer: Buffer.from(zip([{ name: "Export-0a1b-Part-1.zip", data: part, modified: new Date(2024, 10, 14) }])) };
+  const settings = await app.settings("Export and Import");
+  const group = settings.getByRole("region", { name: "From Notion" });
+  await group.locator("input[accept='.zip']").setInputFiles(exported);
+  await group.getByText("5 notes, 2 attachments, and 1 folder in Export-0a1b.").waitFor();
+  await group.getByRole("button", { name: "Import 5 Notes" }).click();
+  await group.getByText("Imported 5 notes.").waitFor();
+  const notes = await page.evaluate(() =>
+    Object.fromEntries(window.testing.notes.entries.filter(({ note }) => note.source?.app === "notion").map(({ note, meta }) => [meta.title, { body: note.body, type: meta.type }])),
+  );
+  expect(Object.keys(notes).sort()).toEqual(["Dune", "Home", "Plans", "Reading List", "Walden"]);
+  expect([notes.Dune.type, notes.Walden.type]).toEqual(["reading list", "reading list"]);
+  expect(notes.Home.body).toContain("See [[Plans]] and the [[Reading List]].");
+  expect(notes.Home.body).toMatch(/\n!\[photo\]\(\.\.\/attachments\/[0-9a-f]{32}\.png\)\n/);
+  await app.closeSettings();
+  // The database's note is a table of its rows.
+  await app.page.evaluate(() => window.testing.notes.select(window.testing.notes.entries.find((entry) => entry.meta.title === "Reading List")!.note.id));
+  await page.locator(".cm-content").getByText("Frank Herbert").waitFor();
+
+  await (await app.settings("Export and Import")).getByRole("region", { name: "From Notion" }).locator("input[accept='.zip']").setInputFiles(exported);
+  await group.getByText("Everything in Export-0a1b is in lines already.").waitFor();
+});

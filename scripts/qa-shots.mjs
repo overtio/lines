@@ -1532,6 +1532,26 @@ const SCENES = [
     shoot: ".editor-pane",
   },
   {
+    id: "notion-note",
+    title: "A database brought from Notion",
+    look: "Reading List: its title, and the table of its rows, Dune and Walden, with Author, Status, Date read and Related columns, Related a mention of Walden; New Reading List under it.",
+    act: async (page) => {
+      const folder = `${root}tests/unit/fixtures/notion/Export`;
+      const walk = (dir) => readdirSync(dir).flatMap((entry) => (statSync(join(dir, entry)).isDirectory() ? walk(join(dir, entry)) : [join(dir, entry)]));
+      const part = zip(walk(folder).map((path) => ({ name: relative(folder, path), data: new Uint8Array(readFileSync(path)), modified: new Date(2024, 10, 14) })));
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      await page.getByRole("dialog").getByRole("navigation").getByText("Export and Import", { exact: true }).first().click();
+      const group = page.getByRole("dialog").getByRole("region", { name: "From Notion" });
+      await group.locator("input[accept='.zip']").setInputFiles({ name: "Export-0a1b.zip", mimeType: "application/zip", buffer: Buffer.from(zip([{ name: "Part-1.zip", data: part, modified: new Date() }])) });
+      await group.getByRole("button", { name: /^Import \d+ Notes$/ }).click();
+      await group.getByRole("button", { name: "Undo Import" }).waitFor();
+      await page.keyboard.press("Escape");
+      await page.evaluate(() => window.testing.notes.select(window.testing.notes.entries.find((entry) => entry.meta.title === "Reading List").note.id));
+      await page.locator(".cm-content").getByText("Frank Herbert").waitFor();
+    },
+    shoot: ".editor-pane",
+  },
+  {
     id: "readwise-note",
     title: "A book brought from Readwise",
     look: "Its properties (author, readwise), title and cover; its tag, then the person's note; Highlights, each a quote with where it is and when in it, the person's note on it under it as text.",
