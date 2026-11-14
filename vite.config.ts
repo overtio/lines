@@ -77,8 +77,9 @@ const PLUGINS = fileURLToPath(new URL("src/plugins/", import.meta.url));
 /**
  * What Settings' search looks through (components/settings/search.ts), as `virtual:settings-search`:
  * the messages each section shows, by its id, read from its file and the files of its parts, so
- * a setting added to one is found without listing it anywhere else. A plugin's page is
- * `plugin:<its id>`, the id from its file's name (`SfSymbolsSettings.svelte` is `sf-symbols`'s).
+ * a setting added to one is found without listing it anywhere else; each with the part it's in
+ * (`ThemeEditor`), the first for one in several. A plugin's page is `plugin:<its id>`, the id from
+ * its file's name (`SfSymbolsSettings.svelte` is `sf-symbols`'s).
  */
 function settingsSearch(): Plugin {
   const id = "virtual:settings-search";
@@ -88,7 +89,7 @@ function settingsSearch(): Plugin {
     resolveId: (source) => (source === id ? resolved : undefined),
     load(module) {
       if (module !== resolved) return;
-      const keysOf = (path: string, seen: Set<string>): string[] => {
+      const keysOf = (path: string, seen: Set<string>): [key: string, part: string][] => {
         if (seen.has(path)) return [];
         seen.add(path);
         this.addWatchFile(path);
@@ -96,7 +97,8 @@ function settingsSearch(): Plugin {
         // (`speak(t("settings.themeCopied"))`), a message set when something's done or goes wrong
         // (`pictureError = t(…)`), a button's words while it's busy, and a share menu's, shown once it's open.
         const source = readFileSync(path, "utf8").replace(/(speak\(|\b\w+ = t\(|\b(busyLabel|copyLabel|copied|downloadLabel)=\{)[^\n]*/g, "");
-        const keys = [...source.matchAll(/"([a-z][A-Za-z]*\.[A-Za-z0-9_.-]+)"/g)].map((found) => found[1]);
+        const part = basename(path, ".svelte");
+        const keys = [...source.matchAll(/"([a-z][A-Za-z]*\.[A-Za-z0-9_.-]+)"/g)].map((found): [string, string] => [found[1], part]);
         const parts = [...source.matchAll(/from "\.\/([A-Za-z]+\.svelte)"/g)].flatMap((found) => keysOf(join(dirname(path), found[1]), seen));
         return [...keys, ...parts];
       };
@@ -109,7 +111,13 @@ function settingsSearch(): Plugin {
           const name = basename(file, "Settings.svelte");
           return [`plugin:${name.replace(/(?<=.)([A-Z])/g, "-$1").toLowerCase()}`, join(PLUGINS, file)];
         });
-      const index = Object.fromEntries([...own, ...pluginPages].map(([section, path]) => [section, [...new Set(keysOf(path, new Set()))]]));
+      const index = Object.fromEntries(
+        [...own, ...pluginPages].map(([section, path]) => {
+          const parts: Record<string, string> = {};
+          for (const [key, part] of keysOf(path, new Set())) parts[key] ??= part;
+          return [section, parts];
+        }),
+      );
       return `export default ${JSON.stringify(index)};`;
     },
   };
