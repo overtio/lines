@@ -1202,7 +1202,8 @@ describe("properties drawn apart (Settings → Layout → Properties)", () => {
         // Level with the text's first line; the two a two-column page, centred, the text narrowed
         // for them (from 640 px) but no narrower than 30 of its ems.
         expect(Math.abs(drawn.y - title.y)).toBeLessThan(4);
-        const scroller = (await app.page.locator(".editor-pane .cm-editor:not(.cm-props) > .cm-scroller").first().boundingBox())!;
+        // Where a note's text is centred: the scroller less the room it keeps for a scroll bar.
+        const scroller = await app.page.locator(".editor-pane .cm-editor:not(.cm-props) > .cm-scroller").first().evaluate((el) => ({ x: el.getBoundingClientRect().x, width: el.clientWidth }));
         const [from, to] = place === "left" ? [drawn.x, text.x + text.width] : [text.x, drawn.x + drawn.width];
         expect(Math.abs(from - scroller.x - (scroller.x + scroller.width - to))).toBeLessThan(2);
         expect(text.width).toBeLessThan(640);
@@ -1342,5 +1343,163 @@ describe("properties drawn apart (Settings → Layout → Properties)", () => {
     await app.page.reload();
     await app.page.waitForFunction(() => window.testing?.notes.ready);
     expect(await app.page.evaluate(() => window.testing.prefs.propertiesPlace)).toBe("bottom");
+  });
+
+  test("after a note ending in a table or a picture, they show below it and take clicks there; a click on the title stays in the title", async () => {
+    const picture = `data:image/png;base64,${png(60, 40, () => [200, 90, 60]).toString("base64")}`;
+    for (const last of ["| a | b |\n| - | - |\n| 1 | 2 |", `![a block](${picture})`]) {
+      await reopen("bottom");
+      const body = `${NOTE}\n\n${last}`;
+      await app.open(body);
+      const { page } = app;
+      await page.waitForFunction(() => {
+        const host = document.querySelector<HTMLElement>(".editor-pane .cm-props-apart");
+        return host && getComputedStyle(host).opacity === "1" && getComputedStyle(host).pointerEvents !== "none";
+      });
+      // Below all that's drawn in the note, the room kept for them aside (its last child).
+      const bottom = await page.evaluate(() => {
+        const content = document.querySelector(".editor-pane .cm-editor:not(.cm-props) > .cm-scroller > .cm-content")!;
+        return Math.max(...[...content.children].slice(0, -1).map((child) => child.getBoundingClientRect().bottom));
+      });
+      expect((await properties().boundingBox())!.y).toBeGreaterThanOrEqual(bottom);
+      await page.locator(".editor-pane .cm-line", { hasText: /^Ada$/ }).click();
+      await page.keyboard.press("End");
+      await page.keyboard.type(" Hello");
+      expect(await app.text()).toBe(body.replace("# Ada", "# Ada Hello"));
+      // Clicked in them, typing goes into them.
+      await properties().getByText("1815").click();
+      await page.keyboard.press("End");
+      await page.keyboard.type("!");
+      expect(await app.text()).toBe(body.replace("# Ada", "# Ada Hello").replace("born: 1815", "born: 1815!"));
+    }
+    // With the cursor in a diagram's code at the end, the diagram drawn under it: they're under that.
+    await app.open(`${NOTE}\n\n\`\`\`mermaid\ngraph TD\n  A --> B\n\`\`\``);
+    await place((await app.text())!.indexOf("A --> B"));
+    await app.page.locator(".editor-pane .cm-content svg").first().waitFor();
+    await app.page.waitForFunction(() => {
+      const content = document.querySelector(".editor-pane .cm-editor:not(.cm-props) > .cm-scroller > .cm-content")!;
+      const bottom = Math.max(...[...content.children].slice(0, -1).map((child) => child.getBoundingClientRect().bottom));
+      return document.querySelector(".editor-pane .cm-props")!.getBoundingClientRect().top >= bottom;
+    });
+  });
+
+  test("Tab order: Esc and Tab from the note's text into them, where focus stays; Esc and ⇧Tab back into the text, where it stays too", async () => {
+    await reopen("bottom");
+    await app.open(NOTE);
+    const { page } = app;
+    await properties().waitFor();
+    await place();
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Tab");
+    await inProperties();
+    // Not sent back once the note hears it lost focus.
+    await page.waitForTimeout(150);
+    expect((await where()).in).toBe("properties");
+    expect(await page.evaluate(() => document.activeElement?.getAttribute("aria-label"))).toBe("Properties");
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Shift+Tab");
+    await inProperties(false);
+    await page.waitForTimeout(150);
+    // Back where its cursor was, at the end of the text.
+    expect(await where()).toEqual({ in: "note", line: "The end." });
+    // In again, typing goes in at the end of the first property.
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Tab");
+    await inProperties();
+    await page.keyboard.type("s");
+    expect(await app.text()).toBe(NOTE.replace("person", "persons"));
+  });
+
+  test("an outside change (sync) while typing in them reaches them, and typing goes on", async () => {
+    await reopen("bottom");
+    const id = await app.open(NOTE);
+    const { page } = app;
+    await place();
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("End");
+    await page.keyboard.type("s");
+    await page.evaluate((id) => window.testing.notes.setText(id, (body) => body.replace("born: 1815", "born: 1815-12-10").replace("The end.", "The end, synced.")), id);
+    await properties().getByText("1815-12-10").waitFor();
+    await page.keyboard.type("!");
+    expect(await app.text()).toBe(NOTE.replace("person", "persons!").replace("born: 1815", "born: 1815-12-10").replace("The end.", "The end, synced."));
+    expect((await where()).in).toBe("properties");
+  });
+
+  test("Find and Replace All reach across the line break after them; ⌘F in them opens their note's find bar", async () => {
+    await reopen("bottom");
+    await app.open(`${NOTE}\n\n# Second`);
+    const { page } = app;
+    await place();
+    await page.keyboard.press("ArrowDown");
+    await inProperties();
+    await page.keyboard.press(`${mod()}+f`);
+    const find = page.getByRole("search", { name: "Find in note" });
+    await find.waitFor();
+    await find.getByRole("button", { name: "Regular expression" }).click();
+    await find.getByRole("textbox", { name: "Find" }).fill("\\n# ");
+    await find.getByRole("button", { name: "Replace", exact: true }).first().click();
+    await find.getByRole("textbox", { name: "Replace with" }).fill("\\n## ");
+    await find.getByRole("button", { name: "Replace All" }).click();
+    expect(await app.text()).toBe(`${NOTE.replace("\n# Ada", "\n## Ada")}\n\n## Second`);
+  });
+
+  test("⌘F in the properties of a note open beside another opens that note's find bar, not the other's", async () => {
+    await reopen("right", 2400);
+    await app.open(NOTE);
+    await app.open("# Other\n\nSome text.");
+    const { page } = app;
+    await page.locator(".note-list [data-id]").filter({ hasText: "Ada" }).click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Open to the Side" }).click();
+    const beside = page.getByRole("region", { name: "Beside: Ada" });
+    await beside.locator(".cm-props").getByText("Lovelace").click();
+    await inProperties();
+    await page.keyboard.press(`${mod()}+f`);
+    await beside.getByRole("search", { name: "Find in note" }).waitFor();
+    expect(await page.getByRole("search", { name: "Find in note" }).count()).toBe(1);
+  });
+
+  test("other formats keep their first lines as they are, and a note switched to another language and back follows", async () => {
+    await reopen("bottom");
+    await app.open("---\ntype: paper\n---\n\\section{Intro}\n\nText", "latex");
+    expect(await properties().count()).toBe(0);
+    expect(await noteText()).toContain("type: paper");
+    const id = await app.open(NOTE);
+    await properties().waitFor();
+    await app.page.evaluate((id) => window.testing.notes.setFormat(id, "latex"), id);
+    await properties().waitFor({ state: "detached" });
+    await app.page.waitForFunction(() => document.querySelector(".editor-pane .cm-content")?.textContent?.includes("Lovelace"));
+    await app.page.evaluate((id) => window.testing.notes.setFormat(id, "markdown"), id);
+    await properties().waitFor();
+    expect(await noteText()).not.toContain("Lovelace");
+  });
+
+  test("Show Markdown and the outline reach them at once: Source shows them as written, the outline on their side moves them clear of it", async () => {
+    await reopen("right", WIDE);
+    await app.open(NOTE);
+    await properties().waitFor();
+    expect(await properties().innerText()).not.toContain("type:");
+    await app.page.evaluate(() => (window.testing.prefs.markdownMode = "source"));
+    await app.page.waitForFunction(() => document.querySelector(".editor-pane .cm-props")?.textContent?.includes("type: person"));
+    await app.page.evaluate(() => (window.testing.prefs.markdownMode = "live"));
+    const before = (await properties().boundingBox())!;
+    await app.page.evaluate(() => Object.assign(window.testing.prefs, { outline: true, outlineSide: "right" }));
+    await app.page.waitForFunction((x) => document.querySelector(".editor-pane .cm-props")!.getBoundingClientRect().x < x - 5, before.x);
+  });
+
+  test("where there's no room beside the text, no editor is made for them, a note at a time", async () => {
+    await reopen("right");
+    await app.open(NOTE);
+    expect(await properties().count()).toBe(0);
+    await app.page.evaluate(() => {
+      (window as unknown as { made: number }).made = 0;
+      new MutationObserver((records) => {
+        for (const record of records) for (const node of record.addedNodes) if (node instanceof Element && node.matches(".cm-props-apart")) (window as unknown as { made: number }).made++;
+      }).observe(document.body, { childList: true, subtree: true });
+    });
+    await app.open(NOTE.replace("Ada", "Grace"));
+    await app.open(NOTE.replace("Ada", "Mary"));
+    await app.page.waitForTimeout(100);
+    expect(await app.page.evaluate(() => (window as unknown as { made: number }).made)).toBe(0);
+    expect(await noteText()).toContain("Lovelace");
   });
 });

@@ -272,10 +272,11 @@ class PropertiesPane {
   #text = "";
   /** The cursor in the note's text, last, for it to go back to from the properties. */
   #inText: EditorSelection | null = null;
+  /** Counts the note's text being focused, for what's done once each has settled. */
+  #focusTurn = 0;
   #gone = false;
 
   constructor(readonly view: EditorView) {
-    // The scroller's whole box, which a scroll bar coming and going leaves as it is.
     this.#resized.observe(view.scrollDOM, { box: "border-box" });
     for (const el of [view.contentDOM, this.host]) this.#resized.observe(el);
     this.#restyled.observe(document.documentElement, { attributeFilter: ["style"] });
@@ -285,6 +286,15 @@ class PropertiesPane {
     if (placeOf(view.state) !== "bottom") this.write(this.read(view));
     if (drawnEnd(view.state) >= 0 && this.#layout?.room !== false) this.open();
     this.measure();
+    // A note just opened has its cursor at its very start, in the properties hidden there: it goes
+    // to the start of its text instead, where it shows.
+    const { main } = view.state.selection;
+    if (main.empty && main.head === 0) {
+      queueMicrotask(() => {
+        const end = drawnEnd(this.view.state);
+        if (!this.#gone && end >= 0 && this.view.state.selection.main.head === 0) this.view.dispatch({ selection: { anchor: end + 1 }, annotations: Transaction.addToHistory.of(false) });
+      });
+    }
   }
 
   update(update: ViewUpdate) {
@@ -320,10 +330,12 @@ class PropertiesPane {
    */
   #noteFocused = (event: FocusEvent) => {
     const from = event.relatedTarget instanceof Node ? event.relatedTarget : null;
+    const turn = ++this.#focusTurn;
     setTimeout(() => {
       const { view, pane } = this;
       const end = drawnEnd(view.state);
-      if (this.#gone || !pane || !view.hasFocus || !inProperties(view.state, end)) return;
+      // Not if it's been focused again since (keys typed first can come first), or isn't now.
+      if (this.#gone || turn !== this.#focusTurn || !pane || !view.hasFocus || !inProperties(view.state, end)) return;
       if (from && pane.dom.contains(from)) view.dispatch({ selection: this.#inText ?? EditorSelection.cursor(end + 1) });
       else pane.focus();
     });
@@ -341,10 +353,12 @@ class PropertiesPane {
     const end = drawnEnd(view.state);
     const place = placeOf(view.state);
     this.host.className = place === "bottom" ? "cm-props-apart" : "cm-props-apart is-beside";
+    const doc = view.state.doc.slice(0, end);
     this.pane = new EditorView({
       state: EditorState.create({
-        doc: view.state.doc.sliceString(0, end),
-        selection: inProperties(view.state, end) ? view.state.selection : undefined,
+        doc,
+        // The note's cursor while it's in them, or for one reaching them by Tab, at the end of the first property.
+        selection: view.hasFocus && inProperties(view.state, end) ? view.state.selection : EditorSelection.cursor(doc.line(Math.min(2, doc.lines)).to),
         extensions: [
           propertiesEditing(view.state),
           paneKeys(this),
@@ -480,11 +494,12 @@ class PropertiesPane {
       const room = typeof block.type === "number" ? undefined : block.type.find((part) => part.widget instanceof Room);
       return { room: true, top: y(room?.top ?? block.bottom) + size, left: text.left - box.left, width: text.right - text.left, height: Math.ceil(this.host.offsetHeight + size) };
     }
-    // Beside it, the text and the properties are a two-column page, centred in the scroller (its
-    // whole width, so a scroll bar coming and going doesn't move them). Short of room, they're as
-    // narrow as they go, and then the text narrows, down to a comfortable measure; past that they're
-    // at the top. Over a backdrop, the text's page and their card (editor.css) are what's centred,
-    // the room between pages around and between them.
+    // Beside it, the text and the properties are a two-column page, centred where a note's text is
+    // (the scroller less the room it keeps for a scroll bar, which doesn't come and go). Short of
+    // room, they're as narrow as they go, and then the text narrows, down to a comfortable measure;
+    // past that they're at the top. Over a backdrop, the text's page and their card (editor.css) are
+    // what's centred, the room between pages around and between them.
+    const across = scroller.clientWidth;
     const pad = parseFloat(getComputedStyle(view.contentDOM).paddingLeft);
     const page = parseFloat(style.getPropertyValue("--page-gap")) || 0;
     const outline = view.state.facet(placing).outline === place ? OUTLINE : 0;
@@ -492,11 +507,11 @@ class PropertiesPane {
     const margin = page ? page + outline : Math.max(pad, EDGE + outline);
     /** Between the text and its page's edge, and between them and their card's. */
     const inset = page ? { text: pad, them: page / 2 } : { text: 0, them: 0 };
-    const room = box.width - 2 * margin - inset.text - inset.them - gap;
-    const chosen = Math.min(parseFloat(style.getPropertyValue("--editor-width")) || Infinity, box.width - 2 * page) - 2 * pad;
+    const room = across - 2 * margin - inset.text - inset.them - gap;
+    const chosen = Math.min(parseFloat(style.getPropertyValue("--editor-width")) || Infinity, across - 2 * page) - 2 * pad;
     const width = Math.min(Math.max(room - chosen, NARROWEST * size), WIDEST * size);
     const narrowed = Math.min(chosen, room - width);
-    const start = (box.width - (inset.text + narrowed + gap + width + inset.them)) / 2;
+    const start = (across - (inset.text + narrowed + gap + width + inset.them)) / 2;
     const textLeft = place === "right" ? start + inset.text : start + inset.them + width + gap;
     const first = view.lineBlockAt(Math.max(0, view.state.field(apart).end + 1));
     return {
