@@ -125,7 +125,7 @@
 {/snippet}
 
 {#if palette}
-  <FieldGroup title={palette.name} note={usedBy ? t("settings.paletteUsedBy", { names: usedBy }) : t("settings.paletteUnused")} action={actions}>
+  <FieldGroup title={palette.name} note={usedBy ? t("settings.paletteUsedBy", { names: usedBy }) : t("settings.paletteUnused")} action={actions} data-settings-part="PaletteEditor">
     {#if confirming && usedBy && instead}
       <FieldRow label={t("settings.paletteInstead", { names: usedBy })} note={t("settings.paletteInsteadNote")}>
         <Select value={instead} options={others} label={t("settings.paletteInstead", { names: usedBy })} class="w-48" onchange={(to) => (chosen = to)} />

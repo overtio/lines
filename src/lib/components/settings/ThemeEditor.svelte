@@ -243,10 +243,12 @@
   </FieldRow>
 {/snippet}
 
+<!-- Where search leads to what isn't drawn for this theme: one of lines' own says to make a copy. -->
 <FieldGroup
   title={definition.name}
   note={mine ? (mine.author ? t("settings.themeBy", { author: mine.author }) : null) : t("settings.themeBuiltInNote")}
   action={actions}
+  data-settings-part="ThemeEditor"
 >
   {#if mine}
     <FieldRow label={t("settings.themeName")} for="{uid}-name">

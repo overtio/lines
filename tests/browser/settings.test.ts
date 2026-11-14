@@ -82,6 +82,29 @@ test("search finds a setting in any section, in its words or a choice's, and ope
   await settings.waitFor({ state: "hidden" });
 });
 
+test("what only a theme or palette of your own has, found with one of lines' own chosen, leads to making one", async () => {
+  app = await openApp();
+  const settings = await app.settings("General");
+  const search = settings.getByRole("searchbox", { name: "Search settings" });
+  const found = settings.getByRole("list", { name: "Settings found" }).getByRole("button");
+  /** Focus on Make a Copy, in the group whose note says to make a copy to change it. */
+  const onMakeCopy = (note: string) =>
+    app.page.waitForFunction(
+      (note) => document.activeElement?.textContent?.trim() === "Make a Copy" && !!document.activeElement.closest("section")?.querySelector("p")?.textContent?.includes(note),
+      note,
+      { timeout: 2000 },
+    );
+
+  await search.fill("light colors");
+  await found.filter({ hasText: /^Make Light Colors/ }).click();
+  await settings.getByRole("heading", { name: "Theme", level: 2 }).waitFor();
+  await onMakeCopy("what it’s made of. Make a copy to change it.");
+
+  await search.fill("add a color");
+  await found.filter({ hasText: /^Add a Color/ }).click();
+  await onMakeCopy("One of lines’ own. Make a copy to change it.");
+});
+
 test("spreadsheet notes are off at first, blocks in notes on; a spreadsheet note here turns them on, unless they were turned off", async () => {
   app = await openApp();
   const page = app.page;

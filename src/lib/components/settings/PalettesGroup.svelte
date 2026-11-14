@@ -240,7 +240,13 @@
   {#snippet copyAction()}
     <Button icon="copy" onclick={() => copy(chosen)}>{t("settings.makeCopy")}</Button>
   {/snippet}
-  <FieldGroup title={chosen.name} note={chosen.author ? t("settings.themeBy", { author: chosen.author }) : t("settings.paletteBuiltIn")} action={copyAction}>
+  <!-- Where search leads to what only a palette of your own has (PaletteEditor): this says to make a copy. -->
+  <FieldGroup
+    title={chosen.name}
+    note={chosen.author ? t("settings.themeBy", { author: chosen.author }) : t("settings.paletteBuiltIn")}
+    action={copyAction}
+    data-settings-part="PaletteEditor"
+  >
     <ul class="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-x-3 gap-y-2 p-3">
       {#each chosen.colors as { id, color } (id)}
         <li class="flex min-w-0 items-center gap-2" title={color}>

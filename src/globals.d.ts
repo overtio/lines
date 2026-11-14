@@ -8,8 +8,8 @@ interface Window {
   EyeDropper?: new () => { open(): Promise<{ sRGBHex: string }> };
 }
 
-/** The messages each of Settings' sections shows, by its id, for its search (vite.config.ts). */
+/** The messages each of Settings' sections shows, by its id, for its search, each with the part it's in (vite.config.ts). */
 declare module "virtual:settings-search" {
-  const index: Record<string, string[]>;
+  const index: Record<string, Record<string, string>>;
   export default index;
 }

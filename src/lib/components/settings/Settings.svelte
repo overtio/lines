@@ -141,7 +141,16 @@
     }
   }
 
-  /** Opens the section a result is in, on the setting: scrolled to, lit up a moment, and its control focused. */
+  /** Where a part of a section says how to have what it doesn't show for what's chosen, as a theme of lines' own says to make a copy. */
+  function standInOf(root: HTMLElement, part: string) {
+    const place = root.querySelector<HTMLElement>(`[data-settings-part="${part}"]`);
+    return place?.checkVisibility() ? place : undefined;
+  }
+
+  /**
+   * Opens the section a result is in, on the setting: scrolled to, lit up a moment, and its control
+   * focused. One not drawn for what's chosen, on the place its part says how to have it.
+   */
   async function show(result: Found) {
     await openSection(result.section.id);
     if (result.text === result.section.title) return;
@@ -149,7 +158,7 @@
     await loading.get(result.section.id);
     await tick();
     await new Promise(requestAnimationFrame);
-    const place = body && placeOf(body, result.text);
+    const place = body && (placeOf(body, result.text) ?? (result.part && standInOf(body, result.part)));
     if (!place) return;
     place.scrollIntoView({ block: "center", behavior: reducedMotion.matches ? "instant" : "smooth" });
     place.animate([{ backgroundColor: "color-mix(in srgb, var(--accent) 16%, transparent)" }, { backgroundColor: "transparent" }], { duration: 1800, easing: "ease-in" });

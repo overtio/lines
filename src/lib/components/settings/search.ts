@@ -15,6 +15,12 @@ export interface Found {
   section: Section;
   /** What matched, as Settings shows it; the section's own title when that's what matched. */
   text: string;
+  /**
+   * The part of the section it's in (`ThemeEditor`), for one that isn't drawn for what's chosen (a
+   * theme of your own's name, with one of lines' own chosen): it leads to the place that part marks
+   * with `data-settings-part`, which says how to have it.
+   */
+  part?: string;
 }
 
 /** For matching: lowercase, without accents, so "resume" finds "Résumé". */
@@ -33,11 +39,15 @@ function entriesOf(shown: Section[]): Entry[] {
   if (entries) return entries;
   const messages = en as Record<string, string>;
   entries = shown.flatMap((section) => {
-    const keys = (index[section.id] ?? []).filter((key) => key in messages && !messages[key].includes("{"));
-    const texts = [section.title, ...keys.map((key) => t(key as MessageKey))];
-    if (section.id === "plugins") texts.push(...plugins.all.map((plugin) => plugin.name));
+    // Each text once, with the part it's first in.
+    const texts = new Map<string, string | undefined>([[section.title, undefined]]);
+    for (const [key, part] of Object.entries(index[section.id] ?? {})) {
+      const text = key in messages && !messages[key].includes("{") ? t(key as MessageKey) : null;
+      if (text && !texts.has(text)) texts.set(text, part);
+    }
+    if (section.id === "plugins") for (const { name } of plugins.all) if (!texts.has(name)) texts.set(name, undefined);
     const inSection = plain(section.title);
-    return [...new Set(texts)].map((text) => ({ section, text, plain: plain(text), inSection }));
+    return [...texts].map(([text, part]) => ({ section, text, part, plain: plain(text), inSection }));
   });
   return entries;
 }
@@ -57,5 +67,5 @@ export function searchSettings(query: string, shown: Section[]): Found[] {
     .filter((entry) => words.every((word) => entry.plain.includes(word) || entry.inSection.includes(word)) && words.some((word) => entry.plain.includes(word)))
     .sort((a, b) => rank(a) - rank(b))
     .slice(0, 60)
-    .map(({ section, text }) => ({ section, text }));
+    .map(({ section, text, part }) => ({ section, text, part }));
 }

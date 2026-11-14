@@ -1,10 +1,11 @@
 <script lang="ts">
   // A group of settings: its heading, and a card with a row for each (FieldRow).
   import type { Snippet } from "svelte";
+  import type { HTMLAttributes } from "svelte/elements";
   import Card from "./Card.svelte";
   import SectionHeading from "./SectionHeading.svelte";
 
-  type Props = {
+  type Props = HTMLAttributes<HTMLElement> & {
     title?: string;
     note?: string | null;
     /** A button at the end of the heading. */
@@ -13,10 +14,10 @@
     id?: string;
     children: Snippet;
   };
-  let { title, note, action, id, children }: Props = $props();
+  let { title, note, action, id, children, ...rest }: Props = $props();
 </script>
 
-<section aria-label={title}>
+<section aria-label={title} {...rest}>
   {#if title}<SectionHeading {title} {note} {action} {id} />{/if}
   <Card>{@render children()}</Card>
 </section>
