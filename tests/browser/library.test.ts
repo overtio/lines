@@ -67,12 +67,15 @@ test("a link pasted into a new note is filled in at once, filed, and one ⌘Z pu
   const text = (await app.text())!;
   expect(text).toStartWith(`---\ntype: video\nchannel: Rick Astley\nlink: https://www.youtube.com/watch?v=dQw4w9WgXcQ\nstatus: to watch\n---\n# ${TITLE}\n`);
   // Its picture, as wide as a video's shows, kept with it once it's written. WebKit here can't store
-  // pictures: there it's taken out of the note again, rather than left one that can't be shown.
-  expect(text.slice(text.indexOf(`# ${TITLE}\n`))).toMatch(/^# .*\n\n!\[.*\|400\]\(\.\.\/attachments\/([0-9a-f]{32}\.jpg)\)\n$/);
+  // pictures: there it's taken out of the note again, rather than left one that can't be shown, which
+  // may be done already.
+  const below = text.slice(text.indexOf(`# ${TITLE}\n`));
   if (engine() === "chromium") {
+    expect(below).toMatch(/^# .*\n\n!\[.*\|400\]\(\.\.\/attachments\/([0-9a-f]{32}\.jpg)\)\n$/);
     const name = /attachments\/([0-9a-f]{32}\.jpg)/.exec(text)![1];
     await page.waitForFunction(async (name) => (await window.testing.attachmentNames()).includes(name), name);
   } else {
+    expect(below).toMatch(/^# .*\n(?:\n!\[.*\|400\]\(\.\.\/attachments\/[0-9a-f]{32}\.jpg\)\n)?$/);
     await page.waitForFunction((title) => window.testing.text()?.endsWith(`# ${title}\n`), TITLE);
   }
   // Only the link was sent.
