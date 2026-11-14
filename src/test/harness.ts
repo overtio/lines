@@ -1,3 +1,4 @@
+import "./silence";
 import { EditorView } from "@codemirror/view";
 import { feeds } from "../lib/feeds/feeds.svelte";
 import { NoFeed } from "../lib/feeds/find";

@@ -291,3 +291,21 @@ test("typing in an episode note as it ends keeps what's typed; ⌘Z in another n
   await page.waitForFunction(() => !window.testing.text()?.includes("typed words"));
   expect(await page.evaluate((id) => window.testing.notes.get(id)?.note.body, episode)).toContain("status: listened");
 });
+
+test("the tests make no sound: a sound starting is muted, and Web Audio reaches the speakers through a gain of 0", async () => {
+  app = await openApp();
+  const heard = await app.page.evaluate(async () => {
+    const audio = new Audio();
+    void audio.play().catch(() => {});
+    const context = new AudioContext();
+    const oscillator = context.createOscillator();
+    const gains: number[] = [];
+    const connect = AudioNode.prototype.connect as (this: AudioNode, ...args: unknown[]) => unknown;
+    // What the oscillator is joined to, on its way to the speakers.
+    const joined = connect.call(oscillator, context.destination) as AudioNode;
+    if (joined instanceof GainNode) gains.push(joined.gain.value);
+    await context.close();
+    return { muted: audio.muted, gains };
+  });
+  expect(heard).toEqual({ muted: true, gains: [0] });
+});

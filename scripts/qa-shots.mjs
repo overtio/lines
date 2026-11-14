@@ -1056,7 +1056,8 @@ if (!args.includes("--no-build")) await build({ root, mode: "test", logLevel: "e
 // A port of its own, as the browser tests' (tests/browser/setup.ts).
 const server = await preview({ root, mode: "test", logLevel: "error", build: { outDir }, preview: { host: "127.0.0.1", port: 0, open: false } });
 const url = server.resolvedUrls.local[0];
-const browser = await (engine === "webkit" ? webkit : chromium).launch();
+// Unheard (the test build mutes itself too: src/test/silence.ts); WebKit has no such switch.
+const browser = engine === "webkit" ? await webkit.launch() : await chromium.launch({ args: ["--mute-audio"] });
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
