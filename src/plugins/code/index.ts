@@ -56,6 +56,10 @@ const commentText = (line: string, opening: RegExp) => line.replace(opening, "")
 const tagsLine = (line: string, opening: RegExp) => opening.test(line) && TAGS_ONLY.test(commentText(line, opening));
 /** Where the note starts, after a script's `#!` line. */
 const topOf = (lines: string[]) => lines.findIndex((line) => line.trim() && !SHEBANG.test(line));
+/** The line a note's title is read from: its first, but a `#!` line or a comment of only tags. */
+const titleLineOf = (lines: string[], opening: RegExp) => lines.findIndex((line) => line.trim() && !SHEBANG.test(line) && !tagsLine(line, opening));
+/** A comment of its own, a line saying `text`. */
+const commented = ([open, close]: [string, string?], text: string) => [open, text, close].filter(Boolean).join(" ");
 
 /**
  * A note's title is its first line as it reads, a comment (`opening` starts one) without its marks
@@ -63,7 +67,7 @@ const topOf = (lines: string[]) => lines.findIndex((line) => line.trim() && !SHE
  */
 function meta(body: string, opening: RegExp): NoteMeta {
   const lines = body.split("\n", 400);
-  const first = lines.findIndex((line) => line.trim() && !SHEBANG.test(line) && !tagsLine(line, opening));
+  const first = titleLineOf(lines, opening);
   const title = first < 0 ? "" : commentText(lines[first], opening);
   const comments: string[] = [];
   for (const line of lines.slice(Math.max(topOf(lines), 0))) {
@@ -95,15 +99,31 @@ const addTag = (comment: [string, string?], opening: RegExp) => (body: string, t
   if (meta(body, opening).tags.includes(tag)) return body;
   const lines = body.split("\n");
   const top = topOf(lines);
-  if (top < 0) return `${[comment[0], `#${tag}`, comment[1]].filter(Boolean).join(" ")}\n${body}`;
+  if (top < 0) return `${commented(comment, `#${tag}`)}\n${body}`;
   for (let i = top; i < lines.length && opening.test(lines[i]); i++) {
     if (!tagsLine(lines[i], opening)) continue;
     lines[i] = CLOSING.test(lines[i]) ? lines[i].replace(CLOSING, (closing) => ` #${tag}${closing}`) : `${lines[i].trimEnd()} #${tag}`;
     return lines.join("\n");
   }
   const at = opening.test(lines[top]) ? top + 1 : top;
-  lines.splice(at, 0, [comment[0], `#${tag}`, comment[1]].filter(Boolean).join(" "));
+  lines.splice(at, 0, commented(comment, `#${tag}`));
   return lines.join("\n");
+};
+
+/**
+ * The note with its title changed by `mark`, its code left as it is: in the comment the title is
+ * read from, or else in a comment of its own above the line it's read from (after a `#!` line, in a
+ * note without one). As it is, if that comment would read as a tag it doesn't have (`#include`).
+ */
+const markTitle = (comment: [string, string?], opening: RegExp) => (body: string, mark: (title: string) => string) => {
+  const lines = body.split("\n");
+  const first = titleLineOf(lines, opening);
+  const title = first < 0 ? "" : commentText(lines[first], opening);
+  const opened = first < 0 ? null : opening.exec(lines[first]);
+  if (opened) lines[first] = opened[0] + mark(title) + lines[first].slice(opened[0].length + title.length);
+  else lines.splice(first < 0 ? (SHEBANG.test(lines[0]) ? 1 : 0) : first, 0, commented(comment, mark(title).trim()));
+  const text = lines.join("\n");
+  return meta(text, opening).tags.join() === meta(body, opening).tags.join() ? text : body;
 };
 
 const group = () => ({ id: "code", name: t("plugins.code"), default: "code-javascript" });
@@ -142,6 +162,7 @@ export const code = (): Plugin => ({
           plainText: (body) => body,
           stats: (body) => countLines(body.split("\n").map((text) => ({ text, heading: false }))),
           addTag: addTag(comment, opening),
+          markTitle: markTitle(comment, opening),
           newNote: ({ tag }) => (tag ? addTag(comment, opening)("", tag) : ""),
           file: (body) => body,
           print: (body, parts) => el("div", "doc doc-code-note", parts.code(body, description.name)),
