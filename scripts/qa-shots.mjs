@@ -167,6 +167,46 @@ async function subscribe(page, feeds) {
 
 const FEEDS = { "https://svelte.dev/blog/rss.xml": "blog.rss", "https://daringfireball.net/feeds/main": "blog.atom", "https://feeds.megaphone.fm/FSI1483080183": "podcast.rss" };
 
+/** lines' own look, and three styles with their themes: a scene taken in each, `-neon` after its id. */
+const LOOKS = [
+  ["", {}],
+  ["-neon", { style: "neon", theme: "neon" }],
+  ["-classic", { style: "classic", theme: "classic" }],
+  ["-pixel", { style: "pixel", theme: "pixel" }],
+];
+
+/** " in Neon", for a look's suffix. */
+const inLook = (suffix) => (suffix ? ` in ${suffix[1].toUpperCase()}${suffix.slice(2)}` : "");
+
+/** A comment, and a reply under it, down to `depth`. */
+const chain = (depth, at = 1) => ({
+  id: 900_000 + at,
+  type: "comment",
+  author: `person${at}`,
+  created_at_i: Math.floor(Date.now() / 1000) - 3600 * (depth - at + 1),
+  text: `Depth ${at}. ${"A reply that goes on for a while, as replies do. ".repeat(2)}`,
+  children: at < depth ? [chain(depth, at + 1)] : [],
+});
+
+/**
+ * Hacker News' feed subscribed to, and the IceWM story's discussion open under it, from the tests'
+ * copy of it (tests/browser/feeds/), with a thread `deep` comments deep first, if asked for.
+ */
+async function openDiscussion(page, deep = 0) {
+  const cors = { "access-control-allow-origin": "*" };
+  const story = JSON.parse(readFileSync(`${root}tests/browser/feeds/hn-story.json`, "utf8"));
+  const official = JSON.parse(readFileSync(`${root}tests/browser/feeds/hn-official.json`, "utf8"));
+  if (deep) {
+    story.children.unshift(chain(deep));
+    official.kids.unshift(900_001);
+  }
+  await page.route(/^https:\/\/(hn\.algolia\.com|hacker-news\.firebaseio\.com)\//, (route) => route.fulfill({ json: route.request().url().includes("algolia") ? story : official, headers: cors }));
+  await subscribe(page, { "https://news.ycombinator.com/rss": "hn.rss" });
+  await page.evaluate(() => window.testing.notes.setFilter({ kind: "feeds" }));
+  await page.locator(".note-list").getByRole("button", { name: /^IceWM/ }).click();
+  await page.locator("[data-fold]").first().waitFor();
+}
+
 /** The podcast's latest episode played (a minute of sound), paused 12 seconds in. */
 async function playEpisode(page) {
   const audio = wav(60_000);
@@ -716,14 +756,47 @@ const SCENES = [
       await page.locator(".note-list").getByRole("button", { name: /^What’s new in Svelte/ }).click();
     },
   },
+  ...LOOKS.map(([suffix, prefs]) => ({
+    id: `feeds-discussion${suffix}`,
+    title: `A Hacker News post's discussion${inLook(suffix)}`,
+    look: "Under the post, after a rule across the text's width: how many comments, and Open on Hacker News at the end of that line. Each comment's header, a chevron, its author (the poster's in the accent) and how long ago, quieter than the text; its text lined up with the name, quotes with the bar quotes have; replies drawn in under a thin line down from the chevron. The thread inside the note's margins, lined up with the post's text.",
+    prefs,
+    act: (page) => openDiscussion(page),
+  })),
+  {
+    id: "feeds-discussion-folded",
+    title: "A Hacker News post's discussion, a comment folded and the keyboard on it",
+    look: "The first comment folded, with the keyboard's ring around its header: its chevron pointing right, how many replies went with it after its time, and the next comment straight under it.",
+    act: async (page) => {
+      await openDiscussion(page);
+      await page.locator("[data-fold]").first().focus();
+      await page.keyboard.press("ArrowLeft");
+    },
+  },
   ...[
-    ["", {}],
-    ["-neon", { style: "neon", theme: "neon" }],
-    ["-classic", { style: "classic", theme: "classic" }],
-    ["-pixel", { style: "pixel", theme: "pixel" }],
-  ].map(([suffix, prefs]) => ({
+    ["backdrop", "over a backdrop", { paperBackdrop: "dawn" }],
+    ["ruled", "on ruled paper", { paperPattern: "lines" }],
+  ].map(([id, title, prefs]) => ({
+    id: `feeds-discussion-${id}`,
+    title: `A Hacker News post's discussion ${title}`,
+    look: "The post and its discussion on one page: over a backdrop, one card from the title down past the comments (none round the post alone); on ruled paper, the comments' text ruled at its own lines, their headers not.",
+    prefs,
+    act: (page) => openDiscussion(page),
+  })),
+  {
+    id: "feeds-discussion-phone",
+    title: "Phone: a Hacker News post's deep thread",
+    look: "A thread fourteen replies deep: replies drawn in four levels, then in line with the fourth, each saying whom it answers (↳ reply to …); every comment's text a good width, nothing running off the side.",
+    width: 390,
+    height: 780,
+    act: async (page) => {
+      await openDiscussion(page, 14);
+      await page.locator("[data-fold]").nth(5).focus();
+    },
+  },
+  ...LOOKS.map(([suffix, prefs]) => ({
     id: `player${suffix}`,
-    title: `The podcast player${suffix ? ` in ${suffix[1].toUpperCase()}${suffix.slice(2)}` : ""}`,
+    title: `The podcast player${inLook(suffix)}`,
     look: "At the bottom of the sidebar, over Set up sync: the episode's artwork, its title and show cut short, the close button lined up with them; the slider across with the time played and left under its ends; back 15, play and forward 30 centered, the speed at the end, all in line. The episode's row says how much is left, its play button clear of the text.",
     prefs,
     act: (page) => playEpisode(page),

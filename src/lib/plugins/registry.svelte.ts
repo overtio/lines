@@ -102,6 +102,7 @@ class Plugins {
   });
   readonly linkActions = $derived(this.#from("linkActions"));
   readonly fileImports = $derived(this.#from("fileImports"));
+  readonly discussions = $derived(this.#from("discussions"));
 
   constructor() {
     // Turned on or off in another window (Settings is one in the desktop apps).
@@ -261,6 +262,16 @@ class Plugins {
   /** The library's kind of things whose notes have this `type`, if it's one. */
   libraryKind(type: string) {
     return this.libraryKinds.find((kind) => kind.type === type);
+  }
+
+  /** What reads the discussion at `link` (a post's comments link), if anything does. */
+  discussion(link: string) {
+    try {
+      const url = new URL(link);
+      return this.discussions.find((source) => source.recognizes(url));
+    } catch {
+      return undefined;
+    }
   }
 
   /** What draws math, if anything does. */

@@ -5,6 +5,7 @@ import { NoFeed } from "../lib/feeds/find";
 import { htmlToMarkdown, saysMore } from "../lib/feeds/markdown";
 import { readOpml } from "../lib/feeds/opml";
 import { isFeed, NotAFeed, readFeed } from "../lib/feeds/parse";
+import { htmlToText } from "../lib/feeds/text";
 import { readBookmarks } from "../lib/library/bookmarks";
 import { lock } from "../lib/lock/lock.svelte";
 import { attachmentNames, saveAttachment } from "../lib/notes/attachments";
@@ -17,6 +18,7 @@ import { prefs } from "../lib/prefs.svelte";
 import { customThemes } from "../lib/themes/custom.svelte";
 import { themeDrafts } from "../lib/themes/drafts.svelte";
 import { presets, writePresetFile } from "../lib/themes/presets.svelte";
+import { readThread } from "../plugins/hacker-news/thread";
 
 /*
  * What the browser tests (tests/browser/) use inside the page, in builds made with `--mode test`
@@ -46,6 +48,8 @@ const testing = {
   player,
   /** Reading feeds, their HTML and OPML (lib/feeds/), and bookmarks files (lib/library/bookmarks.ts), as lines does. */
   reading: { readFeed, isFeed, NotAFeed, NoFeed, htmlToMarkdown, saysMore, readOpml, readBookmarks },
+  /** Reading a discussion: its comments' HTML (lib/feeds/text.ts), and Hacker News' threads (plugins/hacker-news/). */
+  discussions: { htmlToText, readThread },
   /** The app lock, to turn on as Settings does. */
   lock,
   panes,

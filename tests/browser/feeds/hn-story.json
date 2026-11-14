@@ -1,0 +1,137 @@
+{
+ "id": 50478515,
+ "type": "story",
+ "author": "inatreecrown2",
+ "created_at_i": 1794545693,
+ "title": "IceWM",
+ "text": null,
+ "children": [
+  {
+   "id": 50478932,
+   "type": "comment",
+   "author": "microtonal",
+   "created_at_i": 1794549531,
+   "text": "I worked for a commercial Linux distribution in 2004-2005 (not existing anymore). Our default desktop user IceWM, but if I recall correctly, we used GNOME’s Nautilus to provide the desktop background&#x2F;folders.<p>IceWM was really lightweight, so it ran well on a variety of customer machines.<p>Great times!",
+   "children": []
+  },
+  {
+   "id": 50479019,
+   "type": "comment",
+   "author": "yjftsjthsd-h",
+   "created_at_i": 1794550067,
+   "text": "I&#x27;m mildly bemused at the other comments treating this as a blast from the past. I use icewm <i>today</i> as a super low resource DE for a headless remote desktop system, with a major benefit being that it&#x27;s all in one with no configuration needed; one unit includes panel, app menu, and window manager that work out of the box.",
+   "children": [
+    {
+     "id": 50479164,
+     "type": "comment",
+     "author": "inatreecrown2",
+     "created_at_i": 1794551225,
+     "text": "I use it as my main desktop for audio work.",
+     "children": [
+      {
+       "id": 50480307,
+       "type": "comment",
+       "author": "fho",
+       "created_at_i": 1794559628,
+       "text": "I always wondered if that&#x27;s worth it.<p>I&#x27;ve been running a whole band (16in, 8out) with Ardour, 3x Guitarix and &quot;standard effects&quot; (EQ, Compression, Barry&#x27;s Satan Maximizer, etc) for some years now on a 10th gen i7.<p>That&#x27;s with -rt patches and running live.<p>I considered switching to Xfwm, but even with Gnome3 I never had issues with performance.",
+       "children": []
+      }
+     ]
+    },
+    {
+     "id": 50479646,
+     "type": "comment",
+     "author": "dead_hn_theory",
+     "created_at_i": 1794555042,
+     "text": "&gt; treating this as a blast from the past.<p>Well, for most of us it is.",
+     "children": []
+    }
+   ]
+  },
+  {
+   "id": 50479141,
+   "type": "comment",
+   "author": "inatreecrown2",
+   "created_at_i": 1794551047,
+   "text": "I just switched to IceWM after trying so many different versions of tiling window managers. The one that worked best for me was MangoWM, but in the end it also interfered more than helped with my work. \nA simple floating wm like IceWM works best for the apps I use: basic tools like terminal and Thunar, Reaper, windows apps via wine.\nReally happy I found out about it. It lets me concentrate on the things that matter.",
+   "children": [
+    {
+     "id": 50480229,
+     "type": "comment",
+     "author": "jamesbfb",
+     "created_at_i": 1794559066,
+     "text": "&gt; It lets me concentrate on the things that matter<p>I don’t know if it’s the case of me being old-ish, but you’ve hit the nail on the head. I’ve been using i3 with pretty much the same dot files for well over a decade, simply because it stays the hell away from the work I am doing.",
+     "children": [
+      {
+       "id": 50483163,
+       "type": "comment",
+       "author": "trevithick",
+       "created_at_i": 1794576309,
+       "text": "Same here but with Xfce. It&#x27;s a trajectory I&#x27;ve seen in many comments. Starting out trying every new DE, customizing them, etc. Eventually ending up on one DE for a decade plus and not even bothering to change the default wallpaper.",
+       "children": []
+      },
+      {
+       "id": 50485951,
+       "type": "comment",
+       "author": "SoftTalker",
+       "created_at_i": 1794587686,
+       "text": "At some point, or maybe past a certain age, fucking around with desktop and window manager configurations stops being entertaining. You just want something that has consistent, sane defaults, works with no fuss, and otherwise stays out of your way.",
+       "children": []
+      }
+     ]
+    },
+    {
+     "id": 50486343,
+     "type": "comment",
+     "author": "necrotic_comp",
+     "created_at_i": 1794589236,
+     "text": "Yep, I went through the same process. I&#x27;m using IceWM with the win95 default theme, and I set it the same on all of my computers.<p>It&#x27;s scriptable, unobtrusive,  lightweight, and stable. \nWhat more could you want ?",
+     "children": [
+      {
+       "id": 50486689,
+       "type": "comment",
+       "author": "MithrilTuxedo",
+       "created_at_i": 1794590742,
+       "text": "&gt;using IceWM with the win95 default theme<p>Blast from the past... I used LiteStep on Windows before MSBLAST made me leave the platform for Linux.<p><a href=\"https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;LiteStep\" rel=\"nofollow\">https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;LiteStep</a>",
+       "children": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 50481489,
+   "type": "comment",
+   "author": "sscarduzio",
+   "created_at_i": 1794566391,
+   "text": "I use IceWM *today* in my remote machines via RustDesk (another massive project!).<p>The only thing I don&#x27;t understand is why minimal WMs need to (intentionally?) reject basic usability and visual design principles.<p>- Main menu = nested dropdown\n- No padding anywhere\n- Terrible box shadows<p>etc.",
+   "children": [
+    {
+     "id": 50482393,
+     "type": "comment",
+     "author": "desdenova",
+     "created_at_i": 1794571877,
+     "text": "&gt; No padding anywhere<p>That&#x27;s a feature",
+     "children": []
+    },
+    {
+     "id": 50483193,
+     "type": "comment",
+     "author": "anders_er",
+     "created_at_i": 1794576456,
+     "text": "Margins and borders are superfluous if you set the thumb buttons (the discard your work buttons) to move and resize anywhere.<p>Try it.",
+     "children": [
+      {
+       "id": 50483965,
+       "type": "comment",
+       "author": "andai",
+       "created_at_i": 1794579960,
+       "text": "I use alt + drag to move and alt + right drag to resize on xfce. I don&#x27;t know if other WMs have it but that&#x27;s the main thing I miss on other OSes.",
+       "children": []
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

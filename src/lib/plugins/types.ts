@@ -96,6 +96,8 @@ export interface Contributions {
   linkActions?: LinkAction[];
   /** Files lines imports as something other than a note in a language: a browser's bookmarks, as the Library's resources. */
   fileImports?: FileImport[];
+  /** Sites whose discussion of a post lines shows under it, from the post's comments link: Hacker News'. */
+  discussions?: DiscussionSource[];
 }
 
 /**
@@ -113,6 +115,59 @@ export interface FileImport {
    * Settings, given the files' names and text, and what to call when it's done with (Cancel).
    */
   step: () => Promise<{ default: Component<{ files: { name: string; text: string }[]; onclose: () => void }> }>;
+}
+
+/**
+ * A site whose discussion of a post lines shows under it in the reader (Discussion.svelte), rather
+ * than only linking to it: from the post's comments link (RSS's `<comments>`), only to read.
+ */
+export interface DiscussionSource {
+  id: string;
+  /** As people know it: "Hacker News". */
+  name: string;
+  /** Whether it's a link to a discussion it reads; quick, and without asking anyone. */
+  recognizes(url: URL): boolean;
+  /** The discussion's page on the site, for a link it recognizes, to open there: made from what names it, not the link as it came. */
+  page(url: URL): string;
+  /** The discussion at a link it recognizes. Rejects when it can't be read (offline). */
+  load(url: URL, signal: AbortSignal): Promise<Discussion>;
+}
+
+/** A post's discussion: its comments, each with the replies to it. */
+export interface Discussion {
+  /** Who posted what's discussed, whose comments are marked as theirs. */
+  author?: string;
+  /** How many comments the site counts, which can be more than it gave (some left out, or not there yet). */
+  count?: number;
+  comments: DiscussionComment[];
+}
+
+/** A comment, and the replies to it. */
+export interface DiscussionComment {
+  id: string;
+  author: string;
+  /** When it was written, in ms since 1970, where the site says. */
+  time?: number;
+  text: TextBlock[];
+  replies: DiscussionComment[];
+}
+
+/**
+ * Text a site gave as HTML, kept as what lines draws itself (feeds/text.ts) and never as HTML:
+ * paragraphs, quotes and code, with links, emphasis and code within them.
+ */
+export interface TextBlock {
+  kind: "paragraph" | "quote" | "code";
+  spans: TextSpan[];
+}
+
+export interface TextSpan {
+  text: string;
+  /** Only ever to the web, http(s). */
+  href?: string;
+  emphasis?: boolean;
+  strong?: boolean;
+  code?: boolean;
 }
 
 /** A web link in a Markdown note: its whole Markdown (`[text](…)`, `<…>` or a bare address), where it is, its address and its text. */
