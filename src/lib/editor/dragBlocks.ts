@@ -413,6 +413,8 @@ const handles = ViewPlugin.fromClass(
       this.pointerY = event.clientY;
       if (this.drag || this.sliding || event.buttons || this.view.state.readOnly || !fine.matches) return;
       if (this.handle.contains(event.target as Node)) return;
+      // Over the note's properties drawn beside or after it (propertiesApart.ts), an editor of their own.
+      if ((event.target as Element).closest?.(".cm-editor") !== this.view.dom) return this.hide();
       this.showAt(event.clientY);
     };
 

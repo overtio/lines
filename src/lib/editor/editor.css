@@ -479,9 +479,61 @@
 }
 
 /* A line across, through the middle of the closing `---`. (Padding, not margins: CodeMirror measures lines.) */
-.cm-line.cm-lp-props-close:not(.is-active) {
+.cm-line.cm-lp-props-close:not(.is-active),
+.cm-props-after .cm-line.cm-lp-props-open:not(.is-active) {
   padding-block: calc(0.4 * var(--editor-size)) calc(0.6 * var(--editor-size)) !important;
   background: linear-gradient(var(--border), var(--border)) 0 calc(50% - 0.1 * var(--editor-size)) / 100% 1px no-repeat;
+}
+
+/*
+ * The properties drawn apart from the text (Settings → Layout → Properties, propertiesApart.ts): an
+ * editor of their own in the note's scroller, beside its text or after it. After it, the line is
+ * above them; beside it there's none, and their `---` lines take no room until the cursor's in them.
+ */
+.cm-props-apart {
+  position: absolute;
+}
+
+.cm-editor.cm-props {
+  height: auto;
+}
+
+.cm-editor.cm-props > .cm-scroller {
+  overflow: visible;
+}
+
+.cm-editor.cm-props > .cm-scroller > .cm-content {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cm-props-after .cm-line.cm-lp-props-close:not(.is-active) {
+  padding-block: 0 !important;
+  background: none;
+}
+
+/*
+ * The note's text beside them: the two a two-column page, centred, the text narrowed where there
+ * isn't room for both at their widths (propertiesApart.ts works them out). A backdrop's page too.
+ */
+.cm-editor.cm-page > .cm-scroller[data-props-beside] > .cm-content {
+  flex-grow: 0 !important;
+  width: var(--props-text-width) !important;
+  max-width: none !important;
+  margin-inline: var(--props-text-left) 0 !important;
+}
+
+.cm-props-beside .cm-line.cm-lp-props-fence:not(.is-active) {
+  padding-block: 0 !important;
+  background: none;
+  font-size: 0;
+  line-height: 0;
+}
+
+/* Their own editor has no pages: after the text they're on its page, and beside it on a card (below). */
+:root[data-backdrop] .editor-pane .cm-props .cm-page-layer {
+  display: none;
 }
 
 /*
@@ -2775,6 +2827,23 @@
     0 18px 60px rgb(0 0 0 / 0.16);
   backdrop-filter: var(--page-blur);
   pointer-events: none;
+}
+
+/*
+ * A note's properties beside its page (propertiesApart.ts) on a card of their own, as the page is,
+ * with half the room between pages around their text, which stays where it's measured to go.
+ */
+:root[data-backdrop] .editor-pane .cm-props-apart.is-beside {
+  --props-pad: calc(var(--page-gap) / 2);
+  box-sizing: content-box;
+  margin: calc(-1 * var(--props-pad));
+  padding: var(--props-pad);
+  border-radius: var(--radius-xl);
+  background-color: var(--page-bg);
+  box-shadow:
+    var(--card-shadow),
+    0 18px 60px rgb(0 0 0 / 0.16);
+  backdrop-filter: var(--page-blur);
 }
 
 /* The paper is the page's, then, rather than the pane's. */

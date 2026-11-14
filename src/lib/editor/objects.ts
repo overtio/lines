@@ -7,7 +7,7 @@ import {
   selectedCompletionIndex,
 } from "@codemirror/autocomplete";
 import { syntaxTree } from "@codemirror/language";
-import { type EditorState, Prec, StateEffect, StateField } from "@codemirror/state";
+import { type EditorState, Facet, Prec, StateEffect, StateField } from "@codemirror/state";
 import { closeHoverTooltips, type EditorView, hoverTooltip, keymap, WidgetType } from "@codemirror/view";
 import type { SyntaxNode } from "@lezer/common";
 import { mount, unmount } from "svelte";
@@ -50,6 +50,12 @@ export const frontMatterField = StateField.define<FrontMatter | null>({
   create: readFront,
   update: (value, tr) => (tr.docChanged ? readFront(tr.state) : value),
 });
+
+/**
+ * How many lines at the note's start were its properties, drawn apart from its text and kept there
+ * while they're being typed in, though for a moment (a key half typed) they aren't (propertiesApart.ts).
+ */
+export const heldProperties = Facet.define<number, number>({ combine: (values) => values[0] ?? 0 });
 
 /** Other notes' titles, icons, types or properties changed, so mentions are drawn again. */
 export const objectsChanged = StateEffect.define<null>();

@@ -41,6 +41,25 @@ Writing is easier when the page is **calm**, the words are *clear*, and nothing 
 
 The last paragraph runs long enough to wrap onto a second line, so its rows show under each line.`;
 
+/** A note with properties of each kind lines draws: a type, text, a date, a score and a list. */
+const PERSON = `---
+type: person
+fullname: Ada Lovelace
+born: 1815-12-10
+rating: 4/5
+languages:
+  - English
+  - French
+---
+# Ada
+
+She wrote the first program, for Charles Babbage's Analytical Engine, and saw that it could do more than count.
+
+## To read
+
+- [ ] Her notes on the Engine
+- [ ] The letters to Babbage`;
+
 const CODE = `# Code notes
 # #tour
 
@@ -533,6 +552,71 @@ const SCENES = [
   { id: "page-break", title: "A page break, without a backdrop", look: "A dashed line named Page break, with room around it; the line above it in the text's own color and size.", note: "The first page ends here.\n<!-- pagebreak -->\nThe second page starts here." },
   { id: "code-note", title: "A code note", look: "Line numbers beside each line, a fixed-width font, highlighting in the theme's colors.", note: CODE, format: "code-python" },
   { id: "code-note-backdrop", title: "A code note over a backdrop", look: "The page holds the line numbers, each exactly beside its line, with even room on both sides.", prefs: { paperBackdrop: "dawn" }, note: CODE, format: "code-python" },
+  ...[
+    ["right", 1512],
+    ["left", 1728],
+  ].map(([side, width]) => ({
+    id: `properties-${side}`,
+    title: `Properties beside the note, on the ${side}, in a ${width} px window (a MacBook's) with the sidebar and the note list`,
+    look: `The note's text and a column of its properties ${side === "right" ? "after it" : "before it, clear of where the line grip shows"}, together a two-column page centred in the pane (as much room left of the one as right of the other)${width === 1512 ? ", the text narrowed for them but a comfortable width still" : ", the text as wide as it's chosen"}; their first line level with the title's; keys muted in their column, the type's icon, the stars, the list's items in the values' column; no line under them; the note's text starting with its title.`,
+    prefs: { propertiesPlace: side },
+    note: PERSON,
+    width,
+  })),
+  {
+    id: "properties-right-editing",
+    title: "Properties beside the note, the cursor in them",
+    look: "Their `---` lines showing faint above and below them, as at the top, the cursor on the last one's value; the note's text where it was.",
+    prefs: { propertiesPlace: "right" },
+    note: PERSON,
+    width: 1512,
+    act: async (page) => {
+      await page.evaluate(() => window.testing.place(window.testing.text().indexOf("# Ada")));
+      await page.keyboard.press("ArrowUp");
+    },
+    schemes: ["light"],
+  },
+  {
+    id: "properties-right-panes",
+    title: "Properties on the right, the note beside another, in a 2,400 px window",
+    look: "In the left pane, the note and its properties a two-column page centred in that pane, the text narrowed; the note beside it as it always is.",
+    prefs: { propertiesPlace: "right" },
+    note: PERSON,
+    width: 2400,
+    act: async (page) => {
+      await page.evaluate(() => window.testing.open("# Beside\n\nAnother note, open beside it."));
+      await page.evaluate(() => window.testing.notes.select(window.testing.notes.entries.find((entry) => entry.meta.title === "Ada").note.id));
+      await page.locator(".note-list [data-id]").filter({ hasText: "Beside" }).click({ button: "right" });
+      await page.getByRole("menuitem", { name: "Open to the Side" }).click();
+      await page.getByRole("region", { name: /Beside/ }).waitFor();
+    },
+    schemes: ["light"],
+  },
+  { id: "properties-bottom", title: "Properties after the note", look: "After the last line, a line across the text's width, then the properties drawn as at the top, lined up with the text; the note's text starting with its title.", prefs: { propertiesPlace: "bottom" }, note: PERSON },
+  {
+    id: "properties-bottom-editing",
+    title: "Properties after the note, the cursor in them",
+    look: "Their `---` lines showing faint, the line across gone, the cursor on the first property, as ↓ from the last line left it.",
+    prefs: { propertiesPlace: "bottom" },
+    note: PERSON,
+    act: async (page) => {
+      await page.evaluate(() => window.testing.place());
+      await page.keyboard.press("ArrowDown");
+    },
+    schemes: ["light"],
+  },
+  { id: "properties-narrow", title: "Properties on the right, without room beside the note (1,280 px)", look: "At the top, as they always were, the text as wide as it's chosen.", prefs: { propertiesPlace: "right" }, note: PERSON, schemes: ["light"] },
+  { id: "properties-backdrop", title: "Properties beside a page over a backdrop, in a 1,728 px window", look: "The page and a card of their own (its corners, shadow and color, as the page's) centred together, the room between pages around and between them; readable over the picture.", prefs: { propertiesPlace: "right", paperBackdrop: "dawn" }, note: PERSON, width: 1728 },
+  { id: "properties-backdrop-bottom", title: "Properties after the note over a backdrop", look: "On the page, after its text and a line across, with no card of their own; the page as long as they need.", prefs: { propertiesPlace: "bottom", paperBackdrop: "dawn" }, note: PERSON },
+  ...["classic", "pixel", "neon"].map((style) => ({
+    id: `properties-${style}`,
+    title: `Properties beside the note, in ${style[0].toUpperCase()}${style.slice(1)}`,
+    look: "In the style's type and colors, as the note's text is, lined up with the title.",
+    prefs: { propertiesPlace: "right", style, theme: style },
+    note: PERSON,
+    width: 1512,
+    schemes: ["light"],
+  })),
   {
     id: "line-marks",
     title: "Marks in the margin, and Changes",

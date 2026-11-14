@@ -1,6 +1,6 @@
 <script lang="ts">
   import { t } from "../../i18n/index.svelte";
-  import { prefs, type Side } from "../../prefs.svelte";
+  import { prefs, type PropertiesPlace, type Side } from "../../prefs.svelte";
   import FieldGroup from "../ui/FieldGroup.svelte";
   import FieldRow from "../ui/FieldRow.svelte";
   import Segmented from "../ui/Segmented.svelte";
@@ -9,6 +9,11 @@
   const sides: { id: Side; label: string }[] = [
     { id: "left", label: t("settings.sideLeft") },
     { id: "right", label: t("settings.sideRight") },
+  ];
+  const propertiesPlaces: { id: PropertiesPlace; label: string }[] = [
+    { id: "top", label: t("settings.placeTop") },
+    ...sides,
+    { id: "bottom", label: t("settings.placeBottom") },
   ];
 </script>
 
@@ -30,6 +35,14 @@
       <Segmented label={t("settings.outlineSide")} options={sides} value={prefs.outlineSide} onselect={(side) => (prefs.outlineSide = side)} />
     </FieldRow>
   {/if}
+  <FieldRow label={t("settings.propertiesPlace")} note={t("settings.propertiesPlaceNote")}>
+    <Segmented
+      label={t("settings.propertiesPlace")}
+      options={propertiesPlaces}
+      value={prefs.propertiesPlace}
+      onselect={(place) => (prefs.propertiesPlace = place)}
+    />
+  </FieldRow>
   <FieldRow label={t("settings.sidebarAbout")} note={t("settings.sidebarAboutNote")}>
     <Switch label={t("settings.sidebarAbout")} checked={prefs.sidebarAbout} onchange={(on) => (prefs.sidebarAbout = on)} />
   </FieldRow>

@@ -34,7 +34,7 @@ import { prefs } from "../prefs.svelte";
 import { InlineMathWidget } from "./math";
 import { fenceCode } from "./rendered";
 import { followClick, openHref } from "./links";
-import { drawMention, frontMatterField, objectsChanged, openMention, openTag, valueText } from "./objects";
+import { drawMention, frontMatterField, heldProperties, objectsChanged, openMention, openTag, valueText } from "./objects";
 import { normalizeTag } from "../notes/parse";
 import { cheer, viewSelectionInUse } from "./util";
 import { keyOf } from "../notes/properties";
@@ -699,7 +699,7 @@ function build(view: EditorView): DecorationSet {
   }
 
   // The title and the blank lines between paragraphs get their own, adjustable spacing.
-  const title = titleLine(doc, front ? front.lines + 1 : 1);
+  const title = titleLine(doc, (front?.lines ?? state.facet(heldProperties)) + 1);
   for (let pos = from; pos <= to; ) {
     const line = doc.lineAt(pos);
     if (line.number === title) decos.push(titleDeco.range(line.from));

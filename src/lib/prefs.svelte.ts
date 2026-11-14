@@ -45,6 +45,9 @@ export type PlaybackRate = (typeof PLAYBACK_RATES)[number];
 export type Paper = "a4" | "letter";
 /** Which side of the window a pane goes on. */
 export type Side = "left" | "right";
+/** Where a note's properties show: at its top, beside its text on its left or right, or after its last line (editor/propertiesApart.ts). */
+export const PROPERTIES_PLACES = ["top", "left", "right", "bottom"] as const;
+export type PropertiesPlace = (typeof PROPERTIES_PLACES)[number];
 /** How far apart a paper pattern's lines and dots are (Settings → Plugins → Paper): a row of cells for each line of text, or a size chosen. */
 export type PaperSpacing = "text" | "custom";
 /** How a score (`Rating: 4/5`) is drawn: as marks of one of these kinds, or as written (editor/scores.ts). */
@@ -264,6 +267,8 @@ export interface Stored {
   /** A line beside the note for each of its headings (editor/outline.svelte.ts), on its right or left. */
   outline: boolean;
   outlineSide: Side;
+  /** Where a note's properties show: at its top, or apart from its text where there's room. */
+  propertiesPlace: PropertiesPlace;
   /** Scroll bars wherever something scrolls (off: none; scrolling still works). */
   scrollbars: boolean;
   /** The sidebar's version badge and GitHub button (a downloaded update's restart button shows anyway). */
@@ -437,6 +442,7 @@ const DEFAULTS: Stored = {
   tabs: false,
   outline: false,
   outlineSide: "right",
+  propertiesPlace: "top",
   scrollbars: true,
   sidebarAbout: true,
   hideBars: false,
@@ -604,6 +610,7 @@ function read(json?: string): Stored {
     tabs: flag(raw.tabs, DEFAULTS.tabs),
     outline: flag(raw.outline, DEFAULTS.outline),
     outlineSide: oneOf(raw.outlineSide, SIDES, DEFAULTS.outlineSide),
+    propertiesPlace: oneOf(raw.propertiesPlace, PROPERTIES_PLACES, DEFAULTS.propertiesPlace),
     scrollbars: flag(raw.scrollbars, DEFAULTS.scrollbars),
     sidebarAbout: flag(raw.sidebarAbout, DEFAULTS.sidebarAbout),
     hideBars: flag(raw.hideBars, DEFAULTS.hideBars),
@@ -714,6 +721,7 @@ class Prefs {
   tabs = $state(this.#initial.tabs);
   outline = $state(this.#initial.outline);
   outlineSide = $state(this.#initial.outlineSide);
+  propertiesPlace = $state(this.#initial.propertiesPlace);
   scrollbars = $state(this.#initial.scrollbars);
   sidebarAbout = $state(this.#initial.sidebarAbout);
   hideBars = $state(this.#initial.hideBars);
@@ -926,6 +934,7 @@ class Prefs {
       tabs: this.tabs,
       outline: this.outline,
       outlineSide: this.outlineSide,
+      propertiesPlace: this.propertiesPlace,
       scrollbars: this.scrollbars,
       sidebarAbout: this.sidebarAbout,
       hideBars: this.hideBars,
@@ -1044,6 +1053,7 @@ class Prefs {
     this.tabs = next.tabs;
     this.outline = next.outline;
     this.outlineSide = next.outlineSide;
+    this.propertiesPlace = next.propertiesPlace;
     this.scrollbars = next.scrollbars;
     this.sidebarAbout = next.sidebarAbout;
     this.hideBars = next.hideBars;
