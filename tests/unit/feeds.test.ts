@@ -13,6 +13,7 @@ mock.module("../../src/lib/release", () => ({ VERSION: "0.0.0", REPO: "https://g
 const { encodingOf, readAtMost } = await import("../../src/lib/feeds/fetch");
 const { linkOf, usualFeeds } = await import("../../src/lib/feeds/find");
 const { formatAgo } = await import("../../src/lib/format");
+const { iconsOf, iconToAsk } = await import("../../src/lib/feeds/icon");
 
 /*
  * Feeds' logic that needs no page: dates and durations as feeds write them, keeping posts across
@@ -171,6 +172,29 @@ describe("mending a feed that isn't quite XML", () => {
     expect(performance.now() - start).toBeLessThan(500);
     expect(unclosed).toBe(crafted[0]);
     expect(many).toBe(crafted[1].replaceAll("&c", "&amp;c"));
+  });
+});
+
+describe("a site's icon", () => {
+  type Link = { rel?: string; href: string; type?: string; sizes?: string };
+  const page = (...links: Link[]) => ({ url: "https://example.com/", title: "", data: [], meta: new Map(), links: links.map((link) => ({ rel: "icon", type: "", title: "", sizes: "", ...link })) });
+
+  test("the largest picture its page names (a phone's, which says no size, is 180 pixels), a drawing last, none not on the web at large", () => {
+    const named = page(
+      { href: "https://example.com/16.png", sizes: "16x16" },
+      { rel: "apple-touch-icon", href: "https://example.com/touch.png" },
+      { href: "https://example.com/mark.svg", type: "image/svg+xml" },
+      { rel: "shortcut icon", href: "https://example.com/32.png", sizes: "32x32" },
+      { rel: "stylesheet", href: "https://example.com/style.css" },
+      { href: "http://example.com/plain.png", sizes: "64x64" },
+    );
+    expect(iconsOf(named)).toEqual(["https://example.com/touch.png", "https://example.com/32.png", "https://example.com/16.png", "https://example.com/mark.svg"]);
+    expect(iconToAsk(named, "https://example.com/")).toBe("https://example.com/touch.png");
+  });
+
+  test("else the favicon.ico at the site's root, as Hacker News' Y is", () => {
+    expect(iconToAsk(null, "https://news.ycombinator.com/news")).toBe("https://news.ycombinator.com/favicon.ico");
+    expect(iconToAsk(page(), "https://example.com/blog/")).toBe("https://example.com/favicon.ico");
   });
 });
 

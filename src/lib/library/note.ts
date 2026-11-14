@@ -19,6 +19,13 @@ export interface LibraryNote {
   keep(): Promise<void>;
 }
 
+/** A cover to keep with a note: the picture, the attachment's name it's kept under, and how wide the note shows it. */
+export interface Cover {
+  picture: Blob;
+  name: string;
+  width: number;
+}
+
 /**
  * The picture at `url`, ready to keep with a note (no larger than it needs to be); nothing where it
  * can't be had (on the web, a site that doesn't let pages download it), or where it isn't on the
@@ -45,14 +52,17 @@ async function coverAt(url: string, signal?: AbortSignal): Promise<Blob | undefi
  * brought from another app can say where it's got to instead (`status`, or null for nowhere).
  */
 export async function libraryNote(item: LibraryItem, signal?: AbortSignal, { status = firstStatus(item.type) }: { status?: string | null } = {}): Promise<LibraryNote> {
-  const kind = plugins.libraryKind(item.type);
-  const picture = item.cover ? await coverAt(item.cover, signal) : undefined;
-  const name = picture && (await attachmentNameOf(picture));
-  const cover = name ? { name, width: COVER_WIDTH[kind?.cover ?? "square"] } : undefined;
+  const cover = item.cover ? await coverFor(item.cover, item.type, signal) : undefined;
   return {
-    text: libraryNoteText(item, { status: status ?? undefined, cover, mentions: kind?.mentions }),
+    text: libraryNoteText(item, { status: status ?? undefined, cover, mentions: plugins.libraryKind(item.type)?.mentions }),
     keep: async () => {
-      if (picture && name) await putAttachment(name, picture);
+      if (cover) await putAttachment(cover.name, cover.picture);
     },
   };
+}
+
+/** The picture at `url` as the cover of a note of `type`, at the width its kind's covers are shown; nothing where it can't be had. */
+export async function coverFor(url: string, type: string, signal?: AbortSignal): Promise<Cover | undefined> {
+  const picture = await coverAt(url, signal);
+  return picture && { picture, name: await attachmentNameOf(picture), width: COVER_WIDTH[plugins.libraryKind(type)?.cover ?? "square"] };
 }

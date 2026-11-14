@@ -11,6 +11,8 @@ export interface PageLink {
   /** Where it points, made whole against the page's address. */
   href: string;
   title: string;
+  /** What sizes it comes in, as a site's icons say (`32x32`, `any`). */
+  sizes: string;
 }
 
 export interface Page {
@@ -110,7 +112,7 @@ export function readPage(html: string, url: string): Page {
       if (key && content !== undefined && !meta.has(key)) meta.set(key, content.trim());
     } else {
       const href = attrs.get("href") && absolute(attrs.get("href")!, url);
-      if (href) links.push({ rel: (attrs.get("rel") ?? "").toLowerCase(), type: (attrs.get("type") ?? "").toLowerCase(), href, title: attrs.get("title") ?? "" });
+      if (href) links.push({ rel: (attrs.get("rel") ?? "").toLowerCase(), type: (attrs.get("type") ?? "").toLowerCase(), href, title: attrs.get("title") ?? "", sizes: (attrs.get("sizes") ?? "").toLowerCase() });
     }
   }
   for (const [, source, script] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {

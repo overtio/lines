@@ -14,7 +14,7 @@
   import Icon from "../icons/Icon.svelte";
   import { longPress } from "../longPress";
   import { coverOf } from "../library/text";
-  import { attachmentURL } from "../notes/attachments";
+  import { arrivedURL } from "../notes/attachments";
   import { notes } from "../notes/store.svelte";
   import { plugins } from "../plugins/registry.svelte";
   import type { Filter } from "../notes/types";
@@ -22,6 +22,7 @@
   import { menuPoint } from "../popover";
   import type { RowSize } from "../sidebarLayout.svelte";
   import { type MenuItem, menuSections, ui } from "../ui.svelte";
+  import { fitPicture } from "./fitPicture";
   import SidebarRow from "./SidebarRow.svelte";
 
   // A row of the Library's feeds: a kind of feed's posts (RSS, Atom, podcasts'), or every feed's,
@@ -152,12 +153,12 @@
         {@const entry = notes.get(note)}
         {@const cover = entry && coverOf(entry.note.body)}
         <li class="pl-3.5">
-          <!-- Its artwork, or its kind's icon; a feed that failed, a quiet mark there instead, and why, said and shown on pointing at it. -->
+          <!-- Its artwork (once it's here), or its kind's icon; a feed that failed, a quiet mark there instead, and why, said and shown on pointing at it. -->
           {#snippet artwork()}
-            {#await attachmentURL(cover!)}
+            {#await arrivedURL(cover!)}
               <span class="size-4 shrink-0 rounded-[calc(3px*var(--radius-scale))] bg-hover"></span>
             {:then src}
-              {#if src}<img class="size-4 shrink-0 rounded-[calc(3px*var(--radius-scale))] object-cover" {src} alt="" draggable="false" />{:else}<Icon name="rss" size={16} strokeWidth={1.75} class="shrink-0 text-muted" />{/if}
+              {#if src}<img class="size-4 shrink-0 rounded-[calc(3px*var(--radius-scale))] object-cover" {src} alt="" draggable="false" {@attach fitPicture} />{:else}<Icon name="rss" size={16} strokeWidth={1.75} class="shrink-0 text-muted" />{/if}
             {/await}
           {/snippet}
           <SidebarRow

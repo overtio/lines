@@ -220,6 +220,11 @@ export function attachmentURL(name: string): Promise<string | null> {
  */
 export const attachmentHere = (name: string): boolean | undefined => here.get(name);
 
+/** A URL for showing an attachment once it's here: at once if it is, else when it arrives (a cover kept just after its note, or synced). */
+export async function arrivedURL(name: string): Promise<string | null> {
+  return (await attachmentURL(name)) ?? new Promise((resolve) => whenArrived(name, () => void attachmentURL(name).then(resolve)));
+}
+
 /** Calls `callback` when an attachment that wasn't here arrives (from sync, or another window). */
 export function whenArrived(name: string, callback: () => void) {
   let set = waiting.get(name);

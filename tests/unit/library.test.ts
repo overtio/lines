@@ -172,6 +172,15 @@ describe("a library note's text", () => {
     const value = (key: string) => meta.properties.find((property) => property.key === key)?.value;
     expect(subtitleOf(kind, value)).toBe("The Daily · @nytimes");
   });
+
+  test("a cover had later (a feed's site's icon) goes under the note's title, at the width it's given", () => {
+    const cover = { name: "0123456789abcdef0123456789abcdef.png", width: 18 };
+    expect(text.withCover("---\ntype: feed\nfeed: https://news.ycombinator.com/rss\n---\n# Hacker News\n\nLinks for the curious.\n", "Hacker News", cover)).toBe(
+      "---\ntype: feed\nfeed: https://news.ycombinator.com/rss\n---\n# Hacker News\n\n![Hacker News|18](../attachments/0123456789abcdef0123456789abcdef.png)\n\nLinks for the curious.\n",
+    );
+    expect(text.withCover("---\ntype: feed\n---\n# Quiet\n", "Quiet", cover)).toBe("---\ntype: feed\n---\n# Quiet\n\n![Quiet|18](../attachments/0123456789abcdef0123456789abcdef.png)\n");
+    expect(text.coverOf(text.withCover("# A [bracketed] title\n", "A [bracketed] title", cover))).toBe(cover.name);
+  });
 });
 
 describe("what something's about", () => {

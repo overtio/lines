@@ -57,6 +57,8 @@ The home page and the docs at https://overtio.github.io/lines/ (`site/`):
 
 ## Feeds
 
+- On the web, a feed's site's icon (for a feed with no picture of its own) can be had only where the site lets web pages download it, and few do: those keep the feed glyph. The apps get every site's.
+- A site's icon is asked for once; one changed later on the site isn't picked up, and a feed whose site had none isn't asked again for a month.
 - **On the web, most feeds can't be read.** A web page may only read a feed whose site allows it (CORS), and most don't; the Feeds view and the box to subscribe say so. Feeds that allow it (some blogs, many podcast hosts) work, and Apple Podcasts' lookup finds a podcast's feed, which can be subscribed to if it allows it. The desktop apps read every feed.
 - On the web, a site's answer can't be read either unless it allows it: a feed that says to wait (with Retry-After) or that it's gone looks like one that couldn't be reached, so it's asked again as one that failed, later each time, a day at most.
 - **Read and unread are per device.** Subscriptions are notes and sync, but which posts were read, and the posts themselves, are kept on each device, which fetches them itself (a new device starts with every post unread).

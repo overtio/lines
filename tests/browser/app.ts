@@ -62,6 +62,8 @@ export async function openApp({ prefs = {}, tour = false, scheme = "light", widt
   const dir = onDisk && engine() === "webkit" ? mkdtempSync(join(tmpdir(), "lines-test-")) : null;
   const context = dir ? await webkit.launchPersistentContext(dir, settings) : await globalThis.lines.browser.newContext(settings);
   if (engine() === "chromium") await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  // Nothing reaches the web: what a test doesn't answer itself (its own routes come first) is answered with nothing.
+  await context.route((url) => url.protocol.startsWith("http") && url.hostname !== "127.0.0.1", (route) => route.fulfill({ body: "", contentType: "text/plain" }));
   // Once, so a reload keeps what the test changed.
   await context.addInitScript(
     ([prefs, tour]) => {

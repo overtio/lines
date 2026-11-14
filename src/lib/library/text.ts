@@ -91,10 +91,23 @@ export function libraryNoteText(item: LibraryItem, { status, cover, mentions = [
   });
   const title = oneLine(item.title);
   const parts = [`---\n${front.join("\n")}\n---\n# ${escapeMarkdown(title)}`];
-  if (cover) parts.push(`![${escapeMarkdown(title.replace(/[[\]|]/g, ""))}|${cover.width}](${ATTACHMENT_PATH}${cover.name})`);
+  if (cover) parts.push(coverLine(title, cover));
   if (item.description) parts.push(...summary(item.description).map(escapeMarkdown));
   if (item.tags?.length) parts.push(item.tags.map((tag) => `#${tag}`).join(" "));
   return parts.join("\n\n") + "\n";
+}
+
+/** A cover as a library note shows it, under its title. */
+const coverLine = (title: string, { name, width }: { name: string; width: number }) => `![${escapeMarkdown(title.replace(/[[\]|]/g, ""))}|${width}](${ATTACHMENT_PATH}${name})`;
+
+/** A library note's text with a cover put where it shows one, under its title (its first heading), for a note made without one. */
+export function withCover(body: string, title: string, cover: { name: string; width: number }): string {
+  const front = /^---\n[\s\S]*?\n---(?:\n|$)/.exec(body)?.[0].length ?? 0;
+  const heading = /^#[ \t].*$/m.exec(body.slice(front));
+  const at = front + (heading ? heading.index + heading[0].length : 0);
+  const head = body.slice(0, at).replace(/\n+$/, "");
+  const rest = body.slice(at).replace(/^\n+/, "");
+  return `${head}${head && "\n\n"}${coverLine(title, cover)}\n${rest && `\n${rest}`}`;
 }
 
 /** The picture a library note shows first, its cover: an attachment's name, or null. */

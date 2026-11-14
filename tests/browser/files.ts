@@ -54,6 +54,20 @@ export function png(width: number, height: number, at: (x: number, y: number) =>
   return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk("IHDR", header), chunk("IDAT", deflateSync(rows)), chunk("IEND", new Uint8Array())]);
 }
 
+/** An icon file (.ico), as a site's favicon.ico is, holding one PNG `side` pixels square. */
+export function ico(picture: Buffer, side: number) {
+  const header = Buffer.alloc(22);
+  header.writeUInt16LE(1, 2);
+  header.writeUInt16LE(1, 4);
+  header.writeUInt8(side % 256, 6);
+  header.writeUInt8(side % 256, 7);
+  header.writeUInt16LE(1, 10);
+  header.writeUInt16LE(32, 12);
+  header.writeUInt32LE(picture.length, 14);
+  header.writeUInt32LE(header.length, 18);
+  return Buffer.concat([header, picture]);
+}
+
 /** A short click, as a WAV file: 16-bit mono at 22,050 Hz. */
 export function wav(ms = 60) {
   const rate = 22_050;

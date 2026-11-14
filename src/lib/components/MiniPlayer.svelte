@@ -11,6 +11,7 @@
   import { BACK, FORWARD, player, STEP } from "../player/player.svelte";
   import { ui } from "../ui.svelte";
   import Button from "./ui/Button.svelte";
+  import { fitPicture } from "./fitPicture";
   import IconButton from "./ui/IconButton.svelte";
   import Slider from "./ui/Slider.svelte";
 
@@ -91,7 +92,7 @@
       >
         {#snippet artwork(src: string | null | undefined)}
           {#if src}
-            <img {src} alt="" class="size-9 shrink-0 rounded-md bg-input object-cover" />
+            <img {src} alt="" class="size-9 shrink-0 rounded-md bg-input object-cover" {@attach fitPicture} />
           {:else}
             <span class="grid size-9 shrink-0 place-items-center rounded-md bg-input text-muted"><Icon name="headphones" size={16} /></span>
           {/if}
