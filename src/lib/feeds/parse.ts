@@ -5,13 +5,13 @@ import { fingerprint } from "./posts";
 
 /*
  * Reading a feed: RSS 2.0, Atom 1.0 and RSS 1.0 (RDF), with the podcast tags that matter (iTunes',
- * Podcasting 2.0's season and episode, Media RSS's pictures). It's read as XML by the browser; one
- * that isn't quite XML (a bare &, an HTML entity, a stray character, a prefix never declared) is
- * mended and read again, and one still broken is read as far as it goes.
+ * Podcasting 2.0's season and episode, Media RSS's pictures), and JSON Feed. XML is read by the
+ * browser; one that isn't quite XML (a bare &, an HTML entity, a stray character, a prefix never
+ * declared) is mended and read again, and one still broken is read as far as it goes.
  */
 
-/** What a feed is written in: RSS 2.0, Atom, or RSS 1.0 (RDF). */
-export type FeedFormat = "rss" | "atom" | "rdf";
+/** What a feed is written in: RSS 2.0, Atom, RSS 1.0 (RDF), or JSON Feed. */
+export type FeedFormat = "rss" | "atom" | "rdf" | "json";
 
 /** A feed as it was read. */
 export interface Feed {
@@ -81,10 +81,12 @@ const PLAYABLE_FILE = /\.(?:mp3|m4a|m4b|aac|ogg|oga|opus|wav|flac|mp4|m4v|mov)(?
 const FEED_ROOT = /<(?:[\w-]+:)?(?:rss|feed|RDF)[\s>]/iy;
 
 /**
- * Whether some text is a feed rather than a page: its first element, past the XML declaration,
- * comments and a doctype, is RSS's, Atom's or RDF's. Read through once, whatever comes before it.
+ * Whether some text is a feed rather than a page: JSON Feed's object, or XML whose first element,
+ * past the declaration, comments and a doctype, is RSS's, Atom's or RDF's. Read through once,
+ * whatever comes before it.
  */
 export function isFeed(text: string): boolean {
+  if (JSON_START.test(text)) return jsonFeed(text) !== null;
   let at = text.startsWith("\uFEFF") ? 1 : 0;
   for (;;) {
     while (at < text.length && /\s/.test(text[at])) at++;
@@ -111,6 +113,8 @@ function doctypeEnd(text: string, at: number) {
 
 /** Reads a feed fetched from `url`; throws NotAFeed if it isn't one. */
 export function readFeed(text: string, url: string): Feed {
+  const json = JSON_START.test(text) ? jsonFeed(text) : null;
+  if (json) return { ...readJson(json, url), format: "json" };
   const root = parseXml(text).documentElement;
   const kind = root?.localName;
   if (kind === "rss") return { ...readRss(child(root, "channel", null) ?? root, url, null), format: "rss" };
@@ -218,17 +222,23 @@ function text(parent: Element, name: string, ns: string | null): string | undefi
 /** A title as plain text: some feeds write theirs as HTML, or with its entities written twice. */
 const titleText = (value: string | undefined) => (!value ? "" : /&[#\w]+;|<\/[a-z]/i.test(value) ? plainText(value) : value.replace(/\s+/g, " ").trim());
 
-/** HTML for content that may be plain text: plain text's paragraphs and lines kept as such. */
-function asHtml(value: string): string {
-  // A tag: its name, then a space or its end (read without looking further, however long the text).
-  if (/<\/?[a-z][\w:-]*(?:\s|\/?>)/i.test(value)) return value;
-  const escape = (line: string) => line.replace(/&(?![#\w]+;)/g, "&amp;").replace(/</g, "&lt;");
-  return value
+/** Text's paragraphs and lines as HTML, each line put through `escape`. */
+const paragraphs = (value: string, escape: (line: string) => string) =>
+  value
     .trim()
     .split(/\n\s*\n/)
     .map((paragraph) => `<p>${paragraph.trim().split("\n").map(escape).join("<br>")}</p>`)
     .join("");
+
+/** HTML for content that may be plain text: plain text's paragraphs and lines kept as such. */
+function asHtml(value: string): string {
+  // A tag: its name, then a space or its end (read without looking further, however long the text).
+  if (/<\/?[a-z][\w:-]*(?:\s|\/?>)/i.test(value)) return value;
+  return paragraphs(value, (line) => line.replace(/&(?![#\w]+;)/g, "&amp;").replace(/</g, "&lt;"));
 }
+
+/** HTML for what's only ever text (JSON Feed's): nothing in it read as a tag or an entity. */
+const textHtml = (value: string) => paragraphs(value, (line) => line.replace(/&/g, "&amp;").replace(/</g, "&lt;"));
 
 /**
  * A few sentences of a post, as plain text, cut at a word; none for one that says nothing but links
@@ -449,6 +459,73 @@ function readAtom(root: Element, url: string): Feed {
     description: plainText(atomHtml(child(root, "subtitle", ns) ?? child(root, "tagline", ns))) || tags.summary,
     author: feedAuthor ?? tags.author,
     image: tags.image ?? address(text(root, "logo", ns) ?? text(root, "icon", ns), base),
+    posts: distinct(posts),
+  };
+}
+
+/* JSON Feed (1.0 and 1.1): an object, whose `version` says it's one. */
+
+type Fields = Record<string, unknown>;
+
+/** Text at the start of a JSON object, past a byte-order mark and spaces. */
+const JSON_START = /^\uFEFF?\s*\{/;
+const JSON_FEED = /^https?:\/\/jsonfeed\.org\/version\/\d+(?:\.\d+)?\/?$/;
+
+const isFields = (value: unknown): value is Fields => !!value && typeof value === "object" && !Array.isArray(value);
+/** A field's text, if it's text with something in it: a feed may give anything anywhere. */
+const textOf = (value: unknown) => (typeof value === "string" && value.trim() ? value.trim() : undefined);
+const listOf = (value: unknown) => (Array.isArray(value) ? value.filter(isFields) : []);
+
+/** The feed the text is, if it's JSON Feed's object. */
+function jsonFeed(text: string): Fields | null {
+  try {
+    const value: unknown = JSON.parse(text.replace(/^\uFEFF/, ""));
+    return isFields(value) && JSON_FEED.test(String(value.version)) ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Who wrote it: 1.1's `authors`, or 1.0's `author`. */
+function jsonAuthors(fields: Fields): string | undefined {
+  const authors = Array.isArray(fields.authors) ? listOf(fields.authors) : isFields(fields.author) ? [fields.author] : [];
+  return authors.flatMap((author) => textOf(author.name) ?? []).join(", ") || undefined;
+}
+
+function readJson(feed: Fields, url: string): Feed {
+  const home = address(textOf(feed.home_page_url), url);
+  const feedAuthor = jsonAuthors(feed);
+  const posts = listOf(feed.items).map((item): Post => {
+    const link = address(textOf(item.url), url) ?? address(textOf(item.external_url), url);
+    const base = link ?? home ?? url;
+    const title = titleText(textOf(item.title));
+    const date = readDate(textOf(item.date_published) ?? textOf(item.date_modified));
+    const summary = textOf(item.summary);
+    const html = textOf(item.content_html) ?? textHtml(textOf(item.content_text) ?? summary ?? "");
+    const attachments = listOf(item.attachments).map((file) => ({ url: textOf(file.url) ?? null, type: textOf(file.mime_type) ?? null, seconds: file.duration_in_seconds }));
+    const audio = audioOf(attachments, base);
+    const seconds = attachments.find((file) => audio && address(file.url, base) === audio.url)?.seconds;
+    const id = typeof item.id === "number" ? String(item.id) : textOf(item.id);
+    return {
+      id: id || link || `${title}\n${date ?? ""}\n${fingerprint(html)}`,
+      title: title || excerptOf(html).slice(0, 80),
+      link,
+      author: jsonAuthors(item) ?? feedAuthor,
+      date,
+      html,
+      base,
+      excerpt: excerptOf(summary ? textHtml(summary) : html, base, [link]),
+      image: address(textOf(item.image) ?? textOf(item.banner_image), base),
+      audio,
+      duration: typeof seconds === "number" && seconds > 0 ? Math.round(seconds) : undefined,
+    };
+  });
+  return {
+    title: titleText(textOf(feed.title)) || new URL(url).hostname,
+    link: home,
+    description: textOf(feed.description)?.replace(/\s+/g, " "),
+    author: feedAuthor,
+    image: address(textOf(feed.icon) ?? textOf(feed.favicon), url),
     posts: distinct(posts),
   };
 }

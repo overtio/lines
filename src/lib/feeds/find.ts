@@ -17,12 +17,12 @@ export interface Found {
 
 export class NoFeed extends Error {}
 
-/** Feeds a page may name, best first. */
-const FEED_TYPES = ["application/rss+xml", "application/atom+xml", "application/rdf+xml", "application/xml", "text/xml"];
+/** Feeds a page may name, best first; plain JSON only when its address says it's a feed (JSON Feed 1.0's, not a site's API). */
+const FEED_TYPES = ["application/rss+xml", "application/atom+xml", "application/rdf+xml", "application/feed+json", "application/xml", "text/xml", "application/json"];
 /** How many of the feeds a page names are tried, and of those it links to for its podcast's. */
 const TRIED = 3;
 /** Where sites keep their feed by custom (WordPress, Ghost, Jekyll, Hugo, Next.js blogs…), best first. */
-const USUAL = ["feed", "rss", "rss.xml", "feed.xml", "atom.xml", "index.xml", "atom"];
+const USUAL = ["feed", "rss", "rss.xml", "feed.xml", "atom.xml", "index.xml", "atom", "feed.json"];
 
 /** A link as typed: `feed:` taken off, `https://` put on a bare `example.com/feed`. Null if it isn't one. */
 export function linkOf(input: string): string | null {
@@ -40,10 +40,10 @@ export function linkOf(input: string): string | null {
   }
 }
 
-/** Links that look like a feed's own: `….xml`, `/feed`, `/rss`, `feeds.…`, `?format=rss`. */
+/** Links that look like a feed's own: `….xml`, `/feed`, `/feed.json`, `/rss`, `feeds.…`, `?format=rss`. */
 export function looksLikeFeed(url: URL) {
   return (
-    /(?:\.(?:rss|atom|rdf|xml)|\/(?:feeds?|rss2?|atom)(?:\.\w+)?)\/?$/i.test(url.pathname) ||
+    /(?:\.(?:rss|atom|rdf|xml)|\/(?:feeds?|rss2?|atom)(?:\.\w+)?|\/feed\/json)\/?$/i.test(url.pathname) ||
     /^(?:feeds?|rss)\./i.test(url.hostname) ||
     /(?:^|&)(?:feed|format)=(?:rss|atom|feed)\b/i.test(url.search.slice(1))
   );
@@ -64,7 +64,7 @@ export function readSite(html: string, base: string): { named: string[]; links: 
   };
   const named = [...page.querySelectorAll("link[rel~='alternate'][href][type]")]
     .map((link) => ({ type: link.getAttribute("type")!.toLowerCase().split(";")[0].trim(), href: link.getAttribute("href")! }))
-    .filter(({ type }) => FEED_TYPES.includes(type))
+    .filter(({ type, href }) => FEED_TYPES.includes(type) && (type !== "application/json" || /feed/i.test(href)))
     .sort((a, b) => FEED_TYPES.indexOf(a.type) - FEED_TYPES.indexOf(b.type))
     .flatMap(({ href }) => whole(href).map(String));
   const links = [...page.querySelectorAll("a[href]")].flatMap((link) => whole(link.getAttribute("href")!));

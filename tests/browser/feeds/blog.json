@@ -1,0 +1,44 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "Linked & Loaded",
+  "home_page_url": "https://linked.example/",
+  "feed_url": "https://linked.example/feed.json",
+  "description": "Links,\n  and what I make of them",
+  "icon": "/icon-512.png",
+  "favicon": "https://linked.example/favicon.ico",
+  "language": "en",
+  "authors": [{ "name": "Ada Lovelace", "url": "https://linked.example/about" }],
+  "items": [
+    {
+      "id": "https://linked.example/2026/11/engines",
+      "url": "https://linked.example/2026/11/engines",
+      "external_url": "https://engines.example/analytical",
+      "title": "On engines",
+      "content_html": "<p>Read <a href=\"/2026/10/notes\">my notes</a> first.</p><script>alert(1)</script>",
+      "summary": "Why the engine matters.",
+      "image": "/img/engine.png",
+      "date_published": "2026-11-13T09:30:00-05:00",
+      "date_modified": "2026-11-13T10:00:00-05:00",
+      "tags": ["engines"]
+    },
+    {
+      "id": 42,
+      "content_text": "No title, plain text with <b>angle brackets</b> & an &amp; written out.\n\nA second paragraph.",
+      "date_modified": "2026-11-12T08:00:00Z",
+      "author": { "name": "Charles Babbage" }
+    },
+    {
+      "id": "ep-7",
+      "url": "https://linked.example/podcast/7",
+      "title": "Episode 7",
+      "content_text": "We talk engines.",
+      "attachments": [
+        { "url": "https://cdn.linked.example/7.vtt", "mime_type": "text/vtt" },
+        { "url": "https://cdn.linked.example/7.mp3", "mime_type": "audio/mpeg", "size_in_bytes": 1000, "duration_in_seconds": 1834.6 }
+      ]
+    },
+    { "id": "ep-7", "title": "The same id again: kept once" },
+    "not an item",
+    { "id": { "nested": true }, "title": 7, "external_url": "javascript:alert(1)", "content_html": "<p>Fields of the wrong kind</p>" }
+  ]
+}

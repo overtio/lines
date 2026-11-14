@@ -97,6 +97,7 @@ export default {
   // The Library's rows of feeds, a kind each (Settings → Library → Feeds in the sidebar).
   "feeds.group.rss": "RSS Feeds",
   "feeds.group.atom": "Atom Feeds",
+  "feeds.group.json": "JSON Feeds",
   "feeds.group.podcast": "Podcast Feeds",
   "feeds.showGroup": "Show the feeds in {group}",
   "feeds.inSidebar": "Feeds in the sidebar",

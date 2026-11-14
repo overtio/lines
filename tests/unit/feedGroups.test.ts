@@ -11,8 +11,8 @@ const post = (audio?: string): KeptPost => ({ id: "1", key: "k", title: "A post"
 const record = (format: FeedRecord["format"], posts: KeptPost[] = [post()]) => ({ format, posts });
 
 describe("feeds by kind", () => {
-  test("RSS 2.0 and RSS 1.0 are RSS, Atom is Atom", () => {
-    expect([groupOf(record("rss"), "feed"), groupOf(record("rdf"), "feed"), groupOf(record("atom"), "feed")]).toEqual(["rss", "rss", "atom"]);
+  test("RSS 2.0 and RSS 1.0 are RSS, Atom is Atom, JSON Feed is JSON", () => {
+    expect([groupOf(record("rss"), "feed"), groupOf(record("rdf"), "feed"), groupOf(record("atom"), "feed"), groupOf(record("json"), "feed")]).toEqual(["rss", "rss", "atom", "json"]);
   });
 
   test("a podcast's feed is a podcast's whatever it's written in: its posts have sound, or its note is a podcast's", () => {

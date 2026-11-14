@@ -154,6 +154,14 @@ describe("telling a feed from a page", () => {
     expect(isFeed("<!-- never closed <rss>")).toBe(false);
   });
 
+  test("JSON Feed by its version, 1.0's and 1.1's; other JSON isn't one", () => {
+    expect(isFeed('\uFEFF {"version": "https://jsonfeed.org/version/1.1", "title": "A blog", "items": []}')).toBe(true);
+    expect(isFeed('{"items": [], "version": "https://jsonfeed.org/version/1"}')).toBe(true);
+    expect(isFeed('{"version": "1.1", "items": []}')).toBe(false);
+    expect(isFeed('[{"version": "https://jsonfeed.org/version/1.1"}]')).toBe(false);
+    expect(isFeed('{"version": "https://jsonfeed.org/version/1.1", "items": [')).toBe(false);
+  });
+
   test("at once, however what comes first was made", () => {
     const crafted = ["<?a?>".repeat(50_000), "<!---->".repeat(50_000), " ".repeat(5_000_000), "<?".repeat(100_000), "<!--".repeat(100_000), "<!DOCTYPE [".repeat(100_000)];
     const start = performance.now();
@@ -258,6 +266,8 @@ describe("links", () => {
     expect(root[0]).toBe("https://example.com/feed");
     expect(new Set(root).size).toBe(root.length);
     expect(root.length).toBe(blog.length / 2);
+    // A JSON Feed's usual place, last.
+    expect(root.at(-1)).toBe("https://example.com/feed.json");
   });
 
   test("decodes a feed as it says it's encoded", () => {

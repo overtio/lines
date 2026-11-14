@@ -71,6 +71,7 @@ export default {
   "feeds.opmlTitle": "Feeds de lines",
   "feeds.group.rss": "Feeds RSS",
   "feeds.group.atom": "Feeds Atom",
+  "feeds.group.json": "Feeds JSON",
   "feeds.group.podcast": "Feeds de pódcasts",
   "feeds.showGroup": "Mostrar los feeds de {group}",
   "feeds.inSidebar": "Feeds en la barra lateral",
