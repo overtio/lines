@@ -1249,9 +1249,9 @@ describe("properties drawn apart (Settings → Layout → Properties)", () => {
     expect(await app.text()).toBe(NOTE);
     await inProperties();
     expect(await where()).toEqual({ in: "properties", line: "type: person" });
-    await page.keyboard.press(`${mod()}+Shift+z`);
+    await page.keyboard.press(`${mod()}+Shift+Z`);
     expect(await app.text()).toBe(NOTE.replace("person", "persons"));
-    await page.keyboard.press(`${mod()}+Shift+z`);
+    await page.keyboard.press(`${mod()}+Shift+Z`);
     expect(await app.text()).toBe(`${NOTE.replace("person", "persons")}!`);
     await inProperties(false);
 
