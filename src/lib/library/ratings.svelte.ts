@@ -1,9 +1,10 @@
 import { speak } from "../a11y";
-import { type Scale, type Score, scoreOn, scoresOf, spokenScore } from "../editor/scores";
+import { type Scale, type Score, scoreIn, scoreOn, scoresOf, spokenScore } from "../editor/scores";
 import { t } from "../i18n/index.svelte";
 import { looks } from "../notes/looks.svelte";
-import { frontMatter, keyOf, renameKey, typeOf } from "../notes/properties";
+import { frontMatter, keyOf, propertyOf, renameKey, typeOf } from "../notes/properties";
 import { notes } from "../notes/store.svelte";
+import type { NoteMeta } from "../notes/types";
 import { plugins } from "../plugins/registry.svelte";
 import type { MenuItem } from "../ui.svelte";
 import { DEFAULT_SCALE, type KindRatings, type LinesScale, ratingKey, SCALES } from "./ratings";
@@ -141,3 +142,11 @@ export function rateItems(scale: Scale, current: Score | null, set: (score: numb
 /** Says a rating was set ("Rated 4 out of 5") or taken out, for screen readers. */
 export const sayRated = (score: number | null, scale: Scale) =>
   speak(score === null ? t("library.rating.cleared") : t("library.rating.rated", { score: spokenScore(scoreOn(score, scale), scale) }));
+
+/** A library note's overall rating, on its kind's scale (as written, `score` null, where it doesn't fit), if it has one: what its row shows. */
+export function ratingOf({ meta }: { meta: NoteMeta }): { score: Score | null; scale: Scale; written: string } | null {
+  const written = propertyOf(meta.properties, OVERALL)?.value.trim();
+  if (!written || !ratings.rated(meta.type)) return null;
+  const scale = ratings.scaleOf(meta.type);
+  return { score: scoreIn(written, scale), scale, written };
+}
