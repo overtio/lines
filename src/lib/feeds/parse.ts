@@ -320,8 +320,12 @@ function audioOf(enclosures: { url: string | null; type: string | null }[], base
 
 /** Posts in the feed's order, each with an id of its own (a feed with two alike keeps the first). */
 function distinct(posts: Post[]): Post[] {
+  // Known only by a link that others share (an aggregator's posts, with no guids): by its title too.
+  const counts = new Map<string, number>();
+  for (const { id } of posts) counts.set(id, (counts.get(id) ?? 0) + 1);
+  const own = posts.map((post) => (post.id === post.link && counts.get(post.id)! > 1 ? { ...post, id: `${post.id}\n${post.title}` } : post));
   const seen = new Set<string>();
-  return posts.filter((post) => !seen.has(post.id) && seen.add(post.id));
+  return own.filter((post) => !seen.has(post.id) && seen.add(post.id));
 }
 
 /* RSS 2.0 (and 0.9x). */

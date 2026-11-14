@@ -86,6 +86,8 @@ mock.module("../../src/lib/plugins/registry.svelte", () => ({
 
 /** The folder's files by path, the same on every device, as the drive keeps them. */
 export const drive = new Map<string, { text: string; etag: string }>();
+/** Each file read from the folder, by path, in order. */
+export const reads: string[] = [];
 let writes = 0;
 
 /** Something to do just before the folder's next write, as another device could. */
@@ -101,7 +103,10 @@ mock.module("@tauri-apps/api/core", () => ({
         .filter(([file]) => file.startsWith(`${dir}/`) && !file.slice(dir.length + 1).includes("/"))
         .map(([file, { etag }]) => ({ name: file.slice(dir.length + 1), etag }));
     }
-    if (command === "sync_folder_read") return drive.get(path) ?? null;
+    if (command === "sync_folder_read") {
+      reads.push(path);
+      return drive.get(path) ?? null;
+    }
     if (command === "sync_folder_write") {
       const write = beforeWrite.next;
       beforeWrite.next = undefined;

@@ -18,6 +18,7 @@
   import { colorName } from "./settings/colorNames";
   import Button from "./ui/Button.svelte";
   import ColorField from "./ui/ColorField.svelte";
+  import Notice from "./ui/Notice.svelte";
   import { floating } from "./ui/styles";
 
   const uid = $props.id();
@@ -64,16 +65,13 @@
 
 <!-- Out of the way while Settings shows over the notes. -->
 {#if themeDrafts.picking && !ui.settings}
-  <div
-    role="status"
-    class="{floating} fixed bottom-4 left-1/2 flex max-w-[calc(100vw-32px)] -translate-x-1/2 flex-wrap items-center gap-x-3 gap-y-1.5 py-1.5 pr-1.5 pl-3.5 text-sm text-fg"
-  >
-    <span>{changed ? t("picking.changed", { count: changed }) : t("picking.hint")}</span>
-    <div class="flex items-center gap-1">
+  <Notice role="status">
+    {changed ? t("picking.changed", { count: changed }) : t("picking.hint")}
+    {#snippet actions()}
       {#if changed}<Button variant="quiet" onclick={() => void openSettings("theme")}>{t("picking.save")}</Button>{/if}
       <Button variant="primary" onclick={() => ((themeDrafts.picking = false), close())}>{t("picking.done")}</Button>
-    </div>
-  </div>
+    {/snippet}
+  </Notice>
 {/if}
 
 {#if outline}

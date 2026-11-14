@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { latexContent, markTitle } from "../../src/plugins/latex/text";
-import { beforeWrite, devices, drive, editElsewhere, FOLDER, fileOf, languages, notes, serialize, sync } from "./sync";
+import { beforeWrite, devices, drive, editElsewhere, FOLDER, fileOf, languages, notes, reads, serialize, sync } from "./sync";
 // After ./sync, which sets up the page it runs in.
 const { looks, tagLooks, typeLooks } = await import("../../src/lib/notes/looks.svelte");
 
@@ -351,6 +351,59 @@ describe("sync, of tags' and types' icons and colors", () => {
     expect(merged.tags.work).toMatchObject({ color: "blue" });
     expect(merged.types.book).toMatchObject({ icon: "book-open" });
     expect(looks.looks.types.book.icon).toBe("book-open");
+  });
+});
+
+describe("sync, of a folder of small files beside the notes: what was done with feeds' posts", () => {
+  test("each file goes up when it changed here, comes in only when its tag says it changed there, and a drive's copy of one is merged in and taken out", async () => {
+    const files = new Map([
+      ["a.json", "A1"],
+      ["b.json", "B1"],
+    ]);
+    const merged: [string, string][] = [];
+    let ready = true;
+    sync.shareFolder({ dir: "feeds/", ready: () => ready, names: () => [...files.keys()], files: () => files, merge: (name, text) => void merged.push([name, text]), onChange: () => {} });
+    const [device] = await devices(1);
+    const path = (name: string) => `${FOLDER.path}/feeds/${name}`;
+    const folderReads = () => reads.filter((read) => read.includes("/feeds/"));
+    await device.sync();
+    expect([drive.get(path("a.json"))?.text, drive.get(path("b.json"))?.text]).toEqual(["A1", "B1"]);
+
+    // Nothing changed: nothing read, nothing written.
+    reads.length = 0;
+    const tags = [drive.get(path("a.json"))!.etag, drive.get(path("b.json"))!.etag];
+    await device.sync();
+    expect(folderReads()).toEqual([]);
+    expect([drive.get(path("a.json"))!.etag, drive.get(path("b.json"))!.etag]).toEqual(tags);
+
+    // Changed here: only that one goes up.
+    files.set("b.json", "B2");
+    await device.sync();
+    expect([drive.get(path("a.json"))!.etag, drive.get(path("b.json"))!.text]).toEqual([tags[0], "B2"]);
+
+    // Changed there: only that one is read, and merged.
+    drive.set(path("a.json"), { text: "A-elsewhere", etag: "elsewhere" });
+    reads.length = 0;
+    await device.sync();
+    expect(folderReads()).toEqual([path("a.json")]);
+    expect(merged).toEqual([["a.json", "A-elsewhere"]]);
+
+    // A drive's own copy of one, kept beside it: merged in, then taken out of the folder.
+    drive.set(path("a 2.json"), { text: "A-copy", etag: "copy" });
+    await device.sync();
+    expect(merged.at(-1)).toEqual(["a.json", "A-copy"]);
+    expect(drive.has(path("a 2.json"))).toBe(false);
+
+    // Encrypted: under names that hide them, the plain ones gone; still read only when changed.
+    await sync.encrypt("correct horse battery");
+    await sync.syncNow();
+    const stored = [...drive.keys()].filter((key) => key.includes("/feeds/"));
+    expect(stored).toHaveLength(2);
+    expect(stored.every((key) => /\/feeds\/[0-9a-f]{32}\.enc$/.test(key))).toBe(true);
+    reads.length = 0;
+    await device.sync();
+    expect(folderReads()).toEqual([]);
+    ready = false;
   });
 });
 

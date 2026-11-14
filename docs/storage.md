@@ -16,22 +16,24 @@ Browser storage belongs to one site (origin) in one browser profile. Another bro
 | `lines` | `attachments` | Images and files added to notes, named by their content hash |
 | `lines` | `sync` | What was last exchanged with the sync folder or bucket, per note, to tell which side changed |
 | `lines-folders` | `folders` | The browser's handle to the folder chosen with **Save to a folder**, so lines can use it again after a reload |
-| `lines-feeds` | `feeds` | Each feed subscribed to: what it said of itself and what it's written in (RSS, Atom, RSS 1.0 or JSON Feed, for the sidebar's rows by kind), its newest 200 posts (all but their content), which were read, and its ETag and Last-Modified for asking whether it changed (its picture is its note's cover, an attachment) |
+| `lines-feeds` | `feeds` | Each feed subscribed to: what it said of itself and what it's written in (RSS, Atom, RSS 1.0 or JSON Feed, for the sidebar's rows by kind), its newest 200 posts (all but their content), which were read and which dismissed (and why), and its ETag and Last-Modified for asking whether it changed (its picture is its note's cover, an attachment) |
 | `lines-feeds` | `posts` | Each post's content, as the feed gave it (HTML), read when the post is opened |
+| `lines-feeds` | `marks` | What was done with each feed's posts, as it syncs (`feeds/`, [sync.md](sync.md#how-it-works)): when each was read, marked unread, dismissed or restored, by a fingerprint of its id, and when it was last in its feed; and Dismiss All's watermark |
 | `lines-feeds` | `positions` | Where each podcast episode was stopped, and whether it was played to the end; the episode in the player, to put back after the app lock or a restart; and where each book kept with a note was left, and how far it's been read, by the note |
 
-With the app lock on, the notes and attachments in `lines` and everything in `lines-feeds` are encrypted (see [sync.md](sync.md) and `src/lib/lock/vault.ts`). `lines-feeds` keeps each record under a random id (a feed's, a post's, an episode's note's), so nothing there says what's subscribed to or listened to. It isn't synced: subscriptions are notes and sync as notes do, and each device fetches the posts itself.
+With the app lock on, the notes and attachments in `lines` and everything in `lines-feeds` are encrypted (see [sync.md](sync.md) and `src/lib/lock/vault.ts`). `lines-feeds` keeps each record under a random id (a feed's, a post's, its marks', an episode's note's), so nothing there says what's subscribed to or listened to. Most of it isn't synced: subscriptions are notes and sync as notes do, and each device fetches the posts itself; the marks sync, as `feeds/`.
 
 ### localStorage
 
 | Key | What's in it |
 |---|---|
-| `lines.prefs` | Theme, appearance, font (one of lines' or one installed on the device, by its name) and formatting's fonts, text size, note width, spacing, icon set, layout, symbols, spreadsheets, links, whether links are looked up (the Library), how often feeds refresh, the podcast player's speed, whether books are read a page at a time or scrolled and a PDF's pages in the theme's colors |
+| `lines.prefs` | Theme, appearance, font (one of lines' or one installed on the device, by its name) and formatting's fonts, text size, note width, spacing, icon set, layout, symbols, spreadsheets, links, whether links are looked up (the Library), how often feeds refresh and whether posts read are dismissed, the podcast player's speed, whether books are read a page at a time or scrolled and a PDF's pages in the theme's colors |
 | `lines.language` | The language chosen in Settings, unless it's System |
 | `lines.plugins` | Plugins turned off or on in Settings |
 | `lines.tabs` | The open tabs, when tabs are on |
 | `lines.tagIcons`, `lines.typeIcons` | Icons given to tags and types |
 | `lines.sync` | Where notes sync to: the folder (its name and an id for its handle) or the bucket and its keys. Encrypted while the app lock is on |
+| `lines.sync.shared` | The tag and a hash of each file of feeds' marks as last exchanged with the sync folder or bucket, so only those changed are read or written |
 | `lines.sync.leftovers` | Set only while encrypted copies are being removed after turning end-to-end encryption off |
 | `lines.seeded` | That the welcome note or feature tour has been added once, so deleting them doesn't bring them back |
 | `lines.unsaved.<id>` | A note typed in just before the page went (a tab closed or reloaded, lines quit), until it's in `lines`: stored at the next start unless what's there is newer. Never a locked note, nor anything while the app lock is on |

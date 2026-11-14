@@ -16,7 +16,7 @@ export async function eraseThisDevice() {
       request.onblocked = () => resolve();
     });
   }
-  for (const key of ["lines.lock", "lines.sync", "lines.sync.leftovers", "lines.floating", "lines.lockedNotes"]) localStorage.removeItem(key);
+  for (const key of ["lines.lock", "lines.sync", "lines.sync.leftovers", "lines.sync.shared", "lines.floating", "lines.lockedNotes"]) localStorage.removeItem(key);
   if (isMacApp) {
     const { invoke } = await import("@tauri-apps/api/core");
     await invoke("touch_id_forget").catch(() => {});

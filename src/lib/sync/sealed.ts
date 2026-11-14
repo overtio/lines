@@ -119,13 +119,22 @@ export class SealedRemote implements Remote {
 
   /** A drive's copy of a note is still sealed with the note's name, `writtenAs`. */
   async get(key: string, writtenAs = key) {
-    const object = await this.store.get(await this.fileKey(key));
+    return this.#read(await this.fileKey(key), writtenAs);
+  }
+
+  /** A drive's copy of a file whose name is hidden, stored as `stored`: sealed with the file's name, `key`. */
+  getCopy(stored: string, key: string) {
+    return this.#read(stored, key);
+  }
+
+  async #read(stored: string, writtenAs: string) {
+    const object = await this.store.get(stored);
     if (!object) return null;
     let data: Bytes;
     try {
       data = fromBase64(object.text);
     } catch {
-      throw new SyncError(t("sync.error.notSealed", { file: this.#context(key) }));
+      throw new SyncError(t("sync.error.notSealed", { file: this.#context(writtenAs) }));
     }
     return { text: fromUtf8(await this.#open(data, writtenAs)), etag: object.etag };
   }

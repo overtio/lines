@@ -14,7 +14,7 @@
   import Switch from "../ui/Switch.svelte";
 
   // The feeds' part of Settings → Library: how they're listed in the sidebar, how often they're
-  // fetched, and OPML in and out.
+  // fetched, whether a post read leaves the list, and OPML in and out.
 
   const inSidebar = [
     { id: "kind", label: t("feeds.byKind") },
@@ -68,6 +68,9 @@
   </FieldRow>
   <FieldRow label={t("feeds.timeNotes")} note={t("feeds.timeNotesNote")}>
     <Switch label={t("feeds.timeNotes")} checked={prefs.timeNotes} onchange={(on) => (prefs.timeNotes = on)} />
+  </FieldRow>
+  <FieldRow label={t("feeds.dismissOnRead")} note={t("feeds.dismissOnReadNote")}>
+    <Switch label={t("feeds.dismissOnRead")} checked={prefs.dismissOnRead} onchange={(on) => (prefs.dismissOnRead = on)} />
   </FieldRow>
   <FieldRow label={t("feeds.opml")} note={t("feeds.opmlNote")}>
     <Button icon="import" onclick={() => picker?.click()} disabled={importing}>{importing ? t("feeds.importing") : t("feeds.importOpml")}</Button>

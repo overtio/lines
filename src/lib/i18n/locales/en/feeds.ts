@@ -84,6 +84,30 @@ export default {
   "feeds.saved": "Saved “{title}” to the Library",
   "feeds.couldntSave": "The post couldn’t be saved.",
   "feeds.copyLink": "Copy Link",
+  // Taking a post out of the lists, done with it or not interesting to you: its row's button and
+  // menu, the buttons over an open one, with their keys, and what screen readers hear and the notice says after.
+  "feeds.dismiss": "Dismiss",
+  "feeds.dismissWithKey": "Dismiss ({key})",
+  "feeds.uninteresting": "Not Interesting",
+  "feeds.uninterestingWithKey": "Not Interesting ({key})",
+  "feeds.didDismiss": "Dismissed “{title}”",
+  "feeds.didDismissUninteresting": "Dismissed “{title}” as not interesting",
+  "feeds.didDismissMany": "{count, plural, one {Dismissed # post} other {Dismissed # posts}}",
+  "feeds.undo": "Undo",
+  // Putting dismissed posts back in the list.
+  "feeds.restore": "Restore",
+  "feeds.didRestore": "{count, plural, one {Restored # post} other {Restored # posts}}",
+  // A feed's menu (and its row's): every post in its list taken out at once.
+  "feeds.dismissAll": "Dismiss All",
+  // The posts taken out of a feed's list, from its menu, and the bar over them.
+  "feeds.showDismissed": "Show Dismissed",
+  "feeds.hideDismissed": "Hide Dismissed",
+  "feeds.dismissedHint": "Dismissed posts can be restored.",
+  // A dismissed post, as not interesting, in the list of them.
+  "feeds.wasUninteresting": "Not interesting",
+  // The list, with every post dismissed, and with none dismissed.
+  "feeds.allCaughtUp": "All caught up.",
+  "feeds.noDismissed": "No dismissed posts.",
   // In the note's place, in the Feeds with no post open.
   "feeds.choosePost": "Choose a post to read it.",
   // The open post, as screen readers name it.
@@ -111,6 +135,8 @@ export default {
   // In an episode's note as it plays, Enter after a time's item starts the next with the time it's at.
   "feeds.timeNotes": "Time new notes while listening",
   "feeds.timeNotesNote": "In an episode’s note, while it plays or is paused after playing (not one paused before lines opened), Enter after an item of a list of times starts the next with the time the episode is at.",
+  "feeds.dismissOnRead": "Dismiss posts once read",
+  "feeds.dismissOnReadNote": "A post you open leaves the list when you go on to another, unless you mark it unread. It’s still under Show Dismissed, in its feed’s menu.",
   "feeds.opml": "Subscriptions",
   "feeds.opmlNote": "As an OPML file, which other feed readers and podcast apps import and export.",
   "feeds.importOpml": "Import OPML…",

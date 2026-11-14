@@ -202,6 +202,28 @@ describe("reading feeds", () => {
     expect(atom.posts.map((post) => post.comments)).toEqual(["https://blog.example/a#comments", undefined]);
   });
 
+  test("posts with no guid (or JSON Feed id) that share a link (an aggregator's) are told apart by their titles; one alone keeps its link", async () => {
+    const feed = await read(
+      `<rss version="2.0"><channel><title>Links</title><item><title>First take</title><link>https://a.example/story</link></item><item><title>Second take</title><link>https://a.example/story</link></item><item><title>Other</title><link>https://b.example/</link></item><item><title>Again</title><guid>g</guid><link>https://a.example/story</link></item></channel></rss>`,
+      "https://links.example/rss",
+    );
+    expect(feed.posts.map((post) => [post.id, post.title])).toEqual([
+      ["https://a.example/story\nFirst take", "First take"],
+      ["https://a.example/story\nSecond take", "Second take"],
+      ["https://b.example/", "Other"],
+      ["g", "Again"],
+    ]);
+    // A JSON Feed's items with no id alike, a link post by its external_url.
+    const items = [
+      { title: "First take", url: "https://a.example/story", content_text: "a" },
+      { title: "Second take", external_url: "https://a.example/story", content_text: "b" },
+      { title: "Other", url: "https://b.example/", content_text: "c" },
+      { id: 7, title: "Again", url: "https://a.example/story", content_text: "d" },
+    ];
+    const json = await read(JSON.stringify({ version: "https://jsonfeed.org/version/1.1", title: "Links", items }), "https://links.example/feed.json");
+    expect(json.posts.map((post) => post.id)).toEqual(["https://a.example/story\nFirst take", "https://a.example/story\nSecond take", "https://b.example/", "7"]);
+  });
+
   test("a page isn't a feed", async () => {
     const refused = await app.page.evaluate(() => {
       try {

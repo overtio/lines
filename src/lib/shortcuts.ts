@@ -46,6 +46,7 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.lock", keys: [{ mac: "Ctrl-Mod-l", other: "Ctrl-Alt-l" }], note: "shortcuts.lockNote" },
       { action: "shortcuts.closeFloating", keys: ["Mod-w"], only: "desktop" },
       { action: "shortcuts.undoTrash", keys: ["Mod-z"], note: "shortcuts.undoTrashNote" },
+      { action: "shortcuts.undoDismiss", keys: ["Mod-z"], note: "shortcuts.undoTrashNote" },
     ],
   },
   {
@@ -61,6 +62,8 @@ export const SHORTCUTS: ShortcutGroup[] = [
       { action: "shortcuts.openBelow", keys: ["Alt-Shift-click"], note: "shortcuts.inList" },
       { action: "shortcuts.pickAll", keys: ["Mod-a"], note: "shortcuts.inList" },
       { action: "shortcuts.trashPicked", keys: ["Backspace"], note: "shortcuts.inList" },
+      { action: "shortcuts.dismissPost", keys: ["e", "Backspace"], note: "shortcuts.inPosts" },
+      { action: "shortcuts.uninterestingPost", keys: ["n"], note: "shortcuts.inPosts" },
       { action: "shortcuts.calendarDays", keys: ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"], note: "shortcuts.inCalendar" },
       { action: "shortcuts.calendarWeek", keys: ["Home", "End"], note: "shortcuts.inCalendar" },
       { action: "shortcuts.calendarMonths", keys: ["PageUp", "PageDown"], note: "shortcuts.inCalendar" },
