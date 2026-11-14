@@ -157,6 +157,29 @@ test("imported from Settings → Library: what it will do, said first, then done
   ]);
 });
 
+test("a bookmark of what the Library has, its link written another way, is in the Library already", async () => {
+  app = await openApp();
+  await app.open("---\ntype: video\nlink: https://www.youtube.com/watch?v=dQw4w9WgXcQ\n---\n# Never Gonna Give You Up");
+  const links = ["https://youtu.be/dQw4w9WgXcQ?si=x", "http://www.example.com/page/?utm_source=mail", "https://example.com/page", "https://example.com/other"];
+  const html = `<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<DL><p>\n${links.map((link, i) => `<DT><A HREF="${link}" ADD_DATE="${1700000000 + i}">Page ${i}</A>`).join("\n")}\n</DL><p>\n`;
+  const settings = await chooseBookmarks([{ name: "bookmarks.html", text: html }]);
+  await settings.getByText("4 bookmarks in bookmarks.html").waitFor();
+  expect(await settings.getByText(/left out$/).allInnerTexts()).toEqual(["1 is in the Library already, with the same link: left out", "1 repeat in the file: left out"]);
+});
+
+test("a bookmark of a site whose feed is subscribed to isn't the subscription: it's imported", async () => {
+  app = await openApp();
+  await app.page.route("https://blog.example/feed.xml", (route) =>
+    route.fulfill({ headers: { "access-control-allow-origin": "*" }, contentType: "application/rss+xml", body: "<rss><channel><title>A Blog</title></channel></rss>" }),
+  );
+  // The feed's note links to its site's home page, as subscribing writes it.
+  await app.open("---\ntype: feed\nfeed: https://blog.example/feed.xml\nlink: https://blog.example/\n---\n# A Blog");
+  const html = `<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<DL><p>\n<DT><A HREF="https://blog.example/" ADD_DATE="1700000000">A Blog</A>\n</DL><p>\n`;
+  const settings = await chooseBookmarks([{ name: "bookmarks.html", text: html }]);
+  await settings.getByText("1 bookmark in bookmarks.html").waitFor();
+  expect(await settings.getByText(/left out$/).count()).toBe(0);
+});
+
 test("Export and Import's Import Files… asks about a bookmarks file, and imports the rest as notes", async () => {
   app = await openApp();
   const settings = await app.settings("Export and Import");

@@ -558,6 +558,11 @@ test("OPML in: each feed fetched for what it says, one that can't be kept as the
     <outline type="rss" text="Svelte (from the file)" xmlUrl="${BLOG}"/>
     <outline type="rss" text="Gone" xmlUrl="https://gone.example/rss" htmlUrl="https://gone.example/"/>
   </outline></body></opml>`;
+  // A bookmark of a feed's address isn't a subscription to it.
+  await page.evaluate(async () => {
+    const body = "---\ntype: resource\nlink: https://gone.example/rss\n---\n# Gone's feed";
+    await window.testing.notes.insert({ id: crypto.randomUUID(), body, createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+  });
   expect(await page.evaluate((opml) => window.testing.feeds.importOpml(opml), opml)).toBe(2);
   const titles = await page.evaluate(() => window.testing.feeds.subscriptions.map(({ title }) => title));
   expect(titles).toEqual(["Gone", "Svelte blog"]);

@@ -17,5 +17,5 @@ export function stubApp(platform: Record<string, unknown> = {}) {
   mock.module("../../src/lib/i18n/index.svelte", () => ({ t: (key: string) => key, language: "en", locale: "en" }));
   const stubs: Record<string, unknown> = Object.fromEntries(NAMES.map((name) => [name, /^(is|can)[A-Z]/.test(name) ? false : name === "modKey" || name === "newNoteKey" ? "" : () => undefined]));
   mock.module("../../src/lib/platform", () => ({ ...stubs, coarsePointer: { matches: false }, reducedMotion: { matches: false }, ...platform }));
-  mock.module("../../src/lib/plugins/registry.svelte", () => ({ DEFAULT_LANGUAGE: "markdown", plugins: { libraryKind: () => undefined } }));
+  mock.module("../../src/lib/plugins/registry.svelte", () => ({ DEFAULT_LANGUAGE: "markdown", plugins: { libraryKind: () => undefined, librarySources: [] } }));
 }

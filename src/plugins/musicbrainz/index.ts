@@ -173,6 +173,10 @@ const source: LibrarySource = {
   id: "musicbrainz",
   name: "MusicBrainz",
   recognizes: (url) => musicIn(url) !== null,
+  key: (url) => {
+    const found = musicIn(url);
+    return found && found !== "streaming" ? `musicbrainz:${found.kind}/${found.id}` : null;
+  },
   lookup,
   searches: ["album", "song"],
   search,

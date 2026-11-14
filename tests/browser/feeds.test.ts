@@ -318,9 +318,9 @@ describe("subscribing", () => {
     app.page.evaluate(async (input) => {
       const { feeds, reading, notes } = window.testing;
       try {
-        const url = await feeds.subscribe(input);
+        const { url, again } = await feeds.subscribe(input);
         const subscription = feeds.subscription(url)!;
-        return { url, title: subscription.title, note: notes.get(subscription.note)!.note.body.split("\n# ")[0] };
+        return { url, again, title: subscription.title, note: notes.get(subscription.note)!.note.body.split("\n# ")[0] };
       } catch (error) {
         return { error: error instanceof reading.NoFeed ? "no feed" : (error as Error).message };
       }
@@ -341,12 +341,24 @@ describe("subscribing", () => {
       (route) => route.fulfill({ json: { resultCount: 1, results: [{ kind: "podcast", collectionName: "Syntax", artistName: "Wes Bos", feedUrl: "https://feeds.megaphone.fm/FSI1483080183" }] }, headers: { "access-control-allow-origin": "*" } }),
     );
     await answer("https://feeds.megaphone.fm/FSI1483080183", fixture("podcast.rss"), "application/xml");
+    // Bookmarks of the feed's address and of its site aren't subscriptions to it.
+    await app.page.evaluate(async () => {
+      for (const link of ["https://site.example/feed.xml", "https://svelte.dev/blog"]) {
+        const body = `---\ntype: resource\nlink: ${link}\n---\n# ${link}`;
+        await window.testing.notes.insert({ id: crypto.randomUUID(), body, createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+      }
+    });
     const blog = await subscribe("https://site.example/feed.xml");
-    expect([blog.url, blog.title]).toEqual(["https://site.example/feed.xml", "Svelte blog"]);
+    expect([blog.url, blog.again, blog.title]).toEqual(["https://site.example/feed.xml", false, "Svelte blog"]);
     // Its artwork kept as an attachment, as the Library keeps covers.
     expect(blog.note).toMatch(/^---\ntype: feed\nfeed: https:\/\/site\.example\/feed\.xml\nlink: https:\/\/svelte\.dev\/blog\n---$/);
-    // RSS first, of the feeds the page names; one already subscribed to isn't again.
-    expect(await subscribe("site.example")).toEqual(blog);
+    // RSS first, of the feeds the page names; one already subscribed to isn't again, but added again, counted.
+    const again = await subscribe("site.example");
+    expect([again.url, again.again, again.note]).toEqual([blog.url, true, blog.note!.replace("\n---", "\ntimes added: 2\n---")]);
+    // By an address written another way, the subscription there is, at its own address: the one with its posts.
+    await answer("https://site.example/feed.xml?utm_source=share", fixture("blog.rss"), "application/rss+xml");
+    const loosely = await subscribe("https://site.example/feed.xml?utm_source=share");
+    expect([loosely.url, loosely.again]).toEqual([blog.url, true]);
     const podcast = await subscribe("https://podcasts.apple.com/us/podcast/syntax-tasty-web-development-treats/id1253186678");
     expect([podcast.url, podcast.title]).toEqual(["https://feeds.megaphone.fm/FSI1483080183", "Syntax - Tasty Web Development Treats"]);
     expect(podcast.note).toContain("type: podcast\nauthor: Wes Bos & Scott Tolinski - Full Stack JavaScript Web Developers\nfeed: https://feeds.megaphone.fm/FSI1483080183");

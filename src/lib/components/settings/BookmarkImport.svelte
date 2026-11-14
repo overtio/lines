@@ -6,9 +6,10 @@
   import { onMount, untrack } from "svelte";
   import { speak } from "../../a11y";
   import { locale, t } from "../../i18n/index.svelte";
-  import { type BookmarksInput, libraryLinks } from "../../library/bookmarkImport";
+  import type { BookmarksInput } from "../../library/bookmarkImport";
   import { planImport, readBookmarks } from "../../library/bookmarks";
   import { imports } from "../../library/imports.svelte";
+  import { inLibrary } from "../../library/same";
   import type { ImportFile } from "../../plugins/types";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
@@ -33,7 +34,10 @@
   const bookmarks = $derived(read.flatMap((file) => file.bookmarks ?? []));
   const name = $derived(list(read.filter((file) => file.bookmarks).map((file) => file.name)));
   /** What importing them would do, with the library as it was when they were chosen; worked out again as they're imported. */
-  const plan = $derived(planImport(bookmarks, untrack(libraryLinks)));
+  const plan = $derived.by(() => {
+    const these = bookmarks;
+    return untrack(() => planImport(these, (link) => inLibrary({ link })));
+  });
   let folderTags = $state(false);
 
   const found = $derived(t("library.bookmarks.found", { count: bookmarks.length, name }));

@@ -1,6 +1,7 @@
 import { dayOf } from "../notes/calendar";
 import type { LibraryItem } from "../plugins/types";
 import { known, libraryTag } from "./text";
+import { linkKey } from "./keys";
 
 /*
  * A browser's bookmarks, as the Library's resources (docs/library.md): read from the page of links
@@ -174,21 +175,12 @@ function readBackup(json: string): Bookmark[] | null {
 
 /* Making notes of them. */
 
-/** A link as it's compared, so the same page written two ways (`HTTPS://Example.com`) is one. */
-export function linkKey(link: string): string {
-  try {
-    return new URL(link).href;
-  } catch {
-    return link;
-  }
-}
-
 const isWebPage = (url: string) => /^https?:\/\/[^/\s]/i.test(url);
 
 /** What importing bookmarks would do: those to add, and how many are left out, and why. */
 export interface BookmarkPlan {
   add: Bookmark[];
-  /** In the library already: a note there has the same link. */
+  /** In the library already: a note there is of what its link is to (same.ts). */
   there: number;
   /** In the file more than once: added once, the first time. */
   repeated: number;
@@ -196,15 +188,14 @@ export interface BookmarkPlan {
   other: number;
 }
 
-/** What importing `bookmarks` would do, with the library's notes' links `kept`. */
-export function planImport(bookmarks: Bookmark[], kept: Iterable<string>): BookmarkPlan {
-  const there = new Set([...kept].map(linkKey));
+/** What importing `bookmarks` would do, with what the Library has (`there`, of a link). */
+export function planImport(bookmarks: Bookmark[], there: (link: string) => boolean): BookmarkPlan {
   const seen = new Set<string>();
   const plan: BookmarkPlan = { add: [], there: 0, repeated: 0, other: 0 };
   for (const bookmark of bookmarks) {
     const key = linkKey(bookmark.url);
     if (!isWebPage(bookmark.url)) plan.other++;
-    else if (there.has(key)) plan.there++;
+    else if (there(bookmark.url)) plan.there++;
     else if (seen.has(key)) plan.repeated++;
     else {
       seen.add(key);

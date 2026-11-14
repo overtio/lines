@@ -2,7 +2,9 @@ import { untrack } from "svelte";
 import { SvelteMap } from "svelte/reactivity";
 import { speak } from "../a11y";
 import { t } from "../i18n/index.svelte";
+import { keepCover } from "../library/covers";
 import { coverOfItem, libraryNote } from "../library/note";
+import { addedAgain, inLibrary, libraryNoteOf } from "../library/same";
 import { clock, coverOf, known, withCover } from "../library/text";
 import { putAttachment } from "../notes/attachments";
 import { dayOf } from "../notes/calendar";
@@ -63,9 +65,6 @@ function feedOf(properties: Parameters<typeof propertyOf>[0]): string | null {
   const value = propertyOf(properties, "feed")?.value.trim();
   return value && /^https?:\/\/\S+$/i.test(value) ? value : null;
 }
-
-/** The note (not in the Trash) whose `key` property is `value`: a post saved to the Library, by its link or its sound. */
-export const savedWith = (key: string, value: string) => notes.entries.find(({ note, meta }) => !note.trashed && propertyOf(meta.properties, key)?.value.trim() === value);
 
 /** Every subscription as one line each, so typing that changes none leaves it the same and nothing below redraws. */
 function signature() {
@@ -355,10 +354,13 @@ class Feeds {
     return feedStorage.content(post.key);
   }
 
-  /** The note a post was saved to the Library as, if it was: the one with its link (an episode's, its sound). */
+  /**
+   * The Library's note of a post, saved or added some other way: an episode by its sound (its link is
+   * often its show's page, the same for every episode), anything else by its link.
+   */
   savedNote({ post }: Row) {
-    const [key, value] = post.audio ? ["audio", post.audio.url] : ["link", post.link];
-    return value ? savedWith(key, value) : undefined;
+    if (post.audio) return libraryNoteOf({ type: "episode", properties: [["audio", post.audio.url]] });
+    return post.link ? libraryNoteOf({ link: post.link }) : undefined;
   }
 
   /**
@@ -421,24 +423,30 @@ class Feeds {
     const id = crypto.randomUUID();
     const now = Date.now();
     await notes.insert({ id, body: note.text, createdAt: now, updatedAt: now, pinned: false, trashed: false });
-    await note.keep().catch((error) => console.warn("lines: couldn't keep a cover", error));
+    await keepCover(note, id);
     return id;
   }
 
   /**
    * Subscribes to the feed `input` means (its link, its site's, its podcast's page on Apple
    * Podcasts): a note for it, made as any library note is (its artwork kept with it), with its
-   * posts kept from the fetch that found it. A feed already subscribed to isn't again. Returns the
-   * feed's address.
+   * posts kept from the fetch that found it. One the Library has already is added again instead
+   * (`again`). Returns the feed's address: that subscription's own, if it's one already.
    */
-  async subscribe(input: string, signal = new AbortController().signal): Promise<string> {
+  async subscribe(input: string, signal = new AbortController().signal): Promise<{ url: string; again: boolean }> {
     const link = linkOf(input);
     if (!link) throw new NoFeed(input);
     const found = await findFeed((await namedFeed(link, signal)) ?? link, signal, namedFeed);
-    if (this.#subscribed.has(found.url)) return found.url;
+    const item = feedItem(found.url, found.feed);
+    // By its feed's address: a note of the site it's from (a bookmark) isn't a subscription.
+    const there = libraryNoteOf({ type: item.type, properties: [["feed", found.url]] });
+    if (there) {
+      addedAgain(there);
+      return { url: feedOf(there.meta.properties) ?? found.url, again: true };
+    }
     await this.take(found.url, found.feed, found.validators);
-    await this.#write(feedItem(found.url, found.feed), signal);
-    return found.url;
+    await this.#write(item, signal);
+    return { url: found.url, again: false };
   }
 
   /**
@@ -493,7 +501,8 @@ class Feeds {
    * says of it, and why kept as any feed's that failed. How many were added.
    */
   async importOpml(text: string): Promise<number> {
-    const outlines = readOpml(text).filter(({ url }) => !this.#subscribed.has(url));
+    // By their feeds' addresses: a page of a site (a bookmark) isn't a subscription to its feed.
+    const outlines = readOpml(text).filter(({ url }) => !inLibrary({ type: "feed", properties: [["feed", url]] }));
     await Promise.all(
       outlines.map(async ({ url, title, site }) => {
         const feed = await this.#request(url);

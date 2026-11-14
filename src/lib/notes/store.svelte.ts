@@ -179,7 +179,7 @@ class NotesStore {
   picked = $state.raw<ReadonlySet<string>>(new Set());
   filter = $state<Filter>({ kind: "all" });
   query = $state("");
-  /** A freshly created note that the editor should focus once it opens. */
+  /** A note the editor should put the keyboard in, at its title's end, once it's open: one made just now, or opened in another's place. */
   pendingFocus = $state<string | null>(null);
   /** Bumped when notes change from outside the editor (e.g. sync), so editors with them open can refresh. */
   remoteRevision = $state<{ ids: string[]; n: number }>({ ids: [], n: 0 });

@@ -66,11 +66,14 @@ test("a link pasted into a new note is filled in at once, filed, and one ⌘Z pu
   await filled(page);
   const text = (await app.text())!;
   expect(text).toStartWith(`---\ntype: video\nchannel: Rick Astley\nlink: https://www.youtube.com/watch?v=dQw4w9WgXcQ\nstatus: to watch\n---\n# ${TITLE}\n`);
-  // Its picture, as wide as a video's shows, kept with it once it's written. (WebKit here can't store pictures.)
+  // Its picture, as wide as a video's shows, kept with it once it's written. WebKit here can't store
+  // pictures: there it's taken out of the note again, rather than left one that can't be shown.
   expect(text.slice(text.indexOf(`# ${TITLE}\n`))).toMatch(/^# .*\n\n!\[.*\|400\]\(\.\.\/attachments\/([0-9a-f]{32}\.jpg)\)\n$/);
   if (engine() === "chromium") {
     const name = /attachments\/([0-9a-f]{32}\.jpg)/.exec(text)![1];
     await page.waitForFunction(async (name) => (await window.testing.attachmentNames()).includes(name), name);
+  } else {
+    await page.waitForFunction((title) => window.testing.text()?.endsWith(`# ${title}\n`), TITLE);
   }
   // Only the link was sent.
   expect(asked).toEqual([`https://www.youtube.com/oembed?format=json&url=${encodeURIComponent("https://www.youtube.com/watch?v=dQw4w9WgXcQ")}`]);
@@ -417,4 +420,344 @@ test("a link changed while it's looked up isn't added", async () => {
   await page.waitForTimeout(500);
   expect(await app.text()).toBe(`# Plans\n\nWatch ${LINK.slice(0, -2)}x${LINK.slice(-2)}! tonight`);
   expect(await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "video").length)).toBe(0);
+});
+
+/** A video note there is already, as a link made it; its id. */
+const videoThere = (page: App["page"], more = "") =>
+  page.evaluate(
+    async (more) => {
+      const now = Date.now() - 60_000;
+      const id = crypto.randomUUID();
+      const body = `---\ntype: video\nchannel: Rick Astley\nlink: https://www.youtube.com/watch?v=dQw4w9WgXcQ\nstatus: to watch\n${more}---\n# Never Gonna Give You Up\n`;
+      await window.testing.notes.insert({ id, body, createdAt: now, updatedAt: now, pinned: false, trashed: false });
+      return id;
+    },
+    more,
+  );
+const bodyOf = (page: App["page"], id: string) => page.evaluate((id) => window.testing.notes.get(id)?.note.body, id);
+const videos = (page: App["page"]) => page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "video").length);
+
+test("a link to what the Library has, pasted into a new note, opens that note, counted, and the new one goes to the Trash", async () => {
+  app = await openApp();
+  const { page } = app;
+  await youtube(page);
+  const there = await videoThere(page);
+  const date = await page.evaluate((id) => window.testing.notes.get(id)!.note.updatedAt, there);
+  // The same video, written another way.
+  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await page.waitForFunction(() => window.testing.text() === "# ");
+  const made = await page.evaluate(() => window.testing.notes.selectedId);
+  await paste(page, "https://youtu.be/dQw4w9WgXcQ?si=shared");
+  await page.waitForFunction((there) => window.testing.notes.selectedId === there, there);
+  // Said, quietly, at the end of the note open; the new note, that was only the link, in the Trash.
+  expect(await page.locator(".cm-library-lookup").innerText()).toBe("Already in your Library");
+  expect(await page.evaluate((made) => window.testing.notes.get(made!)?.note.trashed, made)).toBe(true);
+  await page.waitForFunction((there) => window.testing.notes.get(there)?.note.body.includes("\ntimes added: 2\n"), there);
+  // Counted as any edit is, so it syncs as one (kept as of then, it would lose to an edit elsewhere).
+  expect(await page.evaluate((id) => window.testing.notes.get(id)!.note.updatedAt, there)).toBeGreaterThan(date);
+  expect(await videos(page)).toBe(1);
+  // Typed straight away, it's at the end of its title: its properties as they were, on its shelf still.
+  await page.keyboard.type("xyz");
+  await page.waitForFunction(() => window.testing.text()?.includes("\n# Never Gonna Give You Upxyz\n"));
+  expect(await app.text()).toStartWith("---\ntype: video\n");
+  await page.keyboard.press("Backspace");
+  await page.keyboard.press("Backspace");
+  await page.keyboard.press("Backspace");
+
+  // Again, then with counting off in Settings → Library: opened, not counted.
+  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await paste(page, LINK);
+  await page.waitForFunction((there) => window.testing.notes.get(there)?.note.body.includes("\ntimes added: 3\n"), there);
+  await toggle(await app.settings("Library"), "Count adding again", false);
+  await app.closeSettings();
+  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await paste(page, LINK);
+  await page.waitForFunction((there) => window.testing.notes.selectedId === there, there);
+  await page.waitForTimeout(300);
+  expect(await bodyOf(page, there)).toContain("\ntimes added: 3\n");
+  expect(await videos(page)).toBe(1);
+});
+
+test("an IMDb link pasted twice is one note: the second opens the first", async () => {
+  app = await openApp();
+  const { page } = app;
+  const answer = (pattern: string, json: unknown) => page.route(pattern, (route: Route) => route.fulfill({ headers: CORS, json }));
+  await answer("https://www.wikidata.org/w/api.php?action=query**", { query: { search: [{ title: "Q64584978" }] } });
+  await answer("https://www.wikidata.org/w/api.php?action=wbgetentities**", {
+    entities: {
+      Q64584978: {
+        labels: { en: { value: "Emily in Paris" } },
+        sitelinks: { enwiki: { title: "Emily in Paris" } },
+        claims: { P31: [{ mainsnak: { datavalue: { value: { id: "Q5398426" } } } }], P345: [{ mainsnak: { datavalue: { value: "tt8962124" } } }] },
+      },
+    },
+  });
+  await answer("https://en.wikipedia.org/api/rest_v1/page/summary/**", { wikibase_item: "Q64584978", extract: "An American comedy-drama series." });
+  await answer("https://en.wikipedia.org/w/api.php?**", { query: { pages: { "1": { title: "Emily in Paris", pageimage: "Emily_in_Paris_logo.svg" } } } });
+  for (const link of ["https://www.imdb.com/title/tt8962124", "https://m.imdb.com/title/tt8962124/?ref_=fn_al_tt_1"]) {
+    await page.getByRole("button", { name: "New note", exact: true }).click();
+    await page.waitForFunction(() => window.testing.text() === "# ");
+    await paste(page, link);
+    await page.waitForFunction(() => window.testing.text()?.includes("# Emily in Paris"));
+  }
+  const shows = await page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "show").map((entry) => entry.note.body));
+  expect(shows).toHaveLength(1);
+  // Its page's picture is a logo: no cover, rather than one that can't be shown.
+  expect(shows[0]).not.toContain("](../attachments/");
+  expect(shows[0]).toContain("\ntimes added: 2\n");
+});
+
+test("Add to Library and a link's menu open or mention what the Library has, counted, and make nothing", async () => {
+  app = await openApp();
+  const { page } = app;
+  await youtube(page);
+  const there = await videoThere(page);
+  const picker = await addToLibrary(page);
+  await picker.getByRole("searchbox").fill("https://www.youtube.com/watch?v=dQw4w9WgXcQ&feature=share");
+  await picker.getByRole("option", { name: /^Rick Astley - Never Gonna Give You Up/ }).click();
+  await page.waitForFunction((there) => window.testing.notes.selectedId === there, there);
+  await page.waitForFunction((there) => window.testing.notes.get(there)?.note.body.includes("\ntimes added: 2\n"), there);
+  // Opened with the keyboard at the end of its title, not before its properties.
+  await page.keyboard.type("xyz");
+  await page.waitForFunction(() => window.testing.text()?.includes("\n# Never Gonna Give You Upxyz\n"));
+  expect(await app.text()).toStartWith("---\ntype: video\n");
+  for (let i = 0; i < 3; i++) await page.keyboard.press("Backspace");
+
+  await app.open(`# Plans\n\nWatch ${LINK} tonight`);
+  await page.locator(".cm-content .cm-lp-link").click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Add to Library" }).click();
+  await page.waitForFunction(() => window.testing.text() === "# Plans\n\nWatch @[Never Gonna Give You Up] tonight");
+  await page.waitForFunction((there) => window.testing.notes.get(there)?.note.body.includes("\ntimes added: 3\n"), there);
+  expect(await videos(page)).toBe(1);
+});
+
+test("a cover that can't be shown is its kind's icon on its shelf, and mended when what it is is added again", async () => {
+  app = await openApp();
+  const { page } = app;
+  await youtube(page);
+  // A cover kept before lines knew better: not a picture.
+  const broken = await page.evaluate(async () => window.testing.saveAttachment(new Blob(["<svg xmlns='http://www.w3.org/2000/svg'/>"], { type: "image/jpeg" })).catch(() => "0123456789abcdef0123456789abcdef.jpg"));
+  const there = await videoThere(page, "");
+  await page.evaluate(
+    ([id, name]) => window.testing.notes.setText(id, (body) => `${body}\n![Never Gonna Give You Up|400](../attachments/${name})\n`),
+    [there, broken] as const,
+  );
+  await app.open("# Elsewhere");
+  await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Videos/ }).click();
+  const row = page.locator(".note-list [data-id]").filter({ hasText: "Never Gonna Give You Up" });
+  await row.locator(".ui-cover svg").waitFor();
+  expect(await row.locator(".ui-cover img").count()).toBe(0);
+
+  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await paste(page, LINK);
+  if (engine() === "chromium") {
+    await page.waitForFunction(([id, name]) => !window.testing.notes.get(id)?.note.body.includes(name), [there, broken] as const);
+    // A picture now, kept.
+    expect(await bodyOf(page, there)).toMatch(/\n!\[Never Gonna Give You Up\|400\]\(\.\.\/attachments\/[0-9a-f]{32}\.jpg\)\n/);
+    // And shown on its shelf at once.
+    await row.locator(".ui-cover img").waitFor();
+  } else {
+    // WebKit here can't store the broken one, so it's one not on this device yet: left for it to arrive.
+    await page.waitForFunction((there) => window.testing.notes.get(there)?.note.body.includes("\ntimes added: 2\n"), there);
+    expect(await bodyOf(page, there)).toContain(`](../attachments/${broken})`);
+  }
+});
+
+test("a see-through cover stays see-through, and a drawing (an SVG) isn't kept as one", async () => {
+  app = await openApp();
+  const { page } = app;
+  await page.route("https://www.youtube.com/oembed**", (route: Route) => route.fulfill({ headers: CORS, json: { title: "A logo", author_name: "Someone" } }));
+  // A 2×2 PNG, half of it clear.
+  const clear = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEUlEQVR4nGP4z8DA8B+EYAwANN0F+8lEt70AAAAASUVORK5CYII=", "base64");
+  await page.route("https://i.ytimg.com/vi/dQw4w9WgXcQ/**", (route: Route) => route.fulfill({ headers: { ...CORS, "content-type": "image/png" }, body: clear }));
+  await page.route("https://i.ytimg.com/vi/aaaaaaaaaaa/**", (route: Route) =>
+    route.fulfill({ headers: { ...CORS, "content-type": "image/png" }, body: "<svg xmlns='http://www.w3.org/2000/svg'><circle r='4'/></svg>" }),
+  );
+  await app.open("");
+  await page.evaluate(() => window.testing.place());
+  await paste(page, LINK);
+  await page.waitForFunction(() => window.testing.text()?.includes("# A logo"));
+  if (engine() === "chromium") await page.waitForFunction(() => /\]\(\.\.\/attachments\/[0-9a-f]{32}\.png\)/.test(window.testing.text() ?? ""));
+  await app.open("");
+  await page.evaluate(() => window.testing.place());
+  await paste(page, "https://youtu.be/aaaaaaaaaaa");
+  await page.waitForFunction(() => window.testing.text()?.startsWith("---\ntype: video\n"));
+  expect(await app.text()).not.toContain("](../attachments/");
+});
+
+test("a cover sent as any file (as storage hosts send them) is kept, told a picture by its bytes", async () => {
+  app = await openApp();
+  const { page } = app;
+  await page.route("https://www.youtube.com/oembed**", (route: Route) => route.fulfill({ headers: CORS, json: { title: "Stored elsewhere", author_name: "Someone" } }));
+  await page.route("https://i.ytimg.com/**", (route: Route) => route.fulfill({ headers: { ...CORS, "content-type": "application/octet-stream" }, body: PNG }));
+  await app.open("");
+  await page.evaluate(() => window.testing.place());
+  await paste(page, LINK);
+  await page.waitForFunction(() => window.testing.text()?.includes("# Stored elsewhere"));
+  // WebKit here can't store pictures, so it's taken out again there.
+  if (engine() === "chromium") await page.waitForFunction(() => /\]\(\.\.\/attachments\/[0-9a-f]{32}\.jpg\)/.test(window.testing.text() ?? ""));
+});
+
+test("a post is saved already when the Library has a note of its link, however that was added", async () => {
+  app = await openApp();
+  const { page } = app;
+  const id = await app.open("---\ntype: article\nlink: https://example.com/2026/a-post/\n---\n# A Post");
+  const saved = (post: { link?: string; audio?: { url: string } }) =>
+    page.evaluate((post) => window.testing.feeds.savedNote({ feed: "https://example.com/feed.xml", post } as never)?.note.id ?? null, post);
+  expect(await saved({ link: "https://www.example.com/2026/a-post?utm_source=rss" })).toBe(id);
+  expect(await saved({ link: "https://example.com/2026/another-post/" })).toBeNull();
+});
+
+test("found already after you've moved on: the note that was only the link goes, where you are; a note of long ago is left, with Open, uncounted", async () => {
+  app = await openApp();
+  const { page } = app;
+  let answer!: () => void;
+  await youtube(page, new Promise<void>((resolve) => (answer = resolve)));
+  const there = await videoThere(page);
+  // A new note for the link, left for another while it's looked up.
+  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await page.waitForFunction(() => window.testing.text() === "# ");
+  const made = (await page.evaluate(() => window.testing.notes.selectedId))!;
+  await paste(page, LINK);
+  await page.locator(".cm-library-lookup").waitFor();
+  const elsewhere = await app.open("# Elsewhere\n\n");
+  await page.evaluate(() => window.testing.place());
+  await page.keyboard.type("Typing");
+  answer();
+  await page.waitForFunction((there) => window.testing.notes.get(there)?.note.body.includes("\ntimes added: 2\n"), there);
+  await page.keyboard.type(" on");
+  // Still here, still typing here; the note that was only the link in the Trash.
+  expect(await page.evaluate(() => window.testing.notes.selectedId)).toBe(elsewhere);
+  expect(await app.text()).toBe("# Elsewhere\n\nTyping on");
+  expect(await page.evaluate((made) => window.testing.notes.get(made)?.note.trashed, made)).toBe(true);
+
+  // A note of long ago, its whole text made a link to it by hand: left as it is, not in the Trash, nor counted.
+  const old = await page.evaluate(async () => {
+    const id = crypto.randomUUID();
+    await window.testing.notes.insert({ id, body: "# Plans", createdAt: 0, updatedAt: 0, pinned: true, trashed: false });
+    return id;
+  });
+  await page.evaluate((id) => window.testing.notes.select(id), old);
+  await page.waitForFunction(() => window.testing.text() === "# Plans");
+  await page.evaluate(() => window.testing.place());
+  await page.keyboard.press(`${mod()}+a`);
+  await paste(page, LINK);
+  await page.waitForFunction(() => /Already in your Library/.test(document.querySelector(".cm-library-lookup")?.textContent ?? ""));
+  await page.waitForFunction(([id, link]) => window.testing.notes.get(id)?.note.body === link, [old, LINK] as const);
+  expect(await page.evaluate((id) => window.testing.notes.get(id)!.note, old)).toMatchObject({ trashed: false, pinned: true });
+  expect(await page.evaluate(() => window.testing.notes.selectedId)).toBe(old);
+  expect(await bodyOf(page, there)).toContain("\ntimes added: 2\n");
+  // Open opens it, the keyboard at the end of its title.
+  expect(await page.locator(".cm-library-lookup").innerText()).toMatch(/^Already in your Library\s*Open$/);
+  await page.locator(".cm-library-open").click();
+  await page.waitForFunction((there) => window.testing.notes.selectedId === there, there);
+  await page.keyboard.type("!");
+  await page.waitForFunction(() => window.testing.text()?.includes("\n# Never Gonna Give You Up!\n"));
+});
+
+test("a show found by searching that the Library has from IMDb is opened, not made again; typed into meanwhile, it's kept, offering to merge what was typed", async () => {
+  app = await openApp();
+  const { page } = app;
+  const entity = {
+    labels: { en: { value: "Emily in Paris" } },
+    descriptions: { en: { value: "American comedy-drama series" } },
+    sitelinks: { enwiki: { title: "Emily in Paris" } },
+    claims: { P31: [{ mainsnak: { datavalue: { value: { id: "Q5398426" } } } }], P345: [{ mainsnak: { datavalue: { value: "tt8962124" } } }] },
+  };
+  const answer = (asked: (url: URL) => boolean, json: unknown) => page.route(asked, (route: Route) => route.fulfill({ headers: CORS, json }));
+  const wikidata = (url: URL) => url.hostname === "www.wikidata.org";
+  await answer((url) => wikidata(url) && url.searchParams.get("list") === "search", { query: { search: [{ title: "Q64584978" }] } });
+  await answer((url) => wikidata(url) && url.searchParams.get("action") === "wbgetentities", { entities: { Q64584978: entity } });
+  await answer((url) => url.href.startsWith("https://en.wikipedia.org/api/rest_v1/page/summary/"), { wikibase_item: "Q64584978", extract: "An American comedy-drama series." });
+  await answer((url) => url.href.startsWith("https://en.wikipedia.org/w/api.php?"), { query: { pages: { "1": { title: "Emily in Paris" } } } });
+  const there = await page.evaluate(async () => {
+    const id = crypto.randomUUID();
+    const body = "---\ntype: show\nlink: https://www.imdb.com/title/tt8962124/\nstatus: to watch\n---\n# Emily in Paris\n";
+    await window.testing.notes.insert({ id, body, createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+    return id;
+  });
+  const picker = await addToLibrary(page);
+  await picker.getByRole("radio", { name: "Shows" }).click();
+  await picker.getByRole("searchbox").fill("emily");
+  await picker.getByRole("option", { name: /^Emily in Paris/ }).click();
+  await page.waitForFunction((there) => window.testing.notes.selectedId === there, there);
+  await page.waitForFunction((there) => window.testing.notes.get(there)?.note.body.includes("\ntimes added: 2\n"), there);
+  const shows = () => page.evaluate(() => window.testing.notes.entries.filter((entry) => entry.meta.type === "show" && !entry.note.trashed).length);
+  expect(await shows()).toBe(1);
+  // Typed straight away, at the end of its title.
+  await page.keyboard.type("xyz");
+  await page.waitForFunction(() => window.testing.text()?.startsWith("---\ntype: show\n") && window.testing.text()?.includes("\n# Emily in Parisxyz\n"));
+  await page.keyboard.press("Backspace");
+  await page.keyboard.press("Backspace");
+  await page.keyboard.press("Backspace");
+
+  // Chosen again, a line typed into the note made for it before it's found to be there already.
+  let found!: () => void;
+  const later = new Promise<void>((resolve) => (found = resolve));
+  await page.route(
+    (url) => url.hostname === "www.wikidata.org" && url.searchParams.get("props") === "claims|labels|sitelinks",
+    async (route: Route) => {
+      await later;
+      await route.fulfill({ headers: CORS, json: { entities: { Q64584978: entity } } });
+    },
+  );
+  const again = await addToLibrary(page);
+  await again.getByRole("radio", { name: "Shows" }).click();
+  await again.getByRole("searchbox").fill("emily");
+  await again.getByRole("option", { name: /^Emily in Paris/ }).click();
+  await page.waitForFunction((there) => window.testing.notes.selectedId !== there && window.testing.text()?.startsWith("---\ntype: show\n"), there);
+  const made = (await page.evaluate(() => window.testing.notes.selectedId))!;
+  await page.keyboard.press("Enter");
+  await page.keyboard.type("Recommended by Sam");
+  found();
+  await page.waitForFunction((there) => window.testing.notes.get(there)?.note.body.includes("\ntimes added: 3\n"), there);
+  // Kept, as typed, saying so; going on typing, it still does.
+  await page.keyboard.type(".");
+  expect(await page.locator(".cm-library-lookup").innerText()).toMatch(/^Already in your Library\s*Open\s*Merge$/);
+  expect(await app.text()).toContain("\nRecommended by Sam.");
+  expect(await page.evaluate(() => window.testing.notes.selectedId)).toBe(made);
+  expect(await shows()).toBe(2);
+  // Merged: what was typed is the one there's, opened; the note made for it in the Trash.
+  await page.getByRole("button", { name: "Move what you wrote to the note in your Library" }).click();
+  await page.waitForFunction((there) => window.testing.notes.selectedId === there, there);
+  expect(await bodyOf(page, there)).toEndWith("# Emily in Paris\n\nRecommended by Sam.\n");
+  expect(await page.evaluate((made) => window.testing.notes.get(made)?.note.trashed, made)).toBe(true);
+  expect(await shows()).toBe(1);
+});
+
+test("a cover that's still to arrive from another device is left as it is when what it is is added again", async () => {
+  app = await openApp();
+  const { page } = app;
+  await youtube(page);
+  const missing = "0123456789abcdef0123456789abcdef.jpg";
+  const there = await videoThere(page);
+  await page.evaluate(([id, name]) => window.testing.notes.setText(id, (body) => `${body}\n![Never Gonna Give You Up|400](../attachments/${name})\n`), [there, missing] as const);
+  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await paste(page, LINK);
+  await page.waitForFunction((there) => window.testing.notes.get(there)?.note.body.includes("\ntimes added: 2\n"), there);
+  await page.waitForTimeout(500);
+  expect(await bodyOf(page, there)).toContain(`](../attachments/${missing})`);
+});
+
+test("a feed's episodes sharing their show's link are each saved by their sound, not taken for the show or each other", async () => {
+  app = await openApp();
+  const { page } = app;
+  // The show's note subscribes to its feed, which is fetched.
+  await page.route("https://show.example/feed.xml", (route: Route) => route.fulfill({ headers: CORS, contentType: "application/rss+xml", body: "<rss><channel><title>The Show</title></channel></rss>" }));
+  const [podcast, first] = await page.evaluate(async () => {
+    const insert = async (body: string) => {
+      const id = crypto.randomUUID();
+      await window.testing.notes.insert({ id, body, createdAt: 0, updatedAt: 0, pinned: false, trashed: false });
+      return id;
+    };
+    return [
+      await insert("---\ntype: podcast\nfeed: https://show.example/feed.xml\nlink: https://show.example/\n---\n# The Show"),
+      await insert("---\ntype: episode\npodcast: @[The Show]\naudio: https://cdn.example/1.mp3\nlink: https://show.example/\n---\n# Episode 1"),
+    ];
+  });
+  const saved = (audio: string) =>
+    page.evaluate((audio) => window.testing.feeds.savedNote({ feed: "https://show.example/feed.xml", post: { link: "https://show.example/", audio: { url: audio } } } as never)?.note.id ?? null, audio);
+  expect(await saved("https://cdn.example/1.mp3")).toBe(first);
+  expect(await saved("https://cdn.example/2.mp3")).toBeNull();
+  expect(podcast).not.toBe(first);
 });

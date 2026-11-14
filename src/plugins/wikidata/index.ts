@@ -19,6 +19,9 @@ const KINDS: Record<string, string[]> = {
   book: ["Q7725634", "Q571", "Q8261", "Q47461344", "Q1667921", "Q49084", "Q12106333"],
 };
 
+/** The sites whose ids Wikidata keeps (IMDb's, The Movie Database's, Letterboxd's), by the property that holds them, as the Library compares them. */
+const KEYS: Record<string, string> = { P345: "imdb", P4947: "tmdb-movie", P4983: "tmdb-tv", P6127: "letterboxd" };
+
 /** What a link says the item is: its Wikidata id, a Wikipedia page, or another site's id for it and the property that holds it. */
 type Found = { item: string } | { wiki: string; title: string } | { property: string; id: string };
 
@@ -66,7 +69,6 @@ interface Entity {
 interface Summary {
   wikibase_item?: string;
   extract?: string;
-  originalimage?: { source: string };
 }
 
 const url = (params: Record<string, string>) => `${API}?${new URLSearchParams({ ...params, format: "json", origin: "*" })}`;
@@ -84,9 +86,34 @@ const firstYear = (entity: Entity, property: string) =>
     .filter(Boolean)
     .sort()[0];
 
-/** A Wikipedia page's summary: what it's about, the picture at its top, and its item. */
+/** A Wikipedia page's summary: what it's about, and its item. */
 const summaryOf = (wiki: string, title: string, signal: AbortSignal) =>
   getJson<Summary>(`https://${wiki}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, "_"))}`, signal);
+
+/** Whether a picture's file is a photo or a poster: not a drawing (an SVG), nor a logo, which aren't covers. */
+const isPicture = (file: string) => /\.(?:jpe?g|png|webp|gif)$/i.test(file) && !/logo/i.test(file);
+
+/**
+ * The pictures at the top of Wikipedia `wiki`'s pages `titles` (a film's poster, a book's cover), by
+ * title, `size` pixels across: as each page shows it, its poster too, which isn't free (PageImages
+ * gives those when asked for any), but not a logo or a drawing, which some series' pages have instead.
+ */
+async function picturesOf(wiki: string, titles: string[], size: number, signal: AbortSignal): Promise<Map<string, string>> {
+  const params = new URLSearchParams({ action: "query", prop: "pageimages", piprop: "thumbnail|name", titles: titles.join("|"), pithumbsize: String(size), pilicense: "any", format: "json", origin: "*" });
+  const pages = await getJson<{ query?: { pages?: Record<string, { title: string; pageimage?: string; thumbnail?: { source: string } }> } }>(`https://${wiki}.wikipedia.org/w/api.php?${params}`, signal);
+  const found = new Map<string, string>();
+  for (const page of Object.values(pages?.query?.pages ?? {})) if (page.thumbnail && page.pageimage && isPicture(page.pageimage)) found.set(page.title, page.thumbnail.source);
+  return found;
+}
+
+/** The item's own picture (P18), where it's a photo, from Wikimedia Commons, `size` pixels across. */
+async function commonsPicture(entity: Entity, size: number, signal: AbortSignal): Promise<string | undefined> {
+  const file = values(entity, "P18").find((value): value is string => typeof value === "string" && isPicture(value));
+  if (!file) return undefined;
+  const params = new URLSearchParams({ action: "query", prop: "imageinfo", iiprop: "url", iiurlwidth: String(size), titles: `File:${file}`, format: "json", origin: "*" });
+  const pages = await getJson<{ query?: { pages?: Record<string, { imageinfo?: { thumburl?: string }[] }> } }>(`https://commons.wikimedia.org/w/api.php?${params}`, signal);
+  return Object.values(pages?.query?.pages ?? {})[0]?.imageinfo?.[0]?.thumburl;
+}
 
 async function itemId(found: Found, signal: AbortSignal): Promise<string | undefined> {
   if ("item" in found) return found.item;
@@ -138,7 +165,10 @@ async function lookup(link: URL, signal: AbortSignal): Promise<LibraryItem | nul
   );
 
   const page = entity.sitelinks?.[`${wiki}wiki`] ?? entity.sitelinks?.enwiki;
-  summary ??= page ? await summaryOf(entity.sitelinks?.[`${wiki}wiki`] ? wiki : "en", page.title, signal) : null;
+  const pageWiki = entity.sitelinks?.[`${wiki}wiki`] ? wiki : "en";
+  summary ??= page ? await summaryOf(pageWiki, page.title, signal) : null;
+  // Its poster or cover, as its Wikipedia page shows it; or else its own picture, if it's a photo.
+  const cover = (page && (await picturesOf(pageWiki, [page.title], 600, signal)).get(page.title)) || (await commonsPicture(entity, 600, signal));
   const minutes = amount(entity, "P2047");
   const properties: Record<string, [string, string | number | undefined][]> = {
     movie: [
@@ -161,12 +191,23 @@ async function lookup(link: URL, signal: AbortSignal): Promise<LibraryItem | nul
       ["isbn", (values(entity, "P212")[0] ?? values(entity, "P957")[0]) as string | undefined],
     ],
   };
+  // What it's known as elsewhere, so a note of it from another link is found (library/same.ts).
+  const ids = [
+    `wikidata:${id}`,
+    // Its page in lines' language and in English, each a link it can be added from.
+    ...[...new Set([wiki, "en"])].flatMap((each) => {
+      const linked = entity.sitelinks?.[`${each}wiki`];
+      return linked ? [`wikipedia:${each}:${linked.title.replace(/ /g, "_")}`] : [];
+    }),
+    ...Object.entries(KEYS).flatMap(([property, name]) => values(entity, property).flatMap((value) => (typeof value === "string" ? [`${name}:${value}`] : []))),
+  ];
   return {
     type,
     title,
     link: link.href,
     properties: known(properties[type]),
-    cover: summary?.originalimage?.source,
+    ids,
+    cover,
     description: summary?.extract,
   };
 }
@@ -203,9 +244,7 @@ async function search(type: string, text: string, signal: AbortSignal): Promise<
   const posters = new Map<string, string>();
   for (const wiki of new Set(items.flatMap((item) => (item.wiki ? [item.wiki] : [])))) {
     const titles = items.filter((item) => item.wiki === wiki).map((item) => item.page!);
-    const params = new URLSearchParams({ action: "query", prop: "pageimages", titles: titles.join("|"), pithumbsize: "200", pilicense: "any", format: "json", origin: "*" });
-    const pages = await getJson<{ query?: { pages?: Record<string, { title: string; thumbnail?: { source: string } }> } }>(`https://${wiki}.wikipedia.org/w/api.php?${params}`, signal);
-    for (const page of Object.values(pages?.query?.pages ?? {})) if (page.thumbnail) posters.set(`${wiki}:${page.title}`, page.thumbnail.source);
+    for (const [title, picture] of await picturesOf(wiki, titles, 200, signal)) posters.set(`${wiki}:${title}`, picture);
   }
   return items.map(({ id, entity, title, wiki, page }) => ({
     type,
@@ -221,6 +260,13 @@ const source: LibrarySource = {
   id: "wikidata",
   name: "Wikidata",
   recognizes: (url) => itemIn(url) !== null,
+  key: (url) => {
+    const found = itemIn(url);
+    if (!found) return null;
+    if ("item" in found) return `wikidata:${found.item}`;
+    if ("wiki" in found) return `wikipedia:${found.wiki}:${found.title.replace(/ /g, "_")}`;
+    return `${KEYS[found.property]}:${found.id}`;
+  },
   lookup,
   searches: ["movie", "show"],
   search,

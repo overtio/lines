@@ -43,6 +43,7 @@ const { spotify, spotifyIn, spotifyLink } = await import("../../src/plugins/spot
 const { soundcloud, soundcloudIn } = await import("../../src/plugins/soundcloud");
 const { paperItem } = await import("../../src/plugins/arxiv");
 const bookmarks = await import("../../src/lib/library/bookmarks");
+const keys = await import("../../src/lib/library/keys");
 const { dayOf } = await import("../../src/lib/notes/calendar");
 
 const fixture = (name: string) => readFileSync(new URL(`fixtures/library/${name}`, import.meta.url), "utf8");
@@ -365,7 +366,7 @@ describe("Wikidata", () => {
     expect(itemIn(new URL("https://en.wikipedia.org/wiki/Caf%E9"))).toBeNull();
   });
 
-  test("a film by its IMDb id: its director, first year, runtime, genres, and Wikipedia's summary and poster", async () => {
+  test("a film by its IMDb id: its director, first year, runtime, genres, Wikipedia's summary and the poster its page shows", async () => {
     // Trimmed from wikidata.org's and Wikipedia's answers (November 2026).
     answers.set("https://www.wikidata.org/w/api.php?action=query", { query: { search: [{ title: "Q109228991" }] } });
     const claim = (value: unknown) => ({ mainsnak: { datavalue: { value } } });
@@ -376,6 +377,7 @@ describe("Wikidata", () => {
           sitelinks: { enwiki: { title: "Dune: Part Two" } },
           claims: {
             P31: [claim({ id: "Q11424" })],
+            P345: [claim("tt15239678")],
             P57: [claim({ id: "Q548823" })],
             P577: [claim({ time: "+2024-03-01T00:00:00Z" }), claim({ time: "+2023-10-18T00:00:00Z" })],
             P2047: [claim({ amount: "+165", unit: "http://www.wikidata.org/entity/Q7727" })],
@@ -394,7 +396,10 @@ describe("Wikidata", () => {
     answers.set("https://en.wikipedia.org/api/rest_v1/page/summary/Dune%3A_Part_Two", {
       wikibase_item: "Q109228991",
       extract: "Dune: Part Two is a 2024 American epic space opera film directed by Denis Villeneuve.",
-      originalimage: { source: "https://upload.wikimedia.org/wikipedia/en/5/52/Dune_Part_Two_poster.jpeg" },
+    });
+    // Its poster isn't free: PageImages gives it, asked for any.
+    answers.set("https://en.wikipedia.org/w/api.php?action=query&prop=pageimages", {
+      query: { pages: { "1": { title: "Dune: Part Two", pageimage: "Dune_Part_Two_poster.jpeg", thumbnail: { source: "https://upload.wikimedia.org/wikipedia/en/5/52/Dune_Part_Two_poster.jpeg" } } } },
     });
     expect(await look(wikidata, "https://www.imdb.com/title/tt15239678/")).toEqual({
       type: "movie",
@@ -408,8 +413,10 @@ describe("Wikidata", () => {
       ],
       cover: "https://upload.wikimedia.org/wikipedia/en/5/52/Dune_Part_Two_poster.jpeg",
       description: "Dune: Part Two is a 2024 American epic space opera film directed by Denis Villeneuve.",
+      ids: ["wikidata:Q109228991", "wikipedia:en:Dune:_Part_Two", "imdb:tt15239678"],
     });
     expect(new URL(asked[0]).searchParams.get("srsearch")).toBe("haswbstatement:P345=tt15239678");
+    expect(new URL(asked.find((each) => each.includes("pageimages"))!).searchParams.get("pilicense")).toBe("any");
   });
 
   test("something Wikidata has that isn't a film, a series or a book is nothing", async () => {
@@ -618,7 +625,7 @@ describe("searching the catalogs (Add to Library)", () => {
         Q60834962: { labels: { en: { value: "Dune" } }, descriptions: { en: { value: "2021 film directed by Denis Villeneuve" } }, sitelinks: { enwiki: { title: "Dune (2021 film)" }, frwiki: { title: "Dune (film, 2021)" } } },
       },
     });
-    answers.set("https://en.wikipedia.org/w/api.php", { query: { pages: { 1: { title: "Dune (2021 film)", thumbnail: { source: "https://upload.wikimedia.org/dune.jpg" } } } } });
+    answers.set("https://en.wikipedia.org/w/api.php", { query: { pages: { 1: { title: "Dune (2021 film)", pageimage: "Dune_(2021_film).jpg", thumbnail: { source: "https://upload.wikimedia.org/dune.jpg" } } } } });
     const found = await find(wikidata, "movie", "dune");
     expect(found.map((item) => [item.title, item.link, item.cover, item.description])).toEqual([
       ["Dune", "https://en.wikipedia.org/wiki/Dune_(2021_film)", "https://upload.wikimedia.org/dune.jpg", "2021 film directed by Denis Villeneuve"],
@@ -802,14 +809,23 @@ describe("bookmarks", () => {
     for (const none of ["", "0", "-5", "soon", 123, Date.now() + 7 * 86_400_000, undefined]) expect(bookmarks.bookmarkTime(none), String(none)).toBeUndefined();
   });
 
-  test("once each: not those in the library already by their link, nor repeats, nor what isn't a web page", () => {
+  test("once each: not those in the library already, nor repeats (however their links are written), nor what isn't a web page", () => {
     const at = (url: string, title = url) => ({ title, url, folders: [], tags: [] });
     const plan = bookmarks.planImport(
-      [at("https://example.com/a", "first"), at("HTTPS://EXAMPLE.com/a", "again"), at("https://example.com"), at("https://kept.org/x"), at("javascript:void(0)"), at("place:sort=8"), at("chrome://settings/")],
-      ["https://kept.org/x"],
+      [
+        at("https://example.com/a", "first"),
+        at("HTTPS://EXAMPLE.com/a", "again"),
+        at("http://www.example.com/a/?utm_source=feed", "and again"),
+        at("https://example.com"),
+        at("https://kept.org/x"),
+        at("javascript:void(0)"),
+        at("place:sort=8"),
+        at("chrome://settings/"),
+      ],
+      (link) => keys.linkKey(link) === keys.linkKey("https://kept.org/x"),
     );
     expect(plan.add.map((each) => each.title)).toEqual(["first", "https://example.com"]);
-    expect([plan.there, plan.repeated, plan.other]).toEqual([1, 1, 3]);
+    expect([plan.there, plan.repeated, plan.other]).toEqual([1, 2, 3]);
   });
 
   test("a resource's note: its folder, the day it was bookmarked, what it says of itself as text, and its tags as lines' own", () => {
@@ -842,5 +858,62 @@ describe("bookmarks", () => {
     // Untitled, named by its link; undated, no day.
     const untitled = bookmarks.bookmarkItem({ title: "", url: "https://www.example.com/page/", folders: [], tags: [] });
     expect([untitled.title, untitled.properties]).toEqual(["example.com/page", []]);
+  });
+});
+
+describe("the same thing, however it's added", () => {
+  test("a link is the same page however it's written: its scheme, www., a closing /, where it was shared from", () => {
+    const same = ["https://www.imdb.com/title/tt8962124/", "HTTP://IMDB.com/title/tt8962124", "https://www.imdb.com/title/tt8962124/?ref_=nv_sr_srsg_0", "https://imdb.com/title/tt8962124#"];
+    expect(new Set(same.map(keys.linkKey))).toEqual(new Set(["imdb.com/title/tt8962124"]));
+    // What's after `#` can be what the page shows, not only where on it.
+    expect(keys.linkKey("https://app.example/#json=1")).not.toBe(keys.linkKey("https://app.example/#json=2"));
+    expect(keys.linkKey("https://app.example/#!/inbox")).toBe("app.example#!/inbox");
+    // But words on the page a browser's link goes to are only where on it.
+    expect(keys.linkKey("https://example.com/a#:~:text=hello%20there")).toBe("example.com/a");
+    expect(keys.linkKey("https://example.com/a#notes:~:text=hello")).toBe("example.com/a#notes");
+    // What the query says of the page itself stays, in its order.
+    expect(keys.linkKey("https://example.com/search?b=2&utm_medium=x&a=1")).toBe("example.com/search?a=1&b=2");
+    expect(keys.linkKey("https://example.com/watch?v=1")).not.toBe(keys.linkKey("https://example.com/watch?v=2"));
+  });
+
+  test("an ISBN-10 is the ISBN-13 of the same book; one whose check digit doesn't add up is no book's", () => {
+    expect(keys.isbnKey("0-441-17271-7")).toBe("9780441172719");
+    expect(keys.isbnKey("978-0-441-17271-9")).toBe("9780441172719");
+    expect(keys.isbnKey("080442957X")).toBe("9780804429573");
+    for (const none of ["0000000000", "9780000000000", "0441172718", "978-0-441-17271-0", "12345"]) expect(keys.isbnKey(none), none).toBeNull();
+  });
+
+  test("each source knows its links by its own id, written any way", () => {
+    const keyOf = (plugin: () => Plugin, link: string) => sourceOf(plugin).key?.(new URL(link));
+    expect(keyOf(wikidata, "https://www.imdb.com/title/tt8962124/episodes/?season=2")).toBe("imdb:tt8962124");
+    expect(keyOf(wikidata, "https://m.imdb.com/title/tt8962124")).toBe("imdb:tt8962124");
+    expect(keyOf(wikidata, "https://en.wikipedia.org/wiki/Emily_in_Paris")).toBe("wikipedia:en:Emily_in_Paris");
+    expect(keyOf(wikidata, "https://www.wikidata.org/wiki/Q64584978")).toBe("wikidata:Q64584978");
+    expect([keyOf(youtube, "https://youtu.be/dQw4w9WgXcQ?si=abc"), keyOf(youtube, "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42")]).toEqual(["youtube:dQw4w9WgXcQ", "youtube:dQw4w9WgXcQ"]);
+    expect([keyOf(openLibrary, "https://www.amazon.com/dp/0441172717"), keyOf(openLibrary, "https://openlibrary.org/isbn/9780441172719")]).toEqual(["isbn:9780441172719", "isbn:9780441172719"]);
+    expect(keyOf(musicbrainz, "https://musicbrainz.org/recording/b1a9c0e9-d987-4042-ae91-78d6a3267d69")).toBe("musicbrainz:recording/b1a9c0e9-d987-4042-ae91-78d6a3267d69");
+    expect(keyOf(applePodcasts, "https://podcasts.apple.com/gb/podcast/the-daily/id1200361736?i=1000801496509")).toBe("apple-podcasts:1200361736/1000801496509");
+  });
+
+  test("what Wikidata finds is known by its other sites' ids too, so a note of it from another link is found", async () => {
+    answers.set("https://en.wikipedia.org/api/rest_v1/page/summary/Emily_in_Paris", { wikibase_item: "Q64584978", extract: "An American comedy-drama series." });
+    answers.set("https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q64584978", {
+      entities: {
+        Q64584978: {
+          labels: { en: { value: "Emily in Paris" } },
+          sitelinks: { enwiki: { title: "Emily in Paris" } },
+          claims: {
+            P31: [{ mainsnak: { datavalue: { value: { id: "Q5398426" } } } }],
+            P345: [{ mainsnak: { datavalue: { value: "tt8962124" } } }],
+            P154: [{ mainsnak: { datavalue: { value: "Emily in Paris logo.svg" } } }],
+          },
+        },
+      },
+    });
+    // Its page's picture is its logo: no cover, rather than a logo.
+    answers.set("https://en.wikipedia.org/w/api.php?action=query&prop=pageimages", { query: { pages: { "1": { title: "Emily in Paris", pageimage: "Emily_in_Paris_logo.svg", thumbnail: { source: "https://upload.wikimedia.org/x/600px-Emily_in_Paris_logo.svg.png" } } } } });
+    const item = (await look(wikidata, "https://en.wikipedia.org/wiki/Emily_in_Paris"))!;
+    expect(item.ids).toEqual(expect.arrayContaining(["wikidata:Q64584978", "imdb:tt8962124", "wikipedia:en:Emily_in_Paris"]));
+    expect(item.cover).toBeUndefined();
   });
 });

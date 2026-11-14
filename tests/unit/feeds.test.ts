@@ -5,7 +5,7 @@ import { backoff, DAY, KEEP, merge, type KeptPost } from "../../src/lib/feeds/po
 import { writeOpml } from "../../src/lib/feeds/opml";
 import { Thread } from "../../src/lib/feeds/thread.svelte";
 import type { DiscussionComment } from "../../src/lib/plugins/types";
-import { drawable, isDrawing, pictureSize } from "../../src/lib/pictures";
+import { drawable, isDrawing, pictureOf } from "../../src/lib/pictures";
 import { storyId, storyPage } from "../../src/plugins/hacker-news/links";
 import { ico, png } from "../browser/files";
 import { stubApp } from "./stubs";
@@ -208,21 +208,23 @@ describe("a site's icon", () => {
   });
 });
 
-describe("a picture's size, read from its file before it's drawn", () => {
+describe("a picture's kind and size, read from its file before it's drawn", () => {
   const bytes = (...parts: (string | number[])[]) => new Uint8Array(parts.flatMap((part) => (typeof part === "string" ? [...part].map((char) => char.charCodeAt(0)) : part)));
 
   test("as PNG, GIF, JPEG, BMP, WebP and icon files say it", () => {
-    expect(pictureSize(png(18, 12, () => [0, 0, 0]))).toEqual({ width: 18, height: 12 });
-    expect(pictureSize(bytes("GIF89a", [0x40, 0x01, 0xf0, 0x00]))).toEqual({ width: 320, height: 240 });
+    expect(pictureOf(png(18, 12, () => [0, 0, 0]))).toEqual({ type: "image/png", width: 18, height: 12 });
+    expect(pictureOf(bytes("GIF89a", [0x40, 0x01, 0xf0, 0x00]))).toEqual({ type: "image/gif", width: 320, height: 240 });
     // A JPEG's start, a table (stepped over), then its frame's header.
-    expect(pictureSize(bytes([0xff, 0xd8, 0xff, 0xdb, 0x00, 0x04, 0, 0, 0xff, 0xc0, 0x00, 0x11, 8, 0x01, 0xe0, 0x02, 0x80, 3]))).toEqual({ width: 640, height: 480 });
+    expect(pictureOf(bytes([0xff, 0xd8, 0xff, 0xdb, 0x00, 0x04, 0, 0, 0xff, 0xc0, 0x00, 0x11, 8, 0x01, 0xe0, 0x02, 0x80, 3]))).toEqual({ type: "image/jpeg", width: 640, height: 480 });
     // A BMP drawn top down says its height less than nothing.
-    expect(pictureSize(bytes("BM", Array(16).fill(0), [32, 0, 0, 0], [0xf0, 0xff, 0xff, 0xff]))).toEqual({ width: 32, height: 16 });
-    expect(pictureSize(bytes("RIFF", [0, 0, 0, 0], "WEBP", "VP8X", [10, 0, 0, 0], [0, 0, 0, 0], [0x3f, 0x01, 0x00], [0xef, 0x00, 0x00]))).toEqual({ width: 320, height: 240 });
+    expect(pictureOf(bytes("BM", Array(16).fill(0), [32, 0, 0, 0], [0xf0, 0xff, 0xff, 0xff]))).toEqual({ type: "image/bmp", width: 32, height: 16 });
+    expect(pictureOf(bytes("RIFF", [0, 0, 0, 0], "WEBP", "VP8X", [10, 0, 0, 0], [0, 0, 0, 0], [0x3f, 0x01, 0x00], [0xef, 0x00, 0x00]))).toEqual({ type: "image/webp", width: 320, height: 240 });
     // An icon file: by the PNG inside it, or where it holds another kind of picture, as its entry says (0 for 256).
-    expect(pictureSize(ico(png(48, 48, () => [0, 0, 0]), 48))).toEqual({ width: 48, height: 48 });
-    expect(pictureSize(bytes([0, 0, 1, 0, 1, 0], [0, 0, 0, 0, 1, 0, 32, 0], [0, 0, 0, 0], [22, 0, 0, 0]))).toEqual({ width: 256, height: 256 });
-    expect(pictureSize(bytes("<html>"))).toBeNull();
+    expect(pictureOf(ico(png(48, 48, () => [0, 0, 0]), 48))).toEqual({ type: "image/x-icon", width: 48, height: 48 });
+    expect(pictureOf(bytes([0, 0, 1, 0, 1, 0], [0, 0, 0, 0, 1, 0, 32, 0], [0, 0, 0, 0], [22, 0, 0, 0]))).toEqual({ type: "image/x-icon", width: 256, height: 256 });
+    expect(pictureOf(bytes("<html>"))).toBeNull();
+    // An SVG is a drawing, not a picture with a size of its own.
+    expect(pictureOf(bytes("<svg xmlns='http://www.w3.org/2000/svg'/>"))).toBeNull();
   });
 
   test("one that says it's more than 8,192 pixels across isn't drawn, nor one whose size can't be told", () => {

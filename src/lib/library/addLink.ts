@@ -8,10 +8,11 @@ import { mentionOf } from "../notes/properties";
 import { notes } from "../notes/store.svelte";
 import { withTimeout } from "../pacing";
 import type { WebLink } from "../plugins/types";
-import { libraryNoteOf } from "./adding";
+import { keepCover } from "./covers";
 import { type LookupState, LookupWidget } from "./linkNotes";
 import { lookUp } from "./lookup";
 import { libraryNote } from "./note";
+import { addedAgain, libraryNoteOf } from "./same";
 
 /*
  * A web link in a note added to the Library from its menu (editor/linkMenu.ts): what it is becomes a
@@ -77,7 +78,7 @@ export async function addLink(view: EditorView, link: WebLink) {
     const item = await lookUp(link.href, signal);
     if (!addings.has(adding)) return;
     if (!item) return say(adding, "nothing", t("library.nothing"));
-    const existing = libraryNoteOf(item.link, link.href);
+    const existing = libraryNoteOf(item) ?? libraryNoteOf({ link: link.href });
     const made = existing ? null : await libraryNote(item, signal);
     if (!addings.has(adding)) return;
     end(adding);
@@ -86,7 +87,8 @@ export async function addLink(view: EditorView, link: WebLink) {
     const text = adding.view ? adding.view.state.doc.toString() : stored?.body;
     if (!stored || stored.trashed || stored.locked || text?.slice(adding.from, adding.to) !== adding.markdown) return;
     const id = existing?.note.id ?? notes.add(made!.text);
-    made?.keep().catch((error) => console.warn("lines: couldn't keep a cover", error));
+    if (made) void keepCover(made, id);
+    if (existing) addedAgain(existing, item);
     // As the note's title reads (what it's found by), not as the source wrote it.
     const title = notes.get(id)?.meta.title || item.title;
     const mention = mentionOf(title);
@@ -95,7 +97,7 @@ export async function addLink(view: EditorView, link: WebLink) {
     } else {
       notes.setText(note, text.slice(0, adding.from) + mention + text.slice(adding.to));
     }
-    speak(t("library.filled", { title }));
+    speak(existing ? t("library.already") : t("library.filled", { title }));
   } catch (error) {
     if (!addings.has(adding)) return;
     console.warn("lines: couldn't add a link to the library", error);
