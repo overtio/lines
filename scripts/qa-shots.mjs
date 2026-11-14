@@ -139,17 +139,17 @@ const seedLibrary = (page) =>
     const square = (top, bottom) => [500, 500, top, bottom];
     const items = [
       ["movie", "Dune: Part Two", { director: "Denis Villeneuve", year: "2024", runtime: "166 min", genre: "Science fiction, Adventure" }, "to watch", tall("#e0a94a", "#4a210a"), "Paul Atreides unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the known universe, he endeavors to prevent a terrible future only he can foresee."],
-      ["movie", "Arrival", { director: "Denis Villeneuve", year: "2016", runtime: "116 min" }, "watched", tall("#9fb3c4", "#1b2733"), "A linguist works with the military to talk with the visitors after twelve spacecraft appear around the world."],
-      ["movie", "Paris, Texas", { director: "Wim Wenders", year: "1984", runtime: "147 min" }, "watching", null, "A man wanders out of the desert, and sets out to put his family back together."],
+      ["movie", "Arrival", { director: "Denis Villeneuve", year: "2016", runtime: "116 min" }, "watched", tall("#9fb3c4", "#1b2733"), "A linguist works with the military to talk with the visitors after twelve spacecraft appear around the world.", "4.5/5"],
+      ["movie", "Paris, Texas", { director: "Wim Wenders", year: "1984", runtime: "147 min" }, "watching", null, "A man wanders out of the desert, and sets out to put his family back together.", "3/5"],
       ["book", "Dune", { author: "Frank Herbert", year: "1965", pages: "896" }, "reading", tall("#c86c2b", "#391507"), "Set on the desert planet Arrakis, Dune is the story of the boy Paul Atreides."],
-      ["album", "Kid A", { artist: "Radiohead", year: "2000", tracks: "10" }, "listened", square("#d2dde4", "#56677a"), ""],
+      ["album", "Kid A", { artist: "Radiohead", year: "2000", tracks: "10" }, "listened", square("#d2dde4", "#56677a"), "", "5/5"],
       ["song", "Never Gonna Give You Up", { artist: "Rick Astley", album: "Whenever You Need Somebody", year: "1987", duration: "3:33" }, "to listen", square("#7aa7d8", "#1f3554"), ""],
       ["video", "How Dune Was Made", { channel: "Behind the Scenes", duration: "14:02" }, "to watch", [640, 360, "#b98a50", "#2f1a0b"], ""],
     ];
     const now = Date.now();
-    for (const [i, [type, title, properties, status, picture, about]] of items.entries()) {
+    for (const [i, [type, title, properties, status, picture, about, rating]] of items.entries()) {
       const name = picture && (await cover(picture, title));
-      const front = Object.entries({ type, ...properties, link: `https://example.com/${i}`, status }).map(([key, value]) => `${key}: ${value}`);
+      const front = Object.entries({ type, ...properties, link: `https://example.com/${i}`, status, ...(rating && { rating }) }).map(([key, value]) => `${key}: ${value}`);
       // As wide as the library shows a cover: a video's wider than a poster or an album.
       const shown = picture && (picture[0] > picture[1] ? 400 : 240);
       const body = [`---\n${front.join("\n")}\n---\n# ${title}`, ...(name ? [`![${title}|${shown}](../attachments/${name})`] : []), ...(about ? [about] : [])].join("\n\n");
@@ -1140,7 +1140,7 @@ const SCENES = [
   ...["lines", "classic", "pixel", "neon"].map((style) => ({
     id: `library-shelf-${style}`,
     title: `The Library and a shelf of it, in ${style[0].toUpperCase()}${style.slice(1)}`,
-    look: "In the sidebar, Library after the places and before Types with its + at the heading's end, quiet like the heading: Books, Movies, Music and Videos with their icons and counts, lined up with the rows above; Types with Person only. Movies listed: each row's poster beside its title, the director and year under it, and its status in a quiet outline before the date; Paris, Texas without a poster shows the film icon in a box of the same size; titles lined up with each other. Dune: Part Two open: its properties, its title, its poster 240 pixels wide (not the note's width) and what it's about.",
+    look: "In the sidebar, Library after the places and before Types with its + at the heading's end, quiet like the heading: Books, Movies, Music and Videos with their icons and counts, lined up with the rows above; Types with Person only. Movies listed: each row's poster beside its title, the director and year under it, and its status in a quiet outline before the date; Arrival's four and a half stars and Paris, Texas's three small after its status, lined up with it, the half filled to its middle, the rest faint; Paris, Texas without a poster shows the film icon in a box of the same size; titles lined up with each other. Dune: Part Two open: its properties, its title, its poster 240 pixels wide (not the note's width) and what it's about.",
     prefs: style === "lines" ? {} : { style, theme: style },
     act: async (page) => {
       await seedLibrary(page);
@@ -1149,6 +1149,82 @@ const SCENES = [
     },
     schemes: style === "lines" ? ["light", "dark"] : ["light"],
   })),
+  {
+    id: "ratings-marks",
+    title: "A rating in stars, and scores on lines of their own",
+    look: "In the properties, rating's three and a half stars in the theme's yellow, the fourth filled to its middle, the fifth a faint outline, the size of the text and on its baseline like the values above; in the text, Score's six of seven and Half's two and a half, the same. Nothing jumps from the text around them.",
+    note: "---\ntype: book\nauthor: Mary Shelley\nyear: 1818\nstatus: read\nrating: 3.5/5\n---\n# Frankenstein\n\nScore: 6/7\nHalf: 2.5/5\n\nThe last line, for the cursor.",
+    act: (page) => page.evaluate(() => window.testing.place()),
+    shoot: ".cm-lp-editable",
+  },
+  {
+    id: "ratings-points",
+    title: "A show rated out of 10, with ratings of its own",
+    look: "Shows on Out of 10, with Story and Music: rating 9, story 8.5 and music 10, each bold, its /10 faint, and a short bar in the accent filled as far, the bars lined up under each other; the keys in their column like any property's.",
+    storage: { "lines.looks": { ratings: { kinds: { show: { scale: { id: "10", at: 1 }, named: { names: ["Story", "Music"], at: 1 } } } } } },
+    note: "---\ntype: show\ncreator: Kanehito Yamada\nrating: 9/10\nstory: 8.5/10\nmusic: 10/10\nstatus: watched\n---\n# Frieren: Beyond Journey's End\n\nThe last line, for the cursor.",
+    act: (page) => page.evaluate(() => window.testing.place()),
+    shoot: ".cm-lp-editable",
+  },
+  {
+    id: "ratings-words",
+    title: "Ratings in words, on Grades",
+    look: "Movies on Grades: rating A, a chip in the accent, its corners as round as a mention's; story on the same. Under them a Key: Value line as written. Nothing taller than the line.",
+    storage: { "lines.looks": { ratings: { kinds: { movie: { scale: { id: "grades", at: 1 }, named: { names: ["Story"], at: 1 } } } } } },
+    note: "---\ntype: movie\ndirector: Denis Villeneuve\nrating: A\nstory: S\nstatus: watched\n---\n# Arrival\n\nNot a grade: Q\n\nThe last line, for the cursor.",
+    act: (page) => page.evaluate(() => window.testing.place()),
+    shoot: ".cm-lp-editable",
+  },
+  {
+    id: "ratings-rate-menu",
+    title: "Rate ▸ in an item's menu on its shelf",
+    look: "Arrival's menu: its statuses, Watched checked, then Rate with a chevron at its end; beside it, Rate's own menu lined up with it, 5 out of 5 to 1 out of 5, none checked (it's 4.5), then a line and Remove Rating. Both menus' rows as tall as each other, checks and icons in one column.",
+    act: async (page) => {
+      await seedLibrary(page);
+      await page.getByRole("navigation", { name: "Library" }).getByRole("button", { name: /^Movies/ }).click();
+      await page.locator(".note-list [data-id]").filter({ hasText: "Arrival" }).click({ button: "right" });
+      await page.getByRole("menuitem", { name: "Rate" }).click();
+      await page.getByRole("menuitem", { name: "Remove Rating" }).waitFor();
+    },
+  },
+  {
+    id: "ratings-settings",
+    title: "Settings → Library → Ratings",
+    look: "Ratings after Links: a row for each kind, its name, its note (Show's: \u201cAlso rated for Story and Music.\u201d) and a select of its scale with the pencil after it, lined up down the card. Show's pencil open: Story and Music in fields, each with up, down and remove, the up of the first and the down of the last dimmed; the field to add another and Add; the note under them. Scales after it: Vibes (\u201cWords: …\u201d) and Hearts with a heart, each with a pencil and a trash, the one in use dimmed; New Scale quiet at the heading's end.",
+    storage: {
+      "lines.looks": {
+        ratings: {
+          kinds: { show: { scale: { id: "10", at: 1 }, named: { names: ["Story", "Music"], at: 1 } }, movie: { scale: { id: "vibes", at: 1 } } },
+          scales: { vibes: { name: "Vibes", scale: { kind: "labels", labels: ["Masterpiece", "Great", "Fine", "Meh"] }, at: 1 }, hearts: { name: "Hearts", scale: { kind: "marks", of: 7, icon: "heart" }, at: 1 } },
+        },
+      },
+    },
+    act: async (page) => {
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      const dialog = page.getByRole("dialog");
+      await dialog.getByRole("navigation").getByText("Library", { exact: true }).click();
+      await dialog.getByRole("button", { name: "Show ratings" }).click();
+      await dialog.getByRole("textbox", { name: "Rating 1" }).evaluate((field) => field.scrollIntoView({ block: "center" }));
+    },
+    shoot: "dialog",
+    height: 1000,
+  },
+  {
+    id: "ratings-new-scale",
+    title: "Settings → Library → Ratings → New Scale",
+    look: "Under Scales, a form in the card: the name field focused (a 2px accent ring) and Marks, Points and Words beside it; Out of and its number, the icons in a row at the end, Hearts chosen; Cancel and Save at the end, Save primary. Then Words chosen: one field for the words, its note under it.",
+    act: async (page) => {
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      const dialog = page.getByRole("dialog");
+      await dialog.getByRole("navigation").getByText("Library", { exact: true }).click();
+      await dialog.getByRole("button", { name: "New Scale" }).click();
+      await dialog.getByRole("textbox", { name: "Scale’s name" }).fill("Hearts");
+      await dialog.getByRole("radio", { name: "Hearts" }).click();
+      await dialog.getByRole("textbox", { name: "Scale’s name" }).focus();
+      await dialog.getByRole("button", { name: "Save", exact: true }).evaluate((button) => button.scrollIntoView({ block: "center" }));
+    },
+    shoot: "dialog",
+  },
   ...["lines", "classic", "pixel", "neon"].map((style) => ({
     id: `library-add-${style}`,
     title: `Add to Library, searching Books, in ${style[0].toUpperCase()}${style.slice(1)}`,

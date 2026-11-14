@@ -354,9 +354,9 @@
   clip-path: inset(0 0 0 50%);
 }
 
-/* A click sets it (ratings.ts), where the note can be changed. */
-.cm-content[contenteditable="true"] .cm-lp-score-mark,
-.cm-content[contenteditable="true"] .cm-lp-score-label {
+/* A click sets it (ratings.ts), in a line of a note that can be changed (not in a type table). */
+.cm-content[contenteditable="true"] .cm-line .cm-lp-score-mark,
+.cm-content[contenteditable="true"] .cm-line .cm-lp-score-label {
   cursor: pointer;
 }
 
