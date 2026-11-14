@@ -4,23 +4,36 @@ import { getJson } from "../../lib/library/web";
 import type { LibraryItem, LibrarySource, Plugin } from "../../lib/plugins/types";
 
 /*
- * Wikidata (wikidata.org), the open database behind Wikipedia: films, series and books, found by a
- * link to IMDb, The Movie Database, Letterboxd, Wikipedia or Wikidata itself, and what they're
+ * Wikidata (wikidata.org), the open database behind Wikipedia: films, series, comics and books, found
+ * by a link to IMDb, The Movie Database, Letterboxd, Wikipedia or Wikidata itself, and what they're
  * about from their Wikipedia page, in lines' language where there's one. Only the id in the link
  * (or the page's title) is sent. Wikidata and Wikipedia answer web pages too.
  */
 
 const API = "https://www.wikidata.org/w/api.php";
 
-/** The kinds of item each kind is, by their ids (`instance of`, P31): a film, a series, a book. */
+/** The kinds of item each kind is, by their ids (`instance of`, P31): a film, a series, a comic (before a book, which a graphic novel is too), a book. */
 const KINDS: Record<string, string[]> = {
   movie: ["Q11424", "Q24869", "Q202866", "Q93204", "Q506240", "Q24862", "Q229390", "Q20650540", "Q17517379", "Q1054574"],
   show: ["Q5398426", "Q63952888", "Q117467246", "Q581714", "Q1259759", "Q526877", "Q15416", "Q113687694"],
+  comic: ["Q21198342", "Q8274", "Q74262765", "Q562214", "Q754669", "Q7978994", "Q725377", "Q14406742", "Q1004", "Q1760610", "Q838795"],
   book: ["Q7725634", "Q571", "Q8261", "Q47461344", "Q1667921", "Q49084", "Q12106333"],
 };
 
-/** The sites whose ids Wikidata keeps (IMDb's, The Movie Database's, Letterboxd's), by the property that holds them, as the Library compares them. */
-const KEYS: Record<string, string> = { P345: "imdb", P4947: "tmdb-movie", P4983: "tmdb-tv", P6127: "letterboxd" };
+/**
+ * The sites whose ids Wikidata keeps (IMDb's, The Movie Database's, Letterboxd's, AniList's and
+ * MyAnimeList's for a manga), by the property that holds them, as the Library compares them.
+ */
+const KEYS: Record<string, string> = { P345: "imdb", P4947: "tmdb-movie", P4983: "tmdb-tv", P6127: "letterboxd", P8731: "anilist", P4087: "myanimelist" };
+
+/** The form a comic comes in, by what it's an instance of: a manga series, a webtoon, a graphic novel… */
+const FORMATS: [format: string, ids: string[]][] = [
+  ["manga", ["Q21198342", "Q8274"]],
+  ["manhwa", ["Q74262765", "Q562214"]],
+  ["manhua", ["Q754669"]],
+  ["webtoon", ["Q7978994"]],
+  ["graphic novel", ["Q725377"]],
+];
 
 /** What a link says the item is: its Wikidata id, a Wikipedia page, or another site's id for it and the property that holds it. */
 type Found = { item: string } | { wiki: string; title: string } | { property: string; id: string };
@@ -146,7 +159,7 @@ async function lookup(link: URL, signal: AbortSignal): Promise<LibraryItem | nul
   if (!title) return null;
 
   // The people, genres and publishers it names, by their names in one go.
-  const named = { director: "P57", creator: "P170", author: "P50", genre: "P136", publisher: "P123" };
+  const named = { director: "P57", creator: "P170", author: "P50", illustrator: "P110", genre: "P136", publisher: "P123" };
   const referred = [...new Set(Object.values(named).flatMap((property) => itemIds(entity, property).slice(0, 4)))].slice(0, 50);
   const labelled = referred.length
     ? await getJson<{ entities?: Record<string, Entity> }>(url({ action: "wbgetentities", ids: referred.join("|"), props: "labels", languages, languagefallback: "1" }), signal)
@@ -182,6 +195,12 @@ async function lookup(link: URL, signal: AbortSignal): Promise<LibraryItem | nul
       ["year", firstYear(entity, "P580") ?? firstYear(entity, "P577")],
       ["seasons", amount(entity, "P2437")],
       ["genre", genre],
+    ],
+    comic: [
+      ["author", labels("author")],
+      ["artist", labels("illustrator") === labels("author") ? undefined : labels("illustrator")],
+      ["format", FORMATS.find(([, ids]) => ids.some((each) => kinds.has(each)))?.[0] ?? "comic"],
+      ["year", firstYear(entity, "P580") ?? firstYear(entity, "P577")],
     ],
     book: [
       ["author", labels("author")],

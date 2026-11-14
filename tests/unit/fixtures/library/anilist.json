@@ -1,0 +1,29 @@
+{
+  "data": {
+    "Media": {
+      "id": 105398,
+      "idMal": 121496,
+      "format": "MANGA",
+      "countryOfOrigin": "KR",
+      "title": { "romaji": "Na Honjaman Level Up", "english": "Solo Leveling" },
+      "startDate": { "year": 2018 },
+      "chapters": 201,
+      "staff": {
+        "edges": [
+          { "role": "Story (chs 1-92)", "node": { "name": { "full": "So-Ryeong Gi" } } },
+          { "role": "Story (chs 93-201)", "node": { "name": { "full": "Hyeon-Gun" } } },
+          { "role": "Art (chs 1-179)", "node": { "name": { "full": "Seong-Rak Jang" } } },
+          { "role": "Art (chs 180-200)", "node": { "name": { "full": "DISCIPLES" } } },
+          { "role": "Original Story", "node": { "name": { "full": "Chu-Gong" } } },
+          { "role": "Lettering (English)", "node": { "name": { "full": "Abigail Blackman" } } }
+        ]
+      },
+      "coverImage": {
+        "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx105398-b673Vt5ZSuz3.jpg",
+        "large": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx105398-b673Vt5ZSuz3.jpg"
+      },
+      "description": "In a world where awakened beings called “Hunters” must battle deadly monsters to protect humanity, Seong Jin-U, nicknamed “the weakest hunter of all mankind,” finds himself in a constant struggle for survival.\n<br><br>\n(Source: Tappytoon)\n<br><br>\n<i>Note: Includes 22 extra chapters.</i>",
+      "siteUrl": "https://anilist.co/manga/105398"
+    }
+  }
+}

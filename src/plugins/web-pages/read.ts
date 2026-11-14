@@ -1,18 +1,23 @@
 import { absolute, imageOf, namesOf, type Page, textOf, typesOf } from "../../lib/library/page";
 import { clock, dayOf, isoSeconds, known, names, runtime, yearOf } from "../../lib/library/text";
 import type { LibraryItem } from "../../lib/plugins/types";
+import { comicOf, comicTitle } from "./comics";
 
 /*
  * What a page says it is, as a library item: from its JSON-LD (schema.org's Book, Movie, TVSeries,
  * VideoObject, MusicRecording, MusicAlbum, PodcastSeries, PodcastEpisode, Article and its kinds,
- * ScholarlyArticle), or its Open Graph type (`og:type` video.movie, music.song, book, article…).
- * A page that says neither isn't anything the library keeps: nothing is guessed.
+ * ScholarlyArticle, ComicSeries), or its Open Graph type (`og:type` video.movie, music.song, book,
+ * article…); a book that's a comic, as comics.ts tells. A page that says none of these isn't
+ * anything the library keeps: nothing is guessed.
  */
 
 /** schema.org's types, as the library's kinds. */
 const SCHEMA: Record<string, string> = {
   Book: "book",
   Audiobook: "book",
+  ComicSeries: "comic",
+  ComicIssue: "comic",
+  ComicStory: "comic",
   Movie: "movie",
   TVSeries: "show",
   VideoObject: "video",
@@ -70,10 +75,18 @@ function musicLine(description: string | undefined) {
   return { artist: parts[0], album: at > 1 ? parts[1] : undefined, year: yearOf(parts[at + 1]) };
 }
 
-/** What a page says of something of `type`, from its JSON-LD object (`o`) and its tags. */
-function propertiesOf(type: string, o: Record<string, unknown>, page: Page): [string, string | number | undefined][] {
+/** What a page says of something of `type`, from its JSON-LD object (`o`) and its tags; a comic's `format` as comics.ts read it. */
+function propertiesOf(type: string, o: Record<string, unknown>, page: Page, format?: string): [string, string | number | undefined][] {
   const music = musicLine(said(page, "og:description"));
   switch (type) {
+    case "comic":
+      return [
+        // Where JSON-LD doesn't say, its author as the site's own tags do (`com-linewebtoon:webtoon:author`).
+        ["author", names(namesOf(o.author ?? o.creator)) ?? said(page, "book:author", ...[...page.meta.keys()].filter((key) => key.endsWith(":author")))],
+        ["artist", names(namesOf(o.illustrator ?? o.artist ?? o.penciler))],
+        ["format", format],
+        ["year", yearOf(o.datePublished ?? o.startDate ?? o.dateCreated)],
+      ];
     case "book":
       return [
         ["author", names(namesOf(o.author)) ?? said(page, "book:author")],
@@ -145,16 +158,21 @@ function propertiesOf(type: string, o: Record<string, unknown>, page: Page): [st
 export function itemOfPage(page: Page): LibraryItem | null {
   const graph = OPEN_GRAPH[page.meta.get("og:type")?.toLowerCase() ?? ""];
   // The thing the page is about: the one its Open Graph type says, or else the first of a kind.
-  const object = page.data.find((each) => graph && kindOf(each) === graph) ?? page.data.find((each) => kindOf(each)) ?? {};
-  const type = kindOf(object) ?? graph;
-  const title = textOf(object.name) ?? textOf(object.headline) ?? said(page, "og:title", "twitter:title") ?? page.title;
+  const found = page.data.find((each) => graph && kindOf(each) === graph) ?? page.data.find((each) => kindOf(each)) ?? {};
+  const told = kindOf(found) ?? graph;
+  // A book, or a page that doesn't say what it's about, may be a comic.
+  const comic = !told || told === "book" || told === "comic" ? comicOf(page) : null;
+  const type = comic ? "comic" : told;
+  const object = comic?.object ?? found;
+  const named = textOf(object.name) ?? textOf(object.headline) ?? said(page, "og:title", "twitter:title") ?? page.title;
+  const title = comic && named ? comicTitle(named, page.url) : named;
   if (!type || !title) return null;
   const cover = imageOf(object.image) ?? imageOf(object.thumbnailUrl) ?? page.meta.get("og:image") ?? page.meta.get("twitter:image");
   return {
     type,
     title,
     link: page.url,
-    properties: known(propertiesOf(type, object, page)),
+    properties: known(propertiesOf(type, object, page, comic?.format)),
     cover: (cover && absolute(cover, page.url)) || undefined,
     description: textOf(object.description) ?? said(page, "og:description", "twitter:description", "description"),
   };

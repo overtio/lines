@@ -41,6 +41,17 @@ const KINDS: LibraryKind[] = [
     statuses: READ,
   },
   {
+    // Manga, manhwa, manhua, webtoons, comics and graphic novels: `format` says which.
+    type: "comic",
+    name: t("library.comic"),
+    label: t("library.comics"),
+    icon: "book-image",
+    properties: ["author", "artist", "format", "year", "chapters"],
+    subtitle: ["author", "format"],
+    cover: "tall",
+    statuses: READ,
+  },
+  {
     type: "movie",
     name: t("library.movie"),
     label: t("library.movies"),

@@ -2,6 +2,8 @@
 export default {
   "library.book": "Book",
   "library.books": "Books",
+  "library.comic": "Comic",
+  "library.comics": "Comics",
   "library.movie": "Movie",
   "library.movies": "Movies",
   "library.show": "Show",

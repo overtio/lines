@@ -12,8 +12,11 @@ import { stubApp } from "./stubs";
 /** What each address asked for answers: JSON, a page's HTML, or a status; the first whose start matches. */
 const answers = new Map<string, unknown>();
 const asked: string[] = [];
+/** The bodies sent, as JSON (AniList's queries and what they ask for). */
+const sent: { query: string; variables: Record<string, unknown> }[] = [];
 const answer = (url: string, init?: RequestInit) => {
   asked.push(init?.method === "HEAD" ? `HEAD ${url}` : url);
+  if (typeof init?.body === "string") sent.push(JSON.parse(init.body));
   const found = [...answers].find(([start]) => url.startsWith(start))?.[1];
   if (found === undefined) return new Response("", { status: 404 });
   if (typeof found === "number") return new Response("", { status: found });
@@ -41,6 +44,7 @@ const { musicbrainz, musicIn } = await import("../../src/plugins/musicbrainz");
 const { applePodcasts, podcastIn } = await import("../../src/plugins/apple-podcasts");
 const { spotify, spotifyIn, spotifyLink } = await import("../../src/plugins/spotify");
 const { soundcloud, soundcloudIn } = await import("../../src/plugins/soundcloud");
+const { anilist, seriesIn } = await import("../../src/plugins/anilist");
 const { paperItem } = await import("../../src/plugins/arxiv");
 const bookmarks = await import("../../src/lib/library/bookmarks");
 const keys = await import("../../src/lib/library/keys");
@@ -54,6 +58,7 @@ const look = (plugin: () => Plugin, link: string) => sourceOf(plugin).lookup(new
 beforeEach(() => {
   answers.clear();
   asked.length = 0;
+  sent.length = 0;
 });
 
 describe("a note that's a link", () => {
@@ -274,6 +279,77 @@ describe("a page's description of itself", () => {
   });
 });
 
+describe("a comic, told from a book by its page", () => {
+  /** A page about a work, as JSON-LD `type` describes it with `more`, at `url`, with `body` (its labels). */
+  const work = (url: string, type: string, more: Record<string, unknown> = {}, body = "") =>
+    readPage(`<script type="application/ld+json">${JSON.stringify({ "@type": type, name: "Night Shift", ...more })}</script>${body}`, url);
+  const typeOf = (read: ReturnType<typeof readPage>) => itemOfPage(read)?.type;
+  const formatOf = (read: ReturnType<typeof readPage>) => itemOfPage(read)?.properties.find(([key]) => key === "format")?.[1];
+
+  test("a scanlation site's series, a book by its JSON-LD, is a manhwa by where it is and what it's labelled", () => {
+    expect(itemOfPage(page("divascans.html", "https://divascans.org/series/comic/chat-with-me"))).toEqual({
+      type: "comic",
+      title: "Chat With Me",
+      link: "https://divascans.org/series/comic/chat-with-me",
+      properties: [["format", "manhwa"]],
+      cover: "https://divascans.org/covers/chat-with-me.webp",
+      description: "Two strangers trade messages late at night, and neither can bring themselves to say goodbye.",
+    });
+  });
+
+  test("a webtoon on WEBTOON, by its own Open Graph type, its author from its own tag", () => {
+    expect(itemOfPage(page("webtoons.html", "https://www.webtoons.com/en/fantasy/tower-of-god/list?title_no=95"))).toEqual({
+      type: "comic",
+      title: "Tower of God",
+      link: "https://www.webtoons.com/en/fantasy/tower-of-god/list?title_no=95",
+      properties: [
+        ["author", "SIU"],
+        ["format", "webtoon"],
+      ],
+      cover: "https://swebtoon-phinf.pstatic.net/20250204_46/17386458444547o1b2_JPEG/95.jpg?type=crop540_540",
+      description: expect.stringContaining("Whatever you desire—it's here."),
+    });
+  });
+
+  test("a comic as other sites say: schema.org's ComicSeries, Tapas' webcomic, a series on MangaUpdates labelled by its type", () => {
+    expect(typeOf(work("https://comics.example/x", "ComicSeries"))).toBe("comic");
+    const tapas = itemOfPage(
+      readPage('<meta property="og:type" content="comicpanda:webcomic_series"><meta property="og:title" content="Read The Beginning After The End | Tapas Web Community">', "https://tapas.io/series/the-beginning-after-the-end/info"),
+    )!;
+    expect([tapas.type, tapas.title, formatOf(readPage('<meta property="og:type" content="comicpanda:webcomic_series"><title>x</title>', "https://tapas.io/series/x/info"))]).toEqual([
+      "comic",
+      "The Beginning After The End",
+      "webtoon",
+    ]);
+    // The site's menu says Manga; the series' own row says what it is.
+    const updates = work("https://www.mangaupdates.com/series/6z1uqw7/solo-leveling", "CreativeWork", { author: "Chu-Gong", datePublished: "2018", genre: ["Action", "Fantasy"] }, "<b>Manga</b><div><b>Type</b></div><div>Manhwa</div>");
+    expect(itemOfPage(updates)!.properties).toEqual([
+      ["author", "Chu-Gong"],
+      ["format", "manhwa"],
+      ["year", "2018"],
+    ]);
+  });
+
+  test("two of what it's called, what it's labelled and where it is make a comic; one alone doesn't", () => {
+    // Called a manga, and filed under /manga/.
+    expect(formatOf(work("https://shelf.example/manga/night-shift", "Book", { genre: ["Manga", "Romance"] }))).toBe("manga");
+    // Labelled a manhua, and called one.
+    expect(formatOf(work("https://shelf.example/books/night-shift", "Book", { keywords: "manhua, drama" }, "<dt>Type</dt><dd>Manhua</dd>"))).toBe("manhua");
+    // A book about comics: what it's about says so, nothing else does, though the shop's menu lists Manga.
+    expect(typeOf(work("https://shop.example/books/the-ten-cent-plague", "Book", { genre: ["History", "Comics"] }, "<a>Manga</a><a>Graphic Novels</a>"))).toBe("book");
+    // A novel a site files under /comic/ for reasons of its own.
+    expect(typeOf(work("https://site.example/comic/night-shift", "Book", { genre: ["Romance"] }))).toBe("book");
+    // Its labels alone, a menu's.
+    expect(typeOf(work("https://shop.example/books/night-shift", "Book", {}, "<a>Comics</a><a>Manga</a>"))).toBe("book");
+  });
+
+  test("one labelled a novel, or a page about something else, isn't a comic however it's filed", () => {
+    expect(typeOf(work("https://site.example/series/comic/night-shift", "Book", { genre: ["Manga"] }, "<span>Type</span><span>Light Novel</span>"))).toBe("book");
+    expect(typeOf(work("https://www.mangaupdates.com/series/abc/night-shift", "CreativeWork", {}, "<b>Type</b><div>Novel</div>"))).toBeUndefined();
+    expect(typeOf(work("https://news.example/comics/2026/a-review", "NewsArticle", { keywords: "comics, manga" }, "<span>Type</span><span>Manga</span>"))).toBe("article");
+  });
+});
+
 describe("YouTube", () => {
   test("knows its videos' links, and only those", () => {
     for (const link of ["https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10", "https://youtu.be/dQw4w9WgXcQ?si=x", "https://m.youtube.com/shorts/dQw4w9WgXcQ"]) {
@@ -419,10 +495,109 @@ describe("Wikidata", () => {
     expect(new URL(asked.find((each) => each.includes("pageimages"))!).searchParams.get("pilicense")).toBe("any");
   });
 
+  test("a manga series is a comic, its form from what it's an instance of", async () => {
+    answers.set("https://en.wikipedia.org/api/rest_v1/page/summary/One_Piece", { wikibase_item: "Q28667972", extract: "One Piece is a Japanese manga series written and illustrated by Eiichiro Oda." });
+    answers.set("https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q28667972&props=claims", {
+      entities: {
+        Q28667972: {
+          labels: { en: { value: "One Piece" } },
+          claims: {
+            P31: [{ mainsnak: { datavalue: { value: { id: "Q21198342" } } } }],
+            P50: [{ mainsnak: { datavalue: { value: { id: "Q353589" } } } }],
+            P110: [{ mainsnak: { datavalue: { value: { id: "Q353589" } } } }],
+            P577: [{ mainsnak: { datavalue: { value: { time: "+1997-07-22T00:00:00Z" } } } }],
+          },
+        },
+      },
+    });
+    answers.set("https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q353589", { entities: { Q353589: { labels: { en: { value: "Eiichiro Oda" } } } } });
+    const item = (await look(wikidata, "https://en.wikipedia.org/wiki/One_Piece"))!;
+    // Written and drawn by one: its author.
+    expect([item.type, item.title, item.properties]).toEqual([
+      "comic",
+      "One Piece",
+      [
+        ["author", "Eiichiro Oda"],
+        ["format", "manga"],
+        ["year", "1997"],
+      ],
+    ]);
+  });
+
   test("something Wikidata has that isn't a film, a series or a book is nothing", async () => {
     answers.set("https://en.wikipedia.org/api/rest_v1/page/summary/Paris", { wikibase_item: "Q90", extract: "Paris is the capital of France." });
     answers.set("https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q90", { entities: { Q90: { labels: { en: { value: "Paris" } }, claims: { P31: [{ mainsnak: { datavalue: { value: { id: "Q515" } } } }] } } } });
     expect(await look(wikidata, "https://en.wikipedia.org/wiki/Paris")).toBeNull();
+  });
+});
+
+describe("AniList", () => {
+  test("knows series by their links there and to MyAnimeList; MangaDex's only in the apps, which can ask it", () => {
+    expect(seriesIn(new URL("https://anilist.co/manga/105398/Solo-Leveling/"))).toEqual({ id: 105398 });
+    expect(seriesIn(new URL("https://myanimelist.net/manga/121496/Na_Honjaman_Level_Up"))).toEqual({ mal: 121496 });
+    expect(seriesIn(new URL("https://mangadex.org/title/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/solo-leveling"))).toBeNull();
+    expect(seriesIn(new URL("https://anilist.co/anime/21/One-Piece"))).toBeNull();
+  });
+
+  test("a manhwa by its MyAnimeList link: who it's from and who drew it, its form by its country, and only the id sent", async () => {
+    answers.set("https://graphql.anilist.co", JSON.parse(readFileSync(new URL("fixtures/library/anilist.json", import.meta.url), "utf8")));
+    const item = (await look(anilist, "https://myanimelist.net/manga/121496/Na_Honjaman_Level_Up"))!;
+    expect(item).toEqual({
+      type: "comic",
+      title: "Solo Leveling",
+      link: "https://myanimelist.net/manga/121496/Na_Honjaman_Level_Up",
+      properties: [
+        ["author", "Chu-Gong, So-Ryeong Gi, Hyeon-Gun"],
+        ["artist", "Seong-Rak Jang, DISCIPLES"],
+        ["format", "manhwa"],
+        ["year", "2018"],
+        ["chapters", "201"],
+      ],
+      // Known by its MyAnimeList id too, so a note of it added from AniList is the one added from there.
+      ids: ["anilist:105398", "myanimelist:121496"],
+      cover: "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx105398-b673Vt5ZSuz3.jpg",
+      description: expect.stringContaining("“the weakest hunter of all mankind,”"),
+    });
+    expect(sent.map(({ variables }) => variables)).toEqual([{ mal: 121496 }]);
+    // Its note says what it's about in plain sentences.
+    expect(text.libraryNoteText(item)).not.toMatch(/<br|<i>/);
+  });
+
+  test("a light novel is a book; searching finds comics only, each with its link there", async () => {
+    answers.set("https://graphql.anilist.co", {
+      data: {
+        Page: {
+          media: [{ id: 30013, format: "MANGA", countryOfOrigin: "JP", title: { english: "One Piece", romaji: "ONE PIECE" }, startDate: { year: 1997 }, staff: { edges: [{ role: "Story & Art", node: { name: { full: "Eiichiro Oda" } } }] }, coverImage: { large: "https://s4.anilist.co/c/30013.jpg" }, siteUrl: "https://anilist.co/manga/30013" }],
+        },
+      },
+    });
+    const found = await sourceOf(anilist).search!("comic", "one piece", new AbortController().signal);
+    expect(found).toEqual([
+      {
+        type: "comic",
+        title: "One Piece",
+        link: "https://anilist.co/manga/30013",
+        properties: [
+          ["author", "Eiichiro Oda"],
+          ["format", "manga"],
+          ["year", "1997"],
+        ],
+        ids: ["anilist:30013"],
+        cover: "https://s4.anilist.co/c/30013.jpg",
+        description: undefined,
+      },
+    ]);
+    expect(sent[0].variables).toEqual({ search: "one piece" });
+    expect(sent[0].query).toContain("format_not: NOVEL");
+    answers.set("https://graphql.anilist.co", { data: { Media: { id: 85737, format: "NOVEL", countryOfOrigin: "JP", title: { english: "The Apothecary Diaries" }, startDate: { year: 2012 }, staff: { edges: [{ role: "Story", node: { name: { full: "Natsu Hyuuga" } } }] } } } });
+    const novel = (await look(anilist, "https://anilist.co/manga/85737"))!;
+    expect([novel.type, novel.properties]).toEqual([
+      "book",
+      [
+        ["author", "Natsu Hyuuga"],
+        ["year", "2012"],
+      ],
+    ]);
   });
 });
 
@@ -893,6 +1068,7 @@ describe("the same thing, however it's added", () => {
     expect([keyOf(openLibrary, "https://www.amazon.com/dp/0441172717"), keyOf(openLibrary, "https://openlibrary.org/isbn/9780441172719")]).toEqual(["isbn:9780441172719", "isbn:9780441172719"]);
     expect(keyOf(musicbrainz, "https://musicbrainz.org/recording/b1a9c0e9-d987-4042-ae91-78d6a3267d69")).toBe("musicbrainz:recording/b1a9c0e9-d987-4042-ae91-78d6a3267d69");
     expect(keyOf(applePodcasts, "https://podcasts.apple.com/gb/podcast/the-daily/id1200361736?i=1000801496509")).toBe("apple-podcasts:1200361736/1000801496509");
+    expect([keyOf(anilist, "https://anilist.co/manga/105398/Solo-Leveling/"), keyOf(anilist, "https://myanimelist.net/manga/121496/Na_Honjaman_Level_Up")]).toEqual(["anilist:105398", "myanimelist:121496"]);
   });
 
   test("what Wikidata finds is known by its other sites' ids too, so a note of it from another link is found", async () => {

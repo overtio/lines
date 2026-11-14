@@ -118,12 +118,14 @@ export default {
     "Muestra los enlaces a artículos de arXiv como los cita arXiv: arXiv:1706.03762. En las apps, añade /artículo, para buscar en arXiv y enlazar un artículo, y completa una nota que es un enlace a uno como artículo científico de la biblioteca. Lo que buscas se envía a arXiv.",
   "plugins.library.name": "Biblioteca",
   "plugins.library.description":
-    "Libros, películas, series, vídeos, música, pódcasts, artículos y artículos científicos, cada uno una nota, en la Biblioteca de la barra lateral con su portada y por dónde vas. Una nota nueva que es solo un enlace se completa con lo que es.",
+    "Libros, cómics, películas, series, vídeos, música, pódcasts, artículos y artículos científicos, cada uno una nota, en la Biblioteca de la barra lateral con su portada y por dónde vas. Una nota nueva que es solo un enlace se completa con lo que es.",
   "plugins.webPages.name": "Páginas web",
   "plugins.webPages.description":
     "Busca un enlace a cualquier página por lo que dice ser (un libro, una película, un artículo…), como dicen la mayoría de los sitios para los buscadores: IMDb, Letterboxd, Goodreads, Spotify, Bandcamp, Substack, blogs y noticias. El enlace se envía a su sitio.",
   "plugins.webPages.apps": "Necesita la app de lines: los sitios no dejan que las páginas web los lean.",
   "plugins.youtube.description": "Busca los enlaces a vídeos de YouTube: su título, su canal y su imagen, y en las apps cuándo se publicaron y cuánto duran. El enlace se envía a YouTube.",
+  "plugins.anilist.description":
+    "Busca manga, manhwa y manhua por un enlace a AniList, MyAnimeList o, en las apps, MangaDex, y los encuentra desde Cómics en Añadir a la biblioteca: autor, dibujante, año, capítulos y portada. El identificador del enlace, o las palabras buscadas, se envían a AniList.",
   "plugins.openLibrary.description": "Busca libros por un enlace a Open Library o un ISBN en un enlace (de una librería, o de Amazon): autor, año, páginas y portada. El ISBN o el identificador del libro se envía a Open Library.",
   "plugins.wikidata.description":
     "Busca películas, series y libros por un enlace a IMDb, The Movie Database, Letterboxd, Wikipedia o Wikidata: dirección, año, duración, género y de qué tratan, según Wikipedia. El identificador del enlace se envía a Wikidata y Wikipedia.",

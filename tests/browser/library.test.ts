@@ -206,7 +206,7 @@ test("notes that are just a link aren't looked up as they open or as they're wri
   const settings = await app.settings("Library");
   // On the web, only the sources that work there are named, each once: not Web Pages, nor Feeds' own for a site's page, which reads it.
   await expect(settings.getByText("In the browser, only", { exact: false }).innerText()).resolves.toBe(
-    "In the browser, only YouTube, Open Library, Wikidata, MusicBrainz, SoundCloud, Apple Podcasts, and Feeds can be asked: other sites don’t let web pages read them. The lines app reads any page.",
+    "In the browser, only YouTube, Open Library, Wikidata, AniList, MusicBrainz, SoundCloud, Apple Podcasts, and Feeds can be asked: other sites don’t let web pages read them. The lines app reads any page.",
   );
   await toggle(settings, "Look up links", false);
   await app.closeSettings();
@@ -279,7 +279,7 @@ test("Add to Library searches the kind chosen, and what's chosen is a note on it
   const picker = await addToLibrary(page);
   // What can be searched from a web page: not papers (arXiv answers the apps only).
   const kinds = picker.getByRole("radiogroup", { name: "What to search for" });
-  expect(await kinds.getByRole("radio").allInnerTexts()).toEqual(["Books", "Movies", "Shows", "Music", "Podcasts"]);
+  expect(await kinds.getByRole("radio").allInnerTexts()).toEqual(["Books", "Comics", "Movies", "Shows", "Music", "Podcasts"]);
   await page.keyboard.type("dune");
   await picker.getByRole("option", { name: /^Dune, Frank Herbert · 1965/ }).waitFor();
   // Only what was typed is sent.
@@ -760,4 +760,55 @@ test("a feed's episodes sharing their show's link are each saved by their sound,
   expect(await saved("https://cdn.example/1.mp3")).toBe(first);
   expect(await saved("https://cdn.example/2.mp3")).toBeNull();
   expect(podcast).not.toBe(first);
+});
+
+/** AniList, answering for the page as it would (trimmed): its search, or the series a link asks for, and its covers. The variables asked with. */
+async function anilist(page: App["page"]) {
+  const asked: Record<string, unknown>[] = [];
+  const series = {
+    id: 30013,
+    format: "MANGA",
+    countryOfOrigin: "JP",
+    title: { english: "One Piece", romaji: "ONE PIECE" },
+    startDate: { year: 1997 },
+    chapters: null,
+    staff: { edges: [{ role: "Story & Art", node: { name: { full: "Eiichiro Oda" } } }] },
+    coverImage: { extraLarge: "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/30013.jpg", large: "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/30013.jpg" },
+    description: "Gol D. Roger was known as the Pirate King.<br><br>\n(Source: VIZ Media)",
+    siteUrl: "https://anilist.co/manga/30013",
+  };
+  await page.route(
+    (url) => url.hostname === "graphql.anilist.co",
+    (route: Route) => {
+      const { variables } = route.request().postDataJSON();
+      asked.push(variables);
+      return route.fulfill({ headers: CORS, json: variables.search ? { data: { Page: { media: [series] } } } : { data: { Media: series } } });
+    },
+  );
+  await page.route("https://s4.anilist.co/**", (route: Route) => route.fulfill({ headers: { ...CORS, "content-type": "image/png" }, body: PNG }));
+  return asked;
+}
+
+test("Add to Library's Comics searches AniList, and a link to AniList is looked up there: a comic on its shelf", async () => {
+  app = await openApp();
+  const { page } = app;
+  const asked = await anilist(page);
+  const picker = await addToLibrary(page);
+  await picker.getByRole("radio", { name: "Comics" }).click();
+  await picker.getByRole("searchbox").fill("one piece");
+  await picker.getByRole("option", { name: /^One Piece, Eiichiro Oda · manga/ }).click();
+  const front = "---\ntype: comic\nauthor: Eiichiro Oda\nformat: manga\nyear: 1997\nlink: https://anilist.co/manga/30013\nstatus: to read\n---\n# One Piece\n";
+  await page.waitForFunction((front) => window.testing.text()?.startsWith(front), front);
+  await page.waitForFunction(() => window.testing.text()?.includes("\nGol D. Roger was known as the Pirate King.\n"));
+  expect(await page.locator("#note-list-title").innerText()).toBe("Comics");
+  expect(await page.locator(".note-list [data-id]").first().innerText()).toMatch(/^One Piece\s+Eiichiro Oda · manga\s+To Read/);
+  // Only what was typed, then (AniList asked no more than every two seconds) the id chosen.
+  while (asked.length < 2) await page.waitForTimeout(100);
+  expect(asked).toEqual([{ search: "one piece" }, { id: 30013 }]);
+
+  // A link to it pasted into a new note.
+  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await page.waitForFunction(() => window.testing.text()?.endsWith("# "));
+  await paste(page, "https://anilist.co/manga/30013/One-Piece/");
+  await page.waitForFunction(() => window.testing.text()?.startsWith("---\ntype: comic\nauthor: Eiichiro Oda\nformat: manga\n"));
 });
