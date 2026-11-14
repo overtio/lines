@@ -97,6 +97,7 @@ const FORWARDED: Record<string, string[]> = {
   notes: ["addSamples", "reset", "setFilter"],
   feeds: ["importOpml"],
   imports: ["start", "stop", "undo", "clear"],
+  ratings: ["rename"],
 };
 
 /**

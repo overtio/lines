@@ -4,7 +4,9 @@ import type { SyntaxNodeRef } from "@lezer/common";
 import { mount, unmount } from "svelte";
 import Icon from "../icons/Icon.svelte";
 import type { IconName } from "../icons/icons";
+import { ratings } from "../library/ratings.svelte";
 import { keyOf, mentionKey, propertyOf, readTypeRef, type TypeRef, typeLabel, typeRefOf } from "../notes/properties";
+import { prefs } from "../prefs.svelte";
 import { notes } from "../notes/store.svelte";
 import { typeLooks } from "../notes/looks.svelte";
 import { t } from "../i18n/index.svelte";
@@ -12,13 +14,15 @@ import { ui } from "../ui.svelte";
 import { windowLabel } from "../windows/channel";
 import { cardInset, type CardInset, sameInset, setInset } from "./cards";
 import { iconOf, objectsChanged, openNote, valueText } from "./objects";
+import { drawScore, fractionOf, MARKS, type Scale, type Score, scoreIn } from "./scores";
 import { arrowsInto, drawnBlock, drawnBlocks, focused, isEditing } from "./util";
 
 /*
  * Type tables: `@type.recipe` on a line of its own is drawn as a table of the notes of that type,
  * a row each, with a column for each of their properties, or the ones named after it:
  * `@type.recipe(time, servings)`. The header adds, removes and sorts columns; adding or removing
- * one rewrites the line. With the cursor on the line, it shows with the table below it.
+ * one rewrites the line. With the cursor on the line, it shows with the table below it. Scores are
+ * drawn as marks, a library kind's ratings on its scale, and sort by how high they are.
  */
 
 interface Column {
@@ -26,6 +30,15 @@ interface Column {
   key: string;
   /** The key as the notes write it, for the header. */
   label: string;
+  /** For one of a library kind's ratings, its scale. */
+  scale?: Scale;
+}
+
+interface Cell {
+  /** Its value as it reads. */
+  text: string;
+  /** A score it is, drawn as marks (scores.ts). */
+  score?: { score: Score; scale: Scale };
 }
 
 export interface TableData {
@@ -37,7 +50,7 @@ export interface TableData {
   columns: Column[];
   /** The type's other keys, which the header's + offers. */
   others: Column[];
-  rows: { id: string; title: string; icon: IconName; cells: string[] }[];
+  rows: { id: string; title: string; icon: IconName; cells: Cell[] }[];
 }
 
 /** The notes of `ref`'s type, as a table: every key they have, most used first, unless the line names them. */
@@ -59,9 +72,17 @@ export function tableData(ref: TypeRef): TableData {
     .map((key, order) => ({ ...key, order }))
     .sort((a, b) => b.count - a.count || a.order - b.order)
     .map(({ label }) => ({ key: mentionKey(label), label }));
-  const columns = ref.columns ? ref.columns.map((key) => ({ key, label: keys.get(keyOf(key))?.label ?? key })) : all;
-  const shown = new Set(columns.map((column) => keyOf(column.key)));
   const type = entries[0]?.meta.type ?? ref.type;
+  const columns = (ref.columns ? ref.columns.map((key) => ({ key, label: keys.get(keyOf(key))?.label ?? key })) : all).map((column) => {
+    const scale = ratings.scaleFor(type, column.key);
+    return scale ? { ...column, scale } : column;
+  });
+  const shown = new Set(columns.map((column) => keyOf(column.key)));
+  /** A cell: its value, and the score it is, on its column's scale or as marks out of 2 to 10, unless scores are drawn as written. */
+  const cell = (column: Column, value: string): Cell => {
+    const score = prefs.scores === "off" ? null : column.scale ? scoreIn(value, column.scale) : scoreIn(value);
+    return score ? { text: value, score: { score, scale: column.scale ?? { kind: "marks", of: score.of } } } : { text: value };
+  };
   return {
     type,
     icon: typeLooks.icon(type),
@@ -75,7 +96,7 @@ export function tableData(ref: TypeRef): TableData {
         icon: iconOf(entry),
         cells: columns.map((column) => {
           const property = propertyOf(entry.meta.properties, column.key);
-          return property ? valueText(property.value) : "";
+          return cell(column, property ? valueText(property.value) : "");
         }),
       }))
       .sort((a, b) => a.title.localeCompare(b.title)),
@@ -85,6 +106,11 @@ export function tableData(ref: TypeRef): TableData {
 /** Each table's sort, kept while it redraws: which column (-1 for the title) and which way. */
 const sorts = new WeakMap<HTMLElement, { column: number; descending: boolean }>();
 const icons = new WeakMap<HTMLElement, Record<string, unknown>[]>();
+
+/** Unmounts the icons a table drew. */
+function unmountTable(dom: HTMLElement) {
+  for (const mounted of icons.get(dom) ?? []) void unmount(mounted);
+}
 
 function icon(name: IconName, size = 14) {
   const span = document.createElement("span");
@@ -115,9 +141,9 @@ function setColumns(view: EditorView, dom: HTMLElement, data: TableData, columns
   view.dispatch({ changes: { from, to: from + match[0].length, insert: typeRefOf(data.type, columns) }, userEvent: "input" });
 }
 
-/** A new note of the type, with the table's columns as empty properties, opened to type its title. */
+/** A new note of the type, with the table's columns as empty properties (but its ratings, set once they're given), opened to type its title. */
 function newNote(data: TableData) {
-  const keys = data.columns.map((column) => `${column.label}: `);
+  const keys = data.columns.filter((column) => !column.scale).map((column) => `${column.label}: `);
   const body = ["---", `type: ${data.type}`, ...keys, "---", "# "].join("\n");
   if (windowLabel().startsWith("note-")) return openNote(notes.add(body));
   notes.show(notes.create(body));
@@ -127,7 +153,7 @@ function render(dom: HTMLElement, data: TableData, view: EditorView) {
   // Drawing it again replaces its buttons; the one that had focus gets it back afterwards.
   const active = document.activeElement;
   const focusKey = active instanceof HTMLElement && dom.contains(active) ? active.dataset.focus : undefined;
-  for (const mounted of icons.get(dom) ?? []) void unmount(mounted);
+  unmountTable(dom);
   const mounted: Record<string, unknown>[] = [];
   const editable = !view.state.readOnly;
   const sort = sorts.get(dom);
@@ -215,12 +241,13 @@ function render(dom: HTMLElement, data: TableData, view: EditorView) {
 
   const rows = [...data.rows];
   if (sort) {
-    const value = (row: TableData["rows"][number]) => (sort.column < 0 ? row.title : row.cells[sort.column] ?? "");
+    const value = (row: TableData["rows"][number]): Cell => (sort.column < 0 ? { text: row.title } : (row.cells[sort.column] ?? { text: "" }));
     rows.sort((a, b) => {
-      // Empty cells last, either way.
+      // Empty cells last, either way; scores by how high they are, before what isn't one.
       const [x, y] = [value(a), value(b)];
-      if (!x || !y) return Number(!x) - Number(!y);
-      const order = x.localeCompare(y, undefined, { numeric: true });
+      if (!x.text || !y.text) return Number(!x.text) - Number(!y.text);
+      const order =
+        x.score && y.score ? fractionOf(x.score.score) - fractionOf(y.score.score) : x.score || y.score ? Number(!x.score) - Number(!y.score) : x.text.localeCompare(y.text, undefined, { numeric: true });
       return sort.descending ? -order : order;
     });
   }
@@ -254,9 +281,10 @@ function render(dom: HTMLElement, data: TableData, view: EditorView) {
     tr.append(name);
     for (const cell of row.cells) {
       const td = document.createElement("td");
-      td.textContent = cell;
+      if (cell.score) td.append(drawScore(cell.score.score, cell.score.scale, MARKS[prefs.scores as Exclude<typeof prefs.scores, "off">], prefs.icons, true));
+      else td.textContent = cell.text;
       // Short values ("25 min") stay on one line; long ones wrap.
-      if (cell.length <= 24) td.classList.add("is-short");
+      if (cell.text.length <= 24) td.classList.add("is-short");
       tr.append(td);
     }
     if (editable && data.others.length) tr.append(document.createElement("td"));
@@ -294,7 +322,8 @@ class TypeTableWidget extends WidgetType {
     readonly preview: boolean,
   ) {
     super();
-    this.key = JSON.stringify(data);
+    // Drawn again in another icon set, as its scores' marks are copies of the set's icons.
+    this.key = JSON.stringify(data) + prefs.icons;
   }
   eq(other: TypeTableWidget) {
     return other.key === this.key && sameInset(other.inset, this.inset) && other.preview === this.preview;
@@ -322,7 +351,7 @@ class TypeTableWidget extends WidgetType {
     return true;
   }
   destroy(dom: HTMLElement) {
-    for (const mounted of icons.get(dom) ?? []) void unmount(mounted);
+    unmountTable(dom);
   }
   get estimatedHeight() {
     return 44 + this.data.rows.length * 34;

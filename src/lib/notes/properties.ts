@@ -167,6 +167,20 @@ export function typeRefOf(type: string, columns: string[] | null) {
 }
 
 /**
+ * The note with its property `from` called `to`, where it is and as it's set; as it was if it hasn't
+ * one (whose value `only` takes, if it's given), or has a `to` already.
+ */
+export function renameKey(body: string, from: string, to: string, only?: (value: string) => boolean): string {
+  const front = frontMatter(body);
+  const property = front && propertyOf(front.properties, from);
+  if (!property || propertyOf(front.properties, to) || (only && !only(property.value))) return body;
+  const lines = body.split("\n");
+  const line = lines[property.line - 1];
+  lines[property.line - 1] = to + line.slice(line.indexOf(":"));
+  return lines.join("\n");
+}
+
+/**
  * The note with its properties changed: each key set to its value (as written, on the line it was
  * on, keeping how its key was written), or taken out where the value is null. Of a key written more
  * than once, the first is changed, or the one on `line`. New ones go at the end of the properties,

@@ -337,6 +337,91 @@
   fill: currentColor;
 }
 
+/*
+ * Marks in one piece, in a table (scores.ts's `compact`): the icon, filled, along the line as a mask
+ * (in a class of its own, scores.ts), in the score's color as far as it goes, and faint after.
+ */
+.cm-lp-score-compact {
+  display: inline-block;
+  width: calc(var(--marks) * 1.125em);
+  height: 1em;
+  background: linear-gradient(to right, var(--score) var(--fill), var(--text-faint) var(--fill));
+  mask-repeat: repeat-x;
+  mask-position: left top;
+  mask-size: 1.125em 1em;
+}
+
+.cm-lp-score-compact:dir(rtl) {
+  background: linear-gradient(to left, var(--score) var(--fill), var(--text-faint) var(--fill));
+  mask-position: right top;
+}
+
+/* Half a mark (`3.5/5`): a filled one over the faint one, cut at its middle (its end, right to left). */
+.cm-lp-score-mark.is-half {
+  position: relative;
+}
+
+.cm-lp-score-mark.is-half .icon + .icon {
+  position: absolute;
+  inset: 0;
+  color: var(--score);
+  fill: currentColor;
+  clip-path: inset(0 50% 0 0);
+}
+
+.cm-lp-score-mark.is-half .icon + .icon:dir(rtl) {
+  clip-path: inset(0 0 0 50%);
+}
+
+/* A click sets it (ratings.ts), in a line of a note that can be changed (not in a type table). */
+.cm-content[contenteditable="true"] .cm-line .cm-lp-score-mark,
+.cm-content[contenteditable="true"] .cm-line .cm-lp-score-label {
+  cursor: pointer;
+}
+
+.cm-lp-score-icons {
+  gap: 0.3em;
+}
+
+.cm-lp-score-icons .cm-lp-score-mark.is-filled {
+  color: var(--accent);
+}
+
+/* Points (`85/100`): a short bar filled as far, the number, and what it's out of, faint. */
+/* Inline, as text is: on the line's baseline, and no taller than the line. */
+.cm-lp-score-points {
+  display: inline;
+  vertical-align: baseline;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.cm-lp-score-of {
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+.cm-lp-score-meter {
+  display: inline-block;
+  vertical-align: 0.3em;
+  width: 2.5em;
+  height: 0.25em;
+  margin-right: 0.5em;
+  border-radius: 1em;
+  background: linear-gradient(var(--accent), var(--accent)) no-repeat 0 0 / var(--filled) 100%, color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+/* A word (`A`, `Masterpiece`), as a chip in the accent, inline as a mention is. */
+.cm-lp-score-label {
+  display: inline;
+  vertical-align: baseline;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-radius: calc(6px * var(--radius-scale));
+  padding: 0.05em 0.45em;
+  font-weight: 600;
+}
+
 /* Centered on the name's capitals, in any font. */
 .cm-lp-tag-icon {
   display: inline-flex;

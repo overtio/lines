@@ -23,6 +23,8 @@ export type WindowMessage =
   | { type: "themes"; themes: string; palettes: string }
   /** Colors changed by right-clicking, not saved yet, or picking them turned on or off (themes/drafts.svelte.ts). */
   | { type: "theme-drafts"; drafts: string }
+  /** What the Library's kinds are rated on changed (library/ratings.svelte.ts): all of it, as saved. */
+  | { type: "ratings"; ratings: string }
   /** Your own presets changed (themes/presets.svelte.ts): all of them, as saved. */
   | { type: "presets"; presets: string }
   /** A plugin was turned on or off (plugins/registry.svelte.ts): which are, by choice. */

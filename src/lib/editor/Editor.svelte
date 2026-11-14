@@ -5,6 +5,7 @@
   import { frontMatter } from "../notes/properties";
   import { notes } from "../notes/store.svelte";
   import type { Note } from "../notes/types";
+  import { ratings } from "../library/ratings.svelte";
   import { looks } from "../notes/looks.svelte";
   import { tagColorCss, tagColorSheet } from "./tagColors";
   import { plugins } from "../plugins/registry.svelte";
@@ -243,7 +244,9 @@
   $effect(() => {
     void notes.objectsSignature;
     void looks.looks;
+    void ratings.choices;
     void prefs.scores;
+    void prefs.icons;
     void prefs.copyValues;
     untrack(() => view?.dispatch({ effects: objectsChanged.of(null) }));
   });

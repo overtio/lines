@@ -385,6 +385,7 @@ And another.
 - [ ] Open todo
   - [ ] Nested open todo
 Rating: 4/5
+Half: 3.5/5
 Score: 7 / 10
 Not a score: 12/20
 

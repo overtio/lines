@@ -102,9 +102,24 @@ export function bigSheet(rows: number, seed = 13) {
   return out.join("\n");
 }
 
+/** A thing in the Library, rated: a book or a film, with what it's by, its rating and its status. */
+function libraryNote(rng: Random) {
+  const [type, by, status] = rng() < 0.5 ? ["book", "author", "read"] : ["movie", "director", "watched"];
+  const stars = (1 + Math.floor(rng() * 9)) / 2;
+  return `---\ntype: ${type}\n${by}: ${title(rng)}\nyear: ${1950 + Math.floor(rng() * 75)}\nstatus: ${status}\nrating: ${stars}/5\n---\n# ${title(rng)}\n\n${paragraph(rng)}`;
+}
+
+/** A rated book with scores in its text and a table of every book, which draws each one's rating as marks. */
+function ratedNote() {
+  const rng = random(17);
+  const scores = Array.from({ length: 6 }, (_, i) => `${title(rng)}: ${1 + (i % 5)}/5`).join("\n");
+  return `---\ntype: book\nauthor: Mary Shelley\nyear: 1818\nstatus: read\nrating: 4.5/5\n---\n# ${SPECIAL.rated}\n\n${paragraph(rng)}\n\n${scores}\n\n@type.book\n\n${paragraph(rng)}`;
+}
+
 /** The notes the benchmarks open by name, pinned so they're at the top of the list. */
 export const SPECIAL = {
   typical: "Typical note",
+  rated: "Rated note",
   long: "Long note 3000",
   huge: "Long note 12000",
   latex: "Long LaTeX 3000",
@@ -127,6 +142,8 @@ export function library(count: number): Note[] {
   const notes = Array.from({ length: count }, (_, i) => {
     if (i % 100 === 50) return note(longLatex(40, i), i + 10, { format: "latex" });
     if (i % 100 === 99) return note(bigSheet(20, i), i + 10, { format: "spreadsheet" });
+    // One in twenty a library note, rated: 250 in 5,000.
+    if (i % 20 === 7) return note(libraryNote(rng), i + 10);
     return note(everydayNote(rng), i + 10);
   });
   const typical = `# ${SPECIAL.typical}\n\n${everydayNote(random(3)).split("\n").slice(1).join("\n")}\n\n${table(random(4), 5)}\n\n${paragraph(random(5))}`;
@@ -136,6 +153,7 @@ export function library(count: number): Note[] {
     note(longMarkdown(12000), 2, { pinned: true }),
     note(longLatex(3000), 3, { pinned: true, format: "latex" }),
     note(bigSheet(3000), 4, { pinned: true, format: "spreadsheet" }),
+    note(ratedNote(), 5, { pinned: true }),
     ...notes,
   ];
 }
