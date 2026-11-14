@@ -1,0 +1,4 @@
+- This is the first paragraph of an essay, written in Logseq one paragraph to a block.
+- The second paragraph goes on with the thought, as prose does, and ends here.
+- ## A heading
+- The last paragraph, under the heading, is long enough to read as prose too.

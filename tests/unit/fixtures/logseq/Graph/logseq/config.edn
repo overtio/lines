@@ -1,0 +1,9 @@
+{:meta/version 1
+
+ ;; :journal/page-title-format "EEE, dd.MM.yyyy"
+ :journal/page-title-format "MMM do, yyyy"
+ :journal/file-name-format "yyyy_MM_dd"
+ :file/name-format :triple-lowbar
+
+ :favorites ["welcome" "projects/acme"]
+}

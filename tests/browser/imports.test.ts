@@ -175,3 +175,28 @@ test("Bear's backup: its notes with their tags, pictures, pins, archive and tras
   await group.locator("input[accept*='.bear2bk']").setInputFiles(bearBackup());
   await group.getByText("Everything in Bear Notes 2024-11-14 is in lines already.").waitFor();
 });
+
+test("a Logseq graph: its pages and journals, outlines as lists and prose as paragraphs, references as text; then nothing new", async () => {
+  app = await openApp({ onDisk: true });
+  const { page } = app;
+  const settings = await app.settings("Export and Import");
+  const group = settings.getByRole("region", { name: "From Logseq" });
+  const graph = fileURLToPath(new URL("../unit/fixtures/logseq/Graph", import.meta.url));
+  await group.locator("input[webkitdirectory]").setInputFiles(graph);
+  await group.getByText("5 notes, 1 attachment, and 3 folders in Graph.").waitFor();
+  await group.getByText(/^2 empty pages, left out \(Logseq makes some itself\): /).waitFor();
+  await group.getByRole("button", { name: "Import 5 Notes" }).click();
+  await group.getByText("Imported 5 notes.").waitFor();
+  const notes = await page.evaluate(() =>
+    Object.fromEntries(window.testing.notes.entries.filter(({ note }) => note.source?.app === "logseq").map(({ note, meta }) => [meta.title, note])),
+  );
+  expect(Object.keys(notes).sort()).toEqual(["Essay", "Nov 14th, 2024", "Projects/Acme", "Recipes/Pancakes", "Welcome"]);
+  expect(notes.Essay.body).toStartWith("# Essay\n\nThis is the first paragraph of an essay");
+  expect(notes.Welcome.body).toContain("\n- As I said: Planned: 100 ([[Projects/Acme]])\n");
+  expect(notes.Welcome.body).toMatch(/\n- !\[photo\.png\|320\]\(\.\.\/attachments\/[0-9a-f]{32}\.png\)\n/);
+  expect([notes.Welcome.pinned, notes["Projects/Acme"].pinned]).toEqual([true, true]);
+  await page.locator('.sidebar [data-tag="journals"]').waitFor();
+
+  await group.locator("input[webkitdirectory]").setInputFiles(graph);
+  await group.getByText("Everything in Graph is in lines already.").waitFor();
+});

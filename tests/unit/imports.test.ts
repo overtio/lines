@@ -19,6 +19,9 @@ stubApp();
 
 const { readVault } = await import("../../src/plugins/obsidian/vault");
 const { readBear } = await import("../../src/plugins/bear/backup");
+const { readGraph } = await import("../../src/plugins/logseq/graph");
+const { readPage, writePage } = await import("../../src/plugins/logseq/outline");
+const { formatDay, readDay } = await import("../../src/plugins/logseq/dates");
 const { translate: translateBear } = await import("../../src/plugins/bear/markdown");
 const { translate } = await import("../../src/plugins/obsidian/markdown");
 const { attachmentPath, notesInput, notesWork, planNotes, Tally: Tallies, withTitle } = await import("../../src/lib/imports/notes");
@@ -46,8 +49,8 @@ function folder(name: string): Exported {
 const DAY = Date.UTC(2024, 10, 14);
 const vault = await readVault(folder("obsidian/Vault"));
 const note = (id: string) => vault.notes.find((each) => each.id === id)!;
-/** What's said of each kind that didn't come across as it was: how many, and its examples. */
-const said = (report: Tally) => Object.fromEntries([...report.kinds].map(([kind, { count, examples }]) => [kind.replace("import.report.", ""), [count, ...examples]]));
+/** What's said of each kind that didn't come across as it was: how many, and its examples (in order, as files may come in any). */
+const said = (report: Tally) => Object.fromEntries([...report.kinds].map(([kind, { count, examples }]) => [kind.replace("import.report.", ""), [count, ...[...examples].sort()]]));
 /** Where a placeholder for an attachment is, as a test reads it. */
 const shown = (body: string) => body.replace(/\.\.\/attachments\/\uE000(\d+)\uE000/g, (_, index) => `<${vault.attachments[Number(index)].path}>`);
 const entries = (...notes: { body: string; source?: NoteSource; trashed?: boolean }[]): Entry[] =>
@@ -316,6 +319,92 @@ describe("Bear", () => {
     // Code as lines' Markdown reads it: indented, in a list, a URL too.
     expect(translated("Text\n\n    ~one~ #a b#\n\n- Item\n\n      ~two~\n\nhttps://example.com/~a~")).toBe("Text\n\n    ~one~ #a b#\n\n- Item\n\n      ~two~\n\nhttps://example.com/~a~");
     expect(translated("A\n| a |\n|---|\n\n| b |\n|---|")).toBe("A\n\n| a |\n|---|\n\n| b |\n|---|");
+  });
+});
+
+const graph = await readGraph(folder("logseq/Graph"));
+
+describe("Logseq", () => {
+  const page = (name: string) => graph.notes.find((each) => each.name === name)!;
+  const shownPaths = (body: string) => body.replace(/\.\.\/attachments\/\uE000(\d+)\uE000/g, (_, index) => `<${graph.attachments[Number(index)].path}>`);
+
+  test("a note of each page and day, titled as Logseq names it, namespaces in their folders; empty ones, backups and Org pages left out", () => {
+    expect(graph.notes.map(({ id, name, folders, pinned }) => [id, name, folders.join("/"), pinned]).sort()).toEqual([
+      ["journals/2024_11_14.md", "Nov 14th, 2024", "Journals", false],
+      ["pages/Essay.md", "Essay", "", false],
+      ["pages/Projects___Acme.md", "Projects/Acme", "Projects", true],
+      ["pages/Recipes%2FPancakes.md", "Recipes/Pancakes", "Recipes", false],
+      ["pages/Welcome.md", "Welcome", "", true],
+    ]);
+    expect(page("Nov 14th, 2024")).toMatchObject({ body: "---\ndate: 2024-11-14\n---\n# Nov 14th, 2024\n\n- Rain all day. Met [[Ada]].\n- [ ] Call the bank\n", created: new Date(2024, 10, 14).getTime() });
+  });
+
+  test("an outline stays a list; a page that's clearly prose is paragraphs; headings are headings", () => {
+    expect(page("Essay").body).toBe(
+      "# Essay\n\nThis is the first paragraph of an essay, written in Logseq one paragraph to a block.\n\nThe second paragraph goes on with the thought, as prose does, and ends here.\n\n## A heading\n\nThe last paragraph, under the heading, is long enough to read as prose too.\n",
+    );
+    expect(page("Projects/Acme").body).toBe("# Projects/Acme\n\n## Budget\n\n- Planned: 100\n- Spent: 80\n");
+    expect(page("Recipes/Pancakes").body).toBe("# Recipes/Pancakes\n\nFlour, milk and eggs.\n");
+  });
+
+  test("its Markdown in Linedown: links, tags, tasks, references, embeds, assets; properties; code as it is", () => {
+    expect(page("Welcome").tags).toEqual(["inbox", "Big Ideas"]);
+    expect(shownPaths(page("Welcome").body)).toBe(
+      [
+        "---",
+        "alias: Start",
+        "---",
+        "# Welcome",
+        "",
+        "- Links to [[Essay]], [[Projects/Acme]] and [[Recipes/Pancakes]], and [[Essay|the essay]].",
+        "  - A child with a #tag and #two-words, ==highlighted==.",
+        "    - Deeper still",
+        "- [ ] Write the plan",
+        "- [ ] DOING Draft it",
+        "- [x] Ship it",
+        "- [ ] [#A] Celebrate",
+        "  SCHEDULED: <2024-11-20 Wed>",
+        "- [x] ~~Old idea~~",
+        "- As I said: Planned: 100 ([[Projects/Acme]])",
+        "- [[Essay]]",
+        "- {{query (todo todo doing)}}",
+        "- https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "- ![photo.png|320](<assets/photo_1731571200000_0.png>)",
+        "- ```js",
+        '  const x = "[[not a link]]";',
+        "  ```",
+        "- A block with properties",
+        "  owner:: Ada",
+        "  - Hidden child",
+        "",
+      ].join("\n"),
+    );
+    expect(said(graph.report)).toEqual({
+      empty: [2, "Nov 15th, 2024", "contents"],
+      org: [1, "pages/Notes.org"],
+      taskStates: [2, "CANCELED Old idea (Welcome)", "DOING Draft it (Welcome)"],
+      blockProperties: [1, "owner:: (Welcome)"],
+      priorities: [1, "[#A] (Welcome)"],
+      taskDates: [1, "SCHEDULED: <2024-11-20 Wed> (Welcome)"],
+      embeds: [1, "{{embed [[Essay]]}} (Welcome)"],
+      macros: [1, "{{query (todo todo doing)}} (Welcome)"],
+      spacedTags: [1, "#[[two words]] → #two-words (Welcome)"],
+      refs: [1, "Planned: 100 (Welcome)"],
+      unused: [2, "assets/unused_1731571200001_0.png", "draws/2024-11-14-sketch.excalidraw"],
+    });
+  });
+
+  test("outlines indented with spaces or tabs, a block's lines and code under it, and properties written as the first block", () => {
+    const page = readPage("title:: Old\n- First\n  more of it\n  - Under\n    ```\n    - not a block\n    ```\n- Second");
+    expect(page.properties).toEqual([["title", "Old"]]);
+    expect(writePage(page, { property: () => {}, task: () => {} })).toBe("- First\n  more of it\n  - Under\n    ```\n    - not a block\n    ```\n- Second");
+    expect(readPage("- tags:: a, b\n- Text").properties).toEqual([["tags", "a, b"]]);
+  });
+
+  test("journals' days, read from their files' names and titled as the graph says", () => {
+    const day = { year: 2026, month: 11, day: 1 };
+    expect(["MMM do, yyyy", "EEE, dd.MM.yyyy", "yyyy-MM-dd", "MMMM d'st'"].map((format) => formatDay(day, format))).toEqual(["Nov 1st, 2026", "Sun, 01.11.2026", "2026-11-01", "November 1st"]);
+    expect([readDay("2026_11_01", "yyyy_MM_dd"), readDay("Nov 1st, 2026", "MMM do, yyyy"), readDay("2026_13_01", "yyyy_MM_dd")]).toEqual([day, null, null]);
   });
 });
 

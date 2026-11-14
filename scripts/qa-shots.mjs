@@ -1501,6 +1501,37 @@ const SCENES = [
     shoot: ".editor-pane",
   },
   {
+    id: "logseq-found",
+    title: "Settings → Export and Import → From Logseq, a graph chosen",
+    look: "Its group after Bear's: what to choose and where Logseq says it is; Choose Graph Folder…; how many notes, attachments and folders, and quieter, a line for each kind left out or kept as text, with examples; Tag notes with their folders; Import 5 Notes, focused, and Cancel.",
+    act: async (page) => {
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      await page.getByRole("dialog").getByRole("navigation").getByText("Export and Import", { exact: true }).first().click();
+      const group = page.getByRole("dialog").getByRole("region", { name: "From Logseq" });
+      await group.locator("input[webkitdirectory]").setInputFiles(`${root}tests/unit/fixtures/logseq/Graph`);
+      await group.getByRole("button", { name: /^Import \d+ Notes$/ }).waitFor();
+      await group.evaluate((element) => element.scrollIntoView({ block: "start" }));
+    },
+    shoot: "dialog",
+  },
+  {
+    id: "logseq-note",
+    title: "A page brought from Logseq",
+    look: "Welcome: its alias as a property; the outline as a nested list, bullets as lines draws them; tasks as boxes, DOING with its word, the cancelled one ticked and struck; the reference as Planned: 100 and a mention of Projects/Acme; the picture at 320 px; the code block as code.",
+    act: async (page) => {
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      await page.getByRole("dialog").getByRole("navigation").getByText("Export and Import", { exact: true }).first().click();
+      const group = page.getByRole("dialog").getByRole("region", { name: "From Logseq" });
+      await group.locator("input[webkitdirectory]").setInputFiles(`${root}tests/unit/fixtures/logseq/Graph`);
+      await group.getByRole("button", { name: /^Import \d+ Notes$/ }).click();
+      await group.getByRole("button", { name: "Undo Import" }).waitFor();
+      await page.keyboard.press("Escape");
+      await page.evaluate(() => window.testing.notes.select(window.testing.notes.entries.find((entry) => entry.meta.title === "Welcome" && entry.note.source?.app === "logseq").note.id));
+      await page.locator(".cm-content").getByText("Draft it").waitFor();
+    },
+    shoot: ".editor-pane",
+  },
+  {
     id: "readwise-note",
     title: "A book brought from Readwise",
     look: "Its properties (author, readwise), title and cover; its tag, then the person's note; Highlights, each a quote with where it is and when in it, the person's note on it under it as text.",
