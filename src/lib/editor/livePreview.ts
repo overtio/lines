@@ -660,8 +660,8 @@ function build(view: EditorView): DecorationSet {
   }
 
   if (front) {
-    // The properties: a key column and values, with the `---` lines shrunk away until the cursor is in them.
-    const active = touches(0, frontEnd);
+    // The properties: a key column and values, with the `---` lines shrunk away until the cursor is in them (never, Hidden).
+    const active = mode !== "hidden" && touches(0, frontEnd);
     const keyLines = new Set(front.properties.map((property) => property.line));
     for (let n = 1; n <= front.lines; n++) {
       const line = doc.line(n);
@@ -671,7 +671,7 @@ function build(view: EditorView): DecorationSet {
         // A YAML comment, or a list item or more of the value above, which lines up with the values.
         const comment = /^\s*#/.test(line.text);
         cls += comment ? " cm-lp-prop-comment" : " cm-lp-prop-more";
-        if (!comment && !lineActive(line.from)) hide(line.from, line.from + /^\s*/.exec(line.text)![0].length);
+        if (!comment && !styleLineShows(line.from)) hide(line.from, line.from + /^\s*/.exec(line.text)![0].length);
       }
       decos.push(Decoration.line({ class: cls }).range(line.from));
       // The `---` lines, unseen, are said in words.
@@ -685,7 +685,7 @@ function build(view: EditorView): DecorationSet {
       const valueFrom = line.from + /^[^:]*:[ \t]*/.exec(line.text)![0].length;
       const keyEnd = line.from + property.key.length;
       mark(line.from, valueFrom, "cm-lp-prop-key");
-      if (!lineActive(line.from)) hide(keyEnd, valueFrom);
+      if (!styleLineShows(line.from)) hide(keyEnd, valueFrom);
       const valueTo = line.from + line.text.trimEnd().length;
       if (valueTo <= valueFrom) continue;
       if (keyOf(property.key) === "type") {

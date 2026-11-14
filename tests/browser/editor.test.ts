@@ -1026,3 +1026,23 @@ test("times and words between colons are text, not emoji shortcodes: a duration'
   const apart = await lines.evaluateAll((all) => all.flatMap((line) => [...line.querySelectorAll("span")].map((span) => span.textContent)).filter((text) => /^:\w+:$/.test(text ?? "")));
   expect(apart).toEqual([]);
 });
+
+test("Show Markdown: Hidden shows a note's properties without their `---` lines or a key's colon, even with the cursor on them; Live shows them there", async () => {
+  const body = "---\nduration: 4:47:43\nstatus: to watch\n---\n# Talk";
+  const seen = async (app: App) => {
+    // The cursor at the end of `status: to watch`.
+    await app.page.evaluate(() => window.testing.place(window.testing.text()!.indexOf("to watch") + 8));
+    await app.page.waitForTimeout(100);
+    return app.page.locator(".editor-pane .cm-content").evaluate((content) => ({
+      fences: [...content.querySelectorAll(".cm-lp-props-fence")].map((line) => line.classList.contains("is-active") || /---/.test(line.textContent ?? "")),
+      status: content.querySelector(".cm-line:nth-child(3)")?.textContent?.replace(/\s+/g, " ").trim(),
+    }));
+  };
+  app = await openApp({ prefs: { markdownMode: "hidden" } });
+  await app.open(body);
+  expect(await seen(app)).toEqual({ fences: [false, false], status: "statusto watch" });
+  await app.close();
+  app = await openApp({ prefs: { markdownMode: "live" } });
+  await app.open(body);
+  expect(await seen(app)).toEqual({ fences: [true, true], status: "status: to watch" });
+});
