@@ -79,7 +79,11 @@ test("an item's menu on its shelf rates it, on its kind's scale, and its row sho
   expect(await set.getAttribute("aria-checked")).toBe("true");
   const focused = (name: string) => page.waitForFunction((name) => document.activeElement?.textContent?.trim() === name, name);
   await focused("5 out of 5");
-  await page.keyboard.press("End");
+  // ↓ down past the scores, the line between skipped.
+  for (let i = 0; i < 8 && (await page.evaluate(() => document.activeElement?.textContent?.trim())) !== "Remove Rating"; i++) {
+    await page.keyboard.press("ArrowDown");
+    await page.waitForTimeout(50);
+  }
   await focused("Remove Rating");
   await page.keyboard.press("Enter");
   await page.waitForFunction(() => !window.testing.notes.visible[0].note.body.includes("rating:"));
