@@ -78,7 +78,7 @@ Put one in a Markdown note with `/spreadsheet` (a ` ```csv ` block), or, with Sp
 ### Organizing
 
 - **Tags, not folders.** Write `#tag` or `#nested/tag` anywhere in a note, or drag a note onto a tag (or a type, the Inbox, the Trash) in the sidebar. Give tags and types icons and colors, synced to your other devices, and rename them everywhere at once.
-- **Library.** Paste a link to a book, a movie, a show, a video, a song, a podcast, an article or a paper into a new note, and it fills itself in: its title, cover, who made it, when and what it's about, from the site and open catalogs (Open Library, Wikidata, MusicBrainz, Apple Podcasts, SoundCloud, YouTube, arXiv), with only the link sent. One undo puts the link back. Or search the catalogs from the Library's +, or turn a link in any note into a mention of its own library note from the link's menu. The sidebar's Library lists them by kind, each with its cover and where you've got to (to read, reading, read), set from its menu. Import your bookmarks from any browser (or Pocket, Pinboard, Raindrop) as resources, with their folders, dates and tags, and look each up when you want. See [docs/library.md](docs/library.md).
+- **Library.** Paste a link to a book, a movie, a show, a video, a song, a podcast, an article or a paper into a new note, and it fills itself in: its title, cover, who made it, when and what it's about, from the site and open catalogs (Open Library, Wikidata, MusicBrainz, Apple Podcasts, SoundCloud, YouTube, arXiv), with only the link sent. One undo puts the link back. Or search the catalogs from the Library's +, or turn a link in any note into a mention of its own library note from the link's menu. The sidebar's Library lists them by kind, each with its cover and where you've got to (to read, reading, read), set from its menu. Import your bookmarks from any browser (or Pocket, Pinboard, Raindrop) as resources, with their folders, dates and tags, and look each up when you want. Moving from Readwise? Your books, articles, podcasts and tweets come over with their highlights, and what you saved in Reader with where you'd got to; importing again adds only what's new. See [docs/library.md](docs/library.md).
 - **Feeds and podcasts.** Subscribe to a blog, a site or a podcast (its feed's link, the site's, its Apple Podcasts page, or in the apps its maker's SoundCloud) and read its posts in the Library's RSS, Atom and Podcast Feeds (or all in one Feeds, as you choose), drawn as notes, read and unread kept, Save to Library for the ones to keep. A Hacker News post has its discussion under it, threaded, to fold and go through by keyboard. RSS, Atom and RSS 1.0, fetched in the apps every 30 minutes, asking only whether they changed; OPML in and out. Episodes play in lines, in a mini player that goes on across notes, starts each where it stopped, and answers the media keys. See [docs/library.md](docs/library.md#feeds).
 - **Objects and mentions.** Give a note properties and a type (`type: person`) and it's listed under Types. Type `@` or `[[` to mention another note, `@Ada.email` to show one of its properties, and `@type.recipe` for a table of every recipe.
 - **Inbox.** New notes and imports land in the Inbox, first in the sidebar, until you file them (or send new notes straight to Notes, in Settings).
@@ -312,6 +312,7 @@ src/
     spotify/  soundcloud/    Their links played in notes with the sites' own players (lib/editor/sitePlayer.ts); SoundCloud's looked up too
     feeds/                   Feeds as a kind of the library (subscriptions), and a note that's just a feed's link made one
     hacker-news/             A Hacker News story's discussion under its post: Algolia's copy of the thread, ranked by the official API (thread.ts)
+    readwise/                Moving from Readwise: its API (api.ts), what it has as library notes (sources.ts), their highlights (write.ts), what importing writes (plan.ts)
     code/                    Code notes, a format for each language CodeMirror knows, shown as one (Code) with a choice of language
     changes/                 Marks the lines changed since a note was opened (a line diff, diff.ts)
     paper/                   Paper to write on: ruled lines, dots, squares, graph and isometric paper, grain and linen, backdrops
@@ -334,7 +335,8 @@ src/
       linkNotes.ts           A note that's just a link, looked up as it becomes one and filled in as one change
       adding.ts              Add to Library (components/AddToLibrary.svelte): what a search found, as a note filled in from its page
       addLink.ts             Add to Library from a link's menu: makes its note and mentions it in its place
-      bookmarks.ts           A browser's exported bookmarks read (Netscape's file, Firefox's backup), as resources; bookmarkImport.ts makes them
+      bookmarks.ts           A browser's exported bookmarks read (Netscape's file, Firefox's backup), as resources; bookmarkImport.ts, what importing them writes
+      imports.svelte.ts      Any import into the Library (bookmarks, Readwise), written in the main window a batch at a time, and Undo
       page.ts  web.ts        What a page says about itself, read as text; asking the web as lines
       shelves.svelte.ts      The Library's rows in the sidebar; rows.ts, what a note's row on its shelf shows
     feeds/
@@ -507,6 +509,9 @@ What's planned next. Known limits of what's already there are in [docs/limitatio
 - [x] Play podcast episodes in lines
 - [x] A Hacker News post's discussion under it, to read
 - [ ] Other sites' discussions (Lobsters, Reddit), and the replies Algolia leaves out under deleted comments
+- [x] Move from Readwise: highlights, and what was saved in Reader, as library notes
+- [ ] Keep in step with Readwise after moving (its token kept, what's changed since asked for)
+- [ ] Import from Goodreads, Letterboxd and Pocket's own exports, as Readwise and bookmarks are
 - [ ] JSON Feed, and feeds that need signing in
 - [ ] Sync what's been read and played between devices
 - [ ] Shelves as a grid of covers

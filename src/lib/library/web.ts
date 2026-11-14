@@ -23,11 +23,14 @@ const PAGE_CHARACTERS = 3_000_000;
 /** An answer that isn't what was asked for: a server's error, or something else. */
 export class LookupError extends Error {}
 
-/** Asks for `url` (as lines, in the apps), giving up after a while or once `signal` aborts. */
-export async function request(url: string, signal: AbortSignal, init: RequestInit = {}): Promise<Response> {
+/**
+ * Asks for `url` (as lines, in the apps), giving up once `signal` aborts, or after `timeout` ms,
+ * the answer's body read or not.
+ */
+export async function request(url: string, signal: AbortSignal, init: RequestInit = {}, timeout = TIMEOUT): Promise<Response> {
   const fetch = await webFetch();
   const headers = { ...(init.headers as Record<string, string>), ...(isTauri && { "user-agent": CLIENT }) };
-  return fetch(url, { ...init, headers, signal: withTimeout(signal, TIMEOUT) });
+  return fetch(url, { ...init, headers, signal: withTimeout(signal, timeout) });
 }
 
 /** What a service answers in JSON; null if it has nothing there (404). Rejects offline, or on any other error. */

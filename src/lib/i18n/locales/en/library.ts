@@ -56,6 +56,14 @@ export default {
   // A resource's menu on its shelf: makes it what its link is (a book, a video…) where a source knows it.
   "library.lookUpDetails": "Look Up Details",
   // Settings → Library → Bookmarks, and Settings → Export and Import when a bookmarks file is chosen.
+  // Any import into the Library (ImportStep.svelte): how it's going, stopping it, and taking it back.
+  "library.import.progress": "Importing… {done} of {count}",
+  "library.import.stop": "Stop",
+  "library.import.stopped": "Stopped: what was imported before is kept, and Undo takes it back.",
+  "library.import.failed": "Something went wrong partway, and it stopped. What was imported before is kept, and Undo takes it back.",
+  "library.import.undo": "Undo Import",
+  "library.import.kept": "{count, plural, one {# you’ve changed since is kept.} other {# you’ve changed since are kept.}}",
+  "library.import.unavailable": "This couldn’t be loaded. Try again after restarting lines.",
   "library.bookmarks.title": "Bookmarks",
   "library.bookmarks.note":
     "Bookmarks exported from a browser (Chrome, Edge, Firefox, Safari, Brave, Arc…) or from Pocket, Pinboard or Raindrop become resources in the Library, a note each. Nothing is looked up as they come in; each can be later, from its menu.",
@@ -71,10 +79,8 @@ export default {
   "library.bookmarks.folderTagsNote": "Each gets its folders as a tag, like #dev/rust. Either way they’re kept, as its folder property.",
   "library.bookmarks.start": "{count, plural, one {Import # Resource} other {Import # Resources}}",
   // {done} and {count}: numbers, written the language's way.
-  "library.bookmarks.importing": "Importing… {done} of {count}",
   "library.bookmarks.imported":
     "{count, plural, =0 {Nothing new to import} one {Imported # resource} other {Imported # resources}}{there, plural, =0 {} one {; # was already there} other {; # were already there}}",
-  "library.bookmarks.undo": "Undo Import",
   "library.bookmarks.undone": "{count, plural, one {Import undone: # resource removed} other {Import undone: # resources removed}}",
   "library.bookmarks.unreadable": "{name} isn’t a file of bookmarks lines can read.",
   "library.settings.links": "Links",

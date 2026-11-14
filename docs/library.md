@@ -80,7 +80,7 @@ link: https://doc.rust-lang.org/book/
 ```
 
 - **Before anything's written**, it says what will happen: how many bookmarks there are, how many are in the Library already (a note there has the same link: left out), repeated in the file (imported once) or not web pages (bookmarklets, the browser's own pages, Firefox's saved searches: left out). **Tag with their folders** (off) gives each its folders as a nested tag, `#bookmarks-bar/dev/rust`; either way its folders are kept, as its `folder`.
-- **Then it imports them**, a few hundred at a time, showing how far it's got; five thousand take a second or two. After, it says what it did ("Imported 1,234 resources; 56 were already there"), and **Undo Import** there deletes them all again, but any changed since. Closing Settings leaves them in.
+- **Then it imports them**, a few hundred at a time, showing how far it's got (Stop stops it, keeping what's imported); five thousand take a second or two. After, it says what it did ("Imported 1,234 resources; 56 were already there"), and **Undo Import** there deletes them all again, but any changed since. Closing Settings doesn't stop an import, and opening it again shows how it went, with Undo, until another is asked about.
 - **Each is dated when it was bookmarked**, created and last changed then, so Resources lists the latest bookmarked first and they don't crowd the top of your notes; `added` is that day. A file that has no dates (Safari's) keeps its order, dated as it's imported. A bookmark's tags (Firefox's, Pinboard's, Raindrop's, Pocket's) are its `#tags`, as lines writes tags (`Web Browsers` is `#web-browsers`); what a bookmark says of itself (Firefox's and Safari's descriptions) is its text.
 - **Nothing is looked up** as they come in: thousands of bookmarks would ask thousands of sites. Right-click one on its shelf → **Look Up Details**, and it's looked up as a note that's just a link is: what its link is (a book, a video, an article…), where a source knows it, keeping its `folder`, `added` and tags. Or right-click its link in another note → Add to Library, which mentions it as it is.
 - Resources are filed, not in the Inbox. They're notes like any other, so with sync on, each is a file of its own in the synced folder or bucket: the first sync after importing thousands sends thousands of small files, which takes a while (a few minutes for 5,000 to a bucket), and every device then has them.
@@ -153,6 +153,41 @@ Subscribe to blogs, sites and podcasts, and read their posts in lines.
 - Where each episode was stopped is kept on this device, a feed's episode by its post, a note's by the note, and it starts there next time; an episode's row says how much is left. Locked or quit while it plays, it's back in the player afterwards, paused where it was. Played to the end, or stopped in its last 20 seconds, it's Played (its row's menu marks it played or not; Mark as Played on the one playing puts the player away), and an `episode` note's `status` becomes `listened`: done by lines, not by you, so ⌘Z doesn't undo it. One that couldn't be played plays when Play is pressed again.
 - The system's media controls (media keys, the Mac's Now Playing) show what's playing and play, pause and skip it; previous and next go back 15 seconds and forward 30.
 - Episodes play from their feeds' addresses, over https (an `http:` one is asked for over https), as the apps' web views allow; nothing is downloaded to listen to offline yet.
+
+## From Readwise
+
+Settings → Library → Readwise brings what [Readwise](https://readwise.io) and its Reader keep into the Library: each book, article, podcast's episode and tweet you highlighted, with the highlights, and what you saved in Reader, read or not. It's [the Readwise plugin](plugins.md#lines-own-plugins)'s, and was made from Readwise's documented API, not tried against a real account yet ([limitations.md](limitations.md#library)).
+
+```markdown
+---
+type: book
+author: Herman Melville
+readwise: 1001
+---
+# Moby-Dick
+
+![Moby-Dick|240](../attachments/3f9c….jpg)
+
+#classics
+
+Read on the train, a chapter a day.
+
+## Highlights
+
+> Call me Ishmael.
+> — Location 12 · 2024-03-01 #openings
+
+The best first line there is.
+```
+
+- **The token.** Readwise gives you an access token to copy at [readwise.io/access_token](https://readwise.io/access_token). Paste it and Find: it's sent to readwise.io and nowhere else, used for this import, and not kept. The field empties once Readwise has answered, and Settings closing takes it. If Readwise doesn't take it, it says so, and the field has it to correct.
+- **Before anything's written** it says what it found: how many books, articles, episodes, videos and papers are new, with how many highlights; which notes there already get highlights they haven't got (by title); and what's left out (Readwise's supplemental books, its suggestions rather than your highlights). Import, or Cancel. With nothing new, it says so.
+- **Importing** shows how far it's got, and Stop stops it, keeping what it wrote. Closing Settings doesn't stop it, and opening it again shows where it's got to. Then it says what it did, with **Undo Import**: the notes it made are removed, but those you've changed since; the notes it added highlights to are as they were, but those you've changed since. If something goes wrong partway, it says so, and Undo Import takes back what it wrote.
+- **Each thing is a library note** of its kind, made as a link's is (its cover downloaded and kept with it, but Readwise's own picture for something without one), with nothing looked up: Readwise has said what it is. A book is a `book` (its author, and the link Readwise gives, which a Kindle book hasn't got), an article (a newsletter, a post saved from a feed, or a tweet) an `article` (author, site, published), a podcast's highlights an `episode` (its `podcast`), a PDF saved in Reader a `paper` (the file isn't downloaded), a video a `video`. Where Reader says how far you've got, that's its `status`: Archive is read (watched), opened is reading, the rest is to read. A book only in Readwise has no status: Readwise doesn't know. Readwise's id of it is kept as `readwise:`, Reader's as `reader:`. It's dated when it was saved, or first highlighted.
+- **Its highlights** are under `## Highlights` (in English in every language, as property keys are), after its tags and what you wrote about it, each a quote with where it is (a page, a Kindle location, a time into an episode) and the day it was made, linked to its own page if it has one (a tweet, a podcast's clip), its tags after; your note on it is under the quote. Tags are written as lines writes tags (`continental philosophy` is `#continental-philosophy`), as a bookmark's are. What came from Readwise is written as just that text, as everything the Library writes is: nothing in a highlight or a note on it is a heading, a list, a table, a link or a tag.
+- **Importing again** adds only what's new. Something lines has already isn't made again: it's found by its `readwise:` or `reader:` id, its link, or its kind, title and who it's by (both saying who, and not linking to different pages), so a book you added yourself is found too, and two copies of one book in Readwise (Kindle's and Apple Books') are one note. It gets the highlights it hasn't got, at its end, under `## Highlights` (added if it hasn't got it), and nothing else of it changes, not even its date. A highlight is there if a quote in the note has its words, a long one anywhere in the note, however it's been laid out since.
+- **Reader's feeds** come as OPML: in Reader, Export Feeds as OPML on your account's page, then Import OPML under [Feeds](#feeds). What's in Reader's Feed (posts not saved) isn't brought.
+- On the web too: Readwise lets web pages ask it. Reader's list is asked no more than 20 times a minute, as Readwise asks; when Readwise says to wait, it waits, and a page that fails or doesn't come is asked again a few times, a while later each time.
 
 ## Not yet
 

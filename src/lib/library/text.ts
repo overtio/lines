@@ -1,5 +1,6 @@
 import { ATTACHMENT_PATH } from "../notes/attachments";
 import { escapeMarkdown, propertyValue } from "../notes/escape";
+import { cleanTagInput, normalizeTag } from "../notes/parse";
 import { mentionOf } from "../notes/properties";
 import type { LibraryItem } from "../plugins/types";
 
@@ -171,6 +172,16 @@ export const runtime = (seconds: number | undefined) => (seconds && seconds >= 6
 
 /** Names as a property lists them: `Ada Lovelace, Charles Babbage`, each once. */
 export const names = (list: (string | undefined)[]) => [...new Set(list.map((name) => name?.trim()).filter(Boolean))].join(", ") || undefined;
+
+/**
+ * A tag another app files something under (a bookmark's, a highlight's), or a path of them (a
+ * bookmark's folders, `Dev / Rust` as `dev/rust`), as lines writes tags: `Web Browsers` as
+ * `web-browsers`. Null where nothing of it can be one (a tag of only digits).
+ */
+export function libraryTag(names: string[]): string | null {
+  const parts = names.map((name) => cleanTagInput(name.replace(/[/#]/g, " ")).replace(/-{2,}/g, "-").replace(/^-|-$/g, "")).filter(Boolean);
+  return parts.length ? normalizeTag(parts.join("/")) : null;
+}
 
 /** An item's properties, in order, leaving out those with nothing found. */
 export const known = (properties: [string, string | number | undefined][]): [string, string][] =>

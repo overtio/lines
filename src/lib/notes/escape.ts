@@ -35,6 +35,24 @@ export function escapeMarkdown(text: string): string {
   return escapeTags(escaped).replace(LINE_START, "\\$1").replace(NUMBERED, "$1\\$2");
 }
 
+/**
+ * Plain text of several lines as Markdown that reads as exactly that text (a quote, a note on it):
+ * its paragraphs, each its lines as `escapeMarkdown` keeps a line, and escaped too what only lines
+ * together make: a table's bars, and a heading's underline (`=`, `--`) under a line of text.
+ */
+export function escapeMarkdownText(text: string): string[] {
+  return text
+    .split(/\n\s*\n/)
+    .map((paragraph) =>
+      paragraph
+        .split("\n")
+        .map((line) => escapeMarkdown(line).replace(/\|/g, "\\|").replace(/^(?=[=-]+$)/, "\\"))
+        .filter(Boolean)
+        .join("\n"),
+    )
+    .filter(Boolean);
+}
+
 /** A value YAML would read as something else, or not at all: starting with its syntax, with `: ` or ` #` in it, or a word it reads as true, false or nothing. */
 const YAML_MISREADS = /^[-?:,[\]{}#&*!|>'"%@`]|: |\s#|:$|^(?:true|false|yes|no|on|off|null|~)$/i;
 

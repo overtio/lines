@@ -17,6 +17,7 @@ import picker from "./picker";
 import player from "./player";
 import plugins from "./plugins";
 import print from "./print";
+import readwise from "./readwise";
 import secrets from "./secrets";
 import settings from "./settings";
 import sheet from "./sheet";
@@ -40,6 +41,7 @@ export default {
   ...player,
   ...plugins,
   ...print,
+  ...readwise,
   ...secrets,
   ...settings,
   ...sheet,

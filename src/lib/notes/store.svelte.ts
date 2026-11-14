@@ -14,7 +14,7 @@ import type { SampleSet } from "./samples";
 import { normalizeTag, renameTagIn, renameTypeIn } from "./parse";
 import { nameOf } from "./properties";
 import { IndexedDBStorage, syncRecords, type NoteStorage } from "./storage";
-import type { Filter, Note, NoteLock, NoteMeta, WrappedKey } from "./types";
+import { type Filter, isClosed, type Note, type NoteLock, type NoteMeta, type WrappedKey } from "./types";
 import { WELCOME_NOTE } from "./welcome";
 
 export interface Entry {
@@ -59,8 +59,8 @@ async function firstNotes(): Promise<Note[]> {
   return [{ id: crypto.randomUUID(), body: WELCOME_NOTE, createdAt: now, updatedAt: now, pinned: false, trashed: false }];
 }
 
-/** A locked note that isn't open: all there is of it is its title. */
-export const isClosed = (note: Note) => !!note.locked && !note.locked.open;
+/** A locked note that isn't open (types.ts). */
+export { isClosed };
 
 /**
  * What the list knows of a note. A locked note shows its title only, open or not: its tags,

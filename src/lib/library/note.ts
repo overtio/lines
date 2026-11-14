@@ -41,15 +41,16 @@ async function coverAt(url: string, signal?: AbortSignal): Promise<Blob | undefi
 /**
  * A library note for what a source found, written the same way however it's added (a link, Add to
  * Library, a saved post): starting where its kind starts (`to read`), its cover downloaded but kept
- * only with `keep()`, once the note is written, so nothing's left over when it isn't.
+ * only with `keep()`, once the note is written, so nothing's left over when it isn't. Something
+ * brought from another app can say where it's got to instead (`status`, or null for nowhere).
  */
-export async function libraryNote(item: LibraryItem, signal?: AbortSignal): Promise<LibraryNote> {
+export async function libraryNote(item: LibraryItem, signal?: AbortSignal, { status = firstStatus(item.type) }: { status?: string | null } = {}): Promise<LibraryNote> {
   const kind = plugins.libraryKind(item.type);
   const picture = item.cover ? await coverAt(item.cover, signal) : undefined;
   const name = picture && (await attachmentNameOf(picture));
   const cover = name ? { name, width: COVER_WIDTH[kind?.cover ?? "square"] } : undefined;
   return {
-    text: libraryNoteText(item, { status: firstStatus(item.type), cover, mentions: kind?.mentions }),
+    text: libraryNoteText(item, { status: status ?? undefined, cover, mentions: kind?.mentions }),
     keep: async () => {
       if (picture && name) await putAttachment(name, picture);
     },

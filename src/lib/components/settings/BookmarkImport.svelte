@@ -1,108 +1,105 @@
 <script lang="ts">
-  // A browser's bookmarks as the Library's resources (lib/library/bookmarks.ts), in Settings: what
-  // importing them would do, before anything's written; doing it, a batch at a time; and what it
-  // did, which can be taken back while it's shown. Rows of the card it's in (Library, or Export and Import).
+  // A browser's bookmarks as the Library's resources (lib/library/bookmarks.ts), in Settings: the
+  // files to import, chosen here (Settings → Library) or in Export and Import (`files`); what
+  // importing them would do, before anything's written; then the import, and what it did
+  // (ImportStep.svelte). Rows of the card of its group.
   import { onMount, untrack } from "svelte";
   import { speak } from "../../a11y";
   import { locale, t } from "../../i18n/index.svelte";
-  import Icon from "../../icons/Icon.svelte";
-  import { type Imported, importBookmarks, libraryLinks, undoImport } from "../../library/bookmarkImport";
+  import { type BookmarksInput, libraryLinks } from "../../library/bookmarkImport";
   import { planImport, readBookmarks } from "../../library/bookmarks";
+  import { imports } from "../../library/imports.svelte";
+  import type { ImportFile } from "../../plugins/types";
   import Button from "../ui/Button.svelte";
   import Callout from "../ui/Callout.svelte";
   import FieldRow from "../ui/FieldRow.svelte";
   import Switch from "../ui/Switch.svelte";
   import CardBlock from "./CardBlock.svelte";
+  import ImportStep from "./ImportStep.svelte";
 
-  let { files, onclose }: { files: { name: string; text: string }[]; onclose: () => void } = $props();
+  let { files, onclose }: { files?: ImportFile[]; onclose?: () => void } = $props();
 
+  const ID = "bookmarks";
   const list = (names: string[]) => new Intl.ListFormat(locale, { type: "conjunction" }).format(names);
-  const number = (count: number) => count.toLocaleString(locale);
 
-  const read = $derived(files.map(({ name, text }) => ({ name, bookmarks: readBookmarks(text) })));
+  let picker = $state<HTMLInputElement>();
+  let importButton = $state<HTMLElement>();
+  let reading = $state(false);
+  /** The files chosen here, read; or those chosen in Export and Import. */
+  let chosen = $state.raw<ImportFile[] | null>(untrack(() => files) ?? null);
+
+  const read = $derived((chosen ?? []).map(({ name, text }) => ({ name, bookmarks: readBookmarks(text) })));
   const unreadable = $derived(read.filter((file) => !file.bookmarks).map((file) => file.name));
   const bookmarks = $derived(read.flatMap((file) => file.bookmarks ?? []));
   const name = $derived(list(read.filter((file) => file.bookmarks).map((file) => file.name)));
-
-  /** What importing them would do, with the library as it was when they were chosen; again as they're imported. */
-  let plan = $derived(planImport(bookmarks, untrack(libraryLinks)));
+  /** What importing them would do, with the library as it was when they were chosen; worked out again as they're imported. */
+  const plan = $derived(planImport(bookmarks, untrack(libraryLinks)));
   let folderTags = $state(false);
-  let step = $state<"asking" | "importing" | "done" | "undone">("asking");
-  let done = $state(0);
-  let imported = $state.raw<Imported | null>(null);
-  let removed = $state(0);
 
+  const found = $derived(t("library.bookmarks.found", { count: bookmarks.length, name }));
   /** What's left out, and why: each reason there are some for. */
   const leftOut = $derived((["there", "repeated", "other"] as const).flatMap((why) => (plan[why] ? [t(`library.bookmarks.${why}`, { count: plan[why] })] : [])));
-  const result = $derived(t("library.bookmarks.imported", { count: imported?.size ?? 0, there: plan.there }));
+  const lines = $derived([found, ...leftOut, ...(plan.add.length ? [] : [t("library.bookmarks.imported", { count: 0, there: plan.there })])]);
+  /** Asked about, or imported from here before (Settings closed and opened again meanwhile). */
+  const shown = $derived(bookmarks.length > 0 || (!files && imports.state?.id === ID));
 
   onMount(() => {
-    if (bookmarks.length) speak(t("library.bookmarks.found", { count: bookmarks.length, name }));
+    if (files) {
+      imports.clear(ID);
+      if (bookmarks.length) speak(found);
+    }
   });
 
-  async function start() {
-    plan = planImport(bookmarks, libraryLinks());
-    step = "importing";
-    done = 0;
-    imported = await importBookmarks(plan.add, { folderTags }, (count) => (done = count));
-    step = "done";
-    speak(result);
+  async function bookmarksChosen() {
+    const picked = [...(picker?.files ?? [])];
+    if (picker) picker.value = "";
+    if (!picked.length) return;
+    reading = true;
+    imports.clear(ID);
+    chosen = await Promise.all(picked.map(async (file) => ({ name: file.name, text: await file.text() })));
+    reading = false;
+    if (bookmarks.length) speak(found);
   }
 
-  async function undo() {
-    if (!imported) return;
-    removed = await undoImport(imported);
-    imported = null;
-    step = "undone";
-    speak(t("library.bookmarks.undone", { count: removed }));
+  function close() {
+    chosen = null;
+    imports.clear(ID);
+    if (onclose) onclose();
+    else importButton?.focus();
   }
 
-  const focus = (element: HTMLElement) => element.focus();
+  const input = (): BookmarksInput => ({ bookmarks: $state.snapshot(bookmarks), folderTags });
 </script>
 
+{#if !files}
+  <CardBlock class="items-start">
+    <Button icon="import" busy={reading} disabled={reading} onclick={() => picker?.click()} {@attach (button: HTMLElement) => void (importButton = button)}>
+      {reading ? t("library.bookmarks.reading") : t("library.bookmarks.import")}
+    </Button>
+    <input bind:this={picker} type="file" multiple accept=".html,.htm,.json,text/html,application/json" class="hidden" onchange={bookmarksChosen} />
+  </CardBlock>
+{/if}
 {#if unreadable.length}
   <CardBlock>
     <Callout tone="danger" class="w-full">{t("library.bookmarks.unreadable", { name: list(unreadable) })}</Callout>
   </CardBlock>
 {/if}
-{#if bookmarks.length}
-  {#if step === "asking"}
-    <CardBlock>
-      <div class="flex flex-col gap-1">
-        <p class="m-0 text-sm leading-normal text-fg">{t("library.bookmarks.found", { count: bookmarks.length, name })}</p>
-        {#each leftOut as line (line)}
-          <p class="m-0 text-xs leading-normal text-muted">{line}</p>
-        {/each}
-      </div>
-    </CardBlock>
-    {#if plan.add.length}
-      <FieldRow label={t("library.bookmarks.folderTags")} note={t("library.bookmarks.folderTagsNote")}>
-        <Switch label={t("library.bookmarks.folderTags")} checked={folderTags} onchange={(on) => (folderTags = on)} />
-      </FieldRow>
-    {/if}
-    <CardBlock class="flex-row flex-wrap items-center gap-1.5">
-      {#if plan.add.length}
-        <Button variant="primary" icon="import" onclick={start} {@attach focus}>{t("library.bookmarks.start", { count: plan.add.length })}</Button>
-      {:else}
-        <p class="m-0 mr-auto text-sm leading-normal text-muted">{result}</p>
-      {/if}
-      <Button variant="quiet" onclick={onclose} {@attach (button: HTMLElement) => void (plan.add.length || button.focus())}>{t("settings.cancel")}</Button>
-    </CardBlock>
-  {:else if step === "importing"}
-    <CardBlock class="gap-1.5 outline-none" role="status" tabindex={-1} {@attach focus}>
-      <progress class="w-full accent-accent" max={plan.add.length} value={done} aria-label={t("library.bookmarks.importing", { done: number(done), count: number(plan.add.length) })}></progress>
-      <p class="m-0 text-xs leading-normal text-muted">{t("library.bookmarks.importing", { done: number(done), count: number(plan.add.length) })}</p>
-    </CardBlock>
-  {:else}
-    <!-- Taken back, focus is here, where Undo was. -->
-    <CardBlock class="flex-row flex-wrap items-center gap-x-2 gap-y-1.5 outline-none" tabindex={-1} {@attach (block: HTMLElement) => void (step === "undone" && block.focus())}>
-      <p class="m-0 flex min-w-0 flex-1 items-center gap-2 text-sm leading-normal text-muted" role="status">
-        <Icon name="check" size={15} class="shrink-0 text-success" />
-        {step === "done" ? result : t("library.bookmarks.undone", { count: removed })}
-      </p>
-      {#if step === "done"}
-        <Button variant="quiet" class="-my-1" onclick={undo} {@attach focus}>{t("library.bookmarks.undo")}</Button>
-      {/if}
-    </CardBlock>
-  {/if}
+{#if shown}
+  {#key chosen}
+    <ImportStep
+      id={ID}
+      {lines}
+      action={plan.add.length ? t("library.bookmarks.start", { count: plan.add.length }) : undefined}
+      onimport={() => imports.start(ID, input())}
+      oncancel={close}
+      result={(done) => t("library.bookmarks.imported", { count: done.added, there: plan.there })}
+      undone={(undone) => t("library.bookmarks.undone", { count: undone.removed })}
+    >
+      {#snippet options()}
+        <FieldRow label={t("library.bookmarks.folderTags")} note={t("library.bookmarks.folderTagsNote")}>
+          <Switch label={t("library.bookmarks.folderTags")} checked={folderTags} onchange={(on) => (folderTags = on)} />
+        </FieldRow>
+      {/snippet}
+    </ImportStep>
+  {/key}
 {/if}

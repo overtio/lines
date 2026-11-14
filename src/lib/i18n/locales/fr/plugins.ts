@@ -147,6 +147,8 @@ export default {
   "plugins.feeds.description":
     "Abonnez-vous aux flux des sites et des podcasts, et lisez leurs articles dans les Flux de la Bibliothèque. Une nouvelle note qui n’est que le lien d’un flux vous y abonne. Les notes d’épisodes ont un bouton pour les lire. Les flux sont téléchargés depuis leurs sites, dans les apps toutes les 30 minutes.",
   "plugins.hackerNews.description": "Affiche les commentaires d’un article de Hacker News sous sa publication dans les Flux de la Bibliothèque, en fils de discussion, à lire. Son identifiant est envoyé à l’API de Hacker News et à la copie d’Algolia.",
+  "plugins.readwise.description":
+    "Importe dans la Bibliothèque vos surlignages de Readwise et ce que vous avez enregistré dans Reader, depuis Réglages → Bibliothèque. Utilise un jeton d’accès de Readwise, envoyé uniquement à Readwise et non conservé.",
   "plugins.code": "Code",
   "plugins.code.description": "Des notes qui sont des fichiers de code, dans l’un des quelque 120 langages de programmation : numéros de ligne, police à chasse fixe et coloration aux couleurs du thème, avec indentation et crochets comme dans un éditeur de code. Elles se téléchargent et s’exportent comme des fichiers de leur langage (.py, .ts, .rs…).",
   "plugins.typing": "Dactylographie",

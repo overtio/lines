@@ -1,0 +1,133 @@
+{
+  "new": {
+    "count": 1,
+    "nextPageCursor": null,
+    "results": [
+      {
+        "id": "01readernew",
+        "url": "https://read.readwise.io/new/read/01readernew",
+        "source_url": "https://example.com/blog/notes-that-last",
+        "title": "Notes That Last",
+        "author": "Sam Writer",
+        "source": "Reader add from import URL",
+        "category": "article",
+        "location": "new",
+        "tags": {},
+        "site_name": "Example Blog",
+        "word_count": 1200,
+        "reading_time": "5 mins",
+        "created_at": "2026-10-01T10:00:00.000000+00:00",
+        "updated_at": "2026-10-01T10:00:05.000000+00:00",
+        "published_date": "2026-09-30",
+        "notes": "",
+        "summary": "How to write notes you’ll read again.",
+        "image_url": "https://example.com/images/notes.png",
+        "parent_id": null,
+        "reading_progress": 0,
+        "first_opened_at": null,
+        "last_opened_at": null,
+        "saved_at": "2026-10-01T10:00:00.000000+00:00",
+        "last_moved_at": "2026-10-01T10:00:00.000000+00:00"
+      }
+    ]
+  },
+  "later": {
+    "count": 2,
+    "nextPageCursor": "later2",
+    "results": [
+      {
+        "id": "01readerarticle",
+        "url": "https://read.readwise.io/later/read/01readerarticle",
+        "source_url": "https://example.com/on-gardens",
+        "title": "On Gardens",
+        "author": "Ada Example",
+        "source": "Reader add from import URL",
+        "category": "article",
+        "location": "later",
+        "tags": { "gardening": { "name": "gardening", "type": "manual", "created": 1714521600000 } },
+        "site_name": "Example Gardens",
+        "word_count": 2400,
+        "reading_time": "10 mins",
+        "created_at": "2026-05-02T08:00:00.000000+00:00",
+        "updated_at": "2026-05-03T09:00:00.000000+00:00",
+        "published_date": "2026-05-01",
+        "notes": "Send to Mum.",
+        "summary": "Why a garden is never finished.",
+        "image_url": "https://example.com/images/garden.jpg",
+        "parent_id": null,
+        "reading_progress": 0.4,
+        "first_opened_at": "2026-05-03T08:50:00.000000+00:00",
+        "last_opened_at": "2026-05-03T09:00:00.000000+00:00",
+        "saved_at": "2026-05-02T08:00:00.000000+00:00",
+        "last_moved_at": "2026-05-02T08:00:00.000000+00:00"
+      }
+    ]
+  },
+  "later:later2": {
+    "count": 2,
+    "nextPageCursor": null,
+    "results": [
+      {
+        "id": "01readerhighlight",
+        "url": "https://read.readwise.io/read/01readerhighlight",
+        "source_url": "https://example.com/on-gardens",
+        "title": null,
+        "author": null,
+        "category": "highlight",
+        "location": "later",
+        "tags": {},
+        "content": "Weeds are plants in the wrong place",
+        "notes": "Try this in spring.",
+        "parent_id": "01readerarticle",
+        "reading_progress": 0,
+        "saved_at": "2026-05-03T09:00:00.000000+00:00",
+        "updated_at": "2026-05-03T09:00:00.000000+00:00"
+      }
+    ]
+  },
+  "shortlist": { "count": 0, "nextPageCursor": null, "results": [] },
+  "archive": {
+    "count": 2,
+    "nextPageCursor": null,
+    "results": [
+      {
+        "id": "01readerpdf",
+        "url": "https://read.readwise.io/archive/read/01readerpdf",
+        "source_url": "https://example.org/papers/attention-and-reading.pdf",
+        "title": "Attention and Reading",
+        "author": "A. Researcher, B. Scholar",
+        "category": "pdf",
+        "location": "archive",
+        "tags": {},
+        "site_name": "example.org",
+        "published_date": 1714521600000,
+        "notes": "",
+        "summary": "",
+        "image_url": "https://readwise-assets.s3.amazonaws.com/static/images/pdf_cover.png",
+        "parent_id": null,
+        "reading_progress": 1,
+        "saved_at": "2026-04-20T12:00:00.000000+00:00",
+        "updated_at": "2026-04-28T12:00:00.000000+00:00"
+      },
+      {
+        "id": "01readervideo",
+        "url": "https://read.readwise.io/archive/read/01readervideo",
+        "source_url": "https://www.youtube.com/watch?v=example0001",
+        "title": "How Books Are Bound",
+        "author": "Example Bindery",
+        "category": "video",
+        "location": "archive",
+        "tags": {},
+        "site_name": "YouTube",
+        "published_date": "2025-11-11",
+        "notes": "",
+        "summary": "A bookbinder shows each step.",
+        "image_url": "https://i.ytimg.com/vi/example0001/hqdefault.jpg",
+        "parent_id": null,
+        "reading_progress": 0,
+        "saved_at": "2026-01-15T12:00:00.000000+00:00",
+        "updated_at": "2026-01-16T12:00:00.000000+00:00"
+      }
+    ]
+  }
+}

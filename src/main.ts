@@ -16,6 +16,7 @@ import Settings from "./lib/components/settings/Settings.svelte";
 import LockedNote from "./lib/components/LockedNote.svelte";
 import LockScreen from "./lib/components/LockScreen.svelte";
 import { feeds } from "./lib/feeds/feeds.svelte";
+import { imports } from "./lib/library/imports.svelte";
 import { player } from "./lib/player/player.svelte";
 import { lock } from "./lib/lock/lock.svelte";
 import { arrived, removeUnusedAttachments } from "./lib/notes/attachments";
@@ -152,7 +153,7 @@ async function start() {
     if (lock.enabled) watchActivity();
   } else if (isSettingsWindow) {
     ui.settings = initialSection();
-    const synced = forwardToMain({ sync, lock, lockedNotes, notes, feeds }, sync, (state) => {
+    const synced = forwardToMain({ sync, lock, lockedNotes, notes, feeds, imports }, sync, (state) => {
       lock.settings = state.lock;
       noteKeys.settings = state.noteKeys;
     });
@@ -185,7 +186,7 @@ async function start() {
   // Settings, in its own window, asks this one to sync, lock and add notes.
   if (isTauri) {
     serveSettings(
-      { sync, lock, lockedNotes, notes, feeds },
+      { sync, lock, lockedNotes, notes, feeds, imports },
       () => ({
         config: sync.config,
         status: sync.status,
