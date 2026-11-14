@@ -113,7 +113,8 @@ export function drawScore(score: Score, scale: Scale, mark: IconName): HTMLEleme
     const meter = document.createElement("span");
     meter.className = "cm-lp-score-meter";
     meter.style.setProperty("--filled", `${(score.score / score.of) * 100}%`);
-    el.append(String(score.score), of, meter);
+    // The bar first, so bars of ratings under each other line up whatever their numbers.
+    el.append(meter, String(score.score), of);
   } else if (scale.kind === "labels" && !scale.icons) {
     // A word, which a click offers the others of (ratings.ts).
     el.className = "cm-lp-score cm-lp-score-label";
