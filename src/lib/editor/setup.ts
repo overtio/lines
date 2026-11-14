@@ -438,9 +438,9 @@ export const steadyScroller: Extension = [
 ];
 
 /**
- * The editor of a note's properties drawn apart from its text (propertiesApart.ts), from the note's
- * own `note`: a Markdown note's, its settings too, but none of what's the note's alone, its history,
- * marks in its margin and find bar, which stay in the note's editor.
+ * The editor of a note's properties drawn apart from its text (propertiesApart.ts): a Markdown
+ * note's, with the settings of the note's own (its state, `note`), but none of what's the note's
+ * alone: its history, the marks in its margin and its find bar.
  */
 export function propertiesEditing(note: EditorState): Extension[] {
   return [
