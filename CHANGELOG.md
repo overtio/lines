@@ -2,6 +2,50 @@
 
 What changed in each release of lines. Written by `bun scripts/release.mjs prepare` from the commits since the release before (docs/releasing.md).
 
+## [0.5.0](https://github.com/overtio/lines/compare/v0.4.2...v0.5.0) (2026-11-14)
+
+### Features
+
+- **feeds:** read JSON Feed, and subscribe to one a site's page names ([#353](https://github.com/overtio/lines/pull/353))
+- **editor:** show a note's properties on the left, right or bottom (Settings → Layout) ([#341](https://github.com/overtio/lines/pull/341))
+- **feeds:** an RSS or Atom feed shows its site's icon, as a podcast shows its artwork ([#338](https://github.com/overtio/lines/pull/338))
+- **player:** take notes while listening, with times that play the episode from there ([#327](https://github.com/overtio/lines/pull/327))
+- **library:** keep a book's PDF or EPUB with its note, read it there, and keep quotes from it ([#329](https://github.com/overtio/lines/pull/329))
+- **library:** move from Readwise: highlights and what was saved in Reader, as library notes ([#323](https://github.com/overtio/lines/pull/323))
+- **plugins:** play Spotify and SoundCloud links in notes, and look SoundCloud up for the Library ([#324](https://github.com/overtio/lines/pull/324))
+- **feeds:** read a Hacker News story's discussion under its post, threaded ([#326](https://github.com/overtio/lines/pull/326))
+- **library:** import bookmarks from any browser as resources in the Library ([#325](https://github.com/overtio/lines/pull/325))
+- **feeds:** RSS, Atom and podcast feeds each a row of the Library, or together as you choose ([#322](https://github.com/overtio/lines/pull/322))
+- **feeds:** a blog's or podcast's site becomes a subscription to its feed ([#320](https://github.com/overtio/lines/pull/320))
+- **player:** play podcast episodes in lines, each from where you stopped it ([#317](https://github.com/overtio/lines/pull/317))
+- **feeds:** subscribe to blogs and podcasts, and read their posts in the Library ([#315](https://github.com/overtio/lines/pull/315))
+- **library:** add to the Library by searching the catalogs, or from a link in any note ([#314](https://github.com/overtio/lines/pull/314))
+- **library:** books, movies and music as notes, filled in from a link and kept in a Library ([#312](https://github.com/overtio/lines/pull/312))
+- **settings:** a font of its own for headings, bold, italics, code and other formatting ([#316](https://github.com/overtio/lines/pull/316))
+- **settings:** choose any font installed on your device, and font size in a group of its own ([#313](https://github.com/overtio/lines/pull/313))
+- **settings:** symbols are font ligatures, under Typography ([#311](https://github.com/overtio/lines/pull/311))
+- **themes:** palettes of your own, and choosing which color each part of lines is drawn in ([#309](https://github.com/overtio/lines/pull/309))
+- **themes:** a color for each heading level, bold, italics, links and other formatting ([#308](https://github.com/overtio/lines/pull/308))
+- **themes:** themes are a palette of colors and what each is used for ([#307](https://github.com/overtio/lines/pull/307))
+- **settings:** a color picker of lines' own, showing the theme's colors ([#305](https://github.com/overtio/lines/pull/305))
+
+### Fixes
+
+- **library:** one note of each thing, however it's added, and covers that always show ([#339](https://github.com/overtio/lines/pull/339))
+- **editor:** opening a note, its text isn't pushed down by its pictures or sideways by a scroll bar ([#340](https://github.com/overtio/lines/pull/340))
+- **editor:** Hidden Markdown hides a note's properties' --- lines and colons too ([#336](https://github.com/overtio/lines/pull/336))
+- **feeds:** a discussion's comments can be selected and copied ([#337](https://github.com/overtio/lines/pull/337))
+- **editor:** a time like 4:47:43 isn't colored as an emoji shortcode ([#335](https://github.com/overtio/lines/pull/335))
+- **calendar:** dragging one of a note's two times under one key moves that one, not the other ([#331](https://github.com/overtio/lines/pull/331))
+- **sync:** a large attachment syncs through a bucket in the apps without running out of memory ([#333](https://github.com/overtio/lines/pull/333))
+- **tests:** the browser tests and QA pictures make no sound ([#334](https://github.com/overtio/lines/pull/334))
+- **settings:** search results for your own themes' settings lead to Make a Copy, not nowhere ([#332](https://github.com/overtio/lines/pull/332))
+- **sync:** a code note's conflicted copy is marked in a comment, never on a line of its code ([#330](https://github.com/overtio/lines/pull/330))
+- **feeds:** a post that says only "Comments" has no excerpt in the list ([#328](https://github.com/overtio/lines/pull/328))
+- **feeds:** a post links to its source and comments, and says what a bare link's page says ([#321](https://github.com/overtio/lines/pull/321))
+- **settings:** the font pickers open and scroll without stalling ([#319](https://github.com/overtio/lines/pull/319))
+- **editor:** tags, mentions and short links sit alike in every font ([#318](https://github.com/overtio/lines/pull/318))
+
 ## [0.4.2](https://github.com/overtio/lines/compare/v0.4.1...v0.4.2) (2026-11-12)
 
 ### Fixes
